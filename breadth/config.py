@@ -16,6 +16,7 @@ BREADTH_FILE = DATA_DIR / "breadth.csv"      # full breadth history, one row per
 UNIVERSE_FILE = DATA_DIR / "universe.csv"    # common-stock ticker list
 SPLITS_FILE = DATA_DIR / "splits.csv"        # split history used to adjust stored raw bars
 REF_NAMES_FILE = DATA_DIR / "ref_names.csv"  # names/types for ETFs and ADRs
+SUBTHEMES_FILE = DATA_DIR / "subthemes.csv"  # one peer-group sub-theme per stock
 THEMES_FILE = DATA_DIR / "themes.csv"        # your theme lists (edit freely)
 STATE_FILE = DATA_DIR / "state.json"         # bookkeeping (split checks, universe refresh)
 
@@ -36,7 +37,7 @@ EXTRA_RETRY_DAYS = 7          # retry tickers that returned no data after this m
 # ---- Storage ---------------------------------------------------------------
 # Longest lookback is 65 trading days (quarter); keep extra so recent history
 # can be recomputed after split adjustments.
-KEEP_TRADING_DAYS = 160
+KEEP_TRADING_DAYS = 260    # ~1 year: enough for 180-day returns plus EMAs
 
 # ---- Universe filters ------------------------------------------------------
 MIN_PRICE = 3.0              # close must be at least this

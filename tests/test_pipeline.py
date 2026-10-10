@@ -155,6 +155,7 @@ def test_end_to_end(tmp_path=None):
     config.SPLITS_FILE = config.DATA_DIR / "splits.csv"
     config.STATE_FILE = config.DATA_DIR / "state.json"
     config.THEMES_FILE = config.DATA_DIR / "themes.csv"
+    config.SUBTHEMES_FILE = config.DATA_DIR / "subthemes.csv"
     config.REF_NAMES_FILE = config.DATA_DIR / "ref_names.csv"
     config.BENCHMARK = "NOTRADED"
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -169,6 +170,8 @@ def test_end_to_end(tmp_path=None):
     rows = ["theme,ticker,role", "Alpha,SPYETF,etf"] + [f"Alpha,T{i:04d},member" for i in range(10)] \
         + [f"Beta,T{i:04d},member" for i in range(10, 25)]
     config.THEMES_FILE.write_text("\n".join(rows) + "\n")
+    config.SUBTHEMES_FILE.write_text("group,subtheme,ticker\n" + "".join(
+        f"G,{'Sub A' if i < 12 else 'Sub B'},T{i:04d}\n" for i in range(25)))
     config.BENCHMARK = "SPYETF"
     hist1 = store.load_breadth()
     assert hist1["complete"].sum() > 150
@@ -192,6 +195,8 @@ def test_end_to_end(tmp_path=None):
     T = data["themes"]
     assert T and T["counts"]["themes"] == 2 and T["counts"]["stocks"] == 25
     assert all(0 <= r["score"] <= 8 for r in T["themes"])
+    assert T["counts"]["subthemes"] == 2 and all(s_["sub"] in ("Sub A", "Sub B") for s_ in T["stocks"])
+    assert set(T["horizons"]) >= {"d60", "d90", "d180"}
     assert all(0 <= s_["setup"] <= 10 for s_ in T["stocks"])
     assert T["bench"]["ticker"] == "SPYETF" and T["themes"][0]["etf"] in (None, "SPYETF")
     assert 0 <= T["pulse"]["long"] <= 10 and 0 <= T["pulse"]["short"] <= 10

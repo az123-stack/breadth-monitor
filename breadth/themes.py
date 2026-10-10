@@ -13,6 +13,10 @@ import pandas as pd
 from . import config
 
 RS_DAYS = 63           # ~90 calendar days, as in the sheet's RS formula
+# Return horizons in trading days. Short ones feed the scores; long ones are
+# shown for context (they fill in once enough history is stored).
+HORIZONS = {"today": 1, "d3": 3, "d5": 5, "d15": 15, "d20": 20, "d30": 30, "d60": 60, "d90": 90, "d180": 180}
+SHOW = ["today", "d5", "d15", "d30", "d60", "d90", "d180"]
 HISTORY_DAYS = 30      # days of theme scores/ranks kept for movement + trails
 
 
@@ -24,11 +28,9 @@ def ticker_frames(adjusted, tickers):
     close = b.pivot(index="date", columns="ticker", values="c").sort_index().astype("float64")
     close = close.ffill(limit=3)  # bridge the odd missing print
     r = lambda n: close / close.shift(n) - 1
-    f = {
-        "close": close,
-        "today": r(1), "d3": r(3), "d5": r(5), "d15": r(15), "d20": r(20), "d30": r(30),
-        "rs": (close / close.shift(RS_DAYS) - 1) * 100,
-    }
+    f = {"close": close, "rs": (close / close.shift(RS_DAYS) - 1) * 100}
+    for k, n in HORIZONS.items():
+        f[k] = r(n)
     # Sheet: 5D Score = (Today*2 + 1D*1 + 3D*1 + 5D*2)/6 ; 1D == Today here.
     f["st"] = (f["today"] * 3 + f["d3"] + f["d5"] * 2) / 6
     # Sheet: LT Score = (1D + 3D + 5D*2 + 15D*2 + 20D*2 + 30D*3)/11
@@ -91,7 +93,7 @@ def theme_table(f, i, members):
         tick = [t for t in tick if t in f["close"].columns]
         if not tick:
             continue
-        v = {k: f[k].iloc[i][tick] for k in ("today", "d5", "d15", "d30", "rs", "lt")}
+        v = {k: f[k].iloc[i][tick] for k in SHOW + ["rs", "lt"]}
         valid = v["today"].notna()
         if not valid.any():
             continue
@@ -105,8 +107,7 @@ def theme_table(f, i, members):
             "theme": theme, "n": n, "score": score,
             "class": "STRONG" if score >= 7 else "WATCHLIST" if score >= 4 else "WEAK",
             "rotation": rotation(*(0 if pd.isna(avg[k]) else avg[k] for k in ("today", "d5", "d15", "d30"))),
-            "today": avg["today"], "d5": avg["d5"], "d15": avg["d15"], "d30": avg["d30"],
-            "rs": avg["rs"], "lt": avg["lt"], "st_b": st_b, "lt_b": lt_b,
+            **{k: avg[k] for k in SHOW}, "rs": avg["rs"], "lt": avg["lt"], "st_b": st_b, "lt_b": lt_b,
             "st_label": breadth_label(st_b), "lt_label": breadth_label(lt_b),
         })
     t = pd.DataFrame(rows)
@@ -182,7 +183,7 @@ def _r(v, nd=4):
     return round(float(v), nd)
 
 
-def build(adjusted, themes_df, universe, names=None, missing=()):
+def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=None):
     if themes_df is None or themes_df.empty or adjusted.empty:
         return None
     names = names or {}
@@ -193,6 +194,8 @@ def build(adjusted, themes_df, universe, names=None, missing=()):
         members[theme] = m or e          # ETF-only themes (e.g. Gold) score their ETFs
         etfs[theme] = e
     all_t = set(themes_df["ticker"]) | {config.BENCHMARK}
+    if subthemes_df is not None and not subthemes_df.empty:
+        all_t |= set(subthemes_df["ticker"])
     f = ticker_frames(adjusted, all_t)
     dates = f["close"].index
     if len(dates) < RS_DAYS + 2:
@@ -200,49 +203,65 @@ def build(adjusted, themes_df, universe, names=None, missing=()):
     last = len(dates) - 1
     first_hist = max(RS_DAYS, last - HISTORY_DAYS + 1)
 
-    # theme tables + pulse for each recent day (ranks, trails, pulse history)
-    tables = {}
-    for i in range(first_hist, last + 1):
-        t = theme_table(f, i, members)
-        if not t.empty:
-            tables[i] = t
-    now = tables[last]
-    hist_idx = sorted(tables)
-
-    def rank_at(i):
-        return dict(zip(tables[i]["theme"], tables[i]["rank"])) if i in tables else {}
-
-    def ago(n):
-        j = last - n
-        return rank_at(j) if j >= first_hist else {}
-
-    r1, r3, r4, r5, r10 = ago(1), ago(3), ago(4), ago(5), ago(10)
     bench = config.BENCHMARK if config.BENCHMARK in f["close"].columns else None
     bret = {k: (float(f[k].iloc[last][bench]) if bench and not pd.isna(f[k].iloc[last][bench]) else None)
-            for k in ("today", "d5", "d15", "d30")}
+            for k in SHOW}
 
-    score_hist = {i: {k: int(v) for k, v in zip(tables[i]["theme"], tables[i]["score"])} for i in hist_idx}
-    theme_rows = []
-    for row in now.to_dict("records"):
-        th = row["theme"]
-        etf = next((e for e in etfs[th] if e in f["close"].columns and not pd.isna(f["d5"].iloc[last].get(e))), None)
-        trail = [score_hist[i].get(th) for i in hist_idx]
-        delta = lambda prev: int(prev[th] - row["rank"]) if prev.get(th) is not None else None
-        theme_rows.append({
-            "theme": th, "rank": int(row["rank"]), "score": int(row["score"]), "class": row["class"],
-            "rotation": row["rotation"], "n": int(row["n"]),
-            "today": _r(row["today"]), "d5": _r(row["d5"]), "d15": _r(row["d15"]), "d30": _r(row["d30"]),
-            "rs": _r(row["rs"], 2), "lt": _r(row["lt"]), "st_b": _r(row["st_b"], 3), "lt_b": _r(row["lt_b"], 3),
-            "st_label": row["st_label"], "lt_label": row["lt_label"],
-            "vs_d5": _r(row["d5"] - bret["d5"]) if bret["d5"] is not None else None,
-            "vs_d30": _r(row["d30"] - bret["d30"]) if bret["d30"] is not None else None,
-            "mv1": delta(r1), "mv3": delta(r3), "mv5": delta(r5), "mv10": delta(r10),
-            "r_m4": r4.get(th), "r_m9": ago(9).get(th),
-            "etf": etf, "etf_d5": _r(f["d5"].iloc[last][etf]) if etf else None,
-            "etf_d30": _r(f["d30"].iloc[last][etf]) if etf else None,
-            "trail": trail, "members": [t for t in members[th] if t in f["close"].columns],
-        })
+    def ranked(members_map, etfs_map, extra=None):
+        """Score + rank every group for each recent day; rows for the latest day."""
+        tables = {}
+        for i in range(first_hist, last + 1):
+            t = theme_table(f, i, members_map)
+            if not t.empty:
+                tables[i] = t
+        hist_idx = sorted(tables)
+        now = tables[last]
+        rank_at = {i: dict(zip(tables[i]["theme"], tables[i]["rank"])) for i in hist_idx}
+        score_hist = {i: dict(zip(tables[i]["theme"], tables[i]["score"])) for i in hist_idx}
+        ago = lambda n: rank_at.get(last - n, {})
+        r1, r3, r4, r5, r10 = ago(1), ago(3), ago(4), ago(5), ago(10)
+        rows = []
+        for row in now.to_dict("records"):
+            th = row["theme"]
+            etf = next((e for e in etfs_map.get(th, []) if e in f["close"].columns
+                        and not pd.isna(f["d5"].iloc[last].get(e))), None)
+            delta = lambda prev: int(prev[th] - row["rank"]) if prev.get(th) is not None else None
+            rows.append({
+                "theme": th, "rank": int(row["rank"]), "score": int(row["score"]), "class": row["class"],
+                "rotation": row["rotation"], "n": int(row["n"]),
+                **{k: _r(row[k]) for k in SHOW},
+                "rs": _r(row["rs"], 2), "lt": _r(row["lt"]), "st_b": _r(row["st_b"], 3), "lt_b": _r(row["lt_b"], 3),
+                "st_label": row["st_label"], "lt_label": row["lt_label"],
+                **{f"vs_{k}": (_r(row[k] - bret[k]) if bret[k] is not None and not pd.isna(row[k]) else None)
+                   for k in ("d5", "d30", "d90")},
+                "mv1": delta(r1), "mv3": delta(r3), "mv5": delta(r5), "mv10": delta(r10), "r_m4": r4.get(th),
+                "etf": etf, **{f"etf_{k}": (_r(f[k].iloc[last][etf]) if etf else None) for k in ("d5", "d30")},
+                "trail": [None if score_hist[i].get(th) is None else int(score_hist[i][th]) for i in hist_idx],
+                "members": [t for t in members_map[th] if t in f["close"].columns],
+                **(extra(th) if extra else {}),
+            })
+        return rows, now, tables, hist_idx
+
+    theme_rows, now, tables, hist_idx = ranked(members, etfs)
     score_of = dict(zip(now["theme"], now["score"]))
+
+    # sub-themes: one peer group per stock (data/subthemes.csv)
+    sub_rows, sub_of, group_of = [], {}, {}
+    if subthemes_df is not None and not subthemes_df.empty:
+        sub_members = {}
+        for r in subthemes_df.itertuples():
+            sub_members.setdefault(r.subtheme, []).append(r.ticker)
+            sub_of[r.ticker] = r.subtheme
+            group_of[r.subtheme] = r.group
+        # a sub-theme's "themes" = the themes its stocks belong to
+        th_of = {}
+        for th, tick in members.items():
+            for t in tick:
+                th_of.setdefault(t, set()).add(th)
+        extra = lambda st: {"group": group_of.get(st, ""),
+                            "parents": sorted({x for t in sub_members[st] for x in th_of.get(t, ())})}
+        sub_rows, _, _, _ = ranked(sub_members, {}, extra)
+    sub_score = {r["theme"]: r["score"] for r in sub_rows}
 
     # stocks: unique members, scored with their strongest theme
     stock_themes = {}
@@ -250,22 +269,22 @@ def build(adjusted, themes_df, universe, names=None, missing=()):
         for t in tick:
             stock_themes.setdefault(t, []).append(th)
     cols = f["close"].columns
-    # RS rank across unique tickers today and 5/10 days ago
     def rs_rank(i):
         s = f["rs"].iloc[i][[t for t in stock_themes if t in cols]].dropna().sort_values(ascending=False)
         return {t: k + 1 for k, t in enumerate(s.index)}
-    rk_now, rk5, rk10 = rs_rank(last), rs_rank(last - 5), rs_rank(last - 10)
-    rk4 = rs_rank(last - 4)
+    rk_now, rk5, rk10, rk4 = rs_rank(last), rs_rank(last - 5), rs_rank(last - 10), rs_rank(last - 4)
     stocks = []
     for t, ths in stock_themes.items():
         if t not in cols or pd.isna(f["today"].iloc[last][t]):
             continue
-        s = {k: f[k].iloc[last][t] for k in ("today", "d3", "d5", "d15", "d20", "d30", "rs", "st", "lt", "e8", "e21", "e50")}
+        s = {k: f[k].iloc[last][t] for k in list(HORIZONS) + ["rs", "st", "lt", "e8", "e21", "e50"]}
         ths_sorted = sorted(ths, key=lambda x: -score_of.get(x, -1))
         best = score_of.get(ths_sorted[0], 0)
         pts = setup_score(best, s)
+        sub = sub_of.get(t)
         stocks.append({
             "t": t, "name": names.get(t, ""), "themes": ths_sorted, "tscore": int(best),
+            "sub": sub, "group": group_of.get(sub, "") if sub else "", "sscore": sub_score.get(sub),
             "setup": pts, "tier": tier(pts), "price": _r(f["close"].iloc[last][t], 2),
             **{k: _r(v, 2 if k == "rs" else 4) for k, v in s.items()},
             "rk": rk_now.get(t), "rk5": int(rk5[t] - rk_now[t]) if t in rk5 and t in rk_now else None,
@@ -276,7 +295,8 @@ def build(adjusted, themes_df, universe, names=None, missing=()):
     stocks.sort(key=lambda r: (-r["setup"], -(r["rs"] or -1e9)))
 
     # Live layer: for a new session N, an N-day return = live / close[last+1-N] - 1
-    offs = {"c1": 0, "c3": 2, "c5": 4, "c15": 14, "c20": 19, "c30": 29, "c63": RS_DAYS - 1}
+    offs = {"c1": 0, "c3": 2, "c5": 4, "c15": 14, "c20": 19, "c30": 29, "c63": RS_DAYS - 1,
+            "c60": 59, "c90": 89, "c180": 179}
     refs = {}
     for t in cols:
         if pd.isna(f["close"].iloc[last][t]):
@@ -290,9 +310,9 @@ def build(adjusted, themes_df, universe, names=None, missing=()):
         "trail_dates": [dates[i].strftime("%Y-%m-%d") for i in hist_idx],
         "pulse": pulse(now), "pulse_hist": pulse_hist,
         "bench": {"ticker": bench, **{k: _r(v) for k, v in bret.items()}},
-        "themes": theme_rows, "stocks": stocks,
+        "themes": theme_rows, "subthemes": sub_rows, "stocks": stocks, "horizons": SHOW,
         "refs": refs, "ref_keys": list(offs) + ["ema8", "ema21", "ema50"],
         "theme_etfs": {th: e for th, e in etfs.items()},
         "missing": [m for m in missing if m in all_t],
-        "counts": {"themes": len(theme_rows), "stocks": len(stocks)},
+        "counts": {"themes": len(theme_rows), "subthemes": len(sub_rows), "stocks": len(stocks)},
     }

@@ -11,6 +11,10 @@ on:
         description: "Calendar days of history to load (first run: 730). Leave 0 for a normal update."
         required: false
         default: "0"
+      extend_history:
+        description: "Refetch older history for long-term returns (one-off, ~70 min)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -37,9 +41,12 @@ jobs:
         env:
           MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
           BACKFILL_DAYS: ${{ github.event.inputs.backfill_days || '0' }}
+          EXTEND: ${{ github.event.inputs.extend_history || 'false' }}
         run: |
           if [ "$BACKFILL_DAYS" != "0" ]; then
             python -m breadth.update --backfill-days "$BACKFILL_DAYS"
+          elif [ "$EXTEND" = "true" ]; then
+            python -m breadth.update --extend-history
           else
             python -m breadth.update
           fi

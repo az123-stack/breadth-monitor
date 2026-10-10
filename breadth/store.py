@@ -159,7 +159,7 @@ def load_themes():
 
 def theme_tickers():
     t = load_themes()
-    return set(t["ticker"]) | {config.BENCHMARK}
+    return set(t["ticker"]) | set(load_subthemes()["ticker"]) | {config.BENCHMARK}
 
 
 def load_names():
@@ -176,3 +176,14 @@ def load_names():
 def save_ref_names(rows):
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).drop_duplicates("ticker").sort_values("ticker").to_csv(config.REF_NAMES_FILE, index=False)
+
+
+def load_subthemes():
+    """data/subthemes.csv -> DataFrame(group, subtheme, ticker); one row per stock."""
+    if not config.SUBTHEMES_FILE.exists():
+        return pd.DataFrame(columns=["group", "subtheme", "ticker"])
+    t = pd.read_csv(config.SUBTHEMES_FILE, dtype=str).fillna("")
+    for c in t.columns:
+        t[c] = t[c].str.strip()
+    t["ticker"] = t["ticker"].str.upper()
+    return t[t["ticker"] != ""].drop_duplicates("ticker")

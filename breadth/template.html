@@ -24,6 +24,8 @@
   --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
   --tint-strong: 34%;
   --tint-light: 14%;
+  --pos: #16a34a; --neg: #dc2626;
+  --t1: 16%; --t2: 32%; --t3: 52%;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -32,6 +34,7 @@
     --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
     --up: #3987e5; --down: #e66767; --s1: #3987e5; --s2: #d95926; --neutral-mid: #383835;
     --tint-strong: 40%; --tint-light: 18%;
+    --pos: #22c55e; --neg: #ef4444; --t1: 18%; --t2: 34%; --t3: 55%;
   }
 }
 :root[data-theme="dark"] {
@@ -40,6 +43,7 @@
   --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
   --up: #3987e5; --down: #e66767; --s1: #3987e5; --s2: #d95926; --neutral-mid: #383835;
   --tint-strong: 40%; --tint-light: 18%;
+  --pos: #22c55e; --neg: #ef4444; --t1: 18%; --t2: 34%; --t3: 55%;
 }
 * { box-sizing: border-box; }
 body {
@@ -138,6 +142,28 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .sig .t small { display: block; font-weight: 400; color: var(--text-secondary); font-size: 12.5px; margin-top: 1px; }
 .sig.minor .t { font-weight: 500; }
 @media (max-width: 520px) { .sig { grid-template-columns: 22px 1fr; } .sig .d { grid-column: 2; } .sig .t { grid-column: 2; } }
+/* ---------- green/red return fills ---------- */
+.g1 { background: color-mix(in srgb, var(--pos) var(--t1), transparent); }
+.g2 { background: color-mix(in srgb, var(--pos) var(--t2), transparent); }
+.g3 { background: color-mix(in srgb, var(--pos) var(--t3), transparent); font-weight: 600; }
+.r1 { background: color-mix(in srgb, var(--neg) var(--t1), transparent); }
+.r2 { background: color-mix(in srgb, var(--neg) var(--t2), transparent); }
+.r3 { background: color-mix(in srgb, var(--neg) var(--t3), transparent); font-weight: 600; }
+/* ---------- browse ---------- */
+.browsebar { padding: 10px 14px; margin-bottom: 10px; }
+.browsebar .filters { justify-content: flex-start; }
+.browse { display: grid; gap: 8px; }
+.bucket { overflow: hidden; }
+.bucket summary { list-style: none; display: flex; align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer; flex-wrap: wrap; }
+.bucket summary::-webkit-details-marker { display: none; }
+.bucket summary::before { content: "▸"; color: var(--text-muted); transition: transform .12s; }
+.bucket[open] summary::before { transform: rotate(90deg); }
+.bucket .bname { font-weight: 600; flex: 1 1 260px; min-width: 0; }
+.bucket .bname small { display: block; font-weight: 400; color: var(--text-muted); font-size: 12px; }
+.bucket .bret { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.bucket .bret span { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; padding: 3px 7px; border-radius: 6px; min-width: 74px; text-align: right; }
+.bucket .bret em { font-style: normal; font-family: Inter, system-ui, sans-serif; color: var(--text-muted); margin-right: 5px; font-size: 11px; }
+.bucket .bbody { border-top: 1px solid var(--grid); padding: 6px 0 4px; }
 /* ---------- tabs ---------- */
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 0 0 16px; }
 .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer; }
@@ -226,7 +252,7 @@ const TONES = {
 };
 
 let TAB = "breadth";
-try { const h = location.hash.slice(1); if (["breadth", "themes", "stocks"].includes(h)) TAB = h; } catch (e) {}
+try { const h = location.hash.slice(1); if (["breadth", "themes", "browse", "stocks"].includes(h)) TAB = h; } catch (e) {}
 
 function render() {
   const app = document.getElementById("app");
@@ -244,6 +270,7 @@ function render() {
   const tabs = $(`<nav class="tabs" role="tablist">
     <button role="tab" data-tab="breadth">Breadth</button>
     <button role="tab" data-tab="themes">Themes</button>
+    <button role="tab" data-tab="browse">Browse</button>
     <button role="tab" data-tab="stocks">Stocks</button></nav>`);
   app.append(tabs);
   const panel = $('<div class="panel"></div>');
@@ -253,6 +280,7 @@ function render() {
     panel.innerHTML = "";
     if (TAB === "themes") renderThemes(panel);
     else if (TAB === "stocks") renderStocks(panel);
+    else if (TAB === "browse") renderBrowse(panel);
     else renderBreadth(panel);
   };
   tabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
@@ -646,8 +674,10 @@ function table(rows) {
 /* =================== LIVE LAYER (Google Sheet prices) =================== */
 let LIVE = null;          // { fetched: Date, spyDate: "YYYY-MM-DD", spyTime: string, prices: {t: p} }
 let LIVE_ERR = null, LIVE_T = null, LIVE_BUSY = false;
-const UI = { themes: { cls: "All", q: "", open: new Set(), sort: ["rank", 1] },
-             stocks: { tier: "All", theme: "", q: "", limit: 100, sort: ["setup", -1] } };
+const UI = { hz: "short",
+  themes: { view: "theme", cls: "All", q: "", open: new Set(), sort: ["rank", 1] },
+  browse: { view: "theme", order: "rank", q: "", open: new Set(), all: false },
+  stocks: { tier: "All", theme: "", sub: "", q: "", limit: 100, sort: ["setup", -1] } };
 
 function parseLiveCSV(text) {
   const prices = {}; let spyTime = null;
@@ -676,7 +706,7 @@ async function fetchLive() {
     LIVE_T = liveActive() ? computeLive(DATA.themes, LIVE.prices, LIVE.spyDate) : null;
   } catch (e) { LIVE_ERR = String(e.message || e); }
   LIVE_BUSY = false;
-  if (TAB === "themes" || TAB === "stocks") rerenderPanel();
+  if (TAB === "themes" || TAB === "stocks" || TAB === "browse") rerenderPanel();
 }
 const liveActive = () => !!(LIVE && LIVE.spyDate && DATA.themes && LIVE.spyDate > DATA.themes.date);
 const getT = () => LIVE_T || DATA.themes;
@@ -688,8 +718,9 @@ function liveMetrics(T, prices) {
     const r = T.refs[t], p = prices[t], c1 = r[ix.c1];
     if (p == null || !c1) continue;
     if (Math.abs(p / c1 - 1) > 0.5) { bad.push(t); continue; }  // wrong listing or bad print
-    const ret = (k) => r[ix[k]] ? p / r[ix[k]] - 1 : null;
-    const m = { price: p, today: p / c1 - 1, d3: ret("c3"), d5: ret("c5"), d15: ret("c15"), d20: ret("c20"), d30: ret("c30") };
+    const ret = (k) => (ix[k] != null && r[ix[k]]) ? p / r[ix[k]] - 1 : null;
+    const m = { price: p, today: p / c1 - 1, d3: ret("c3"), d5: ret("c5"), d15: ret("c15"), d20: ret("c20"), d30: ret("c30"),
+                d60: ret("c60"), d90: ret("c90"), d180: ret("c180") };
     m.rs = r[ix.c63] ? (p / r[ix.c63] - 1) * 100 : null;
     const z = (v) => v ?? 0;
     m.st = (m.today * 3 + z(m.d3) + z(m.d5) * 2) / 6;
@@ -755,42 +786,51 @@ function pulseJS(rows) {
     short_label: S >= 8 ? "SHORT SIDE LIVE — strong short setup" : S >= 6 ? "LEAN SHORT — selective shorts only" : S >= 4 ? "SOME SHORT SETUPS — weak themes present" : S >= 2 ? "MOSTLY NEUTRAL — monitor for deterioration" : "NO SHORT EDGE — market too strong to short" };
 }
 
-function computeLive(T, prices, spyDate) {
-  const { M, bad } = liveMetrics(T, prices);
-  const bench = T.bench && T.bench.ticker && M[T.bench.ticker];
-  let rows = T.themes.map(th => {
+const SHOW_H = ["today", "d5", "d15", "d30", "d60", "d90", "d180"];
+function liveGroups(rows0, M, etfMap, bench) {
+  const rows = rows0.map(th => {
     const mem = th.members.filter(t => M[t]);
     if (!mem.length) return null;
     const v = (k) => mem.map(t => M[t][k]);
-    const a = { today: mean(v("today")), d5: mean(v("d5")), d15: mean(v("d15")), d30: mean(v("d30")), rs: mean(v("rs")), lt: mean(v("lt")) };
+    const a = Object.fromEntries([...SHOW_H, "rs", "lt"].map(k => [k, mean(v(k))]));
     const n = mem.length;
     const st_b = mem.filter(t => M[t].today > 0 && M[t].d5 > 0).length / n;
     const lt_b = mem.filter(t => M[t].d15 > 0 && M[t].d30 > 0).length / n;
     const sig = ["today", "d5", "d15", "d30", "rs", "lt"].filter(k => a[k] != null && a[k] > 0).length;
     const score = sig + (st_b >= 0.5 ? 1 : 0) + (lt_b >= 0.6 ? 1 : 0);
-    const etfs = (T.theme_etfs && T.theme_etfs[th.theme]) || [];
+    const etfs = (etfMap && etfMap[th.theme]) || [];
     const etf = etfs.find(e => M[e]) || th.etf;
-    return { ...th, n, score, class: score >= 7 ? "STRONG" : score >= 4 ? "WATCHLIST" : "WEAK", rotation: rotationOf(a),
-      today: a.today, d5: a.d5, d15: a.d15, d30: a.d30, rs: a.rs, lt: a.lt, st_b, lt_b, st_label: blabel(st_b), lt_label: blabel(lt_b),
-      vs_d5: bench && a.d5 != null ? a.d5 - bench.d5 : null, vs_d30: bench && a.d30 != null ? a.d30 - bench.d30 : null,
+    const vs = (k) => bench && a[k] != null && bench[k] != null ? a[k] - bench[k] : null;
+    return { ...th, ...a, n, score, class: score >= 7 ? "STRONG" : score >= 4 ? "WATCHLIST" : "WEAK", rotation: rotationOf(a),
+      st_b, lt_b, st_label: blabel(st_b), lt_label: blabel(lt_b), vs_d5: vs("d5"), vs_d30: vs("d30"), vs_d90: vs("d90"),
       etf, etf_d5: etf && M[etf] ? M[etf].d5 : null, etf_d30: etf && M[etf] ? M[etf].d30 : null,
-      trail: [...th.trail.slice(1), score], members: th.members };
+      trail: [...th.trail.slice(1), score] };
   }).filter(Boolean);
   rows.sort((x, y) => (y.score - x.score) || ((y.rs ?? -1e9) - (x.rs ?? -1e9)));
-  rows.forEach((r, i) => { r.rank = i + 1; r.mv5 = r.r_m4 != null ? r.r_m4 - r.rank : null; r.mv1 = null; });
+  rows.forEach((r, i) => { r.rank = i + 1; r.mv5 = r.r_m4 != null ? r.r_m4 - r.rank : null; });
+  return rows;
+}
+
+function computeLive(T, prices, spyDate) {
+  const { M, bad } = liveMetrics(T, prices);
+  const bench = T.bench && T.bench.ticker ? M[T.bench.ticker] : null;
+  const rows = liveGroups(T.themes, M, T.theme_etfs, bench);
+  const subs = liveGroups(T.subthemes || [], M, null, bench);
   const scoreOf = Object.fromEntries(rows.map(r => [r.theme, r.score]));
+  const subScore = Object.fromEntries(subs.map(r => [r.theme, r.score]));
   let stocks = T.stocks.filter(s => M[s.t]).map(s => {
     const m = M[s.t], ths = s.themes.slice().sort((a, b) => (scoreOf[b] ?? -1) - (scoreOf[a] ?? -1));
     const best = scoreOf[ths[0]] ?? 0, pts = setupScoreJS(best, m);
-    return { ...s, ...m, themes: ths, tscore: best, setup: pts, tier: pts >= 8 ? "A" : pts >= 5 ? "B" : "C" };
+    return { ...s, ...m, themes: ths, tscore: best, sscore: subScore[s.sub] ?? null, setup: pts, tier: pts >= 8 ? "A" : pts >= 5 ? "B" : "C" };
   });
   const byRS = stocks.filter(s => s.rs != null).sort((a, b) => b.rs - a.rs);
   byRS.forEach((s, i) => { s.rk = i + 1; s.rk5 = s.rk_m4 != null ? s.rk_m4 - s.rk : null; });
   stocks.sort((a, b) => (b.setup - a.setup) || ((b.rs ?? -1e9) - (a.rs ?? -1e9)));
   const pulse = pulseJS(rows);
-  return { ...T, date: spyDate, themes: rows, stocks, pulse,
+  return { ...T, date: spyDate, themes: rows, subthemes: subs, stocks, pulse,
     pulse_hist: [...(T.pulse_hist || []).slice(1), { date: spyDate, long: pulse.long, short: pulse.short }],
-    counts: { themes: rows.length, stocks: stocks.length }, live: { priced: Object.keys(M).length, total: Object.keys(T.refs).length, bad } };
+    counts: { themes: rows.length, subthemes: subs.length, stocks: stocks.length },
+    live: { priced: Object.keys(M).length, total: Object.keys(T.refs).length, bad } };
 }
 
 function liveBar() {
@@ -810,31 +850,39 @@ function rerenderPanel() {
   const panel = document.querySelector(".panel"); if (!panel) return;
   const y = window.scrollY; panel.innerHTML = "";
   if (TAB === "themes") renderThemes(panel); else if (TAB === "stocks") renderStocks(panel);
+  else if (TAB === "browse") renderBrowse(panel); else renderBreadth(panel);
   window.scrollTo(0, y);
 }
-setInterval(() => { if (document.visibilityState === "visible" && (TAB === "themes" || TAB === "stocks")) fetchLive(); }, 3 * 60 * 1000);
+setInterval(() => { if (document.visibilityState === "visible" && (TAB === "themes" || TAB === "stocks" || TAB === "browse")) fetchLive(); }, 3 * 60 * 1000);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && LIVE && Date.now() - LIVE.fetched > 60000) fetchLive(); });
 
-/* =================== THEMES & STOCKS =================== */
+/* =================== THEMES, SUB-THEMES, BROWSE & STOCKS =================== */
 const pct = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : "") + (v * 100).toFixed(d) + "%";
 const num = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : "") + Number(v).toFixed(d);
-// Return-cell tint: 4 steps each side, thresholds scale with the horizon.
+const HZ = { short: ["today", "d5", "d15", "d30"], long: ["d30", "d60", "d90", "d180"] };
+const HZ_LABEL = { today: "Today", d5: "5D", d15: "15D", d30: "30D", d60: "60D", d90: "90D", d180: "180D" };
+const hz = () => HZ[UI.hz] || HZ.short;
+// Green/red fills in 3 steps; the step thresholds scale with the horizon.
+const SCALE = { today: 0.015, d3: 0.03, d5: 0.04, d15: 0.08, d20: 0.1, d30: 0.12, d60: 0.18, d90: 0.24, d180: 0.35,
+  rs: 20, lt: 0.04, vs_d5: 0.03, vs_d30: 0.08, vs_d90: 0.15, etf_d5: 0.04, etf_d30: 0.12 };
 function tint(v, scale) {
-  if (v == null) return "";
+  if (v == null || !scale) return "";
   const a = Math.abs(v) / scale;
-  const k = a >= 2 ? "2" : a >= 0.75 ? "1" : "";
-  return k ? (v > 0 ? "u" : "d") + k : "";
+  const k = a >= 2 ? "3" : a >= 1 ? "2" : a >= 0.35 ? "1" : "";
+  return k ? (v > 0 ? "g" : "r") + k : "";
 }
-const SCALE = { today: 0.015, d3: 0.03, d5: 0.04, d15: 0.08, d20: 0.1, d30: 0.12, rs: 20, lt: 0.04, vs_d5: 0.03, vs_d30: 0.08, etf_d5: 0.04 };
+const retCell = (v, k) => `<td class="num ${tint(v, SCALE[k])}">${pct(v)}</td>`;
 const CLASS_COLOR = { STRONG: "var(--good)", WATCHLIST: "var(--warning)", WEAK: "var(--critical)" };
 const ROT = { "Early Rotation": "🌅 Early", "Mid Rotation": "🚀 Mid", "Late / Cooling": "🔻 Late / cooling", "Neutral": "⏸ Neutral" };
 const mvCell = (v) => v == null ? '<span class="mv">–</span>' : v === 0 ? '<span class="mv">·</span>'
   : `<span class="mv ${v > 0 ? "up" : "dn"}">${v > 0 ? "▲" : "▼"}${Math.abs(v)}${Math.abs(v) >= 10 ? (v > 0 ? " 🔥" : " ❄️") : ""}</span>`;
 const trailHTML = (tr) => `<span class="trail" title="Score over the last ${tr.length} days">${tr.map(v => v == null ? '<i style="height:2px;opacity:.3"></i>' : `<i style="height:${3 + v * 2}px;opacity:${0.35 + v * 0.08}"></i>`).join("")}</span>`;
+const badge = (r) => `<span class="badge" title="${r.class.toLowerCase()}"><i style="background:${CLASS_COLOR[r.class]}"></i><span class="num">${r.score}</span></span>`;
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 function sortable(table, cols, getRows, draw, state) {
   let key = state[0], dir = state[1];
-  const ths = table.querySelectorAll("th");
+  const ths = table.querySelectorAll(":scope > thead th");
   const mark = () => ths.forEach((th, i) => { if (cols[i].k === key) th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending"); else th.removeAttribute("aria-sort"); });
   ths.forEach((th, i) => {
     if (!cols[i].k) return;
@@ -854,6 +902,15 @@ function sortRows(rows, key, dir) {
     return (typeof x === "string" ? x.localeCompare(y) : x - y) * dir;
   });
 }
+// A small segmented control bound to a key on a state object.
+function chips(label, options, state, key, onChange) {
+  const el = $(`<div class="chips" role="group" aria-label="${label}">${options.map(([v, t]) => `<button data-v="${v}" aria-pressed="${state[key] === v}">${t}</button>`).join("")}</div>`);
+  el.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    state[key] = b.dataset.v; el.querySelectorAll("button").forEach(o => o.setAttribute("aria-pressed", o === b)); onChange();
+  }));
+  return el;
+}
+const hzChips = () => chips("Return horizon", [["short", "Short-term"], ["long", "Long-term"]], UI, "hz", rerenderPanel);
 
 function pulseCard(T) {
   const P = T.pulse, H = T.pulse_hist || [];
@@ -875,117 +932,180 @@ function pulseCard(T) {
   return $(`<section class="pulse">${side("long")}${side("short")}</section>`);
 }
 
+const stockMap = () => { const M = {}; (getT().stocks || []).forEach(s => { M[s.t] = s; }); return M; };
+const stockCols = () => [
+  { k: "t", h: "Ticker", l: true, asc: true }, { k: "setup", h: "Setup<small>/ 10</small>" }, { k: "rs", h: "RS<small>3-mo %</small>" },
+  { k: "rk", h: "RS rank", asc: true }, { k: "rk5", h: "Rank Δ<small>5 days</small>" },
+  ...hz().map(k => ({ k, h: HZ_LABEL[k] })), { k: "lt", h: "LT score" },
+  { k: "e8", h: "vs 8 EMA" }, { k: "e21", h: "vs 21 EMA" }, { k: "e50", h: "vs 50 EMA" }, { k: "price", h: "Price" },
+];
+// sub: "sub" shows the stock's sub-theme under its name, "themes" its themes, "both" both
+function stockCells(s, show) {
+  const ema = (v) => { const near = v != null && v >= -0.03 && v <= 0.01; return `<td class="num"${near ? ' style="font-weight:700" title="Within -3% to +1% of this EMA"' : ""}>${pct(v)}</td>`; };
+  const th = s.themes[0] + (s.themes.length > 1 ? ` +${s.themes.length - 1}` : "");
+  const sub = show === "themes" ? th : show === "sub" ? (s.sub || "") : [s.sub, th].filter(Boolean).join(" · ");
+  return `<td class="l tname">${s.t}<small>${esc((s.name || "").slice(0, 26))}${sub ? (s.name ? " · " : "") + esc(sub) : ""}</small></td>
+    <td><span class="tier ${s.tier}">${s.tier}</span> <span class="num">${s.setup}</span></td>
+    <td class="num ${tint(s.rs, SCALE.rs)}">${num(s.rs)}</td><td class="num">${s.rk ?? "–"}</td><td>${mvCell(s.rk5)}</td>
+    ${hz().map(k => retCell(s[k], k)).join("")}${retCell(s.lt, "lt")}
+    ${ema(s.e8)}${ema(s.e21)}${ema(s.e50)}<td class="num">${s.price == null ? "–" : s.price.toFixed(2)}</td>`;
+}
+function stockTable(list, show) {
+  const cols = stockCols();
+  return `<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead>
+    <tbody>${list.map(s => `<tr>${stockCells(s, show)}</tr>`).join("")}</tbody></table></div>`;
+}
+const groupRows = (T, view) => view === "sub" ? (T.subthemes || []) : T.themes;
+
+/* ---------- Themes tab ---------- */
 function renderThemes(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
-  const T = getT(), U = UI.themes;
+  const T = getT(), U = UI.themes, sub = U.view === "sub";
   app.append(liveBar());
-  app.append(pulseCard(T));
+  if (!sub) app.append(pulseCard(T));
+  const H = hz(), vsK = UI.hz === "long" ? "vs_d90" : "vs_d30";
   const cols = [
-    { k: "theme", h: "Theme", l: true, asc: true }, { k: "rank", h: "Rank", asc: true }, { k: "score", h: "Score<small>/ 8</small>" },
+    { k: "theme", h: sub ? "Sub-theme" : "Theme", l: true, asc: true }, { k: "rank", h: "Rank", asc: true }, { k: "score", h: "Score<small>/ 8</small>" },
     { k: "mv5", h: "Rank Δ<small>5 days</small>" }, { k: null, h: "Trail<small>30 days</small>" }, { k: "rotation", h: "Rotation", l: true, asc: true },
-    { k: "today", h: "Today" }, { k: "d5", h: "5D" }, { k: "d15", h: "15D" }, { k: "d30", h: "30D" }, { k: "rs", h: "RS<small>3-mo %</small>" },
-    { k: "vs_d30", h: "vs SPY<small>30D</small>" }, { k: "st_b", h: "ST breadth" }, { k: "lt_b", h: "LT breadth" }, { k: "etf_d5", h: "ETF<small>5D</small>" }, { k: "n", h: "Stocks" },
+    ...H.map(k => ({ k, h: HZ_LABEL[k] })), { k: "rs", h: "RS<small>3-mo %</small>" },
+    { k: vsK, h: `vs SPY<small>${UI.hz === "long" ? "90D" : "30D"}</small>` }, { k: "st_b", h: "ST breadth" }, { k: "lt_b", h: "LT breadth" },
+    ...(sub ? [] : [{ k: "etf_d5", h: "ETF<small>5D</small>" }]), { k: "n", h: "Stocks" },
   ];
-  const card = $(`<section class="card tcard"><div class="head"><h2>Themes <span class="meta">· ${T.counts.themes} themes, ${T.counts.stocks} stocks · click a row for its stocks</span></h2>
-    <div class="filters"><div class="chips" role="group" aria-label="Class">${["All", "STRONG", "WATCHLIST", "WEAK"].map((c, i) => `<button data-c="${c}" aria-pressed="${i === 0}">${c === "All" ? "All" : c[0] + c.slice(1).toLowerCase()}</button>`).join("")}</div>
-    <input type="search" placeholder="Search themes"></div></div>
+  const rowsAll = groupRows(T, U.view);
+  const card = $(`<section class="card tcard"><div class="head"><h2>${sub ? "Sub-themes" : "Themes"} <span class="meta">· ${rowsAll.length} ${sub ? "peer groups" : "themes"} · click a row for its stocks</span></h2>
+    <div class="filters"></div></div>
     <div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>
-    <div class="note">Score: +1 each for positive average Today, 5D, 15D, 30D, RS and LT score; +1 if at least 50% of the theme's stocks are up today and over 5 days (ST breadth); +1 if at least 60% are up over 15 and 30 days (LT breadth). 7–8 strong, 4–6 watchlist, 0–3 weak.
-    Rank Δ: places gained (▲) or lost (▼) in 5 days. Returns are equal-weighted averages of the theme's stocks; the ETF column is the theme's benchmark ETF.
-    ${T.missing && T.missing.length ? `<br>Tickers with no data (check spelling or listing): ${T.missing.join(", ")}.` : ""}
-    Edit themes in <a href="${DATA.repo ? DATA.repo + "/edit/main/data/themes.csv" : "#"}" target="_blank" rel="noopener">data/themes.csv</a>.</div></section>`);
+    <div class="note">${sub ? "Sub-themes group stocks by what they actually sell, so names that move on the same news sit together even across themes. Each stock has one sub-theme; edit them in "
+      + `<a href="${DATA.repo}/edit/main/data/subthemes.csv" target="_blank" rel="noopener">data/subthemes.csv</a>. Scored with the same rules as themes.`
+      : "Score: +1 each for positive average Today, 5D, 15D, 30D, RS and LT score; +1 if at least 50% of the theme's stocks are up today and over 5 days (ST breadth); +1 if at least 60% are up over 15 and 30 days (LT breadth). 7–8 strong, 4–6 watchlist, 0–3 weak."}
+    Rank Δ: places gained (▲) or lost (▼) in 5 days. Returns are equal-weighted averages; green and red get darker as the move gets bigger for that horizon.
+    ${T.missing && T.missing.length && !sub ? `<br>Tickers with no data (check spelling or listing): ${T.missing.join(", ")}.` : ""}
+    ${sub ? "" : `Edit themes in <a href="${DATA.repo}/edit/main/data/themes.csv" target="_blank" rel="noopener">data/themes.csv</a>.`}</div></section>`);
+  const f = card.querySelector(".filters");
+  f.append(chips("View", [["theme", "Themes"], ["sub", "Sub-themes"]], U, "view", () => { U.open.clear(); rerenderPanel(); }));
+  f.append(chips("Class", [["All", "All"], ["STRONG", "Strong"], ["WATCHLIST", "Watchlist"], ["WEAK", "Weak"]], U, "cls", () => draw(current())));
+  f.append(hzChips());
+  const qi = $('<input type="search" placeholder="Search">'); qi.value = U.q; f.append(qi);
   app.append(card);
   const body = card.querySelector("tbody");
-  const open = U.open;
-  const filtered = () => T.themes.filter(r => (U.cls === "All" || r.class === U.cls) && (!U.q || r.theme.toLowerCase().includes(U.q)));
+  const filtered = () => rowsAll.filter(r => (U.cls === "All" || r.class === U.cls) && (!U.q || r.theme.toLowerCase().includes(U.q) || (r.group || "").toLowerCase().includes(U.q)));
   const draw = (rows) => {
     body.innerHTML = "";
     rows.forEach(r => {
-      const tr = $(`<table><tr class="trow${open.has(r.theme) ? " open" : ""}">
-        <td class="l tname">${r.theme}<small>${r.etf ? r.etf + " · " : ""}${r.n} stocks</small></td>
-        <td class="num">${r.rank}</td>
-        <td><span class="badge"><i style="background:${CLASS_COLOR[r.class]}"></i><span class="num">${r.score}</span></span></td>
-        <td>${mvCell(r.mv5)}</td>
+      const small = sub ? `${esc(r.group)} · ${r.n} stocks` : `${r.etf ? r.etf + " · " : ""}${r.n} stocks`;
+      const tr = $(`<table><tr class="trow${U.open.has(r.theme) ? " open" : ""}">
+        <td class="l tname">${esc(r.theme)}<small>${small}</small></td><td class="num">${r.rank}</td><td>${badge(r)}</td><td>${mvCell(r.mv5)}</td>
         <td>${trailHTML(r.trail)}</td><td class="l">${ROT[r.rotation] || r.rotation}</td>
-        ${["today", "d5", "d15", "d30"].map(k => `<td class="num ${tint(r[k], SCALE[k])}">${pct(r[k])}</td>`).join("")}
-        <td class="num ${tint(r.rs, SCALE.rs)}">${num(r.rs)}</td>
-        <td class="num ${tint(r.vs_d30, SCALE.vs_d30)}">${r.vs_d30 == null ? "–" : (r.vs_d30 > 0 ? "+" : "") + (r.vs_d30 * 100).toFixed(1) + " pts"}</td>
+        ${H.map(k => retCell(r[k], k)).join("")}<td class="num ${tint(r.rs, SCALE.rs)}">${num(r.rs)}</td>
+        <td class="num ${tint(r[vsK], SCALE[vsK])}">${r[vsK] == null ? "–" : (r[vsK] > 0 ? "+" : "") + (r[vsK] * 100).toFixed(1) + " pts"}</td>
         <td class="num">${Math.round(r.st_b * 100)}% <span class="meta">${r.st_label}</span></td>
         <td class="num">${Math.round(r.lt_b * 100)}% <span class="meta">${r.lt_label}</span></td>
-        <td class="num ${tint(r.etf_d5, SCALE.etf_d5)}">${pct(r.etf_d5)}</td><td class="num">${r.n}</td></tr></table>`).querySelector("tr");
+        ${sub ? "" : retCell(r.etf_d5, "etf_d5")}<td class="num">${r.n}</td></tr></table>`).querySelector("tr");
       body.append(tr);
-      if (open.has(r.theme)) body.append(drillRow(r, cols.length));
-      tr.addEventListener("click", () => { open.has(r.theme) ? open.delete(r.theme) : open.add(r.theme); draw(current()); });
+      if (U.open.has(r.theme)) body.append(drillRow(r, cols.length, sub));
+      tr.addEventListener("click", () => { U.open.has(r.theme) ? U.open.delete(r.theme) : U.open.add(r.theme); draw(current()); });
     });
   };
   const current = sortable(card.querySelector("table"), cols, filtered, draw, U.sort);
-  card.querySelectorAll(".chips button").forEach(b => {
-    b.setAttribute("aria-pressed", b.dataset.c === U.cls);
-    b.addEventListener("click", () => { U.cls = b.dataset.c; card.querySelectorAll(".chips button").forEach(o => o.setAttribute("aria-pressed", o === b)); draw(current()); });
-  });
-  const qi = card.querySelector("input"); qi.value = U.q;
   qi.addEventListener("input", (e) => { U.q = e.target.value.trim().toLowerCase(); draw(current()); });
   draw(current());
 }
-
-function stockMap() {
-  const M = {}; (getT().stocks || []).forEach(s => { M[s.t] = s; }); return M;
-}
-const STOCK_COLS = [
-  { k: "t", h: "Ticker", l: true, asc: true }, { k: "setup", h: "Setup<small>/ 10</small>" }, { k: "rs", h: "RS<small>3-mo %</small>" },
-  { k: "rk", h: "RS rank", asc: true }, { k: "rk5", h: "Rank Δ<small>5 days</small>" },
-  { k: "today", h: "Today" }, { k: "d5", h: "5D" }, { k: "d15", h: "15D" }, { k: "d30", h: "30D" }, { k: "lt", h: "LT score" },
-  { k: "e8", h: "vs 8 EMA" }, { k: "e21", h: "vs 21 EMA" }, { k: "e50", h: "vs 50 EMA" }, { k: "price", h: "Price" },
-];
-function stockCells(s, withTheme) {
-  const ema = (v) => { const near = v != null && v >= -0.03 && v <= 0.01; return `<td class="num"${near ? ' style="font-weight:700" title="Within -3% to +1% of this EMA"' : ""}>${pct(v)}</td>`; };
-  return `<td class="l tname">${s.t}<small>${(s.name || "").slice(0, 28)}${withTheme ? (s.name ? " · " : "") + s.themes[0] + (s.themes.length > 1 ? ` +${s.themes.length - 1}` : "") : ""}</small></td>
-    <td><span class="tier ${s.tier}">${s.tier}</span> <span class="num">${s.setup}</span></td>
-    <td class="num ${tint(s.rs, SCALE.rs)}">${num(s.rs)}</td><td class="num">${s.rk ?? "–"}</td><td>${mvCell(s.rk5)}</td>
-    ${["today", "d5", "d15", "d30", "lt"].map(k => `<td class="num ${tint(s[k], SCALE[k])}">${pct(s[k])}</td>`).join("")}
-    ${ema(s.e8)}${ema(s.e21)}${ema(s.e50)}<td class="num">${s.price == null ? "–" : s.price.toFixed(2)}</td>`;
-}
-function drillRow(r, span) {
+function drillRow(r, span, sub) {
   const M = stockMap();
   const list = r.members.map(t => M[t]).filter(Boolean).sort((a, b) => (b.rs ?? -1e9) - (a.rs ?? -1e9));
+  const extra = sub && r.parents && r.parents.length ? ` · in themes: ${r.parents.map(esc).join(", ")}` : "";
   const tr = $(`<table><tr class="drill"><td colspan="${span}"><div class="drillbox">
-    <div class="meta">${r.theme}: ${list.length} stocks, strongest RS first · setup score uses this theme's score where it's the stock's strongest theme</div>
-    <div class="scroll"><table class="grid"><thead><tr>${STOCK_COLS.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead>
-    <tbody>${list.map(s => `<tr>${stockCells(s, false)}</tr>`).join("")}</tbody></table></div></div></td></tr></table>`).querySelector("tr");
+    <div class="meta">${esc(r.theme)}: ${list.length} stocks, strongest RS first${extra}</div>
+    ${stockTable(list, sub ? "themes" : "sub")}</div></td></tr></table>`).querySelector("tr");
   tr.addEventListener("click", (e) => e.stopPropagation());
   return tr;
 }
 
+/* ---------- Browse tab: every name, bucket by bucket ---------- */
+function renderBrowse(app) {
+  if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet.</div>')); return; }
+  const T = getT(), U = UI.browse, sub = U.view === "sub", M = stockMap();
+  app.append(liveBar());
+  const bar = $(`<section class="card browsebar"><div class="filters"></div></section>`);
+  const f = bar.querySelector(".filters");
+  f.append(chips("Group by", [["theme", "By theme"], ["sub", "By sub-theme"]], U, "view", () => { U.open.clear(); U.all = false; rerenderPanel(); }));
+  f.append(chips("Order", [["rank", "Strongest first"], ["az", "A–Z"]], U, "order", rerenderPanel));
+  f.append(hzChips());
+  const btns = $('<div class="navbtns"><button data-a="open">Expand all</button><button data-a="close">Collapse all</button></div>');
+  f.append(btns);
+  const qi = $('<input type="search" placeholder="Find a ticker, name or bucket">'); qi.value = U.q; f.append(qi);
+  app.append(bar);
+  let groups = groupRows(T, U.view).slice();
+  if (U.order === "az") groups.sort((a, b) => a.theme.localeCompare(b.theme));
+  else groups.sort((a, b) => a.rank - b.rank);
+  const wrap = $('<div class="browse"></div>');
+  app.append(wrap);
+  const H = hz();
+  const drawAll = () => {
+    wrap.innerHTML = "";
+    const q = U.q;
+    let shown = 0;
+    groups.forEach(g => {
+      let list = g.members.map(t => M[t]).filter(Boolean);
+      const gm = q && (g.theme.toLowerCase().includes(q) || (g.group || "").toLowerCase().includes(q));
+      if (q && !gm) list = list.filter(s => s.t.toLowerCase().startsWith(q) || (s.name || "").toLowerCase().includes(q));
+      if (q && !list.length) return;
+      list.sort((a, b) => (b.rs ?? -1e9) - (a.rs ?? -1e9));
+      shown++;
+      const isOpen = U.all || U.open.has(g.theme) || (q && list.length <= 30);
+      const d = $(`<details class="card bucket"${isOpen ? " open" : ""}>
+        <summary><span class="bname">${esc(g.theme)}<small>${sub ? esc(g.group) + " · " : ""}#${g.rank} · ${ROT[g.rotation] || g.rotation} · ${g.n} stocks</small></span>
+          ${badge(g)}<span class="bret">${H.map(k => `<span class="${tint(g[k], SCALE[k])}"><em>${HZ_LABEL[k]}</em>${pct(g[k])}</span>`).join("")}</span></summary>
+        <div class="bbody"></div></details>`);
+      const body = d.querySelector(".bbody");
+      const fill = () => { if (!body.childElementCount) body.innerHTML = stockTable(list, sub ? "themes" : "sub"); };
+      if (isOpen) fill();
+      d.addEventListener("toggle", () => {
+        if (d.open) { fill(); U.open.add(g.theme); } else { U.open.delete(g.theme); U.all = false; }
+      });
+      wrap.append(d);
+    });
+    if (!shown) wrap.innerHTML = '<div class="card empty">Nothing matches that search.</div>';
+  };
+  btns.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    if (b.dataset.a === "open") { U.all = true; } else { U.all = false; U.open.clear(); }
+    drawAll();
+  }));
+  qi.addEventListener("input", (e) => { U.q = e.target.value.trim().toLowerCase(); drawAll(); });
+  drawAll();
+}
+
+/* ---------- Stocks tab ---------- */
 function renderStocks(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Stock data isn\'t available yet. It appears after the next data run.</div>')); return; }
   const T = getT(), U = UI.stocks;
   app.append(liveBar());
-  const themesList = T.themes.map(t => t.theme).sort();
+  const themesList = T.themes.map(t => t.theme).sort(), subList = (T.subthemes || []).map(t => t.theme).sort();
+  const cols = stockCols();
   const card = $(`<section class="card tcard"><div class="head"><h2>Stocks <span class="meta">· ${T.counts.stocks} in your themes</span></h2>
-    <div class="filters"><div class="chips" role="group" aria-label="Tier">${["All", "A", "B", "C"].map((c, i) => `<button data-c="${c}" aria-pressed="${i === 0}">${c === "All" ? "All tiers" : c + "-tier"}</button>`).join("")}</div>
-    <select aria-label="Theme"><option value="">All themes</option>${themesList.map(t => `<option>${t}</option>`).join("")}</select>
-    <input type="search" placeholder="Search ticker or name"></div></div>
-    <div class="scroll"><table class="grid"><thead><tr>${STOCK_COLS.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>
+    <div class="filters"></div></div>
+    <div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>
     <div class="more-row"></div>
-    <div class="note">Setup score (/10, from your sheet): theme strength (0–2), trend: 15D and 30D up, RS and LT positive (0–2), within −3% to +1% of the 8 or 21 EMA (2, shown in bold), up today (1), resting: 5D under 2% after 15D and 30D gains over 5% (1), positive RS (1), coiling (1). A-tier 8+, B-tier 5–7.
+    <div class="note">Under each ticker: company · sub-theme · strongest theme. Setup score (/10, from your sheet): theme strength (0–2), trend: 15D and 30D up, RS and LT positive (0–2), within −3% to +1% of the 8 or 21 EMA (2, shown in bold), up today (1), resting: 5D under 2% after 15D and 30D gains over 5% (1), positive RS (1), coiling (1). A-tier 8+, B-tier 5–7.
     RS is the % change over about 3 months (63 trading days). RS rank is among all stocks here; Rank Δ is places gained (▲) or lost (▼) in 5 days, with 🔥/❄️ for 10+.</div></section>`);
+  const f = card.querySelector(".filters");
+  f.append(chips("Tier", [["All", "All tiers"], ["A", "A-tier"], ["B", "B-tier"], ["C", "C-tier"]], U, "tier", () => { U.limit = 100; draw(current()); }));
+  f.append(hzChips());
+  const sel = $(`<select aria-label="Theme"><option value="">All themes</option>${themesList.map(t => `<option>${esc(t)}</option>`).join("")}</select>`); sel.value = U.theme; f.append(sel);
+  const sel2 = $(`<select aria-label="Sub-theme"><option value="">All sub-themes</option>${subList.map(t => `<option>${esc(t)}</option>`).join("")}</select>`); sel2.value = U.sub || ""; f.append(sel2);
+  const qi = $('<input type="search" placeholder="Search ticker or name">'); qi.value = U.q; f.append(qi);
   app.append(card);
   const body = card.querySelector("tbody"), moreRow = card.querySelector(".more-row");
   const filtered = () => T.stocks.filter(s => (U.tier === "All" || s.tier === U.tier) && (!U.theme || s.themes.includes(U.theme))
-    && (!U.q || s.t.toLowerCase().startsWith(U.q) || (s.name || "").toLowerCase().includes(U.q)));
+    && (!U.sub || s.sub === U.sub) && (!U.q || s.t.toLowerCase().startsWith(U.q) || (s.name || "").toLowerCase().includes(U.q)));
   const draw = (rows) => {
-    body.innerHTML = rows.slice(0, U.limit).map(s => `<tr>${stockCells(s, true)}</tr>`).join("");
+    body.innerHTML = rows.slice(0, U.limit).map(s => `<tr>${stockCells(s, "both")}</tr>`).join("");
     moreRow.innerHTML = rows.length > U.limit ? `<button>Show ${Math.min(100, rows.length - U.limit)} more (${rows.length - U.limit} hidden)</button>` : "";
     const b = moreRow.querySelector("button"); if (b) b.addEventListener("click", () => { U.limit += 100; draw(current()); });
   };
-  const current = sortable(card.querySelector("table"), STOCK_COLS, filtered, draw, U.sort);
-  card.querySelectorAll(".chips button").forEach(b => {
-    b.setAttribute("aria-pressed", b.dataset.c === U.tier);
-    b.addEventListener("click", () => { U.tier = b.dataset.c; U.limit = 100; card.querySelectorAll(".chips button").forEach(o => o.setAttribute("aria-pressed", o === b)); draw(current()); });
-  });
-  const sel = card.querySelector("select"); sel.value = U.theme;
+  const current = sortable(card.querySelector("table"), cols, filtered, draw, U.sort);
   sel.addEventListener("change", (e) => { U.theme = e.target.value; U.limit = 100; draw(current()); });
-  const qi = card.querySelector("input"); qi.value = U.q;
+  sel2.addEventListener("change", (e) => { U.sub = e.target.value; U.limit = 100; draw(current()); });
   qi.addEventListener("input", (e) => { U.q = e.target.value.trim().toLowerCase(); U.limit = 100; draw(current()); });
   draw(current());
 }

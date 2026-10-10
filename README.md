@@ -47,6 +47,17 @@ daily from the same price data (no Apps Script, no GOOGLEFINANCE).
 - Rank movement (themes and stocks) is computed from stored history, so it
   works without daily snapshots.
 
+## Sub-themes and the Browse tab
+
+`data/subthemes.csv` (`group,subtheme,ticker`) puts every stock in exactly one
+peer group by what it sells (e.g. *Enterprise AI Infrastructure*: DELL, HPE,
+NTNX, PSTG, NTAP), scored with the same rules as themes. The Themes tab has a
+Themes / Sub-themes switch, the Browse tab lists every name bucket by bucket
+(expand or collapse all, search), and the Stocks tab filters by either.
+Returns are shown short-term (Today–30D) or long-term (30D–180D); long
+horizons need about a year of stored bars (run the workflow once with
+"extend history").
+
 ## Live prices during the day (free)
 
 The Themes and Stocks tabs can update intraday from a Google Sheet that uses

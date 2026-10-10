@@ -153,7 +153,7 @@ def recompute_and_publish(bars, splits, universe, state):
     store.save_breadth(history)
     try:
         theme_data = themes.build(adjusted, store.load_themes(), universe,
-                                  names=store.load_names(),
+                                  names=store.load_names(), subthemes_df=store.load_subthemes(),
                                   missing=sorted(state.get("extras_missing", {})))
     except Exception as e:  # never let the theme tab break the breadth dashboard
         log.exception("theme build failed: %s", e)
@@ -167,6 +167,8 @@ def main(argv=None):
     p.add_argument("--backfill-days", type=int, default=0,
                    help="calendar days of history to load (free plan: up to ~730)")
     p.add_argument("--rebuild-only", action="store_true")
+    p.add_argument("--extend-history", action="store_true",
+                   help="refetch older days (pruned earlier) up to KEEP_TRADING_DAYS, incl. theme ETFs/ADRs")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
 
@@ -188,6 +190,17 @@ def main(argv=None):
         bars, added = fetch_days(client, bars, keep, list(weekdays(start, end)))
         store.save_bars(bars)
         store.save_state(state)
+        if args.extend_history and len(bars):
+            have = len(bars["date"].unique())
+            need = config.KEEP_TRADING_DAYS - have
+            if need > 0:
+                first = bars["date"].min().date()
+                older = list(weekdays(first - timedelta(days=int(need * 1.5) + 10), first - timedelta(days=1)))
+                log.info("extending history by up to %d trading days", need)
+                bars, _ = fetch_days(client, bars, keep, older)
+                store.save_bars(bars)
+                state["extras_done"] = []      # refetch ETF/ADR history over the longer window
+                store.save_state(state)
         bars = backfill_extras(client, bars, universe, state)
         if added == 0 and not args.backfill_days:
             log.info("no new trading days; rebuilding site anyway")
