@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-10T21:05:08Z",
+ "generated": "2026-10-10T21:16:15Z",
  "history_days": 435,
  "regime": {
   "key": "choppy",
@@ -11,6 +11,183 @@
   ],
   "date": "2026-10-09"
  },
+ "events": [
+  {
+   "date": "2025-02-25",
+   "kind": "sellers",
+   "tier": "minor",
+   "label": "Sellers take control",
+   "detail": "20-day avg of 4% breakouts (116) fell below both its 40-day avg and 20-day breakdowns (128) for 3 days"
+  },
+  {
+   "date": "2025-03-12",
+   "kind": "washout",
+   "tier": "major",
+   "label": "Washed out",
+   "detail": "T2108 fell to 19: most stocks are below their 40-day average"
+  },
+  {
+   "date": "2025-04-03",
+   "kind": "washout",
+   "tier": "major",
+   "label": "Washed out",
+   "detail": "T2108 fell to 18: most stocks are below their 40-day average"
+  },
+  {
+   "date": "2025-04-09",
+   "kind": "thrust",
+   "tier": "major",
+   "label": "Breadth thrust",
+   "detail": "1874 stocks up 4%+ (18.9x the 40-day average) coming off weak breadth"
+  },
+  {
+   "date": "2025-04-21",
+   "kind": "washout",
+   "tier": "major",
+   "label": "Washed out",
+   "detail": "T2108 fell to 15: most stocks are below their 40-day average"
+  },
+  {
+   "date": "2025-05-06",
+   "kind": "buyers",
+   "tier": "minor",
+   "label": "Buyers take control",
+   "detail": "20-day avg of 4% breakouts (220) moved above both its 40-day avg and 20-day breakdowns for 3 days"
+  },
+  {
+   "date": "2025-05-12",
+   "kind": "extended",
+   "tier": "minor",
+   "label": "Extended",
+   "detail": "T2108 reached 75: broad overbought, pullback risk rises"
+  },
+  {
+   "date": "2025-06-03",
+   "kind": "extended",
+   "tier": "minor",
+   "label": "Extended",
+   "detail": "T2108 reached 77: broad overbought, pullback risk rises"
+  },
+  {
+   "date": "2025-07-03",
+   "kind": "extended",
+   "tier": "minor",
+   "label": "Extended",
+   "detail": "T2108 reached 77: broad overbought, pullback risk rises"
+  },
+  {
+   "date": "2025-08-12",
+   "kind": "thrust",
+   "tier": "major",
+   "label": "Breadth thrust",
+   "detail": "433 stocks up 4%+ (2.9x the 40-day average) coming off weak breadth"
+  },
+  {
+   "date": "2025-08-13",
+   "kind": "followthrough",
+   "tier": "major",
+   "label": "Follow-through",
+   "detail": "Second thrust within 10 days: 411 up 4%+ (2.6x average) confirms the first"
+  },
+  {
+   "date": "2025-11-05",
+   "kind": "sellers",
+   "tier": "minor",
+   "label": "Sellers take control",
+   "detail": "20-day avg of 4% breakouts (162) fell below both its 40-day avg and 20-day breakdowns (190) for 3 days"
+  },
+  {
+   "date": "2025-11-21",
+   "kind": "thrust",
+   "tier": "major",
+   "label": "Breadth thrust",
+   "detail": "515 stocks up 4%+ (3.3x the 40-day average) coming off weak breadth"
+  },
+  {
+   "date": "2025-12-05",
+   "kind": "buyers",
+   "tier": "minor",
+   "label": "Buyers take control",
+   "detail": "20-day avg of 4% breakouts (172) moved above both its 40-day avg and 20-day breakdowns for 3 days"
+  },
+  {
+   "date": "2026-01-05",
+   "kind": "thrust",
+   "tier": "major",
+   "label": "Breadth thrust",
+   "detail": "436 stocks up 4%+ (2.9x the 40-day average) coming off weak breadth"
+  },
+  {
+   "date": "2026-02-06",
+   "kind": "thrust",
+   "tier": "major",
+   "label": "Breadth thrust",
+   "detail": "463 stocks up 4%+ (2.8x the 40-day average) coming off weak breadth"
+  },
+  {
+   "date": "2026-02-23",
+   "kind": "sellers",
+   "tier": "minor",
+   "label": "Sellers take control",
+   "detail": "20-day avg of 4% breakouts (162) fell below both its 40-day avg and 20-day breakdowns (214) for 3 days"
+  },
+  {
+   "date": "2026-03-20",
+   "kind": "washout",
+   "tier": "major",
+   "label": "Washed out",
+   "detail": "T2108 fell to 20: most stocks are below their 40-day average"
+  },
+  {
+   "date": "2026-03-31",
+   "kind": "thrust",
+   "tier": "major",
+   "label": "Breadth thrust",
+   "detail": "645 stocks up 4%+ (4.0x the 40-day average) coming off weak breadth"
+  },
+  {
+   "date": "2026-04-08",
+   "kind": "followthrough",
+   "tier": "major",
+   "label": "Follow-through",
+   "detail": "Second thrust within 10 days: 682 up 4%+ (4.2x average) confirms the first"
+  },
+  {
+   "date": "2026-04-10",
+   "kind": "buyers",
+   "tier": "minor",
+   "label": "Buyers take control",
+   "detail": "20-day avg of 4% breakouts (179) moved above both its 40-day avg and 20-day breakdowns for 3 days"
+  },
+  {
+   "date": "2026-04-20",
+   "kind": "extended",
+   "tier": "minor",
+   "label": "Extended",
+   "detail": "T2108 reached 75: broad overbought, pullback risk rises"
+  },
+  {
+   "date": "2026-07-29",
+   "kind": "sellers",
+   "tier": "minor",
+   "label": "Sellers take control",
+   "detail": "20-day avg of 4% breakouts (170) fell below both its 40-day avg and 20-day breakdowns (196) for 3 days"
+  },
+  {
+   "date": "2026-08-12",
+   "kind": "buyers",
+   "tier": "minor",
+   "label": "Buyers take control",
+   "detail": "20-day avg of 4% breakouts (228) moved above both its 40-day avg and 20-day breakdowns for 3 days"
+  },
+  {
+   "date": "2026-09-16",
+   "kind": "sellers",
+   "tier": "minor",
+   "label": "Sellers take control",
+   "detail": "20-day avg of 4% breakouts (143) fell below both its 40-day avg and 20-day breakdowns (144) for 3 days"
+  }
+ ],
  "percentiles": {
   "up4": 36,
   "dn4": 21,

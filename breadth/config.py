@@ -53,4 +53,10 @@ EXTREME_LOW_PCTILE = 0.10    # 10-day ratio in bottom 10% = washed out
 EXTREME_HIGH_PCTILE = 0.95   # 5-day ratio in top 5% = overextended
 MIN_HISTORY_FOR_PCTILES = 60 # until then, percentile rules are skipped
 
+# ---- Chart annotations (signal markers) ------------------------------------
+EVENT_THRUST_MULT = 2.5      # up-4% count vs prior 40-day avg for a marked thrust
+THRUST_LOW_T2108 = 30        # ...and within 10 days of T2108 at or below this
+THRUST_LOW_RATIO = 0.8       # ...or of a 10-day ratio at or below this
+T2108_EXTENDED = 75          # T2108 crossing above this is marked "Extended"
+
 DASHBOARD_DAYS = 760         # max days on the charts (~3 years); they scroll

@@ -126,6 +126,18 @@ td.d2 { background: color-mix(in srgb, var(--down) var(--tint-strong), transpare
 td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparent); }
 .key { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); padding: 10px 16px 14px; }
 .key i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -2px; }
+.signals { padding: 14px 16px 10px; margin-bottom: 14px; }
+.signals .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.signals h2 { font-size: 14px; font-weight: 600; margin: 0; }
+.signals .more { background: none; border: 0; color: var(--text-secondary); font: inherit; font-size: 12.5px; cursor: pointer; text-decoration: underline; }
+.sig { display: grid; grid-template-columns: 22px 92px 1fr; gap: 4px 10px; align-items: start; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid var(--grid); padding: 8px 4px; font: inherit; color: inherit; cursor: pointer; border-radius: 6px; }
+.sig:hover { background: var(--neutral-mid); }
+.sig svg { margin-top: 1px; }
+.sig .d { color: var(--text-secondary); font-size: 13px; }
+.sig .t { font-weight: 600; font-size: 13.5px; }
+.sig .t small { display: block; font-weight: 400; color: var(--text-secondary); font-size: 12.5px; margin-top: 1px; }
+.sig.minor .t { font-weight: 500; }
+@media (max-width: 520px) { .sig { grid-template-columns: 22px 1fr; } .sig .d { grid-column: 2; } .sig .t { grid-column: 2; } }
 footer { color: var(--text-muted); font-size: 12px; margin-top: 18px; line-height: 1.6; }
 footer a { color: var(--text-secondary); }
 .empty { padding: 40px; text-align: center; color: var(--text-secondary); }
@@ -186,6 +198,9 @@ function render() {
   const tl = $('<section class="tiles"></section>');
   tiles.forEach(([k, v, s]) => tl.append($(`<div class="card tile"><div class="k">${k}</div><div class="v num">${v}</div><div class="s">${s}</div></div>`)));
   app.append(tl);
+  IDX = Object.fromEntries(rows.map((r, i) => [r.date, i]));
+  EVBY = {}; (DATA.events || []).forEach(e => { (EVBY[e.date] = EVBY[e.date] || []).push(e); });
+  app.append(signalsCard());
 
   const bar = $(`<div class="chartbar"><div class="range"></div><div class="navbtns">
     <button data-go="-1" aria-label="Show earlier dates">‹ Earlier</button>
@@ -211,6 +226,71 @@ function render() {
     Slower metrics and T2108 use stocks with 20-day avg volume ≥ 100k. Table shading compares each value with your own history (darker = beyond the 10th/90th percentile).
     Regime thresholds are starter values; calibrate them in <code>breadth/config.py</code>.
     · <a href="breadth.csv">Download full history (CSV)</a></footer>`));
+}
+
+/* ---------- signal events ---------- */
+const EV_STYLE = {
+  thrust:        { color: "var(--good)",     dash: "",     short: "Thrust",     icon: "up" },
+  followthrough: { color: "var(--good)",     dash: "4 3",  short: "Follow-thru", icon: "up" },
+  washout:       { color: "var(--critical)", dash: "",     short: "Washout",    icon: "down" },
+  buyers:        { color: "var(--up)",       dash: "",     short: "Buyers",     icon: "up" },
+  sellers:       { color: "var(--down)",     dash: "",     short: "Sellers",    icon: "down" },
+  extended:      { color: "var(--warning)",  dash: "",     short: "Extended",   icon: "warn" },
+};
+const EV_ICON = {
+  up:   '<path d="M3 13l5-5 3 3 6-6M12 5h5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  down: '<path d="M3 7l5 5 3-3 6 6M12 15h5v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  warn: '<path d="M10 3l8 14H2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 8.5v3.5M10 14.6v.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+};
+const evIcon = (e) => `<svg width="18" height="18" viewBox="0 0 20 20" style="color:${EV_STYLE[e.kind].color}" aria-hidden="true">${EV_ICON[EV_STYLE[e.kind].icon]}</svg>`;
+let EVBY = {}, IDX = {}, scrollToIndex = () => {};
+
+// Major events: a thin vertical line through every chart. withTags: label pills at the top.
+function eventLines(c, x, withTags) {
+  let lastX = -1e9, row = 0;
+  (DATA.events || []).forEach(e => {
+    const i = IDX[e.date]; if (i == null) return;
+    const st = EV_STYLE[e.kind];
+    if (e.tier !== "major") return;
+    S("line", { x1: x(i), x2: x(i), y1: M.t - 6, y2: c.h - M.b, stroke: st.color, "stroke-width": 1.5, "stroke-dasharray": st.dash, opacity: 0.85 }, c.svg);
+    if (withTags) {
+      const g = S("g", {}, c.svg);
+      row = x(i) - lastX < 70 ? (row + 1) % 2 : 0; lastX = x(i);
+      const tx = S("text", { x: x(i) + 5, y: M.t + 4 + row * 13, style: `fill:${st.color};font-weight:600;font-size:10.5px` }, g);
+      tx.textContent = st.short;
+    }
+  });
+}
+// Minor events: a small marker on a line series.
+function eventMarkers(c, x, y, rows, key, kinds) {
+  (DATA.events || []).forEach(e => {
+    if (!kinds.includes(e.kind)) return;
+    const i = IDX[e.date]; if (i == null || rows[i][key] == null) return;
+    const st = EV_STYLE[e.kind], cx = x(i), cy = y(rows[i][key]);
+    const up = st.icon !== "down";
+    S("path", { d: up ? `M${cx},${cy - 13} l6,9 h-12z` : `M${cx},${cy + 13} l6,-9 h-12z`, fill: st.color, stroke: "var(--surface-1)", "stroke-width": 1.5 }, c.svg);
+  });
+}
+
+function signalsCard() {
+  const evs = (DATA.events || []).slice().reverse();
+  const el = $(`<section class="card signals"><div class="head"><h2>Signals</h2><button class="more"></button></div><div class="list"></div></section>`);
+  if (!evs.length) { el.querySelector(".list").innerHTML = '<div class="meta">No signals yet.</div>'; el.querySelector(".more").remove(); return el; }
+  const list = el.querySelector(".list"), more = el.querySelector(".more");
+  let all = false;
+  const draw = () => {
+    list.innerHTML = "";
+    evs.slice(0, all ? evs.length : 3).forEach(e => {
+      const b = $(`<button class="sig ${e.tier}">${evIcon(e)}<span class="d">${new Date(e.date + "T12:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span><span class="t">${e.label}<small>${e.detail}</small></span></button>`);
+      b.addEventListener("click", () => scrollToIndex(IDX[e.date]));
+      list.append(b);
+    });
+    more.textContent = all ? "Show fewer" : `Show all ${evs.length}`;
+    more.style.display = evs.length > 3 ? "" : "none";
+  };
+  more.addEventListener("click", () => { all = !all; draw(); });
+  draw();
+  return el;
 }
 
 /* ---------- small SVG chart kit ---------- */
@@ -254,6 +334,12 @@ function syncScroll(list, bar, rows) {
     const v = b.dataset.go === "end" ? sc.scrollWidth : sc.scrollLeft + Number(b.dataset.go) * page;
     list.forEach(o => o.scrollTo({ left: v, behavior: "smooth" }));
   }));
+  scrollToIndex = (i) => {
+    if (i == null) return;
+    const sc = list[0], v = M.l + i * pxDay - sc.clientWidth / 2;
+    list.forEach(o => o.scrollTo({ left: v, behavior: "smooth" }));
+    list[0].closest(".charts").scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   requestAnimationFrame(() => setAll(list[0].scrollWidth));
 }
 let W = 1100, H = 210, pxDay = 7;
@@ -302,7 +388,8 @@ function hover(c, rows, x, lines) {
     const i = Math.max(0, Math.min(n - 1, Math.floor((sx - M.l) / bw)));
     const row = rows[i];
     cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("opacity", 1);
-    c.tip.innerHTML = `<b>${longDate(row.date)}</b>` + lines.map(([lab, f]) => `<div><span>${lab}</span><span class="num">${f(row)}</span></div>`).join("");
+    c.tip.innerHTML = `<b>${longDate(row.date)}</b>` + lines.map(([lab, f]) => `<div><span>${lab}</span><span class="num">${f(row)}</span></div>`).join("")
+      + (EVBY[row.date] || []).map(e => `<div style="margin-top:4px"><span style="color:${EV_STYLE[e.kind].color};font-weight:600">● ${e.label}</span><span></span></div>`).join("");
     const er = c.el.getBoundingClientRect();     // SVG elements have no offsetTop/Left
     const px = r.left - er.left + x(i) * r.width / W;
     const tw = c.tip.offsetWidth;
@@ -355,6 +442,7 @@ function chartBreakouts(rows) {
     if (r.dn4 > mx) clipped.push([i, r.dn4, false]);
   });
   S("line", { x1: M.l, x2: W - M.r, y1: mid, y2: mid, stroke: "var(--text-muted)", "stroke-width": 1 }, c.svg);
+  eventLines(c, x, false);
   const thr = rows.map(r => ({ v: r.up4_avg40 != null ? r.up4_avg40 * 2 : null }));
   S("path", { d: path(thr, x, y, "v"), fill: "none", stroke: "var(--text-muted)", "stroke-width": 1.5, "stroke-dasharray": "5 4" }, c.svg);
   S("path", { d: path(rows, x, y, "up4_avg40"), fill: "none", stroke: "var(--text-secondary)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
@@ -368,7 +456,7 @@ function chartBreakouts(rows) {
 
 function chartTrend(rows) {
   const c = frame("Breakout trend: 20-day vs 40-day averages",
-    '<span><i class="line" style="background:var(--up)"></i>20-day avg up 4%+</span><span><i class="line" style="background:var(--text-secondary)"></i>40-day avg up 4%+</span><span><i class="line" style="background:var(--down)"></i>20-day avg down 4%+</span>', 190);
+    '<span><i class="line" style="background:var(--up)"></i>20-day avg up 4%+</span><span><i class="line" style="background:var(--text-secondary)"></i>40-day avg up 4%+</span><span><i class="line" style="background:var(--down)"></i>20-day avg down 4%+</span><span>▲▼ buyers / sellers take control</span><span>│ major signal (see Signals)</span>', 200);
   // Zoomed to the averages' own range so turns are visible.
   const keys = ["up4_avg20", "up4_avg40", "dn4_avg20"];
   const vs = rows.flatMap(r => keys.map(k => r[k])).filter(v => v != null);
@@ -380,6 +468,8 @@ function chartTrend(rows) {
   S("path", { d: path(rows, x, y, "dn4_avg20"), fill: "none", stroke: "var(--down)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
   S("path", { d: path(rows, x, y, "up4_avg40"), fill: "none", stroke: "var(--text-secondary)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
   S("path", { d: path(rows, x, y, "up4_avg20"), fill: "none", stroke: "var(--up)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  eventLines(c, x, true);
+  eventMarkers(c, x, y, rows, "up4_avg20", ["buyers", "sellers"]);
   endLabel(c.svg, x, y, rows, "up4_avg20", "", "var(--up)");
   endLabel(c.svg, x, y, rows, "dn4_avg20", "", "var(--down)");
   hover(c, rows, x, [["20-day avg up", r => fmt(r.up4_avg20)], ["40-day avg up", r => fmt(r.up4_avg40)], ["20-day avg down", r => fmt(r.dn4_avg20)]]);
@@ -389,13 +479,16 @@ function chartTrend(rows) {
 function chartRatios(rows) {
   const c = frame("5-day and 10-day breadth ratio (up 4% ÷ down 4%)",
     '<span><i class="line" style="background:var(--s1)"></i>5-day</span><span><i class="line" style="background:var(--s2)"></i>10-day</span><span><i class="line" style="background:var(--text-muted)"></i>1.0 = balanced</span>');
-  const mx = Math.max(2, niceMax(Math.max(...rows.map(r => Math.max(r.ratio5 || 0, r.ratio10 || 0)))));
-  const y = (v) => M.t + (1 - v / mx) * (c.h - M.t - M.b);
+  const rv = rows.flatMap(r => [r.ratio5, r.ratio10]).filter(v => v != null).sort((a, b) => a - b);
+  const mx = Math.max(3, Math.ceil((rv[Math.floor(rv.length * 0.98)] || 2) * 1.1));
+  const y = (v) => M.t + (1 - Math.min(v, mx) / mx) * (c.h - M.t - M.b);
   const ticks = [0, 1, DATA.thresholds.strong_ratio, mx].filter((v, i, a) => a.indexOf(v) === i && v <= mx);
   const x = axes(c, rows, y, ticks, v => fmt(v, 1));
   S("line", { x1: M.l, x2: W - M.r, y1: y(1), y2: y(1), stroke: "var(--text-muted)", "stroke-width": 1, "stroke-dasharray": "4 3" }, c.svg);
   S("path", { d: path(rows, x, y, "ratio10"), fill: "none", stroke: "var(--s2)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
   S("path", { d: path(rows, x, y, "ratio5"), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  eventLines(c, x, false);
+  rows.forEach((r, i) => { if (r.ratio5 > mx && !(rows[i - 1] && rows[i - 1].ratio5 > mx)) { const tx = S("text", { x: x(i), y: M.t - 3, "text-anchor": "middle", style: "fill:var(--text-primary);font-weight:600" }, c.svg); tx.textContent = fmt(r.ratio5, 1) + " ▲"; } });
   endLabel(c.svg, x, y, rows, "ratio10", "10d", "var(--s2)");
   endLabel(c.svg, x, y, rows, "ratio5", "5d", "var(--s1)");
   hover(c, rows, x, [["5-day", r => fmt(r.ratio5, 2)], ["10-day", r => fmt(r.ratio10, 2)]]);
@@ -412,6 +505,8 @@ function chartT2108(rows) {
   const x = axes(c, rows, y, [0, t.oversold, 50, t.overbought, 100], v => v);
   S("path", { d: path(rows, x, y, "t2108"), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
   endLabel(c.svg, x, y, rows, "t2108", "", "var(--s1)");
+  eventLines(c, x, false);
+  eventMarkers(c, x, y, rows, "t2108", ["extended"]);
   hover(c, rows, x, [["T2108", r => fmt(r.t2108, 1)]]);
   return c.el;
 }

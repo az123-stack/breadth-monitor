@@ -47,6 +47,7 @@ def payload(history):
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "history_days": int(history["complete"].sum()),
         "regime": metrics.classify(history),
+        "events": metrics.events(history),
         "percentiles": metrics.percentiles(history),
         "scale": scale,
         "thresholds": {"oversold": config.T2108_OVERSOLD,
