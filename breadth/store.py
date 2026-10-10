@@ -23,16 +23,16 @@ def load_bars():
     return df
 
 
-def save_bars(df):
+def save_bars(df, rewrite_days=()):
     """Write one file per trading day, only for days not already on disk.
 
-    Files are never rewritten (splits are applied in memory), so each day adds
-    one small file to the repo instead of rewriting a large one.
+    Existing files are only rewritten for `rewrite_days` (when newly added
+    theme tickers were backfilled into them); splits are applied in memory.
     """
     config.BARS_DIR.mkdir(parents=True, exist_ok=True)
     for day, g in df.groupby("date"):
         f = _day_file(day)
-        if f.exists():
+        if f.exists() and pd.Timestamp(day) not in rewrite_days:
             continue
         g = g.sort_values("ticker").reset_index(drop=True)[BAR_COLS].copy()
         for col in ["o", "h", "l", "c"]:
@@ -41,12 +41,13 @@ def save_bars(df):
         g.to_parquet(f, index=False, compression="zstd")
 
 
-def append_day(bars, day, rows, universe):
-    """Add one day's grouped bars, keeping only universe tickers."""
+def append_day(bars, day, rows, keep):
+    """Add one day's grouped bars, keeping only tickers in `keep`
+    (the common-stock universe plus theme tickers such as ETFs and ADRs)."""
     if not rows:
         return bars
     new = pd.DataFrame(rows)
-    new = new[new["ticker"].isin(universe)]
+    new = new[new["ticker"].isin(keep)]
     new.insert(0, "date", pd.Timestamp(day))
     bars = bars[bars["date"] != pd.Timestamp(day)]
     return pd.concat([bars, new[BAR_COLS]], ignore_index=True) if len(bars) else new[BAR_COLS]
@@ -143,3 +144,35 @@ def save_state(state):
 
 def parse_date(s):
     return date.fromisoformat(s) if s else None
+
+
+def load_themes():
+    """data/themes.csv -> DataFrame(theme, ticker, role). Empty if missing."""
+    if not config.THEMES_FILE.exists():
+        return pd.DataFrame(columns=["theme", "ticker", "role"])
+    t = pd.read_csv(config.THEMES_FILE, dtype=str).fillna("")
+    t["ticker"] = t["ticker"].str.strip().str.upper()
+    t["theme"] = t["theme"].str.strip()
+    t["role"] = t["role"].str.strip().str.lower().replace("", "member")
+    return t[t["ticker"] != ""].drop_duplicates(["theme", "ticker", "role"])
+
+
+def theme_tickers():
+    t = load_themes()
+    return set(t["ticker"]) | {config.BENCHMARK}
+
+
+def load_names():
+    names = {}
+    for f in (config.UNIVERSE_FILE, config.REF_NAMES_FILE):
+        if f.exists():
+            d = pd.read_csv(f, dtype=str).fillna("")
+            names.update(dict(zip(d["ticker"], d["name"])))
+    import re
+    junk = re.compile(r"[\s,]+(Class [A-Z]\s+)?(Common|Ordinary|American Depositary|Depositary)\b.*$|\s+Common$", re.I)
+    return {k: junk.sub("", v).strip() for k, v in names.items()}
+
+
+def save_ref_names(rows):
+    config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(rows).drop_duplicates("ticker").sort_values("ticker").to_csv(config.REF_NAMES_FILE, index=False)

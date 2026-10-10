@@ -128,6 +128,19 @@ class FakeClient:
         self.calls += 1
         return []
 
+    def tickers_of_type(self, kind):
+        self.calls += 1
+        return [{"ticker": "SPYETF", "name": "Fake ETF", "type": "ETF"}] if kind == "ETF" else []
+
+    def daily_bars(self, ticker, start, end):
+        """Per-ticker history: replay cached grouped days for that ticker."""
+        self.calls += 1
+        out = []
+        for d, rows in sorted(self.cache.items()):
+            if start <= d <= end:
+                out += [{"date": d, **r} for r in rows if r["ticker"] == ticker]
+        return out
+
 
 def test_end_to_end(tmp_path=None):
     import tempfile
@@ -141,6 +154,10 @@ def test_end_to_end(tmp_path=None):
     config.UNIVERSE_FILE = config.DATA_DIR / "universe.csv"
     config.SPLITS_FILE = config.DATA_DIR / "splits.csv"
     config.STATE_FILE = config.DATA_DIR / "state.json"
+    config.THEMES_FILE = config.DATA_DIR / "themes.csv"
+    config.REF_NAMES_FILE = config.DATA_DIR / "ref_names.csv"
+    config.BENCHMARK = "NOTRADED"
+    config.DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     fake = FakeClient()
     update.MassiveClient = lambda: fake
@@ -148,11 +165,16 @@ def test_end_to_end(tmp_path=None):
 
     update.today_et = lambda: date(2026, 3, 31)
     assert update.main(["--backfill-days", "400"]) == 0
+    # Add themes after the backfill: the ETF must be backfilled per ticker.
+    rows = ["theme,ticker,role", "Alpha,SPYETF,etf"] + [f"Alpha,T{i:04d},member" for i in range(10)] \
+        + [f"Beta,T{i:04d},member" for i in range(10, 25)]
+    config.THEMES_FILE.write_text("\n".join(rows) + "\n")
+    config.BENCHMARK = "SPYETF"
     hist1 = store.load_breadth()
     assert hist1["complete"].sum() > 150
     assert len(store.load_bars()["date"].unique()) == config.KEEP_TRADING_DAYS
     assert set(store.load_universe()) == set(fake.tickers) - {"SPYETF"}
-    assert "SPYETF" not in set(store.load_bars()["ticker"])
+    assert "SPYETF" not in set(store.load_bars()["ticker"])   # not a theme ticker yet
 
     # Incremental: three more days, one already-known day is not refetched
     update.today_et = lambda: date(2026, 4, 3)
@@ -161,7 +183,20 @@ def test_end_to_end(tmp_path=None):
     hist2 = store.load_breadth()
     assert hist2.index.max() == pd.Timestamp("2026-04-03")
     assert len(hist2) == len(hist1) + 3
-    assert fake.calls - calls_before == 4      # 3 days + splits
+    assert fake.calls - calls_before == 5      # 3 days + 1 ETF backfill + splits
+    bars_now = store.load_bars()
+    etf_days = bars_now[bars_now["ticker"] == "SPYETF"]["date"].nunique()
+    assert etf_days == bars_now["date"].nunique(), (etf_days, bars_now["date"].nunique())
+    import json
+    data = json.loads((config.DOCS_DIR / "data.json").read_text())
+    T = data["themes"]
+    assert T and T["counts"]["themes"] == 2 and T["counts"]["stocks"] == 25
+    assert all(0 <= r["score"] <= 8 for r in T["themes"])
+    assert all(0 <= s_["setup"] <= 10 for s_ in T["stocks"])
+    assert T["bench"]["ticker"] == "SPYETF" and T["themes"][0]["etf"] in (None, "SPYETF")
+    assert 0 <= T["pulse"]["long"] <= 10 and 0 <= T["pulse"]["short"] <= 10
+    # Breadth must not include the ETF
+    assert hist2["universe"].max() <= 400
     # History before the bar window is untouched
     early = hist1.index[:50]
     pd.testing.assert_frame_equal(hist1.loc[early], hist2.loc[early], check_freq=False)

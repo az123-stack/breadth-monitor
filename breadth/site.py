@@ -22,7 +22,7 @@ def _clean(v):
     return round(v, 2) if isinstance(v, float) else v
 
 
-def payload(history):
+def payload(history, theme_data=None):
     full = history.copy()
     # Short averages for the "breakout trend" chart, computed over the full
     # history so the visible window is never blank at its start.
@@ -54,15 +54,17 @@ def payload(history):
                        "overbought": config.T2108_OVERBOUGHT,
                        "strong_ratio": config.STRONG_RATIO},
         "rows": rows,
+        "themes": theme_data,
+        "repo": config.REPO_URL,
     }
 
 
-def build(history):
+def build(history, theme_data=None):
     config.DOCS_DIR.mkdir(parents=True, exist_ok=True)
-    data = payload(history)
+    data = payload(history, theme_data)
     blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
     html = TEMPLATE.read_text().replace("/*__DATA__*/null", blob)
     (config.DOCS_DIR / "index.html").write_text(html)
-    (config.DOCS_DIR / "data.json").write_text(json.dumps(data, indent=1))
+    (config.DOCS_DIR / "data.json").write_text(json.dumps(data, separators=(",", ":")))
     history.to_csv(config.DOCS_DIR / "breadth.csv", float_format="%.4f")
     (config.DOCS_DIR / ".nojekyll").touch()

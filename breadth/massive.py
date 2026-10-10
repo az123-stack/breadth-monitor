@@ -87,12 +87,34 @@ class MassiveClient:
                         "l": r.get("l"), "c": r["c"], "v": r["v"]})
         return out
 
+    def daily_bars(self, ticker, start, end):
+        """Unadjusted daily bars for one ticker between two dates (inclusive)."""
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        et = ZoneInfo("America/New_York")
+        path = f"/v2/aggs/ticker/{ticker}/range/1/day/{start.isoformat()}/{end.isoformat()}"
+        data = self._get(self.base + path, {"adjusted": "false", "sort": "asc", "limit": 50000})
+        out = []
+        for r in data.get("results") or []:
+            if r.get("c") is None:
+                continue
+            d = datetime.fromtimestamp(r["t"] / 1000, et).date()
+            out.append({"date": d, "ticker": ticker, "o": r.get("o"), "h": r.get("h"),
+                        "l": r.get("l"), "c": r["c"], "v": r.get("v") or 0})
+        return out
+
     def common_stocks(self):
         """Active common stocks on US exchanges (type CS)."""
         rows = self._paged("/v3/reference/tickers",
                            {"market": "stocks", "type": "CS", "active": "true", "limit": 1000})
         return [{"ticker": r["ticker"], "name": r.get("name", ""),
                  "exchange": r.get("primary_exchange", "")} for r in rows]
+
+    def tickers_of_type(self, kind):
+        """Active tickers of one reference type (e.g. ETF, ADRC) with names."""
+        rows = self._paged("/v3/reference/tickers",
+                           {"market": "stocks", "type": kind, "active": "true", "limit": 1000})
+        return [{"ticker": r["ticker"], "name": r.get("name", ""), "type": kind} for r in rows]
 
     def splits_since(self, start):
         """Splits with execution_date >= start."""

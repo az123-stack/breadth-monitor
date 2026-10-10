@@ -27,6 +27,26 @@ Deteriorating / Choppy) uses starter thresholds. Once a few months of history
 exist, adjust them in `config.py` — the dashboard shows where each reading sits
 in your own history to help.
 
+## Themes and Stocks tabs
+
+Theme rotation scoring ported from the "Trading Dashboard v12" sheet, computed
+daily from the same price data (no Apps Script, no GOOGLEFINANCE).
+
+- **Edit the themes** in `data/themes.csv` (`theme,ticker,role`). `role` is
+  `member` for stocks that count toward the theme, `etf` for its benchmark ETF.
+  New tickers that aren't common stocks (ETFs, ADRs) are backfilled
+  automatically on the next run; tickers with no data are listed under the
+  Themes table.
+- **Theme score (/8):** +1 each for positive average Today, 5D, 15D, 30D, RS and
+  LT score; +1 if ≥50% of members are up today and over 5 days (ST breadth);
+  +1 if ≥60% are up over 15 and 30 days (LT breadth). 7–8 strong, 4–6 watchlist.
+- **RS:** % change over ~3 months (63 trading days), as in the sheet.
+- **Rotation:** Late/Cooling (30D > 5%, today and 5D down), Mid (today up,
+  5D > 3%, 15D and 30D > 5%), Early (today up, 30D > 5%), else Neutral.
+- **Setup score (/10)** and **Market Pulse long/short (/10)** use the sheet's rules.
+- Rank movement (themes and stocks) is computed from stored history, so it
+  works without daily snapshots.
+
 ## One-time setup (about 10 minutes)
 
 1. **Get a free Massive API key** at massive.com → Dashboard → API Keys.

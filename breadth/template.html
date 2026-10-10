@@ -138,6 +138,65 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .sig .t small { display: block; font-weight: 400; color: var(--text-secondary); font-size: 12.5px; margin-top: 1px; }
 .sig.minor .t { font-weight: 500; }
 @media (max-width: 520px) { .sig { grid-template-columns: 22px 1fr; } .sig .d { grid-column: 2; } .sig .t { grid-column: 2; } }
+/* ---------- tabs ---------- */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 0 0 16px; }
+.tabs button { background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--text-primary); border-bottom-color: var(--s1); font-weight: 600; }
+/* ---------- pulse ---------- */
+.pulse { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+@media (max-width: 760px) { .pulse { grid-template-columns: 1fr; } }
+.pside { padding: 14px 16px; }
+.pside .kicker { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+.pside .big { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 2px; flex-wrap: wrap; }
+.pside .big b { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+.pside .big span { color: var(--text-secondary); font-size: 13px; }
+.pside .lbl { font-weight: 600; font-size: 14.5px; }
+.meter { height: 8px; border-radius: 4px; background: var(--grid); overflow: hidden; margin: 8px 0 10px; }
+.meter i { display: block; height: 100%; border-radius: 4px; }
+.parts { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.parts td { border-top: 1px solid var(--grid); padding: 5px 6px 5px 0; text-align: left; white-space: normal; vertical-align: top; }
+.parts td.pts { text-align: right; white-space: nowrap; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.parts td.note { color: var(--text-muted); }
+.spark { display: block; margin-top: 8px; }
+/* ---------- tables ---------- */
+.tcard { padding: 12px 0 0; margin-bottom: 14px; }
+.tcard .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 0 16px 10px; }
+.tcard h2 { font-size: 14px; font-weight: 600; margin: 0; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.filters input, .filters select { background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; }
+.filters input { width: 170px; }
+.chips { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.chips button { background: none; border: 0; padding: 5px 10px; font: inherit; font-size: 12.5px; color: var(--text-secondary); cursor: pointer; }
+.chips button[aria-pressed="true"] { background: var(--neutral-mid); color: var(--text-primary); font-weight: 600; }
+table.grid th { cursor: pointer; user-select: none; }
+table.grid th[aria-sort] { color: var(--text-primary); }
+table.grid th[aria-sort="descending"]::after { content: " ▾"; }
+table.grid th[aria-sort="ascending"]::after { content: " ▴"; }
+table.grid td.l, table.grid th.l { text-align: left; }
+table.grid tr.trow { cursor: pointer; }
+table.grid tr.trow:hover td { background: color-mix(in srgb, var(--neutral-mid) 60%, transparent); }
+table.grid tr.open td { background: var(--neutral-mid); }
+table.grid td.tname { font-weight: 600; white-space: nowrap; }
+@media (max-width: 520px) { table.grid td.tname { white-space: normal; min-width: 128px; max-width: 150px; } }
+table.grid td.tname small { display: block; font-weight: 400; color: var(--text-muted); font-size: 11.5px; }
+.badge { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
+.badge i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.trail { display: inline-flex; gap: 1px; vertical-align: middle; }
+.trail i { width: 4px; border-radius: 1px; background: var(--s1); display: inline-block; }
+.mv { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; }
+.mv.up { color: var(--good); } .mv.dn { color: var(--critical); }
+tr.drill > td { padding: 0 0 10px 0; background: var(--surface-0); }
+.drillbox { padding: 10px 12px 4px; }
+.drillbox .meta { margin: 0 0 6px; }
+.drillbox table { font-size: 12px; }
+.tier { display: inline-block; min-width: 18px; padding: 1px 6px; border-radius: 5px; font-weight: 700; font-size: 11.5px; text-align: center; }
+.tier.A { background: color-mix(in srgb, var(--good) 28%, transparent); }
+.tier.B { background: color-mix(in srgb, var(--warning) 26%, transparent); }
+.tier.C { background: var(--neutral-mid); color: var(--text-secondary); }
+.more-row { text-align: center; padding: 10px; }
+.more-row button { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px; font: inherit; font-size: 13px; color: var(--text-primary); cursor: pointer; }
+.note { color: var(--text-muted); font-size: 12px; padding: 0 16px 14px; line-height: 1.55; }
+.note a { color: var(--text-secondary); }
 footer { color: var(--text-muted); font-size: 12px; margin-top: 18px; line-height: 1.6; }
 footer a { color: var(--text-secondary); }
 .empty { padding: 40px; text-align: center; color: var(--text-secondary); }
@@ -161,20 +220,46 @@ const TONES = {
   neutral: { color: "var(--text-muted)", icon: '<path d="M4 12h16M4 7h10M4 17h13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' },
 };
 
+let TAB = "breadth";
+try { const h = location.hash.slice(1); if (["breadth", "themes", "stocks"].includes(h)) TAB = h; } catch (e) {}
+
 function render() {
   const app = document.getElementById("app");
+  app.innerHTML = "";
   if (!DATA || !DATA.rows || !DATA.rows.length) {
     app.innerHTML = '<div class="card empty">No data yet. Run the backfill workflow once to load history.</div>';
     return;
   }
-  const rows = DATA.rows, last = rows[rows.length - 1], R = DATA.regime, P = DATA.percentiles || {};
-  const gen = new Date(DATA.generated);
-
+  const last = DATA.rows[DATA.rows.length - 1], gen = new Date(DATA.generated);
   app.append($(`<header>
     <div><h1>Market Breadth Monitor</h1>
     <div class="meta">Data through ${longDate(last.date)}</div></div>
     <div class="meta">Updated ${gen.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${fmt(DATA.history_days)} days of history</div>
   </header>`));
+  const tabs = $(`<nav class="tabs" role="tablist">
+    <button role="tab" data-tab="breadth">Breadth</button>
+    <button role="tab" data-tab="themes">Themes</button>
+    <button role="tab" data-tab="stocks">Stocks</button></nav>`);
+  app.append(tabs);
+  const panel = $('<div class="panel"></div>');
+  app.append(panel);
+  const show = () => {
+    tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === TAB));
+    panel.innerHTML = "";
+    if (TAB === "themes") renderThemes(panel);
+    else if (TAB === "stocks") renderStocks(panel);
+    else renderBreadth(panel);
+  };
+  tabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    TAB = b.dataset.tab;
+    try { history.replaceState(null, "", "#" + TAB); } catch (e) {}
+    show();
+  }));
+  show();
+}
+
+function renderBreadth(app) {
+  const rows = DATA.rows, last = rows[rows.length - 1], R = DATA.regime, P = DATA.percentiles || {};
 
   const tone = TONES[R.tone] || TONES.neutral;
   app.append($(`<section class="card regime" style="--tone:${tone.color}">
@@ -553,13 +638,184 @@ function table(rows) {
   return el;
 }
 
+/* =================== THEMES & STOCKS =================== */
+const pct = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : "") + (v * 100).toFixed(d) + "%";
+const num = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : "") + Number(v).toFixed(d);
+// Return-cell tint: 4 steps each side, thresholds scale with the horizon.
+function tint(v, scale) {
+  if (v == null) return "";
+  const a = Math.abs(v) / scale;
+  const k = a >= 2 ? "2" : a >= 0.75 ? "1" : "";
+  return k ? (v > 0 ? "u" : "d") + k : "";
+}
+const SCALE = { today: 0.015, d3: 0.03, d5: 0.04, d15: 0.08, d20: 0.1, d30: 0.12, rs: 20, lt: 0.04, vs_d5: 0.03, vs_d30: 0.08, etf_d5: 0.04 };
+const CLASS_COLOR = { STRONG: "var(--good)", WATCHLIST: "var(--warning)", WEAK: "var(--critical)" };
+const ROT = { "Early Rotation": "🌅 Early", "Mid Rotation": "🚀 Mid", "Late / Cooling": "🔻 Late / cooling", "Neutral": "⏸ Neutral" };
+const mvCell = (v) => v == null ? '<span class="mv">–</span>' : v === 0 ? '<span class="mv">·</span>'
+  : `<span class="mv ${v > 0 ? "up" : "dn"}">${v > 0 ? "▲" : "▼"}${Math.abs(v)}${Math.abs(v) >= 10 ? (v > 0 ? " 🔥" : " ❄️") : ""}</span>`;
+const trailHTML = (tr) => `<span class="trail" title="Score over the last ${tr.length} days">${tr.map(v => v == null ? '<i style="height:2px;opacity:.3"></i>' : `<i style="height:${3 + v * 2}px;opacity:${0.35 + v * 0.08}"></i>`).join("")}</span>`;
+
+function sortable(table, cols, getRows, draw, initial) {
+  let key = initial[0], dir = initial[1];
+  const ths = table.querySelectorAll("th");
+  const mark = () => ths.forEach((th, i) => { if (cols[i].k === key) th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending"); else th.removeAttribute("aria-sort"); });
+  ths.forEach((th, i) => {
+    if (!cols[i].k) return;
+    th.addEventListener("click", () => {
+      if (key === cols[i].k) dir = -dir; else { key = cols[i].k; dir = cols[i].asc ? 1 : -1; }
+      mark(); draw(sortRows(getRows(), key, dir));
+    });
+  });
+  mark();
+  return () => sortRows(getRows(), key, dir);
+}
+function sortRows(rows, key, dir) {
+  return rows.slice().sort((a, b) => {
+    const x = a[key], y = b[key];
+    if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * dir;
+  });
+}
+
+function pulseCard(T) {
+  const P = T.pulse, H = T.pulse_hist || [];
+  const side = (kind) => {
+    const v = P[kind], label = P[kind + "_label"], parts = P[kind + "_parts"];
+    const col = kind === "long" ? (v >= 6 ? "var(--good)" : v >= 4 ? "var(--warning)" : "var(--critical)")
+                                : (v >= 6 ? "var(--critical)" : v >= 4 ? "var(--warning)" : "var(--text-muted)");
+    const vals = H.map(h => h[kind]);
+    const w = 260, h = 34, n = Math.max(vals.length - 1, 1);
+    const pts = vals.map((x, i) => `${(i / n * w).toFixed(1)},${(h - 2 - x / 10 * (h - 4)).toFixed(1)}`).join(" ");
+    return `<div class="card pside">
+      <div class="kicker">${kind === "long" ? "Long side" : "Short side"}</div>
+      <div class="big"><b class="num">${v}<span style="font-size:15px;color:var(--text-muted)"> / 10</span></b><span class="lbl" style="color:var(--text-primary)">${label}</span></div>
+      <div class="meter"><i style="width:${v * 10}%;background:${col}"></i></div>
+      <table class="parts">${parts.map(p => `<tr><td>${p.name}<br><span style="color:var(--text-muted)">${p.value}</span></td><td class="note">${p.note}</td><td class="pts">${p.pts}/${p.max}</td></tr>`).join("")}</table>
+      ${vals.length > 2 ? `<svg class="spark" width="100%" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" height="${h}" aria-label="${kind} score, last ${vals.length} days"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg><div class="meta" style="font-size:11.5px">Last ${vals.length} trading days</div>` : ""}
+    </div>`;
+  };
+  return $(`<section class="pulse">${side("long")}${side("short")}</section>`);
+}
+
+function renderThemes(app) {
+  const T = DATA.themes;
+  if (!T) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  app.append(pulseCard(T));
+  const cols = [
+    { k: "theme", h: "Theme", l: true, asc: true }, { k: "rank", h: "Rank", asc: true }, { k: "score", h: "Score<small>/ 8</small>" },
+    { k: "mv5", h: "Rank Δ<small>5 days</small>" }, { k: null, h: "Trail<small>30 days</small>" }, { k: "rotation", h: "Rotation", l: true, asc: true },
+    { k: "today", h: "Today" }, { k: "d5", h: "5D" }, { k: "d15", h: "15D" }, { k: "d30", h: "30D" }, { k: "rs", h: "RS<small>3-mo %</small>" },
+    { k: "vs_d30", h: "vs SPY<small>30D</small>" }, { k: "st_b", h: "ST breadth" }, { k: "lt_b", h: "LT breadth" }, { k: "etf_d5", h: "ETF<small>5D</small>" }, { k: "n", h: "Stocks" },
+  ];
+  const card = $(`<section class="card tcard"><div class="head"><h2>Themes <span class="meta">· ${T.counts.themes} themes, ${T.counts.stocks} stocks · click a row for its stocks</span></h2>
+    <div class="filters"><div class="chips" role="group" aria-label="Class">${["All", "STRONG", "WATCHLIST", "WEAK"].map((c, i) => `<button data-c="${c}" aria-pressed="${i === 0}">${c === "All" ? "All" : c[0] + c.slice(1).toLowerCase()}</button>`).join("")}</div>
+    <input type="search" placeholder="Search themes"></div></div>
+    <div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>
+    <div class="note">Score: +1 each for positive average Today, 5D, 15D, 30D, RS and LT score; +1 if at least 50% of the theme's stocks are up today and over 5 days (ST breadth); +1 if at least 60% are up over 15 and 30 days (LT breadth). 7–8 strong, 4–6 watchlist, 0–3 weak.
+    Rank Δ: places gained (▲) or lost (▼) in 5 days. Returns are equal-weighted averages of the theme's stocks; the ETF column is the theme's benchmark ETF.
+    ${T.missing && T.missing.length ? `<br>Tickers with no data (check spelling or listing): ${T.missing.join(", ")}.` : ""}
+    Edit themes in <a href="${DATA.repo ? DATA.repo + "/edit/main/data/themes.csv" : "#"}" target="_blank" rel="noopener">data/themes.csv</a>.</div></section>`);
+  app.append(card);
+  const body = card.querySelector("tbody");
+  let cls = "All", q = "";
+  const filtered = () => T.themes.filter(r => (cls === "All" || r.class === cls) && (!q || r.theme.toLowerCase().includes(q)));
+  const open = new Set();
+  const draw = (rows) => {
+    body.innerHTML = "";
+    rows.forEach(r => {
+      const tr = $(`<table><tr class="trow${open.has(r.theme) ? " open" : ""}">
+        <td class="l tname">${r.theme}<small>${r.etf ? r.etf + " · " : ""}${r.n} stocks</small></td>
+        <td class="num">${r.rank}</td>
+        <td><span class="badge"><i style="background:${CLASS_COLOR[r.class]}"></i><span class="num">${r.score}</span></span></td>
+        <td>${mvCell(r.mv5)}</td>
+        <td>${trailHTML(r.trail)}</td><td class="l">${ROT[r.rotation] || r.rotation}</td>
+        ${["today", "d5", "d15", "d30"].map(k => `<td class="num ${tint(r[k], SCALE[k])}">${pct(r[k])}</td>`).join("")}
+        <td class="num ${tint(r.rs, SCALE.rs)}">${num(r.rs)}</td>
+        <td class="num ${tint(r.vs_d30, SCALE.vs_d30)}">${r.vs_d30 == null ? "–" : (r.vs_d30 > 0 ? "+" : "") + (r.vs_d30 * 100).toFixed(1) + " pts"}</td>
+        <td class="num">${Math.round(r.st_b * 100)}% <span class="meta">${r.st_label}</span></td>
+        <td class="num">${Math.round(r.lt_b * 100)}% <span class="meta">${r.lt_label}</span></td>
+        <td class="num ${tint(r.etf_d5, SCALE.etf_d5)}">${pct(r.etf_d5)}</td><td class="num">${r.n}</td></tr></table>`).querySelector("tr");
+      body.append(tr);
+      if (open.has(r.theme)) body.append(drillRow(r, cols.length));
+      tr.addEventListener("click", () => { open.has(r.theme) ? open.delete(r.theme) : open.add(r.theme); draw(current()); });
+    });
+  };
+  const current = sortable(card.querySelector("table"), cols, filtered, draw, ["rank", 1]);
+  card.querySelectorAll(".chips button").forEach(b => b.addEventListener("click", () => {
+    cls = b.dataset.c; card.querySelectorAll(".chips button").forEach(o => o.setAttribute("aria-pressed", o === b)); draw(current());
+  }));
+  card.querySelector("input").addEventListener("input", (e) => { q = e.target.value.trim().toLowerCase(); draw(current()); });
+  draw(current());
+}
+
+let STOCK_BY = null;
+function stockMap() {
+  if (!STOCK_BY) { STOCK_BY = {}; (DATA.themes.stocks || []).forEach(s => { STOCK_BY[s.t] = s; }); }
+  return STOCK_BY;
+}
+const STOCK_COLS = [
+  { k: "t", h: "Ticker", l: true, asc: true }, { k: "setup", h: "Setup<small>/ 10</small>" }, { k: "rs", h: "RS<small>3-mo %</small>" },
+  { k: "rk", h: "RS rank", asc: true }, { k: "rk5", h: "Rank Δ<small>5 days</small>" },
+  { k: "today", h: "Today" }, { k: "d5", h: "5D" }, { k: "d15", h: "15D" }, { k: "d30", h: "30D" }, { k: "lt", h: "LT score" },
+  { k: "e8", h: "vs 8 EMA" }, { k: "e21", h: "vs 21 EMA" }, { k: "e50", h: "vs 50 EMA" }, { k: "price", h: "Price" },
+];
+function stockCells(s, withTheme) {
+  const ema = (v) => { const near = v != null && v >= -0.03 && v <= 0.01; return `<td class="num"${near ? ' style="font-weight:700" title="Within -3% to +1% of this EMA"' : ""}>${pct(v)}</td>`; };
+  return `<td class="l tname">${s.t}<small>${(s.name || "").slice(0, 28)}${withTheme ? (s.name ? " · " : "") + s.themes[0] + (s.themes.length > 1 ? ` +${s.themes.length - 1}` : "") : ""}</small></td>
+    <td><span class="tier ${s.tier}">${s.tier}</span> <span class="num">${s.setup}</span></td>
+    <td class="num ${tint(s.rs, SCALE.rs)}">${num(s.rs)}</td><td class="num">${s.rk ?? "–"}</td><td>${mvCell(s.rk5)}</td>
+    ${["today", "d5", "d15", "d30", "lt"].map(k => `<td class="num ${tint(s[k], SCALE[k])}">${pct(s[k])}</td>`).join("")}
+    ${ema(s.e8)}${ema(s.e21)}${ema(s.e50)}<td class="num">${s.price == null ? "–" : s.price.toFixed(2)}</td>`;
+}
+function drillRow(r, span) {
+  const M = stockMap();
+  const list = r.members.map(t => M[t]).filter(Boolean).sort((a, b) => (b.rs ?? -1e9) - (a.rs ?? -1e9));
+  const tr = $(`<table><tr class="drill"><td colspan="${span}"><div class="drillbox">
+    <div class="meta">${r.theme}: ${list.length} stocks, strongest RS first · setup score uses this theme's score where it's the stock's strongest theme</div>
+    <div class="scroll"><table class="grid"><thead><tr>${STOCK_COLS.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead>
+    <tbody>${list.map(s => `<tr>${stockCells(s, false)}</tr>`).join("")}</tbody></table></div></div></td></tr></table>`).querySelector("tr");
+  tr.addEventListener("click", (e) => e.stopPropagation());
+  return tr;
+}
+
+function renderStocks(app) {
+  const T = DATA.themes;
+  if (!T) { app.append($('<div class="card empty">Stock data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  const themesList = T.themes.map(t => t.theme).sort();
+  const card = $(`<section class="card tcard"><div class="head"><h2>Stocks <span class="meta">· ${T.counts.stocks} in your themes</span></h2>
+    <div class="filters"><div class="chips" role="group" aria-label="Tier">${["All", "A", "B", "C"].map((c, i) => `<button data-c="${c}" aria-pressed="${i === 0}">${c === "All" ? "All tiers" : c + "-tier"}</button>`).join("")}</div>
+    <select aria-label="Theme"><option value="">All themes</option>${themesList.map(t => `<option>${t}</option>`).join("")}</select>
+    <input type="search" placeholder="Search ticker or name"></div></div>
+    <div class="scroll"><table class="grid"><thead><tr>${STOCK_COLS.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>
+    <div class="more-row"></div>
+    <div class="note">Setup score (/10, from your sheet): theme strength (0–2), trend: 15D and 30D up, RS and LT positive (0–2), within −3% to +1% of the 8 or 21 EMA (2, shown in bold), up today (1), resting: 5D under 2% after 15D and 30D gains over 5% (1), positive RS (1), coiling (1). A-tier 8+, B-tier 5–7.
+    RS is the % change over about 3 months (63 trading days). RS rank is among all stocks here; Rank Δ is places gained (▲) or lost (▼) in 5 days, with 🔥/❄️ for 10+.</div></section>`);
+  app.append(card);
+  const body = card.querySelector("tbody"), moreRow = card.querySelector(".more-row");
+  let tierF = "All", themeF = "", q = "", limit = 100;
+  const filtered = () => T.stocks.filter(s => (tierF === "All" || s.tier === tierF) && (!themeF || s.themes.includes(themeF))
+    && (!q || s.t.toLowerCase().startsWith(q) || (s.name || "").toLowerCase().includes(q)));
+  const draw = (rows) => {
+    body.innerHTML = rows.slice(0, limit).map(s => `<tr>${stockCells(s, true)}</tr>`).join("");
+    moreRow.innerHTML = rows.length > limit ? `<button>Show ${Math.min(100, rows.length - limit)} more (${rows.length - limit} hidden)</button>` : "";
+    const b = moreRow.querySelector("button"); if (b) b.addEventListener("click", () => { limit += 100; draw(current()); });
+  };
+  const current = sortable(card.querySelector("table"), STOCK_COLS, filtered, draw, ["setup", -1]);
+  card.querySelectorAll(".chips button").forEach(b => b.addEventListener("click", () => {
+    tierF = b.dataset.c; limit = 100; card.querySelectorAll(".chips button").forEach(o => o.setAttribute("aria-pressed", o === b)); draw(current());
+  }));
+  card.querySelector("select").addEventListener("change", (e) => { themeF = e.target.value; limit = 100; draw(current()); });
+  card.querySelector("input").addEventListener("input", (e) => { q = e.target.value.trim().toLowerCase(); limit = 100; draw(current()); });
+  draw(current());
+}
+
 render();
 let lastW = window.innerWidth;
 window.addEventListener("resize", () => {
   if (Math.abs(window.innerWidth - lastW) < 40) return;
   lastW = window.innerWidth;
   clearTimeout(window._rt);
-  window._rt = setTimeout(() => { document.getElementById("app").innerHTML = ""; render(); }, 150);
+  window._rt = setTimeout(() => { render(); }, 150);
 });
 </script>
 </body>

@@ -15,6 +15,8 @@ BARS_DIR = DATA_DIR / "bars"                 # one raw parquet file per trading 
 BREADTH_FILE = DATA_DIR / "breadth.csv"      # full breadth history, one row per day
 UNIVERSE_FILE = DATA_DIR / "universe.csv"    # common-stock ticker list
 SPLITS_FILE = DATA_DIR / "splits.csv"        # split history used to adjust stored raw bars
+REF_NAMES_FILE = DATA_DIR / "ref_names.csv"  # names/types for ETFs and ADRs
+THEMES_FILE = DATA_DIR / "themes.csv"        # your theme lists (edit freely)
 STATE_FILE = DATA_DIR / "state.json"         # bookkeeping (split checks, universe refresh)
 
 # ---- Massive (formerly Polygon.io) API -------------------------------------
@@ -24,6 +26,10 @@ API_KEY = os.environ.get("MASSIVE_API_KEY", "")
 # Set MASSIVE_MIN_INTERVAL=0 if you upgrade to a paid plan.
 MIN_CALL_INTERVAL = float(os.environ.get("MASSIVE_MIN_INTERVAL", "12.5"))
 UNIVERSE_REFRESH_DAYS = 7
+
+BENCHMARK = "SPY"
+REPO_URL = os.environ.get("REPO_URL", "https://github.com/az123-stack/breadth-monitor")
+EXTRA_RETRY_DAYS = 7          # retry tickers that returned no data after this many days
 
 # ---- Storage ---------------------------------------------------------------
 # Longest lookback is 65 trading days (quarter); keep extra so recent history

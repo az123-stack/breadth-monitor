@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from . import config, metrics, site, store
+from . import config, metrics, site, store, themes
 from .massive import MassiveClient, MassiveError
 
 log = logging.getLogger("breadth")
@@ -41,12 +41,17 @@ def refresh_universe(client, state, force=False):
             raise MassiveError(f"universe looks too small ({len(rows)} tickers), not saving")
         store.save_universe(rows)
         state["universe_refreshed"] = today_et().isoformat()
+        try:  # names for ETFs and ADRs used in themes (a few extra calls, weekly)
+            ref = client.tickers_of_type("ETF") + client.tickers_of_type("ADRC")
+            store.save_ref_names(ref)
+        except Exception as e:
+            log.warning("could not refresh ETF/ADR names: %s", e)
         universe = {r["ticker"] for r in rows}
         log.info("universe: %d common stocks", len(universe))
     return universe
 
 
-def fetch_days(client, bars, universe, days, checkpoint_every=25):
+def fetch_days(client, bars, keep, days, checkpoint_every=25):
     have = set(pd.to_datetime(bars["date"]).dt.date) if len(bars) else set()
     todo = [d for d in days if d not in have]
     log.info("%d day(s) to fetch", len(todo))
@@ -62,12 +67,59 @@ def fetch_days(client, bars, universe, days, checkpoint_every=25):
         if not rows:
             log.info("%s: no data (holiday or not published yet)", d)
             continue
-        bars = store.append_day(bars, d, rows, universe)
+        bars = store.append_day(bars, d, rows, keep)
         added += 1
         log.info("[%d/%d] %s: %d bars", i, len(todo), d, len(rows))
         if added % checkpoint_every == 0:
             store.save_bars(bars)
     return bars, added
+
+
+def backfill_extras(client, bars, universe, state):
+    """Theme tickers outside the common-stock universe (ETFs, ADRs, SPY...)
+    were not kept in older stored days. Fetch their history once, per ticker."""
+    if bars.empty:
+        return bars
+    done = set(state.get("extras_done", []))
+    missing = dict(state.get("extras_missing", {}))
+    today = today_et()
+    todo = []
+    for t in sorted(store.theme_tickers() - universe - done):
+        last_try = store.parse_date(missing.get(t))
+        if last_try and (today - last_try).days < config.EXTRA_RETRY_DAYS:
+            continue
+        todo.append(t)
+    if not todo:
+        return bars
+    dates = pd.DatetimeIndex(sorted(bars["date"].unique()))
+    start, end = dates[0].date(), dates[-1].date()
+    log.info("backfilling %d theme ticker(s) outside the stock universe", len(todo))
+    new, rewrite = [], set()
+    for i, t in enumerate(todo, 1):
+        try:
+            rows = client.daily_bars(t, start, end)
+        except MassiveError as e:
+            log.warning("%s: %s", t, e)
+            rows = []
+        rows = [r for r in rows if pd.Timestamp(r["date"]) in dates]
+        if rows:
+            new.extend(rows)
+            rewrite.update(pd.Timestamp(r["date"]) for r in rows)
+            done.add(t)
+            missing.pop(t, None)
+        else:
+            missing[t] = today.isoformat()
+        log.info("[%d/%d] %s: %d bars", i, len(todo), t, len(rows))
+    if new:
+        add = pd.DataFrame(new)
+        add["date"] = pd.to_datetime(add["date"])
+        key = add.set_index(["date", "ticker"]).index
+        bars = bars[~bars.set_index(["date", "ticker"]).index.isin(key)]
+        bars = pd.concat([bars, add[store.BAR_COLS]], ignore_index=True)
+        store.save_bars(bars, rewrite_days=rewrite)
+    state["extras_done"] = sorted(done)
+    state["extras_missing"] = missing
+    return bars
 
 
 def refresh_splits(client, bars, state):
@@ -91,12 +143,22 @@ def refresh_splits(client, bars, state):
     return splits
 
 
-def recompute_and_publish(bars, splits):
+def recompute_and_publish(bars, splits, universe, state):
     adjusted = store.apply_splits(bars, splits)
-    fresh = metrics.compute(adjusted)
+    # Breadth stays on the common-stock universe; theme ETFs/ADRs are excluded.
+    extras = store.theme_tickers() - set(universe)
+    stocks = adjusted[~adjusted["ticker"].isin(extras)]
+    fresh = metrics.compute(stocks)
     history = metrics.merge(store.load_breadth(), fresh)
     store.save_breadth(history)
-    site.build(history)
+    try:
+        theme_data = themes.build(adjusted, store.load_themes(), universe,
+                                  names=store.load_names(),
+                                  missing=sorted(state.get("extras_missing", {})))
+    except Exception as e:  # never let the theme tab break the breadth dashboard
+        log.exception("theme build failed: %s", e)
+        theme_data = None
+    site.build(history, theme_data)
     return history
 
 
@@ -114,6 +176,7 @@ def main(argv=None):
     if not args.rebuild_only:
         client = MassiveClient()
         universe = refresh_universe(client, state)
+        keep = universe | store.theme_tickers()
         end = today_et()
         if args.backfill_days:
             start = end - timedelta(days=args.backfill_days)
@@ -122,7 +185,10 @@ def main(argv=None):
         else:
             log.error("no stored data yet: run once with --backfill-days")
             return 1
-        bars, added = fetch_days(client, bars, universe, list(weekdays(start, end)))
+        bars, added = fetch_days(client, bars, keep, list(weekdays(start, end)))
+        store.save_bars(bars)
+        store.save_state(state)
+        bars = backfill_extras(client, bars, universe, state)
         if added == 0 and not args.backfill_days:
             log.info("no new trading days; rebuilding site anyway")
         splits = refresh_splits(client, bars, state)
@@ -130,12 +196,13 @@ def main(argv=None):
         store.save_state(state)
     else:
         splits = store.load_splits()
+        universe = store.load_universe()
 
     if bars.empty:
         log.error("no bars stored")
         return 1
 
-    history = recompute_and_publish(bars, splits)
+    history = recompute_and_publish(bars, splits, universe, state)
     # Prune old bars only after the metrics they fed are safely written.
     store.prune(bars)
     last = history.iloc[-1]
