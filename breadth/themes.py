@@ -35,6 +35,7 @@ def ticker_frames(adjusted, tickers):
     f["lt"] = (f["today"] + f["d3"] + f["d5"] * 2 + f["d15"] * 2 + f["d20"] * 2 + f["d30"] * 3) / 11
     for n in (8, 21, 50):
         ema = close.ewm(span=n, adjust=False, min_periods=n).mean()
+        f[f"ema{n}"] = ema
         f[f"e{n}"] = close / ema - 1
     return f
 
@@ -215,7 +216,7 @@ def build(adjusted, themes_df, universe, names=None, missing=()):
         j = last - n
         return rank_at(j) if j >= first_hist else {}
 
-    r1, r3, r5, r10 = ago(1), ago(3), ago(5), ago(10)
+    r1, r3, r4, r5, r10 = ago(1), ago(3), ago(4), ago(5), ago(10)
     bench = config.BENCHMARK if config.BENCHMARK in f["close"].columns else None
     bret = {k: (float(f[k].iloc[last][bench]) if bench and not pd.isna(f[k].iloc[last][bench]) else None)
             for k in ("today", "d5", "d15", "d30")}
@@ -236,6 +237,7 @@ def build(adjusted, themes_df, universe, names=None, missing=()):
             "vs_d5": _r(row["d5"] - bret["d5"]) if bret["d5"] is not None else None,
             "vs_d30": _r(row["d30"] - bret["d30"]) if bret["d30"] is not None else None,
             "mv1": delta(r1), "mv3": delta(r3), "mv5": delta(r5), "mv10": delta(r10),
+            "r_m4": r4.get(th), "r_m9": ago(9).get(th),
             "etf": etf, "etf_d5": _r(f["d5"].iloc[last][etf]) if etf else None,
             "etf_d30": _r(f["d30"].iloc[last][etf]) if etf else None,
             "trail": trail, "members": [t for t in members[th] if t in f["close"].columns],
@@ -253,6 +255,7 @@ def build(adjusted, themes_df, universe, names=None, missing=()):
         s = f["rs"].iloc[i][[t for t in stock_themes if t in cols]].dropna().sort_values(ascending=False)
         return {t: k + 1 for k, t in enumerate(s.index)}
     rk_now, rk5, rk10 = rs_rank(last), rs_rank(last - 5), rs_rank(last - 10)
+    rk4 = rs_rank(last - 4)
     stocks = []
     for t, ths in stock_themes.items():
         if t not in cols or pd.isna(f["today"].iloc[last][t]):
@@ -267,10 +270,19 @@ def build(adjusted, themes_df, universe, names=None, missing=()):
             **{k: _r(v, 2 if k == "rs" else 4) for k, v in s.items()},
             "rk": rk_now.get(t), "rk5": int(rk5[t] - rk_now[t]) if t in rk5 and t in rk_now else None,
             "rk10": int(rk10[t] - rk_now[t]) if t in rk10 and t in rk_now else None,
+            "rk_m4": rk4.get(t),
             "is_stock": t in universe,
         })
     stocks.sort(key=lambda r: (-r["setup"], -(r["rs"] or -1e9)))
 
+    # Live layer: for a new session N, an N-day return = live / close[last+1-N] - 1
+    offs = {"c1": 0, "c3": 2, "c5": 4, "c15": 14, "c20": 19, "c30": 29, "c63": RS_DAYS - 1}
+    refs = {}
+    for t in cols:
+        if pd.isna(f["close"].iloc[last][t]):
+            continue
+        refs[t] = [_r(f["close"].iloc[last - o][t], 4) if last - o >= 0 else None for o in offs.values()] + \
+                  [_r(f[f"ema{n}"].iloc[last][t], 4) for n in (8, 21, 50)]
     pulse_hist = [{"date": dates[i].strftime("%Y-%m-%d"), **{k: v for k, v in pulse(tables[i]).items() if k in ("long", "short")}}
                   for i in hist_idx]
     return {
@@ -279,6 +291,8 @@ def build(adjusted, themes_df, universe, names=None, missing=()):
         "pulse": pulse(now), "pulse_hist": pulse_hist,
         "bench": {"ticker": bench, **{k: _r(v) for k, v in bret.items()}},
         "themes": theme_rows, "stocks": stocks,
+        "refs": refs, "ref_keys": list(offs) + ["ema8", "ema21", "ema50"],
+        "theme_etfs": {th: e for th, e in etfs.items()},
         "missing": [m for m in missing if m in all_t],
         "counts": {"themes": len(theme_rows), "stocks": len(stocks)},
     }

@@ -56,6 +56,7 @@ def payload(history, theme_data=None):
         "rows": rows,
         "themes": theme_data,
         "repo": config.REPO_URL,
+        "live_url": config.LIVE_CSV_URL,
     }
 
 

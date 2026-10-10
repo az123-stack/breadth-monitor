@@ -142,6 +142,11 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 0 0 16px; }
 .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer; }
 .tabs button[aria-selected="true"] { color: var(--text-primary); border-bottom-color: var(--s1); font-weight: 600; }
+.livebar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 9px 14px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); font-size: 13px; color: var(--text-secondary); }
+.livebar b { color: var(--text-primary); }
+.livebar .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-muted); flex: none; }
+.livebar .dot.on { background: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 25%, transparent); }
+.livebar button { margin-left: auto; background: var(--surface-0); border: 1px solid var(--border); border-radius: 8px; padding: 4px 12px; font: inherit; font-size: 12.5px; color: var(--text-primary); cursor: pointer; }
 /* ---------- pulse ---------- */
 .pulse { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 @media (max-width: 760px) { .pulse { grid-template-columns: 1fr; } }
@@ -638,6 +643,178 @@ function table(rows) {
   return el;
 }
 
+/* =================== LIVE LAYER (Google Sheet prices) =================== */
+let LIVE = null;          // { fetched: Date, spyDate: "YYYY-MM-DD", spyTime: string, prices: {t: p} }
+let LIVE_ERR = null, LIVE_T = null, LIVE_BUSY = false;
+const UI = { themes: { cls: "All", q: "", open: new Set(), sort: ["rank", 1] },
+             stocks: { tier: "All", theme: "", q: "", limit: 100, sort: ["setup", -1] } };
+
+function parseLiveCSV(text) {
+  const prices = {}; let spyTime = null;
+  text.split(/\r?\n/).forEach(line => {
+    const i = line.indexOf(","); if (i < 0) return;
+    const k = line.slice(0, i).trim().replace(/^"|"$/g, ""), v = line.slice(i + 1).trim().replace(/^"|"$/g, "");
+    if (k === "_spytime") spyTime = v;
+    else if (k && k[0] !== "_" && k !== "ticker") { const n = parseFloat(v.replace(/[$,]/g, "")); if (isFinite(n) && n > 0) prices[k.toUpperCase()] = n; }
+  });
+  let spyDate = null;
+  const m = spyTime && spyTime.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) spyDate = `${m[3]}-${m[1].padStart(2, "0")}-${m[2].padStart(2, "0")}`;
+  return { prices, spyTime, spyDate };
+}
+
+async function fetchLive() {
+  if (!DATA.live_url || !DATA.themes || LIVE_BUSY) return;
+  LIVE_BUSY = true;
+  try {
+    const url = DATA.live_url + (DATA.live_url.includes("?") ? "&" : "?") + "cb=" + Date.now();
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const parsed = parseLiveCSV(await r.text());
+    if (!Object.keys(parsed.prices).length) throw new Error("no prices in sheet");
+    LIVE = { ...parsed, fetched: new Date() }; LIVE_ERR = null;
+    LIVE_T = liveActive() ? computeLive(DATA.themes, LIVE.prices, LIVE.spyDate) : null;
+  } catch (e) { LIVE_ERR = String(e.message || e); }
+  LIVE_BUSY = false;
+  if (TAB === "themes" || TAB === "stocks") rerenderPanel();
+}
+const liveActive = () => !!(LIVE && LIVE.spyDate && DATA.themes && LIVE.spyDate > DATA.themes.date);
+const getT = () => LIVE_T || DATA.themes;
+
+function liveMetrics(T, prices) {
+  const K = T.ref_keys, M = {}, bad = [];
+  const ix = Object.fromEntries(K.map((k, i) => [k, i]));
+  for (const t in T.refs) {
+    const r = T.refs[t], p = prices[t], c1 = r[ix.c1];
+    if (p == null || !c1) continue;
+    if (Math.abs(p / c1 - 1) > 0.5) { bad.push(t); continue; }  // wrong listing or bad print
+    const ret = (k) => r[ix[k]] ? p / r[ix[k]] - 1 : null;
+    const m = { price: p, today: p / c1 - 1, d3: ret("c3"), d5: ret("c5"), d15: ret("c15"), d20: ret("c20"), d30: ret("c30") };
+    m.rs = r[ix.c63] ? (p / r[ix.c63] - 1) * 100 : null;
+    const z = (v) => v ?? 0;
+    m.st = (m.today * 3 + z(m.d3) + z(m.d5) * 2) / 6;
+    m.lt = (m.today + z(m.d3) + z(m.d5) * 2 + z(m.d15) * 2 + z(m.d20) * 2 + z(m.d30) * 3) / 11;
+    [[8, "ema8"], [21, "ema21"], [50, "ema50"]].forEach(([n, k]) => {
+      const e = r[ix[k]]; if (e == null) { m["e" + n] = null; return; }
+      const a = 2 / (n + 1), en = p * a + e * (1 - a); m["e" + n] = p / en - 1;
+    });
+    M[t] = m;
+  }
+  return { M, bad };
+}
+
+function rotationOf(a) {
+  const t = a.today ?? 0, d5 = a.d5 ?? 0, d15 = a.d15 ?? 0, d30 = a.d30 ?? 0;
+  if (d30 > 0.05 && t < 0 && d5 < 0) return "Late / Cooling";
+  if (t > 0 && d5 > 0.03 && d15 > 0.05 && d30 > 0.05) return "Mid Rotation";
+  if (t > 0 && d30 > 0.05) return "Early Rotation";
+  return "Neutral";
+}
+const blabel = (x) => x >= 0.7 ? "Wide" : x >= 0.4 ? "Moderate" : "Narrow";
+const mean = (a) => { const v = a.filter(x => x != null && isFinite(x)); return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null; };
+
+function setupScoreJS(ts, s) {
+  const ok = (v) => v != null && isFinite(v);
+  let p = ts >= 7 ? 2 : ts >= 4 ? 1 : 0;
+  if (ok(s.d15) && ok(s.d30) && s.d15 > 0 && s.d30 > 0) p += (ok(s.rs) && s.rs > 0 && ok(s.lt) && s.lt > 0.02) ? 2 : 1;
+  const near = (v) => ok(v) && v >= -0.03 && v <= 0.01;
+  if (near(s.e8) || near(s.e21)) p += 2;
+  if (ok(s.today) && s.today > 0) p += 1;
+  if (ok(s.d5) && ok(s.d15) && ok(s.d30) && s.d5 < 0.02 && s.d15 > 0.05 && s.d30 > 0.05) p += 1;
+  if (ok(s.rs) && s.rs > 0) p += 1;
+  if (ok(s.d5) && ok(s.today) && Math.abs(s.d5) < 0.02 && Math.abs(s.today) < 0.03 && s.d15 > 0.05 && s.d30 > 0.05) p += 1;
+  return p;
+}
+
+function pulseJS(rows) {
+  const N = Math.max(rows.length, 1), cnt = (f) => rows.filter(f).length;
+  const strong = cnt(r => r.score >= 7), weak = cnt(r => r.score <= 2);
+  const green = cnt(r => r.today > 0) / N, red = cnt(r => r.today < 0) / N;
+  const mid = cnt(r => r.rotation === "Mid Rotation"), cool = cnt(r => r.rotation === "Late / Cooling");
+  const stW = cnt(r => r.st_label === "Wide") / N, stN = cnt(r => r.st_label === "Narrow") / N, ltW = cnt(r => r.lt_label === "Wide") / N;
+  const negRS = cnt(r => r.rs < 0);
+  const tiers = (x, a, b, c) => x >= a ? 3 : x >= b ? 2 : x >= c ? 1 : 0, two = (x, a, b) => x >= a ? 2 : x >= b ? 1 : 0;
+  const P = (name, value, pts, max, note) => ({ name, value, pts, max, note });
+  const lp = [
+    P("Strong themes (7+/8)", `${strong} of ${N}`, tiers(strong / N, .25, .15, .08), 3, strong / N >= .25 ? "Wide leadership — high conviction to trade long" : strong / N >= .08 ? "Some leaders — be selective" : "Few leaders — sit on hands"),
+    P("Themes green today", `${Math.round(green * 100)}% of themes`, two(green, .55, .35), 2, green >= .55 ? "Majority green — good day to trade long" : green >= .35 ? "Mixed — selective only" : "Mostly red — avoid longs"),
+    P("Mid-rotation themes", `${mid} themes`, mid >= 5 ? 2 : mid >= 3 ? 1 : 0, 2, mid >= 5 ? "Strong rotation — multiple themes accelerating" : mid >= 3 ? "Rotation present — follow the leaders" : "Little rotation — wait"),
+    P("Short-term breadth wide", `${Math.round(stW * 100)}% of themes`, two(stW, .35, .15), 2, stW >= .35 ? "Broad participation — confirms the move" : "Narrow breadth — thin leadership"),
+    P("Long-term breadth wide", `${Math.round(ltW * 100)}% of themes`, ltW >= .4 ? 1 : 0, 1, ltW >= .4 ? "Strong structural base — trend has legs" : "LT breadth thin — reversal risk"),
+  ];
+  const sp = [
+    P("Weak themes (0–2/8)", `${weak} of ${N}`, tiers(weak / N, .25, .15, .08), 3, weak / N >= .25 ? "Many weak themes — strong short environment" : weak / N >= .08 ? "Some weakness — selective shorts" : "Few weak themes — not ideal short day"),
+    P("Themes red today", `${Math.round(red * 100)}% of themes`, two(red, .55, .35), 2, red >= .55 ? "Majority red — good day to work the short side" : red >= .35 ? "Mixed — selective shorts only" : "Mostly green — poor short day"),
+    P("Late / cooling themes", `${cool} themes`, cool >= 5 ? 2 : cool >= 3 ? 1 : 0, 2, cool >= 5 ? "Multiple themes rolling over — short side has fuel" : cool >= 3 ? "Some themes cooling — watch for failed bounces" : "Little deterioration — shorts premature"),
+    P("Short-term breadth narrow", `${Math.round(stN * 100)}% of themes`, two(stN, .35, .15), 2, stN >= .35 ? "Breadth collapsing — distribution underway" : "Breadth still holding — shorts need patience"),
+    P("Themes with negative RS", `${negRS} of ${N}`, negRS / N >= .4 ? 1 : 0, 1, negRS / N >= .4 ? "Relative strength deteriorating broadly — structural shorts" : "RS mostly positive still — be patient with shorts"),
+  ];
+  const L = lp.reduce((s, x) => s + x.pts, 0), S = sp.reduce((s, x) => s + x.pts, 0);
+  return { long: L, short: S, long_parts: lp, short_parts: sp,
+    long_label: L >= 8 ? "GO — strong broad setup" : L >= 6 ? "LEAN LONG — stay selective" : L >= 4 ? "SELECTIVE — A-tier setups only" : L >= 2 ? "CAUTION — weak breadth, reduce size" : "SIT OUT — no edge today",
+    short_label: S >= 8 ? "SHORT SIDE LIVE — strong short setup" : S >= 6 ? "LEAN SHORT — selective shorts only" : S >= 4 ? "SOME SHORT SETUPS — weak themes present" : S >= 2 ? "MOSTLY NEUTRAL — monitor for deterioration" : "NO SHORT EDGE — market too strong to short" };
+}
+
+function computeLive(T, prices, spyDate) {
+  const { M, bad } = liveMetrics(T, prices);
+  const bench = T.bench && T.bench.ticker && M[T.bench.ticker];
+  let rows = T.themes.map(th => {
+    const mem = th.members.filter(t => M[t]);
+    if (!mem.length) return null;
+    const v = (k) => mem.map(t => M[t][k]);
+    const a = { today: mean(v("today")), d5: mean(v("d5")), d15: mean(v("d15")), d30: mean(v("d30")), rs: mean(v("rs")), lt: mean(v("lt")) };
+    const n = mem.length;
+    const st_b = mem.filter(t => M[t].today > 0 && M[t].d5 > 0).length / n;
+    const lt_b = mem.filter(t => M[t].d15 > 0 && M[t].d30 > 0).length / n;
+    const sig = ["today", "d5", "d15", "d30", "rs", "lt"].filter(k => a[k] != null && a[k] > 0).length;
+    const score = sig + (st_b >= 0.5 ? 1 : 0) + (lt_b >= 0.6 ? 1 : 0);
+    const etfs = (T.theme_etfs && T.theme_etfs[th.theme]) || [];
+    const etf = etfs.find(e => M[e]) || th.etf;
+    return { ...th, n, score, class: score >= 7 ? "STRONG" : score >= 4 ? "WATCHLIST" : "WEAK", rotation: rotationOf(a),
+      today: a.today, d5: a.d5, d15: a.d15, d30: a.d30, rs: a.rs, lt: a.lt, st_b, lt_b, st_label: blabel(st_b), lt_label: blabel(lt_b),
+      vs_d5: bench && a.d5 != null ? a.d5 - bench.d5 : null, vs_d30: bench && a.d30 != null ? a.d30 - bench.d30 : null,
+      etf, etf_d5: etf && M[etf] ? M[etf].d5 : null, etf_d30: etf && M[etf] ? M[etf].d30 : null,
+      trail: [...th.trail.slice(1), score], members: th.members };
+  }).filter(Boolean);
+  rows.sort((x, y) => (y.score - x.score) || ((y.rs ?? -1e9) - (x.rs ?? -1e9)));
+  rows.forEach((r, i) => { r.rank = i + 1; r.mv5 = r.r_m4 != null ? r.r_m4 - r.rank : null; r.mv1 = null; });
+  const scoreOf = Object.fromEntries(rows.map(r => [r.theme, r.score]));
+  let stocks = T.stocks.filter(s => M[s.t]).map(s => {
+    const m = M[s.t], ths = s.themes.slice().sort((a, b) => (scoreOf[b] ?? -1) - (scoreOf[a] ?? -1));
+    const best = scoreOf[ths[0]] ?? 0, pts = setupScoreJS(best, m);
+    return { ...s, ...m, themes: ths, tscore: best, setup: pts, tier: pts >= 8 ? "A" : pts >= 5 ? "B" : "C" };
+  });
+  const byRS = stocks.filter(s => s.rs != null).sort((a, b) => b.rs - a.rs);
+  byRS.forEach((s, i) => { s.rk = i + 1; s.rk5 = s.rk_m4 != null ? s.rk_m4 - s.rk : null; });
+  stocks.sort((a, b) => (b.setup - a.setup) || ((b.rs ?? -1e9) - (a.rs ?? -1e9)));
+  const pulse = pulseJS(rows);
+  return { ...T, date: spyDate, themes: rows, stocks, pulse,
+    pulse_hist: [...(T.pulse_hist || []).slice(1), { date: spyDate, long: pulse.long, short: pulse.short }],
+    counts: { themes: rows.length, stocks: stocks.length }, live: { priced: Object.keys(M).length, total: Object.keys(T.refs).length, bad } };
+}
+
+function liveBar() {
+  const T = DATA.themes;
+  if (!DATA.live_url) return $(`<div class="livebar"><span class="dot off"></span><span>End of day · ${longDate(T.date)} close. <span class="meta">Live prices aren't connected yet.</span></span></div>`);
+  let dot = "off", text;
+  if (LIVE_ERR) text = `Couldn't load live prices (${LIVE_ERR}). Showing ${longDate(T.date)} close.`;
+  else if (!LIVE) text = "Loading live prices…";
+  else if (LIVE_T) { dot = "on"; const L = LIVE_T.live;
+    text = `<b>Live</b> · Google prices fetched ${LIVE.fetched.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} (Google runs up to ~20 min behind) · ${L.priced} of ${L.total} tickers priced${L.bad.length ? ` · ignored ${L.bad.length} odd price${L.bad.length > 1 ? "s" : ""} (${L.bad.slice(0, 6).join(", ")}${L.bad.length > 6 ? "…" : ""})` : ""}`; }
+  else text = `End of day · ${longDate(T.date)} close. <span class="meta">Live numbers start once Google shows a newer trading session.</span>`;
+  const el = $(`<div class="livebar"><span class="dot ${dot}"></span><span>${text}</span>${DATA.live_url ? '<button>Refresh</button>' : ""}</div>`);
+  const b = el.querySelector("button"); if (b) b.addEventListener("click", () => { b.textContent = "Refreshing…"; fetchLive(); });
+  return el;
+}
+function rerenderPanel() {
+  const panel = document.querySelector(".panel"); if (!panel) return;
+  const y = window.scrollY; panel.innerHTML = "";
+  if (TAB === "themes") renderThemes(panel); else if (TAB === "stocks") renderStocks(panel);
+  window.scrollTo(0, y);
+}
+setInterval(() => { if (document.visibilityState === "visible" && (TAB === "themes" || TAB === "stocks")) fetchLive(); }, 3 * 60 * 1000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && LIVE && Date.now() - LIVE.fetched > 60000) fetchLive(); });
+
 /* =================== THEMES & STOCKS =================== */
 const pct = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : "") + (v * 100).toFixed(d) + "%";
 const num = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : "") + Number(v).toFixed(d);
@@ -655,14 +832,15 @@ const mvCell = (v) => v == null ? '<span class="mv">–</span>' : v === 0 ? '<sp
   : `<span class="mv ${v > 0 ? "up" : "dn"}">${v > 0 ? "▲" : "▼"}${Math.abs(v)}${Math.abs(v) >= 10 ? (v > 0 ? " 🔥" : " ❄️") : ""}</span>`;
 const trailHTML = (tr) => `<span class="trail" title="Score over the last ${tr.length} days">${tr.map(v => v == null ? '<i style="height:2px;opacity:.3"></i>' : `<i style="height:${3 + v * 2}px;opacity:${0.35 + v * 0.08}"></i>`).join("")}</span>`;
 
-function sortable(table, cols, getRows, draw, initial) {
-  let key = initial[0], dir = initial[1];
+function sortable(table, cols, getRows, draw, state) {
+  let key = state[0], dir = state[1];
   const ths = table.querySelectorAll("th");
   const mark = () => ths.forEach((th, i) => { if (cols[i].k === key) th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending"); else th.removeAttribute("aria-sort"); });
   ths.forEach((th, i) => {
     if (!cols[i].k) return;
     th.addEventListener("click", () => {
       if (key === cols[i].k) dir = -dir; else { key = cols[i].k; dir = cols[i].asc ? 1 : -1; }
+      state[0] = key; state[1] = dir;
       mark(); draw(sortRows(getRows(), key, dir));
     });
   });
@@ -698,8 +876,9 @@ function pulseCard(T) {
 }
 
 function renderThemes(app) {
-  const T = DATA.themes;
-  if (!T) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  const T = getT(), U = UI.themes;
+  app.append(liveBar());
   app.append(pulseCard(T));
   const cols = [
     { k: "theme", h: "Theme", l: true, asc: true }, { k: "rank", h: "Rank", asc: true }, { k: "score", h: "Score<small>/ 8</small>" },
@@ -717,9 +896,8 @@ function renderThemes(app) {
     Edit themes in <a href="${DATA.repo ? DATA.repo + "/edit/main/data/themes.csv" : "#"}" target="_blank" rel="noopener">data/themes.csv</a>.</div></section>`);
   app.append(card);
   const body = card.querySelector("tbody");
-  let cls = "All", q = "";
-  const filtered = () => T.themes.filter(r => (cls === "All" || r.class === cls) && (!q || r.theme.toLowerCase().includes(q)));
-  const open = new Set();
+  const open = U.open;
+  const filtered = () => T.themes.filter(r => (U.cls === "All" || r.class === U.cls) && (!U.q || r.theme.toLowerCase().includes(U.q)));
   const draw = (rows) => {
     body.innerHTML = "";
     rows.forEach(r => {
@@ -740,18 +918,18 @@ function renderThemes(app) {
       tr.addEventListener("click", () => { open.has(r.theme) ? open.delete(r.theme) : open.add(r.theme); draw(current()); });
     });
   };
-  const current = sortable(card.querySelector("table"), cols, filtered, draw, ["rank", 1]);
-  card.querySelectorAll(".chips button").forEach(b => b.addEventListener("click", () => {
-    cls = b.dataset.c; card.querySelectorAll(".chips button").forEach(o => o.setAttribute("aria-pressed", o === b)); draw(current());
-  }));
-  card.querySelector("input").addEventListener("input", (e) => { q = e.target.value.trim().toLowerCase(); draw(current()); });
+  const current = sortable(card.querySelector("table"), cols, filtered, draw, U.sort);
+  card.querySelectorAll(".chips button").forEach(b => {
+    b.setAttribute("aria-pressed", b.dataset.c === U.cls);
+    b.addEventListener("click", () => { U.cls = b.dataset.c; card.querySelectorAll(".chips button").forEach(o => o.setAttribute("aria-pressed", o === b)); draw(current()); });
+  });
+  const qi = card.querySelector("input"); qi.value = U.q;
+  qi.addEventListener("input", (e) => { U.q = e.target.value.trim().toLowerCase(); draw(current()); });
   draw(current());
 }
 
-let STOCK_BY = null;
 function stockMap() {
-  if (!STOCK_BY) { STOCK_BY = {}; (DATA.themes.stocks || []).forEach(s => { STOCK_BY[s.t] = s; }); }
-  return STOCK_BY;
+  const M = {}; (getT().stocks || []).forEach(s => { M[s.t] = s; }); return M;
 }
 const STOCK_COLS = [
   { k: "t", h: "Ticker", l: true, asc: true }, { k: "setup", h: "Setup<small>/ 10</small>" }, { k: "rs", h: "RS<small>3-mo %</small>" },
@@ -779,8 +957,9 @@ function drillRow(r, span) {
 }
 
 function renderStocks(app) {
-  const T = DATA.themes;
-  if (!T) { app.append($('<div class="card empty">Stock data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  if (!DATA.themes) { app.append($('<div class="card empty">Stock data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  const T = getT(), U = UI.stocks;
+  app.append(liveBar());
   const themesList = T.themes.map(t => t.theme).sort();
   const card = $(`<section class="card tcard"><div class="head"><h2>Stocks <span class="meta">· ${T.counts.stocks} in your themes</span></h2>
     <div class="filters"><div class="chips" role="group" aria-label="Tier">${["All", "A", "B", "C"].map((c, i) => `<button data-c="${c}" aria-pressed="${i === 0}">${c === "All" ? "All tiers" : c + "-tier"}</button>`).join("")}</div>
@@ -792,24 +971,27 @@ function renderStocks(app) {
     RS is the % change over about 3 months (63 trading days). RS rank is among all stocks here; Rank Δ is places gained (▲) or lost (▼) in 5 days, with 🔥/❄️ for 10+.</div></section>`);
   app.append(card);
   const body = card.querySelector("tbody"), moreRow = card.querySelector(".more-row");
-  let tierF = "All", themeF = "", q = "", limit = 100;
-  const filtered = () => T.stocks.filter(s => (tierF === "All" || s.tier === tierF) && (!themeF || s.themes.includes(themeF))
-    && (!q || s.t.toLowerCase().startsWith(q) || (s.name || "").toLowerCase().includes(q)));
+  const filtered = () => T.stocks.filter(s => (U.tier === "All" || s.tier === U.tier) && (!U.theme || s.themes.includes(U.theme))
+    && (!U.q || s.t.toLowerCase().startsWith(U.q) || (s.name || "").toLowerCase().includes(U.q)));
   const draw = (rows) => {
-    body.innerHTML = rows.slice(0, limit).map(s => `<tr>${stockCells(s, true)}</tr>`).join("");
-    moreRow.innerHTML = rows.length > limit ? `<button>Show ${Math.min(100, rows.length - limit)} more (${rows.length - limit} hidden)</button>` : "";
-    const b = moreRow.querySelector("button"); if (b) b.addEventListener("click", () => { limit += 100; draw(current()); });
+    body.innerHTML = rows.slice(0, U.limit).map(s => `<tr>${stockCells(s, true)}</tr>`).join("");
+    moreRow.innerHTML = rows.length > U.limit ? `<button>Show ${Math.min(100, rows.length - U.limit)} more (${rows.length - U.limit} hidden)</button>` : "";
+    const b = moreRow.querySelector("button"); if (b) b.addEventListener("click", () => { U.limit += 100; draw(current()); });
   };
-  const current = sortable(card.querySelector("table"), STOCK_COLS, filtered, draw, ["setup", -1]);
-  card.querySelectorAll(".chips button").forEach(b => b.addEventListener("click", () => {
-    tierF = b.dataset.c; limit = 100; card.querySelectorAll(".chips button").forEach(o => o.setAttribute("aria-pressed", o === b)); draw(current());
-  }));
-  card.querySelector("select").addEventListener("change", (e) => { themeF = e.target.value; limit = 100; draw(current()); });
-  card.querySelector("input").addEventListener("input", (e) => { q = e.target.value.trim().toLowerCase(); limit = 100; draw(current()); });
+  const current = sortable(card.querySelector("table"), STOCK_COLS, filtered, draw, U.sort);
+  card.querySelectorAll(".chips button").forEach(b => {
+    b.setAttribute("aria-pressed", b.dataset.c === U.tier);
+    b.addEventListener("click", () => { U.tier = b.dataset.c; U.limit = 100; card.querySelectorAll(".chips button").forEach(o => o.setAttribute("aria-pressed", o === b)); draw(current()); });
+  });
+  const sel = card.querySelector("select"); sel.value = U.theme;
+  sel.addEventListener("change", (e) => { U.theme = e.target.value; U.limit = 100; draw(current()); });
+  const qi = card.querySelector("input"); qi.value = U.q;
+  qi.addEventListener("input", (e) => { U.q = e.target.value.trim().toLowerCase(); U.limit = 100; draw(current()); });
   draw(current());
 }
 
 render();
+if (DATA && DATA.live_url) fetchLive();
 let lastW = window.innerWidth;
 window.addEventListener("resize", () => {
   if (Math.abs(window.innerWidth - lastW) < 40) return;

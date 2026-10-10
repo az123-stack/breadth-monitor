@@ -47,6 +47,17 @@ daily from the same price data (no Apps Script, no GOOGLEFINANCE).
 - Rank movement (themes and stocks) is computed from stored history, so it
   works without daily snapshots.
 
+## Live prices during the day (free)
+
+The Themes and Stocks tabs can update intraday from a Google Sheet that uses
+GOOGLEFINANCE (one row per theme ticker), published to the web as CSV. The page
+fetches it when opened, on **Refresh**, and every 3 minutes while open, then
+recalculates every return, score, rank and the long/short pulse in the browser
+using reference closes from the nightly run. Prices that differ from the last
+close by more than 50% are ignored (wrong listing or bad print). Set the
+published CSV link as `LIVE_CSV_URL` in `breadth/config.py`. The Breadth tab
+stays end-of-day.
+
 ## One-time setup (about 10 minutes)
 
 1. **Get a free Massive API key** at massive.com → Dashboard → API Keys.

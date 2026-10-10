@@ -28,6 +28,8 @@ MIN_CALL_INTERVAL = float(os.environ.get("MASSIVE_MIN_INTERVAL", "12.5"))
 UNIVERSE_REFRESH_DAYS = 7
 
 BENCHMARK = "SPY"
+# Published Google Sheet (CSV) with GOOGLEFINANCE prices for the live layer.
+LIVE_CSV_URL = os.environ.get("LIVE_CSV_URL", "")
 REPO_URL = os.environ.get("REPO_URL", "https://github.com/az123-stack/breadth-monitor")
 EXTRA_RETRY_DAYS = 7          # retry tickers that returned no data after this many days
 
