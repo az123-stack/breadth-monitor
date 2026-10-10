@@ -864,7 +864,7 @@ const HZ_LABEL = { today: "Today", d5: "5D", d15: "15D", d30: "30D", d60: "60D",
 const hz = () => HZ[UI.hz] || HZ.short;
 // Green/red fills in 3 steps; the step thresholds scale with the horizon.
 const SCALE = { today: 0.015, d3: 0.03, d5: 0.04, d15: 0.08, d20: 0.1, d30: 0.12, d60: 0.18, d90: 0.24, d180: 0.35,
-  rs: 20, lt: 0.04, vs_d5: 0.03, vs_d30: 0.08, vs_d90: 0.15, etf_d5: 0.04, etf_d30: 0.12 };
+  rs: 20, lt: 0.04, st: 0.025, vs_d5: 0.03, vs_d30: 0.08, vs_d90: 0.15, etf_d5: 0.04, etf_d30: 0.12 };
 function tint(v, scale) {
   if (v == null || !scale) return "";
   const a = Math.abs(v) / scale;
@@ -933,27 +933,42 @@ function pulseCard(T) {
 }
 
 const stockMap = () => { const M = {}; (getT().stocks || []).forEach(s => { M[s.t] = s; }); return M; };
-const stockCols = () => [
-  { k: "t", h: "Ticker", l: true, asc: true }, { k: "setup", h: "Setup<small>/ 10</small>" }, { k: "rs", h: "RS<small>3-mo %</small>" },
-  { k: "rk", h: "RS rank", asc: true }, { k: "rk5", h: "Rank Δ<small>5 days</small>" },
-  ...hz().map(k => ({ k, h: HZ_LABEL[k] })), { k: "lt", h: "LT score" },
+const stockCols = (ranks) => [
+  { k: "t", h: "Ticker", l: true, asc: true },
+  ...(ranks ? [{ k: "st_rk", h: "ST rank<small>in bucket</small>", asc: true }, { k: "lt_rk", h: "LT rank<small>in bucket</small>", asc: true }] : []),
+  { k: "setup", h: "Setup<small>/ 10</small>" }, { k: "rs", h: "RS<small>3-mo %</small>" },
+  { k: "rk", h: "RS rank<small>all stocks</small>", asc: true }, { k: "rk5", h: "Rank Δ<small>5 days</small>" },
+  ...hz().map(k => ({ k, h: HZ_LABEL[k] })), { k: "st", h: "ST score<small>5D score</small>" }, { k: "lt", h: "LT score" },
   { k: "e8", h: "vs 8 EMA" }, { k: "e21", h: "vs 21 EMA" }, { k: "e50", h: "vs 50 EMA" }, { k: "price", h: "Price" },
 ];
 // sub: "sub" shows the stock's sub-theme under its name, "themes" its themes, "both" both
-function stockCells(s, show) {
+function stockCells(s, show, ranks) {
   const ema = (v) => { const near = v != null && v >= -0.03 && v <= 0.01; return `<td class="num"${near ? ' style="font-weight:700" title="Within -3% to +1% of this EMA"' : ""}>${pct(v)}</td>`; };
   const th = s.themes[0] + (s.themes.length > 1 ? ` +${s.themes.length - 1}` : "");
   const sub = show === "themes" ? th : show === "sub" ? (s.sub || "") : [s.sub, th].filter(Boolean).join(" · ");
+  const rk = (v, n) => `<td class="num"><b>${v ?? "–"}</b><span class="meta">/${n}</span></td>`;
   return `<td class="l tname">${s.t}<small>${esc((s.name || "").slice(0, 26))}${sub ? (s.name ? " · " : "") + esc(sub) : ""}</small></td>
+    ${ranks ? rk(s.st_rk, s._n) + rk(s.lt_rk, s._n) : ""}
     <td><span class="tier ${s.tier}">${s.tier}</span> <span class="num">${s.setup}</span></td>
     <td class="num ${tint(s.rs, SCALE.rs)}">${num(s.rs)}</td><td class="num">${s.rk ?? "–"}</td><td>${mvCell(s.rk5)}</td>
-    ${hz().map(k => retCell(s[k], k)).join("")}${retCell(s.lt, "lt")}
+    ${hz().map(k => retCell(s[k], k)).join("")}${retCell(s.st, "st")}${retCell(s.lt, "lt")}
     ${ema(s.e8)}${ema(s.e21)}${ema(s.e50)}<td class="num">${s.price == null ? "–" : s.price.toFixed(2)}</td>`;
 }
+// A bucket's stock table: ST rank (by 5D score) and LT rank (by LT score) within
+// the bucket, 1 = strongest, as in the sheet's Theme Drill-Down. Sortable.
+const BUCKET_SORT = ["st_rk", 1];
 function stockTable(list, show) {
-  const cols = stockCols();
-  return `<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead>
-    <tbody>${list.map(s => `<tr>${stockCells(s, show)}</tr>`).join("")}</tbody></table></div>`;
+  const n = list.length;
+  const rows = list.map(s => ({ ...s, _n: n }));
+  const rankBy = (k, out) => rows.filter(r => r[k] != null).sort((a, b) => b[k] - a[k]).forEach((r, i) => { r[out] = i + 1; });
+  rankBy("st", "st_rk"); rankBy("lt", "lt_rk");
+  const cols = stockCols(true);
+  const el = $(`<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>`);
+  const body = el.querySelector("tbody");
+  const draw = (rs) => { body.innerHTML = rs.map(s => `<tr>${stockCells(s, show, true)}</tr>`).join(""); };
+  const current = sortable(el.querySelector("table"), cols, () => rows, draw, BUCKET_SORT);
+  draw(current());
+  return el;
 }
 const groupRows = (T, view) => view === "sub" ? (T.subthemes || []) : T.themes;
 
@@ -1015,8 +1030,9 @@ function drillRow(r, span, sub) {
   const list = r.members.map(t => M[t]).filter(Boolean).sort((a, b) => (b.rs ?? -1e9) - (a.rs ?? -1e9));
   const extra = sub && r.parents && r.parents.length ? ` · in themes: ${r.parents.map(esc).join(", ")}` : "";
   const tr = $(`<table><tr class="drill"><td colspan="${span}"><div class="drillbox">
-    <div class="meta">${esc(r.theme)}: ${list.length} stocks, strongest RS first${extra}</div>
-    ${stockTable(list, sub ? "themes" : "sub")}</div></td></tr></table>`).querySelector("tr");
+    <div class="meta">${esc(r.theme)}: ${list.length} stocks · ST rank = by 5D score, LT rank = by LT score, 1 = strongest in this bucket · click a column to sort${extra}</div>
+    </div></td></tr></table>`).querySelector("tr");
+  tr.querySelector(".drillbox").append(stockTable(list, sub ? "themes" : "sub"));
   tr.addEventListener("click", (e) => e.stopPropagation());
   return tr;
 }
@@ -1058,7 +1074,7 @@ function renderBrowse(app) {
           ${badge(g)}<span class="bret">${H.map(k => `<span class="${tint(g[k], SCALE[k])}"><em>${HZ_LABEL[k]}</em>${pct(g[k])}</span>`).join("")}</span></summary>
         <div class="bbody"></div></details>`);
       const body = d.querySelector(".bbody");
-      const fill = () => { if (!body.childElementCount) body.innerHTML = stockTable(list, sub ? "themes" : "sub"); };
+      const fill = () => { if (!body.childElementCount) body.append(stockTable(list, sub ? "themes" : "sub")); };
       if (isOpen) fill();
       d.addEventListener("toggle", () => {
         if (d.open) { fill(); U.open.add(g.theme); } else { U.open.delete(g.theme); U.all = false; }
