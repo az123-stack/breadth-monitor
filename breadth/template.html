@@ -176,6 +176,7 @@ function render() {
   W = Math.max(300, Math.round(charts.clientWidth - 34));   // draw at real pixel width
   H = W < 600 ? 190 : 210;
   charts.append(chartBreakouts(rows));
+  charts.append(chartTrend(rows));
   charts.append(chartRatios(rows));
   charts.append(chartT2108(rows));
   app.append(table(rows));
@@ -257,22 +258,57 @@ function endLabel(svg, x, y, rows, key, text, color) {
 
 function chartBreakouts(rows) {
   const c = frame("Stocks up / down 4%+ per day",
-    '<span><i style="background:var(--up)"></i>Up 4%+</span><span><i style="background:var(--down)"></i>Down 4%+</span><span><i class="line" style="background:var(--text-secondary)"></i>40-day avg of up 4%+</span>');
-  const mx = niceMax(Math.max(...rows.map(r => Math.max(r.up4 || 0, r.dn4 || 0, r.up4_avg40 || 0))));
+    '<span><i style="background:var(--up)"></i>Up 4%+</span><span><i style="background:var(--down)"></i>Down 4%+</span><span><i class="line" style="background:var(--text-secondary)"></i>40-day avg of up 4%+</span><span><i class="line" style="background:var(--text-muted);height:0;border-top:2px dashed var(--text-muted)"></i>Thrust level (2× avg)</span>');
+  // Scale to normal days, not the rare spike: cap at the 95th percentile of the
+  // window (or the thrust line), and label any bar that runs past the top.
+  const vals = rows.flatMap(r => [r.up4 || 0, r.dn4 || 0]).sort((a, b) => a - b);
+  const p95 = vals[Math.floor(vals.length * 0.95)] || 1;
+  const thrustMax = Math.max(...rows.map(r => (r.up4_avg40 || 0) * 2));
+  const mx = niceMax(Math.max(p95, thrustMax) * 1.05);
   const mid = M.t + (c.h - M.t - M.b) / 2, half = (c.h - M.t - M.b) / 2;
-  const y = (v) => mid - v / mx * half;            // up above the line
-  const yd = (v) => mid + v / mx * half;           // down mirrored below
+  const cap = (v) => Math.min(v, mx);
+  const y = (v) => mid - cap(v) / mx * half;
+  const yd = (v) => mid + cap(v) / mx * half;
   const x = axes(c.svg, c.h, rows, y, [mx, mx / 2, 0], v => fmt(v));
   [mx / 2, mx].forEach(t => { S("line", { x1: M.l, x2: W - M.r, y1: yd(t), y2: yd(t), stroke: "var(--grid)" }, c.svg); const tx = S("text", { x: W - M.r + 6, y: yd(t) + 4 }, c.svg); tx.textContent = fmt(t); });
   const bw = (W - M.l - M.r) / rows.length, w = Math.max(1, bw - 2);
+  const clipped = [];
   rows.forEach((r, i) => {
     const x0 = x(i) - w / 2;
     if (r.up4) S("rect", { x: x0, y: y(r.up4), width: w, height: mid - y(r.up4), rx: Math.min(2, w / 3), fill: "var(--up)" }, c.svg);
     if (r.dn4) S("rect", { x: x0, y: mid, width: w, height: yd(r.dn4) - mid, rx: Math.min(2, w / 3), fill: "var(--down)" }, c.svg);
+    if (r.up4 > mx) clipped.push([i, r.up4, true]);
+    if (r.dn4 > mx) clipped.push([i, r.dn4, false]);
   });
   S("line", { x1: M.l, x2: W - M.r, y1: mid, y2: mid, stroke: "var(--text-muted)", "stroke-width": 1 }, c.svg);
+  const thr = rows.map(r => ({ v: r.up4_avg40 != null ? r.up4_avg40 * 2 : null }));
+  S("path", { d: path(thr, x, y, "v"), fill: "none", stroke: "var(--text-muted)", "stroke-width": 1.5, "stroke-dasharray": "5 4" }, c.svg);
   S("path", { d: path(rows, x, y, "up4_avg40"), fill: "none", stroke: "var(--text-secondary)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
-  hover(c, rows, x, [["Up 4%+", r => fmt(r.up4)], ["Down 4%+", r => fmt(r.dn4)], ["40-day avg", r => fmt(r.up4_avg40)]]);
+  clipped.forEach(([i, v, up]) => {
+    const tx = S("text", { x: x(i), y: up ? M.t - 2 : c.h - M.b + 12, "text-anchor": "middle", style: "fill:var(--text-primary);font-weight:600" }, c.svg);
+    tx.textContent = fmt(v) + (up ? " ▲" : " ▼");
+  });
+  hover(c, rows, x, [["Up 4%+", r => fmt(r.up4)], ["Down 4%+", r => fmt(r.dn4)], ["40-day avg", r => fmt(r.up4_avg40)], ["Thrust level", r => r.up4_avg40 == null ? "–" : fmt(r.up4_avg40 * 2)]]);
+  return c.el;
+}
+
+function chartTrend(rows) {
+  const c = frame("Breakout trend: 20-day vs 40-day averages",
+    '<span><i class="line" style="background:var(--up)"></i>20-day avg up 4%+</span><span><i class="line" style="background:var(--text-secondary)"></i>40-day avg up 4%+</span><span><i class="line" style="background:var(--down)"></i>20-day avg down 4%+</span>', 190);
+  // Zoomed to the averages' own range so turns are visible.
+  const keys = ["up4_avg20", "up4_avg40", "dn4_avg20"];
+  const vs = rows.flatMap(r => keys.map(k => r[k])).filter(v => v != null);
+  const lo = Math.max(0, Math.floor(Math.min(...vs) / 25) * 25), hi = Math.ceil(Math.max(...vs) / 25) * 25;
+  const y = (v) => M.t + (1 - (v - lo) / (hi - lo || 1)) * (c.h - M.t - M.b);
+  const step = hi - lo <= 100 ? 25 : 50, ticks = [];
+  for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) ticks.push(t);
+  const x = axes(c.svg, c.h, rows, y, ticks, v => fmt(v));
+  S("path", { d: path(rows, x, y, "dn4_avg20"), fill: "none", stroke: "var(--down)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  S("path", { d: path(rows, x, y, "up4_avg40"), fill: "none", stroke: "var(--text-secondary)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  S("path", { d: path(rows, x, y, "up4_avg20"), fill: "none", stroke: "var(--up)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  endLabel(c.svg, x, y, rows, "up4_avg20", "", "var(--up)");
+  endLabel(c.svg, x, y, rows, "dn4_avg20", "", "var(--down)");
+  hover(c, rows, x, [["20-day avg up", r => fmt(r.up4_avg20)], ["40-day avg up", r => fmt(r.up4_avg40)], ["20-day avg down", r => fmt(r.dn4_avg20)]]);
   return c.el;
 }
 

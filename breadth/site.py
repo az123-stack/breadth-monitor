@@ -23,11 +23,17 @@ def _clean(v):
 
 
 def payload(history):
-    df = history.tail(config.DASHBOARD_DAYS)
+    full = history.copy()
+    # Short averages for the "breakout trend" chart, computed over the full
+    # history so the visible window is never blank at its start.
+    full["up4_avg20"] = full["up4"].rolling(20).mean()
+    full["dn4_avg20"] = full["dn4"].rolling(20).mean()
+    extra = ["up4_avg20", "dn4_avg20"]
+    df = full.tail(config.DASHBOARD_DAYS)
     rows = []
     for d, r in df.iterrows():
         rows.append({"date": d.strftime("%Y-%m-%d"),
-                     **{c: _clean(r.get(c)) for c in metrics.METRIC_COLS}})
+                     **{c: _clean(r.get(c)) for c in metrics.METRIC_COLS + extra}})
     # Percentile thresholds from full history for cell shading.
     comp = history[history["complete"]]
     scale = {}
