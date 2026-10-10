@@ -74,13 +74,19 @@ h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
 @media (max-width: 520px) { .tiles { grid-template-columns: repeat(2, 1fr); } .tile .v { font-size: 22px; } }
 
 /* Charts */
-.charts { display: grid; gap: 10px; margin-bottom: 14px; }
-.chart { padding: 14px 16px 8px; position: relative; }
+.charts { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-bottom: 14px; }
+.chart { padding: 14px 16px 8px; position: relative; min-width: 0; }
 .chart h2, .tablecard h2 { font-size: 14px; font-weight: 600; margin: 0; }
 .chart .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin: 4px 0 6px; }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 .legend i.line { height: 2px; border-radius: 1px; vertical-align: 3px; width: 14px; }
-.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart .plot { display: flex; align-items: flex-start; }
+.chart .scroller { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: var(--border) transparent; padding-bottom: 4px; }
+.chart .scroller::-webkit-scrollbar { height: 8px; }
+.chart .scroller::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.chart svg { display: block; overflow: visible; }
+.chart svg.yaxis { flex: none; }
+.chart .hint { font-size: 11.5px; color: var(--text-muted); margin-left: auto; }
 .chart svg text { fill: var(--text-muted); font-size: 11px; font-family: Inter, system-ui, sans-serif; }
 .tip {
   position: absolute; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border);
@@ -173,12 +179,15 @@ function render() {
 
   const charts = $('<section class="charts"></section>');
   app.append(charts);
-  W = Math.max(300, Math.round(charts.clientWidth - 34));   // draw at real pixel width
-  H = W < 600 ? 190 : 210;
+  const view = Math.max(260, Math.round(charts.clientWidth - 34 - AXW));
+  const pxDay = view < 600 ? 4 : 7;                          // ~3 months visible on a phone, ~6 on desktop
+  W = Math.max(view, rows.length * pxDay + M.l + M.r);
+  H = view < 560 ? 190 : 210;
   charts.append(chartBreakouts(rows));
   charts.append(chartTrend(rows));
   charts.append(chartRatios(rows));
   charts.append(chartT2108(rows));
+  syncScroll([...charts.querySelectorAll(".scroller")]);
   app.append(table(rows));
 
   app.append($(`<footer>
@@ -190,24 +199,41 @@ function render() {
 }
 
 /* ---------- small SVG chart kit ---------- */
+function syncScroll(list) {
+  let lock = false;
+  list.forEach(sc => sc.addEventListener("scroll", () => {
+    if (lock) return; lock = true;
+    list.forEach(o => { if (o !== sc) o.scrollLeft = sc.scrollLeft; });
+    requestAnimationFrame(() => { lock = false; });
+  }, { passive: true }));
+  requestAnimationFrame(() => list.forEach(sc => { sc.scrollLeft = sc.scrollWidth; }));
+}
 let W = 1100, H = 210;
-const M = { t: 10, r: 46, b: 24, l: 8 };
+const M = { t: 14, r: 26, b: 24, l: 26 };
+const AXW = 40;          // fixed y-axis column outside the scroll area
 function frame(title, legend, height = H) {
-  const el = $(`<div class="card chart"><h2>${title}</h2><div class="legend">${legend}</div></div>`);
+  const el = $(`<div class="card chart"><h2>${title}</h2><div class="legend">${legend}</div><div class="plot"><div class="scroller"></div></div></div>`);
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", `0 0 ${W} ${height}`);
+  svg.setAttribute("width", W); svg.setAttribute("height", height);
   svg.setAttribute("role", "img"); svg.setAttribute("aria-label", title);
-  el.append(svg);
+  el.querySelector(".scroller").append(svg);
+  const ax = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  ax.setAttribute("class", "yaxis"); ax.setAttribute("viewBox", `0 0 ${AXW} ${height}`);
+  ax.setAttribute("width", AXW); ax.setAttribute("height", height);
+  el.querySelector(".plot").append(ax);
   const tip = $('<div class="tip"></div>'); el.append(tip);
-  return { el, svg, tip, h: height };
+  return { el, svg, ax, tip, h: height, scroller: el.querySelector(".scroller") };
 }
 const S = (tag, attrs, parent) => { const n = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent && parent.append(n); return n; };
 
-function axes(svg, h, rows, y, ticks, fmtY) {
+function yLabel(c, yy, text) { const tx = S("text", { x: 4, y: yy + 4 }, c.ax); tx.textContent = text; }
+function axes(c, rows, y, ticks, fmtY) {
+  const svg = c.svg, h = c.h;
   const g = S("g", {}, svg);
   ticks.forEach(t => {
     S("line", { x1: M.l, x2: W - M.r, y1: y(t), y2: y(t), stroke: "var(--grid)", "stroke-width": 1 }, g);
-    const tx = S("text", { x: W - M.r + 6, y: y(t) + 4 }, g); tx.textContent = fmtY(t);
+    yLabel(c, y(t), fmtY(t));
   });
   const n = rows.length, x = (i) => M.l + (i + 0.5) * (W - M.l - M.r) / n;
   const step = Math.max(1, Math.ceil(n / Math.max(3, Math.floor(W / 130))));
@@ -258,7 +284,7 @@ function endLabel(svg, x, y, rows, key, text, color) {
 
 function chartBreakouts(rows) {
   const c = frame("Stocks up / down 4%+ per day",
-    '<span><i style="background:var(--up)"></i>Up 4%+</span><span><i style="background:var(--down)"></i>Down 4%+</span><span><i class="line" style="background:var(--text-secondary)"></i>40-day avg of up 4%+</span><span><i class="line" style="background:var(--text-muted);height:0;border-top:2px dashed var(--text-muted)"></i>Thrust level (2× avg)</span>');
+    '<span><i style="background:var(--up)"></i>Up 4%+</span><span><i style="background:var(--down)"></i>Down 4%+</span><span><i class="line" style="background:var(--text-secondary)"></i>40-day avg of up 4%+</span><span><i class="line" style="background:var(--text-muted);height:0;border-top:2px dashed var(--text-muted)"></i>Thrust level (2× avg)</span><span class="hint">← scroll left for earlier dates (all charts move together)</span>');
   // Scale to normal days, not the rare spike: cap at the 95th percentile of the
   // window (or the thrust line), and label any bar that runs past the top.
   const vals = rows.flatMap(r => [r.up4 || 0, r.dn4 || 0]).sort((a, b) => a - b);
@@ -269,8 +295,8 @@ function chartBreakouts(rows) {
   const cap = (v) => Math.min(v, mx);
   const y = (v) => mid - cap(v) / mx * half;
   const yd = (v) => mid + cap(v) / mx * half;
-  const x = axes(c.svg, c.h, rows, y, [mx, mx / 2, 0], v => fmt(v));
-  [mx / 2, mx].forEach(t => { S("line", { x1: M.l, x2: W - M.r, y1: yd(t), y2: yd(t), stroke: "var(--grid)" }, c.svg); const tx = S("text", { x: W - M.r + 6, y: yd(t) + 4 }, c.svg); tx.textContent = fmt(t); });
+  const x = axes(c, rows, y, [mx, mx / 2, 0], v => fmt(v));
+  [mx / 2, mx].forEach(t => { S("line", { x1: M.l, x2: W - M.r, y1: yd(t), y2: yd(t), stroke: "var(--grid)" }, c.svg); yLabel(c, yd(t), fmt(t)); });
   const bw = (W - M.l - M.r) / rows.length, w = Math.max(1, bw - 2);
   const clipped = [];
   rows.forEach((r, i) => {
@@ -302,7 +328,7 @@ function chartTrend(rows) {
   const y = (v) => M.t + (1 - (v - lo) / (hi - lo || 1)) * (c.h - M.t - M.b);
   const step = hi - lo <= 100 ? 25 : 50, ticks = [];
   for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) ticks.push(t);
-  const x = axes(c.svg, c.h, rows, y, ticks, v => fmt(v));
+  const x = axes(c, rows, y, ticks, v => fmt(v));
   S("path", { d: path(rows, x, y, "dn4_avg20"), fill: "none", stroke: "var(--down)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
   S("path", { d: path(rows, x, y, "up4_avg40"), fill: "none", stroke: "var(--text-secondary)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
   S("path", { d: path(rows, x, y, "up4_avg20"), fill: "none", stroke: "var(--up)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
@@ -318,7 +344,7 @@ function chartRatios(rows) {
   const mx = Math.max(2, niceMax(Math.max(...rows.map(r => Math.max(r.ratio5 || 0, r.ratio10 || 0)))));
   const y = (v) => M.t + (1 - v / mx) * (c.h - M.t - M.b);
   const ticks = [0, 1, DATA.thresholds.strong_ratio, mx].filter((v, i, a) => a.indexOf(v) === i && v <= mx);
-  const x = axes(c.svg, c.h, rows, y, ticks, v => fmt(v, 1));
+  const x = axes(c, rows, y, ticks, v => fmt(v, 1));
   S("line", { x1: M.l, x2: W - M.r, y1: y(1), y2: y(1), stroke: "var(--text-muted)", "stroke-width": 1, "stroke-dasharray": "4 3" }, c.svg);
   S("path", { d: path(rows, x, y, "ratio10"), fill: "none", stroke: "var(--s2)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
   S("path", { d: path(rows, x, y, "ratio5"), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
@@ -335,7 +361,7 @@ function chartT2108(rows) {
   const y = (v) => M.t + (1 - v / 100) * (c.h - M.t - M.b);
   S("rect", { x: M.l, y: y(t.oversold), width: W - M.l - M.r, height: y(0) - y(t.oversold), fill: "var(--down)", opacity: 0.12 }, c.svg);
   S("rect", { x: M.l, y: y(100), width: W - M.l - M.r, height: y(t.overbought) - y(100), fill: "var(--up)", opacity: 0.12 }, c.svg);
-  const x = axes(c.svg, c.h, rows, y, [0, t.oversold, 50, t.overbought, 100], v => v);
+  const x = axes(c, rows, y, [0, t.oversold, 50, t.overbought, 100], v => v);
   S("path", { d: path(rows, x, y, "t2108"), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
   endLabel(c.svg, x, y, rows, "t2108", "", "var(--s1)");
   hover(c, rows, x, [["T2108", r => fmt(r.t2108, 1)]]);

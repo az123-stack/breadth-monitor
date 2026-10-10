@@ -53,4 +53,4 @@ EXTREME_LOW_PCTILE = 0.10    # 10-day ratio in bottom 10% = washed out
 EXTREME_HIGH_PCTILE = 0.95   # 5-day ratio in top 5% = overextended
 MIN_HISTORY_FOR_PCTILES = 60 # until then, percentile rules are skipped
 
-DASHBOARD_DAYS = 120         # rows shown on the dashboard
+DASHBOARD_DAYS = 760         # max days on the charts (~3 years); they scroll

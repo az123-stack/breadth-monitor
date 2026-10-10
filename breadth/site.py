@@ -29,7 +29,9 @@ def payload(history):
     full["up4_avg20"] = full["up4"].rolling(20).mean()
     full["dn4_avg20"] = full["dn4"].rolling(20).mean()
     extra = ["up4_avg20", "dn4_avg20"]
-    df = full.tail(config.DASHBOARD_DAYS)
+    # Chart window: every fully computed day (capped), so you can scroll back.
+    comp_idx = full.index[full["complete"]]
+    df = full.loc[comp_idx].tail(config.DASHBOARD_DAYS) if len(comp_idx) else full.tail(120)
     rows = []
     for d, r in df.iterrows():
         rows.append({"date": d.strftime("%Y-%m-%d"),
