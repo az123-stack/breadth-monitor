@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Breadth Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --surface-0: #f4f3f0;
+  --surface-1: #fcfcfb;
+  --border: #e3e1dc;
+  --grid: #ebe9e4;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #7a7974;
+  --up: #2a78d6;
+  --down: #e34948;
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --neutral-mid: #f0efec;
+  --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
+  --tint-strong: 34%;
+  --tint-light: 14%;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-0: #121211; --surface-1: #1a1a19; --border: #2e2e2b; --grid: #262624;
+    --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+    --up: #3987e5; --down: #e66767; --s1: #3987e5; --s2: #d95926; --neutral-mid: #383835;
+    --tint-strong: 40%; --tint-light: 18%;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #121211; --surface-1: #1a1a19; --border: #2e2e2b; --grid: #262624;
+  --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #8f8e86;
+  --up: #3987e5; --down: #e66767; --s1: #3987e5; --s2: #d95926; --neutral-mid: #383835;
+  --tint-strong: 40%; --tint-light: 18%;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--surface-0); color: var(--text-primary);
+  font: 14px/1.45 Inter, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; }
+header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+.meta { color: var(--text-secondary); font-size: 13px; }
+.num { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; }
+
+/* Regime */
+.regime { display: grid; grid-template-columns: 6px 1fr; overflow: hidden; margin-bottom: 14px; }
+.regime .bar { background: var(--tone); }
+.regime .body { padding: 16px 18px; }
+.regime .label { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; }
+.regime .label svg { flex: none; color: var(--tone); }
+.regime .kicker { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); margin-bottom: 4px; }
+.regime p { margin: 6px 0 0; color: var(--text-secondary); max-width: 760px; }
+.regime ul { margin: 8px 0 0; padding-left: 18px; color: var(--text-secondary); font-size: 13px; }
+
+/* Tiles */
+.tiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 14px; }
+.tile { padding: 12px 14px; }
+.tile .k { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+.tile .v { font-size: 26px; font-weight: 600; margin-top: 2px; letter-spacing: -0.02em; }
+.tile .s { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+@media (max-width: 900px) { .tiles { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 520px) { .tiles { grid-template-columns: repeat(2, 1fr); } .tile .v { font-size: 22px; } }
+
+/* Charts */
+.charts { display: grid; gap: 10px; margin-bottom: 14px; }
+.chart { padding: 14px 16px 8px; position: relative; }
+.chart h2, .tablecard h2 { font-size: 14px; font-weight: 600; margin: 0; }
+.chart .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin: 4px 0 6px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.legend i.line { height: 2px; border-radius: 1px; vertical-align: 3px; width: 14px; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart svg text { fill: var(--text-muted); font-size: 11px; font-family: Inter, system-ui, sans-serif; }
+.tip {
+  position: absolute; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12);
+  opacity: 0; transition: opacity .08s; white-space: nowrap; z-index: 2;
+}
+.tip b { display: block; margin-bottom: 3px; font-weight: 600; }
+.tip div { display: flex; justify-content: space-between; gap: 14px; color: var(--text-secondary); }
+.tip span:last-child { color: var(--text-primary); }
+
+/* Table */
+.tablecard { padding: 14px 0 0; }
+.tablecard .head { display: flex; justify-content: space-between; align-items: center; padding: 0 16px 10px; gap: 10px; flex-wrap: wrap; }
+.toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.toggle button { background: none; border: 0; padding: 5px 10px; font: inherit; font-size: 12px; color: var(--text-secondary); cursor: pointer; }
+.toggle button[aria-pressed="true"] { background: var(--neutral-mid); color: var(--text-primary); font-weight: 600; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+th, td { padding: 6px 10px; text-align: right; white-space: nowrap; border-top: 1px solid var(--grid); }
+th { position: sticky; top: 0; background: var(--surface-1); font-weight: 600; color: var(--text-secondary); font-size: 11.5px; vertical-align: bottom; line-height: 1.25; }
+th small { display: block; font-weight: 400; color: var(--text-muted); }
+td:first-child, th:first-child { text-align: left; position: sticky; left: 0; background: var(--surface-1); z-index: 1; }
+td.grp, th.grp { border-left: 1px solid var(--border); }
+td.u2 { background: color-mix(in srgb, var(--up) var(--tint-strong), transparent); }
+td.u1 { background: color-mix(in srgb, var(--up) var(--tint-light), transparent); }
+td.d2 { background: color-mix(in srgb, var(--down) var(--tint-strong), transparent); }
+td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparent); }
+.key { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); padding: 10px 16px 14px; }
+.key i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -2px; }
+footer { color: var(--text-muted); font-size: 12px; margin-top: 18px; line-height: 1.6; }
+footer a { color: var(--text-secondary); }
+.empty { padding: 40px; text-align: center; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DATA = /*__DATA__*/null;
+
+const $ = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstElementChild; };
+const fmt = (v, d = 0) => v == null ? "–" : Number(v).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
+const ord = (n) => n == null ? "" : n + (["th","st","nd","rd"][(n % 100 - 20) % 10] || ["th","st","nd","rd"][n % 100] || "th");
+const shortDate = (s) => { const d = new Date(s + "T12:00:00"); return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }); };
+const longDate = (s) => { const d = new Date(s + "T12:00:00"); return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" }); };
+
+const TONES = {
+  bull:    { color: "var(--good)",     icon: '<path d="M4 14l5-5 4 4 7-7M14 6h6v6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' },
+  bear:    { color: "var(--critical)", icon: '<path d="M4 8l5 5 4-4 7 7M14 16h6v-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' },
+  warn:    { color: "var(--warning)",  icon: '<path d="M12 3l9.5 17h-19z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.2v.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' },
+  neutral: { color: "var(--text-muted)", icon: '<path d="M4 12h16M4 7h10M4 17h13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' },
+};
+
+function render() {
+  const app = document.getElementById("app");
+  if (!DATA || !DATA.rows || !DATA.rows.length) {
+    app.innerHTML = '<div class="card empty">No data yet. Run the backfill workflow once to load history.</div>';
+    return;
+  }
+  const rows = DATA.rows, last = rows[rows.length - 1], R = DATA.regime, P = DATA.percentiles || {};
+  const gen = new Date(DATA.generated);
+
+  app.append($(`<header>
+    <div><h1>Market Breadth Monitor</h1>
+    <div class="meta">Data through ${longDate(last.date)}</div></div>
+    <div class="meta">Updated ${gen.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${fmt(DATA.history_days)} days of history</div>
+  </header>`));
+
+  const tone = TONES[R.tone] || TONES.neutral;
+  app.append($(`<section class="card regime" style="--tone:${tone.color}">
+    <div class="bar"></div>
+    <div class="body">
+      <div class="kicker">Market regime</div>
+      <div class="label"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">${tone.icon}</svg>${R.label}</div>
+      <p>${R.advice}</p>
+      <ul>${R.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
+    </div></section>`));
+
+  const pct = (k) => P[k] != null ? `${ord(P[k])} percentile of your history` : "building history";
+  const tiles = [
+    ["Up 4%+ today", fmt(last.up4), last.up4_avg40 != null ? `40-day avg ${fmt(last.up4_avg40)}` : pct("up4")],
+    ["Down 4%+ today", fmt(last.dn4), pct("dn4")],
+    ["5-day ratio", fmt(last.ratio5, 2), pct("ratio5")],
+    ["10-day ratio", fmt(last.ratio10, 2), pct("ratio10")],
+    ["T2108", fmt(last.t2108, 1), "% of stocks above 40-day MA"],
+    ["Up / down 25% qtr", `${fmt(last.up25q)} / ${fmt(last.dn25q)}`, "65-day moves"],
+  ];
+  const tl = $('<section class="tiles"></section>');
+  tiles.forEach(([k, v, s]) => tl.append($(`<div class="card tile"><div class="k">${k}</div><div class="v num">${v}</div><div class="s">${s}</div></div>`)));
+  app.append(tl);
+
+  const charts = $('<section class="charts"></section>');
+  app.append(charts);
+  W = Math.max(300, Math.round(charts.clientWidth - 34));   // draw at real pixel width
+  H = W < 600 ? 190 : 210;
+  charts.append(chartBreakouts(rows));
+  charts.append(chartRatios(rows));
+  charts.append(chartT2108(rows));
+  app.append(table(rows));
+
+  app.append($(`<footer>
+    <b>Definitions.</b> Universe: US common stocks, close ≥ $3. 4% days: close ≥ 4% above (or below) the prior close on volume above the prior day and ≥ 100k.
+    5/10-day ratio: sum of 4% up days ÷ sum of 4% down days over the window. 25%/qtr: change over 65 trading days; month: 20 days; 34-day: 13%.
+    Slower metrics and T2108 use stocks with 20-day avg volume ≥ 100k. Table shading compares each value with your own history (darker = beyond the 10th/90th percentile).
+    Regime thresholds are starter values; calibrate them in <code>breadth/config.py</code>.
+    · <a href="breadth.csv">Download full history (CSV)</a></footer>`));
+}
+
+/* ---------- small SVG chart kit ---------- */
+let W = 1100, H = 210;
+const M = { t: 10, r: 46, b: 24, l: 8 };
+function frame(title, legend, height = H) {
+  const el = $(`<div class="card chart"><h2>${title}</h2><div class="legend">${legend}</div></div>`);
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${height}`);
+  svg.setAttribute("role", "img"); svg.setAttribute("aria-label", title);
+  el.append(svg);
+  const tip = $('<div class="tip"></div>'); el.append(tip);
+  return { el, svg, tip, h: height };
+}
+const S = (tag, attrs, parent) => { const n = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent && parent.append(n); return n; };
+
+function axes(svg, h, rows, y, ticks, fmtY) {
+  const g = S("g", {}, svg);
+  ticks.forEach(t => {
+    S("line", { x1: M.l, x2: W - M.r, y1: y(t), y2: y(t), stroke: "var(--grid)", "stroke-width": 1 }, g);
+    const tx = S("text", { x: W - M.r + 6, y: y(t) + 4 }, g); tx.textContent = fmtY(t);
+  });
+  const n = rows.length, x = (i) => M.l + (i + 0.5) * (W - M.l - M.r) / n;
+  const step = Math.max(1, Math.ceil(n / Math.max(3, Math.floor(W / 130))));
+  for (let i = n - 1; i >= 0; i -= step) {
+    const tx = S("text", { x: x(i), y: h - 6, "text-anchor": "middle" }, g); tx.textContent = shortDate(rows[i].date);
+  }
+  return x;
+}
+
+function hover(c, rows, x, lines) {
+  const n = rows.length, bw = (W - M.l - M.r) / n;
+  const cross = S("line", { y1: M.t, y2: c.h - M.b, stroke: "var(--text-muted)", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0 }, c.svg);
+  const hit = S("rect", { x: M.l, y: 0, width: W - M.l - M.r, height: c.h, fill: "transparent" }, c.svg);
+  const move = (ev) => {
+    const pt = ev.touches ? ev.touches[0] : ev;
+    const r = c.svg.getBoundingClientRect();
+    const sx = (pt.clientX - r.left) * W / r.width;
+    const i = Math.max(0, Math.min(n - 1, Math.floor((sx - M.l) / bw)));
+    const row = rows[i];
+    cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("opacity", 1);
+    c.tip.innerHTML = `<b>${longDate(row.date)}</b>` + lines.map(([lab, f]) => `<div><span>${lab}</span><span class="num">${f(row)}</span></div>`).join("");
+    const er = c.el.getBoundingClientRect();     // SVG elements have no offsetTop/Left
+    const px = r.left - er.left + x(i) * r.width / W;
+    const tw = c.tip.offsetWidth;
+    const right = px + 14 + tw < er.width - 4;    // sit beside the crosshair, flip near the edge
+    c.tip.style.left = (right ? px + 14 : Math.max(4, px - 14 - tw)) + "px";
+    c.tip.style.top = (r.top - er.top + 4) + "px";
+    c.tip.style.opacity = 1;
+  };
+  const leave = () => { cross.setAttribute("opacity", 0); c.tip.style.opacity = 0; };
+  hit.addEventListener("mousemove", move); hit.addEventListener("touchmove", move, { passive: true });
+  hit.addEventListener("touchstart", move, { passive: true });
+  hit.addEventListener("mouseleave", leave); hit.addEventListener("touchend", leave);
+}
+
+function niceMax(v) { const p = Math.pow(10, Math.floor(Math.log10(v || 1))); return Math.ceil((v || 1) / p * 2) / 2 * p; }
+function path(rows, x, y, key) {
+  let d = "", pen = false;
+  rows.forEach((r, i) => { const v = r[key]; if (v == null) { pen = false; return; } d += (pen ? "L" : "M") + x(i).toFixed(1) + "," + y(v).toFixed(1); pen = true; });
+  return d;
+}
+function endLabel(svg, x, y, rows, key, text, color) {
+  for (let i = rows.length - 1; i >= 0; i--) if (rows[i][key] != null) {
+    S("circle", { cx: x(i), cy: y(rows[i][key]), r: 4, fill: color, stroke: "var(--surface-1)", "stroke-width": 2 }, svg);
+    return;
+  }
+}
+
+function chartBreakouts(rows) {
+  const c = frame("Stocks up / down 4%+ per day",
+    '<span><i style="background:var(--up)"></i>Up 4%+</span><span><i style="background:var(--down)"></i>Down 4%+</span><span><i class="line" style="background:var(--text-secondary)"></i>40-day avg of up 4%+</span>');
+  const mx = niceMax(Math.max(...rows.map(r => Math.max(r.up4 || 0, r.dn4 || 0, r.up4_avg40 || 0))));
+  const mid = M.t + (c.h - M.t - M.b) / 2, half = (c.h - M.t - M.b) / 2;
+  const y = (v) => mid - v / mx * half;            // up above the line
+  const yd = (v) => mid + v / mx * half;           // down mirrored below
+  const x = axes(c.svg, c.h, rows, y, [mx, mx / 2, 0], v => fmt(v));
+  [mx / 2, mx].forEach(t => { S("line", { x1: M.l, x2: W - M.r, y1: yd(t), y2: yd(t), stroke: "var(--grid)" }, c.svg); const tx = S("text", { x: W - M.r + 6, y: yd(t) + 4 }, c.svg); tx.textContent = fmt(t); });
+  const bw = (W - M.l - M.r) / rows.length, w = Math.max(1, bw - 2);
+  rows.forEach((r, i) => {
+    const x0 = x(i) - w / 2;
+    if (r.up4) S("rect", { x: x0, y: y(r.up4), width: w, height: mid - y(r.up4), rx: Math.min(2, w / 3), fill: "var(--up)" }, c.svg);
+    if (r.dn4) S("rect", { x: x0, y: mid, width: w, height: yd(r.dn4) - mid, rx: Math.min(2, w / 3), fill: "var(--down)" }, c.svg);
+  });
+  S("line", { x1: M.l, x2: W - M.r, y1: mid, y2: mid, stroke: "var(--text-muted)", "stroke-width": 1 }, c.svg);
+  S("path", { d: path(rows, x, y, "up4_avg40"), fill: "none", stroke: "var(--text-secondary)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  hover(c, rows, x, [["Up 4%+", r => fmt(r.up4)], ["Down 4%+", r => fmt(r.dn4)], ["40-day avg", r => fmt(r.up4_avg40)]]);
+  return c.el;
+}
+
+function chartRatios(rows) {
+  const c = frame("5-day and 10-day breadth ratio (up 4% ÷ down 4%)",
+    '<span><i class="line" style="background:var(--s1)"></i>5-day</span><span><i class="line" style="background:var(--s2)"></i>10-day</span><span><i class="line" style="background:var(--text-muted)"></i>1.0 = balanced</span>');
+  const mx = Math.max(2, niceMax(Math.max(...rows.map(r => Math.max(r.ratio5 || 0, r.ratio10 || 0)))));
+  const y = (v) => M.t + (1 - v / mx) * (c.h - M.t - M.b);
+  const ticks = [0, 1, DATA.thresholds.strong_ratio, mx].filter((v, i, a) => a.indexOf(v) === i && v <= mx);
+  const x = axes(c.svg, c.h, rows, y, ticks, v => fmt(v, 1));
+  S("line", { x1: M.l, x2: W - M.r, y1: y(1), y2: y(1), stroke: "var(--text-muted)", "stroke-width": 1, "stroke-dasharray": "4 3" }, c.svg);
+  S("path", { d: path(rows, x, y, "ratio10"), fill: "none", stroke: "var(--s2)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  S("path", { d: path(rows, x, y, "ratio5"), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  endLabel(c.svg, x, y, rows, "ratio10", "10d", "var(--s2)");
+  endLabel(c.svg, x, y, rows, "ratio5", "5d", "var(--s1)");
+  hover(c, rows, x, [["5-day", r => fmt(r.ratio5, 2)], ["10-day", r => fmt(r.ratio10, 2)]]);
+  return c.el;
+}
+
+function chartT2108(rows) {
+  const t = DATA.thresholds;
+  const c = frame("T2108: % of stocks above their 40-day moving average",
+    `<span><i class="line" style="background:var(--s1)"></i>T2108</span><span><i style="background:color-mix(in srgb,var(--down) 18%,transparent)"></i>Below ${t.oversold} (oversold)</span><span><i style="background:color-mix(in srgb,var(--up) 18%,transparent)"></i>Above ${t.overbought} (overbought)</span>`);
+  const y = (v) => M.t + (1 - v / 100) * (c.h - M.t - M.b);
+  S("rect", { x: M.l, y: y(t.oversold), width: W - M.l - M.r, height: y(0) - y(t.oversold), fill: "var(--down)", opacity: 0.12 }, c.svg);
+  S("rect", { x: M.l, y: y(100), width: W - M.l - M.r, height: y(t.overbought) - y(100), fill: "var(--up)", opacity: 0.12 }, c.svg);
+  const x = axes(c.svg, c.h, rows, y, [0, t.oversold, 50, t.overbought, 100], v => v);
+  S("path", { d: path(rows, x, y, "t2108"), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  endLabel(c.svg, x, y, rows, "t2108", "", "var(--s1)");
+  hover(c, rows, x, [["T2108", r => fmt(r.t2108, 1)]]);
+  return c.el;
+}
+
+/* ---------- Market Monitor table ---------- */
+const COLS = [
+  ["up4", "Up 4%", "today", "up"], ["dn4", "Down 4%", "today", "down"],
+  ["ratio5", "5-day", "ratio", "ratio", 2], ["ratio10", "10-day", "ratio", "ratio", 2],
+  ["up25q", "Up 25%", "quarter", "up", 0, true], ["dn25q", "Down 25%", "quarter", "down"],
+  ["up25m", "Up 25%", "month", "up", 0, true], ["dn25m", "Down 25%", "month", "down"],
+  ["up50m", "Up 50%", "month", "up", 0, true], ["dn50m", "Down 50%", "month", "down"],
+  ["up13_34", "Up 13%", "34 days", "up", 0, true], ["dn13_34", "Down 13%", "34 days", "down"],
+  ["t2108", "T2108", "% > 40MA", "t2108", 1, true], ["universe", "Stocks", "universe", "none", 0, true],
+];
+function shade(key, kind, v) {
+  if (v == null) return "";
+  const sc = DATA.scale[key];
+  if (kind === "ratio") return v >= 2 ? "u2" : v >= DATA.thresholds.strong_ratio ? "u1" : v <= 0.5 ? "d2" : v < 1 ? "d1" : "";
+  if (kind === "t2108") return v <= DATA.thresholds.oversold ? "d2" : v < 40 ? "d1" : v >= DATA.thresholds.overbought ? "u2" : v > 60 ? "u1" : "";
+  if (!sc) return "";
+  const cls = kind === "up" ? ["u1", "u2"] : kind === "down" ? ["d1", "d2"] : null;
+  if (!cls || v <= 0) return "";
+  return v >= sc[2] && sc[2] > 0 ? cls[1] : v >= sc[1] && sc[1] > 0 ? cls[0] : "";
+}
+function table(rows) {
+  const el = $(`<section class="card tablecard"><div class="head"><h2>Daily breadth (Market Monitor view)</h2>
+    <div class="toggle" role="group" aria-label="Rows shown"><button data-n="20" aria-pressed="true">20 days</button><button data-n="60">60</button><button data-n="9999">All</button></div></div>
+    <div class="scroll"><table><thead></thead><tbody></tbody></table></div>
+    <div class="key"><span><i style="background:color-mix(in srgb,var(--up) var(--tint-strong),transparent)"></i>Strong (top 10% / ratio ≥ 2 / T2108 ≥ ${DATA.thresholds.overbought})</span>
+    <span><i style="background:color-mix(in srgb,var(--up) var(--tint-light),transparent)"></i>Above median</span>
+    <span><i style="background:color-mix(in srgb,var(--down) var(--tint-light),transparent)"></i>Above-median selling</span>
+    <span><i style="background:color-mix(in srgb,var(--down) var(--tint-strong),transparent)"></i>Heavy (top 10% / ratio ≤ 0.5 / T2108 ≤ ${DATA.thresholds.oversold})</span></div></section>`);
+  el.querySelector("thead").innerHTML = "<tr><th>Date</th>" + COLS.map(c => `<th class="${c[5] ? "grp" : ""}">${c[1]}<small>${c[2]}</small></th>`).join("") + "</tr>";
+  const body = el.querySelector("tbody");
+  const fill = (n) => {
+    body.innerHTML = rows.slice(-n).reverse().map(r => "<tr><td>" + shortDate(r.date) + "</td>" +
+      COLS.map(c => `<td class="num ${c[5] ? "grp " : ""}${shade(c[0], c[3], r[c[0]])}">${fmt(r[c[0]], c[4] || 0)}</td>`).join("") + "</tr>").join("");
+  };
+  el.querySelectorAll(".toggle button").forEach(b => b.addEventListener("click", () => {
+    el.querySelectorAll(".toggle button").forEach(o => o.setAttribute("aria-pressed", o === b));
+    fill(+b.dataset.n);
+  }));
+  fill(20);
+  return el;
+}
+
+render();
+let lastW = window.innerWidth;
+window.addEventListener("resize", () => {
+  if (Math.abs(window.innerWidth - lastW) < 40) return;
+  lastW = window.innerWidth;
+  clearTimeout(window._rt);
+  window._rt = setTimeout(() => { document.getElementById("app").innerHTML = ""; render(); }, 150);
+});
+</script>
+</body>
+</html>
