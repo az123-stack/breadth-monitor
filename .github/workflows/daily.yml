@@ -54,5 +54,10 @@ jobs:
             echo "No changes"
           else
             git commit -m "Breadth update $(date -u +%Y-%m-%d)"
-            git push
+            # If code was pushed while this ran, replay our data commit on top
+            # (generated files from this run win any conflict).
+            for i in 1 2 3; do
+              git push && break
+              git pull --rebase -X theirs || { git rebase --abort; exit 1; }
+            done
           fi
