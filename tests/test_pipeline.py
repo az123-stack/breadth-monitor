@@ -246,6 +246,37 @@ def test_setup_masks():
     assert bool(checks["H"].iloc[-1]["A"])
 
 
+
+def test_kq_screen():
+    from breadth import kq
+    n = 140
+    dates = pd.bdate_range("2026-01-01", periods=n)
+    rows = []
+    def add(t, closes, vol=2_000_000, spread=0.035, gap_at=None):
+        for i, d in enumerate(dates):
+            c = closes[i]
+            o = c * (1.12 if gap_at is not None and i == gap_at else 1.0)
+            v = vol * (10 if gap_at is not None and i == gap_at else 1)
+            rows.append({"date": d, "ticker": t, "o": o, "h": c * (1 + spread), "l": c * (1 - spread), "c": c, "v": v})
+    # LEAD: flat, then a steep leg up, then a tight pause near the rising 20-day
+    lead = [10.0] * 70 + list(np.linspace(10, 30, 60)) + [30.0, 30.3, 30.1, 30.4, 30.2, 30.5, 30.3, 30.6, 30.4, 30.5]
+    add("LEAD", lead)
+    # GAP: same shape but a 10x-volume gap 5 days ago -> not this setup
+    add("GAP", lead, gap_at=n - 5)
+    # DULL: drifts, never a top performer -> not a candidate
+    add("DULL", list(np.linspace(10, 11, n)))
+    # filler so the performance percentile means something
+    for k in range(40):
+        add(f"F{k}", list(np.linspace(10, 10 + k * 0.05, n)))
+    df = pd.DataFrame(rows)
+    out = kq.build(df, set(df["ticker"]), tv={"LEAD": "NASDAQ:LEAD"})
+    secs = {r["t"]: s for s in ("basing", "extended", "reject") for r in out[s]}
+    assert "DULL" not in secs
+    assert secs.get("GAP") == "reject", secs
+    assert secs.get("LEAD") in ("basing", "extended"), secs
+    assert out["tv"].get("LEAD") == "NASDAQ:LEAD"
+    return {k: v for k, v in secs.items()}
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

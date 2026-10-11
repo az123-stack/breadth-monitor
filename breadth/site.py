@@ -22,7 +22,7 @@ def _clean(v):
     return round(v, 2) if isinstance(v, float) else v
 
 
-def payload(history, theme_data=None):
+def payload(history, theme_data=None, kq_data=None):
     full = history.copy()
     # Short averages for the "breakout trend" chart, computed over the full
     # history so the visible window is never blank at its start.
@@ -55,14 +55,15 @@ def payload(history, theme_data=None):
                        "strong_ratio": config.STRONG_RATIO},
         "rows": rows,
         "themes": theme_data,
+        "kq": kq_data,
         "repo": config.REPO_URL,
         "live_url": config.LIVE_CSV_URL,
     }
 
 
-def build(history, theme_data=None):
+def build(history, theme_data=None, kq_data=None):
     config.DOCS_DIR.mkdir(parents=True, exist_ok=True)
-    data = payload(history, theme_data)
+    data = payload(history, theme_data, kq_data)
     blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
     html = TEMPLATE.read_text().replace("/*__DATA__*/null", blob)
     (config.DOCS_DIR / "index.html").write_text(html)

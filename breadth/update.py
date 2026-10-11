@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from . import config, metrics, site, store, themes
+from . import config, kq, metrics, site, store, themes
 from .massive import MassiveClient, MassiveError
 
 log = logging.getLogger("breadth")
@@ -164,7 +164,12 @@ def recompute_and_publish(bars, splits, universe, state):
     except Exception as e:  # never let the theme tab break the breadth dashboard
         log.exception("theme build failed: %s", e)
         theme_data = None
-    site.build(history, theme_data)
+    try:
+        kq_data = kq.build(adjusted, universe, names=store.load_names(), tv=store.load_tv_symbols())
+    except Exception as e:  # the KQ list is optional; never block the page
+        log.exception("kq screen failed: %s", e)
+        kq_data = None
+    site.build(history, theme_data, kq_data)
     return history
 
 

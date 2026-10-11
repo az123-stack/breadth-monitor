@@ -30,6 +30,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - `themes.py` sheet port: theme Score /8, rotation, setup score, long/short pulse, ranks, payload
 - `strength.py` v2: RS Rating, RS-line ★/⚑ flags, tightness, Theme Strength
 - `setups.py` momentum bursts (2LYNCH), anticipation, episodic pivots, regime trade stats
+- `kq.py` KQ breakout screen → `DATA.kq` (Basing / Extended / Not this setup or failing a rule); "⬇ KQ list" button exports it to TradingView
 - `site.py` + `template.html` single self-contained page (tabs: Breadth, Themes, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 79 themes · `data/subthemes.csv` (group,subtheme,ticker) 119 peer groups
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly, 7 tests)
@@ -43,6 +44,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   % above EMA21/50 (25%), median RS Rating (25%); groups < 5 stocks shrunk toward 50.
 - Anticipation: RS ≥ 85, ≤ 10% off high, ADR ≥ 4, 5-day range ≤ 1.5 ADR, volume dry-up ≤ 0.7.
 - EPs: gap 8–60%, 3× volume, ≥ $5, ≥ $20M traded.
+- KQ screen: ADR ≥ 5, $20M+/day, top 5% on 1/3/6-month return, close > SMA50, SMA20 > SMA50, 30%+ leg in 60 days,
+  ≤ 25% off high. Sections in order: event (10% gap on 3x vol or 8x vol day, 15 days) or flat MA (SMA20 rise < 0.9 ATR
+  in 10 days) → reject; ≥ 1.5 ATR above SMA20 → extended; 10-day range > 3.5 ATR or 4+ SMA10 crosses → reject; else basing.
+  Thresholds hand-calibrated on the Oct 9, 2026 candidates; screen proxies, not chart grades.
 - TradingView export priority: bursts → anticipation → ⚑ → ★ → RS 99 → fast risers →
   top 2 themes → top 3 sub-themes (new names) → bottom 2 themes → EPs (off) → ETFs; de-duplicated.
 

@@ -183,6 +183,16 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .xsum { margin: 6px 0; }
 .xprev { width: 100%; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11.5px; background: var(--surface-0); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 8px; resize: vertical; }
 .xbtns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.xopens { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.kqsec { margin-top: 6px; }
+.kqsec summary { cursor: pointer; font-size: 12.5px; color: var(--text-secondary); padding: 2px 0; }
+.kqtab { width: 100%; border-collapse: collapse; font-size: 12px; margin: 4px 0 6px; }
+.kqtab th, .kqtab td { text-align: left; padding: 3px 6px; border-top: 1px solid var(--grid); vertical-align: top; }
+.kqtab th { color: var(--text-muted); font-weight: 600; }
+.kqtab td.n { font-family: "JetBrains Mono", ui-monospace, monospace; text-align: right; white-space: nowrap; }
+.kqtab td.t { font-weight: 700; white-space: nowrap; }
+.kqtab td.w { color: var(--text-secondary); }
+.kqnote { font-size: 12px; color: var(--text-muted); margin: 8px 0 0; }
 /* ---------- browse ---------- */
 .browsebar { padding: 10px 14px; margin-bottom: 10px; }
 .browsebar .filters { justify-content: flex-start; }
@@ -303,9 +313,10 @@ function render() {
     <div><h1>Market Breadth Monitor</h1>
     <div class="meta">Data through ${longDate(last.date)}</div></div>
     <div class="hright"><div class="meta">Updated ${gen.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${fmt(DATA.history_days)} days of history</div>
-    ${DATA.themes ? '<button class="xopen">⬇ TradingView list</button>' : ""}</div>
+    <div class="xopens">${DATA.kq ? '<button class="xopen kqopen">⬇ KQ list</button>' : ""}${DATA.themes ? '<button class="xopen tvopen">⬇ TradingView list</button>' : ""}</div></div>
   </header>`));
-  const xo = app.querySelector(".xopen"); if (xo) xo.addEventListener("click", openExport);
+  const xo = app.querySelector(".tvopen"); if (xo) xo.addEventListener("click", openExport);
+  const ko = app.querySelector(".kqopen"); if (ko) ko.addEventListener("click", openKQ);
   const tabs = $(`<nav class="tabs" role="tablist">
     <button role="tab" data-tab="breadth">Breadth</button>
     <button role="tab" data-tab="themes">Themes</button>
@@ -1403,6 +1414,82 @@ function openExport() {
   m.querySelector(".xdl").addEventListener("click", () => {
     const blob = new Blob([refresh().text], { type: "text/plain" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fname();
+    document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  });
+  m.querySelector(".xcopy").addEventListener("click", async (e) => {
+    try { await navigator.clipboard.writeText(refresh().text); e.target.textContent = "Copied"; }
+    catch (err) { m.querySelector(".xprev").select(); e.target.textContent = "Press Ctrl+C"; }
+    setTimeout(() => { e.target.textContent = "Copy to clipboard"; }, 1500);
+  });
+  const close = () => m.remove();
+  m.querySelector(".xclose").addEventListener("click", close);
+  m.addEventListener("click", (e) => { if (e.target === m) close(); });
+  document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { close(); document.removeEventListener("keydown", esc); } });
+  document.body.append(m);
+  refresh();
+}
+
+/* =================== KQ watchlist export =================== */
+// Three sections from the daily KQ screen (breadth/kq.py). Screen proxies only:
+// every name still needs a full chart grade before it is traded.
+const KQ_DEFS = [
+  { id: "basing", on: true, label: "KQ Basing - watch for trigger", why: "Passes the screen and is still coiling near the rising 10/20, tightest range first" },
+  { id: "extended", on: true, label: "KQ Extended - wait for handle", why: "Already 1.5+ ATR above the 20-day: needs a sideways handle before an entry, closest to ready first" },
+  { id: "reject", on: true, label: "KQ Not this setup or failing a rule", why: "News/volume event, flat 20-day MA (rule 3) or loose, choppy base (rule 5). For study, not entries" },
+];
+const KQ_ON = Object.fromEntries(KQ_DEFS.map(d => [d.id, d.on]));
+
+function buildKQ() {
+  const K = DATA.kq, tv = K.tv || {};
+  const sections = KQ_DEFS.filter(d => KQ_ON[d.id] && (K[d.id] || []).length).map(d => ({ id: d.id, name: d.label, ticks: K[d.id].map(r => r.t) }));
+  const clean = (s) => s.replace(/[,#\n]/g, " ").replace(/\s+/g, " ").trim();
+  const text = sections.map(s => ["###" + clean(s.name), ...s.ticks.map(t => tv[t] || t)].join(",")).join(",");
+  return { text, sections, total: sections.reduce((n, s) => n + s.ticks.length, 0) };
+}
+
+function openKQ() {
+  const old = document.querySelector(".xmodal"); if (old) old.remove();
+  const K = DATA.kq, c = K.cfg;
+  const m = $(`<div class="xmodal" role="dialog" aria-modal="true" aria-label="KQ watchlist"><div class="card xbox">
+    <div class="xhead"><h2>KQ breakout watchlist</h2><button class="xclose" aria-label="Close">✕</button></div>
+    <p class="meta">Screen for Kristjan's basic breakout as of the ${longDate(K.date)} close: ${K.candidates} of ${fmt(K.screened)} stocks pass
+      (ADR ≥ ${c.min_adr}%, $${c.min_dvol / 1e6}M+ a day, top ${100 - c.top_pct}% over 1/3/6 months, above a rising 20 over the 50, a ${c.min_leg * 100}%+ leg in ${c.leg_days} days, ≤ ${-c.max_off * 100}% off the high).
+      In TradingView: watchlist menu → <b>Upload list…</b> → choose the file.</p>
+    <div class="xlist"></div>
+    <div class="xsum meta"></div>
+    <textarea class="xprev" readonly rows="4" aria-label="Preview"></textarea>
+    <div class="xbtns"><button class="xdl primary">Download .txt</button><button class="xcopy">Copy to clipboard</button></div>
+    <p class="kqnote">A screen, not a grade. End-of-day data only; earnings dates are not checked. Send each chart for a full grade before trading it.</p></div></div>`);
+  const list = m.querySelector(".xlist");
+  const refresh = () => {
+    const ex = buildKQ();
+    list.querySelectorAll("[data-count]").forEach(el => {
+      const n = (K[el.dataset.count] || []).length;
+      el.textContent = !KQ_ON[el.dataset.count] ? "off" : n ? `${n} tickers` : "none today";
+    });
+    m.querySelector(".xsum").textContent = `${ex.total} tickers in ${ex.sections.length} sections`;
+    m.querySelector(".xprev").value = ex.text;
+    return ex;
+  };
+  const num = (v, suf = "") => v == null ? "–" : `${v}${suf}`;
+  KQ_DEFS.forEach(d => {
+    const rows = K[d.id] || [];
+    const wrap = $(`<div><label class="xrow"><input type="checkbox" ${KQ_ON[d.id] ? "checked" : ""}><span><b>${d.label}</b><small>${d.why}</small></span><span class="xcount meta" data-count="${d.id}"></span></label></div>`);
+    wrap.querySelector("input").addEventListener("change", (e) => { KQ_ON[d.id] = e.target.checked; refresh(); });
+    if (rows.length) {
+      const det = $(`<details class="kqsec"><summary>Show the ${rows.length} names</summary><table class="kqtab"><thead><tr><th>Ticker</th><th>Why</th><th class="n">ADR</th><th class="n">$M/day</th><th class="n">Off high</th></tr></thead><tbody></tbody></table></details>`);
+      const tb = det.querySelector("tbody");
+      rows.forEach(r => { const tr = document.createElement("tr");
+        tr.innerHTML = `<td class="t"></td><td class="w"></td><td class="n">${num(r.adr, "%")}</td><td class="n">${num(r.dvol)}</td><td class="n">${num(r.off, "%")}</td>`;
+        tr.querySelector(".t").textContent = r.t; tr.querySelector(".t").title = r.name || "";
+        tr.querySelector(".w").textContent = r.why; tb.append(tr); });
+      wrap.append(det);
+    }
+    list.append(wrap);
+  });
+  m.querySelector(".xdl").addEventListener("click", () => {
+    const blob = new Blob([refresh().text], { type: "text/plain" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `kq-watchlist-${K.date}.txt`;
     document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
   });
   m.querySelector(".xcopy").addEventListener("click", async (e) => {
