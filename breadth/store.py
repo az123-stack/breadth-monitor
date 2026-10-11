@@ -173,6 +173,22 @@ def load_names():
     return {k: junk.sub("", v).strip() for k, v in names.items()}
 
 
+TV_EXCHANGE = {"XNAS": "NASDAQ", "XNYS": "NYSE", "ARCX": "AMEX", "XASE": "AMEX", "BATS": "CBOE"}
+
+
+def load_tv_symbols():
+    """ticker -> TradingView symbol (EXCHANGE:TICKER) where the exchange is known."""
+    out = {}
+    for f in (config.UNIVERSE_FILE, config.REF_NAMES_FILE):
+        if f.exists():
+            d = pd.read_csv(f, dtype=str).fillna("")
+            if "exchange" in d.columns:
+                for t, ex in zip(d["ticker"], d["exchange"]):
+                    if TV_EXCHANGE.get(ex):
+                        out[t] = f"{TV_EXCHANGE[ex]}:{t}"
+    return out
+
+
 def save_ref_names(rows):
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).drop_duplicates("ticker").sort_values("ticker").to_csv(config.REF_NAMES_FILE, index=False)

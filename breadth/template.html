@@ -165,6 +165,24 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .regtab th.nowcol { color: var(--text-primary); box-shadow: inset 0 -2px 0 var(--s1); }
 .ck { display: inline-block; width: 17px; height: 17px; line-height: 17px; text-align: center; border-radius: 4px; font-size: 10.5px; font-weight: 700; margin-right: 2px; background: var(--grid); color: var(--text-muted); }
 .ck.on { background: color-mix(in srgb, var(--pos) 35%, transparent); color: var(--text-primary); }
+.hright { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+@media (max-width: 520px) { .hright { align-items: flex-start; } }
+.xopen, .xbtns button { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; color: var(--text-primary); cursor: pointer; }
+.xbtns button.primary { background: var(--s1); border-color: var(--s1); color: #fff; }
+.xmodal { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; z-index: 50; overflow-y: auto; }
+.xbox { width: 100%; max-width: 640px; padding: 16px 18px; }
+.xhead { display: flex; justify-content: space-between; align-items: center; }
+.xhead h2 { margin: 0; font-size: 17px; }
+.xclose { background: none; border: 0; font-size: 18px; cursor: pointer; color: var(--text-secondary); }
+.xlist { display: grid; gap: 2px; margin: 10px 0; }
+.xrow { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: start; padding: 7px 4px; border-top: 1px solid var(--grid); cursor: pointer; }
+.xrow input { margin-top: 3px; }
+.xrow small { display: block; color: var(--text-muted); font-size: 12px; margin-top: 1px; }
+.xrow .xgroups { color: var(--text-secondary); }
+.xcount { white-space: nowrap; font-size: 12.5px; padding-top: 2px; }
+.xsum { margin: 6px 0; }
+.xprev { width: 100%; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11.5px; background: var(--surface-0); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 8px; resize: vertical; }
+.xbtns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 /* ---------- browse ---------- */
 .browsebar { padding: 10px 14px; margin-bottom: 10px; }
 .browsebar .filters { justify-content: flex-start; }
@@ -284,8 +302,10 @@ function render() {
   app.append($(`<header>
     <div><h1>Market Breadth Monitor</h1>
     <div class="meta">Data through ${longDate(last.date)}</div></div>
-    <div class="meta">Updated ${gen.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${fmt(DATA.history_days)} days of history</div>
+    <div class="hright"><div class="meta">Updated ${gen.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${fmt(DATA.history_days)} days of history</div>
+    ${DATA.themes ? '<button class="xopen">⬇ TradingView list</button>' : ""}</div>
   </header>`));
+  const xo = app.querySelector(".xopen"); if (xo) xo.addEventListener("click", openExport);
   const tabs = $(`<nav class="tabs" role="tablist">
     <button role="tab" data-tab="breadth">Breadth</button>
     <button role="tab" data-tab="themes">Themes</button>
@@ -1295,6 +1315,107 @@ function renderStocks(app) {
   sel2.addEventListener("change", (e) => { U.sub = e.target.value; U.limit = 100; draw(current()); });
   qi.addEventListener("input", (e) => { U.q = e.target.value.trim().toLowerCase(); U.limit = 100; draw(current()); });
   draw(current());
+}
+
+/* =================== TradingView export =================== */
+// Sections in priority order. TradingView keeps a symbol once per list, so a
+// ticker that qualifies for several sections appears in the first one only.
+const EXPORT_DEFS = [
+  { id: "bursts", on: true, label: "Momentum bursts · 2LYNCH 5+", why: "Today's 4% breakouts meeting 5+ of the 2LYNCH checks (whole market)",
+    get: (T, L) => L.bursts.filter(r => r.lynch >= 5).map(r => r.t) },
+  { id: "ant", on: true, label: "Anticipation · tight coils", why: "Tight, quiet coils in RS 85+ leaders near highs (whole market)",
+    get: (T, L) => L.anticipation.map(r => r.t) },
+  { id: "lead", on: true, label: "RS leads price ⚑", why: "RS line vs SPY at a 1-year high while price is still below its high",
+    get: (T) => byRS(T.stocks.filter(s => s.rs_lead)) },
+  { id: "star", on: true, label: "RS line new high ★", why: "RS line vs SPY at a 1-year high",
+    get: (T) => byRS(T.stocks.filter(s => s.rs_nh)) },
+  { id: "rs99", on: true, label: "RS Rating 99", why: "Top 1% of the market on 3–12 month performance",
+    get: (T) => byRS(T.stocks.filter(s => (s.rsr ?? 0) >= 99)) },
+  { id: "risers", on: true, label: "Fast risers · RS +15 in 5 days", why: "Biggest RS Rating gains this week (RS 60+), up to 30",
+    get: (T) => T.stocks.filter(s => (s.rsr5 ?? 0) >= 15 && (s.rsr ?? 0) >= 60).sort((a, b) => b.rsr5 - a.rsr5).slice(0, 30).map(s => s.t) },
+  { id: "top_themes", on: true, label: "Top 2 themes", why: "Members of the two strongest themes, strongest RS first", multi: true,
+    get: (T) => rankedGroups(T.themes).slice(0, 2).map(g => ["Top theme · " + g.theme, byRS(members(T, g))]) },
+  { id: "top_subs", on: true, label: "Top 3 sub-themes (new names)", why: "The three strongest peer groups not already covered by the sections above", multi: true,
+    get: (T, L, seen) => rankedGroups(T.subthemes || []).filter(g => g.members.filter(t => !seen.has(t)).length >= Math.max(2, g.members.length / 2))
+      .slice(0, 3).map(g => ["Top sub-theme · " + g.theme, byRS(members(T, g))]) },
+  { id: "bottom_themes", on: true, label: "Bottom 2 themes (short watch)", why: "Members of the two weakest themes, weakest RS first", multi: true,
+    get: (T) => rankedGroups(T.themes).slice(-2).reverse().map(g => ["Bottom theme · " + g.theme, byRS(members(T, g)).reverse()]) },
+  { id: "eps", on: false, label: "Episodic pivots (watch only)", why: "Big gaps on heavy volume in the last 5 sessions; check the catalyst first",
+    get: (T, L) => L.eps.map(r => r.t) },
+  { id: "market", on: true, label: "Market & theme ETFs", why: "SPY, QQQ, IWM plus the ETFs of the top and bottom themes",
+    get: (T) => ["SPY", "QQQ", "IWM", ...rankedGroups(T.themes).slice(0, 5).map(g => g.etf), ...rankedGroups(T.themes).slice(-3).map(g => g.etf)].filter(Boolean) },
+];
+const byRS = (list) => list.slice().sort((a, b) => (b.rsr ?? -1) - (a.rsr ?? -1)).map(s => s.t);
+const rankedGroups = (rows) => rows.slice().filter(g => g.n >= 3).sort((a, b) => (a.s_rank ?? a.rank) - (b.s_rank ?? b.rank));
+const members = (T, g) => { const M = stockMap(); return g.members.map(t => M[t]).filter(Boolean); };
+const EXPORT_ON = Object.fromEntries(EXPORT_DEFS.map(d => [d.id, d.on]));
+
+function buildExport() {
+  const T = getT(), L = DATA.themes.lists || { bursts: [], anticipation: [], eps: [] }, tv = DATA.themes.tv || {};
+  const seen = new Set(), sections = [];
+  let dupes = 0;
+  EXPORT_DEFS.forEach(d => {
+    if (!EXPORT_ON[d.id]) return;
+    const parts = d.multi ? d.get(T, L, seen) : [[d.label, d.get(T, L, seen)]];
+    parts.forEach(([name, ticks]) => {
+      const keep = [];
+      ticks.forEach(t => { if (!t) return; if (seen.has(t)) { dupes++; return; } seen.add(t); keep.push(t); });
+      if (keep.length) sections.push({ id: d.id, name, ticks: keep });
+    });
+  });
+  const clean = (s) => s.replace(/[,#\n]/g, " ").replace(/\s+/g, " ").trim();
+  const text = sections.map(s => ["###" + clean(s.name), ...s.ticks.map(t => tv[t] || t)].join(",")).join(",");
+  return { text, sections, total: seen.size, dupes };
+}
+
+function openExport() {
+  const old = document.querySelector(".xmodal"); if (old) old.remove();
+  const asOf = longDate(getT().date) + (LIVE_T ? " (live prices)" : " close");
+  const m = $(`<div class="xmodal" role="dialog" aria-modal="true" aria-label="Export to TradingView"><div class="card xbox">
+    <div class="xhead"><h2>Export to TradingView</h2><button class="xclose" aria-label="Close">✕</button></div>
+    <p class="meta">A .txt watchlist with one section per group, as of ${asOf}. In TradingView: open the watchlist menu → <b>Upload list…</b> → choose the file.</p>
+    <div class="xlist"></div>
+    <div class="xsum meta"></div>
+    <textarea class="xprev" readonly rows="4" aria-label="Preview"></textarea>
+    <div class="xbtns"><button class="xdl primary">Download .txt</button><button class="xcopy">Copy to clipboard</button></div></div></div>`);
+  const list = m.querySelector(".xlist");
+  const refresh = () => {
+    const ex = buildExport();
+    const counts = Object.fromEntries(ex.sections.map(s => [s.name, s.ticks.length]));
+    list.querySelectorAll("[data-count]").forEach(el => {
+      const d = EXPORT_DEFS.find(x => x.id === el.dataset.count);
+      if (!EXPORT_ON[d.id]) { el.textContent = "off"; return; }
+      const names = ex.sections.filter(s => s.id === d.id);
+      el.textContent = names.length ? names.map(s => `${s.ticks.length}`).join(" + ") + " tickers" : "none today";
+      const sub = el.parentElement.querySelector(".xgroups");
+      if (sub) sub.textContent = d.multi ? names.map(s => s.name.split(" · ")[1]).join(" · ") : "";
+    });
+    m.querySelector(".xsum").textContent = `${ex.total} tickers in ${ex.sections.length} sections${ex.dupes ? ` · ${ex.dupes} repeats left in their first section only` : ""}`;
+    m.querySelector(".xprev").value = ex.text;
+    return ex;
+  };
+  EXPORT_DEFS.forEach(d => {
+    const row = $(`<label class="xrow"><input type="checkbox" ${EXPORT_ON[d.id] ? "checked" : ""}><span><b>${d.label}</b><small>${d.why}</small><small class="xgroups"></small></span><span class="xcount meta" data-count="${d.id}"></span></label>`);
+    row.querySelector("input").addEventListener("change", (e) => { EXPORT_ON[d.id] = e.target.checked; refresh(); });
+    list.append(row);
+  });
+  const fname = () => `breadth-watchlist-${getT().date}.txt`;
+  m.querySelector(".xdl").addEventListener("click", () => {
+    const blob = new Blob([refresh().text], { type: "text/plain" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fname();
+    document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  });
+  m.querySelector(".xcopy").addEventListener("click", async (e) => {
+    try { await navigator.clipboard.writeText(refresh().text); e.target.textContent = "Copied"; }
+    catch (err) { m.querySelector(".xprev").select(); e.target.textContent = "Press Ctrl+C"; }
+    setTimeout(() => { e.target.textContent = "Copy to clipboard"; }, 1500);
+  });
+  const close = () => m.remove();
+  m.querySelector(".xclose").addEventListener("click", close);
+  m.addEventListener("click", (e) => { if (e.target === m) close(); });
+  document.addEventListener("keydown", function esc(e) { if (e.key === "Escape") { close(); document.removeEventListener("keydown", esc); } });
+  document.body.append(m);
+  refresh();
 }
 
 render();

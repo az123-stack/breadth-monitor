@@ -114,7 +114,8 @@ class MassiveClient:
         """Active tickers of one reference type (e.g. ETF, ADRC) with names."""
         rows = self._paged("/v3/reference/tickers",
                            {"market": "stocks", "type": kind, "active": "true", "limit": 1000})
-        return [{"ticker": r["ticker"], "name": r.get("name", ""), "type": kind} for r in rows]
+        return [{"ticker": r["ticker"], "name": r.get("name", ""), "type": kind,
+                 "exchange": r.get("primary_exchange", "")} for r in rows]
 
     def splits_since(self, start):
         """Splits with execution_date >= start."""

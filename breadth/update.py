@@ -48,6 +48,11 @@ def refresh_universe(client, state, force=False):
             log.warning("could not refresh ETF/ADR names: %s", e)
         universe = {r["ticker"] for r in rows}
         log.info("universe: %d common stocks", len(universe))
+    elif not config.REF_NAMES_FILE.exists():
+        try:  # ETF/ADR names and exchanges (for display and TradingView export)
+            store.save_ref_names(client.tickers_of_type("ETF") + client.tickers_of_type("ADRC"))
+        except Exception as e:
+            log.warning("could not fetch ETF/ADR names: %s", e)
     return universe
 
 
@@ -154,6 +159,7 @@ def recompute_and_publish(bars, splits, universe, state):
     try:
         theme_data = themes.build(adjusted, store.load_themes(), universe,
                                   names=store.load_names(), subthemes_df=store.load_subthemes(),
+                                  tv=store.load_tv_symbols(),
                                   missing=sorted(state.get("extras_missing", {})))
     except Exception as e:  # never let the theme tab break the breadth dashboard
         log.exception("theme build failed: %s", e)

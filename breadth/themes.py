@@ -183,7 +183,16 @@ def _r(v, nd=4):
     return round(float(v), nd)
 
 
-def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=None):
+def etfs_flat(etfs):
+    return {e for lst in etfs.values() for e in lst}
+
+
+def _tv_map(tv, tickers):
+    tv = tv or {}
+    return {t: tv[t] for t in dict.fromkeys(tickers) if t in tv}
+
+
+def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=None, tv=None):
     if themes_df is None or themes_df.empty or adjusted.empty:
         return None
     names = names or {}
@@ -343,4 +352,6 @@ def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=No
         "theme_etfs": {th: e for th, e in etfs.items()},
         "missing": [m for m in missing if m in all_t],
         "counts": {"themes": len(theme_rows), "subthemes": len(sub_rows), "stocks": len(stocks)},
+        "tv": _tv_map(tv, [s_["t"] for s_ in stocks] + list(etfs_flat(etfs)) + [config.BENCHMARK, "QQQ", "IWM"]
+                      + ([r_["t"] for lst in (v2 or {}).get("lists", {}).values() if isinstance(lst, list) for r_ in lst])),
     }

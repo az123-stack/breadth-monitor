@@ -71,6 +71,17 @@ predicted 10-day theme returns. Setups made money only in strong breadth
 (bursts +0.16R, anticipation +0.18R per trade) and lost in weak breadth;
 EPs without a catalyst check lost in every regime.
 
+## TradingView watchlist export
+
+The **⬇ TradingView list** button (top right) downloads a .txt watchlist
+(`###Section,NASDAQ:XXXX,...`). In TradingView: watchlist menu → Upload list.
+Sections, in priority order (a ticker appears only in the first section it
+qualifies for): momentum bursts (2LYNCH 5+), anticipation coils, RS leads
+price ⚑, RS line new high ★, RS Rating 99, fast risers (RS +15 in 5 days),
+top 2 themes, top 3 sub-themes not already covered, bottom 2 themes (short
+watch), episodic pivots (off by default), and market/theme ETFs. Each section
+can be switched off before downloading. It uses live prices when they're loaded.
+
 ## Sub-themes and the Browse tab
 
 `data/subthemes.csv` (`group,subtheme,ticker`) puts every stock in exactly one
