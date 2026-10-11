@@ -38,6 +38,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Baseline `data/setups_review.json`; daily counts `data/setup_counts.csv`.
   **When Adam says "review my trade setups"**: read the reasons in `setup_review`, the backtest by regime (`trade_bt`),
   propose adds/drops/retunes, build them, then run `python -m breadth.review --mark-reviewed --note "..."` and rebuild.
+- `playbook.py` "Today's playbook" card at the top of Trade Setups → `DATA.themes.playbook`: state = post-thrust (25 sessions
+  after a major Breadth thrust / Follow-through, `metrics.thrust_window`) else breadth regime; ranks all 7 setup types
+  (4 Trade Setups + bursts, anticipation, EPs) by backtested avg R in that state: Focus ≥ +0.15R, Selective ≥ 0, Avoid < 0,
+  Unproven n < 15; shows the "if a thrust comes" ranking too. Setup cards follow the playbook order.
+  The review flag also fires (⚡) the morning a major thrust prints, with the post-thrust playbook in the reason.
 - `levels.py` all-time highs and old monthly peaks from Yahoo (free; Massive free plan only reaches ~2 years), cached in
   `data/levels.json`, fetched in the daily run for new/stale tickers (`config.LEVELS_ENABLED`; tests switch it off)
 - `kq.py` KQ breakout screen → `DATA.kq` (Basing / Extended / Not this setup or failing a rule); "⬇ KQ list" button exports it to TradingView

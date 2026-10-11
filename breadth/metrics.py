@@ -276,3 +276,24 @@ def events(history):
         if sellers.loc[d] and last.get("side") != "sellers" and add("sellers", d, 15):
             last["side"] = "sellers"
     return out
+
+
+THRUST_WINDOW = 25   # sessions after a major breadth thrust / follow-through
+
+
+def thrust_window(history, dates, n=THRUST_WINDOW):
+    """Boolean array over `dates`: True within n sessions of (and including) a
+    major Breadth thrust or Follow-through signal."""
+    import numpy as _np
+    idx = {d: i for i, d in enumerate(dates)}
+    out = _np.zeros(len(dates), dtype=bool)
+    try:
+        ev = events(history)
+    except Exception:
+        return out
+    for e in ev:
+        if e.get("kind") in ("thrust", "followthrough") and e.get("tier") == "major":
+            i = idx.get(pd.Timestamp(e["date"]))
+            if i is not None:
+                out[i:i + n] = True
+    return out

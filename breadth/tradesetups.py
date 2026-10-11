@@ -287,6 +287,8 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
     adr = t["adr"].to_numpy()
     br = breadth.reindex(dates)
     regime = np.where((br["ratio5"] >= 1.5) & (br["ratio10"] >= 1.5), "strong", np.where(br["ratio10"] < 1, "weak", "mixed"))
+    from . import metrics as MT
+    tw = MT.thrust_window(breadth, dates)
     ANG = angles.to_numpy()
 
     def outcomes(mask, dedupe=True, every=1):
@@ -319,8 +321,8 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
 
     def summarize(res, key=None):
         o = {}
-        for k in ("all", "strong", "mixed", "weak"):
-            rr = [r for r in res if k == "all" or regime[r[0]] == k]
+        for k in ("all", "strong", "mixed", "weak", "thrust"):
+            rr = [r for r in res if k == "all" or (tw[r[0]] if k == "thrust" else regime[r[0]] == k)]
             if not rr:
                 o[k] = {"n": 0}
                 continue
@@ -331,7 +333,8 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
         return o
 
     out = {"from": str(dates[first].date()), "to": str(dates[N - 1 - hold].date()), "hold": hold,
-           "days": {k: int((regime[first:N - hold] == k).sum()) for k in ("strong", "mixed", "weak")}, "setups": {}}
+           "days": {**{k: int((regime[first:N - hold] == k).sum()) for k in ("strong", "mixed", "weak")},
+                    "thrust": int(tw[first:N - hold].sum())}, "setups": {}}
     allres = []
     for key, m in masks.items():
         r = outcomes(m)

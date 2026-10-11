@@ -353,6 +353,25 @@ def test_setup_review(tmp_path=None):
     finally:
         config.DATA_DIR = old
 
+
+def test_playbook():
+    from breadth import playbook as PB
+    st = lambda r, n=30: {"mixed": {"n": n, "avg_r": r, "win": 0.5}, "thrust": {"n": n, "avg_r": -r, "win": 0.5}, "all": {"n": n, "avg_r": r}}
+    td = {"trade_bt": {"setups": {"ath": st(0.05), "pullback": st(0.30), "rotation": st(-0.10), "coiled": st(0.40, n=5)},
+                       "recent": {"pullback": {"n": 12, "avg_r": -0.2}}, "base": {"mixed": {"n": 99, "avg_r": 0.1}}, "days": {"thrust": 25}},
+          "setup_stats": {"bursts": st(0.20), "anticipation": st(-0.05), "eps": st(-0.30)},
+          "trade_setups": {"setups": [{"key": "ath", "count": 3}, {"key": "pullback", "count": 0}]},
+          "lists": {"bursts": [{"lynch": 5}, {"lynch": 3}], "counts": {"anticipation": 2, "eps": 1}}}
+    rows = PB.rank(td, "mixed")
+    v = {r["key"]: r["verdict"] for r in rows}
+    assert [r["key"] for r in rows][:3] == ["pullback", "bursts", "ath"], rows
+    assert v == {"pullback": "Focus", "bursts": "Focus", "ath": "Selective", "coiled": "Unproven",
+                 "rotation": "Avoid", "anticipation": "Avoid", "eps": "Avoid"}
+    p = next(r for r in rows if r["key"] == "pullback")
+    assert "cooling lately" in p["why"] and "none qualify today" in p["why"]
+    assert next(r for r in rows if r["key"] == "bursts")["today"] == 1
+    assert PB.rank(td, "thrust")[0]["key"] == "eps"   # signs flip in the thrust bucket of this fixture
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

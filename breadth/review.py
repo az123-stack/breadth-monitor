@@ -9,6 +9,8 @@ The setups were last reviewed against a baseline saved in data/setups_review.jso
   slumping  a setup's last 30 sessions of completed signals average <= -0.15R (n >= 10)
   leaders   3 or more of the top 5 themes by Strength have changed since the review
   stale     30+ days since the last review
+  thrust    a major Breadth thrust / Follow-through fired in the last 3 sessions
+            (same morning, with the post-thrust playbook in the reason)
 Mark a review done (after rewriting setups with Claude):
     python -m breadth.review --mark-reviewed
 """
@@ -74,6 +76,19 @@ def evaluate(theme_data, breadth, today=None):
     day = theme_data["date"]
     counts = record_counts(day, X["setups"])
     reasons = []
+    try:
+        from . import playbook
+        th = playbook.thrust_today(breadth)
+        if th and (not base or th["date"] > base.get("data_date", "")):
+            pb = theme_data.get("playbook") or {}
+            ranks = pb.get("rows") if pb.get("state") == "thrust" else pb.get("if_thrust")
+            top = [f"{r['name']} ({r['avg_r']:+.2f}R)" for r in (ranks or []) if r["verdict"] in ("Focus", "Selective")][:3]
+            avoid = [r["name"] for r in (ranks or []) if r["verdict"] == "Avoid"]
+            reasons.append({"kind": "thrust", "text": f"{th['label']} on {th['date']}. Switch to the post-thrust playbook: "
+                            + (", ".join(top) if top else "press the leaders")
+                            + (f"; pause {', '.join(avoid)}" if avoid else "") + "."})
+    except Exception:
+        pass
     regs = [regime_of(r) for _, r in breadth.tail(REGIME_DAYS).iterrows()] if len(breadth) else []
     now = regs[-1] if regs else None
     if base and regs and len(set(regs)) == 1 and now != base.get("regime"):

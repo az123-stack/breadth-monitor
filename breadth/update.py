@@ -177,6 +177,11 @@ def recompute_and_publish(bars, splits, universe, state):
         except Exception as e:  # optional panel; never block the page
             log.exception("trade setups failed: %s", e)
         try:
+            from . import playbook
+            theme_data["playbook"] = playbook.build(theme_data, history)
+        except Exception as e:
+            log.exception("playbook failed: %s", e)
+        try:
             from . import review
             theme_data["setup_review"] = review.evaluate(theme_data, history)
         except Exception as e:

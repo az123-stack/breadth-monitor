@@ -162,6 +162,13 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .revcard.on { border-color: color-mix(in srgb, var(--warning) 60%, transparent); background: color-mix(in srgb, var(--warning) 10%, var(--card-bg, transparent)); }
 .revcard ul { margin: 6px 0 4px; padding-left: 20px; }
 .revcard li { margin: 3px 0; }
+.pbv { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; vertical-align: 1px; }
+.pbv.focus { background: color-mix(in srgb, var(--good) 35%, transparent); }
+.pbv.selective { background: color-mix(in srgb, var(--warning) 30%, transparent); }
+.pbv.avoid { background: color-mix(in srgb, var(--critical) 28%, transparent); }
+.pbv.unproven { background: var(--grid); color: var(--text-secondary); }
+.pbtab td.pbwhy { white-space: normal; min-width: 280px; font-size: 12.5px; color: var(--text-secondary); }
+.pbtab tr.pbdim td { opacity: .7; }
 .tsbtns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .tsbtns button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--grid); background: var(--surface, transparent); color: var(--text-primary); cursor: pointer; }
 .ang { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 999px; margin: 1px 2px 1px 0; background: var(--grid); color: var(--text-secondary); white-space: nowrap; }
@@ -325,7 +332,7 @@ function render() {
     <div><h1>Market Breadth Monitor</h1>
     <div class="meta">Data through ${longDate(last.date)}</div></div>
     <div class="hright"><div class="meta">Updated ${gen.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${fmt(DATA.history_days)} days of history</div>
-    <div class="xopens">${DATA.themes && DATA.themes.setup_review && DATA.themes.setup_review.flag ? `<button class="xopen revflag" title="The market has shifted since the trade setups were chosen">⚑ Review setups <span class="revn">${DATA.themes.setup_review.reasons.length}</span></button>` : ""}${DATA.kq ? '<button class="xopen kqopen">⬇ KQ list</button>' : ""}${DATA.themes ? '<button class="xopen tvopen">⬇ TradingView list</button>' : ""}</div></div>
+    <div class="xopens">${DATA.themes && DATA.themes.setup_review && DATA.themes.setup_review.flag ? `<button class="xopen revflag" title="The market has shifted since the trade setups were chosen">${DATA.themes.setup_review.reasons.some(r => r.kind === "thrust") ? "⚡ Thrust · review setups" : "⚑ Review setups"} <span class="revn">${DATA.themes.setup_review.reasons.length}</span></button>` : ""}${DATA.kq ? '<button class="xopen kqopen">⬇ KQ list</button>' : ""}${DATA.themes ? '<button class="xopen tvopen">⬇ TradingView list</button>' : ""}</div></div>
   </header>`));
   const xo = app.querySelector(".tvopen"); if (xo) xo.addEventListener("click", openExport);
   const ko = app.querySelector(".kqopen"); if (ko) ko.addEventListener("click", openKQ);
@@ -1379,8 +1386,9 @@ function renderTrades(app) {
       <ul>${RV.reasons.map(r => `<li><b>${ICON[r.kind] || "•"}</b> ${esc(r.text)}</li>`).join("")}</ul>
       <div class="note" style="padding:4px 0 0">Bring this back to Claude in the Market Dashboard project and say <b>"review my trade setups"</b>. We'll add, drop or retune setups, then mark the review done and this flag clears.
       ${b.date ? `Last reviewed ${longDate(b.date)} in ${b.regime} breadth.` : ""}</div></section>`)
-      : $(`<div class="note revcard" style="padding:0 2px 10px">✓ Setups still fit the market. Last reviewed ${b.date ? longDate(b.date) : "–"} in ${b.regime || "–"} breadth; checked daily for a breadth-regime change (${RV.checks.regime_days}+ sessions), a setup going dry (${RV.checks.dry_days} sessions with no names) or slumping (≤ ${RV.checks.slump_r}R over its last 30 sessions), 3+ new top-5 themes, or ${RV.checks.stale_days}+ days since review.</div>`));
+      : $(`<div class="note revcard" style="padding:0 2px 10px">✓ Setups still fit the market. Last reviewed ${b.date ? longDate(b.date) : "–"} in ${b.regime || "–"} breadth; checked daily for a breadth-regime change (${RV.checks.regime_days}+ sessions), a setup going dry (${RV.checks.dry_days} sessions with no names) or slumping (≤ ${RV.checks.slump_r}R over its last 30 sessions), 3+ new top-5 themes, or ${RV.checks.stale_days}+ days since review — and the same morning a major breadth thrust fires.</div>`));
   }
+  if (T.playbook) app.append(playbookCard(T.playbook));
   head.querySelector(".tsall").addEventListener("click", () => tsDownload("trade-setups", X.setups.map(s => ({ name: s.name, ticks: s.top }))));
   app.append(head);
   const mag = (r) => {
@@ -1397,10 +1405,11 @@ function renderTrades(app) {
     rotation: [["e21", "vs 21 EMA", r => `<td class="num">${pct(r.e21)}</td>`], ["rsr5", "RS Δ<small>5 days</small>", r => `<td class="num">${r.rsr5 == null ? "–" : (r.rsr5 > 0 ? "+" : "") + r.rsr5}</td>`]],
     coiled: [["tight", "Tight<small>5d range ÷ ADR</small>", r => `<td class="num">${r.tight?.toFixed(2) ?? "–"}</td>`]],
   };
-  X.setups.forEach(S => {
+  const PR = Object.fromEntries(((T.playbook || {}).rows || []).map(r => [r.key, r]));
+  X.setups.slice().sort((a, b) => ((PR[a.key] || {}).rank || 9) - ((PR[b.key] || {}).rank || 9)).forEach(S => {
     const rows = S.top.map((t, i) => ({ ...X.rows[t], n: i + 1 }));
     const sec = $(`<section class="card tcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
-      <h2>${S.name} <span class="meta">· ${S.count} qualify today${S.count > 5 ? ", showing the top 5" : ""}</span></h2>
+      <h2>${PR[S.key] ? `<span class="pbv ${PR[S.key].verdict.toLowerCase()}">${PR[S.key].verdict}</span> ` : ""}${S.name} <span class="meta">· ${S.count} qualify today${S.count > 5 ? ", showing the top 5" : ""}</span></h2>
       <div class="tsbtns"><button>⬇ TradingView</button></div></div><p class="note" style="padding-top:0">${esc(S.desc)}</p></section>`);
     sec.querySelector("button").addEventListener("click", () => tsDownload(S.key + "-" + S.name.toLowerCase().replace(/\s+/g, "-"), [{ name: S.name, ticks: S.top }]));
     const extra = COLS[S.key] || [];
@@ -1412,11 +1421,25 @@ function renderTrades(app) {
       <td class="num ${rsTint(r.rsr)}">${r.rsr}${r.star ? " ★" : ""}</td>${grpCell(r)}<td class="num">${pct(r.off_hi)}</td>${extra.map(x => x[2](r)).join("")}${S.key === "ath" ? "" : mag(r)}<td class="num">${r.adr?.toFixed(1) ?? "–"}</td>`, UI.ts[S.key]));
     app.append(sec);
   });
-  app.append(tsBacktest(T.trade_bt, now));
+  app.append(tsBacktest(T.trade_bt, (T.playbook && T.playbook.state) || now));
 }
+function playbookCard(P) {
+  const tbl = (rows) => `<div class="scroll"><table class="grid pbtab"><thead><tr><th>#</th><th class="l">Setup</th><th class="l">Verdict</th><th class="l">Why</th><th class="l">Find it</th></tr></thead><tbody>
+    ${rows.map(r => `<tr class="${r.verdict === "Avoid" ? "pbdim" : ""}"><td class="num">${r.rank}</td><td class="l"><b>${esc(r.name)}</b></td><td class="l"><span class="pbv ${r.verdict.toLowerCase()}">${r.verdict}</span></td><td class="l pbwhy">${esc(r.why)}</td><td class="l meta">${r.where}</td></tr>`).join("")}</tbody></table></div>`;
+  const b = P.baseline || {};
+  const el = $(`<section class="card regcard pbcard"><div class="kicker">Today's playbook · what to trade, ranked</div>
+    <div class="regnow" style="margin-top:6px"><span class="regpill ${P.state === "thrust" ? "strong" : P.state}">${P.state === "thrust" ? "⚡ " : ""}${esc(P.label)}${P.state === "thrust" && P.since != null ? ` · day ${P.since + 1}` : ""}</span></div>
+    <p style="margin:8px 0 4px">${esc(P.advice)}</p>
+    ${tbl(P.rows)}
+    <div class="note" style="padding:6px 0 0">Ranked by each setup's backtested result in ${esc(P.label.toLowerCase())}${b.n ? ` (for comparison, any RS 80+ stock: ${b.avg_r >= 0 ? "+" : ""}${b.avg_r.toFixed(2)}R)` : ""}. Focus ≥ +0.15R a trade, Selective ≥ 0R, Avoid below 0R, Unproven = fewer than 15 trades in this state. Setup cards below follow this order.</div>
+    ${P.if_thrust ? `<details class="kqsec" style="margin-top:8px"><summary><b>⚡ If a breadth thrust comes</b> — the playbook switches to this (based on ${P.thrust_days || "–"} post-thrust sessions)</summary>${tbl(P.if_thrust)}<div class="note" style="padding:6px 0 0">A major Breadth thrust or Follow-through on the Breadth tab triggers the switch the same morning, and the ⚡ flag appears at the top. A minor "buyers take control" signal doesn't count: the last one (Aug 12) was a false start.</div></details>` : ""}
+  </section>`);
+  return el;
+}
+
 function tsBacktest(B, now) {
   if (!B) return $('<div class="card empty">The setup backtest appears after the next data run.</div>');
-  const REG = { strong: "Strong", mixed: "Mixed", weak: "Weak", all: "All days" };
+  const REG = { thrust: "After a thrust", strong: "Strong", mixed: "Mixed", weak: "Weak", all: "All days" };
   const cell = (o, k) => !o || !o.n ? `<td class="num meta ${k === now ? "nowcol" : ""}">–</td>` :
     `<td class="num ${k === now ? "nowcol" : ""} ${o.avg_r >= 0.1 ? "g2" : o.avg_r > 0 ? "g1" : o.avg_r <= -0.1 ? "r2" : "r1"}"><b>${o.avg_r >= 0 ? "+" : ""}${o.avg_r.toFixed(2)}R</b> · ${Math.round(o.win * 100)}% win<br><span class="meta" style="font-size:11px">high ${Math.round(o.hit_hi * 100)}% · +1 ADR ${Math.round(o.hit_adr * 100)}% · n ${o.n}</span></td>`;
   const rows = [["ath", "ATH Magnet"], ["pullback", "Leader Pullback"], ["rotation", "Rotation Rookie"], ["coiled", "Coiled Leader"]]
@@ -1425,9 +1448,9 @@ function tsBacktest(B, now) {
       ["Baseline: any stock with RS 80+<small>sampled every 5th day</small>", B.base, "basel"],
       ["On 1 setup", B.confluence["1"], "basel"], ["On 2+ setups at once<small>confluence</small>", B.confluence["2+"], "basel"]]);
   return $(`<section class="card regcard"><div class="kicker">How these setups have traded · ${B.from} to ${B.to}</div>
-    <div class="scroll"><table class="grid btgrid regtab"><thead><tr><th class="l">Signal</th>${["strong", "mixed", "weak", "all"].map(k => `<th class="${k === now ? "nowcol" : ""}">${REG[k]}${k !== "all" ? " breadth" : ""}<small>${k === "all" ? "" : B.days[k] + " days"}${k === now ? " · today" : ""}</small></th>`).join("")}</tr></thead>
-    <tbody>${rows.map(([n, o, c]) => `<tr class="${c}"><td class="l">${n}</td>${["strong", "mixed", "weak", "all"].map(k => cell(o && o[k], k)).join("")}</tr>`).join("")}</tbody></table></div>
-    <div class="note" style="padding:8px 0 0">Every qualifying stock, not just the top 5. Each new signal (not on that list in the prior 5 sessions) is bought at the close with a stop 1 ADR below and sold at the close ${B.hold} sessions later; R = result ÷ that 1-ADR risk. <b>Hit high</b> = traded at or above its 52-week high within ${B.hold} sessions (the backtest can't see older all-time highs). <b>+1 ADR</b> = rallied one ADR above entry within ${B.hold} sessions — the move a short-dated option needs. No commissions, slippage or option pricing; small samples, especially in strong breadth. Past results, not a promise.</div></section>`);
+    <div class="scroll"><table class="grid btgrid regtab"><thead><tr><th class="l">Signal</th>${["thrust", "strong", "mixed", "weak", "all"].map(k => `<th class="${k === now ? "nowcol" : ""}">${REG[k]}${["strong", "mixed", "weak"].includes(k) ? " breadth" : ""}<small>${k === "all" ? "" : (B.days[k] ?? "–") + (k === "thrust" ? " sessions after" : " days")}${k === now ? " · today" : ""}</small></th>`).join("")}</tr></thead>
+    <tbody>${rows.map(([n, o, c]) => `<tr class="${c}"><td class="l">${n}</td>${["thrust", "strong", "mixed", "weak", "all"].map(k => cell(o && o[k], k)).join("")}</tr>`).join("")}</tbody></table></div>
+    <div class="note" style="padding:8px 0 0">Every qualifying stock, not just the top 5. Each new signal (not on that list in the prior 5 sessions) is bought at the close with a stop 1 ADR below and sold at the close ${B.hold} sessions later; R = result ÷ that 1-ADR risk. <b>Hit high</b> = traded at or above its 52-week high within ${B.hold} sessions (the backtest can't see older all-time highs). <b>+1 ADR</b> = rallied one ADR above entry within ${B.hold} sessions — the move a short-dated option needs. <b>After a thrust</b> = the 25 sessions after a major Breadth thrust or Follow-through (overlaps the regime columns). No commissions, slippage or option pricing; small samples, especially in strong breadth and after thrusts. Past results, not a promise.</div></section>`);
 }
 
 /* ---------- Stocks tab ---------- */

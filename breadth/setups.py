@@ -143,12 +143,14 @@ def regime_stats(w, t, rating, liquid, breadth, first=100, hold=3):
         "anticipation": _sim_trigger(ant.fillna(False).to_numpy(), O, C, H, L, hi5, lo5, hold, first),
         "eps": _sim_close(ep.fillna(False).to_numpy(), O, C, H, L, 5, first),
     }
-    out = {"days": {k: int((regime[first:] == k).sum()) for k in ("strong", "mixed", "weak")},
+    from . import metrics as MT
+    tw = MT.thrust_window(breadth, w["c"].index)
+    out = {"days": {**{k: int((regime[first:] == k).sum()) for k in ("strong", "mixed", "weak")}, "thrust": int(tw[first:].sum())},
            "from": str(w["c"].index[first].date()), "to": str(w["c"].index[-1].date())}
     for name, tr in trades.items():
         out[name] = {}
-        for k in ("all", "strong", "mixed", "weak"):
-            r = np.array([x for i, x in tr if k == "all" or regime[i] == k])
+        for k in ("all", "strong", "mixed", "weak", "thrust"):
+            r = np.array([x for i, x in tr if k == "all" or (tw[i] if k == "thrust" else regime[i] == k)])
             out[name][k] = {"n": int(len(r)), "avg_r": round(float(r.mean()), 3) if len(r) else None,
                             "win": round(float((r > 0).mean()), 3) if len(r) else None}
     return out
