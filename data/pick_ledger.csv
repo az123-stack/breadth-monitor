@@ -1,3 +1,3 @@
-date,rank,t,setup,rsr,price,entry_type,trigger,stop_pct,vcp_stop,cands,status,entry,exit_date,ret,ret_nostop,stop_hit,cand_ret
-2026-10-09,1,AMD,pullback,97.0,608.1,open,,0.0365,,AMD;AMGN;CSCO;ERO;FCX;MRK;MSFT;NUE;NVT;VTRS,pending,,,,,,
-2026-10-09,2,ERO,pullback,89.0,37.61,open,,0.0437,,AMD;AMGN;CSCO;ERO;FCX;MRK;MSFT;NUE;NVT;VTRS,pending,,,,,,
+date,rank,t,setup,rsr,price,stop_pct,cands,exit_date,ret,stop_hit,cand_ret
+2026-10-09,1,QMCO,kq,99.0,30.42,0.1018,AMGN;CDNA;CSCO;MRK;MSFT;MTCH;NET;QMCO;SCCO;SDGR;SSRM;VTRS,,,,
+2026-10-09,2,CDNA,kq,99.0,63.67,0.0577,AMGN;CDNA;CSCO;MRK;MSFT;MTCH;NET;QMCO;SCCO;SDGR;SSRM;VTRS,,,,
