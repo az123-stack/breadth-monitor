@@ -375,6 +375,26 @@ def test_playbook():
     assert next(r for r in rows if r["key"] == "bursts")["today"] == 1
     assert PB.rank(td, "thrust")[0]["key"] == "eps"   # signs flip in the thrust bucket of this fixture
 
+
+def test_picks():
+    from breadth import playbook as PB
+    pb = {"state": "mixed", "label": "Mixed breadth", "rows": [
+        {"key": "ath", "verdict": "Selective", "avg_r": 0.1, "n": 100},
+        {"key": "rotation", "verdict": "Focus", "avg_r": 0.3, "n": 100},
+        {"key": "kq", "verdict": "Avoid", "avg_r": -0.2, "n": 100}]}
+    row = lambda t, sub, hits=1, **k: {"t": t, "name": t, "price": 100.0, "adr": 4.0, "rsr": 95, "grp": 90, "sub": sub,
+                                       "hits": hits, "mag": 110.0, "mag_pct": 0.1, "mag_adr": 2.5, "mag_kind": "ATH",
+                                       "ath": 101.0, "ath_pct": 0.01, "ath_ok": True, "e21": 0.02, **k}
+    td = {"trade_setups": {"setups": [{"key": "ath", "name": "ATH Magnet", "top": ["A1", "A2"]},
+                                      {"key": "rotation", "name": "Rotation Rookie", "top": ["R1"]},
+                                      {"key": "kq", "name": "Qullamaggie Flag", "top": ["K1"]}],
+                           "rows": {"A1": row("A1", "S1", hits=3), "A2": row("A2", "S2"), "R1": row("R1", "S1"), "K1": row("K1", "S9")}},
+          "trade_bt": {"setups": {"ath": {"mixed": {"hit_adr": 0.5}}, "rotation": {"mixed": {"hit_adr": 0.6}}}}}
+    out = PB.picks(td, pb)
+    assert [c["t"] for c in out] == ["A1", "R1"] or {c["t"] for c in out} == {"A1", "R1"}, out
+    assert "K1" not in {c["t"] for c in out}                  # Avoid setups are never picked
+    assert all(c["plan"]["entry"] and c["why"] for c in out)
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

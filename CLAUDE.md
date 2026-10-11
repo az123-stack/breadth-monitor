@@ -44,6 +44,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (4 Trade Setups + bursts, anticipation, EPs) by backtested avg R in that state: Focus ≥ +0.15R, Selective ≥ 0, Avoid < 0,
   Unproven n < 15; shows the "if a thrust comes" ranking too. Setup cards follow the playbook order.
   The review flag also fires (⚡) the morning a major thrust prints, with the post-thrust playbook in the reason.
+- Top 2 trades (`playbook.picks`, card at the top of Trade Setups): candidates = top 5 of each Focus/Selective setup;
+  score = 30% setup edge (avg R in today's state shrunk n/(n+30)) + 20% odds of +1 ADR in 5 days + 20% stock strength
+  + 20% room to next level (pullback/rotation) or reach to trigger (flag/VCP) + 10% confluence; one per setup and group.
+- Whole-market leaders (`lists.strongest`, Setups tab Leaders → "Any theme"): all US stocks $10+, $20M+/day, RS ≥ 90,
+  60% RS + 40% closeness to high, no theme weighting (catches lone runners like MRNA).
 - `levels.py` all-time highs and old monthly peaks from Yahoo (free; Massive free plan only reaches ~2 years), cached in
   `data/levels.json`, fetched in the daily run for new/stale tickers (`config.LEVELS_ENABLED`; tests switch it off)
 - `kq.py` KQ breakout screen → `DATA.kq` (Basing / Extended / Not this setup or failing a rule); "⬇ KQ list" button exports it to TradingView

@@ -162,6 +162,21 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .revcard.on { border-color: color-mix(in srgb, var(--warning) 60%, transparent); background: color-mix(in srgb, var(--warning) 10%, var(--card-bg, transparent)); }
 .revcard ul { margin: 6px 0 4px; padding-left: 20px; }
 .revcard li { margin: 3px 0; }
+.picks { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 12px; margin-top: 8px; }
+.pick { border: 1px solid var(--grid); border-radius: 10px; padding: 12px 14px; min-width: 0; }
+.phead { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pnum { font-weight: 700; color: var(--text-muted); }
+.pt { font-size: 20px; font-weight: 800; letter-spacing: .3px; }
+.pscore { margin-left: auto; font-weight: 800; font-size: 18px; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.pwhy { font-size: 13px; margin: 8px 0; color: var(--text-secondary); }
+.pplan { font-size: 13px; }
+.pplan > div { display: grid; grid-template-columns: 58px minmax(0, 1fr); padding: 3px 0; border-top: 1px solid var(--grid); }
+.pplan > div > span { min-width: 0; overflow-wrap: anywhere; }
+.pplan > div > span:first-child { color: var(--text-muted); font-weight: 600; }
+.pparts { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+.pparts span { position: relative; padding: 2px 4px; border-radius: 4px; overflow: hidden; background: var(--grid); }
+.pparts span i { position: absolute; left: 0; top: 0; bottom: 0; background: color-mix(in srgb, var(--good) 30%, transparent); }
+.pparts b { position: relative; font-weight: 600; color: var(--text-secondary); }
 .pbv { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; vertical-align: 1px; }
 .pbv.focus { background: color-mix(in srgb, var(--good) 35%, transparent); }
 .pbv.selective { background: color-mix(in srgb, var(--warning) 30%, transparent); }
@@ -1292,14 +1307,31 @@ function leadersJS(T, n = 25) {
   out.sort((a, c) => c.score - a.score || c.rsr - a.rsr || (a.t < c.t ? -1 : 1));
   return out.slice(0, n);
 }
+function marketLeadersCard(T) {
+  const U = UI.setups, L = (T.lists || {}).strongest || [];
+  const sec = $(`<section class="card tcard leaders"><div class="head"><h2>Leaders <span class="meta">· the strongest stocks in the whole market, in a theme or not, ${longDate(T.date)} close</span></h2></div></section>`);
+  const bar = $('<div class="filters" style="padding:0 16px 8px"></div>');
+  bar.append(chips("Show", [["top", "Top 10"], ["div", "1 per group"], ["mkt", "Any theme"]], U, "lead", rerenderPanel));
+  sec.append(bar);
+  const rows = L.slice(0, 25).map((r, i) => ({ ...r, n: i + 1 }));
+  const cols = [{ k: "n", h: "#", asc: true }, { k: "t", h: "Ticker", l: true, asc: true }, { k: "score", h: "Score<small>0–100</small>" },
+    { k: "rsr", h: "RS Rating" }, { k: "d20", h: "20 days" }, { k: "d60", h: "60 days" }, { k: "off_hi", h: "Off high<small>52-week</small>" },
+    { k: "e50", h: "vs 50 EMA<small>extension</small>", asc: true }, { k: "adr", h: "ADR %" }, { k: "dvol", h: "$ vol<small>50d, $M</small>" }];
+  sec.append(listTable(rows, cols, r => `<td class="num">${r.n}</td><td class="l tname">${r.t}<small>${esc((r.name || "").slice(0, 26))} · ${r.sub ? esc(r.sub) : r.theme ? esc(r.theme) : '<i>not in a theme</i>'}</small></td>
+    <td class="num"><b>${r.score.toFixed(1)}</b></td><td class="num ${rsTint(r.rsr)}">${r.rsr}${r.star ? " ★" : ""}</td>${retCell(r.d20, "d15")}${retCell(r.d60, "d60")}
+    <td class="num">${pct(r.off_hi)}</td><td class="num">${pct(r.e50)}</td><td class="num">${r.adr?.toFixed(1) ?? "–"}</td><td class="num">${r.dvol == null ? "–" : r.dvol.toFixed(0)}</td>`, UI.setups.msort || (UI.setups.msort = ["n", 1])));
+  sec.append($(`<div class="note">Every US stock $10+ trading $20M+ a day with RS Rating 90+ (${(T.lists.counts || {}).strongest ?? L.length} today), scored 60% RS Rating + 40% closeness to the 52-week high — no theme weighting, so lone runners like a biotech on its own news show up here even when their group is weak. Showing the top 25. Names not in a theme don't get live prices or the Trade Setups lists.</div>`));
+  return sec;
+}
 function leadersCard(T) {
+  if (UI.setups.lead === "mkt") return marketLeadersCard(T);
   const U = UI.setups, all = leadersJS(T, 400), seen = new Set();
   const rows = (U.lead === "div" ? all.filter(r => { const g = r.sub || r.theme; if (seen.has(g)) return false; seen.add(g); return true; }) : all).slice(0, 10)
     .map((r, i) => ({ ...r, n: i + 1 }));
   const live = !!LIVE_T;
   const sec = $(`<section class="card tcard leaders"><div class="head"><h2>Leaders <span class="meta">· the 10 strongest stocks by the dashboard's own measures${live ? ", live" : ", " + longDate(T.date) + " close"}</span></h2></div></section>`);
   const bar = $('<div class="filters" style="padding:0 16px 8px"></div>');
-  bar.append(chips("Show", [["top", "Top 10"], ["div", "One per group"]], U, "lead", rerenderPanel));
+  bar.append(chips("Show", [["top", "Top 10"], ["div", "1 per group"], ...((T.lists || {}).strongest ? [["mkt", "Any theme"]] : [])], U, "lead", rerenderPanel));
   sec.append(bar);
   const cols = [{ k: "n", h: "#", asc: true }, { k: "t", h: "Ticker", l: true, asc: true }, { k: "score", h: "Score<small>0–100</small>" }, ...(live ? [{ k: null, h: "Now<small>live</small>" }] : []),
     { k: "rsr", h: "RS Rating" }, { k: "theme_str", h: "Theme<small>Strength</small>" }, { k: "sub_str", h: "Sub-theme<small>Strength</small>" },
@@ -1307,7 +1339,7 @@ function leadersCard(T) {
   sec.append(listTable(rows, cols, r => `<td class="num">${r.n}</td>${nameCell(r)}<td class="num"><b>${r.score.toFixed(1)}</b></td>${live ? nowCell(r) : ""}
     <td class="num ${rsTint(r.rsr)}">${r.rsr}${r.flag ? " ⚑" : r.star ? " ★" : ""}</td><td class="num">${r.theme_str == null ? "–" : Math.round(r.theme_str)}</td><td class="num">${Math.round(r.sub_str)}</td>
     <td class="num">${pct(r.off_hi)}</td><td class="num">${pct(r.e50)}</td><td class="num">${r.tier || "–"}</td>`, UI.setups.lsort || (UI.setups.lsort = ["n", 1])));
-  sec.append($(`<div class="note">Score = 40% RS Rating + 25% its strongest theme's Strength + 15% its sub-theme's Strength + 20% closeness to the 52-week high (at the high = 100, 25% or more below = 0). Stocks $10+ only, no ETFs. "One per group" keeps only the best name in each sub-theme, so you aren't holding five versions of the same bet. A strength ranking, not a buy list: check the "vs 50 EMA" column — names far above it are extended, and entries are better on a tight pullback.</div>`));
+  sec.append($(`<div class="note">Score = 40% RS Rating + 25% its strongest theme's Strength + 15% its sub-theme's Strength + 20% closeness to the 52-week high (at the high = 100, 25% or more below = 0). Stocks $10+ only, no ETFs. "1 per group" keeps only the best name in each sub-theme, so you aren't holding five versions of the same bet. A strength ranking, not a buy list: check the "vs 50 EMA" column — names far above it are extended, and entries are better on a tight pullback.</div>`));
   return sec;
 }
 
@@ -1388,6 +1420,7 @@ function renderTrades(app) {
       ${b.date ? `Last reviewed ${longDate(b.date)} in ${b.regime} breadth.` : ""}</div></section>`)
       : $(`<div class="note revcard" style="padding:0 2px 10px">✓ Setups still fit the market. Last reviewed ${b.date ? longDate(b.date) : "–"} in ${b.regime || "–"} breadth; checked daily for a breadth-regime change (${RV.checks.regime_days}+ sessions), a setup going dry (${RV.checks.dry_days} sessions with no names) or slumping (≤ ${RV.checks.slump_r}R over its last 30 sessions), 3+ new top-5 themes, or ${RV.checks.stale_days}+ days since review — and the same morning a major breadth thrust fires.</div>`));
   }
+  if (T.playbook && (T.playbook.picks || []).length) app.append(picksCard(T.playbook));
   if (T.playbook) app.append(playbookCard(T.playbook));
   head.querySelector(".tsall").addEventListener("click", () => tsDownload("trade-setups", X.setups.map(s => ({ name: s.name, ticks: s.top }))));
   app.append(head);
@@ -1429,6 +1462,21 @@ function renderTrades(app) {
   });
   app.append(tsBacktest(T.trade_bt, (T.playbook && T.playbook.state) || now));
 }
+function picksCard(P) {
+  const W = P.pick_weights || {};
+  const PART = { edge: "Setup edge", prob: "Odds of +1 ADR", stock: "Stock strength", room: "Room / reach", confluence: "Confluence" };
+  const el = $(`<section class="card regcard pickcard"><div class="kicker">Today's top ${P.picks.length} trades</div>
+    <div class="picks">${P.picks.map((c, i) => `<div class="pick">
+      <div class="phead"><span class="pnum">#${i + 1}</span><span class="pt">${c.t}</span><span class="pbv ${c.verdict.toLowerCase()}">${esc(c.setup_name)}</span><span class="pscore" title="Pick score 0–100">${c.score.toFixed(0)}</span></div>
+      <div class="meta" style="font-size:12px">${esc((c.name || "").slice(0, 34))}${c.sub ? " · " + esc(c.sub) : ""}${c.price ? ` · $${c.price.toFixed(2)}` : ""}</div>
+      <p class="pwhy">${esc(c.why)}</p>
+      <div class="pplan">${[["Entry", c.plan.entry], ["Stop", c.plan.stop], ["Target", c.plan.target]].map(([k, v]) => `<div><span>${k}</span><span>${esc(v || "–")}</span></div>`).join("")}</div>
+      <div class="pparts">${Object.entries(c.parts).map(([k, v]) => `<span title="${PART[k]} (${Math.round((W[k] || 0) * 100)}% of the score)"><i style="width:${v}%"></i><b>${PART[k]} ${v}</b></span>`).join("")}</div>
+    </div>`).join("")}</div>
+    <div class="note" style="padding:8px 0 0">Picked from the top 5 of every Focus or Selective setup, one per setup and group. Score = setup edge in today's market (backtested R, shrunk for small samples, ${Math.round((W.edge || 0) * 100)}%) + odds that setup rallied 1 ADR within 5 days (${Math.round((W.prob || 0) * 100)}%) + stock strength (${Math.round((W.stock || 0) * 100)}%) + room to the next level, or for flags/VCPs how close the trigger is (${Math.round((W.room || 0) * 100)}%) + confluence (${Math.round((W.confluence || 0) * 100)}%). A screen, not advice: check the chart and earnings date first.</div></section>`);
+  return el;
+}
+
 function playbookCard(P) {
   const tbl = (rows) => `<div class="scroll"><table class="grid pbtab"><thead><tr><th>#</th><th class="l">Setup</th><th class="l">Verdict</th><th class="l">Why</th><th class="l">Find it</th></tr></thead><tbody>
     ${rows.map(r => `<tr class="${r.verdict === "Avoid" ? "pbdim" : ""}"><td class="num">${r.rank}</td><td class="l"><b>${esc(r.name)}</b></td><td class="l"><span class="pbv ${r.verdict.toLowerCase()}">${r.verdict}</span></td><td class="l pbwhy">${esc(r.why)}</td><td class="l meta">${r.where}</td></tr>`).join("")}</tbody></table></div>`;

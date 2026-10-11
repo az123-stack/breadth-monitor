@@ -278,6 +278,20 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
                                    "since": _r(c.iloc[last][tk] / c.iloc[i][tk] - 1), "days": int(last - i)}))
     el.sort(key=lambda r: (r["days"], -(r["gap"] or 0)))
 
+    # strongest stocks in the whole market, theme or not: 60% RS Rating + 40% closeness to the high
+    from . import leaders as _LD
+    sl = []
+    rl = rating_full.iloc[last]
+    okm = liquid.iloc[last] & (c.iloc[last] >= 10) & (dollar.iloc[last] >= 20e6) & (rl >= 90)
+    for tk in c.columns[okm.fillna(False).values]:
+        offh = t["off_high"].iloc[last][tk]
+        sc = 0.6 * float(rl[tk]) + 0.4 * _LD.high_score(None if pd.isna(offh) else float(offh))
+        sl.append(row(tk, last, {"score": round(sc, 1), "d60": _r(t["d60"].iloc[last][tk]),
+                                 "d20": _r(c.iloc[last][tk] / c.iloc[last - 20][tk] - 1),
+                                 "e50": _r(c.iloc[last][tk] / ema50.iloc[last][tk] - 1),
+                                 "star": bool(nh.iloc[last][tk]) if nh is not None and not pd.isna(nh.iloc[last][tk]) else False}))
+    sl.sort(key=lambda r: (-r["score"], -(r["d60"] or 0)))
+
     # historical results of each list by breadth regime (how these trades did)
     stats = None
     try:
@@ -315,5 +329,5 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
 
     return {"tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt, "vcp": vcp_live,
             "rs_bp": [_r(x, 5) for x in (bps.get(last) if bps.get(last) is not None else [])],
-            "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60],
-                      "counts": {"bursts": len(bl), "anticipation": len(al), "eps": len(el)}}}
+            "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60], "strongest": sl[:40],
+                      "counts": {"bursts": len(bl), "anticipation": len(al), "eps": len(el), "strongest": len(sl)}}}
