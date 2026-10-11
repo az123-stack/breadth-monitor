@@ -72,7 +72,7 @@ def magnets(s, lev):
            "mag_kind": None}
     if nxt:
         out["mag_kind"] = "ATH" if abs(nxt - ath) < 1e-6 * ath or nxt >= ath * 0.999 else (
-            "52-wk high" if abs(nxt - h52) <= h52 * 0.001 else "old high")
+            "52-wk high" if abs(nxt - h52) <= h52 * 0.001 else "prior peak")
     if adr:
         out["ath_adr"] = round(out["ath_pct"] * 100 / adr, 1)
         out["mag_adr"] = round(out["mag_pct"] * 100 / adr, 1) if nxt else None

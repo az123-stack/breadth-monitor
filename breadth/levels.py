@@ -47,7 +47,7 @@ def save(levels):
 
 def peaks_from_monthly(rows):
     """rows: list of (YYYY-MM, high) oldest first -> all-time high and pivot peaks."""
-    rows = [(d, h) for d, h in rows if h is not None and h > 0]
+    rows = list({d: (d, h) for d, h in rows if h is not None and h > 0}.values())   # one bar per month
     if not rows:
         return None
     ath_d, ath = max(rows, key=lambda r: r[1])

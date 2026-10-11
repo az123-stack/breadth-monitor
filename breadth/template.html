@@ -1371,7 +1371,7 @@ function renderTrades(app) {
     <div><div class="kicker">Trade Setups · ${asOf} close</div>
     <p style="margin:6px 0 0">The four trades we want in this market, top 5 each, ranked by the Leaders score. Breadth is <span class="regpill ${now}" style="font-size:13px">${REG[now] || now}</span> — size accordingly.</p></div>
     <div class="tsbtns"><button class="tsall">⬇ All setups (TradingView)</button></div></div>
-    <div class="note">Badges show every buying angle a stock is on: the four setups, a 2LYNCH 5+ burst, the anticipation list. <b>Magnet</b> is the next old high above the price (52-week high, an older peak, or the all-time high) and how many ADRs away it is. ${X.ath_known < Object.keys(X.rows).length ? `All-time highs marked <i>52-wk</i> aren't verified yet: long history loads on the next morning run.` : ""}</div></section>`);
+    <div class="note">Badges show every buying angle a stock is on: the four setups, a 2LYNCH 5+ burst, the anticipation list. <b>Magnet</b> is the next old high above the price (52-week high, an older peak, or the all-time high) and how many ADRs away it is. ${X.ath_known < Object.keys(X.rows).length ? `All-time highs come from long monthly history; any marked <i>52-wk</i> are not verified yet.` : ""}</div></section>`);
   const RV = T.setup_review;
   if (RV) {
     const b = RV.baseline || {}, ICON = { regime: "🌡", dry: "∅", slump: "↓", leaders: "↻", stale: "⏱" };
