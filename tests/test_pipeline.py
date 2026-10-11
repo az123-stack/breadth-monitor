@@ -166,7 +166,7 @@ def test_end_to_end(tmp_path=None):
     real_today = update.today_et
 
     update.today_et = lambda: date(2026, 3, 31)
-    assert update.main(["--backfill-days", "400"]) == 0
+    assert update.main(["--backfill-days", str(int(config.KEEP_TRADING_DAYS * 1.5))]) == 0
     # Add themes after the backfill: the ETF must be backfilled per ticker.
     rows = ["theme,ticker,role", "Alpha,SPYETF,etf"] + [f"Alpha,T{i:04d},member" for i in range(10)] \
         + [f"Beta,T{i:04d},member" for i in range(10, 25)]
@@ -377,23 +377,43 @@ def test_playbook():
 
 
 def test_picks():
-    from breadth import playbook as PB
+    from breadth import playbook as PB, ledger, config
+    import tempfile
+    from pathlib import Path
     pb = {"state": "mixed", "label": "Mixed breadth", "rows": [
         {"key": "ath", "verdict": "Selective", "avg_r": 0.1, "n": 100},
         {"key": "rotation", "verdict": "Focus", "avg_r": 0.3, "n": 100},
+        {"key": "pullback", "verdict": "Focus", "avg_r": 0.2, "n": 100},
         {"key": "kq", "verdict": "Avoid", "avg_r": -0.2, "n": 100}]}
-    row = lambda t, sub, hits=1, **k: {"t": t, "name": t, "price": 100.0, "adr": 4.0, "rsr": 95, "grp": 90, "sub": sub,
-                                       "hits": hits, "mag": 110.0, "mag_pct": 0.1, "mag_adr": 2.5, "mag_kind": "ATH",
-                                       "ath": 101.0, "ath_pct": 0.01, "ath_ok": True, "e21": 0.02, **k}
-    td = {"trade_setups": {"setups": [{"key": "ath", "name": "ATH Magnet", "top": ["A1", "A2"]},
-                                      {"key": "rotation", "name": "Rotation Rookie", "top": ["R1"]},
+    row = lambda t, sub, rs, d60=0.1: {"t": t, "name": t, "price": 100.0, "adr": 4.0, "rsr": rs, "grp": 90, "sub": sub, "d60": d60,
+                                        "hits": 1, "mag": 110.0, "mag_pct": 0.1, "mag_adr": 2.5, "mag_kind": "ATH",
+                                        "ath": 101.0, "ath_pct": 0.01, "ath_ok": True, "e21": 0.02}
+    td = {"trade_setups": {"setups": [{"key": "ath", "name": "ATH Magnet", "top": ["A1"]},
+                                      {"key": "rotation", "name": "Rotation Rookie", "top": ["R1", "R2"]},
+                                      {"key": "pullback", "name": "Leader Pullback", "top": ["P1"]},
                                       {"key": "kq", "name": "Qullamaggie Flag", "top": ["K1"]}],
-                           "rows": {"A1": row("A1", "S1", hits=3), "A2": row("A2", "S2"), "R1": row("R1", "S1"), "K1": row("K1", "S9")}},
-          "trade_bt": {"setups": {"ath": {"mixed": {"hit_adr": 0.5}}, "rotation": {"mixed": {"hit_adr": 0.6}}}}}
+                           "rows": {"A1": row("A1", "S1", 99), "R1": row("R1", "S2", 95, 0.2), "R2": row("R2", "S2", 95, 0.5),
+                                    "P1": row("P1", "S3", 90), "K1": row("K1", "S9", 99)}}}
     out = PB.picks(td, pb)
-    assert [c["t"] for c in out] == ["A1", "R1"] or {c["t"] for c in out} == {"A1", "R1"}, out
-    assert "K1" not in {c["t"] for c in out}                  # Avoid setups are never picked
-    assert all(c["plan"]["entry"] and c["why"] for c in out)
+    # Selective (A1) and Avoid (K1) are skipped while a Focus setup exists; RS ties go to the bigger 60-day gain;
+    # one pick per sub-theme
+    assert [c["t"] for c in out] == ["R2", "P1"], [c["t"] for c in out]
+    assert out[0]["risk10k"] == 400 and pb["pick_cands"] == ["P1", "R1", "R2"]
+    # ledger: record, then settle after 5 sessions
+    old = config.DATA_DIR
+    config.DATA_DIR = Path(tempfile.mkdtemp())
+    try:
+        dates = pd.bdate_range("2026-01-05", periods=8)
+        bars = pd.DataFrame([{"date": d, "ticker": t, "c": 100.0 * (1.1 if (t == "R2" and k >= 5) else 1.0), "l": 99.0}
+                             for k, d in enumerate(dates) for t in ("R2", "P1", "R1")])
+        ledger.record("2026-01-05", out, pb["pick_cands"])
+        df = ledger.settle(bars)
+        r = df[df.t == "R2"].iloc[0]
+        assert abs(r["ret"] - 0.10) < 1e-9 and abs(r["cand_ret"] - 0.10 / 3) < 1e-4
+        sm = ledger.summary(bars)
+        assert sm["n"] == 2 and sm["pnl10k"] == 1000
+    finally:
+        config.DATA_DIR = old
 
 if __name__ == "__main__":
     for name, fn in list(globals().items()):

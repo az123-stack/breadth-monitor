@@ -183,6 +183,15 @@ def recompute_and_publish(bars, splits, universe, state):
         except Exception as e:
             log.exception("playbook failed: %s", e)
         try:
+            from . import ledger
+            pb = theme_data.get("playbook") or {}
+            if pb.get("picks"):
+                ledger.record(theme_data["date"], pb["picks"], pb.get("pick_cands") or [])
+            ledger.settle(adjusted)
+            theme_data["scoreboard"] = ledger.summary(adjusted)
+        except Exception as e:
+            log.exception("pick scoreboard failed: %s", e)
+        try:
             from . import review
             theme_data["setup_review"] = review.evaluate(theme_data, history)
         except Exception as e:

@@ -23,7 +23,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 
 ## Code map
 - `breadth/config.py` settings and thresholds · `massive.py` API client
-- `store.py` parquet bars in `data/bars/` (260 trading days, raw; splits applied in memory),
+- `store.py` parquet bars in `data/bars/` (500 trading days ≈ the free plan's 2-year reach, raw; splits applied in memory),
   themes/subthemes/names loaders, TradingView exchange map
 - `update.py` entry point: `python -m breadth.update [--rebuild-only] [--backfill-days N] [--extend-history]`
 - `metrics.py` breadth metrics, regime classifier, chart events
@@ -44,9 +44,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (4 Trade Setups + bursts, anticipation, EPs) by backtested avg R in that state: Focus ≥ +0.15R, Selective ≥ 0, Avoid < 0,
   Unproven n < 15; shows the "if a thrust comes" ranking too. Setup cards follow the playbook order.
   The review flag also fires (⚡) the morning a major thrust prints, with the post-thrust playbook in the reason.
-- Top 2 trades (`playbook.picks`, card at the top of Trade Setups): candidates = top 5 of each Focus/Selective setup;
-  score = 30% setup edge (avg R in today's state shrunk n/(n+30)) + 20% odds of +1 ADR in 5 days + 20% stock strength
-  + 20% room to next level (pullback/rotation) or reach to trigger (flag/VCP) + 10% confluence; one per setup and group.
+- Top 2 trades (`playbook.picks`, card at the top of Trade Setups): top 5 of each Focus setup (Selective if none),
+  pick highest RS Rating, ties on 60-day gain, one per sub-theme. Chosen from a day-by-day replay (`trade_bt.pick_replay`:
+  rule's #1 vs the day's average candidate, 5-day close-to-close); edge not yet significant (t ≈ 1), so it is tracked live.
+- Pick scoreboard (`ledger.py` → `data/pick_ledger.csv`, `DATA.themes.scoreboard`): logs the 2 picks + candidate list each
+  morning, scores them 5 sessions later vs the average candidate. Research export: `TS.backtest(..., signals=True)`.
 - Whole-market leaders (`lists.strongest`, Setups tab Leaders → "Any theme"): all US stocks $10+, $20M+/day, RS ≥ 90,
   60% RS + 40% closeness to high, no theme weighting (catches lone runners like MRNA).
 - `levels.py` all-time highs and old monthly peaks from Yahoo (free; Massive free plan only reaches ~2 years), cached in

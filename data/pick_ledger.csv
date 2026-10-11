@@ -1,0 +1,3 @@
+date,rank,t,setup,rsr,price,stop_pct,cands,exit_date,ret,stop_hit,cand_ret
+2026-10-09,1,QMCO,kq,99.0,30.42,0.1018,AMD;AMGN;CDNA;CSCO;ERO;FCX;MRK;MSFT;NUE;NVT;QMCO;SDGR;VTRS,,,,
+2026-10-09,2,CDNA,kq,99.0,63.67,0.0577,AMD;AMGN;CDNA;CSCO;ERO;FCX;MRK;MSFT;NUE;NVT;QMCO;SDGR;VTRS,,,,

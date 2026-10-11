@@ -140,7 +140,7 @@ def build(stocks, themes, subthemes, kq=None, lists=None, levels=None, vcp=None)
         rows[s["t"]] = {
             "t": s["t"], "name": s.get("name", ""), "price": s["price"], "score": score, "rsr": rs, "rsr5": s.get("rsr5"),
             "theme": bt, "theme_str": bstr, "sub": s.get("sub"), "sub_str": sub, "grp": grp,
-            "off_hi": s.get("off_hi"), "e21": e21, "e50": e50, "adr": s.get("adr"), "vdry": vdry, "tight": s.get("tight"),
+            "off_hi": s.get("off_hi"), "e21": e21, "e50": e50, "adr": s.get("adr"), "vdry": vdry, "tight": s.get("tight"), "d60": s.get("d60"),
             "tier": s.get("tier"), "star": bool(s.get("rs_nh")), "leader": s["t"] in lead10,
             "rising": in_rise[0] if in_rise else None, "setups": sorted(hit), "angles": sorted(angles), "hits": len(angles),
             **m,
@@ -292,7 +292,7 @@ def vcp_today(w, t, focus):
     return out
 
 
-def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, breadth, first=110, hold=5):
+def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, breadth, first=110, hold=5, signals=False):
     from . import setups as SU
     from . import strength as S2
     cols = [x for x in focus if x in w_all["c"].columns]
@@ -351,6 +351,23 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
     from . import metrics as MT
     tw = MT.thrust_window(breadth, dates)
     ANG = angles.to_numpy()
+    if True:      # per-signal features and forward outcomes: pick-rule replay, and research via signals=True
+        feats = {"rs": rating, "grp": grp, "e21": e21, "e50": e50, "off": off, "adr": t["adr"], "tight": t["tight5"],
+                 "vdry": t["vdry"], "d60": c / c.shift(60) - 1, "rs5": rs5}
+        F = {k: v.to_numpy() for k, v in feats.items()}
+        Cn = c.to_numpy()
+        fwd = c.shift(-hold).to_numpy() / Cn - 1
+        rows = []
+        for key, m in masks.items():
+            mm = m.fillna(False)
+            mm = (mm & ~(mm.shift(1).astype(float).rolling(5, min_periods=1).max().fillna(0) > 0)).to_numpy()
+            for i, j in np.argwhere(mm):
+                if i < first:
+                    continue
+                rows.append({"setup": key, "i": int(i), "date": str(dates[i].date()), "t": cols[j], "regime": str(regime[i]),
+                             "thrust": bool(tw[i]), "angles": int(ANG[i, j]), "fwd": float(fwd[i, j]) if i + hold < N else np.nan,
+                             **{k: float(F[k][i, j]) for k in F}})
+        sig_df = pd.DataFrame(rows)
 
     def outcomes(mask, dedupe=True, every=1):
         m = mask.fillna(False)
@@ -490,4 +507,37 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
     out["base_near"] = summarize(outcomes(base_ok & (off >= A["off"]) & (e21 > 0) & (t["adr"] >= A["adr"])))
     uniq = list({(r[0], r[6]): r for r in allres}.values())   # one trade per stock-day across lists
     out["confluence"] = {"1": summarize([r for r in uniq if r[5] <= 1]), "2+": summarize([r for r in uniq if r[5] >= 2])}
-    return out
+    try:
+        out["pick_replay"] = pick_replay(sig_df, hold)
+    except Exception:
+        out["pick_replay"] = None
+    return (out, sig_df) if signals else out
+
+
+def pick_key(rs, d60):
+    """The top-pick rule: highest RS Rating first, then the bigger 60-day gain."""
+    return (-(rs if rs == rs and rs is not None else 0), -(d60 if d60 == d60 and d60 is not None else 0))
+
+
+def pick_replay(df, hold=5, min_cands=3):
+    """Replay the top-pick rule on past days: each day, the rule picks #1 among that
+    day's setup signals; compare its next-`hold`-day return with the day's average
+    candidate. Uses only that day's data, so it's a fair out-of-sample check of the rule."""
+    if df is None or df.empty:
+        return None
+    df = df.dropna(subset=["fwd"]).drop_duplicates(["i", "t"])
+    picks, avgs = [], []
+    for i, g in df.groupby("i"):
+        if len(g) < min_cands:
+            continue
+        best = min(g.itertuples(), key=lambda r: pick_key(r.rs, r.d60))
+        picks.append(best.fwd); avgs.append(g.fwd.mean())
+    if len(picks) < 10:
+        return None
+    p, a = np.array(picks), np.array(avgs)
+    rel = p - a
+    t = float(rel.mean() / (rel.std(ddof=1) / np.sqrt(len(rel)))) if rel.std(ddof=1) > 0 else 0.0
+    return {"days": len(p), "pick_ret": round(float(p.mean()), 4), "avg_ret": round(float(a.mean()), 4),
+            "edge": round(float(rel.mean()), 4), "t": round(t, 2), "beat": round(float((rel > 0).mean()), 3),
+            "win": round(float((p > 0).mean()), 3), "hold": hold,
+            "from": str(df["date"].min()), "to": str(df["date"].max())}

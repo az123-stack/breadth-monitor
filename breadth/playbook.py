@@ -114,7 +114,6 @@ def build(theme_data, history):
         import logging
         logging.getLogger("breadth").exception("picks failed: %s", e)
         out["picks"] = []
-    out["pick_weights"] = PICK_W
     return out
 
 
@@ -134,84 +133,48 @@ def thrust_today(history, recent=3):
 # ---------------------------------------------------------------------------
 # Today's top 2 trades
 # ---------------------------------------------------------------------------
-SHRINK_N = 30   # edge is shrunk toward 0 by n / (n + 30) so a hot small sample can't dominate
-PICK_W = {"edge": 0.30, "prob": 0.20, "stock": 0.20, "room": 0.20, "confluence": 0.10}
-
-
-def _clip(x, lo, hi):
-    return max(lo, min(hi, x))
-
-
 def picks(theme_data, pb, n=2):
-    """Best n trades today across the Trade Setups lists. Score 0-100:
-      edge        30%  the setup's backtested avg R in today's market state, shrunk by sample
-                       size n/(n+30) (-0.2R -> 0, +0.8R -> 100)
-      probability 20%  how often that setup rallied 1 ADR within 5 sessions in this state
-      stock       20%  RS Rating (and group Strength where the setup uses it)
-      room        20%  pullback/rotation: distance to the next overhead level in ADRs (0.5 or less =
-                       cramped, 2+ = open); flag/VCP: how close the trigger is (0.5 ADR = ready, 2+ = far)
-      confluence  10%  extra buying angles the stock is on (2+ setups, burst, coil)
-    Only Focus/Selective setups are eligible; one pick per sub-theme."""
-    X, B = theme_data.get("trade_setups") or {}, theme_data.get("trade_bt") or {}
-    state = pb["state"]
+    """Today's top trades. The rule (chosen because it did best in a day-by-day replay of
+    our own history - see trade_bt.pick_replay - and because it is simple enough not to
+    be curve-fit): take the top 5 of every Focus setup for today's market (Selective
+    setups if none is Focus), then pick the highest RS Rating, breaking ties on the
+    60-day gain; one pick per sub-theme so the two trades aren't the same bet."""
+    from .tradesetups import pick_key
+    X = theme_data.get("trade_setups") or {}
     verdict = {r["key"]: r for r in pb["rows"]}
-    cands = []
-    for S in X.get("setups", []):
-        v = verdict.get(S["key"])
-        if not v or v["verdict"] not in ("Focus", "Selective"):
+    for allowed in (("Focus",), ("Focus", "Selective")):
+        cands = []
+        for S in X.get("setups", []):
+            v = verdict.get(S["key"])
+            if not v or v["verdict"] not in allowed:
+                continue
+            for t in S["top"]:
+                cands.append({"t": t, "setup": S["key"], "setup_name": S["name"], "verdict": v["verdict"],
+                              "avg_r": v["avg_r"], "row": X["rows"][t]})
+        if cands:
+            break
+    cands.sort(key=lambda c: pick_key(c["row"]["rsr"], c["row"].get("d60")))
+    pb["pick_cands"] = sorted({c["t"] for c in cands})
+    out, seen_t, seen_g = [], set(), set()
+    for c in cands:
+        g = c["row"].get("sub") or c["row"].get("theme")
+        if c["t"] in seen_t or g in seen_g:
             continue
-        st = ((B.get("setups") or {}).get(S["key"]) or {}).get(state) or {}
-        for t in S["top"]:
-            r = X["rows"][t]
-            nn = v["n"] or 0
-            shrunk = (v["avg_r"] or 0) * nn / (nn + SHRINK_N)       # small samples count for less
-            edge = _clip((shrunk + 0.2) / 1.0, 0, 1)
-            prob = _clip(st.get("hit_adr") or 0, 0, 1)
-            stock = r["rsr"] / 99 if S["key"] in ("kq", "vcp") else 0.6 * r["rsr"] / 99 + 0.4 * (r.get("grp") or 0) / 100
-            room_adr = r.get("mag_adr")
-            trig = r.get("kq_pivot") if S["key"] == "kq" else r.get("vcp_pivot") if S["key"] == "vcp" else None
-            if trig and r.get("adr"):
-                # breakout setups: how reachable the trigger is (0.5 ADR or less = ready, 2+ ADRs = not this week)
-                room = _clip((2.0 - (trig / r["price"] - 1) * 100 / r["adr"]) / 1.5, 0, 1)
-            elif S["key"] in ("ath", "kq", "vcp"):
-                room = 1.0                     # the level is the trigger, not a ceiling
-            elif room_adr is None:
-                room = 1.0                     # nothing overhead
-            else:
-                room = _clip((room_adr - 0.5) / 1.5, 0, 1)
-            conf = _clip((r.get("hits", 1) - 1) / 2, 0, 1)
-            score = 100 * (PICK_W["edge"] * edge + PICK_W["prob"] * prob + PICK_W["stock"] * stock
-                           + PICK_W["room"] * room + PICK_W["confluence"] * conf)
-            cands.append({"t": t, "setup": S["key"], "setup_name": S["name"], "score": round(score, 1),
-                          "parts": {"edge": round(edge * 100), "prob": round(prob * 100), "stock": round(stock * 100),
-                                    "room": round(room * 100), "confluence": round(conf * 100)},
-                          "row": r, "verdict": v["verdict"], "avg_r": v["avg_r"], "hit_adr": st.get("hit_adr"), "n": st.get("n")})
-    cands.sort(key=lambda c: -c["score"])
-    out, seen_t, seen_g, seen_s = [], set(), set(), set()
-    for strict in (True, False):       # first pass: a different setup and group for each pick
-        for c in cands:
-            if len(out) == n:
-                break
-            if c["t"] in seen_t:
-                continue
-            g = c["row"].get("sub") or c["row"].get("theme")
-            if strict and (g in seen_g or c["setup"] in seen_s):
-                continue
-            seen_t.add(c["t"]); seen_g.add(g); seen_s.add(c["setup"])
-            _finish(c, pb)
-            out.append(c)
-    out.sort(key=lambda c: -c["score"])
+        seen_t.add(c["t"]); seen_g.add(g)
+        r = c.pop("row")
+        c.update({"rsr": r["rsr"], "d60": r.get("d60"), "name": r.get("name", ""), "sub": g, "price": r.get("price"),
+                  "plan": plan(c["setup"], r), "why": why(c, pb, r), "risk10k": risk10k(c["setup"], r)})
+        out.append(c)
+        if len(out) == n:
+            break
     return out
 
 
-def _finish(c, pb):
-    if True:
-        c["plan"] = plan(c["setup"], c["row"])
-        c["why"] = why(c, pb)
-        c["name"] = c["row"].get("name", "")
-        c["sub"] = c["row"].get("sub") or c["row"].get("theme")
-        c["price"] = c["row"].get("price")
-        c.pop("row")
+def risk10k(key, r):
+    """Dollars lost on a $10k position if the stop is hit (1 ADR, or the VCP stop)."""
+    if key == "vcp" and r.get("vcp_pivot") and r.get("vcp_stop"):
+        return round(10000 * (1 - r["vcp_stop"] / r["vcp_pivot"]))
+    return round(100 * (r.get("adr") or 0) * 1)   # 1 ADR as a % of $10k
 
 
 def _p(x):
@@ -244,15 +207,12 @@ def plan(key, r):
     return {}
 
 
-def why(c, pb):
-    r = c["row"]
-    bits = [f"{c['setup_name']} is {c['verdict'].lower()} in {pb['label'].lower()} ({c['avg_r']:+.2f}R a trade"
-            + (f", +1 ADR within 5 days {round(c['hit_adr'] * 100)}% of the time" if c.get("hit_adr") is not None else "") + ")"]
-    bits.append(f"RS {int(r['rsr'])}" + (" ★" if r.get("star") else "") + (f", group Strength {round(r['grp'])}" if r.get("grp") else ""))
+def why(c, pb, r):
+    bits = [f"Highest RS among today's {c['verdict'].lower()} setups: RS {int(r['rsr'])}" + (" ★" if r.get("star") else "")
+            + (f", {r['d60'] * 100:+.0f}% in 60 days" if r.get("d60") is not None else "")]
+    bits.append(f"{c['setup_name']} is {c['verdict'].lower()} in {pb['label'].lower()} ({c['avg_r']:+.2f}R a trade)")
     if r.get("htf"):
         bits.append(f"high tight flag (+{int(r['kq_leg'])}% leg)")
-    if r.get("hits", 1) > 1:
-        bits.append(f"on {r['hits']} buying angles")
-    if r.get("mag_adr") is not None and c["setup"] in ("pullback", "rotation"):
-        bits.append(f"{r['mag_adr']} ADR of room to {_p(r['mag'])}")
+    if r.get("grp"):
+        bits.append(f"group Strength {round(r['grp'])}")
     return "; ".join(bits) + "."

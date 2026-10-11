@@ -1420,7 +1420,7 @@ function renderTrades(app) {
       ${b.date ? `Last reviewed ${longDate(b.date)} in ${b.regime} breadth.` : ""}</div></section>`)
       : $(`<div class="note revcard" style="padding:0 2px 10px">✓ Setups still fit the market. Last reviewed ${b.date ? longDate(b.date) : "–"} in ${b.regime || "–"} breadth; checked daily for a breadth-regime change (${RV.checks.regime_days}+ sessions), a setup going dry (${RV.checks.dry_days} sessions with no names) or slumping (≤ ${RV.checks.slump_r}R over its last 30 sessions), 3+ new top-5 themes, or ${RV.checks.stale_days}+ days since review — and the same morning a major breadth thrust fires.</div>`));
   }
-  if (T.playbook && (T.playbook.picks || []).length) app.append(picksCard(T.playbook));
+  if (T.playbook && (T.playbook.picks || []).length) app.append(picksCard(T.playbook, T));
   if (T.playbook) app.append(playbookCard(T.playbook));
   head.querySelector(".tsall").addEventListener("click", () => tsDownload("trade-setups", X.setups.map(s => ({ name: s.name, ticks: s.top }))));
   app.append(head);
@@ -1460,21 +1460,35 @@ function renderTrades(app) {
     if (S.key === "kq" && (X.kq_ondeck || []).length) sec.append($(`<div class="note">On deck — extended, wait for a flag to form: ${X.kq_ondeck.map(r => `<b>${r.t}</b> <span class="meta">(+${r.leg}% leg, ${r.ext} ATR above the 20-day)</span>`).join(", ")}</div>`));
     app.append(sec);
   });
+  app.append(scoreboardCard(T.scoreboard));
   app.append(tsBacktest(T.trade_bt, (T.playbook && T.playbook.state) || now));
 }
-function picksCard(P) {
-  const W = P.pick_weights || {};
-  const PART = { edge: "Setup edge", prob: "Odds of +1 ADR", stock: "Stock strength", room: "Room / reach", confluence: "Confluence" };
-  const el = $(`<section class="card regcard pickcard"><div class="kicker">Today's top ${P.picks.length} trades</div>
+function picksCard(P, T) {
+  const R = (T.trade_bt || {}).pick_replay;
+  const ev = R ? `In a day-by-day replay of ${R.days} past sessions (${R.from} to ${R.to}), this rule's #1 pick made <b>${pct(R.pick_ret)}</b> over the next ${R.hold} days (about ${R.pick_ret >= 0 ? "+" : "−"}$${Math.abs(Math.round(R.pick_ret * 10000))} per $10k) against ${pct(R.avg_ret)} for the average candidate, beating it on ${Math.round(R.beat * 100)}% of days. ${Math.abs(R.t) < 2 ? `That edge isn't statistically solid yet (t = ${R.t}) — the scoreboard below tracks whether it holds up live.` : `t = ${R.t}.`}` : "";
+  const el = $(`<section class="card regcard pickcard"><div class="kicker">Today's top ${P.picks.length} trades · highest RS in today's ${P.picks[0].verdict.toLowerCase()} setups</div>
     <div class="picks">${P.picks.map((c, i) => `<div class="pick">
-      <div class="phead"><span class="pnum">#${i + 1}</span><span class="pt">${c.t}</span><span class="pbv ${c.verdict.toLowerCase()}">${esc(c.setup_name)}</span><span class="pscore" title="Pick score 0–100">${c.score.toFixed(0)}</span></div>
+      <div class="phead"><span class="pnum">#${i + 1}</span><span class="pt">${c.t}</span><span class="pbv ${c.verdict.toLowerCase()}">${esc(c.setup_name)}</span><span class="pscore" title="RS Rating">RS ${c.rsr}</span></div>
       <div class="meta" style="font-size:12px">${esc((c.name || "").slice(0, 34))}${c.sub ? " · " + esc(c.sub) : ""}${c.price ? ` · $${c.price.toFixed(2)}` : ""}</div>
       <p class="pwhy">${esc(c.why)}</p>
-      <div class="pplan">${[["Entry", c.plan.entry], ["Stop", c.plan.stop], ["Target", c.plan.target]].map(([k, v]) => `<div><span>${k}</span><span>${esc(v || "–")}</span></div>`).join("")}</div>
-      <div class="pparts">${Object.entries(c.parts).map(([k, v]) => `<span title="${PART[k]} (${Math.round((W[k] || 0) * 100)}% of the score)"><i style="width:${v}%"></i><b>${PART[k]} ${v}</b></span>`).join("")}</div>
+      <div class="pplan">${[["Entry", c.plan.entry], ["Stop", c.plan.stop], ["Target", c.plan.target], ["On $10k", c.risk10k ? `About $${c.risk10k.toLocaleString()} lost if the stop is hit` : null]].filter(x => x[1]).map(([k, v]) => `<div><span>${k}</span><span>${esc(v)}</span></div>`).join("")}</div>
     </div>`).join("")}</div>
-    <div class="note" style="padding:8px 0 0">Picked from the top 5 of every Focus or Selective setup, one per setup and group. Score = setup edge in today's market (backtested R, shrunk for small samples, ${Math.round((W.edge || 0) * 100)}%) + odds that setup rallied 1 ADR within 5 days (${Math.round((W.prob || 0) * 100)}%) + stock strength (${Math.round((W.stock || 0) * 100)}%) + room to the next level, or for flags/VCPs how close the trigger is (${Math.round((W.room || 0) * 100)}%) + confluence (${Math.round((W.confluence || 0) * 100)}%). A screen, not advice: check the chart and earnings date first.</div></section>`);
+    <div class="note" style="padding:8px 0 0">The rule: take the top 5 of every setup rated Focus for today's market, then pick the highest RS Rating (ties go to the bigger 60-day gain), one per sub-theme. ${ev} The data can't see chart quality, news or earnings dates — check those before committing.</div></section>`);
   return el;
+}
+function scoreboardCard(B) {
+  if (!B) return $('<div></div>');
+  const fmtd = (d) => d ? d.slice(5) : "–";
+  const sum = B.n ? `${B.n} closed picks · average ${pct(B.avg_ret)} over 5 days (${B.pnl10k >= 0 ? "+" : "−"}$${Math.abs(B.pnl10k).toLocaleString()} total on $10k each) · ${Math.round(B.win * 100)}% winners · beat the average candidate ${B.beat == null ? "–" : Math.round(B.beat * 100) + "% of the time"} (candidates averaged ${pct(B.avg_cand)}) · stop touched on ${Math.round((B.stops || 0) * 100)}%`
+    : "No closed picks yet: each pick is scored 5 trading days after it's made.";
+  const rows = [...(B.open || []).map(r => ({ ...r, st: "open" })), ...(B.closed || []).map(r => ({ ...r, st: "closed" }))];
+  const body = rows.map(r => `<tr><td class="l">${fmtd(r.date)}</td><td class="num">#${r.rank}</td><td class="l"><b>${r.t}</b></td><td class="l">${esc({ ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP" }[r.setup] || r.setup)}</td>
+    <td class="num">${r.price != null ? (+r.price).toFixed(2) : "–"}</td>${r.st === "open" ? `<td class="num meta">${r.now_ret == null ? "open" : pct(r.now_ret) + " so far"}</td><td class="num meta">–</td><td class="l meta">in progress</td>`
+    : `${retCell(r.ret, "d5")}${retCell(r.cand_ret, "d5")}<td class="l">${String(r.stop_hit).toLowerCase() === "true" ? "stop touched" : "—"}</td>`}</tr>`).join("");
+  return $(`<section class="card regcard"><div class="kicker">Pick scoreboard · live results of the daily top picks</div>
+    <p style="margin:6px 0 8px">${sum}</p>
+    ${rows.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="l">Date</th><th>#</th><th class="l">Ticker</th><th class="l">Setup</th><th>Close<small>pick day</small></th><th>5-day return</th><th>Candidates avg<small>same day</small></th><th class="l">Stop</th></tr></thead><tbody>${body}</tbody></table></div>` : ""}
+    <div class="note" style="padding:8px 0 0">Logged automatically every morning. Returns run from the pick-day close to the close 5 trading days later, the same yardstick as the replay, so live results can confirm or overturn it. "Candidates avg" is what picking at random from the same list would have made. Give it 2–3 months before reading much into it.</div></section>`);
 }
 
 function playbookCard(P) {

@@ -37,7 +37,7 @@ EXTRA_RETRY_DAYS = 7          # retry tickers that returned no data after this m
 # ---- Storage ---------------------------------------------------------------
 # Longest lookback is 65 trading days (quarter); keep extra so recent history
 # can be recomputed after split adjustments.
-KEEP_TRADING_DAYS = 260    # ~1 year: enough for 180-day returns plus EMAs
+KEEP_TRADING_DAYS = 500    # ~2 years (the free plan reaches back ~2 years): 1-year highs, 200-day SMAs and a longer backtest
 
 # ---- Universe filters ------------------------------------------------------
 MIN_PRICE = 3.0              # close must be at least this
