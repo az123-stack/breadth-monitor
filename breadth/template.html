@@ -1465,30 +1465,39 @@ function renderTrades(app) {
 }
 function picksCard(P, T) {
   const R = (T.trade_bt || {}).pick_replay;
-  const ev = R ? `In a day-by-day replay of ${R.days} past sessions (${R.from} to ${R.to}), this rule's #1 pick made <b>${pct(R.pick_ret)}</b> over the next ${R.hold} days (about ${R.pick_ret >= 0 ? "+" : "−"}$${Math.abs(Math.round(R.pick_ret * 10000))} per $10k) against ${pct(R.avg_ret)} for the average candidate, beating it on ${Math.round(R.beat * 100)}% of days. ${Math.abs(R.t) < 2 ? `That edge isn't statistically solid yet (t = ${R.t}) — the scoreboard below tracks whether it holds up live.` : `t = ${R.t}.`}` : "";
-  const el = $(`<section class="card regcard pickcard"><div class="kicker">Today's top ${P.picks.length} trades · highest RS in today's ${P.picks[0].verdict.toLowerCase()} setups</div>
+  const ev = R ? `In a day-by-day replay of ${R.days} past sessions (${R.from} to ${R.to}), traded exactly this way (next-session entry, 5-day hold), the rule's #1 pick made <b>${pct(R.pick_ret)}</b> (about ${R.pick_ret >= 0 ? "+" : "−"}$${Math.abs(Math.round(R.pick_ret * 10000))} per $10k) against ${pct(R.avg_ret)} for the average actionable candidate, beating it on ${Math.round(R.beat * 100)}% of days${R.no_fill ? `; ${R.no_fill} trigger picks never filled` : ""}. ${Math.abs(R.t) < 2 ? `Not statistically solid yet (t = ${R.t}): the scoreboard below tracks it live.` : `t = ${R.t}.`}` : "";
+  const W = P.pick_watch || [];
+  const el = $(`<section class="card regcard pickcard"><div class="kicker">Today's top ${P.picks.length} trades · actionable today · highest RS in today's ${P.picks[0].verdict.toLowerCase()} setups</div>
     <div class="picks">${P.picks.map((c, i) => `<div class="pick">
       <div class="phead"><span class="pnum">#${i + 1}</span><span class="pt">${c.t}</span><span class="pbv ${c.verdict.toLowerCase()}">${esc(c.setup_name)}</span><span class="pscore" title="RS Rating">RS ${c.rsr}</span></div>
-      <div class="meta" style="font-size:12px">${esc((c.name || "").slice(0, 34))}${c.sub ? " · " + esc(c.sub) : ""}${c.price ? ` · $${c.price.toFixed(2)}` : ""}</div>
+      <div class="meta" style="font-size:12px">${esc((c.name || "").slice(0, 34))}${c.sub ? " · " + esc(c.sub) : ""}${c.price ? ` · last close $${c.price.toFixed(2)}` : ""}</div>
       <p class="pwhy">${esc(c.why)}</p>
-      <div class="pplan">${[["Entry", c.plan.entry], ["Stop", c.plan.stop], ["Target", c.plan.target], ["On $10k", c.risk10k ? `About $${c.risk10k.toLocaleString()} lost if the stop is hit` : null]].filter(x => x[1]).map(([k, v]) => `<div><span>${k}</span><span>${esc(v)}</span></div>`).join("")}</div>
+      <div class="pplan">${[["Entry", c.plan.entry], ["Stop", c.plan.stop], ["Target", c.plan.target], ["Logged as", `Entry next session (${c.entry_type === "trigger" ? "only if the trigger trades" : "at the open"}), exit at the close 5 sessions later or at the stop`], ["On $10k", c.risk10k ? `About $${c.risk10k.toLocaleString()} lost if the stop is hit` : null]].filter(x => x[1]).map(([k, v]) => `<div><span>${k}</span><span>${esc(v)}</span></div>`).join("")}</div>
     </div>`).join("")}</div>
-    <div class="note" style="padding:8px 0 0">The rule: take the top 5 of every setup rated Focus for today's market, then pick the highest RS Rating (ties go to the bigger 60-day gain), one per sub-theme. ${ev} The data can't see chart quality, news or earnings dates — check those before committing.</div></section>`);
+    ${W.length ? `<div class="note" style="padding:8px 0 0"><b>Not actionable yet</b> (trigger more than 1 ADR away): ${W.map(w => `<b>${w.t}</b> <span class="meta">${esc(w.setup_name)}, RS ${w.rsr}, trigger $${(+w.trigger).toFixed(2)} (${pct(w.dist_pct)}, ${w.trig_adr} ADR)</span>`).join(", ")}</div>` : ""}
+    <div class="note" style="padding:8px 0 0">The rule: from the top 5 of every setup rated Focus today, keep what you can act on today (flag and VCP triggers within 1 ADR of the close; the other setups buy the next open), then pick the highest RS Rating (ties go to the bigger 60-day gain), one per sub-theme. ${ev} The data can't see chart quality, news or earnings dates — check those before committing.</div></section>`);
   return el;
 }
 function scoreboardCard(B) {
   if (!B) return $('<div></div>');
   const fmtd = (d) => d ? d.slice(5) : "–";
-  const sum = B.n ? `${B.n} closed picks · average ${pct(B.avg_ret)} over 5 days (${B.pnl10k >= 0 ? "+" : "−"}$${Math.abs(B.pnl10k).toLocaleString()} total on $10k each) · ${Math.round(B.win * 100)}% winners · beat the average candidate ${B.beat == null ? "–" : Math.round(B.beat * 100) + "% of the time"} (candidates averaged ${pct(B.avg_cand)}) · stop touched on ${Math.round((B.stops || 0) * 100)}%`
-    : "No closed picks yet: each pick is scored 5 trading days after it's made.";
-  const rows = [...(B.open || []).map(r => ({ ...r, st: "open" })), ...(B.closed || []).map(r => ({ ...r, st: "closed" }))];
-  const body = rows.map(r => `<tr><td class="l">${fmtd(r.date)}</td><td class="num">#${r.rank}</td><td class="l"><b>${r.t}</b></td><td class="l">${esc({ ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP" }[r.setup] || r.setup)}</td>
-    <td class="num">${r.price != null ? (+r.price).toFixed(2) : "–"}</td>${r.st === "open" ? `<td class="num meta">${r.now_ret == null ? "open" : pct(r.now_ret) + " so far"}</td><td class="num meta">–</td><td class="l meta">in progress</td>`
-    : `${retCell(r.ret, "d5")}${retCell(r.cand_ret, "d5")}<td class="l">${String(r.stop_hit).toLowerCase() === "true" ? "stop touched" : "—"}</td>`}</tr>`).join("");
+  const NAME = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP" };
+  const sum = B.n ? `${B.n} closed picks · average ${pct(B.avg_ret)} a trade with stops (${B.pnl10k >= 0 ? "+" : "−"}$${Math.abs(B.pnl10k).toLocaleString()} total on $10k each) · ${Math.round(B.win * 100)}% winners · stop hit on ${Math.round((B.stops || 0) * 100)}% · held 5 days without the stop ${pct(B.avg_nostop)} vs ${pct(B.avg_cand)} for the average candidate (beat it ${B.beat == null ? "–" : Math.round(B.beat * 100) + "% of the time"})${B.no_fill ? ` · ${B.no_fill} trigger pick${B.no_fill > 1 ? "s" : ""} never filled` : ""}`
+    : `No closed picks yet: each pick enters the next session and is scored 5 sessions later.${B.no_fill ? ` ${B.no_fill} trigger pick${B.no_fill > 1 ? "s" : ""} didn't fill.` : ""}`;
+  const rows = [...(B.open || []), ...(B.closed || [])];
+  const body = rows.map(r => {
+    const st = r.status || "pending";
+    const res = st === "closed" ? `${retCell(r.ret, "d5")}${retCell(r.ret_nostop, "d5")}${retCell(r.cand_ret, "d5")}<td class="l">${String(r.stop_hit).toLowerCase() === "true" ? "stopped" : "held"}</td>`
+      : st === "no fill" ? `<td class="num meta">–</td><td class="num meta">–</td><td class="num meta">–</td><td class="l meta">trigger not hit</td>`
+      : st === "open" ? `<td class="num meta">${r.now_ret == null ? "open" : pct(r.now_ret) + " so far"}</td><td class="num meta">–</td><td class="num meta">–</td><td class="l meta">in the trade</td>`
+      : `<td class="num meta">–</td><td class="num meta">–</td><td class="num meta">–</td><td class="l meta">enters next session</td>`;
+    return `<tr><td class="l">${fmtd(r.date)}</td><td class="num">#${r.rank}</td><td class="l"><b>${r.t}</b></td><td class="l">${esc(NAME[r.setup] || r.setup)}</td>
+      <td class="num">${r.entry != null ? (+r.entry).toFixed(2) : r.entry_type === "trigger" && r.trigger != null ? "above " + (+r.trigger).toFixed(2) : "next open"}</td>${res}</tr>`;
+  }).join("");
   return $(`<section class="card regcard"><div class="kicker">Pick scoreboard · live results of the daily top picks</div>
     <p style="margin:6px 0 8px">${sum}</p>
-    ${rows.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="l">Date</th><th>#</th><th class="l">Ticker</th><th class="l">Setup</th><th>Close<small>pick day</small></th><th>5-day return</th><th>Candidates avg<small>same day</small></th><th class="l">Stop</th></tr></thead><tbody>${body}</tbody></table></div>` : ""}
-    <div class="note" style="padding:8px 0 0">Logged automatically every morning. Returns run from the pick-day close to the close 5 trading days later, the same yardstick as the replay, so live results can confirm or overturn it. "Candidates avg" is what picking at random from the same list would have made. Give it 2–3 months before reading much into it.</div></section>`);
+    ${rows.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="l">Picked</th><th>#</th><th class="l">Ticker</th><th class="l">Setup</th><th>Entry</th><th>Result<small>with stop</small></th><th>Held 5 days<small>no stop</small></th><th>Candidates avg<small>same day</small></th><th class="l">Outcome</th></tr></thead><tbody>${body}</tbody></table></div>` : ""}
+    <div class="note" style="padding:8px 0 0">Logged automatically every morning, traded the way you would: entry the next session (the open, or the trigger for flags and VCPs, which may not fill), stop 1 ADR below the fill (entry-day low for flags, the VCP stop for VCPs), exit at the close 5 sessions after entry. "Candidates avg" is what buying a random name from the same list at the same open would have made. Give it 2–3 months before reading much into it.</div></section>`);
 }
 
 function playbookCard(P) {

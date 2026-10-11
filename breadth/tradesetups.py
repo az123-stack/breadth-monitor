@@ -357,6 +357,30 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
         F = {k: v.to_numpy() for k, v in feats.items()}
         Cn = c.to_numpy()
         fwd = c.shift(-hold).to_numpy() / Cn - 1
+        HI5a = w["h"].rolling(5).max().to_numpy()
+        HI10a = w["h"].rolling(10).max().to_numpy()
+        ADRa = t["adr"].to_numpy()
+
+        def next_trade(key, i, j):
+            """How the pick would actually be traded from the next session: flags/VCPs need
+            their trigger (5-day / 10-day high) hit that day, filled at max(trigger, open);
+            everything else buys the next open. Exit at the close `hold` sessions after entry.
+            Returns (trigger distance in ADRs, filled, return)."""
+            trig = HI5a[i, j] if key == "kq" else HI10a[i, j] if key == "vcp" else np.nan
+            dist = (trig / Cn[i, j] - 1) * 100 / ADRa[i, j] if np.isfinite(trig) and ADRa[i, j] > 0 else 0.0
+            k = i + 1
+            if k + hold >= N:
+                return dist, None, np.nan
+            if np.isfinite(trig):
+                tp = trig * 1.001
+                if not H[k, j] >= tp:
+                    return dist, False, np.nan
+                e = max(tp, O[k, j])
+            else:
+                e = O[k, j]
+            x = C[k + hold, j]
+            return dist, True, (x / e - 1) if (np.isfinite(e) and e > 0 and np.isfinite(x)) else np.nan
+
         rows = []
         for key, m in masks.items():
             mm = m.fillna(False)
@@ -364,8 +388,10 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
             for i, j in np.argwhere(mm):
                 if i < first:
                     continue
+                dist, filled, nret = next_trade(key, i, j)
                 rows.append({"setup": key, "i": int(i), "date": str(dates[i].date()), "t": cols[j], "regime": str(regime[i]),
                              "thrust": bool(tw[i]), "angles": int(ANG[i, j]), "fwd": float(fwd[i, j]) if i + hold < N else np.nan,
+                             "trig_adr": float(dist), "filled": filled, "fwd_next": float(nret),
                              **{k: float(F[k][i, j]) for k in F}})
         sig_df = pd.DataFrame(rows)
 
@@ -519,25 +545,38 @@ def pick_key(rs, d60):
     return (-(rs if rs == rs and rs is not None else 0), -(d60 if d60 == d60 and d60 is not None else 0))
 
 
+ACTIONABLE_ADR = 1.0   # a flag/VCP trigger counts as "actionable today" within 1 ADR of the close
+
+
 def pick_replay(df, hold=5, min_cands=3):
-    """Replay the top-pick rule on past days: each day, the rule picks #1 among that
-    day's setup signals; compare its next-`hold`-day return with the day's average
-    candidate. Uses only that day's data, so it's a fair out-of-sample check of the rule."""
+    """Replay the top-pick rule on past days, traded the way the live picks are:
+    each day, among setup signals that are actionable (flag/VCP trigger within 1 ADR
+    of the close; other setups always), pick the highest RS (ties: 60-day gain).
+    Entry next session (open, or the trigger if it's hit that day; no fill = no trade),
+    exit at the close `hold` sessions later, no stop. Benchmark: the average actionable
+    candidate traded the same way."""
     if df is None or df.empty:
         return None
-    df = df.dropna(subset=["fwd"]).drop_duplicates(["i", "t"])
-    picks, avgs = [], []
+    df = df.drop_duplicates(["i", "t"])
+    df = df[df["trig_adr"] <= ACTIONABLE_ADR]
+    picks, avgs, nofill = [], [], 0
     for i, g in df.groupby("i"):
-        if len(g) < min_cands:
+        if len(g) < min_cands or g["filled"].isna().all():
             continue
         best = min(g.itertuples(), key=lambda r: pick_key(r.rs, r.d60))
-        picks.append(best.fwd); avgs.append(g.fwd.mean())
+        done = g[g["fwd_next"].notna()]
+        if best.filled is False:
+            nofill += 1
+            continue
+        if best.fwd_next != best.fwd_next or done.empty:
+            continue
+        picks.append(best.fwd_next); avgs.append(done["fwd_next"].mean())
     if len(picks) < 10:
         return None
     p, a = np.array(picks), np.array(avgs)
     rel = p - a
     t = float(rel.mean() / (rel.std(ddof=1) / np.sqrt(len(rel)))) if rel.std(ddof=1) > 0 else 0.0
-    return {"days": len(p), "pick_ret": round(float(p.mean()), 4), "avg_ret": round(float(a.mean()), 4),
+    return {"days": len(p), "no_fill": nofill, "pick_ret": round(float(p.mean()), 4), "avg_ret": round(float(a.mean()), 4),
             "edge": round(float(rel.mean()), 4), "t": round(t, 2), "beat": round(float((rel > 0).mean()), 3),
             "win": round(float((p > 0).mean()), 3), "hold": hold,
             "from": str(df["date"].min()), "to": str(df["date"].max())}

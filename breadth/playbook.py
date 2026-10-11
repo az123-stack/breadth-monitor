@@ -133,28 +133,44 @@ def thrust_today(history, recent=3):
 # ---------------------------------------------------------------------------
 # Today's top 2 trades
 # ---------------------------------------------------------------------------
+def trigger_of(key, r):
+    """(trigger price, distance in ADRs) for breakout setups; (None, 0) for buy-next-open setups."""
+    trig = r.get("kq_pivot") if key == "kq" else r.get("vcp_pivot") if key == "vcp" else None
+    if not trig or not r.get("price") or not r.get("adr"):
+        return None, 0.0
+    return trig, (trig / r["price"] - 1) * 100 / r["adr"]
+
+
 def picks(theme_data, pb, n=2):
-    """Today's top trades. The rule (chosen because it did best in a day-by-day replay of
-    our own history - see trade_bt.pick_replay - and because it is simple enough not to
-    be curve-fit): take the top 5 of every Focus setup for today's market (Selective
-    setups if none is Focus), then pick the highest RS Rating, breaking ties on the
-    60-day gain; one pick per sub-theme so the two trades aren't the same bet."""
-    from .tradesetups import pick_key
+    """Today's top trades, actionable today. Rule (it did best in a day-by-day replay of our
+    own history - trade_bt.pick_replay - and is simple enough not to be curve-fit): take the
+    top 5 of every Focus setup for today's market (Selective too if fewer than n are
+    actionable), keep the ones you can act on today (flag/VCP trigger within 1 ADR of the
+    close; other setups buy the next open), pick the highest RS Rating, ties on the 60-day
+    gain, one pick per sub-theme. Candidates not actionable yet go to pb["pick_watch"]."""
+    from .tradesetups import pick_key, ACTIONABLE_ADR
     X = theme_data.get("trade_setups") or {}
     verdict = {r["key"]: r for r in pb["rows"]}
     for allowed in (("Focus",), ("Focus", "Selective")):
-        cands = []
+        cands, watch = [], []
         for S in X.get("setups", []):
             v = verdict.get(S["key"])
             if not v or v["verdict"] not in allowed:
                 continue
             for t in S["top"]:
-                cands.append({"t": t, "setup": S["key"], "setup_name": S["name"], "verdict": v["verdict"],
-                              "avg_r": v["avg_r"], "row": X["rows"][t]})
-        if cands:
+                r = X["rows"][t]
+                trig, dist = trigger_of(S["key"], r)
+                c = {"t": t, "setup": S["key"], "setup_name": S["name"], "verdict": v["verdict"], "avg_r": v["avg_r"],
+                     "row": r, "trigger": trig, "trig_adr": round(dist, 2)}
+                (cands if dist <= ACTIONABLE_ADR else watch).append(c)
+        if len({c["t"] for c in cands}) >= n:
             break
     cands.sort(key=lambda c: pick_key(c["row"]["rsr"], c["row"].get("d60")))
+    watch.sort(key=lambda c: pick_key(c["row"]["rsr"], c["row"].get("d60")))
     pb["pick_cands"] = sorted({c["t"] for c in cands})
+    pb["pick_watch"] = [{"t": c["t"], "setup_name": c["setup_name"], "rsr": c["row"]["rsr"], "trigger": c["trigger"],
+                         "dist_pct": round((c["trigger"] / c["row"]["price"] - 1), 4), "trig_adr": c["trig_adr"]}
+                        for c in watch][:5]
     out, seen_t, seen_g = [], set(), set()
     for c in cands:
         g = c["row"].get("sub") or c["row"].get("theme")
@@ -163,6 +179,8 @@ def picks(theme_data, pb, n=2):
         seen_t.add(c["t"]); seen_g.add(g)
         r = c.pop("row")
         c.update({"rsr": r["rsr"], "d60": r.get("d60"), "name": r.get("name", ""), "sub": g, "price": r.get("price"),
+                  "adr": r.get("adr"), "vcp_stop": r.get("vcp_stop") if c["setup"] == "vcp" else None,
+                  "entry_type": "trigger" if c["trigger"] else "open",
                   "plan": plan(c["setup"], r), "why": why(c, pb, r), "risk10k": risk10k(c["setup"], r)})
         out.append(c)
         if len(out) == n:
@@ -186,14 +204,14 @@ def plan(key, r):
     stop1 = price * (1 - adr)
     tgt = f"{_p(r['mag'])} ({r['mag_kind'] if r.get('ath_ok') or r.get('mag_kind') != 'ATH' else '52-wk high'}, {r['mag_pct'] * 100:+.1f}%)" if r.get("mag") else "no overhead level: trail it"
     if key == "ath":
-        return {"entry": f"Buy strength near {_p(price)} as it presses the high", "stop": f"{_p(stop1)} (1 ADR)",
+        return {"entry": f"Buy at the open (last close {_p(price)}) as it presses the high", "stop": "1 ADR below your fill" + f" (~{_p(stop1)})",
                 "target": f"Through the all-time high {_p(r['ath'])} ({r['ath_pct'] * 100:+.1f}%); hold ~5 days"}
     if key == "pullback":
         e21 = price / (1 + r["e21"]) if r.get("e21") is not None else None
-        return {"entry": f"Buy the bounce off the 21 EMA{f' (~{_p(e21)})' if e21 else ''}", "stop": f"{_p(stop1)} (1 ADR) or a close under the 21 EMA",
+        return {"entry": f"Buy at the open, near the 21 EMA{f' (~{_p(e21)})' if e21 else ''}", "stop": "1 ADR below your fill" + f" (~{_p(stop1)})",
                 "target": tgt}
     if key == "rotation":
-        return {"entry": f"Buy near {_p(price)} or on a burst day", "stop": f"{_p(stop1)} (1 ADR)", "target": tgt}
+        return {"entry": f"Buy at the open (last close {_p(price)})", "stop": "1 ADR below your fill" + f" (~{_p(stop1)})", "target": tgt}
     if key == "kq":
         return {"entry": (f"Buy the break of the flag above {_p(r['kq_pivot'])} ({(r['kq_pivot'] / price - 1) * 100:+.1f}% from here)"
                           if r.get("kq_pivot") else "Buy the flag break"),
