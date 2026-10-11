@@ -324,6 +324,35 @@ def test_trade_setups():
     assert r["COIL"]["mag"] == round(40 / 0.88, 2) and r["COIL"]["mag_kind"] == "52-wk high"
     assert r["ATHX"]["ath_ok"] is False
 
+
+def test_setup_review(tmp_path=None):
+    import json, tempfile
+    from datetime import date
+    from pathlib import Path
+    from breadth import config, review
+    old = config.DATA_DIR
+    config.DATA_DIR = Path(tmp_path or tempfile.mkdtemp())
+    try:
+        (config.DATA_DIR / "setups_review.json").write_text(json.dumps(
+            {"date": "2026-10-11", "regime": "mixed", "top_themes": ["A", "B", "C", "D", "E"]}))
+        br = pd.DataFrame({"ratio5": [1.0, 0.8, 0.7, 0.6], "ratio10": [1.1, 0.9, 0.9, 0.8]})
+        setups = [{"key": "ath", "name": "ATH Magnet", "count": 0}, {"key": "pullback", "name": "Leader Pullback", "count": 4}]
+        td = {"date": "2026-10-14", "themes": [{"theme": x, "strength": 90 - i} for i, x in enumerate("AXYZE")],
+              "trade_setups": {"setups": setups},
+              "trade_bt": {"setups": {"ath": {"weak": {"n": 20, "avg_r": -0.2}}}, "recent": {"pullback": {"n": 12, "avg_r": -0.3}}}}
+        for d in ("2026-10-12", "2026-10-13"):
+            review.record_counts(d, setups)
+        out = review.evaluate(td, br, today=date(2026, 10, 14))
+        kinds = {r["kind"] for r in out["reasons"]}
+        assert out["flag"] and kinds == {"regime", "dry", "slump", "leaders"}, out["reasons"]
+        # calm market, same leaders, recent review -> no flag
+        br2 = pd.DataFrame({"ratio5": [1.1] * 3, "ratio10": [1.1] * 3})
+        td2 = {**td, "themes": [{"theme": x, "strength": 90 - i} for i, x in enumerate("ABCDE")],
+               "trade_setups": {"setups": [{"key": "ath", "name": "ATH Magnet", "count": 5}]}, "trade_bt": None}
+        assert not review.evaluate(td2, br2, today=date(2026, 10, 15))["flag"]
+    finally:
+        config.DATA_DIR = old
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

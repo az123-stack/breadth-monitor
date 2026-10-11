@@ -157,6 +157,11 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .regcard .kicker { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
 .regcard .regnow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 6px 0 4px; }
 .regcard p { margin: 6px 0 10px; font-size: 14px; }
+.revflag { background: color-mix(in srgb, var(--warning) 30%, transparent) !important; border-color: color-mix(in srgb, var(--warning) 60%, transparent) !important; font-weight: 700; }
+.revn { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 4px; border-radius: 999px; background: var(--warning); color: #1a1a1a; font-size: 11px; text-align: center; }
+.revcard.on { border-color: color-mix(in srgb, var(--warning) 60%, transparent); background: color-mix(in srgb, var(--warning) 10%, var(--card-bg, transparent)); }
+.revcard ul { margin: 6px 0 4px; padding-left: 20px; }
+.revcard li { margin: 3px 0; }
 .tsbtns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .tsbtns button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--grid); background: var(--surface, transparent); color: var(--text-primary); cursor: pointer; }
 .ang { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 999px; margin: 1px 2px 1px 0; background: var(--grid); color: var(--text-secondary); white-space: nowrap; }
@@ -320,10 +325,14 @@ function render() {
     <div><h1>Market Breadth Monitor</h1>
     <div class="meta">Data through ${longDate(last.date)}</div></div>
     <div class="hright"><div class="meta">Updated ${gen.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${fmt(DATA.history_days)} days of history</div>
-    <div class="xopens">${DATA.kq ? '<button class="xopen kqopen">⬇ KQ list</button>' : ""}${DATA.themes ? '<button class="xopen tvopen">⬇ TradingView list</button>' : ""}</div></div>
+    <div class="xopens">${DATA.themes && DATA.themes.setup_review && DATA.themes.setup_review.flag ? `<button class="xopen revflag" title="The market has shifted since the trade setups were chosen">⚑ Review setups <span class="revn">${DATA.themes.setup_review.reasons.length}</span></button>` : ""}${DATA.kq ? '<button class="xopen kqopen">⬇ KQ list</button>' : ""}${DATA.themes ? '<button class="xopen tvopen">⬇ TradingView list</button>' : ""}</div></div>
   </header>`));
   const xo = app.querySelector(".tvopen"); if (xo) xo.addEventListener("click", openExport);
   const ko = app.querySelector(".kqopen"); if (ko) ko.addEventListener("click", openKQ);
+  const rf = app.querySelector(".revflag"); if (rf) rf.addEventListener("click", () => {
+    const b = app.querySelector('nav.tabs button[data-tab="trades"]'); if (b) b.click();
+    setTimeout(() => { const c = document.querySelector(".revcard"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); }, 50);
+  });
   const tabs = $(`<nav class="tabs" role="tablist">
     <button role="tab" data-tab="breadth">Breadth</button>
     <button role="tab" data-tab="trades">Trade Setups</button>
@@ -1363,6 +1372,15 @@ function renderTrades(app) {
     <p style="margin:6px 0 0">The four trades we want in this market, top 5 each, ranked by the Leaders score. Breadth is <span class="regpill ${now}" style="font-size:13px">${REG[now] || now}</span> — size accordingly.</p></div>
     <div class="tsbtns"><button class="tsall">⬇ All setups (TradingView)</button></div></div>
     <div class="note">Badges show every buying angle a stock is on: the four setups, a 2LYNCH 5+ burst, the anticipation list. <b>Magnet</b> is the next old high above the price (52-week high, an older peak, or the all-time high) and how many ADRs away it is. ${X.ath_known < Object.keys(X.rows).length ? `All-time highs marked <i>52-wk</i> aren't verified yet: long history loads on the next morning run.` : ""}</div></section>`);
+  const RV = T.setup_review;
+  if (RV) {
+    const b = RV.baseline || {}, ICON = { regime: "🌡", dry: "∅", slump: "↓", leaders: "↻", stale: "⏱" };
+    app.append(RV.flag ? $(`<section class="card regcard revcard on"><div class="kicker">⚑ Time to review the setups</div>
+      <ul>${RV.reasons.map(r => `<li><b>${ICON[r.kind] || "•"}</b> ${esc(r.text)}</li>`).join("")}</ul>
+      <div class="note" style="padding:4px 0 0">Bring this back to Claude in the Market Dashboard project and say <b>"review my trade setups"</b>. We'll add, drop or retune setups, then mark the review done and this flag clears.
+      ${b.date ? `Last reviewed ${longDate(b.date)} in ${b.regime} breadth.` : ""}</div></section>`)
+      : $(`<div class="note revcard" style="padding:0 2px 10px">✓ Setups still fit the market. Last reviewed ${b.date ? longDate(b.date) : "–"} in ${b.regime || "–"} breadth; checked daily for a breadth-regime change (${RV.checks.regime_days}+ sessions), a setup going dry (${RV.checks.dry_days} sessions with no names) or slumping (≤ ${RV.checks.slump_r}R over its last 30 sessions), 3+ new top-5 themes, or ${RV.checks.stale_days}+ days since review.</div>`));
+  }
   head.querySelector(".tsall").addEventListener("click", () => tsDownload("trade-setups", X.setups.map(s => ({ name: s.name, ticks: s.top }))));
   app.append(head);
   const mag = (r) => {

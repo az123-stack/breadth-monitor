@@ -1,0 +1,19 @@
+{
+ "date": "2026-10-11",
+ "data_date": "2026-10-09",
+ "regime": "mixed",
+ "top_themes": [
+  "TECH - Cybersecurity",
+  "BIOTECH - Genomics",
+  "TECH - Cloud",
+  "ENERGY - Oil",
+  "MATERIALS - Copper"
+ ],
+ "setups": [
+  "ath",
+  "pullback",
+  "rotation",
+  "coiled"
+ ],
+ "note": "Initial four setups chosen with Adam: ATH Magnet, Leader Pullback, Rotation Rookie, Coiled Leader"
+}

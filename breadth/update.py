@@ -176,6 +176,11 @@ def recompute_and_publish(bars, splits, universe, state):
                                                   kq_data, theme_data.get("lists"), LV.load())
         except Exception as e:  # optional panel; never block the page
             log.exception("trade setups failed: %s", e)
+        try:
+            from . import review
+            theme_data["setup_review"] = review.evaluate(theme_data, history)
+        except Exception as e:
+            log.exception("setup review failed: %s", e)
     site.build(history, theme_data, kq_data)
     return history
 

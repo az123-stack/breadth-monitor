@@ -28,6 +28,7 @@ from . import leaders as LD
 
 MIN_PRICE = 10.0
 TOP = 5
+RECENT = 30          # sessions of completed signals used for "recent results" (review flag)
 SETUPS = [
     ("ath", "ATH Magnet", "Leader within reach of its all-time high: momentum and attention pulling it through."),
     ("pullback", "Leader Pullback", "Leader back at its 21 EMA, uptrend intact, sellers drying up: buy the dip, not the chase."),
@@ -335,6 +336,7 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
     for key, m in masks.items():
         r = outcomes(m)
         out["setups"][key] = summarize(r)
+        out.setdefault("recent", {})[key] = summarize([x for x in r if x[0] >= N - hold - RECENT])["all"]
         allres += r
     out["base"] = summarize(outcomes(base_ok & (rating >= 80), dedupe=False, every=5))
     out["base_near"] = summarize(outcomes(base_ok & (off >= A["off"]) & (e21 > 0) & (t["adr"] >= A["adr"])))
