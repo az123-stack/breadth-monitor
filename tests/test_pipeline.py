@@ -277,6 +277,19 @@ def test_kq_screen():
     assert out["tv"].get("LEAD") == "NASDAQ:LEAD"
     return {k: v for k, v in secs.items()}
 
+
+def test_leaders():
+    from breadth import leaders as LD
+    themes = [{"theme": "A", "strength": 90.0}, {"theme": "B", "strength": 20.0}]
+    subs = [{"theme": "SA", "strength": 80.0}]
+    st = lambda t, rsr, th, sub, off, price=50, stock=True: {"t": t, "rsr": rsr, "themes": th, "sub": sub, "off_hi": off, "price": price, "is_stock": stock}
+    stocks = [st("HI", 95, ["B", "A"], "SA", 0.0), st("LO", 95, ["B"], None, -0.30),
+              st("ETF", 99, ["A"], "SA", 0.0, stock=False), st("PENNY", 99, ["A"], "SA", 0.0, price=5)]
+    r = LD.rank(stocks, themes, subs)
+    assert [x["t"] for x in r] == ["HI", "LO"]
+    assert r[0]["theme"] == "A" and r[0]["score"] == round(0.4 * 95 + 0.25 * 90 + 0.15 * 80 + 0.2 * 100, 1)
+    assert r[1]["sub_str"] == 50.0 and LD.high_score(-0.30) == 0.0 and LD.high_score(-0.10) == 60.0
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

@@ -30,10 +30,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - `themes.py` sheet port: theme Score /8, rotation, setup score, long/short pulse, ranks, payload
 - `strength.py` v2: RS Rating, RS-line ★/⚑ flags, tightness, Theme Strength
 - `setups.py` momentum bursts (2LYNCH), anticipation, episodic pivots, regime trade stats
+- `leaders.py` Leaders ranking → `DATA.themes.leaders`; Setups tab "Leaders" panel (Top 10 / One per group), recomputed live in the browser by `leadersJS`
 - `kq.py` KQ breakout screen → `DATA.kq` (Basing / Extended / Not this setup or failing a rule); "⬇ KQ list" button exports it to TradingView
 - `site.py` + `template.html` single self-contained page (tabs: Breadth, Themes, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 79 themes · `data/subthemes.csv` (group,subtheme,ticker) 119 peer groups
-- `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly, 7 tests)
+- `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
 ## Definitions
 - Breadth universe: US common stocks ≥ $3 (ETFs/ADRs in themes excluded from breadth).
@@ -48,6 +49,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   ≤ 25% off high. Sections in order: event (10% gap on 3x vol or 8x vol day, 15 days) or flat MA (SMA20 rise < 0.9 ATR
   in 10 days) → reject; ≥ 1.5 ATR above SMA20 → extended; 10-day range > 3.5 ATR or 4+ SMA10 crosses → reject; else basing.
   Thresholds hand-calibrated on the Oct 9, 2026 candidates; screen proxies, not chart grades.
+- Leaders score 0–100: 40% RS Rating + 25% strongest theme's Strength + 15% sub-theme Strength (none → 50)
+  + 20% closeness to 52-wk high (at high 100, ≥ 25% off 0); stocks ≥ $10, no ETFs.
 - TradingView export priority: bursts → anticipation → ⚑ → ★ → RS 99 → fast risers →
   top 2 themes → top 3 sub-themes (new names) → bottom 2 themes → EPs (off) → ETFs; de-duplicated.
 

@@ -728,7 +728,7 @@ let LIVE = null;          // { fetched: Date, spyDate: "YYYY-MM-DD", spyTime: st
 let LIVE_ERR = null, LIVE_T = null, LIVE_BUSY = false;
 const UI = { hz: "short",
   themes: { view: "theme", by: "strength", cls: "All", q: "", open: new Set(), sort: ["s_rank", 1] },
-  setups: { mine: "all", lynch: "5" },
+  setups: { mine: "all", lynch: "5", lead: "top" },
   browse: { view: "theme", order: "rank", q: "", open: new Set(), all: false },
   stocks: { tier: "All", theme: "", sub: "", q: "", limit: 100, sort: ["rsr", -1] } };
 
@@ -1247,11 +1247,50 @@ function listTable(rows, cols, cellFn, state) {
 const nameCell = (r) => `<td class="l tname">${r.t}<small>${esc((r.name || "").slice(0, 26))}${r.sub ? " · " + esc(r.sub) : r.theme ? " · " + esc(r.theme) : ""}</small></td>`;
 const nowCell = (r) => { const p = LIVE_T && LIVE && LIVE.prices[r.t]; if (!p || !r.price) return '<td class="num meta">–</td>'; const v = p / r.price - 1; return Math.abs(v) > 0.5 ? '<td class="num meta">–</td>' : retCell(v, "today"); };
 const SETUP_SORT = { b: ["lynch", -1], a: ["tight", 1], e: ["days", 1] };
+/* Leaders: mirrors breadth/leaders.py exactly (weights, $10 floor, neutral 50 sub-theme). */
+const LEAD_W = { rs: 0.40, theme: 0.25, sub: 0.15, high: 0.20 };
+const leadHigh = (o) => o == null ? 0 : Math.max(0, Math.min(100, 100 + o * 400));
+function leadersJS(T, n = 25) {
+  const ts = {}, ss = {};
+  T.themes.forEach(r => ts[r.theme] = r.strength); (T.subthemes || []).forEach(r => ss[r.theme] = r.strength);
+  const out = [];
+  for (const s of T.stocks) {
+    if (!s.is_stock || s.rsr == null || (s.price || 0) < 10) continue;
+    let bt = null, b = null;
+    for (const th of s.themes || []) { const v = ts[th]; if (v != null && (b == null || v > b)) { bt = th; b = v; } }
+    const sub = ss[s.sub] ?? 50, hi = leadHigh(s.off_hi);
+    const score = LEAD_W.rs * s.rsr + LEAD_W.theme * (b || 0) + LEAD_W.sub * sub + LEAD_W.high * hi;
+    out.push({ t: s.t, name: s.name, score: Math.round(score * 10) / 10, rsr: s.rsr, theme: bt, theme_str: b, sub: s.sub, sub_str: sub,
+      off_hi: s.off_hi, price: s.price, star: s.rs_nh, flag: s.rs_lead, e50: s.e50, tier: s.tier });
+  }
+  out.sort((a, c) => c.score - a.score || c.rsr - a.rsr || (a.t < c.t ? -1 : 1));
+  return out.slice(0, n);
+}
+function leadersCard(T) {
+  const U = UI.setups, all = leadersJS(T, 400), seen = new Set();
+  const rows = (U.lead === "div" ? all.filter(r => { const g = r.sub || r.theme; if (seen.has(g)) return false; seen.add(g); return true; }) : all).slice(0, 10)
+    .map((r, i) => ({ ...r, n: i + 1 }));
+  const live = !!LIVE_T;
+  const sec = $(`<section class="card tcard leaders"><div class="head"><h2>Leaders <span class="meta">· the 10 strongest stocks by the dashboard's own measures${live ? ", live" : ", " + longDate(T.date) + " close"}</span></h2></div></section>`);
+  const bar = $('<div class="filters" style="padding:0 16px 8px"></div>');
+  bar.append(chips("Show", [["top", "Top 10"], ["div", "One per group"]], U, "lead", rerenderPanel));
+  sec.append(bar);
+  const cols = [{ k: "n", h: "#", asc: true }, { k: "t", h: "Ticker", l: true, asc: true }, { k: "score", h: "Score<small>0–100</small>" }, ...(live ? [{ k: null, h: "Now<small>live</small>" }] : []),
+    { k: "rsr", h: "RS Rating" }, { k: "theme_str", h: "Theme<small>Strength</small>" }, { k: "sub_str", h: "Sub-theme<small>Strength</small>" },
+    { k: "off_hi", h: "Off high<small>52-week</small>" }, { k: "e50", h: "vs 50 EMA<small>extension</small>", asc: true }, { k: "tier", h: "Tier", asc: true }];
+  sec.append(listTable(rows, cols, r => `<td class="num">${r.n}</td>${nameCell(r)}<td class="num"><b>${r.score.toFixed(1)}</b></td>${live ? nowCell(r) : ""}
+    <td class="num ${rsTint(r.rsr)}">${r.rsr}${r.flag ? " ⚑" : r.star ? " ★" : ""}</td><td class="num">${r.theme_str == null ? "–" : Math.round(r.theme_str)}</td><td class="num">${Math.round(r.sub_str)}</td>
+    <td class="num">${pct(r.off_hi)}</td><td class="num">${pct(r.e50)}</td><td class="num">${r.tier || "–"}</td>`, UI.setups.lsort || (UI.setups.lsort = ["n", 1])));
+  sec.append($(`<div class="note">Score = 40% RS Rating + 25% its strongest theme's Strength + 15% its sub-theme's Strength + 20% closeness to the 52-week high (at the high = 100, 25% or more below = 0). Stocks $10+ only, no ETFs. "One per group" keeps only the best name in each sub-theme, so you aren't holding five versions of the same bet. A strength ranking, not a buy list: check the "vs 50 EMA" column — names far above it are extended, and entries are better on a tight pullback.</div>`));
+  return sec;
+}
+
 function renderSetups(app) {
   if (!DATA.themes || !DATA.themes.lists) { app.append($('<div class="card empty">Setup lists appear after the next data run.</div>')); return; }
   const T = getT(), L = DATA.themes.lists, U = UI.setups, M = stockMap();
   app.append(liveBar());
   app.append(regimeCard(DATA.themes));
+  app.append(leadersCard(T));
   const bar = $('<section class="card browsebar"><div class="filters"></div></section>');
   bar.querySelector(".filters").append(chips("Universe", [["all", "Whole market"], ["mine", "Only my themes"]], U, "mine", rerenderPanel));
   bar.querySelector(".filters").append(chips("2LYNCH", [["5", "2LYNCH 5+"], ["4", "4+"], ["0", "All 4% bursts"]], U, "lynch", rerenderPanel));
