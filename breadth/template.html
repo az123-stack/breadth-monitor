@@ -347,10 +347,17 @@ function render() {
     <div><h1>Market Breadth Monitor</h1>
     <div class="meta">Data through ${longDate(last.date)}</div></div>
     <div class="hright"><div class="meta">Updated ${gen.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${fmt(DATA.history_days)} days of history</div>
-    <div class="xopens">${DATA.themes && DATA.themes.setup_review && DATA.themes.setup_review.flag ? `<button class="xopen revflag" title="The market has shifted since the trade setups were chosen">${DATA.themes.setup_review.reasons.some(r => r.kind === "thrust") ? "⚡ Thrust · review setups" : "⚑ Review setups"} <span class="revn">${DATA.themes.setup_review.reasons.length}</span></button>` : ""}${DATA.kq ? '<button class="xopen kqopen">⬇ KQ list</button>' : ""}${DATA.themes ? '<button class="xopen tvopen">⬇ TradingView list</button>' : ""}</div></div>
+    <div class="xopens">${DATA.themes && DATA.themes.setup_review && DATA.themes.setup_review.flag ? `<button class="xopen revflag" title="The market has shifted since the trade setups were chosen">${DATA.themes.setup_review.reasons.some(r => r.kind === "thrust") ? "⚡ Thrust · review setups" : "⚑ Review setups"} <span class="revn">${DATA.themes.setup_review.reasons.length}</span></button>` : ""}${DATA.themes && DATA.themes.trade_setups ? '<button class="xopen tsopen" title="All Trade Setups lists, one section per setup">⬇ Trade Setups</button>' : ""}${DATA.kq ? '<button class="xopen kqopen">⬇ KQ list</button>' : ""}${DATA.themes ? '<button class="xopen tvopen">⬇ TradingView list</button>' : ""}</div></div>
   </header>`));
   const xo = app.querySelector(".tvopen"); if (xo) xo.addEventListener("click", openExport);
   const ko = app.querySelector(".kqopen"); if (ko) ko.addEventListener("click", openKQ);
+  const tso = app.querySelector(".tsopen"); if (tso) tso.addEventListener("click", () => {
+    const X = DATA.themes.trade_setups, P = DATA.themes.playbook || {};
+    const rank = Object.fromEntries((P.rows || []).map(r => [r.key, r.rank]));
+    const picks = (P.picks || []).map(c => c.t);
+    tsDownload("trade-setups", [...(picks.length ? [{ name: "Today's top picks", ticks: picks }] : []),
+      ...X.setups.slice().sort((a, b) => (rank[a.key] || 9) - (rank[b.key] || 9)).map(s => ({ name: s.name, ticks: s.top }))]);
+  });
   const rf = app.querySelector(".revflag"); if (rf) rf.addEventListener("click", () => {
     const b = app.querySelector('nav.tabs button[data-tab="trades"]'); if (b) b.click();
     setTimeout(() => { const c = document.querySelector(".revcard"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); }, 50);
@@ -1422,7 +1429,7 @@ function renderTrades(app) {
   }
   if (T.playbook && (T.playbook.picks || []).length) app.append(picksCard(T.playbook, T));
   if (T.playbook) app.append(playbookCard(T.playbook));
-  head.querySelector(".tsall").addEventListener("click", () => tsDownload("trade-setups", X.setups.map(s => ({ name: s.name, ticks: s.top }))));
+  head.querySelector(".tsall").addEventListener("click", () => document.querySelector(".tsopen").click());
   app.append(head);
   const mag = (r) => {
     if (r.mag == null) return '<td class="num meta">–</td>';
@@ -1573,6 +1580,8 @@ function renderStocks(app) {
 // Sections in priority order. TradingView keeps a symbol once per list, so a
 // ticker that qualifies for several sections appears in the first one only.
 const EXPORT_DEFS = [
+  { id: "strongest", on: true, label: "Top 10 stocks · any theme", why: "The 10 strongest stocks in the whole market, in a theme or not (Leaders → Any theme)",
+    get: (T, L) => (L.strongest || []).slice(0, 10).map(r => r.t) },
   { id: "bursts", on: true, label: "Momentum bursts · 2LYNCH 5+", why: "Today's 4% breakouts meeting 5+ of the 2LYNCH checks (whole market)",
     get: (T, L) => L.bursts.filter(r => r.lynch >= 5).map(r => r.t) },
   { id: "ant", on: true, label: "Anticipation · tight coils", why: "Tight, quiet coils in RS 85+ leaders near highs (whole market)",
@@ -1594,8 +1603,6 @@ const EXPORT_DEFS = [
     get: (T) => rankedGroups(T.themes).slice(-2).reverse().map(g => ["Bottom theme · " + g.theme, byRS(members(T, g)).reverse()]) },
   { id: "eps", on: false, label: "Episodic pivots (watch only)", why: "Big gaps on heavy volume in the last 5 sessions; check the catalyst first",
     get: (T, L) => L.eps.map(r => r.t) },
-  { id: "market", on: true, label: "Market & theme ETFs", why: "SPY, QQQ, IWM plus the ETFs of the top and bottom themes",
-    get: (T) => ["SPY", "QQQ", "IWM", ...rankedGroups(T.themes).slice(0, 5).map(g => g.etf), ...rankedGroups(T.themes).slice(-3).map(g => g.etf)].filter(Boolean) },
 ];
 const byRS = (list) => list.slice().sort((a, b) => (b.rsr ?? -1) - (a.rsr ?? -1)).map(s => s.t);
 const rankedGroups = (rows) => rows.slice().filter(g => g.n >= 3).sort((a, b) => (a.s_rank ?? a.rank) - (b.s_rank ?? b.rank));

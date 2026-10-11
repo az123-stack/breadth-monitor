@@ -86,8 +86,9 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Backtest: new signals; ATH/Pullback/Rotation buy close, stop 1 ADR, exit 5 sessions. Q-Flag: buy above 5-day high
   within 5 days, stop entry-day low (skip if > 1 ADR), half out after 3 days, rest on close < 10 EMA (20 EMA variant
   reported). VCP: buy above 10-day high, stop 10-day low capped 8%, exit close < 50 SMA. R risk floored at 0.3 ADR.
-- TradingView export priority: bursts → anticipation → ⚑ → ★ → RS 99 → fast risers →
-  top 2 themes → top 3 sub-themes (new names) → bottom 2 themes → EPs (off) → ETFs; de-duplicated.
+- Header "⬇ Trade Setups" downloads today's top picks + every setup's top 5 (playbook order).
+- TradingView export priority: top 10 any-theme stocks (lists.strongest) → bursts → anticipation → ⚑ → ★ → RS 99 → fast risers →
+  top 2 themes → top 3 sub-themes (new names) → bottom 2 themes → EPs (off); de-duplicated (ETF section removed Oct 11).
 
 ## Findings so far (Feb–Oct 2026 history)
 - Theme Strength ranks far more stable than Score /8 (rank corr 0.96 vs 0.79); neither predicts
