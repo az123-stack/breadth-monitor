@@ -169,6 +169,13 @@ def recompute_and_publish(bars, splits, universe, state):
     except Exception as e:  # the KQ list is optional; never block the page
         log.exception("kq screen failed: %s", e)
         kq_data = None
+    if theme_data:
+        try:
+            from . import levels as LV, tradesetups as TS
+            theme_data["trade_setups"] = TS.build(theme_data["stocks"], theme_data["themes"], theme_data["subthemes"],
+                                                  kq_data, theme_data.get("lists"), LV.load())
+        except Exception as e:  # optional panel; never block the page
+            log.exception("trade setups failed: %s", e)
     site.build(history, theme_data, kq_data)
     return history
 
@@ -218,6 +225,12 @@ def main(argv=None):
         splits = refresh_splits(client, bars, state)
         store.save_bars(bars)
         store.save_state(state)
+        try:   # old highs for the Trade Setups magnets (cached; only new tickers are fetched)
+            from . import levels as LV
+            if config.LEVELS_ENABLED:
+                LV.refresh(store.theme_tickers() & set(universe))
+        except Exception as e:
+            log.warning("levels refresh skipped: %s", e)
     else:
         splits = store.load_splits()
         universe = store.load_universe()

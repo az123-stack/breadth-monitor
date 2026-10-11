@@ -69,3 +69,6 @@ THRUST_LOW_RATIO = 0.8       # ...or of a 10-day ratio at or below this
 T2108_EXTENDED = 75          # T2108 crossing above this is marked "Extended"
 
 DASHBOARD_DAYS = 760         # max days on the charts (~3 years); they scroll
+
+# Long-history levels (old highs) for Trade Setups, from Yahoo monthly data; tests switch this off.
+LEVELS_ENABLED = True

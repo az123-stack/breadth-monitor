@@ -31,8 +31,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - `strength.py` v2: RS Rating, RS-line ★/⚑ flags, tightness, Theme Strength
 - `setups.py` momentum bursts (2LYNCH), anticipation, episodic pivots, regime trade stats
 - `leaders.py` Leaders ranking → `DATA.themes.leaders`; Setups tab "Leaders" panel (Top 10 / One per group), recomputed live in the browser by `leadersJS`
+- `tradesetups.py` Trade Setups tab: ATH Magnet, Leader Pullback, Rotation Rookie, Coiled Leader (top 5 each by Leaders score,
+  "setups hit" angles, magnet levels) → `DATA.themes.trade_setups`; backtest of every setup + confluence → `DATA.themes.trade_bt`
+- `levels.py` all-time highs and old monthly peaks from Yahoo (free; Massive free plan only reaches ~2 years), cached in
+  `data/levels.json`, fetched in the daily run for new/stale tickers (`config.LEVELS_ENABLED`; tests switch it off)
 - `kq.py` KQ breakout screen → `DATA.kq` (Basing / Extended / Not this setup or failing a rule); "⬇ KQ list" button exports it to TradingView
-- `site.py` + `template.html` single self-contained page (tabs: Breadth, Themes, Browse, Setups, Stocks; TradingView export modal)
+- `site.py` + `template.html` single self-contained page (tabs: Breadth, Trade Setups, Themes, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 79 themes · `data/subthemes.csv` (group,subtheme,ticker) 119 peer groups
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
@@ -51,6 +55,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Thresholds hand-calibrated on the Oct 9, 2026 candidates; screen proxies, not chart grades.
 - Leaders score 0–100: 40% RS Rating + 25% strongest theme's Strength + 15% sub-theme Strength (none → 50)
   + 20% closeness to 52-wk high (at high 100, ≥ 25% off 0); stocks ≥ $10, no ETFs.
+- Trade Setups (stocks ≥ $10; group = stronger of best theme / sub-theme Strength):
+  ATH Magnet RS ≥ 90, group ≥ 80, ≤ 3% off 52-wk high, above 21 EMA, ADR ≥ 3, true ATH ≤ 2 ADRs away when known ·
+  Leader Pullback RS ≥ 85, group ≥ 70, within 3% of 21 EMA, above 50 EMA, 4–20% off high, vol dry ≤ 0.9 ·
+  Rotation Rookie theme up 10+ Strength ranks in 4 wks (≥ 55) or sub-theme up 15+ (≥ 60), RS ≥ 80 not falling,
+  3–12% off high, 0–6% above 21 EMA · Coiled Leader KQ Basing, RS ≥ 90, group ≥ 80.
+  Backtest: new signals, buy close, stop 1 ADR, exit 5 sessions; hit-high uses the 52-wk high.
 - TradingView export priority: bursts → anticipation → ⚑ → ★ → RS 99 → fast risers →
   top 2 themes → top 3 sub-themes (new names) → bottom 2 themes → EPs (off) → ETFs; de-duplicated.
 
@@ -59,6 +69,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   10-day theme returns, so weights were not tuned to the data.
 - Setups pay only in strong breadth (bursts +0.16R, anticipation +0.18R; bursts −0.09R in weak);
   EPs without a catalyst check lose in every regime.
+- Trade Setups (Mar–Oct 2026, mixed breadth): Rotation +0.29R, Pullback +0.22R, ATH Magnet +0.12R (tags the high 81%
+  vs 76% for any near-high stock), Coiled +0.12R; RS 80+ baseline +0.10R. Confluence (2+ angles) ≈ same R as 1 angle.
 - Limits: survivorship bias in backfill, small strong-regime sample, no costs, no intraday H/L/volume.
 
 ## Working preferences

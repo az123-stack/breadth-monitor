@@ -287,6 +287,17 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
             stats = SU.regime_stats(w, t, rating_full, liquid, br)
     except Exception:
         stats = None
+    trade_bt = None
+    try:
+        from . import store as _store
+        from . import tradesetups as TS
+        br = _store.load_breadth()
+        if len(br):
+            trade_bt = TS.backtest(w, t, ratings, liquid, members, sub_members,
+                                   sorted(set(focus) & set(universe)), br)
+    except Exception as e:
+        import logging
+        logging.getLogger("breadth").exception("trade setup backtest failed: %s", e)
     reg = None
     try:
         from . import store as _store
@@ -295,7 +306,7 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
     except Exception:
         pass
 
-    return {"tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg,
+    return {"tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt,
             "rs_bp": [_r(x, 5) for x in (bps.get(last) if bps.get(last) is not None else [])],
             "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60],
                       "counts": {"bursts": len(bl), "anticipation": len(al), "eps": len(el)}}}

@@ -149,6 +149,7 @@ def test_end_to_end(tmp_path=None):
     tmp = Path(tmp_path or tempfile.mkdtemp())
     for name in ["DATA_DIR", "DOCS_DIR"]:
         setattr(config, name, tmp / name.lower())
+    config.LEVELS_ENABLED = False
     config.BARS_DIR = config.DATA_DIR / "bars"
     config.BREADTH_FILE = config.DATA_DIR / "breadth.csv"
     config.UNIVERSE_FILE = config.DATA_DIR / "universe.csv"
@@ -289,6 +290,39 @@ def test_leaders():
     assert [x["t"] for x in r] == ["HI", "LO"]
     assert r[0]["theme"] == "A" and r[0]["score"] == round(0.4 * 95 + 0.25 * 90 + 0.15 * 80 + 0.2 * 100, 1)
     assert r[1]["sub_str"] == 50.0 and LD.high_score(-0.30) == 0.0 and LD.high_score(-0.10) == 60.0
+
+
+def test_trade_setups():
+    from breadth import levels as LV, tradesetups as TS
+    # monthly peaks: pivot highs and the all-time high
+    rows = [("2021-01", 50), ("2021-02", 80), ("2021-03", 100), ("2021-04", 70), ("2021-05", 60), ("2021-06", 55),
+            ("2021-07", 40), ("2022-01", 30), ("2022-02", 75), ("2022-03", 35), ("2022-04", 30), ("2022-05", 20)]
+    lv = LV.peaks_from_monthly(rows)
+    assert lv["ath"] == 100 and ["2021-03", 100] in lv["peaks"] and ["2022-02", 75] in lv["peaks"]
+    # Yahoo chart JSON parses into the same structure
+    js = {"chart": {"result": [{"timestamp": [1609459200, 1612137600], "indicators": {"quote": [{"high": [10.0, 12.5]}]}}]}}
+    assert LV.parse_chart(js)["ath"] == 12.5
+    themes = [{"theme": "Hot", "strength": 95.0, "s_rank": 1, "s_r_m4": 2},
+              {"theme": "Rising", "strength": 70.0, "s_rank": 10, "s_r_m4": 30}]
+    subs = [{"theme": "HotSub", "strength": 90.0, "s_rank": 1, "s_r_m4": 1}]
+    base = {"is_stock": True, "name": "", "tier": "B", "rs_nh": False, "tight": 1.5, "rsr5": 2}
+    stocks = [
+        {**base, "t": "ATHX", "price": 100.0, "rsr": 97, "themes": ["Hot"], "sub": "HotSub", "off_hi": -0.01, "e21": 0.05, "e50": 0.1, "adr": 4.0, "vdry": 1.0},
+        {**base, "t": "FAR", "price": 100.0, "rsr": 97, "themes": ["Hot"], "sub": "HotSub", "off_hi": -0.01, "e21": 0.05, "e50": 0.1, "adr": 4.0, "vdry": 1.0},
+        {**base, "t": "PB", "price": 50.0, "rsr": 90, "themes": ["Hot"], "sub": None, "off_hi": -0.10, "e21": 0.01, "e50": 0.05, "adr": 4.0, "vdry": 0.8},
+        {**base, "t": "ROT", "price": 30.0, "rsr": 85, "themes": ["Rising"], "sub": None, "off_hi": -0.06, "e21": 0.03, "e50": 0.05, "adr": 3.0, "vdry": 1.0},
+        {**base, "t": "COIL", "price": 40.0, "rsr": 95, "themes": ["Hot"], "sub": None, "off_hi": -0.12, "e21": 0.05, "e50": 0.2, "adr": 6.0, "vdry": 1.0},
+        {**base, "t": "CHEAP", "price": 8.0, "rsr": 99, "themes": ["Hot"], "sub": "HotSub", "off_hi": -0.01, "e21": 0.05, "e50": 0.1, "adr": 4.0, "vdry": 1.0},
+    ]
+    levels = {"FAR": {"ath": 150.0, "peaks": [["2021-03", 150.0]]}, "COIL": {"ath": 90.0, "peaks": [["2021-03", 90.0], ["2022-02", 50.0]]}}
+    out = TS.build(stocks, themes, subs, kq={"basing": [{"t": "COIL"}]}, lists={"bursts": [{"t": "PB", "lynch": 5}]}, levels=levels)
+    top = {s["key"]: s["top"] for s in out["setups"]}
+    assert top["ath"] == ["ATHX"], top          # FAR's real ATH is 50% away; CHEAP is under $10
+    assert top["pullback"] == ["PB"] and top["rotation"] == ["ROT"] and top["coiled"] == ["COIL"], top
+    r = out["rows"]
+    assert r["PB"]["hits"] == 2 and "burst" in r["PB"]["angles"]
+    assert r["COIL"]["mag"] == round(40 / 0.88, 2) and r["COIL"]["mag_kind"] == "52-wk high"
+    assert r["ATHX"]["ath_ok"] is False
 
 if __name__ == "__main__":
     for name, fn in list(globals().items()):

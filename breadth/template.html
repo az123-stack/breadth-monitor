@@ -157,6 +157,13 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .regcard .kicker { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
 .regcard .regnow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 6px 0 4px; }
 .regcard p { margin: 6px 0 10px; font-size: 14px; }
+.tsbtns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tsbtns button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--grid); background: var(--surface, transparent); color: var(--text-primary); cursor: pointer; }
+.ang { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 999px; margin: 1px 2px 1px 0; background: var(--grid); color: var(--text-secondary); white-space: nowrap; }
+.ang.on { background: color-mix(in srgb, var(--pos) 35%, transparent); color: var(--text-primary); }
+.magcell small { display: block; color: var(--text-muted); font-size: 11px; }
+.btgrid td.l small { display: block; color: var(--text-muted); font-weight: 400; }
+.btgrid tr.basel td { color: var(--text-secondary); }
 .regpill { font-weight: 700; font-size: 15px; padding: 3px 12px; border-radius: 999px; }
 .regpill.strong { background: color-mix(in srgb, var(--good) 25%, transparent); }
 .regpill.mixed { background: color-mix(in srgb, var(--warning) 28%, transparent); }
@@ -299,7 +306,7 @@ const TONES = {
 };
 
 let TAB = "breadth";
-try { const h = location.hash.slice(1); if (["breadth", "themes", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
+try { const h = location.hash.slice(1); if (["breadth", "trades", "themes", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
 
 function render() {
   const app = document.getElementById("app");
@@ -319,6 +326,7 @@ function render() {
   const ko = app.querySelector(".kqopen"); if (ko) ko.addEventListener("click", openKQ);
   const tabs = $(`<nav class="tabs" role="tablist">
     <button role="tab" data-tab="breadth">Breadth</button>
+    <button role="tab" data-tab="trades">Trade Setups</button>
     <button role="tab" data-tab="themes">Themes</button>
     <button role="tab" data-tab="browse">Browse</button>
     <button role="tab" data-tab="setups">Setups</button>
@@ -333,6 +341,7 @@ function render() {
     else if (TAB === "stocks") renderStocks(panel);
     else if (TAB === "browse") renderBrowse(panel);
     else if (TAB === "setups") renderSetups(panel);
+    else if (TAB === "trades") renderTrades(panel);
     else renderBreadth(panel);
   };
   tabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
@@ -912,7 +921,8 @@ function rerenderPanel() {
   const panel = document.querySelector(".panel"); if (!panel) return;
   const y = window.scrollY; panel.innerHTML = "";
   if (TAB === "themes") renderThemes(panel); else if (TAB === "stocks") renderStocks(panel);
-  else if (TAB === "browse") renderBrowse(panel); else if (TAB === "setups") renderSetups(panel); else renderBreadth(panel);
+  else if (TAB === "browse") renderBrowse(panel); else if (TAB === "setups") renderSetups(panel);
+  else if (TAB === "trades") renderTrades(panel); else renderBreadth(panel);
   window.scrollTo(0, y);
 }
 setInterval(() => { if (document.visibilityState === "visible" && (TAB !== "breadth")) fetchLive(); }, 3 * 60 * 1000);
@@ -1328,6 +1338,78 @@ function renderSetups(app) {
     <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.dvol == null ? "–" : r.dvol.toFixed(0)}</td><td class="num">${r.price?.toFixed(2) ?? "–"}</td>`, SETUP_SORT.e));
   sec3.append($(`<div class="note">Gap up 8–60% on 3× average volume that held +5% at the close; $5+ and $20M+ average dollar volume. A watch list, not a buy list: without checking the catalyst (earnings, news), these have faded on average in every breadth regime (see the table above). Stockbee's EPs need a real fundamental surprise.</div>`));
   app.append(sec3);
+}
+
+/* ---------- Trade Setups tab (breadth/tradesetups.py) ---------- */
+const ANG_LABEL = { ath: "ATH", pullback: "Pullback", rotation: "Rotation", coiled: "Coiled", burst: "Burst", antic: "Coil" };
+const ANG_TITLE = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", coiled: "Coiled Leader",
+  burst: "2LYNCH 5+ momentum burst today", antic: "Anticipation list (tight, quiet coil)" };
+function tsDownload(name, sections) {
+  const T = DATA.themes, tv = T.tv || {};
+  const clean = (s) => s.replace(/[,#\n]/g, " ").replace(/\s+/g, " ").trim();
+  const text = sections.filter(x => x.ticks.length).map(x => ["###" + clean(x.name), ...x.ticks.map(t => tv[t] || t)].join(",")).join(",");
+  const blob = new Blob([text], { type: "text/plain" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${name}-${T.date}.txt`;
+  document.body.append(a); a.click(); a.remove();
+}
+function renderTrades(app) {
+  const T = DATA.themes, X = T && T.trade_setups;
+  if (!X) { app.append($('<div class="card empty">Trade setups appear after the next data run.</div>')); return; }
+  app.append(liveBar());
+  const live = !!LIVE_T, asOf = longDate(T.date), now = T.regime_now || "mixed";
+  const REG = { strong: "Strong", mixed: "Mixed", weak: "Weak" };
+  const head = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+    <div><div class="kicker">Trade Setups · ${asOf} close</div>
+    <p style="margin:6px 0 0">The four trades we want in this market, top 5 each, ranked by the Leaders score. Breadth is <span class="regpill ${now}" style="font-size:13px">${REG[now] || now}</span> — size accordingly.</p></div>
+    <div class="tsbtns"><button class="tsall">⬇ All setups (TradingView)</button></div></div>
+    <div class="note">Badges show every buying angle a stock is on: the four setups, a 2LYNCH 5+ burst, the anticipation list. <b>Magnet</b> is the next old high above the price (52-week high, an older peak, or the all-time high) and how many ADRs away it is. ${X.ath_known < Object.keys(X.rows).length ? `All-time highs marked <i>52-wk</i> aren't verified yet: long history loads on the next morning run.` : ""}</div></section>`);
+  head.querySelector(".tsall").addEventListener("click", () => tsDownload("trade-setups", X.setups.map(s => ({ name: s.name, ticks: s.top }))));
+  app.append(head);
+  const mag = (r) => {
+    if (r.mag == null) return '<td class="num meta">–</td>';
+    const kind = r.mag_kind === "ATH" && !r.ath_ok ? "52-wk high" : r.mag_kind;
+    return `<td class="num magcell">${r.mag.toFixed(2)}<small>${kind} · ${pct(r.mag_pct)}${r.mag_adr != null ? ` · ${r.mag_adr} ADR` : ""}</small></td>`;
+  };
+  const athCell = (r) => `<td class="num magcell">${r.ath.toFixed(2)}<small>${r.ath_ok ? "all-time" : "52-wk (ATH unverified)"} · ${pct(r.ath_pct)}${r.ath_adr != null ? ` · ${r.ath_adr} ADR` : ""}</small></td>`;
+  const grpCell = (r) => `<td class="num">${Math.round(r.grp)}<small class="meta" style="display:block;font-size:11px">${r.rising ? "rising: " + esc(r.rising.replace(/^[A-Z &]+ - /, "")) : r.theme_str != null && r.theme_str >= r.sub_str ? "theme" : "sub-theme"}</small></td>`;
+  const angles = (r) => `<td class="l">${["ath", "pullback", "rotation", "coiled", "burst", "antic"].filter(k => r.angles.includes(k)).map(k => `<span class="ang on" title="${ANG_TITLE[k]}">${ANG_LABEL[k]}</span>`).join("")}<small class="meta" style="display:block">${r.hits} angle${r.hits > 1 ? "s" : ""}${r.leader ? " · Leaders top 10" : ""}</small></td>`;
+  const COLS = {
+    ath: [["mag", "ATH<small>distance</small>", athCell]],
+    pullback: [["e21", "vs 21 EMA", r => `<td class="num">${pct(r.e21)}</td>`], ["vdry", "Vol dry<small>5d ÷ 50d</small>", r => `<td class="num">${r.vdry?.toFixed(2) ?? "–"}</td>`]],
+    rotation: [["e21", "vs 21 EMA", r => `<td class="num">${pct(r.e21)}</td>`], ["rsr5", "RS Δ<small>5 days</small>", r => `<td class="num">${r.rsr5 == null ? "–" : (r.rsr5 > 0 ? "+" : "") + r.rsr5}</td>`]],
+    coiled: [["tight", "Tight<small>5d range ÷ ADR</small>", r => `<td class="num">${r.tight?.toFixed(2) ?? "–"}</td>`]],
+  };
+  X.setups.forEach(S => {
+    const rows = S.top.map((t, i) => ({ ...X.rows[t], n: i + 1 }));
+    const sec = $(`<section class="card tcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2>${S.name} <span class="meta">· ${S.count} qualify today${S.count > 5 ? ", showing the top 5" : ""}</span></h2>
+      <div class="tsbtns"><button>⬇ TradingView</button></div></div><p class="note" style="padding-top:0">${esc(S.desc)}</p></section>`);
+    sec.querySelector("button").addEventListener("click", () => tsDownload(S.key + "-" + S.name.toLowerCase().replace(/\s+/g, "-"), [{ name: S.name, ticks: S.top }]));
+    const extra = COLS[S.key] || [];
+    const cols = [{ k: "n", h: "#", asc: true }, { k: "t", h: "Ticker", l: true, asc: true }, { k: "hits", h: "Setups hit", l: true }, { k: "score", h: "Score" },
+      ...(live ? [{ k: null, h: "Now<small>live</small>" }] : []), { k: "rsr", h: "RS Rating" }, { k: "grp", h: "Group<small>Strength</small>" },
+      { k: "off_hi", h: "Off high<small>52-week</small>" }, ...extra.map(([k, h]) => ({ k, h })), ...(S.key === "ath" ? [] : [{ k: "mag_pct", h: "Magnet<small>next old high</small>", asc: true }]), { k: "adr", h: "ADR %" }];
+    UI.ts = UI.ts || {}; UI.ts[S.key] = UI.ts[S.key] || ["n", 1];
+    sec.append(listTable(rows, cols, r => `<td class="num">${r.n}</td>${nameCell(r)}${angles(r)}<td class="num"><b>${r.score.toFixed(1)}</b></td>${live ? nowCell(r) : ""}
+      <td class="num ${rsTint(r.rsr)}">${r.rsr}${r.star ? " ★" : ""}</td>${grpCell(r)}<td class="num">${pct(r.off_hi)}</td>${extra.map(x => x[2](r)).join("")}${S.key === "ath" ? "" : mag(r)}<td class="num">${r.adr?.toFixed(1) ?? "–"}</td>`, UI.ts[S.key]));
+    app.append(sec);
+  });
+  app.append(tsBacktest(T.trade_bt, now));
+}
+function tsBacktest(B, now) {
+  if (!B) return $('<div class="card empty">The setup backtest appears after the next data run.</div>');
+  const REG = { strong: "Strong", mixed: "Mixed", weak: "Weak", all: "All days" };
+  const cell = (o, k) => !o || !o.n ? `<td class="num meta ${k === now ? "nowcol" : ""}">–</td>` :
+    `<td class="num ${k === now ? "nowcol" : ""} ${o.avg_r >= 0.1 ? "g2" : o.avg_r > 0 ? "g1" : o.avg_r <= -0.1 ? "r2" : "r1"}"><b>${o.avg_r >= 0 ? "+" : ""}${o.avg_r.toFixed(2)}R</b> · ${Math.round(o.win * 100)}% win<br><span class="meta" style="font-size:11px">high ${Math.round(o.hit_hi * 100)}% · +1 ADR ${Math.round(o.hit_adr * 100)}% · n ${o.n}</span></td>`;
+  const rows = [["ath", "ATH Magnet"], ["pullback", "Leader Pullback"], ["rotation", "Rotation Rookie"], ["coiled", "Coiled Leader"]]
+    .map(([k, n]) => [n, B.setups[k], ""])
+    .concat([["Baseline: any stock within 3% of its high<small>no RS or theme filter: what ATH Magnet's filters add</small>", B.base_near, "basel"],
+      ["Baseline: any stock with RS 80+<small>sampled every 5th day</small>", B.base, "basel"],
+      ["On 1 setup", B.confluence["1"], "basel"], ["On 2+ setups at once<small>confluence</small>", B.confluence["2+"], "basel"]]);
+  return $(`<section class="card regcard"><div class="kicker">How these setups have traded · ${B.from} to ${B.to}</div>
+    <div class="scroll"><table class="grid btgrid regtab"><thead><tr><th class="l">Signal</th>${["strong", "mixed", "weak", "all"].map(k => `<th class="${k === now ? "nowcol" : ""}">${REG[k]}${k !== "all" ? " breadth" : ""}<small>${k === "all" ? "" : B.days[k] + " days"}${k === now ? " · today" : ""}</small></th>`).join("")}</tr></thead>
+    <tbody>${rows.map(([n, o, c]) => `<tr class="${c}"><td class="l">${n}</td>${["strong", "mixed", "weak", "all"].map(k => cell(o && o[k], k)).join("")}</tr>`).join("")}</tbody></table></div>
+    <div class="note" style="padding:8px 0 0">Every qualifying stock, not just the top 5. Each new signal (not on that list in the prior 5 sessions) is bought at the close with a stop 1 ADR below and sold at the close ${B.hold} sessions later; R = result ÷ that 1-ADR risk. <b>Hit high</b> = traded at or above its 52-week high within ${B.hold} sessions (the backtest can't see older all-time highs). <b>+1 ADR</b> = rallied one ADR above entry within ${B.hold} sessions — the move a short-dated option needs. No commissions, slippage or option pricing; small samples, especially in strong breadth. Past results, not a promise.</div></section>`);
 }
 
 /* ---------- Stocks tab ---------- */
