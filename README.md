@@ -47,6 +47,30 @@ daily from the same price data (no Apps Script, no GOOGLEFINANCE).
 - Rank movement (themes and stocks) is computed from stored history, so it
   works without daily snapshots.
 
+## Version-2 measures (RS Rating, Theme Strength, Setups)
+
+- **RS Rating (1–99)**: weighted 3/6/9/12-month return (40/20/20/20) ranked
+  against ~3,000 liquid US stocks; ★ RS line vs SPY at a 1-year high, ⚑ the same
+  while price is below its high. The sheet's 3-month % is kept as "3M %".
+- **Theme Strength (0–100)**: percentile composite across groups of median
+  relative performance vs SPY over 5–90 days (50%), share of members above
+  their 21/50-day EMAs (25%) and median RS Rating (25%); excludes today's move;
+  groups under 5 stocks are shrunk toward 50. Themes rank by Strength by
+  default; the sheet's Score /8 is one click away.
+- **Tightness**: ADR %, 5-day range in ADRs, NR7/inside days, volume dry-up,
+  distance from the 52-week high.
+- **Setups tab**: Momentum bursts (Stockbee 4% breakouts with a 2LYNCH
+  checklist), Anticipation (tight coils in leaders) and Episodic pivots, plus
+  a table of how each list has traded by breadth regime (recomputed daily).
+- `tools/evaluate.py` compares v2 and v1 on stored history (rank stability,
+  forward-return IC, list results).
+
+What the history showed (Feb–Oct 2026): Theme Strength ranks are far more
+stable than Score /8 (day-to-day rank correlation 0.96 vs 0.79), but neither
+predicted 10-day theme returns. Setups made money only in strong breadth
+(bursts +0.16R, anticipation +0.18R per trade) and lost in weak breadth;
+EPs without a catalyst check lost in every regime.
+
 ## Sub-themes and the Browse tab
 
 `data/subthemes.csv` (`group,subtheme,ticker`) puts every stock in exactly one

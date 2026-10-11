@@ -212,6 +212,40 @@ def test_end_to_end(tmp_path=None):
     return tmp
 
 
+
+def test_v2_measures():
+    from breadth import strength as S2
+    # RS Rating: breakpoints map raw scores onto 1-99
+    raw = pd.Series(np.linspace(-1, 1, 1001))
+    bp = S2.breakpoints(raw, pd.Series(True, index=raw.index))
+    r = S2.rate(np.array([-2.0, 0.0, 2.0, np.nan]), bp)
+    assert r[0] == 1 and r[2] == 99 and 45 <= r[1] <= 55 and np.isnan(r[3])
+    # Strength: small groups are pulled toward 50
+    inp = pd.DataFrame({"rel": [0.10, -0.10, 0.20], "part": [0.9, 0.1, 0.95], "lead": [90, 10, 95], "n": [10, 10, 1]},
+                       index=["big_strong", "big_weak", "tiny_strong"])
+    sc = S2.strength_scores(inp)
+    assert sc["big_strong"] > sc["big_weak"]
+    assert abs(sc["tiny_strong"] - 50) < abs(sc["big_strong"] - 50)
+    assert ((sc >= 0) & (sc <= 100)).all()
+
+
+def test_setup_masks():
+    from breadth import strength as S2, setups as SU
+    n, tick = 80, ["A", "B"]
+    dates = pd.bdate_range("2026-01-01", periods=n)
+    c = pd.DataFrame({"A": np.linspace(10, 14, n), "B": [10.0] * n}, index=dates)
+    c.iloc[-1, 0] = c.iloc[-2, 0] * 1.06            # A: +6% burst on the last day
+    w = {"c": c, "o": c * 0.995, "h": c * 1.01, "l": c * 0.99,
+         "v": pd.DataFrame(500_000.0, index=dates, columns=tick)}
+    w["v"].iloc[-1, 0] = 900_000                      # on rising volume
+    w["h"].iloc[-1, 0] = c.iloc[-1, 0] * 1.002        # closes near the high
+    t = S2.tightness(w)
+    liquid = pd.DataFrame(True, index=dates, columns=tick)
+    burst, checks, lynch, ep = SU.masks(w, t, liquid)
+    assert bool(burst.iloc[-1]["A"]) and not bool(burst.iloc[-1]["B"])
+    assert bool(checks["H"].iloc[-1]["A"])
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

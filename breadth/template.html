@@ -149,6 +149,22 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .r1 { background: color-mix(in srgb, var(--neg) var(--t1), transparent); }
 .r2 { background: color-mix(in srgb, var(--neg) var(--t2), transparent); }
 .r3 { background: color-mix(in srgb, var(--neg) var(--t3), transparent); font-weight: 600; }
+.sbar { display: inline-block; width: 54px; height: 6px; border-radius: 3px; background: var(--grid); vertical-align: middle; margin-right: 6px; overflow: hidden; }
+.sbar i { display: block; height: 100%; border-radius: 3px; }
+.sval { display: inline-block; min-width: 22px; text-align: right; }
+.bucket .bstr { white-space: nowrap; }
+.regcard { padding: 14px 16px; margin-bottom: 12px; }
+.regcard .kicker { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+.regcard .regnow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 6px 0 4px; }
+.regcard p { margin: 6px 0 10px; font-size: 14px; }
+.regpill { font-weight: 700; font-size: 15px; padding: 3px 12px; border-radius: 999px; }
+.regpill.strong { background: color-mix(in srgb, var(--good) 25%, transparent); }
+.regpill.mixed { background: color-mix(in srgb, var(--warning) 28%, transparent); }
+.regpill.weak { background: color-mix(in srgb, var(--critical) 25%, transparent); }
+@media (max-width: 520px) { .regtab td.l, .regtab th.l { position: static; min-width: 150px; } .regtab td { white-space: nowrap; } }
+.regtab th.nowcol { color: var(--text-primary); box-shadow: inset 0 -2px 0 var(--s1); }
+.ck { display: inline-block; width: 17px; height: 17px; line-height: 17px; text-align: center; border-radius: 4px; font-size: 10.5px; font-weight: 700; margin-right: 2px; background: var(--grid); color: var(--text-muted); }
+.ck.on { background: color-mix(in srgb, var(--pos) 35%, transparent); color: var(--text-primary); }
 /* ---------- browse ---------- */
 .browsebar { padding: 10px 14px; margin-bottom: 10px; }
 .browsebar .filters { justify-content: flex-start; }
@@ -165,7 +181,10 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .bucket .bret em { font-style: normal; font-family: Inter, system-ui, sans-serif; color: var(--text-muted); margin-right: 5px; font-size: 11px; }
 .bucket .bbody { border-top: 1px solid var(--grid); padding: 6px 0 4px; }
 /* ---------- tabs ---------- */
-.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 0 0 16px; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 0 0 16px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex: none; }
+@media (max-width: 520px) { .tabs button { padding: 8px 10px; font-size: 13.5px; } }
 .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer; }
 .tabs button[aria-selected="true"] { color: var(--text-primary); border-bottom-color: var(--s1); font-weight: 600; }
 .livebar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 9px 14px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); font-size: 13px; color: var(--text-secondary); }
@@ -252,7 +271,7 @@ const TONES = {
 };
 
 let TAB = "breadth";
-try { const h = location.hash.slice(1); if (["breadth", "themes", "browse", "stocks"].includes(h)) TAB = h; } catch (e) {}
+try { const h = location.hash.slice(1); if (["breadth", "themes", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
 
 function render() {
   const app = document.getElementById("app");
@@ -271,6 +290,7 @@ function render() {
     <button role="tab" data-tab="breadth">Breadth</button>
     <button role="tab" data-tab="themes">Themes</button>
     <button role="tab" data-tab="browse">Browse</button>
+    <button role="tab" data-tab="setups">Setups</button>
     <button role="tab" data-tab="stocks">Stocks</button></nav>`);
   app.append(tabs);
   const panel = $('<div class="panel"></div>');
@@ -281,6 +301,7 @@ function render() {
     if (TAB === "themes") renderThemes(panel);
     else if (TAB === "stocks") renderStocks(panel);
     else if (TAB === "browse") renderBrowse(panel);
+    else if (TAB === "setups") renderSetups(panel);
     else renderBreadth(panel);
   };
   tabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
@@ -675,9 +696,10 @@ function table(rows) {
 let LIVE = null;          // { fetched: Date, spyDate: "YYYY-MM-DD", spyTime: string, prices: {t: p} }
 let LIVE_ERR = null, LIVE_T = null, LIVE_BUSY = false;
 const UI = { hz: "short",
-  themes: { view: "theme", cls: "All", q: "", open: new Set(), sort: ["rank", 1] },
+  themes: { view: "theme", by: "strength", cls: "All", q: "", open: new Set(), sort: ["s_rank", 1] },
+  setups: { mine: "all", lynch: "5" },
   browse: { view: "theme", order: "rank", q: "", open: new Set(), all: false },
-  stocks: { tier: "All", theme: "", sub: "", q: "", limit: 100, sort: ["setup", -1] } };
+  stocks: { tier: "All", theme: "", sub: "", q: "", limit: 100, sort: ["rsr", -1] } };
 
 function parseLiveCSV(text) {
   const prices = {}; let spyTime = null;
@@ -706,7 +728,7 @@ async function fetchLive() {
     LIVE_T = liveActive() ? computeLive(DATA.themes, LIVE.prices, LIVE.spyDate) : null;
   } catch (e) { LIVE_ERR = String(e.message || e); }
   LIVE_BUSY = false;
-  if (TAB === "themes" || TAB === "stocks" || TAB === "browse") rerenderPanel();
+  if (TAB !== "breadth") rerenderPanel();
 }
 const liveActive = () => !!(LIVE && LIVE.spyDate && DATA.themes && LIVE.spyDate > DATA.themes.date);
 const getT = () => LIVE_T || DATA.themes;
@@ -814,8 +836,17 @@ function liveGroups(rows0, M, etfMap, bench) {
 function computeLive(T, prices, spyDate) {
   const { M, bad } = liveMetrics(T, prices);
   const bench = T.bench && T.bench.ticker ? M[T.bench.ticker] : null;
+  const ix = Object.fromEntries(T.ref_keys.map((k, i) => [k, i]));
+  const eod = Object.fromEntries(T.stocks.map(s => [s.t, s]));
+  for (const t in M) {
+    const r = liveRating(T, M[t], T.refs[t], ix);
+    const e = eod[t];
+    M[t].rsr = r ?? (e ? e.rsr : null);
+    if (e && e.rsr != null && e.rsr5 != null && r != null) M[t].rsr5 = r - (e.rsr - e.rsr5);
+  }
   const rows = liveGroups(T.themes, M, T.theme_etfs, bench);
   const subs = liveGroups(T.subthemes || [], M, null, bench);
+  liveStrength(rows, M, bench, T); liveStrength(subs, M, bench, T);
   const scoreOf = Object.fromEntries(rows.map(r => [r.theme, r.score]));
   const subScore = Object.fromEntries(subs.map(r => [r.theme, r.score]));
   let stocks = T.stocks.filter(s => M[s.t]).map(s => {
@@ -850,10 +881,10 @@ function rerenderPanel() {
   const panel = document.querySelector(".panel"); if (!panel) return;
   const y = window.scrollY; panel.innerHTML = "";
   if (TAB === "themes") renderThemes(panel); else if (TAB === "stocks") renderStocks(panel);
-  else if (TAB === "browse") renderBrowse(panel); else renderBreadth(panel);
+  else if (TAB === "browse") renderBrowse(panel); else if (TAB === "setups") renderSetups(panel); else renderBreadth(panel);
   window.scrollTo(0, y);
 }
-setInterval(() => { if (document.visibilityState === "visible" && (TAB === "themes" || TAB === "stocks" || TAB === "browse")) fetchLive(); }, 3 * 60 * 1000);
+setInterval(() => { if (document.visibilityState === "visible" && (TAB !== "breadth")) fetchLive(); }, 3 * 60 * 1000);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && LIVE && Date.now() - LIVE.fetched > 60000) fetchLive(); });
 
 /* =================== THEMES, SUB-THEMES, BROWSE & STOCKS =================== */
@@ -875,7 +906,7 @@ const retCell = (v, k) => `<td class="num ${tint(v, SCALE[k])}">${pct(v)}</td>`;
 const CLASS_COLOR = { STRONG: "var(--good)", WATCHLIST: "var(--warning)", WEAK: "var(--critical)" };
 const ROT = { "Early Rotation": "🌅 Early", "Mid Rotation": "🚀 Mid", "Late / Cooling": "🔻 Late / cooling", "Neutral": "⏸ Neutral" };
 const mvCell = (v) => v == null ? '<span class="mv">–</span>' : v === 0 ? '<span class="mv">·</span>'
-  : `<span class="mv ${v > 0 ? "up" : "dn"}">${v > 0 ? "▲" : "▼"}${Math.abs(v)}${Math.abs(v) >= 10 ? (v > 0 ? " 🔥" : " ❄️") : ""}</span>`;
+  : `<span class="mv ${v > 0 ? "up" : "dn"}">${v > 0 ? "▲" : "▼"}${Math.abs(Math.round(v))}${Math.abs(v) >= 10 ? (v > 0 ? " 🔥" : " ❄️") : ""}</span>`;
 const trailHTML = (tr) => `<span class="trail" title="Score over the last ${tr.length} days">${tr.map(v => v == null ? '<i style="height:2px;opacity:.3"></i>' : `<i style="height:${3 + v * 2}px;opacity:${0.35 + v * 0.08}"></i>`).join("")}</span>`;
 const badge = (r) => `<span class="badge" title="${r.class.toLowerCase()}"><i style="background:${CLASS_COLOR[r.class]}"></i><span class="num">${r.score}</span></span>`;
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -936,23 +967,33 @@ const stockMap = () => { const M = {}; (getT().stocks || []).forEach(s => { M[s.
 const stockCols = (ranks) => [
   { k: "t", h: "Ticker", l: true, asc: true },
   ...(ranks ? [{ k: "st_rk", h: "ST rank<small>in bucket</small>", asc: true }, { k: "lt_rk", h: "LT rank<small>in bucket</small>", asc: true }] : []),
-  { k: "setup", h: "Setup<small>/ 10</small>" }, { k: "rs", h: "RS<small>3-mo %</small>" },
-  { k: "rk", h: "RS rank<small>all stocks</small>", asc: true }, { k: "rk5", h: "Rank Δ<small>5 days</small>" },
+  { k: "rsr", h: "RS Rating<small>1–99</small>" }, { k: "rsr5", h: "RS Δ<small>5 days</small>" },
   ...hz().map(k => ({ k, h: HZ_LABEL[k] })), { k: "st", h: "ST score<small>5D score</small>" }, { k: "lt", h: "LT score" },
-  { k: "e8", h: "vs 8 EMA" }, { k: "e21", h: "vs 21 EMA" }, { k: "e50", h: "vs 50 EMA" }, { k: "price", h: "Price" },
+  { k: "adr", h: "ADR %<small>20-day</small>" }, { k: "tight", h: "Tight<small>5d range ÷ ADR</small>", asc: true },
+  { k: "vdry", h: "Vol dry<small>5d ÷ 50d</small>", asc: true }, { k: "off_hi", h: "Off high<small>52-week</small>" },
+  { k: "e8", h: "vs 8 EMA" }, { k: "e21", h: "vs 21 EMA" }, { k: "e50", h: "vs 50 EMA" },
+  { k: "rs", h: "3M %" }, { k: "setup", h: "Sheet setup<small>/ 10</small>" }, { k: "price", h: "Price" },
 ];
-// sub: "sub" shows the stock's sub-theme under its name, "themes" its themes, "both" both
+const rsTint = (v) => v == null ? "" : v >= 90 ? "g3" : v >= 80 ? "g2" : v >= 70 ? "g1" : v <= 20 ? "r2" : v <= 35 ? "r1" : "";
+const rsCell = (s) => `<td class="num ${rsTint(s.rsr)}">${s.rsr ?? "–"}${s.rs_lead ? ' <span title="RS line at a 1-year high while price is still below its high: relative strength leading price">⚑</span>' : s.rs_nh ? ' <span title="RS line (vs SPY) at a 1-year high">★</span>' : ""}</td>`;
+const tightCell = (v) => `<td class="num ${v == null ? "" : v <= 1.25 ? "g2" : v <= 1.5 ? "g1" : ""}">${v == null ? "–" : v.toFixed(2) + "×"}</td>`;
+const dryCell = (v) => `<td class="num ${v == null ? "" : v <= 0.6 ? "g2" : v <= 0.8 ? "g1" : v >= 1.5 ? "r1" : ""}">${v == null ? "–" : v.toFixed(2)}</td>`;
+// show: "sub" shows the stock's sub-theme under its name, "themes" its themes, "both" both
 function stockCells(s, show, ranks) {
   const ema = (v) => { const near = v != null && v >= -0.03 && v <= 0.01; return `<td class="num"${near ? ' style="font-weight:700" title="Within -3% to +1% of this EMA"' : ""}>${pct(v)}</td>`; };
-  const th = s.themes[0] + (s.themes.length > 1 ? ` +${s.themes.length - 1}` : "");
+  const th = (s.themes && s.themes[0] ? s.themes[0] : "") + (s.themes && s.themes.length > 1 ? ` +${s.themes.length - 1}` : "");
   const sub = show === "themes" ? th : show === "sub" ? (s.sub || "") : [s.sub, th].filter(Boolean).join(" · ");
   const rk = (v, n) => `<td class="num"><b>${v ?? "–"}</b><span class="meta">/${n}</span></td>`;
   return `<td class="l tname">${s.t}<small>${esc((s.name || "").slice(0, 26))}${sub ? (s.name ? " · " : "") + esc(sub) : ""}</small></td>
     ${ranks ? rk(s.st_rk, s._n) + rk(s.lt_rk, s._n) : ""}
-    <td><span class="tier ${s.tier}">${s.tier}</span> <span class="num">${s.setup}</span></td>
-    <td class="num ${tint(s.rs, SCALE.rs)}">${num(s.rs)}</td><td class="num">${s.rk ?? "–"}</td><td>${mvCell(s.rk5)}</td>
+    ${rsCell(s)}<td>${mvCell(s.rsr5)}</td>
     ${hz().map(k => retCell(s[k], k)).join("")}${retCell(s.st, "st")}${retCell(s.lt, "lt")}
-    ${ema(s.e8)}${ema(s.e21)}${ema(s.e50)}<td class="num">${s.price == null ? "–" : s.price.toFixed(2)}</td>`;
+    <td class="num">${s.adr == null ? "–" : s.adr.toFixed(1)}</td>${tightCell(s.tight)}${dryCell(s.vdry)}
+    <td class="num">${pct(s.off_hi)}</td>
+    ${ema(s.e8)}${ema(s.e21)}${ema(s.e50)}
+    <td class="num ${tint(s.rs, SCALE.rs)}">${num(s.rs)}</td>
+    <td><span class="tier ${s.tier}">${s.tier}</span> <span class="num">${s.setup}</span></td>
+    <td class="num">${s.price == null ? "–" : s.price.toFixed(2)}</td>`;
 }
 // A bucket's stock table: ST rank (by 5D score) and LT rank (by LT score) within
 // the bucket, 1 = strongest, as in the sheet's Theme Drill-Down. Sortable.
@@ -971,17 +1012,22 @@ function stockTable(list, show) {
   return el;
 }
 const groupRows = (T, view) => view === "sub" ? (T.subthemes || []) : T.themes;
+const strengthBar = (v) => v == null ? '<span class="meta">–</span>'
+  : `<span class="sbar" title="Strength ${v}"><i style="width:${Math.max(2, v)}%;background:${v >= 70 ? "var(--pos)" : v >= 40 ? "var(--text-muted)" : "var(--neg)"}"></i></span><span class="num sval">${Math.round(v)}</span>`;
 
 /* ---------- Themes tab ---------- */
 function renderThemes(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
-  const T = getT(), U = UI.themes, sub = U.view === "sub";
+  const T = getT(), U = UI.themes, sub = U.view === "sub", byS = U.by !== "score";
   app.append(liveBar());
   if (!sub) app.append(pulseCard(T));
   const H = hz(), vsK = UI.hz === "long" ? "vs_d90" : "vs_d30";
+  const rkK = byS ? "s_rank" : "rank", mvK = byS ? "s_mv5" : "mv5";
+  if (U.sort[0] === "rank" || U.sort[0] === "s_rank") U.sort[0] = rkK;
   const cols = [
-    { k: "theme", h: sub ? "Sub-theme" : "Theme", l: true, asc: true }, { k: "rank", h: "Rank", asc: true }, { k: "score", h: "Score<small>/ 8</small>" },
-    { k: "mv5", h: "Rank Δ<small>5 days</small>" }, { k: null, h: "Trail<small>30 days</small>" }, { k: "rotation", h: "Rotation", l: true, asc: true },
+    { k: "theme", h: sub ? "Sub-theme" : "Theme", l: true, asc: true }, { k: rkK, h: "Rank", asc: true },
+    { k: "strength", h: "Strength<small>0–100</small>" }, { k: "score", h: "Score<small>/ 8</small>" },
+    { k: mvK, h: "Rank Δ<small>5 days</small>" }, { k: null, h: `Trail<small>${byS ? "strength" : "score"}, 30 days</small>` }, { k: "rotation", h: "Rotation", l: true, asc: true },
     ...H.map(k => ({ k, h: HZ_LABEL[k] })), { k: "rs", h: "RS<small>3-mo %</small>" },
     { k: vsK, h: `vs SPY<small>${UI.hz === "long" ? "90D" : "30D"}</small>` }, { k: "st_b", h: "ST breadth" }, { k: "lt_b", h: "LT breadth" },
     ...(sub ? [] : [{ k: "etf_d5", h: "ETF<small>5D</small>" }]), { k: "n", h: "Stocks" },
@@ -992,12 +1038,13 @@ function renderThemes(app) {
     <div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>
     <div class="note">${sub ? "Sub-themes group stocks by what they actually sell, so names that move on the same news sit together even across themes. Each stock has one sub-theme; edit them in "
       + `<a href="${DATA.repo}/edit/main/data/subthemes.csv" target="_blank" rel="noopener">data/subthemes.csv</a>. Scored with the same rules as themes.`
-      : "Score: +1 each for positive average Today, 5D, 15D, 30D, RS and LT score; +1 if at least 50% of the theme's stocks are up today and over 5 days (ST breadth); +1 if at least 60% are up over 15 and 30 days (LT breadth). 7–8 strong, 4–6 watchlist, 0–3 weak."}
+      : "Strength (0–100): where the theme stands against all others on relative performance vs SPY over 5–90 days using the median stock (50%), the share of its stocks above their 21- and 50-day EMAs (25%), and the median RS Rating (25%). It leaves out today's move, so it changes gradually; buckets under 5 stocks are pulled toward 50. Score /8 (your sheet): +1 each for positive average Today, 5D, 15D, 30D, RS and LT score; +1 if at least 50% of the theme's stocks are up today and over 5 days (ST breadth); +1 if at least 60% are up over 15 and 30 days (LT breadth). 7–8 strong, 4–6 watchlist, 0–3 weak."}
     Rank Δ: places gained (▲) or lost (▼) in 5 days. Returns are equal-weighted averages; green and red get darker as the move gets bigger for that horizon.
     ${T.missing && T.missing.length && !sub ? `<br>Tickers with no data (check spelling or listing): ${T.missing.join(", ")}.` : ""}
     ${sub ? "" : `Edit themes in <a href="${DATA.repo}/edit/main/data/themes.csv" target="_blank" rel="noopener">data/themes.csv</a>.`}</div></section>`);
   const f = card.querySelector(".filters");
   f.append(chips("View", [["theme", "Themes"], ["sub", "Sub-themes"]], U, "view", () => { U.open.clear(); rerenderPanel(); }));
+  f.append(chips("Rank by", [["strength", "Rank by Strength"], ["score", "by Score /8"]], U, "by", () => { U.sort = [U.by === "score" ? "rank" : "s_rank", 1]; rerenderPanel(); }));
   f.append(chips("Class", [["All", "All"], ["STRONG", "Strong"], ["WATCHLIST", "Watchlist"], ["WEAK", "Weak"]], U, "cls", () => draw(current())));
   f.append(hzChips());
   const qi = $('<input type="search" placeholder="Search">'); qi.value = U.q; f.append(qi);
@@ -1009,8 +1056,9 @@ function renderThemes(app) {
     rows.forEach(r => {
       const small = sub ? `${esc(r.group)} · ${r.n} stocks` : `${r.etf ? r.etf + " · " : ""}${r.n} stocks`;
       const tr = $(`<table><tr class="trow${U.open.has(r.theme) ? " open" : ""}">
-        <td class="l tname">${esc(r.theme)}<small>${small}</small></td><td class="num">${r.rank}</td><td>${badge(r)}</td><td>${mvCell(r.mv5)}</td>
-        <td>${trailHTML(r.trail)}</td><td class="l">${ROT[r.rotation] || r.rotation}</td>
+        <td class="l tname">${esc(r.theme)}<small>${small}</small></td><td class="num">${r[rkK] ?? "–"}</td>
+        <td>${strengthBar(r.strength)}</td><td>${badge(r)}</td><td>${mvCell(r[mvK])}</td>
+        <td>${byS ? trailHTML((r.s_trail || []).map(v => v == null ? null : v / 12.5)) : trailHTML(r.trail)}</td><td class="l">${ROT[r.rotation] || r.rotation}</td>
         ${H.map(k => retCell(r[k], k)).join("")}<td class="num ${tint(r.rs, SCALE.rs)}">${num(r.rs)}</td>
         <td class="num ${tint(r[vsK], SCALE[vsK])}">${r[vsK] == null ? "–" : (r[vsK] > 0 ? "+" : "") + (r[vsK] * 100).toFixed(1) + " pts"}</td>
         <td class="num">${Math.round(r.st_b * 100)}% <span class="meta">${r.st_label}</span></td>
@@ -1053,7 +1101,7 @@ function renderBrowse(app) {
   app.append(bar);
   let groups = groupRows(T, U.view).slice();
   if (U.order === "az") groups.sort((a, b) => a.theme.localeCompare(b.theme));
-  else groups.sort((a, b) => a.rank - b.rank);
+  else groups.sort((a, b) => (a.s_rank ?? a.rank) - (b.s_rank ?? b.rank));
   const wrap = $('<div class="browse"></div>');
   app.append(wrap);
   const H = hz();
@@ -1070,8 +1118,8 @@ function renderBrowse(app) {
       shown++;
       const isOpen = U.all || U.open.has(g.theme) || (q && list.length <= 30);
       const d = $(`<details class="card bucket"${isOpen ? " open" : ""}>
-        <summary><span class="bname">${esc(g.theme)}<small>${sub ? esc(g.group) + " · " : ""}#${g.rank} · ${ROT[g.rotation] || g.rotation} · ${g.n} stocks</small></span>
-          ${badge(g)}<span class="bret">${H.map(k => `<span class="${tint(g[k], SCALE[k])}"><em>${HZ_LABEL[k]}</em>${pct(g[k])}</span>`).join("")}</span></summary>
+        <summary><span class="bname">${esc(g.theme)}<small>${sub ? esc(g.group) + " · " : ""}#${g.s_rank ?? g.rank} by strength · ${ROT[g.rotation] || g.rotation} · ${g.n} stocks</small></span>
+          <span class="bstr">${strengthBar(g.strength)}</span>${badge(g)}<span class="bret">${H.map(k => `<span class="${tint(g[k], SCALE[k])}"><em>${HZ_LABEL[k]}</em>${pct(g[k])}</span>`).join("")}</span></summary>
         <div class="bbody"></div></details>`);
       const body = d.querySelector(".bbody");
       const fill = () => { if (!body.childElementCount) body.append(stockTable(list, sub ? "themes" : "sub")); };
@@ -1091,6 +1139,127 @@ function renderBrowse(app) {
   drawAll();
 }
 
+/* ---------- v2 live: RS Rating and Theme Strength ---------- */
+function liveRating(T, m, r, ix) {
+  const bp = T.rs_bp; if (!bp || !bp.length) return null;
+  let num = 0, den = 0;
+  [["c63", 0.4], ["c126", 0.2], ["c189", 0.2], ["c252", 0.2]].forEach(([k, w]) => {
+    const c0 = ix[k] != null ? r[ix[k]] : null; if (!c0) return;
+    num += w * (m.price / c0 - 1); den += w;
+  });
+  if (!den || !r[ix.c63]) return null;
+  const raw = num / den;
+  let lo = 0, hi = bp.length;                 // count of breakpoints <= raw
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (bp[mid] <= raw) lo = mid + 1; else hi = mid; }
+  return Math.min(99, Math.max(1, lo));
+}
+function pctRank(vals) {                      // pandas rank(pct=True), NaN -> 0.5
+  const idx = vals.map((v, i) => [v, i]).filter(x => x[0] != null && isFinite(x[0])).sort((a, b) => a[0] - b[0]);
+  const out = vals.map(() => 0.5), n = idx.length;
+  for (let a = 0; a < n;) { let b = a; while (b + 1 < n && idx[b + 1][0] === idx[a][0]) b++;
+    const avg = (a + b) / 2 + 1; for (let k = a; k <= b; k++) out[idx[k][1]] = avg / n; a = b + 1; }
+  return out;
+}
+function liveStrength(rows, M, bench, T) {
+  const H = T.str_horizons || [[5, .15], [15, .2], [30, .25], [60, .2], [90, .2]], W = T.str_weights || { rel: .5, part: .25, lead: .25 };
+  const med = (a) => { const v = a.filter(x => x != null && isFinite(x)).sort((x, y) => x - y); if (!v.length) return null; const m = v.length >> 1; return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2; };
+  const inp = rows.map(r => {
+    const mem = r.members.filter(t => M[t]);
+    let rel = 0, ws = 0;
+    H.forEach(([n, w]) => { const md = med(mem.map(t => M[t]["d" + n])); const b = bench ? bench["d" + n] : null; if (md != null && b != null) { rel += w * (md - b); ws += w; } });
+    const part = mem.length ? (mem.filter(t => M[t].e21 > 0).length + mem.filter(t => M[t].e50 > 0).length) / (2 * mem.length) : null;
+    return { rel: ws ? rel / ws : null, part, lead: med(mem.map(t => M[t].rsr)), n: mem.length };
+  });
+  const pr = { rel: pctRank(inp.map(x => x.rel)), part: pctRank(inp.map(x => x.part)), lead: pctRank(inp.map(x => x.lead)) };
+  rows.forEach((r, i) => {
+    let s = 100 * (W.rel * pr.rel[i] + W.part * pr.part[i] + W.lead * pr.lead[i]);
+    const k = Math.min(1, inp[i].n / 5); s = 50 + (s - 50) * k;
+    r.strength = Math.round(s * 10) / 10; r.rel = inp[i].rel; r.part = inp[i].part; r.lead = inp[i].lead;
+  });
+  rows.slice().sort((a, b) => b.strength - a.strength).forEach((r, i) => {
+    r.s_rank = i + 1; r.s_mv5 = r.s_r_m4 != null ? r.s_r_m4 - r.s_rank : null;
+    r.s_trail = [...(r.s_trail || []).slice(1), Math.round(r.strength)];
+  });
+}
+
+/* ---------- Setups tab ---------- */
+const REG_LABEL = { strong: "Strong", mixed: "Mixed", weak: "Weak" };
+function regimeCard(T) {
+  const S = T.setup_stats, now = T.regime_now, last = DATA.rows[DATA.rows.length - 1];
+  if (!S) return $('<div class="card empty">Setup statistics will appear after the next data run.</div>');
+  const cell = (x) => !x || x.n === 0 ? '<td class="num meta">–</td>'
+    : `<td class="num ${x.avg_r >= 0.1 ? "g2" : x.avg_r > 0 ? "g1" : x.avg_r <= -0.1 ? "r2" : "r1"}"><b>${x.avg_r > 0 ? "+" : ""}${x.avg_r.toFixed(2)}R</b><span class="meta"> · ${Math.round(x.win * 100)}% win · ${x.n}</span></td>`;
+  const rows = [["bursts", "Momentum bursts (2LYNCH ≥ 5)"], ["anticipation", "Anticipation (tight coils)"], ["eps", "Episodic pivots"]];
+  const nowStats = (k) => S[k][now] || {};
+  const verdict = now === "strong" ? "Breadth is strong: this is when these setups have paid. Press momentum bursts and anticipation entries."
+    : now === "weak" ? "Breadth is weak: every list has lost money in this regime. Stand aside or trade very small; wait for a thrust."
+    : `Breadth is mixed: momentum bursts have been marginal (${(nowStats("bursts").avg_r ?? 0) >= 0 ? "+" : ""}${(nowStats("bursts").avg_r ?? 0).toFixed(2)}R a trade) and anticipation has lost money. Be very selective and size down until breadth turns strong.`;
+  return $(`<section class="card regcard">
+    <div class="kicker">Breadth regime for setups</div>
+    <div class="regnow"><span class="regpill ${now}">${REG_LABEL[now] || "–"}</span>
+      <span class="meta">5-day ratio ${fmt(last.ratio5, 2)} · 10-day ratio ${fmt(last.ratio10, 2)} — strong = both ≥ 1.5, weak = 10-day under 1</span></div>
+    <p>${verdict}</p>
+    <div class="scroll"><table class="grid regtab"><thead><tr><th class="l">How each list has traded since ${S.from}</th>
+      ${["strong", "mixed", "weak"].map(k => `<th class="${k === now ? "nowcol" : ""}">${REG_LABEL[k]} breadth<small>${S.days[k]} days${k === now ? " · today" : ""}</small></th>`).join("")}<th>All days</th></tr></thead>
+      <tbody>${rows.map(([k, nm]) => `<tr><td class="l">${nm}</td>${["strong", "mixed", "weak", "all"].map(r => cell(S[k][r])).join("")}</tr>`).join("")}</tbody></table></div>
+    <div class="note" style="padding:8px 0 0">Average result per trade in R (multiples of the risk taken), win rate and number of trades. Bursts and EPs: buy the close of the signal day, stop at that day's low, sell after 3 days (EPs 5). Anticipation: buy stop just above the 5-day high within 5 days, stop at the 5-day low, sell 3 days after entry. No commissions or slippage; past results, not a promise.</div>
+  </section>`);
+}
+function listTable(rows, cols, cellFn, state) {
+  const el = $(`<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>`);
+  const body = el.querySelector("tbody");
+  const draw = (rs) => { body.innerHTML = rs.length ? rs.map(r => `<tr>${cellFn(r)}</tr>`).join("") : `<tr><td class="l meta" colspan="${cols.length}">Nothing on this list today.</td></tr>`; };
+  const current = sortable(el.querySelector("table"), cols, () => rows, draw, state);
+  draw(current());
+  return el;
+}
+const nameCell = (r) => `<td class="l tname">${r.t}<small>${esc((r.name || "").slice(0, 26))}${r.sub ? " · " + esc(r.sub) : r.theme ? " · " + esc(r.theme) : ""}</small></td>`;
+const nowCell = (r) => { const p = LIVE_T && LIVE && LIVE.prices[r.t]; if (!p || !r.price) return '<td class="num meta">–</td>'; const v = p / r.price - 1; return Math.abs(v) > 0.5 ? '<td class="num meta">–</td>' : retCell(v, "today"); };
+const SETUP_SORT = { b: ["lynch", -1], a: ["tight", 1], e: ["days", 1] };
+function renderSetups(app) {
+  if (!DATA.themes || !DATA.themes.lists) { app.append($('<div class="card empty">Setup lists appear after the next data run.</div>')); return; }
+  const T = getT(), L = DATA.themes.lists, U = UI.setups, M = stockMap();
+  app.append(liveBar());
+  app.append(regimeCard(DATA.themes));
+  const bar = $('<section class="card browsebar"><div class="filters"></div></section>');
+  bar.querySelector(".filters").append(chips("Universe", [["all", "Whole market"], ["mine", "Only my themes"]], U, "mine", rerenderPanel));
+  bar.querySelector(".filters").append(chips("2LYNCH", [["5", "2LYNCH 5+"], ["4", "4+"], ["0", "All 4% bursts"]], U, "lynch", rerenderPanel));
+  app.append(bar);
+  const mine = (r) => U.mine !== "mine" || !!(r.theme || r.sub);
+  const fresh = (r) => ({ ...r, rsr: (M[r.t] && M[r.t].rsr) ?? r.rsr });
+  const asOf = longDate(DATA.themes.date);
+  const live = !!LIVE_T;
+  // Momentum bursts
+  const chk = (c) => ["2", "L", "Y", "N", "C", "H"].map(k => `<span class="ck ${c[k] ? "on" : ""}" title="${{ 2: "Not up 2 days in a row before", L: "Orderly prior trend", Y: "Young: few prior bursts", N: "Narrow range or down day before", C: "Tight, quiet consolidation before", H: "Closed near the high" }[k]}">${k}</span>`).join("");
+  const b = L.bursts.filter(r => mine(r) && r.lynch >= +U.lynch).map(fresh);
+  const bc = [{ k: "t", h: "Ticker", l: true, asc: true }, { k: "lynch", h: "2LYNCH<small>checks met</small>" }, { k: "chg", h: "Day %" }, ...(live ? [{ k: null, h: "Now<small>live</small>" }] : []),
+    { k: "rsr", h: "RS Rating" }, { k: "vx", h: "Volume<small>× 50d avg</small>" }, { k: "adr", h: "ADR %" }, { k: "off_hi", h: "Off high" }, { k: "dvol", h: "$ vol<small>50d, $M</small>" }, { k: "price", h: "Price" }];
+  const sec1 = $(`<section class="card tcard"><div class="head"><h2>Momentum bursts <span class="meta">· ${b.length} of ${L.counts.bursts} stocks up 4%+ on rising volume, ${asOf} close</span></h2></div></section>`);
+  sec1.append(listTable(b, bc, r => `${nameCell(r)}<td><span class="num"><b>${r.lynch}</b>/6</span> ${chk(r.checks)}</td>${retCell(r.chg, "today")}${live ? nowCell(r) : ""}
+    <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.vx == null ? "–" : r.vx.toFixed(1) + "×"}</td><td class="num">${r.adr == null ? "–" : r.adr.toFixed(1)}</td>
+    <td class="num">${pct(r.off_hi)}</td><td class="num">${r.dvol == null ? "–" : r.dvol.toFixed(0)}</td><td class="num">${r.price?.toFixed(2) ?? "–"}</td>`, SETUP_SORT.b));
+  sec1.append($(`<div class="note">Stockbee's 4% breakout: close up 4%+ on volume above the prior day (100k+), price $3+. 2LYNCH checks: <b>2</b> not up two days in a row before, <b>L</b> orderly trend (above a rising 20-day EMA that's above the 50-day), <b>Y</b> young (at most one other burst in 20 days), <b>N</b> narrow range or down day before, <b>C</b> tight, quiet consolidation before, <b>H</b> closed in the top 30% of the day's range. Bursts meeting 5+ checks have done clearly better than those that don't.</div>`));
+  app.append(sec1);
+  // Anticipation
+  const a = L.anticipation.filter(mine).map(fresh);
+  const ac = [{ k: "t", h: "Ticker", l: true, asc: true }, { k: "tight", h: "Tight<small>5d range ÷ ADR</small>", asc: true }, { k: "vdry", h: "Vol dry<small>5d ÷ 50d</small>", asc: true },
+    { k: null, h: "Trigger" }, ...(live ? [{ k: null, h: "Now<small>live</small>" }] : []), { k: "rsr", h: "RS Rating" }, { k: "adr", h: "ADR %" }, { k: "off_hi", h: "Off high" }, { k: "dvol", h: "$ vol<small>50d, $M</small>" }, { k: "price", h: "Price" }];
+  const sec2 = $(`<section class="card tcard"><div class="head"><h2>Anticipation <span class="meta">· ${a.length} tight, quiet coils in leaders, ${asOf} close</span></h2></div></section>`);
+  sec2.append(listTable(a, ac, r => `${nameCell(r)}${tightCell(r.tight)}${dryCell(r.vdry)}<td>${[r.nr7 ? "NR7" : "", r.inside ? "Inside day" : "", (r.vdry ?? 9) <= 0.7 ? "Vol dry-up" : ""].filter(Boolean).join(" · ")}</td>${live ? nowCell(r) : ""}
+    <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.adr == null ? "–" : r.adr.toFixed(1)}</td><td class="num">${pct(r.off_hi)}</td><td class="num">${r.dvol == null ? "–" : r.dvol.toFixed(0)}</td><td class="num">${r.price?.toFixed(2) ?? "–"}</td>`, SETUP_SORT.a));
+  sec2.append($(`<div class="note">RS Rating 85+, within 10% of the 52-week high, above a rising 50-day EMA, ADR 4%+, last 5 days' range at most 1.5× ADR, plus an NR7, inside day or volume dry-up (5-day under 70% of 50-day). The idea is to buy the breakout from the coil (above the 5-day high) with a stop under it.</div>`));
+  app.append(sec2);
+  // EPs
+  const e = L.eps.filter(mine).map(fresh);
+  const ec = [{ k: "t", h: "Ticker", l: true, asc: true }, { k: "days", h: "When", asc: true }, { k: "gap", h: "Gap" }, { k: "vx", h: "Volume<small>× 50d avg</small>" }, { k: "since", h: "Since EP<small>close to close</small>" },
+    ...(live ? [{ k: null, h: "Now<small>live</small>" }] : []), { k: "rsr", h: "RS Rating" }, { k: "dvol", h: "$ vol<small>50d, $M</small>" }, { k: "price", h: "Price" }];
+  const sec3 = $(`<section class="card tcard"><div class="head"><h2>Episodic pivots <span class="meta">· ${e.length} in the last 5 sessions</span></h2></div></section>`);
+  sec3.append(listTable(e, ec, r => `${nameCell(r)}<td class="num">${r.days === 0 ? "Last session" : r.days + "d ago"}<small class="meta"> ${r.date.slice(5)}</small></td>${retCell(r.gap, "d5")}<td class="num">${r.vx == null ? "–" : r.vx.toFixed(1) + "×"}</td>${retCell(r.since, "d5")}${live ? nowCell(r) : ""}
+    <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.dvol == null ? "–" : r.dvol.toFixed(0)}</td><td class="num">${r.price?.toFixed(2) ?? "–"}</td>`, SETUP_SORT.e));
+  sec3.append($(`<div class="note">Gap up 8–60% on 3× average volume that held +5% at the close; $5+ and $20M+ average dollar volume. A watch list, not a buy list: without checking the catalyst (earnings, news), these have faded on average in every breadth regime (see the table above). Stockbee's EPs need a real fundamental surprise.</div>`));
+  app.append(sec3);
+}
+
 /* ---------- Stocks tab ---------- */
 function renderStocks(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Stock data isn\'t available yet. It appears after the next data run.</div>')); return; }
@@ -1102,17 +1271,19 @@ function renderStocks(app) {
     <div class="filters"></div></div>
     <div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>
     <div class="more-row"></div>
-    <div class="note">Under each ticker: company · sub-theme · strongest theme. Setup score (/10, from your sheet): theme strength (0–2), trend: 15D and 30D up, RS and LT positive (0–2), within −3% to +1% of the 8 or 21 EMA (2, shown in bold), up today (1), resting: 5D under 2% after 15D and 30D gains over 5% (1), positive RS (1), coiling (1). A-tier 8+, B-tier 5–7.
-    RS is the % change over about 3 months (63 trading days). RS rank is among all stocks here; Rank Δ is places gained (▲) or lost (▼) in 5 days, with 🔥/❄️ for 10+.</div></section>`);
+    <div class="note">Under each ticker: company · sub-theme · strongest theme.
+    <b>RS Rating</b> (1–99): weighted 3/6/9/12-month performance (40/20/20/20) ranked against ~3,000 liquid US stocks; ★ = RS line vs SPY at a 1-year high, ⚑ = that while price is still below its high (strength leading price). RS Δ = change over 5 days.
+    <b>Tightness</b>: ADR % = average daily range; Tight = last 5 days' range in ADRs (under 1.5× is a tight coil); Vol dry = 5-day ÷ 50-day volume (under 0.8 is drying up); Off high = distance from the 52-week high. Bold EMA distances are within −3% to +1%.
+    3M % and Sheet setup are your sheet's original RS and setup score, kept for comparison.</div></section>`);
   const f = card.querySelector(".filters");
-  f.append(chips("Tier", [["All", "All tiers"], ["A", "A-tier"], ["B", "B-tier"], ["C", "C-tier"]], U, "tier", () => { U.limit = 100; draw(current()); }));
+  f.append(chips("RS", [["All", "All"], ["80", "RS 80+"], ["90", "RS 90+"]], U, "tier", () => { U.limit = 100; draw(current()); }));
   f.append(hzChips());
   const sel = $(`<select aria-label="Theme"><option value="">All themes</option>${themesList.map(t => `<option>${esc(t)}</option>`).join("")}</select>`); sel.value = U.theme; f.append(sel);
   const sel2 = $(`<select aria-label="Sub-theme"><option value="">All sub-themes</option>${subList.map(t => `<option>${esc(t)}</option>`).join("")}</select>`); sel2.value = U.sub || ""; f.append(sel2);
   const qi = $('<input type="search" placeholder="Search ticker or name">'); qi.value = U.q; f.append(qi);
   app.append(card);
   const body = card.querySelector("tbody"), moreRow = card.querySelector(".more-row");
-  const filtered = () => T.stocks.filter(s => (U.tier === "All" || s.tier === U.tier) && (!U.theme || s.themes.includes(U.theme))
+  const filtered = () => T.stocks.filter(s => (U.tier === "All" || (s.rsr ?? 0) >= +U.tier) && (!U.theme || s.themes.includes(U.theme))
     && (!U.sub || s.sub === U.sub) && (!U.q || s.t.toLowerCase().startsWith(U.q) || (s.name || "").toLowerCase().includes(U.q)));
   const draw = (rows) => {
     body.innerHTML = rows.slice(0, U.limit).map(s => `<tr>${stockCells(s, "both")}</tr>`).join("");

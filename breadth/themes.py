@@ -296,13 +296,37 @@ def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=No
 
     # Live layer: for a new session N, an N-day return = live / close[last+1-N] - 1
     offs = {"c1": 0, "c3": 2, "c5": 4, "c15": 14, "c20": 19, "c30": 29, "c63": RS_DAYS - 1,
-            "c60": 59, "c90": 89, "c180": 179}
+            "c60": 59, "c90": 89, "c180": 179, "c126": 125, "c189": 188, "c252": 251}
     refs = {}
     for t in cols:
         if pd.isna(f["close"].iloc[last][t]):
             continue
         refs[t] = [_r(f["close"].iloc[last - o][t], 4) if last - o >= 0 else None for o in offs.values()] + \
                   [_r(f[f"ema{n}"].iloc[last][t], 4) for n in (8, 21, 50)]
+    # ---- version-2 measures: RS Rating, Theme Strength, tightness, setup lists ----
+    v2 = None
+    try:
+        from . import strength as S2
+        sub_mem = {}
+        if subthemes_df is not None and not subthemes_df.empty:
+            for r_ in subthemes_df.itertuples():
+                sub_mem.setdefault(r_.subtheme, []).append(r_.ticker)
+        v2 = S2.build_v2(adjusted, universe, members, sub_mem, names, set(cols))
+        for rows_, key in ((theme_rows, "themes"), (sub_rows, "subthemes")):
+            for r_ in rows_:
+                r_.update(v2[key].get(r_["theme"], {}))
+        for s_ in stocks:
+            s_.update(v2["tickers"].get(s_["t"], {}))
+        tag = {}
+        for s_ in stocks:
+            tag[s_["t"]] = {"sub": s_.get("sub"), "theme": s_["themes"][0] if s_["themes"] else None}
+        for lst in v2["lists"].values():
+            if isinstance(lst, list):
+                for r_ in lst:
+                    r_.update(tag.get(r_["t"], {}))
+    except Exception as e:  # keep the v1 dashboard working whatever happens
+        import logging
+        logging.getLogger("breadth").exception("v2 measures failed: %s", e)
     pulse_hist = [{"date": dates[i].strftime("%Y-%m-%d"), **{k: v for k, v in pulse(tables[i]).items() if k in ("long", "short")}}
                   for i in hist_idx]
     return {
@@ -312,6 +336,10 @@ def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=No
         "bench": {"ticker": bench, **{k: _r(v) for k, v in bret.items()}},
         "themes": theme_rows, "subthemes": sub_rows, "stocks": stocks, "horizons": SHOW,
         "refs": refs, "ref_keys": list(offs) + ["ema8", "ema21", "ema50"],
+        "rs_bp": v2["rs_bp"] if v2 else [], "lists": v2["lists"] if v2 else None,
+        "setup_stats": v2.get("setup_stats") if v2 else None, "regime_now": v2.get("regime_now") if v2 else None,
+        "str_weights": {"rel": 0.5, "part": 0.25, "lead": 0.25},
+        "str_horizons": [[5, 0.15], [15, 0.20], [30, 0.25], [60, 0.20], [90, 0.20]],
         "theme_etfs": {th: e for th, e in etfs.items()},
         "missing": [m for m in missing if m in all_t],
         "counts": {"themes": len(theme_rows), "subthemes": len(sub_rows), "stocks": len(stocks)},
