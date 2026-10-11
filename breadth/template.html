@@ -1357,8 +1357,8 @@ function renderSetups(app) {
 }
 
 /* ---------- Trade Setups tab (breadth/tradesetups.py) ---------- */
-const ANG_LABEL = { ath: "ATH", pullback: "Pullback", rotation: "Rotation", coiled: "Coiled", burst: "Burst", antic: "Coil" };
-const ANG_TITLE = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", coiled: "Coiled Leader",
+const ANG_LABEL = { ath: "ATH", pullback: "Pullback", rotation: "Rotation", kq: "Q-Flag", vcp: "VCP", burst: "Burst", antic: "Coil" };
+const ANG_TITLE = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP",
   burst: "2LYNCH 5+ momentum burst today", antic: "Anticipation list (tight, quiet coil)" };
 function tsDownload(name, sections) {
   const T = DATA.themes, tv = T.tv || {};
@@ -1398,12 +1398,17 @@ function renderTrades(app) {
   };
   const athCell = (r) => `<td class="num magcell">${r.ath.toFixed(2)}<small>${r.ath_ok ? "all-time" : "52-wk (ATH unverified)"} · ${pct(r.ath_pct)}${r.ath_adr != null ? ` · ${r.ath_adr} ADR` : ""}</small></td>`;
   const grpCell = (r) => `<td class="num">${Math.round(r.grp)}<small class="meta" style="display:block;font-size:11px">${r.rising ? "rising: " + esc(r.rising.replace(/^[A-Z &]+ - /, "")) : r.theme_str != null && r.theme_str >= r.sub_str ? "theme" : "sub-theme"}</small></td>`;
-  const angles = (r) => `<td class="l">${["ath", "pullback", "rotation", "coiled", "burst", "antic"].filter(k => r.angles.includes(k)).map(k => `<span class="ang on" title="${ANG_TITLE[k]}">${ANG_LABEL[k]}</span>`).join("")}<small class="meta" style="display:block">${r.hits} angle${r.hits > 1 ? "s" : ""}${r.leader ? " · Leaders top 10" : ""}</small></td>`;
+  const angles = (r) => `<td class="l">${["ath", "pullback", "rotation", "kq", "vcp", "burst", "antic"].filter(k => r.angles.includes(k)).map(k => `<span class="ang on" title="${ANG_TITLE[k]}">${ANG_LABEL[k]}</span>`).join("")}<small class="meta" style="display:block">${r.hits} angle${r.hits > 1 ? "s" : ""}${r.leader ? " · Leaders top 10" : ""}</small></td>`;
   const COLS = {
     ath: [["mag", "ATH<small>distance</small>", athCell]],
     pullback: [["e21", "vs 21 EMA", r => `<td class="num">${pct(r.e21)}</td>`], ["vdry", "Vol dry<small>5d ÷ 50d</small>", r => `<td class="num">${r.vdry?.toFixed(2) ?? "–"}</td>`]],
     rotation: [["e21", "vs 21 EMA", r => `<td class="num">${pct(r.e21)}</td>`], ["rsr5", "RS Δ<small>5 days</small>", r => `<td class="num">${r.rsr5 == null ? "–" : (r.rsr5 > 0 ? "+" : "") + r.rsr5}</td>`]],
-    coiled: [["tight", "Tight<small>5d range ÷ ADR</small>", r => `<td class="num">${r.tight?.toFixed(2) ?? "–"}</td>`]],
+    kq: [["kq_leg", "Prior leg<small>60 days</small>", r => `<td class="num">${r.kq_leg == null ? "–" : "+" + r.kq_leg + "%"}${r.htf ? ' <span class="ang on" title="High tight flag: 90%+ leg">HTF</span>' : ""}</td>`],
+         ["kq_rng10", "Flag range<small>10d, in ATRs</small>", r => `<td class="num">${r.kq_rng10 ?? "–"}</td>`],
+         ["kq_pivot", "Trigger<small>break of 5-day high</small>", r => `<td class="num">${r.kq_pivot?.toFixed(2) ?? "–"}<small class="meta" style="display:block;font-size:11px">stop: entry-day low</small></td>`]],
+    vcp: [["vcp_r10", "Contraction<small>10d / 20d / 40d range</small>", r => `<td class="num">${[r.vcp_r10, r.vcp_r20, r.vcp_r40].map(x => x == null ? "–" : Math.round(x * 100) + "%").join(" / ")}</td>`],
+          ["vdry", "Vol dry<small>5d ÷ 50d</small>", r => `<td class="num">${r.vdry?.toFixed(2) ?? "–"}</td>`],
+          ["vcp_pivot", "Pivot<small>10-day high</small>", r => `<td class="num">${r.vcp_pivot?.toFixed(2) ?? "–"}<small class="meta" style="display:block;font-size:11px">stop ${r.vcp_stop?.toFixed(2) ?? "–"} (${r.vcp_pivot ? pct(r.vcp_stop / r.vcp_pivot - 1) : "–"})</small></td>`]],
   };
   const PR = Object.fromEntries(((T.playbook || {}).rows || []).map(r => [r.key, r]));
   X.setups.slice().sort((a, b) => ((PR[a.key] || {}).rank || 9) - ((PR[b.key] || {}).rank || 9)).forEach(S => {
@@ -1419,6 +1424,7 @@ function renderTrades(app) {
     UI.ts = UI.ts || {}; UI.ts[S.key] = UI.ts[S.key] || ["n", 1];
     sec.append(listTable(rows, cols, r => `<td class="num">${r.n}</td>${nameCell(r)}${angles(r)}<td class="num"><b>${r.score.toFixed(1)}</b></td>${live ? nowCell(r) : ""}
       <td class="num ${rsTint(r.rsr)}">${r.rsr}${r.star ? " ★" : ""}</td>${grpCell(r)}<td class="num">${pct(r.off_hi)}</td>${extra.map(x => x[2](r)).join("")}${S.key === "ath" ? "" : mag(r)}<td class="num">${r.adr?.toFixed(1) ?? "–"}</td>`, UI.ts[S.key]));
+    if (S.key === "kq" && (X.kq_ondeck || []).length) sec.append($(`<div class="note">On deck — extended, wait for a flag to form: ${X.kq_ondeck.map(r => `<b>${r.t}</b> <span class="meta">(+${r.leg}% leg, ${r.ext} ATR above the 20-day)</span>`).join(", ")}</div>`));
     app.append(sec);
   });
   app.append(tsBacktest(T.trade_bt, (T.playbook && T.playbook.state) || now));
@@ -1442,15 +1448,17 @@ function tsBacktest(B, now) {
   const REG = { thrust: "After a thrust", strong: "Strong", mixed: "Mixed", weak: "Weak", all: "All days" };
   const cell = (o, k) => !o || !o.n ? `<td class="num meta ${k === now ? "nowcol" : ""}">–</td>` :
     `<td class="num ${k === now ? "nowcol" : ""} ${o.avg_r >= 0.1 ? "g2" : o.avg_r > 0 ? "g1" : o.avg_r <= -0.1 ? "r2" : "r1"}"><b>${o.avg_r >= 0 ? "+" : ""}${o.avg_r.toFixed(2)}R</b> · ${Math.round(o.win * 100)}% win<br><span class="meta" style="font-size:11px">high ${Math.round(o.hit_hi * 100)}% · +1 ADR ${Math.round(o.hit_adr * 100)}% · n ${o.n}</span></td>`;
-  const rows = [["ath", "ATH Magnet"], ["pullback", "Leader Pullback"], ["rotation", "Rotation Rookie"], ["coiled", "Coiled Leader"]]
+  const rows = [["ath", "ATH Magnet"], ["pullback", "Leader Pullback"], ["rotation", "Rotation Rookie"],
+      ["kq", "Qullamaggie Flag<small>trail 10 EMA</small>"], ["vcp", "Minervini VCP<small>hold above the 50-day</small>"]]
     .map(([k, n]) => [n, B.setups[k], ""])
+    .concat(B.kq_trail20 ? [["Qullamaggie Flag, 20 EMA trail<small>same entries, looser trail</small>", B.kq_trail20, "basel"]] : [])
     .concat([["Baseline: any stock within 3% of its high<small>no RS or theme filter: what ATH Magnet's filters add</small>", B.base_near, "basel"],
       ["Baseline: any stock with RS 80+<small>sampled every 5th day</small>", B.base, "basel"],
       ["On 1 setup", B.confluence["1"], "basel"], ["On 2+ setups at once<small>confluence</small>", B.confluence["2+"], "basel"]]);
   return $(`<section class="card regcard"><div class="kicker">How these setups have traded · ${B.from} to ${B.to}</div>
     <div class="scroll"><table class="grid btgrid regtab"><thead><tr><th class="l">Signal</th>${["thrust", "strong", "mixed", "weak", "all"].map(k => `<th class="${k === now ? "nowcol" : ""}">${REG[k]}${["strong", "mixed", "weak"].includes(k) ? " breadth" : ""}<small>${k === "all" ? "" : (B.days[k] ?? "–") + (k === "thrust" ? " sessions after" : " days")}${k === now ? " · today" : ""}</small></th>`).join("")}</tr></thead>
     <tbody>${rows.map(([n, o, c]) => `<tr class="${c}"><td class="l">${n}</td>${["thrust", "strong", "mixed", "weak", "all"].map(k => cell(o && o[k], k)).join("")}</tr>`).join("")}</tbody></table></div>
-    <div class="note" style="padding:8px 0 0">Every qualifying stock, not just the top 5. Each new signal (not on that list in the prior 5 sessions) is bought at the close with a stop 1 ADR below and sold at the close ${B.hold} sessions later; R = result ÷ that 1-ADR risk. <b>Hit high</b> = traded at or above its 52-week high within ${B.hold} sessions (the backtest can't see older all-time highs). <b>+1 ADR</b> = rallied one ADR above entry within ${B.hold} sessions — the move a short-dated option needs. <b>After a thrust</b> = the 25 sessions after a major Breadth thrust or Follow-through (overlaps the regime columns). No commissions, slippage or option pricing; small samples, especially in strong breadth and after thrusts. Past results, not a promise.</div></section>`);
+    <div class="note" style="padding:8px 0 0">Every qualifying stock, not just the top 5; each new signal (not on that list in the prior 5 sessions) counts once. ATH Magnet, Pullback and Rotation: buy the close, stop 1 ADR below, sell ${B.hold} sessions later. ${B.exits ? `Qullamaggie Flag: ${B.exits.kq}. Minervini VCP: ${B.exits.vcp} (the backtest uses a 100/150-day template, since only a year of bars is stored).` : ""} R = result ÷ the risk to the stop. <b>Hit high</b> = traded at or above its 52-week high within ${B.hold} sessions (the backtest can't see older all-time highs). <b>+1 ADR</b> = rallied one ADR above entry within ${B.hold} sessions — the move a short-dated option needs. <b>After a thrust</b> = the 25 sessions after a major Breadth thrust or Follow-through (overlaps the regime columns). No commissions, slippage or option pricing; small samples, especially in strong breadth and after thrusts. Past results, not a promise.</div></section>`);
 }
 
 /* ---------- Stocks tab ---------- */

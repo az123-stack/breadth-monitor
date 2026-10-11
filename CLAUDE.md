@@ -31,7 +31,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - `strength.py` v2: RS Rating, RS-line ★/⚑ flags, tightness, Theme Strength
 - `setups.py` momentum bursts (2LYNCH), anticipation, episodic pivots, regime trade stats
 - `leaders.py` Leaders ranking → `DATA.themes.leaders`; Setups tab "Leaders" panel (Top 10 / One per group), recomputed live in the browser by `leadersJS`
-- `tradesetups.py` Trade Setups tab: ATH Magnet, Leader Pullback, Rotation Rookie, Coiled Leader (top 5 each by Leaders score,
+- `tradesetups.py` Trade Setups tab: ATH Magnet, Leader Pullback, Rotation Rookie, Qullamaggie Flag, Minervini VCP (top 5 each by Leaders score;
+  Q-Flag by flag tightness, VCP by contraction;
   "setups hit" angles, magnet levels) → `DATA.themes.trade_setups`; backtest of every setup + confluence → `DATA.themes.trade_bt`
 - `review.py` "⚑ Review setups" flag (header button + card on Trade Setups) → `DATA.themes.setup_review`; checks regime change
   (3+ sessions vs baseline), setup dry 3 sessions, slump ≤ −0.15R over last 30 sessions (n ≥ 10), 3+ new top-5 themes, 30+ days.
@@ -69,8 +70,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   ATH Magnet RS ≥ 90, group ≥ 80, ≤ 3% off 52-wk high, above 21 EMA, ADR ≥ 3, true ATH ≤ 2 ADRs away when known ·
   Leader Pullback RS ≥ 85, group ≥ 70, within 3% of 21 EMA, above 50 EMA, 4–20% off high, vol dry ≤ 0.9 ·
   Rotation Rookie theme up 10+ Strength ranks in 4 wks (≥ 55) or sub-theme up 15+ (≥ 60), RS ≥ 80 not falling,
-  3–12% off high, 0–6% above 21 EMA · Coiled Leader KQ Basing, RS ≥ 90, group ≥ 80.
-  Backtest: new signals, buy close, stop 1 ADR, exit 5 sessions; hit-high uses the 52-wk high.
+  3–12% off high, 0–6% above 21 EMA · Qullamaggie Flag = KQ Basing, any theme, HTF tag at 90%+ leg; "on deck" = KQ Extended ·
+  Minervini VCP = trend template (150/200 SMA live; 100/150 in backtest), RS ≥ 70, ≤ 15% off high, ranges 10d < 0.6×20d,
+  20d < 0.8×40d, vol dry ≤ 0.9. (Coiled Leader was replaced by Qullamaggie Flag on Oct 11.)
+  Backtest: new signals; ATH/Pullback/Rotation buy close, stop 1 ADR, exit 5 sessions. Q-Flag: buy above 5-day high
+  within 5 days, stop entry-day low (skip if > 1 ADR), half out after 3 days, rest on close < 10 EMA (20 EMA variant
+  reported). VCP: buy above 10-day high, stop 10-day low capped 8%, exit close < 50 SMA. R risk floored at 0.3 ADR.
 - TradingView export priority: bursts → anticipation → ⚑ → ★ → RS 99 → fast risers →
   top 2 themes → top 3 sub-themes (new names) → bottom 2 themes → EPs (off) → ETFs; de-duplicated.
 

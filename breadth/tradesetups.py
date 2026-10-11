@@ -14,8 +14,15 @@ Rotation Rookie stock in a theme or sub-theme that money is newly moving into
                 theme up 10+ Strength ranks in 4 weeks (Strength >= 55) or
                 sub-theme up 15+ (>= 60); RS >= 80 and not falling over 5 days,
                 3-12% off the high, 0-6% above the 21 EMA (not extended).
-Coiled Leader   KQ screen 'Basing' list, RS >= 90, group >= 80; the magnet is the
-                next old high above (52-week high or an older peak).
+Qullamaggie Flag KQ screen 'Basing' list (breadth/kq.py), any theme. HTF tag when the
+                prior leg was +90% or more. Trade: buy the break of the 5-day high,
+                stop at the entry day's low, sell half after 3 days, trail the rest
+                on a close below the 10 EMA (20 EMA variant also tested).
+Minervini VCP   trend template (above rising 150/200 SMA, 50 > 150 > 200, 30%+ off
+                the 52-week low, within 15% of the high), RS >= 70, contracting
+                ranges (10-day < 0.6x 20-day, 20-day < 0.8x 40-day) and volume
+                drying up. Trade: buy the break of the 10-day high (pivot), stop
+                under the 10-day low capped at 8%, hold until a close below the 50 SMA.
 
 Each list is ranked by the Leaders score (breadth/leaders.py). "Setups hit"
 counts how many buying angles a stock sits on at once: the four lists above,
@@ -28,19 +35,22 @@ from . import leaders as LD
 
 MIN_PRICE = 10.0
 TOP = 5
+RISK_FLOOR = 0.3     # R is measured against at least 0.3 ADR of risk (a tight low-of-day stop can be pennies)
 RECENT = 30          # sessions of completed signals used for "recent results" (review flag)
 SETUPS = [
     ("ath", "ATH Magnet", "Leader within reach of its all-time high: momentum and attention pulling it through."),
     ("pullback", "Leader Pullback", "Leader back at its 21 EMA, uptrend intact, sellers drying up: buy the dip, not the chase."),
     ("rotation", "Rotation Rookie", "A theme or sub-theme money is newly moving into; the stock hasn't run yet."),
-    ("coiled", "Coiled Leader", "Top-RS name basing tight in a strong group, with old highs overhead as the magnet."),
+    ("kq", "Qullamaggie Flag", "High-ADR top performer basing in a tight flag after a big leg (any theme). Buy the flag break, stop low of day, hold 3-5 days, trail the 10 EMA."),
+    ("vcp", "Minervini VCP", "Young Stage 2 trend tightening up with volume drying out. Buy the pivot break, stop under the last contraction (max 8%), hold while above the 50-day."),
 ]
 RULES = {
     "ath": {"rs": 90, "grp": 80, "off": -0.03, "adr": 3.0, "ath_adr": 2.0},
     "pullback": {"rs": 85, "grp": 70, "e21": 0.03, "off_lo": -0.20, "off_hi": -0.04, "vdry": 0.9},
     "rotation": {"rs": 80, "theme_rise": 10, "theme_str": 55, "sub_rise": 15, "sub_str": 60,
                  "off_lo": -0.12, "off_hi": -0.03, "e21_hi": 0.06},
-    "coiled": {"rs": 90, "grp": 80},
+    "kq": {"htf_leg": 90},
+    "vcp": {"rs": 70, "off": -0.15, "low_up": 0.30, "r10": 0.6, "r20": 0.8, "vdry": 0.9, "stop_cap": 0.08},
 }
 
 
@@ -82,15 +92,15 @@ def magnets(s, lev):
 # ---------------------------------------------------------------------------
 # Today's lists
 # ---------------------------------------------------------------------------
-def build(stocks, themes, subthemes, kq=None, lists=None, levels=None):
-    levels = levels or {}
+def build(stocks, themes, subthemes, kq=None, lists=None, levels=None, vcp=None):
+    levels, vcp = levels or {}, vcp or {}
     ts = {r["theme"]: r.get("strength") for r in themes}
     ss = {r["theme"]: r.get("strength") for r in subthemes}
     rising = {r["theme"] for r in themes if r.get("s_r_m4") and r.get("strength") is not None
               and r["s_r_m4"] - r["s_rank"] >= RULES["rotation"]["theme_rise"] and r["strength"] >= RULES["rotation"]["theme_str"]}
     rising_sub = {r["theme"] for r in subthemes if r.get("s_r_m4") and r.get("strength") is not None
                   and r["s_r_m4"] - r["s_rank"] >= RULES["rotation"]["sub_rise"] and r["strength"] >= RULES["rotation"]["sub_str"]}
-    basing = {r["t"] for r in (kq or {}).get("basing", [])}
+    basing = {r["t"]: r for r in (kq or {}).get("basing", [])}
     bursts = {r["t"] for r in (lists or {}).get("bursts", []) if (r.get("lynch") or 0) >= 5}
     antic = {r["t"] for r in (lists or {}).get("anticipation", [])}
     lead10 = {r["t"] for r in LD.rank(stocks, themes, subthemes, n=10)}
@@ -118,9 +128,12 @@ def build(stocks, themes, subthemes, kq=None, lists=None, levels=None):
         if (in_rise and rs >= R["rs"] and _num(s.get("rsr5"), -1) >= 0 and R["off_lo"] <= off <= R["off_hi"]
                 and e21 is not None and 0 <= e21 <= R["e21_hi"]):
             hit.add("rotation")
-        R = RULES["coiled"]
-        if s["t"] in basing and rs >= R["rs"] and grp >= R["grp"]:
-            hit.add("coiled")
+        kqr = basing.get(s["t"])
+        if kqr:
+            hit.add("kq")
+        vr = vcp.get(s["t"])
+        if vr and rs >= RULES["vcp"]["rs"]:
+            hit.add("vcp")
         if not hit:
             continue
         angles = set(hit) | ({"burst"} if s["t"] in bursts else set()) | ({"antic"} if s["t"] in antic else set())
@@ -132,13 +145,26 @@ def build(stocks, themes, subthemes, kq=None, lists=None, levels=None):
             "rising": in_rise[0] if in_rise else None, "setups": sorted(hit), "angles": sorted(angles), "hits": len(angles),
             **m,
         }
+        if kqr:
+            rows[s["t"]].update({"kq_leg": kqr.get("leg"), "kq_rng10": kqr.get("rng10"), "kq_ext": kqr.get("ext"),
+                                 "htf": (kqr.get("leg") or 0) >= RULES["kq"]["htf_leg"], "kq_pivot": kqr.get("pivot")})
+        if vr:
+            rows[s["t"]].update({"vcp_pivot": vr.get("pivot"), "vcp_stop": vr.get("stop"), "vcp_r10": vr.get("r10"),
+                                 "vcp_r20": vr.get("r20"), "vcp_r40": vr.get("r40")})
     out = []
     for key, name, desc in SETUPS:
         cand = [r for r in rows.values() if key in r["setups"]]
-        cand.sort(key=lambda r: (-r["score"], -r["rsr"], r["t"]))
+        if key == "kq":      # Kristjan ranks by the base: tightest flags first, then RS
+            cand.sort(key=lambda r: (_num(r.get("kq_rng10")), -r["rsr"], r["t"]))
+        elif key == "vcp":   # tightest contraction first, then RS
+            cand.sort(key=lambda r: (_num(r.get("vcp_r10")), -r["rsr"], r["t"]))
+        else:
+            cand.sort(key=lambda r: (-r["score"], -r["rsr"], r["t"]))
         out.append({"key": key, "name": name, "desc": desc, "count": len(cand), "top": [r["t"] for r in cand[:TOP]]})
     shown = {t for s_ in out for t in s_["top"]}
-    return {"setups": out, "rows": {t: rows[t] for t in shown}, "rules": RULES,
+    ondeck = [{"t": r["t"], "name": r.get("name", ""), "leg": r.get("leg"), "ext": r.get("ext"), "adr": r.get("adr"),
+               "price": r.get("price")} for r in (kq or {}).get("extended", []) if (r.get("price") or 0) >= MIN_PRICE]
+    return {"setups": out, "rows": {t: rows[t] for t in shown}, "rules": RULES, "kq_ondeck": ondeck[:10],
             "ath_known": sum(1 for t in shown if rows[t].get("ath_ok")), "levels_cached": len(levels)}
 
 
@@ -232,6 +258,40 @@ def _per_stock(gframe, mem, cols, how="max"):
     return out
 
 
+def vcp_mask(w, t, long_sma=200):
+    """Minervini trend template + VCP contraction, vectorized (days x tickers).
+    The live list uses the real 150/200-day template; the backtest uses
+    long_sma=150 (100/150) because only ~1 year of bars is stored."""
+    V = RULES["vcp"]
+    c, h, l = w["c"], w["h"], w["l"]
+    mid = 150 if long_sma == 200 else 100
+    s50, sm, sl = c.rolling(50).mean(), c.rolling(mid).mean(), c.rolling(long_sma).mean()
+    lo52 = l.rolling(252, min_periods=long_sma).min()
+    tt = ((c > sm) & (c > sl) & (sm > sl) & (sl > sl.shift(21)) & (s50 > sm) & (c > s50)
+          & (c >= (1 + V["low_up"]) * lo52) & (t["off_high"] >= V["off"]))
+    rng = lambda n: h.rolling(n).max() / l.rolling(n).min() - 1
+    r10, r20, r40 = rng(10), rng(20), rng(40)
+    contract = (r10 < V["r10"] * r20) & (r20 < V["r20"] * r40) & (t["vdry"] <= V["vdry"])
+    return tt & contract, {"r10": r10, "r20": r20, "r40": r40, "hi10": h.rolling(10).max(), "lo10": l.rolling(10).min()}
+
+
+def vcp_today(w, t, focus):
+    """Live VCP candidates on the latest day with pivot and stop."""
+    cols = [x for x in focus if x in w["c"].columns]
+    ww = {k: v[cols] for k, v in w.items()}
+    tt = {k: (v[cols] if isinstance(v, pd.DataFrame) else v) for k, v in t.items()}
+    m, f = vcp_mask(ww, tt, long_sma=200)
+    last = m.iloc[-1].fillna(False)
+    out = {}
+    for tk in last[last].index:
+        piv = float(f["hi10"].iloc[-1][tk])
+        lo = float(f["lo10"].iloc[-1][tk])
+        out[tk] = {"pivot": round(piv, 2), "stop": round(max(lo, piv * (1 - RULES["vcp"]["stop_cap"])), 2),
+                   "r10": round(float(f["r10"].iloc[-1][tk]), 4), "r20": round(float(f["r20"].iloc[-1][tk]), 4),
+                   "r40": round(float(f["r40"].iloc[-1][tk]), 4)}
+    return out
+
+
 def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, breadth, first=110, hold=5):
     from . import setups as SU
     from . import strength as S2
@@ -274,8 +334,9 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
                          & (off >= P["off_lo"]) & (off <= P["off_hi"]) & (t["vdry"] <= P["vdry"]))
     masks["rotation"] = (base_ok & in_rise & (rating >= R["rs"]) & (rs5 >= 0) & (off >= R["off_lo"]) & (off <= R["off_hi"])
                          & (e21 >= 0) & (e21 <= R["e21_hi"]))
-    C_ = RULES["coiled"]
-    masks["coiled"] = base_ok & _kq_basing(w, w_all["c"]) & (rating >= C_["rs"]) & (grp >= C_["grp"])
+    masks["kq"] = base_ok & _kq_basing(w, w_all["c"])
+    vm, VF = vcp_mask(w, t, long_sma=150)
+    masks["vcp"] = base_ok & vm & (rating >= RULES["vcp"]["rs"])
     burst, checks, lynch, ep = SU.masks(w, t, liquid_all[cols])
     ant = SU.anticipation_mask(w, t, rating, liquid_all[cols])
     angles = sum(m.fillna(False).astype(int) for m in masks.values()) + (burst & (lynch >= 5)).fillna(False).astype(int) \
@@ -319,6 +380,86 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
                         C[i + hold, j] / e - 1, ANG[i, j], j))
         return res
 
+    E10, E20 = t["ema10"].to_numpy(), t["ema20"].to_numpy()
+    S50 = c.rolling(50).mean().to_numpy()
+    HI5 = w["h"].rolling(5).max().to_numpy()
+    HI10, LO10 = VF["hi10"].to_numpy(), VF["lo10"].to_numpy()
+
+    def _new(mask):
+        m = mask.fillna(False)
+        return (m & ~(m.shift(1).astype(float).rolling(5, min_periods=1).max().fillna(0) > 0)).to_numpy()
+
+    def _tuple(i, j, e, st, x_blend, k_entry):
+        """Shared result row: R, hit 52-wk high / +1 ADR within `hold` sessions of entry, return."""
+        end = min(N - 1, k_entry + hold)
+        hh = np.nanmax(H[k_entry + 1:end + 1, j]) if end > k_entry else np.nan
+        tgt_hi = max(h52[i, j], e * 1.005) if np.isfinite(h52[i, j]) else np.nan
+        risk = max(e - st, e * adr[i, j] / 100 * RISK_FLOOR) if np.isfinite(adr[i, j]) else e - st
+        return (i, (x_blend - e) / risk, hh >= tgt_hi, hh >= e * (1 + adr[i, j] / 100), x_blend / e - 1, ANG[i, j], j)
+
+    def sim_kq(mask, trail):
+        """Kristjan: buy stop above the 5-day high within 5 sessions, stop = entry-day low,
+        sell half at the close 3 sessions after entry, trail the rest until a close
+        below the 10 (or 20) EMA. Open trades are marked at the last close."""
+        TR = E10 if trail == 10 else E20
+        res = []
+        for i, j in np.argwhere(_new(mask)):
+            if i < first or i + 1 >= N:
+                continue
+            tp = HI5[i, j] * 1.001
+            for k in range(i + 1, min(N, i + 6)):
+                if H[k, j] < tp:
+                    continue
+                e = max(tp, O[k, j]); st = L[k, j]
+                if not (np.isfinite(e) and 0 < st < e) or (e - st) > e * adr[i, j] / 100:
+                    break      # he passes when the day's low is more than 1 ADR away
+                half = None; x = None
+                for q in range(k + 1, min(N, k + 41)):
+                    if L[q, j] <= st:
+                        x = min(st, O[q, j]); break
+                    if half is None and q == k + 3:
+                        half = C[q, j]
+                    if q > k + 3 and C[q, j] < TR[q, j]:
+                        x = C[q, j]; break
+                if x is None:
+                    x = C[min(N - 1, k + 40), j]
+                xb = x if half is None else 0.5 * half + 0.5 * x
+                if np.isfinite(xb):
+                    res.append(_tuple(i, j, e, st, xb, k))
+                break
+        return res
+
+    def sim_vcp(mask):
+        """Minervini: buy stop above the 10-day high (pivot) within 5 sessions, stop under
+        the 10-day low capped at 8%, exit on a close below the 50-day SMA (max 60 sessions)."""
+        res = []
+        for i, j in np.argwhere(_new(mask)):
+            if i < first or i + 1 >= N:
+                continue
+            tp = HI10[i, j] * 1.001
+            for k in range(i + 1, min(N, i + 6)):
+                if H[k, j] < tp:
+                    continue
+                e = max(tp, O[k, j]); st = max(LO10[i, j], e * (1 - RULES["vcp"]["stop_cap"]))
+                if not (np.isfinite(e) and 0 < st < e):
+                    break
+                x = None
+                if L[k, j] <= st:
+                    x = st
+                for q in range(k + 1, min(N, k + 61)):
+                    if x is not None:
+                        break
+                    if L[q, j] <= st:
+                        x = min(st, O[q, j]); break
+                    if C[q, j] < S50[q, j]:
+                        x = C[q, j]; break
+                if x is None:
+                    x = C[min(N - 1, k + 60), j]
+                if np.isfinite(x):
+                    res.append(_tuple(i, j, e, st, x, k))
+                break
+        return res
+
     def summarize(res, key=None):
         o = {}
         for k in ("all", "strong", "mixed", "weak", "thrust"):
@@ -337,10 +478,14 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
                     "thrust": int(tw[first:N - hold].sum())}, "setups": {}}
     allres = []
     for key, m in masks.items():
-        r = outcomes(m)
+        r = sim_kq(m, 10) if key == "kq" else sim_vcp(m) if key == "vcp" else outcomes(m)
         out["setups"][key] = summarize(r)
         out.setdefault("recent", {})[key] = summarize([x for x in r if x[0] >= N - hold - RECENT])["all"]
         allres += r
+    out["kq_trail20"] = summarize(sim_kq(masks["kq"], 20))
+    out["exits"] = {"kq": "buy above the 5-day high, stop entry-day low, half out after 3 days, rest on a close below the 10 EMA",
+                    "vcp": "buy above the 10-day high, stop under the 10-day low (max 8%), exit on a close below the 50-day",
+                    "other": f"buy the close, stop 1 ADR, exit after {hold} sessions"}
     out["base"] = summarize(outcomes(base_ok & (rating >= 80), dedupe=False, every=5))
     out["base_near"] = summarize(outcomes(base_ok & (off >= A["off"]) & (e21 > 0) & (t["adr"] >= A["adr"])))
     uniq = list({(r[0], r[6]): r for r in allres}.values())   # one trade per stock-day across lists

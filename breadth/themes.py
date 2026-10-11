@@ -353,7 +353,7 @@ def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=No
         "themes": theme_rows, "subthemes": sub_rows, "stocks": stocks, "horizons": SHOW,
         "refs": refs, "ref_keys": list(offs) + ["ema8", "ema21", "ema50"],
         "rs_bp": v2["rs_bp"] if v2 else [], "lists": v2["lists"] if v2 else None,
-        "leaders": leaders, "trade_bt": v2.get("trade_bt") if v2 else None,
+        "leaders": leaders, "trade_bt": v2.get("trade_bt") if v2 else None, "vcp_live": v2.get("vcp") if v2 else None,
         "setup_stats": v2.get("setup_stats") if v2 else None, "regime_now": v2.get("regime_now") if v2 else None,
         "str_weights": {"rel": 0.5, "part": 0.25, "lead": 0.25},
         "str_horizons": [[5, 0.15], [15, 0.20], [30, 0.25], [60, 0.20], [90, 0.20]],

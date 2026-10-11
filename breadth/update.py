@@ -173,7 +173,8 @@ def recompute_and_publish(bars, splits, universe, state):
         try:
             from . import levels as LV, tradesetups as TS
             theme_data["trade_setups"] = TS.build(theme_data["stocks"], theme_data["themes"], theme_data["subthemes"],
-                                                  kq_data, theme_data.get("lists"), LV.load())
+                                                  kq_data, theme_data.get("lists"), LV.load(),
+                                                  vcp=theme_data.get("vcp_live"))
         except Exception as e:  # optional panel; never block the page
             log.exception("trade setups failed: %s", e)
         try:

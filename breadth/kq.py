@@ -71,6 +71,7 @@ def _features(g):
         "gap_ev": bool(np.any((gaps >= CFG["gap"]) & (vx_gap >= CFG["gap_vx"]))),
         "spike": bool(np.nanmax(vx) >= CFG["spike_vx"]) if np.isfinite(vx).any() else False,
         "day": c[-1] / c[-2] - 1,
+        "pivot": float(np.max(h[-5:])),
     }
 
 
@@ -122,7 +123,8 @@ def build(adjusted, universe, names=None, tv=None):
         out[sec].append({"t": t, "name": names.get(t, ""), "price": _r(f.price), "adr": _r(f.adr, 1),
                          "atr": _r(f.atr, 1), "dvol": _r(f.dvol / 1e6, 0), "top": _r(f.top, 1),
                          "leg": _r(f.leg * 100, 0), "off": _r(f.off * 100, 1), "ext": _r(f.ext, 1),
-                         "rng10": _r(f.rng10, 1), "angle": _r(f.angle, 1), "day": _r(f.day * 100, 1), "why": why})
+                         "rng10": _r(f.rng10, 1), "angle": _r(f.angle, 1), "day": _r(f.day * 100, 1), "why": why,
+                         "pivot": _r(f.pivot)})
     out["basing"].sort(key=lambda r: r["rng10"])
     out["extended"].sort(key=lambda r: r["ext"])
     out["reject"].sort(key=lambda r: r["why"])

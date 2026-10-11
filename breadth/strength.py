@@ -287,6 +287,13 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
             stats = SU.regime_stats(w, t, rating_full, liquid, br)
     except Exception:
         stats = None
+    vcp_live = None
+    try:
+        from . import tradesetups as TS
+        vcp_live = TS.vcp_today(w, t, sorted(set(focus) & set(universe)))
+    except Exception as e:
+        import logging
+        logging.getLogger("breadth").exception("vcp screen failed: %s", e)
     trade_bt = None
     try:
         from . import store as _store
@@ -306,7 +313,7 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
     except Exception:
         pass
 
-    return {"tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt,
+    return {"tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt, "vcp": vcp_live,
             "rs_bp": [_r(x, 5) for x in (bps.get(last) if bps.get(last) is not None else [])],
             "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60],
                       "counts": {"bursts": len(bl), "anticipation": len(al), "eps": len(el)}}}
