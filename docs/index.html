@@ -341,7 +341,7 @@ footer a { color: var(--text-secondary); }
 .mstrip .kicker a { color: var(--text-secondary); text-transform: none; letter-spacing: 0; font-weight: 500; }
 .mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; margin-top: 10px; }
 .mstrip.compact .mgrid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
-@media (max-width: 520px) { .mgrid, .mstrip.compact .mgrid { grid-template-columns: 1fr 1fr; gap: 6px; } .mtile { padding: 7px 8px; } .mtop .spark { width: 56px; } .mv2 { font-size: 16px; } .mdrvs { display: none; } .lc svg text { font-size: 17px; } }
+@media (max-width: 520px) { .mgrid, .mstrip.compact .mgrid { grid-template-columns: 1fr 1fr; gap: 6px; } .mtile { padding: 7px 8px; } .mtop .spark { width: 56px; } .mv2 { font-size: 16px; } .mdrvs { display: none; } .lc svg text { font-size: 22px; } }
 .mtile { border: 1px solid var(--border); border-radius: 10px; padding: 9px 11px; background: var(--surface-0); min-width: 0; }
 .mtop { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
 .mk { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
@@ -387,6 +387,23 @@ footer a { color: var(--text-secondary); }
 .scgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 900px) { .scgrid { grid-template-columns: 1fr; } }
 table.grid.sc { font-size: 12.5px; }
+
+.phow { margin: 8px 0 4px; font-size: 13.5px; }
+.phow summary { cursor: pointer; color: var(--text-secondary); }
+.phow ol { margin: 6px 0 4px; padding-left: 20px; } .phow li { margin: 3px 0; }
+.psug { margin-top: 8px; }
+.plist { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 8px; margin: 4px 0 10px; }
+.plist > p { grid-column: 1 / -1; }
+@media (max-width: 900px) { .plist { grid-template-columns: 1fr; } }
+.prow { display: flex; align-items: center; gap: 10px; text-align: left; background: var(--surface-0); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font: inherit; font-size: 13px; color: var(--text-primary); cursor: pointer; }
+.prow:hover { border-color: var(--text-muted); } .prow.on { border-color: var(--s1); box-shadow: inset 3px 0 0 var(--s1); }
+.pcat { flex: none; width: 84px; overflow-wrap: anywhere; line-height: 1.25; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); }
+.pname { flex: 1; min-width: 0; } .pname small { display: block; color: var(--text-secondary); font-size: 12px; margin-top: 1px; }
+.pbadge { flex: none; font-size: 12px; padding: 2px 7px; border-radius: 5px; background: var(--neutral-mid); white-space: nowrap; max-width: 46%; overflow: hidden; text-overflow: ellipsis; }
+.pbadge.up { color: var(--text-primary); }
+.pmean { margin: 8px 0 6px; padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, var(--s1) 9%, transparent); font-size: 13.5px; }
+.pverdict { font-size: 15px; margin: 6px 0 2px; }
+@media (max-width: 520px) { .pcat { display: none; } .prow { flex-wrap: wrap; gap: 4px; } .pname { flex-basis: 100%; } .pbadge { max-width: 100%; } }
 </style>
 </head>
 <body>
@@ -576,39 +593,101 @@ function groupByKey() {
   (T.subthemes || []).forEach(r => { if (r.px) M["s:" + r.theme] = { ...r, kind: "Sub-theme" }; });
   return M;
 }
-function pairFinder(G, win = 20) {
-  const bySec = {};
-  Object.entries(G).filter(([k]) => k.startsWith("s:")).forEach(([k, r]) => { (bySec[r.group] = bySec[r.group] || []).push([k, r]); });
-  const out = [];
-  Object.entries(bySec).forEach(([sec, list]) => {
-    for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
-      const [ka, a] = list[i], [kb, b] = list[j], n = a.px.length;
-      if (n <= win || b.px.length !== n) continue;
-      const ra = a.px[n - 1] / a.px[n - 1 - win], rb = b.px[n - 1] / b.px[n - 1 - win];
-      const ch = ra / rb - 1;
-      out.push(ch >= 0 ? { a: ka, b: kb, ch, sec } : { a: kb, b: ka, ch: rb / ra - 1, sec });
-    }
-  });
+// Starter pairs: [first, second, category, what a RISING line means, what a FALLING line means]
+const STARTER_PAIRS = [
+  ["s:Refiners", "s:Shale E&P", "Energy", "fuel margins are the better oil trade (fuel prices outrunning crude)", "the crude price itself is the better trade (drillers win)"],
+  ["s:Natural Gas Producers", "s:Shale E&P", "Energy", "gas is the stronger commodity right now", "oil is the stronger commodity right now"],
+  ["s:Gold Mid-tiers", "s:Gold Majors & Royalties", "Metals", "traders are taking more risk inside gold: the smaller, riskier miners lead in a healthy gold run", "money is hiding in the safest gold names: a cautious or tiring gold move"],
+  ["s:Silver Miners", "s:Gold Majors & Royalties", "Metals", "silver is outrunning gold, which usually happens late and hot in a metals run", "gold is leading: the calmer, more defensive part of metals"],
+  ["s:Copper Miners", "s:Gold Majors & Royalties", "Metals", "growth beats fear: copper (the economy metal) over gold (the safety metal)", "fear beats growth: money prefers the safety of gold"],
+  ["s:Regional & Community Banks", "s:Money-center Banks", "Financials", "confidence in the domestic economy and credit; small banks lead in good times", "stress or caution: money sticks with the biggest, safest banks"],
+  ["s:Mid-cap Biotech", "s:Large-cap Biotech", "Health", "risk appetite in health care: speculative biotech is being bought", "caution: money prefers big, profitable biotech"],
+  ["s:AI Applications & Platforms", "s:AI Accelerators & GPUs", "AI", "the AI trade is spreading from the chips to the software that uses them", "the chip makers are still where the AI money goes"],
+  ["s:Neoclouds & GPU Hosting", "s:Hyperscalers", "AI", "speculative AI names are running: a hot, risk-on AI tape", "the safe AI giants lead: a more cautious AI trade"],
+  ["s:Data Center Power & Cooling", "s:AI Accelerators & GPUs", "AI", "the 'picks and shovels' of AI (power, cooling) are leading the chips", "the chips lead the infrastructure around them"],
+  ["s:Homebuilders", "s:Building Products", "Housing", "new-home demand is leading (often when rates fall)", "repair and remodel suppliers lead the builders"],
+  ["s:Defense Tech & Electronics", "s:Defense Primes", "Defense", "money favors the newer, faster-growing defense names", "money favors the big, established contractors"],
+  ["s:Bitcoin Miners", "s:Crypto Exchanges & Brokers", "Crypto", "the high-beta end of crypto is leading: a hot crypto tape", "the steadier crypto businesses lead"],
+  ["t:TECH - Semiconductors", "t:TECH - Software", "Tech", "hardware beats software", "software beats hardware"],
+];
+const pairCorr = (A, B, n = 120) => {          // correlation of daily returns, last n sessions
+  const k = Math.min(n, A.px.length - 1, B.px.length - 1), ra = [], rb = [];
+  for (let i = A.px.length - k; i < A.px.length; i++) { ra.push(A.px[i] / A.px[i - 1] - 1); rb.push(B.px[i] / B.px[i - 1] - 1); }
+  const ma = ra.reduce((s, x) => s + x, 0) / k, mb = rb.reduce((s, x) => s + x, 0) / k;
+  let sab = 0, saa = 0, sbb = 0;
+  for (let i = 0; i < k; i++) { const a = ra[i] - ma, b = rb[i] - mb; sab += a * b; saa += a * a; sbb += b * b; }
+  return saa && sbb ? sab / Math.sqrt(saa * sbb) : 0;
+};
+const corrWords = (c) => c >= 0.7 ? ["close cousins", "they usually move together, so a gap between them is a real choice by money"]
+  : c >= 0.45 ? ["related", "they often move together but each has its own drivers"]
+  : c >= 0.15 ? ["loosely related", "they only partly move together, so the ratio mixes rotation with unrelated news"]
+  : ["unrelated or opposite", "they move independently, so this compares two different trades rather than two versions of one"];
+const ratioMove = (A, B, win) => { const n = A.px.length; return n > win ? (A.px[n - 1] / A.px[n - 1 - win]) / (B.px[n - 1] / B.px[n - 1 - win]) - 1 : null; };
+function cousinsApart(G, win = 20) {
+  const keys = Object.keys(G).filter(k => k.startsWith("s:")), out = [];
+  for (let i = 0; i < keys.length; i++) for (let j = i + 1; j < keys.length; j++) {
+    const A = G[keys[i]], B = G[keys[j]];
+    if (A.px.length !== B.px.length || A.px.length < 130 || (A.n || 0) < 4 || (B.n || 0) < 4) continue;
+    const ch = ratioMove(A, B, win);
+    if (ch == null || Math.abs(ch) < 0.03) continue;
+    const c = pairCorr(A, B);
+    if (c < 0.7) continue;
+    out.push(ch >= 0 ? { a: keys[i], b: keys[j], ch, c } : { a: keys[j], b: keys[i], ch: 1 / (1 + ch) - 1, c });
+  }
   out.sort((p, q) => q.ch - p.ch);
-  const used = new Set(), perSec = {}, pick = [];       // each group once, at most 2 pairs per sector
+  const used = new Set(), pick = [];
   for (const p of out) {
-    if (used.has(p.a) || used.has(p.b) || (perSec[p.sec] || 0) >= 2) continue;
-    pick.push(p); used.add(p.a); used.add(p.b); perSec[p.sec] = (perSec[p.sec] || 0) + 1;
+    if (used.has(p.a) || used.has(p.b)) continue;
+    pick.push(p); used.add(p.a); used.add(p.b);
     if (pick.length >= 8) break;
   }
   return pick;
 }
 function pairCard() {
-  UI.pair = UI.pair || { a: "s:Refiners", b: "s:Shale E&P", win: 90 };
+  UI.pair = UI.pair || { a: "s:Refiners", b: "s:Shale E&P", win: 90, list: "starter" };
   const T = DATA.themes, G = groupByKey(), U = UI.pair, D = T.px_dates || [];
   if (!D.length || !Object.keys(G).length) return $('<div class="card empty">Pair charts appear after the next data run.</div>');
   if (!G[U.a]) U.a = Object.keys(G).find(k => k.startsWith("s:")); if (!G[U.b] || U.b === U.a) U.b = Object.keys(G).find(k => k.startsWith("s:") && k !== U.a);
+  const starters = STARTER_PAIRS.filter(p => G[p[0]] && G[p[1]]);
+  const cousins = cousinsApart(G);
   const opt = (sel) => ["t", "s"].map(p => `<optgroup label="${p === "t" ? "Themes" : "Sub-themes"}">${Object.keys(G).filter(k => k.startsWith(p + ":")).sort((x, y) => x.localeCompare(y)).map(k => `<option value="${esc(k)}"${k === sel ? " selected" : ""}>${esc(k.slice(2))}</option>`).join("")}</optgroup>`).join("");
-  const card = $(`<section class="card regcard"><div class="kicker">Pair chart · which of two groups is leading</div>
-    <div class="filters pairsel"><select class="pa" aria-label="First group">${opt(U.a)}</select><span class="meta">vs</span><select class="pb" aria-label="Second group">${opt(U.b)}</select><button class="pswap" title="Swap">⇄</button></div>
+  const card = $(`<section class="card regcard"><div class="kicker">Pair chart · which of two related groups is winning the money</div>
+    <details class="phow" ${UI.pairHowSeen ? "" : "open"}><summary><b>How to use it</b> (30 seconds)</summary>
+      <ol><li><b>Pick a pair below.</b> Start with the suggestions: each one says what it tells you.</li>
+      <li><b>Read the ratio line</b> (bottom chart). Going <b>up</b> = the first group is beating the second. Going <b>down</b> = the second is winning.</li>
+      <li><b>Watch the dashed line</b> (the ratio's 20-day average). When the ratio crosses it, the lead is changing hands: often the first sign of rotation, before it shows up in Theme Strength.</li></ol>
+      <p class="meta" style="margin:4px 0 0">Best used on two groups that normally move together (the card tells you how closely they do). Then the ratio shows which version of the same trade the money prefers. That's where you hunt for leaders: in the winning group.</p></details>
+    <div class="psug"><div class="filters"></div><div class="plist"></div></div>
+    <div class="filters pairsel"><span class="meta">Or pick any two:</span><select class="pa" aria-label="First group">${opt(U.a)}</select><span class="meta">vs</span><select class="pb" aria-label="Second group">${opt(U.b)}</select><button class="pswap" title="Swap the two groups">⇄</button></div>
     <div class="pbody"></div>
-    <div class="pfind"><div class="meta" style="margin:10px 0 6px"><b>Biggest swings inside a sector, last 20 sessions</b> · click to chart</div><div class="pchips"></div></div>
-    <div class="note" style="padding:8px 0 0">Each group is an equal-weight index of its stocks (start = 100), so one big name can't dominate. The ratio is the first group ÷ the second: rising means the first is outperforming, and the dashed line is its 20-day average. A ratio crossing above its average is an early sign of rotation into the first group. Window: up to ${D.length} sessions.</div></section>`);
+    <div class="note" style="padding:8px 0 0">Each group is an equal-weight index of its stocks (start = 100), so one big name can't dominate. "How closely they move" is the correlation of the two groups' daily moves over the last 120 sessions (1 = always together, 0 = no link). Window: up to ${D.length} sessions.</div></section>`);
+  card.querySelector(".phow summary").addEventListener("click", () => { UI.pairHowSeen = true; });
+  const plist = card.querySelector(".plist");
+  const pick = (a, b) => { U.a = a; U.b = b; card.querySelector(".pa").value = a; card.querySelector(".pb").value = b; draw(); drawList();
+    card.querySelector(".pbody").scrollIntoView({ behavior: "smooth", block: "nearest" }); };
+  const drawList = () => {
+    plist.innerHTML = "";
+    if (U.list === "starter") {
+      plist.append($(`<p class="meta" style="margin:6px 0">Classic pairs traders watch. Each line says what a <b>rising</b> ratio means. The badge is the last 20 sessions.</p>`));
+      starters.forEach(([a, b, cat, up]) => {
+        const ch = ratioMove(G[a], G[b], 20);
+        const row = $(`<button class="prow${U.a === a && U.b === b ? " on" : ""}"><span class="pcat">${esc(cat)}</span><span class="pname"><b>${esc(a.slice(2))}</b> vs ${esc(b.slice(2))}<small>Rising = ${esc(up)}</small></span>
+          <span class="pbadge" title="Ratio change over the last 20 sessions">${ch == null ? "–" : (ch >= 0 ? esc(a.slice(2)) : esc(b.slice(2))) + " " + pct(Math.abs(ch))}</span></button>`);
+        row.addEventListener("click", () => pick(a, b));
+        plist.append(row);
+      });
+    } else {
+      plist.append($(`<p class="meta" style="margin:6px 0">Close cousins: groups that normally move together (correlation 0.7 or more, 4+ stocks each) but split apart over the last 20 sessions. Money is choosing one over the other, so look for leaders in the first group.</p>`));
+      if (!cousins.length) plist.append($('<p class="meta">No close cousins split apart by 3% or more in the last 20 sessions.</p>'));
+      cousins.forEach(p => {
+        const row = $(`<button class="prow${U.a === p.a && U.b === p.b ? " on" : ""}"><span class="pcat">${esc(G[p.a].group || "")}</span><span class="pname"><b>${esc(p.a.slice(2))}</b> pulling ahead of ${esc(p.b.slice(2))}<small>Correlation ${p.c.toFixed(2)}: they usually move together</small></span>
+          <span class="pbadge up">${pct(p.ch)}</span></button>`);
+        row.addEventListener("click", () => pick(p.a, p.b));
+        plist.append(row);
+      });
+    }
+  };
+  card.querySelector(".psug .filters").append(chips("Suggestions", [["starter", `Starter pairs (${starters.length})`], ["cousins", `Cousins pulling apart (${cousins.length})`]], U, "list", drawList));
   const f = card.querySelector(".pairsel");
   const ws = { win: String(U.win) };
   f.append(chips("Window", [["30", "30D"], ["90", "90D"], [String(D.length - 1), "All"]], ws, "win", () => { U.win = +ws.win; draw(); }));
@@ -620,27 +699,29 @@ function pairCard() {
     const ma = ratio.map((_, i) => { const full = A.px.slice(0, s0 + i + 1).map((v, k) => v / B.px[k]); if (full.length < 20) return null; const t = full.slice(-20); return t.reduce((s, x) => s + x, 0) / 20 / (A.px[s0] / B.px[s0]) * 100; });
     const last = ratio.length - 1, r10 = last >= 10 ? ratio[last] / ratio[last - 10] - 1 : null;
     const lead = ratio[last] >= 100 ? A : B, above = ma[last] != null && ratio[last] > ma[last];
-    const msg = `Over ${w} sessions <b>${esc(A.theme)}</b> ${pct(na[last] / 100 - 1)}, <b>${esc(B.theme)}</b> ${pct(nb[last] / 100 - 1)}: ${esc(lead.theme)} leads by ${pct(Math.abs(ratio[last] / 100 - 1)).replace("+", "")}. `
-      + (r10 == null ? "" : `Last 10 sessions the ratio moved ${pct(r10)}, ${above ? `and it's above its 20-day average (momentum with ${esc(A.theme)})` : `and it's below its 20-day average (momentum with ${esc(B.theme)})`}.`)
-      + ` Strength now: ${esc(A.theme)} ${A.strength ?? "–"} (#${A.s_rank ?? "–"}), ${esc(B.theme)} ${B.strength ?? "–"} (#${B.s_rank ?? "–"}).`;
+    let cross = null;                                           // most recent crossing of the 20-day average
+    for (let i = last; i > 0; i--) { if (ma[i] == null || ma[i - 1] == null) break; if ((ratio[i] > ma[i]) !== (ratio[i - 1] > ma[i - 1])) { cross = i; break; } }
+    const c = pairCorr(A, B), [cw, cwhy] = corrWords(c);
+    const st = STARTER_PAIRS.find(p => p[0] === U.a && p[1] === U.b) || STARTER_PAIRS.find(p => p[0] === U.b && p[1] === U.a);
+    const flipped = st && st[0] === U.b;
+    const verdict = above ? `<b>${esc(A.theme)}</b> has the momentum` : `<b>${esc(B.theme)}</b> has the momentum`;
+    const meaning = st ? `<div class="pmean"><b>What this pair tells you:</b> ${esc(flipped ? "falling" : "rising")} = ${esc(st[3])}; ${esc(flipped ? "rising" : "falling")} = ${esc(st[4])}.</div>` : "";
+    const msg = `<div class="pverdict">${verdict}: the ratio is ${above ? "above" : "below"} its 20-day average${cross != null ? `, and crossed it ${last - cross === 0 ? "today" : `${last - cross} session${last - cross === 1 ? "" : "s"} ago`}` : ""}${r10 == null ? "" : ` (${pct(r10)} over 10 sessions)`}.</div>
+      <p style="margin:4px 0">Over ${w} sessions ${esc(A.theme)} ${pct(na[last] / 100 - 1)}, ${esc(B.theme)} ${pct(nb[last] / 100 - 1)}, so ${esc(lead.theme)} leads by ${pct(Math.abs(ratio[last] / 100 - 1)).replace("+", "")}.
+      Strength now: ${esc(A.theme)} ${A.strength ?? "–"} (#${A.s_rank ?? "–"}), ${esc(B.theme)} ${B.strength ?? "–"} (#${B.s_rank ?? "–"}).</p>
+      <p class="meta" style="margin:4px 0">How closely they move: <b>${cw}</b> (correlation ${c.toFixed(2)}): ${cwhy}.</p>`;
     body.innerHTML = "";
-    body.append($(`<p style="margin:8px 0 4px">${msg}</p>`));
-    const legend = `<div class="legend"><span><i class="lsw" style="background:var(--s1)"></i>${esc(A.theme)}</span><span><i class="lsw" style="background:var(--s2)"></i>${esc(B.theme)}</span></div>`;
-    body.append($(legend));
+    body.append($(`<div>${meaning}${msg}</div>`));
+    body.append($(`<div class="legend"><span><i class="lsw" style="background:var(--s1)"></i>${esc(A.theme)}</span><span><i class="lsw" style="background:var(--s2)"></i>${esc(B.theme)}</span></div>`));
     body.append(lineChart(dd, [{ name: A.theme, vals: na, color: "var(--s1)" }, { name: B.theme, vals: nb, color: "var(--s2)" }],
       { title: "Each group, indexed to 100", fmt: v => v.toFixed(0), ref: 100, h: 190 }));
     body.append(lineChart(dd, [{ name: "20-day avg", vals: ma, color: "var(--text-muted)", dash: "4 3", w: 1.5 }, { name: `Ratio ${A.theme} ÷ ${B.theme}`, vals: ratio, color: "var(--s1)" }],
-      { title: `Ratio: ${esc(A.theme)} ÷ ${esc(B.theme)} (rising = ${esc(A.theme)} leading)`, fmt: v => v.toFixed(1), ref: 100, h: 170 }));
+      { title: `Ratio: ${esc(A.theme)} ÷ ${esc(B.theme)} (up = ${esc(A.theme)} winning, down = ${esc(B.theme)} winning)`, fmt: v => v.toFixed(1), ref: 100, h: 170 }));
   };
-  card.querySelector(".pa").addEventListener("change", e => { U.a = e.target.value; draw(); });
-  card.querySelector(".pb").addEventListener("change", e => { U.b = e.target.value; draw(); });
-  card.querySelector(".pswap").addEventListener("click", () => { [U.a, U.b] = [U.b, U.a]; card.querySelector(".pa").value = U.a; card.querySelector(".pb").value = U.b; draw(); });
-  const pc = card.querySelector(".pchips");
-  pairFinder(G).forEach(p => {
-    const b = $(`<button class="pchip" title="${esc(p.sec)}"><b>${esc(p.a.slice(2))}</b> over ${esc(p.b.slice(2))} <span class="num up">${pct(p.ch)}</span></button>`);
-    b.addEventListener("click", () => { U.a = p.a; U.b = p.b; card.querySelector(".pa").value = U.a; card.querySelector(".pb").value = U.b; draw(); card.scrollIntoView({ behavior: "smooth", block: "start" }); });
-    pc.append(b);
-  });
+  card.querySelector(".pa").addEventListener("change", e => { U.a = e.target.value; draw(); drawList(); });
+  card.querySelector(".pb").addEventListener("change", e => { U.b = e.target.value; draw(); drawList(); });
+  card.querySelector(".pswap").addEventListener("click", () => pick(U.b, U.a));
+  drawList();
   draw();
   return card;
 }
@@ -1326,7 +1407,7 @@ function rerenderPanel() {
   if (TAB === "themes") renderThemes(panel); else if (TAB === "stocks") renderStocks(panel);
   else if (TAB === "browse") renderBrowse(panel); else if (TAB === "setups") renderSetups(panel);
   else if (TAB === "trades") renderTrades(panel);
-  else if (TAB === "intraday") renderIntraday(panel); else renderBreadth(panel);
+  else if (TAB === "intraday") renderIntraday(panel); else if (TAB === "rotation") renderRotation(panel); else renderBreadth(panel);
   window.scrollTo(0, y);
 }
 setInterval(() => { if (document.visibilityState === "visible" && (TAB !== "breadth")) fetchLive(); }, 3 * 60 * 1000);

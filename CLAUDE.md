@@ -78,8 +78,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (USO, UNG, GLD, SLV, CPER, IBIT) or are dropped. Each tile lists the sub-themes it drives with their Strength.
   Compact strip on Breadth, full strip on the Rotation tab. Yahoo is blocked in Claude's sandbox: local rebuilds show ETF tiles.
 - Rotation tab (browser-only rendering): macro strip · pair chart (`pairCard`: two groups' equal-weight index, ratio and
-  its 20-day avg; group rows carry `px`, 180 sessions, dates `themes.px_dates`; "biggest swings inside a sector" finder,
-  each group once, ≤ 2 per sector) · theme timeline heatmap (`timelineCard`: rows carry `s_hist` = Strength for
+  its 20-day avg; group rows carry `px`, 180 sessions, dates `themes.px_dates`; guided suggestions: `STARTER_PAIRS` (14 curated
+  pairs, each with what a rising/falling ratio means; edit in template.html) and "Cousins pulling apart" (correlation of daily
+  moves ≥ 0.7 over 120 sessions, 4+ stocks each, biggest 20-session ratio split, each group once); the chart header gives the
+  verdict vs the 20-day average, the last crossing, and the pair's correlation in plain words) · theme timeline heatmap (`timelineCard`: rows carry `s_hist` = Strength for
   `themes.timeline_dates`, 90 sessions; ranks computed in the browser).
 - Strength history uses `strength.group_inputs_many` (numpy, identical numbers to `group_inputs`, tested), which made
   the 90-day history cheaper than the old 30-day loop.
