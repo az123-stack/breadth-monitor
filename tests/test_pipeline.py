@@ -322,6 +322,11 @@ def test_trade_setups():
     assert top["ath"] == ["ATHX"], top          # FAR's real ATH is 50% away; CHEAP is under $10
     assert top["pullback"] == ["PB"] and top["rotation"] == ["ROT"] and top["kq"] == ["COIL"] and top["vcp"] == ["ROT"], top
     assert out["rows"]["COIL"]["htf"] and out["kq_ondeck"][0]["t"] == "RUN" and out["rows"]["ROT"]["hits"] == 2
+    assert "htf" in out["rows"]["COIL"]["tags"] and "burst" in out["rows"]["PB"]["tags"]
+    df = pd.DataFrame({"i": range(40), "t": ["X"] * 40, "fwd_next": [0.05] * 20 + [-0.01] * 20,
+                       "tag_rs99": [True] * 20 + [False] * 20, "tag_ep": [False] * 40})
+    ts = TS.tag_stats(df)
+    assert ts["rs99"]["diff"] == 0.06 and ts["rs99"]["n"] == 20 and ts["ep"]["n"] == 0
     r = out["rows"]
     assert r["PB"]["hits"] == 2 and "burst" in r["PB"]["angles"]
     assert r["COIL"]["mag"] == round(40 / 0.88, 2) and r["COIL"]["mag_kind"] == "52-wk high"

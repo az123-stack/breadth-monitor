@@ -179,7 +179,7 @@ def picks(theme_data, pb, n=2):
         seen_t.add(c["t"]); seen_g.add(g)
         r = c.pop("row")
         c.update({"rsr": r["rsr"], "d60": r.get("d60"), "name": r.get("name", ""), "sub": g, "price": r.get("price"),
-                  "adr": r.get("adr"), "vcp_stop": r.get("vcp_stop") if c["setup"] == "vcp" else None,
+                  "adr": r.get("adr"), "tags": r.get("tags") or [], "vcp_stop": r.get("vcp_stop") if c["setup"] == "vcp" else None,
                   "entry_type": "trigger" if c["trigger"] else "open",
                   "plan": plan(c["setup"], r), "why": why(c, pb, r), "risk10k": risk10k(c["setup"], r)})
         out.append(c)

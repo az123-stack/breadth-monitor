@@ -104,6 +104,23 @@ def build(stocks, themes, subthemes, kq=None, lists=None, levels=None, vcp=None)
     bursts = {r["t"] for r in (lists or {}).get("bursts", []) if (r.get("lynch") or 0) >= 5}
     antic = {r["t"] for r in (lists or {}).get("anticipation", [])}
     lead10 = {r["t"] for r in LD.rank(stocks, themes, subthemes, n=10)}
+    nth = len(themes)
+    top_th = {r["theme"] for r in themes if (r.get("s_rank") or 99) <= 2}
+    bot_th = {r["theme"] for r in themes if (r.get("s_rank") or 0) >= nth - 1}
+    top_sb = {r["theme"] for r in subthemes if (r.get("s_rank") or 99) <= 3}
+    mkt10 = {r["t"] for r in (lists or {}).get("strongest", [])[:10]}
+    eps = {r["t"] for r in (lists or {}).get("eps", [])}
+
+    def tags_of(s, kqr):
+        th = set(s.get("themes") or [])
+        tg = [k for k, ok in (("lead", s.get("rs_lead")), ("star", s.get("rs_nh") and not s.get("rs_lead")),
+                              ("rs99", (s.get("rsr") or 0) >= 99),
+                              ("riser", (s.get("rsr5") or 0) >= 15 and (s.get("rsr") or 0) >= 60),
+                              ("burst", s["t"] in bursts), ("antic", s["t"] in antic), ("mkt10", s["t"] in mkt10),
+                              ("top_theme", bool(th & top_th)), ("top_sub", s.get("sub") in top_sb),
+                              ("htf", bool(kqr) and (kqr.get("leg") or 0) >= 90),
+                              ("ep", s["t"] in eps), ("bottom_theme", bool(th & bot_th))) if ok]
+        return tg
 
     rows = {}
     for s in stocks:
@@ -143,6 +160,7 @@ def build(stocks, themes, subthemes, kq=None, lists=None, levels=None, vcp=None)
             "off_hi": s.get("off_hi"), "e21": e21, "e50": e50, "adr": s.get("adr"), "vdry": vdry, "tight": s.get("tight"), "d60": s.get("d60"),
             "tier": s.get("tier"), "star": bool(s.get("rs_nh")), "leader": s["t"] in lead10,
             "rising": in_rise[0] if in_rise else None, "setups": sorted(hit), "angles": sorted(angles), "hits": len(angles),
+            "tags": tags_of(s, kqr),
             **m,
         }
         if kqr:
@@ -381,6 +399,16 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
             x = C[k + hold, j]
             return dist, True, (x / e - 1) if (np.isfinite(e) and e > 0 and np.isfinite(x)) else np.nan
 
+        # conviction tags at the signal (the same lists as the TradingView export)
+        nhF, leadF = S2.rs_line_flags(c, spy)
+        best_th_rank = -_per_stock(-th_r, members, cols)
+        best_sb_rank = -_per_stock(-sb_r, sub_members, cols)
+        hh60, ll60 = w["h"].rolling(60).max(), w["l"].rolling(60).min()
+        TAGF = {"lead": leadF, "star": nhF, "rs99": rating >= 99, "riser": (rs5 >= 15) & (rating >= 60),
+                "burst": burst & (lynch >= 5), "antic": ant, "top_theme": best_th_rank <= 2, "top_sub": best_sb_rank <= 3,
+                "htf": (hh60 / ll60 - 1) >= 0.9, "ep": ep.astype(float).rolling(5, min_periods=1).max() > 0}
+        TAGA = {k: v.reindex(index=dates, columns=cols).fillna(False).astype(bool).to_numpy() for k, v in TAGF.items()
+                if v is not None}
         rows = []
         for key, m in masks.items():
             mm = m.fillna(False)
@@ -392,7 +420,7 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
                 rows.append({"setup": key, "i": int(i), "date": str(dates[i].date()), "t": cols[j], "regime": str(regime[i]),
                              "thrust": bool(tw[i]), "angles": int(ANG[i, j]), "fwd": float(fwd[i, j]) if i + hold < N else np.nan,
                              "trig_adr": float(dist), "filled": filled, "fwd_next": float(nret),
-                             **{k: float(F[k][i, j]) for k in F}})
+                             **{k: float(F[k][i, j]) for k in F}, **{"tag_" + k: bool(v[i, j]) for k, v in TAGA.items()}})
         sig_df = pd.DataFrame(rows)
 
     def outcomes(mask, dedupe=True, every=1):
@@ -535,6 +563,7 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
     out["confluence"] = {"1": summarize([r for r in uniq if r[5] <= 1]), "2+": summarize([r for r in uniq if r[5] >= 2])}
     try:
         out["pick_replay"] = pick_replay(sig_df, hold)
+        out["tag_stats"] = tag_stats(sig_df)
     except Exception:
         out["pick_replay"] = None
     return (out, sig_df) if signals else out
@@ -580,3 +609,34 @@ def pick_replay(df, hold=5, min_cands=3):
             "edge": round(float(rel.mean()), 4), "t": round(t, 2), "beat": round(float((rel > 0).mean()), 3),
             "win": round(float((p > 0).mean()), 3), "hold": hold,
             "from": str(df["date"].min()), "to": str(df["date"].max())}
+
+
+TAGS = {  # key: (label, kind) - kind 'plus' adds conviction, 'warn' is a caution flag
+    "lead": ("RS line ahead of price ⚑", "plus"), "star": ("RS line new high ★", "plus"), "rs99": ("RS 99", "plus"),
+    "riser": ("Fast riser (RS +15 in 5 days)", "plus"), "burst": ("Burst today (2LYNCH 5+)", "plus"),
+    "antic": ("Anticipation coil", "plus"), "top_theme": ("Top-2 theme", "plus"), "top_sub": ("Top-3 sub-theme", "plus"),
+    "htf": ("High tight flag (90%+ leg)", "plus"), "mkt10": ("Top 10 in the market", "plus"),
+    "ep": ("Recent gap / news (EP)", "warn"), "bottom_theme": ("Bottom-2 theme", "warn"),
+}
+
+
+def tag_stats(df):
+    """For each tag: setup signals WITH the tag vs WITHOUT it, traded the actionable way
+    (next-session entry, 5-session hold). diff = with - without; t = Welch t-stat."""
+    if df is None or df.empty:
+        return None
+    d = df[df["fwd_next"].notna()].drop_duplicates(["i", "t"])
+    out = {"n": int(len(d)), "avg": round(float(d["fwd_next"].mean()), 4)}
+    for k in TAGS:
+        col = "tag_" + k
+        if col not in d:
+            continue
+        a, b = d.loc[d[col], "fwd_next"], d.loc[~d[col], "fwd_next"]
+        if len(a) < 5 or len(b) < 5:
+            out[k] = {"n": int(len(a))}
+            continue
+        se = np.sqrt(a.var(ddof=1) / len(a) + b.var(ddof=1) / len(b))
+        out[k] = {"n": int(len(a)), "with": round(float(a.mean()), 4), "without": round(float(b.mean()), 4),
+                  "win": round(float((a > 0).mean()), 3), "diff": round(float(a.mean() - b.mean()), 4),
+                  "t": round(float((a.mean() - b.mean()) / se), 2) if se > 0 else 0.0}
+    return out
