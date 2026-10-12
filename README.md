@@ -1,4 +1,4 @@
-# Breadth Monitor
+# Market Monitor (formerly Breadth Monitor)
 
 A self-updating market breadth dashboard modeled on Stockbee's Market Monitor.
 Every weekday morning a GitHub Actions job pulls the previous day's bars for

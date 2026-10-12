@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Breadth Monitor</title>
+<title>Market Monitor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -366,7 +366,7 @@ function render() {
   }
   const last = DATA.rows[DATA.rows.length - 1], gen = new Date(DATA.generated);
   app.append($(`<header>
-    <div><h1>Market Breadth Monitor</h1>
+    <div><h1>Market Monitor</h1>
     <div class="meta">Data through ${longDate(last.date)}</div></div>
     <div class="hright"><div class="meta">Updated ${gen.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${fmt(DATA.history_days)} days of history</div>
     <div class="xopens">${DATA.themes && DATA.themes.setup_review && DATA.themes.setup_review.flag ? `<button class="xopen revflag" title="The market has shifted since the trade setups were chosen">${DATA.themes.setup_review.reasons.some(r => r.kind === "thrust") ? "⚡ Thrust · review setups" : "⚑ Review setups"} <span class="revn">${DATA.themes.setup_review.reasons.length}</span></button>` : ""}${DATA.themes && DATA.themes.trade_setups ? '<button class="xopen tsopen" title="All Trade Setups lists, one section per setup">⬇ Trade Setups</button>' : ""}${DATA.kq ? '<button class="xopen kqopen">⬇ KQ list</button>' : ""}${DATA.themes ? '<button class="xopen tvopen">⬇ TradingView list</button>' : ""}</div></div>

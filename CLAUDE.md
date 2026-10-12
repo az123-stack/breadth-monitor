@@ -1,4 +1,4 @@
-# Breadth Monitor — project context
+# Market Monitor (repo: breadth-monitor) — project context
 
 Morning market dashboard modeled on Stockbee's Market Monitor, extended with
 theme rotation (ported from the user's "Trading Dashboard v12" Google Sheet),
