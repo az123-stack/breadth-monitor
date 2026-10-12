@@ -430,6 +430,28 @@ def test_picks():
     finally:
         config.DATA_DIR = old
 
+def test_intraday_sheet_rows():
+    from breadth import intraday
+    old = config.DATA_DIR
+    config.DATA_DIR = Path(__file__).resolve().parent.parent / "data"   # the real member list
+    try:
+        _check_sheet_rows(intraday)
+    finally:
+        config.DATA_DIR = old
+
+
+def _check_sheet_rows(intraday):
+    rows = intraday.sheet_rows()
+    keys = [r[0] for r in rows]
+    assert len(keys) == len(set(keys))
+    assert keys[:len(intraday.PULSE)] == list(intraday.PULSE)
+    flags = {r[0]: r[1] for r in rows}
+    assert flags.get("AAPL") == 1 and flags.get("GOOG") == 0 and flags.get("SPY") == 0
+    assert all(k in flags for k in intraday.SECTOR_ETFS)
+    p = intraday.payload()
+    assert len(p["members"]["SPX"]) > 490 and len(p["members"]["NDX"]) > 95
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

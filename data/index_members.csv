@@ -1,0 +1,605 @@
+index,ticker,sector
+SPX,MMM,Industrials
+SPX,AOS,Industrials
+SPX,ABT,Health Care
+SPX,ABBV,Health Care
+SPX,ACN,Information Technology
+SPX,ADBE,Information Technology
+SPX,AMD,Information Technology
+SPX,AES,Utilities
+SPX,AFL,Financials
+SPX,A,Health Care
+SPX,APD,Materials
+SPX,ABNB,Consumer Discretionary
+SPX,AKAM,Information Technology
+SPX,ALB,Materials
+SPX,ARE,Real Estate
+SPX,ALGN,Health Care
+SPX,ALLE,Industrials
+SPX,LNT,Utilities
+SPX,ALL,Financials
+SPX,GOOGL,Communication Services
+SPX,GOOG,Communication Services
+SPX,MO,Consumer Staples
+SPX,AMZN,Consumer Discretionary
+SPX,AMCR,Materials
+SPX,AEE,Utilities
+SPX,AEP,Utilities
+SPX,AXP,Financials
+SPX,AIG,Financials
+SPX,AMT,Real Estate
+SPX,AWK,Utilities
+SPX,AMP,Financials
+SPX,AME,Industrials
+SPX,AMGN,Health Care
+SPX,APH,Information Technology
+SPX,ADI,Information Technology
+SPX,AON,Financials
+SPX,APA,Energy
+SPX,APO,Financials
+SPX,AAPL,Information Technology
+SPX,AMAT,Information Technology
+SPX,APP,Communication Services
+SPX,APTV,Consumer Discretionary
+SPX,ACGL,Financials
+SPX,ADM,Consumer Staples
+SPX,ARES,Financials
+SPX,ANET,Information Technology
+SPX,AJG,Financials
+SPX,AIZ,Financials
+SPX,T,Communication Services
+SPX,ATO,Utilities
+SPX,ADSK,Information Technology
+SPX,ADP,Industrials
+SPX,AZO,Consumer Discretionary
+SPX,AVY,Materials
+SPX,AXON,Industrials
+SPX,BKR,Energy
+SPX,BALL,Materials
+SPX,BAC,Financials
+SPX,BAX,Health Care
+SPX,BDX,Health Care
+SPX,BRK.B,Financials
+SPX,BBY,Consumer Discretionary
+SPX,TECH,Health Care
+SPX,BIIB,Health Care
+SPX,BLK,Financials
+SPX,BX,Financials
+SPX,XYZ,Financials
+SPX,BNY,Financials
+SPX,BA,Industrials
+SPX,BKNG,Consumer Discretionary
+SPX,BSX,Health Care
+SPX,BMY,Health Care
+SPX,AVGO,Information Technology
+SPX,BR,Industrials
+SPX,BRO,Financials
+SPX,BF.B,Consumer Staples
+SPX,BLDR,Industrials
+SPX,BG,Consumer Staples
+SPX,BXP,Real Estate
+SPX,CHRW,Industrials
+SPX,CDNS,Information Technology
+SPX,CPT,Real Estate
+SPX,COF,Financials
+SPX,CAH,Health Care
+SPX,CCL,Consumer Discretionary
+SPX,CARR,Industrials
+SPX,CVNA,Consumer Discretionary
+SPX,CASY,Consumer Staples
+SPX,CAT,Industrials
+SPX,CBOE,Financials
+SPX,CBRE,Real Estate
+SPX,CDW,Information Technology
+SPX,COR,Health Care
+SPX,CNC,Health Care
+SPX,CNP,Utilities
+SPX,CF,Materials
+SPX,CRL,Health Care
+SPX,SCHW,Financials
+SPX,CHTR,Communication Services
+SPX,CVX,Energy
+SPX,CMG,Consumer Discretionary
+SPX,CB,Financials
+SPX,CHD,Consumer Staples
+SPX,CIEN,Information Technology
+SPX,CI,Health Care
+SPX,CINF,Financials
+SPX,CTAS,Industrials
+SPX,CSCO,Information Technology
+SPX,C,Financials
+SPX,CFG,Financials
+SPX,CLX,Consumer Staples
+SPX,CME,Financials
+SPX,CMS,Utilities
+SPX,KO,Consumer Staples
+SPX,CTSH,Information Technology
+SPX,COHR,Information Technology
+SPX,COIN,Financials
+SPX,CL,Consumer Staples
+SPX,CMCSA,Communication Services
+SPX,FIX,Industrials
+SPX,COP,Energy
+SPX,ED,Utilities
+SPX,STZ,Consumer Staples
+SPX,CEG,Utilities
+SPX,COO,Health Care
+SPX,CPRT,Industrials
+SPX,GLW,Information Technology
+SPX,CPAY,Financials
+SPX,CTVA,Materials
+SPX,CSGP,Real Estate
+SPX,COST,Consumer Staples
+SPX,CRH,Materials
+SPX,CRWD,Information Technology
+SPX,CCI,Real Estate
+SPX,CSX,Industrials
+SPX,CMI,Industrials
+SPX,CVS,Health Care
+SPX,DHR,Health Care
+SPX,DRI,Consumer Discretionary
+SPX,DDOG,Information Technology
+SPX,DVA,Health Care
+SPX,DECK,Consumer Discretionary
+SPX,DE,Industrials
+SPX,DELL,Information Technology
+SPX,DAL,Industrials
+SPX,DVN,Energy
+SPX,DXCM,Health Care
+SPX,FANG,Energy
+SPX,DLR,Real Estate
+SPX,DG,Consumer Staples
+SPX,DLTR,Consumer Staples
+SPX,D,Utilities
+SPX,DPZ,Consumer Discretionary
+SPX,DASH,Consumer Discretionary
+SPX,DOV,Industrials
+SPX,DOW,Materials
+SPX,DHI,Consumer Discretionary
+SPX,DTE,Utilities
+SPX,DUK,Utilities
+SPX,DD,Industrials
+SPX,ETN,Industrials
+SPX,EBAY,Consumer Discretionary
+SPX,ECHO,Communication Services
+SPX,ECL,Materials
+SPX,EIX,Utilities
+SPX,EW,Health Care
+SPX,ELV,Health Care
+SPX,EME,Industrials
+SPX,EMR,Industrials
+SPX,ETR,Utilities
+SPX,EOG,Energy
+SPX,EQT,Energy
+SPX,EFX,Industrials
+SPX,EQIX,Real Estate
+SPX,ERIE,Financials
+SPX,ESS,Real Estate
+SPX,EL,Consumer Staples
+SPX,EG,Financials
+SPX,EVRG,Utilities
+SPX,ES,Utilities
+SPX,EXC,Utilities
+SPX,EXE,Energy
+SPX,EXPE,Consumer Discretionary
+SPX,EXPD,Industrials
+SPX,EXR,Real Estate
+SPX,XOM,Energy
+SPX,FFIV,Information Technology
+SPX,FDS,Financials
+SPX,FICO,Information Technology
+SPX,FAST,Industrials
+SPX,FRT,Real Estate
+SPX,FDX,Industrials
+SPX,FDXF,Industrials
+SPX,FERG,Industrials
+SPX,FIS,Financials
+SPX,FITB,Financials
+SPX,FSLR,Information Technology
+SPX,FE,Utilities
+SPX,FISV,Financials
+SPX,FLEX,Information Technology
+SPX,F,Consumer Discretionary
+SPX,FTNT,Information Technology
+SPX,FTV,Industrials
+SPX,FOXA,Communication Services
+SPX,FOX,Communication Services
+SPX,BEN,Financials
+SPX,FCX,Materials
+SPX,GRMN,Consumer Discretionary
+SPX,IT,Information Technology
+SPX,GE,Industrials
+SPX,GEHC,Health Care
+SPX,GEV,Industrials
+SPX,GEN,Information Technology
+SPX,GNRC,Industrials
+SPX,GD,Industrials
+SPX,GIS,Consumer Staples
+SPX,GM,Consumer Discretionary
+SPX,GPC,Consumer Discretionary
+SPX,GILD,Health Care
+SPX,GPN,Financials
+SPX,GL,Financials
+SPX,GDDY,Information Technology
+SPX,GS,Financials
+SPX,HAL,Energy
+SPX,HIG,Financials
+SPX,HAS,Consumer Discretionary
+SPX,HCA,Health Care
+SPX,DOC,Real Estate
+SPX,HSIC,Health Care
+SPX,HSY,Consumer Staples
+SPX,HPE,Information Technology
+SPX,HLT,Consumer Discretionary
+SPX,HD,Consumer Discretionary
+SPX,HONA,Industrials
+SPX,HON,Industrials
+SPX,HRL,Consumer Staples
+SPX,HST,Real Estate
+SPX,HWM,Industrials
+SPX,HPQ,Information Technology
+SPX,HUBB,Industrials
+SPX,HUM,Health Care
+SPX,HBAN,Financials
+SPX,HII,Industrials
+SPX,IBM,Information Technology
+SPX,IEX,Industrials
+SPX,IDXX,Health Care
+SPX,ITW,Industrials
+SPX,INCY,Health Care
+SPX,IR,Industrials
+SPX,PODD,Health Care
+SPX,INTC,Information Technology
+SPX,IBKR,Financials
+SPX,ICE,Financials
+SPX,IFF,Materials
+SPX,IP,Materials
+SPX,INTU,Information Technology
+SPX,ISRG,Health Care
+SPX,IVZ,Financials
+SPX,INVH,Real Estate
+SPX,IQV,Health Care
+SPX,IRM,Real Estate
+SPX,JBHT,Industrials
+SPX,JBL,Information Technology
+SPX,JKHY,Financials
+SPX,J,Industrials
+SPX,JNJ,Health Care
+SPX,JCI,Industrials
+SPX,JPM,Financials
+SPX,KVUE,Consumer Staples
+SPX,KDP,Consumer Staples
+SPX,KEY,Financials
+SPX,KEYS,Information Technology
+SPX,KMB,Consumer Staples
+SPX,KIM,Real Estate
+SPX,KMI,Energy
+SPX,KKR,Financials
+SPX,KLAC,Information Technology
+SPX,KHC,Consumer Staples
+SPX,KR,Consumer Staples
+SPX,LHX,Industrials
+SPX,LH,Health Care
+SPX,LRCX,Information Technology
+SPX,LVS,Consumer Discretionary
+SPX,LDOS,Industrials
+SPX,LEN,Consumer Discretionary
+SPX,LII,Industrials
+SPX,LLY,Health Care
+SPX,LIN,Materials
+SPX,LYV,Communication Services
+SPX,LMT,Industrials
+SPX,L,Financials
+SPX,LOW,Consumer Discretionary
+SPX,LULU,Consumer Discretionary
+SPX,LITE,Information Technology
+SPX,LYB,Materials
+SPX,MTB,Financials
+SPX,MPC,Energy
+SPX,MAR,Consumer Discretionary
+SPX,MRSH,Financials
+SPX,MLM,Materials
+SPX,MRVL,Information Technology
+SPX,MAS,Industrials
+SPX,MA,Financials
+SPX,MKC,Consumer Staples
+SPX,MCD,Consumer Discretionary
+SPX,MCK,Health Care
+SPX,MDT,Health Care
+SPX,MRK,Health Care
+SPX,META,Communication Services
+SPX,MET,Financials
+SPX,MTD,Health Care
+SPX,MGM,Consumer Discretionary
+SPX,MCHP,Information Technology
+SPX,MU,Information Technology
+SPX,MSFT,Information Technology
+SPX,MAA,Real Estate
+SPX,MRNA,Health Care
+SPX,TAP,Consumer Staples
+SPX,MDLZ,Consumer Staples
+SPX,MPWR,Information Technology
+SPX,MNST,Consumer Staples
+SPX,MCO,Financials
+SPX,MS,Financials
+SPX,MOS,Materials
+SPX,MSI,Information Technology
+SPX,MSCI,Financials
+SPX,NDAQ,Financials
+SPX,NTAP,Information Technology
+SPX,NFLX,Communication Services
+SPX,NEM,Materials
+SPX,NWSA,Communication Services
+SPX,NWS,Communication Services
+SPX,NEE,Utilities
+SPX,NKE,Consumer Discretionary
+SPX,NI,Utilities
+SPX,NDSN,Industrials
+SPX,NSC,Industrials
+SPX,NTRS,Financials
+SPX,NOC,Industrials
+SPX,NCLH,Consumer Discretionary
+SPX,NRG,Utilities
+SPX,NUE,Materials
+SPX,NVDA,Information Technology
+SPX,NVR,Consumer Discretionary
+SPX,NXPI,Information Technology
+SPX,ORLY,Consumer Discretionary
+SPX,OXY,Energy
+SPX,ODFL,Industrials
+SPX,OMC,Communication Services
+SPX,ON,Information Technology
+SPX,OKE,Energy
+SPX,ORCL,Information Technology
+SPX,OTIS,Industrials
+SPX,PCAR,Industrials
+SPX,PKG,Materials
+SPX,PLTR,Information Technology
+SPX,PANW,Information Technology
+SPX,PSKY,Communication Services
+SPX,PH,Industrials
+SPX,PAYX,Industrials
+SPX,PYPL,Financials
+SPX,PNR,Industrials
+SPX,PEP,Consumer Staples
+SPX,PFE,Health Care
+SPX,PCG,Utilities
+SPX,PM,Consumer Staples
+SPX,PSX,Energy
+SPX,PNW,Utilities
+SPX,PNC,Financials
+SPX,PPG,Materials
+SPX,PPL,Utilities
+SPX,PFG,Financials
+SPX,PG,Consumer Staples
+SPX,PGR,Financials
+SPX,PLD,Real Estate
+SPX,PRU,Financials
+SPX,PEG,Utilities
+SPX,PTC,Information Technology
+SPX,PSA,Real Estate
+SPX,PHM,Consumer Discretionary
+SPX,PWR,Industrials
+SPX,QCOM,Information Technology
+SPX,DGX,Health Care
+SPX,Q,Information Technology
+SPX,RL,Consumer Discretionary
+SPX,RJF,Financials
+SPX,RDDT,Communication Services
+SPX,RTX,Industrials
+SPX,O,Real Estate
+SPX,REG,Real Estate
+SPX,REGN,Health Care
+SPX,RF,Financials
+SPX,RSG,Industrials
+SPX,RMD,Health Care
+SPX,RVTY,Health Care
+SPX,HOOD,Financials
+SPX,ROK,Industrials
+SPX,ROL,Industrials
+SPX,ROP,Information Technology
+SPX,ROST,Consumer Discretionary
+SPX,RCL,Consumer Discretionary
+SPX,SPGI,Financials
+SPX,CRM,Information Technology
+SPX,SNDK,Information Technology
+SPX,SBAC,Real Estate
+SPX,SLB,Energy
+SPX,STX,Information Technology
+SPX,SRE,Utilities
+SPX,NOW,Information Technology
+SPX,SHW,Materials
+SPX,SPG,Real Estate
+SPX,SWKS,Information Technology
+SPX,SJM,Consumer Staples
+SPX,SW,Materials
+SPX,SNA,Industrials
+SPX,SOLV,Health Care
+SPX,SO,Utilities
+SPX,LUV,Industrials
+SPX,SWK,Industrials
+SPX,SBUX,Consumer Discretionary
+SPX,STT,Financials
+SPX,STLD,Materials
+SPX,STE,Health Care
+SPX,SYK,Health Care
+SPX,SMCI,Information Technology
+SPX,SYF,Financials
+SPX,SNPS,Information Technology
+SPX,SYY,Consumer Staples
+SPX,TMUS,Communication Services
+SPX,TROW,Financials
+SPX,TTWO,Communication Services
+SPX,TPR,Consumer Discretionary
+SPX,TRGP,Energy
+SPX,TGT,Consumer Staples
+SPX,TEL,Information Technology
+SPX,TDY,Information Technology
+SPX,TER,Information Technology
+SPX,TSLA,Consumer Discretionary
+SPX,TXN,Information Technology
+SPX,TPL,Energy
+SPX,TXT,Industrials
+SPX,TMO,Health Care
+SPX,TJX,Consumer Discretionary
+SPX,TKO,Communication Services
+SPX,TTD,Communication Services
+SPX,TSCO,Consumer Discretionary
+SPX,TT,Industrials
+SPX,TDG,Industrials
+SPX,TRV,Financials
+SPX,TRMB,Information Technology
+SPX,TFC,Financials
+SPX,TYL,Information Technology
+SPX,TSN,Consumer Staples
+SPX,USB,Financials
+SPX,UBER,Industrials
+SPX,UDR,Real Estate
+SPX,ULTA,Consumer Discretionary
+SPX,UNP,Industrials
+SPX,UAL,Industrials
+SPX,UPS,Industrials
+SPX,URI,Industrials
+SPX,UNH,Health Care
+SPX,UHS,Health Care
+SPX,VLO,Energy
+SPX,VEEV,Health Care
+SPX,VTR,Real Estate
+SPX,VLTO,Industrials
+SPX,VRSN,Information Technology
+SPX,VRSK,Industrials
+SPX,VZ,Communication Services
+SPX,VRTX,Health Care
+SPX,VRT,Industrials
+SPX,VTRS,Health Care
+SPX,VICI,Real Estate
+SPX,V,Financials
+SPX,VST,Utilities
+SPX,VMRK,Real Estate
+SPX,VMC,Materials
+SPX,WRB,Financials
+SPX,GWW,Industrials
+SPX,WAB,Industrials
+SPX,WMT,Consumer Staples
+SPX,DIS,Communication Services
+SPX,WBD,Communication Services
+SPX,WM,Industrials
+SPX,WAT,Health Care
+SPX,WEC,Utilities
+SPX,WFC,Financials
+SPX,WELL,Real Estate
+SPX,WST,Health Care
+SPX,WDC,Information Technology
+SPX,WY,Real Estate
+SPX,WSM,Consumer Discretionary
+SPX,WMB,Energy
+SPX,WTW,Financials
+SPX,WDAY,Information Technology
+SPX,WYNN,Consumer Discretionary
+SPX,XEL,Utilities
+SPX,XYL,Industrials
+SPX,YUM,Consumer Discretionary
+SPX,ZBRA,Information Technology
+SPX,ZBH,Health Care
+SPX,ZTS,Health Care
+NDX,ADBE,Technology
+NDX,AMD,Technology
+NDX,ABNB,Consumer Discretionary
+NDX,ALNY,Health Care
+NDX,GOOGL,Technology
+NDX,AMZN,Consumer Discretionary
+NDX,AEP,Utilities
+NDX,AMGN,Health Care
+NDX,ADI,Technology
+NDX,AAPL,Technology
+NDX,AMAT,Technology
+NDX,APP,Technology
+NDX,ARM,Technology
+NDX,ASML,Technology
+NDX,ALAB,Technology
+NDX,ADSK,Technology
+NDX,ADP,Industrials
+NDX,AXON,Industrials
+NDX,BKR,Energy
+NDX,BKNG,Consumer Discretionary
+NDX,AVGO,Technology
+NDX,CDNS,Technology
+NDX,CTAS,Industrials
+NDX,CSCO,Telecommunications
+NDX,CCEP,Consumer Staples
+NDX,CMCSA,Telecommunications
+NDX,CEG,Utilities
+NDX,CPRT,Consumer Discretionary
+NDX,CRWV,Technology
+NDX,COST,Consumer Discretionary
+NDX,CRWD,Technology
+NDX,CSX,Industrials
+NDX,DDOG,Technology
+NDX,DXCM,Health Care
+NDX,FANG,Energy
+NDX,DASH,Technology
+NDX,EXC,Utilities
+NDX,FAST,Industrials
+NDX,FER,Industrials
+NDX,FTNT,Technology
+NDX,GEHC,Health Care
+NDX,GILD,Health Care
+NDX,HONA,Industrials
+NDX,HON,Industrials
+NDX,IDXX,Health Care
+NDX,INTC,Technology
+NDX,INTU,Technology
+NDX,ISRG,Health Care
+NDX,KDP,Consumer Staples
+NDX,KLAC,Technology
+NDX,KHC,Consumer Staples
+NDX,LRCX,Technology
+NDX,LIN,Basic Materials
+NDX,LITE,Technology
+NDX,MAR,Consumer Discretionary
+NDX,MRVL,Technology
+NDX,MELI,Consumer Discretionary
+NDX,META,Technology
+NDX,MCHP,Technology
+NDX,MU,Technology
+NDX,MSFT,Technology
+NDX,MSTR,Technology
+NDX,MDLZ,Consumer Staples
+NDX,MPWR,Technology
+NDX,MNST,Consumer Staples
+NDX,NBIS,Technology
+NDX,NFLX,Consumer Discretionary
+NDX,NVDA,Technology
+NDX,NXPI,Technology
+NDX,ORLY,Consumer Discretionary
+NDX,ODFL,Industrials
+NDX,PCAR,Consumer Discretionary
+NDX,PLTR,Technology
+NDX,PANW,Technology
+NDX,PAYX,Industrials
+NDX,PYPL,Industrials
+NDX,PDD,Technology
+NDX,PEP,Consumer Staples
+NDX,QCOM,Technology
+NDX,REGN,Health Care
+NDX,RKLB,Industrials
+NDX,ROP,Technology
+NDX,ROST,Consumer Discretionary
+NDX,SNDK,Technology
+NDX,STX,Technology
+NDX,SHOP,Technology
+NDX,SPCX,Telecommunications
+NDX,SBUX,Consumer Discretionary
+NDX,SNPS,Technology
+NDX,TMUS,Telecommunications
+NDX,TTWO,Consumer Discretionary
+NDX,TER,Technology
+NDX,TSLA,Consumer Discretionary
+NDX,TXN,Technology
+NDX,TRI,Technology
+NDX,VRTX,Health Care
+NDX,WMT,Consumer Discretionary
+NDX,WBD,Consumer Discretionary
+NDX,WDC,Technology
+NDX,WDAY,Technology
+NDX,XEL,Utilities

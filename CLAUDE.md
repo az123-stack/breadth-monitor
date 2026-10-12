@@ -20,6 +20,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   ("Breadth Monitor – Live Prices", id `1_R08vZphNLMB4MUJSl_bNPx5DjVVy29tMV8WFaOQkSs`,
   URL in `config.LIVE_CSV_URL`) and recomputes themes/stocks in the browser.
   Browser math mirrors Python exactly. Breadth tab stays end-of-day.
+  Sheet layout (row 1 header): ticker | price | closeyest | open | volume | marketcap | volumeavg | index | symbol;
+  rows 2-3 `_asof` (=NOW()) and `_spytime`. Formulas ask GOOGLEFINANCE for column I (`symbol`); marketcap/volumeavg only
+  where index = 1. Rows come from `python -m breadth.intraday --sheet-rows` (pulse symbols, sector ETFs, theme stocks,
+  S&P 500 + Nasdaq-100). When theme tickers change, re-sync the sheet's A/H/I columns and extend formulas.
+  The page parser reads the header, so old 2-column sheets still work.
 
 ## Code map
 - `breadth/config.py` settings and thresholds · `massive.py` API client
@@ -60,7 +65,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - `levels.py` all-time highs and old monthly peaks from Yahoo (free; Massive free plan only reaches ~2 years), cached in
   `data/levels.json`, fetched in the daily run for new/stale tickers (`config.LEVELS_ENABLED`; tests switch it off)
 - `kq.py` KQ breakout screen → `DATA.kq` (Basing / Extended / Not this setup or failing a rule); "⬇ KQ list" button exports it to TradingView
-- `site.py` + `template.html` single self-contained page (tabs: Breadth, Trade Setups, Themes, Browse, Setups, Stocks; TradingView export modal)
+- `intraday.py` Intraday tab config → `DATA.intraday` (index members + sectors from `data/index_members.csv`, pulse symbols,
+  sector ETFs, the tracker's volume curve, day-type thresholds). The tab itself is browser-only (`renderIntraday`):
+  market pulse (indexes, RSP−SPY, IWM−SPY, VIX, bonds, dollar, gold, oil, BTC, sector ETFs) · who's moving the index
+  (SPX/NDX contribution = prior-close Google market cap weight × change, by stock and sector, day type Broad/Narrow/Mixed)
+  · live 4% breadth on theme stocks with volume pacing · theme/sub-theme heat · in play (paced relative volume, gaps,
+  gap-and-go vs fading) · your trades live (picks, setup rows, triggers/ATH, open scoreboard trades vs stops).
+- `site.py` + `template.html` single self-contained page (tabs: Breadth, Intraday, Trade Setups, Themes, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 127 peer groups (swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added)
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 

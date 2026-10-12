@@ -58,7 +58,16 @@ def payload(history, theme_data=None, kq_data=None):
         "kq": kq_data,
         "repo": config.REPO_URL,
         "live_url": config.LIVE_CSV_URL,
+        "intraday": _intraday(),
     }
+
+
+def _intraday():
+    try:
+        from . import intraday
+        return intraday.payload()
+    except Exception:
+        return None
 
 
 def build(history, theme_data=None, kq_data=None):

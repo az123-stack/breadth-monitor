@@ -189,6 +189,23 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .tg.tg-warn { background: color-mix(in srgb, var(--warning) 25%, transparent); }
 .tg.tg-help { border-color: var(--good); }
 .tg.tg-hurt { border-color: var(--critical); }
+.igrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.itile { border: 1px solid var(--grid); border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; min-width: 0; }
+.itile small { color: var(--text-muted); font-size: 11.5px; }
+.itile b { font-size: 18px; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.itile .meta { font-size: 11px; }
+.up { color: var(--good); } .dn { color: var(--critical); }
+.ibars { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 3px 16px; }
+.ibar { display: grid; grid-template-columns: 1fr 80px 64px; align-items: center; gap: 6px; font-size: 12.5px; }
+.ibar i { height: 8px; border-radius: 4px; display: block; }
+.ibar i.up, .ibp i.up { background: color-mix(in srgb, var(--good) 60%, transparent); } .ibar i.dn, .ibp i.dn { background: color-mix(in srgb, var(--critical) 60%, transparent); }
+.ibar b { text-align: right; font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 600; }
+.ibp { display: inline-block; width: 50px; height: 7px; margin-right: 6px; vertical-align: middle; }
+.ibp i { display: block; height: 100%; border-radius: 3px; }
+.isplit { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 12px; }
+.ih { font-size: 13px; margin: 12px 0 4px; }
+@media (max-width: 520px) { .icard table.grid td.l { white-space: normal; min-width: 110px; } .icard table.grid td.l small { display: block; } .icard table.grid th, .icard table.grid td { padding-left: 5px; padding-right: 5px; } }
+.ibtns { margin: 6px 0; }
 .tsbtns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .tsbtns button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--grid); background: var(--surface, transparent); color: var(--text-primary); cursor: pointer; }
 .ang { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 999px; margin: 1px 2px 1px 0; background: var(--grid); color: var(--text-secondary); white-space: nowrap; }
@@ -338,7 +355,7 @@ const TONES = {
 };
 
 let TAB = "breadth";
-try { const h = location.hash.slice(1); if (["breadth", "trades", "themes", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
+try { const h = location.hash.slice(1); if (["breadth", "intraday", "trades", "themes", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
 
 function render() {
   const app = document.getElementById("app");
@@ -369,6 +386,7 @@ function render() {
   });
   const tabs = $(`<nav class="tabs" role="tablist">
     <button role="tab" data-tab="breadth">Breadth</button>
+    <button role="tab" data-tab="intraday">Intraday</button>
     <button role="tab" data-tab="trades">Trade Setups</button>
     <button role="tab" data-tab="themes">Themes</button>
     <button role="tab" data-tab="browse">Browse</button>
@@ -385,6 +403,7 @@ function render() {
     else if (TAB === "browse") renderBrowse(panel);
     else if (TAB === "setups") renderSetups(panel);
     else if (TAB === "trades") renderTrades(panel);
+    else if (TAB === "intraday") renderIntraday(panel);
     else renderBreadth(panel);
   };
   tabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
@@ -784,18 +803,35 @@ const UI = { hz: "short",
   browse: { view: "theme", order: "rank", q: "", open: new Set(), all: false },
   stocks: { tier: "All", theme: "", sub: "", q: "", limit: 100, sort: ["rsr", -1] } };
 
+function csvSplit(line) {
+  const out = []; let cur = "", q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) { if (ch === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+    else if (ch === '"') q = true; else if (ch === ",") { out.push(cur); cur = ""; } else cur += ch;
+  }
+  out.push(cur); return out.map(x => x.trim());
+}
+const liveNum = (v) => { if (v == null || v === "") return null; const n = parseFloat(String(v).replace(/[$,%\s]/g, "")); return isFinite(n) ? n : null; };
+// Live sheet: ticker | price | closeyest | open | volume | marketcap | volumeavg | index | symbol (older sheets: ticker | price)
 function parseLiveCSV(text) {
-  const prices = {}; let spyTime = null;
+  const prices = {}, rows = {}; let spyTime = null, asof = null, cols = null;
   text.split(/\r?\n/).forEach(line => {
-    const i = line.indexOf(","); if (i < 0) return;
-    const k = line.slice(0, i).trim().replace(/^"|"$/g, ""), v = line.slice(i + 1).trim().replace(/^"|"$/g, "");
-    if (k === "_spytime") spyTime = v;
-    else if (k && k[0] !== "_" && k !== "ticker") { const n = parseFloat(v.replace(/[$,]/g, "")); if (isFinite(n) && n > 0) prices[k.toUpperCase()] = n; }
+    if (!line.trim()) return;
+    const f = csvSplit(line), k = (f[0] || "").replace(/^"|"$/g, "");
+    if (k === "ticker") { cols = f.map(x => x.toLowerCase()); return; }
+    if (k === "_spytime") { spyTime = f[1]; return; }
+    if (k === "_asof") { asof = f[1]; return; }
+    if (!k || k[0] === "_") return;
+    const key = k.toUpperCase(), r = {};
+    (cols || ["ticker", "price"]).forEach((c, i) => { if (i > 0 && c !== "symbol") r[c] = liveNum(f[i]); });
+    if (r.price != null && r.price > 0) prices[key] = r.price;
+    rows[key] = r;
   });
   let spyDate = null;
   const m = spyTime && spyTime.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (m) spyDate = `${m[3]}-${m[1].padStart(2, "0")}-${m[2].padStart(2, "0")}`;
-  return { prices, spyTime, spyDate };
+  return { prices, rows, spyTime, spyDate, asof };
 }
 
 async function fetchLive() {
@@ -965,7 +1001,8 @@ function rerenderPanel() {
   const y = window.scrollY; panel.innerHTML = "";
   if (TAB === "themes") renderThemes(panel); else if (TAB === "stocks") renderStocks(panel);
   else if (TAB === "browse") renderBrowse(panel); else if (TAB === "setups") renderSetups(panel);
-  else if (TAB === "trades") renderTrades(panel); else renderBreadth(panel);
+  else if (TAB === "trades") renderTrades(panel);
+  else if (TAB === "intraday") renderIntraday(panel); else renderBreadth(panel);
   window.scrollTo(0, y);
 }
 setInterval(() => { if (document.visibilityState === "visible" && (TAB !== "breadth")) fetchLive(); }, 3 * 60 * 1000);
@@ -1398,6 +1435,158 @@ function renderSetups(app) {
     <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.dvol == null ? "–" : r.dvol.toFixed(0)}</td><td class="num">${r.price?.toFixed(2) ?? "–"}</td>`, SETUP_SORT.e));
   sec3.append($(`<div class="note">Gap up 8–60% on 3× average volume that held +5% at the close; $5+ and $20M+ average dollar volume. A watch list, not a buy list: without checking the catalyst (earnings, news), these have faded on average in every breadth regime (see the table above). Stockbee's EPs need a real fundamental surprise.</div>`));
   app.append(sec3);
+}
+
+/* =================== Intraday tab (breadth/intraday.py) =================== */
+function nyClock() {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false })
+    .formatToParts(new Date()).map(x => [x.type, x.value]));
+  const mins = (+p.hour % 24) * 60 + (+p.minute) - 570, wk = !["Sat", "Sun"].includes(p.weekday);
+  return { mins, open: wk && mins >= 0 && mins < 390, label: `${p.hour}:${p.minute} ET` };
+}
+function volPace(mins) {
+  const P = (DATA.intraday || {}).volume_profile || [[0, 0], [390, 1]];
+  if (mins <= 0) return null; if (mins >= 390) return 1;
+  for (let i = 1; i < P.length; i++) if (mins <= P[i][0]) { const [a, x] = P[i - 1], [b, y] = P[i]; return x + (y - x) * (mins - a) / (b - a); }
+  return 1;
+}
+const ID = { idx: "^SPX" };
+function liveRow(t) {
+  const r = LIVE && LIVE.rows && LIVE.rows[t]; if (!r || r.price == null || !r.closeyest) return null;
+  const chg = r.price / r.closeyest - 1; if (!isFinite(chg) || Math.abs(chg) > 0.6) return null;
+  return { ...r, chg, gap: r.open ? r.open / r.closeyest - 1 : null, fromOpen: r.open ? r.price / r.open - 1 : null };
+}
+function indexMovers(key) {
+  const I = DATA.intraday, mem = (I.members || {})[key === "^NDX" ? "NDX" : "SPX"] || [], dup = new Set(I.dup_classes || []);
+  const rows = [];
+  mem.forEach(([t, sector]) => { if (dup.has(t)) return; const r = liveRow(t); if (!r || !r.marketcap) return;
+    rows.push({ t, sector, chg: r.chg, cap0: r.marketcap / (1 + r.chg), volume: r.volume, vavg: r.volumeavg }); });
+  const tot = rows.reduce((a, r) => a + r.cap0, 0);
+  rows.forEach(r => { r.w = r.cap0 / tot; r.bp = r.w * r.chg * 1e4; });
+  const ret = rows.reduce((a, r) => a + r.w * r.chg, 0), eq = rows.length ? rows.reduce((a, r) => a + r.chg, 0) / rows.length : null;
+  const adv = rows.filter(r => r.chg > 0).length, dec = rows.filter(r => r.chg < 0).length;
+  const byAbs = rows.slice().sort((a, b) => Math.abs(b.bp) - Math.abs(a.bp));
+  const top10 = byAbs.slice(0, 10).reduce((a, r) => a + r.bp, 0), net = ret * 1e4;
+  const big10 = rows.slice().sort((a, b) => b.cap0 - a.cap0).slice(0, 10).reduce((a, r) => a + r.bp, 0);
+  const actual = liveRow(key);
+  const D = I.day_type || {}, share = adv + dec ? (ret >= 0 ? adv : dec) / (adv + dec) : null, t10share = net ? top10 / net : null;
+  let type = "Mixed";
+  if (Math.abs(ret) < D.flat) type = "Flat";
+  else if (share >= D.broad_share && Math.abs(t10share) <= D.broad_top10) type = "Broad";
+  else if (Math.abs(t10share) >= D.narrow_top10 || Math.abs(ret - eq) >= D.narrow_gap) type = "Narrow";
+  const sectors = {};
+  rows.forEach(r => { const s = sectors[r.sector] ||= { sector: r.sector, w: 0, bp: 0, n: 0, up: 0, sum: 0 }; s.w += r.w; s.bp += r.bp; s.n++; s.sum += r.chg; if (r.chg > 0) s.up++; });
+  return { rows, ret, eq, adv, dec, share, top10, t10share, big10, net, actual: actual && actual.chg, type,
+    sectors: Object.values(sectors).map(s => ({ ...s, avg: s.sum / s.n, upShare: s.up / s.n })).sort((a, b) => b.bp - a.bp) };
+}
+function renderIntraday(app) {
+  const I = DATA.intraday, T = DATA.themes;
+  if (!I) { app.append($('<div class="icard card empty">Intraday data appears after the next build.</div>')); return; }
+  const clk = nyClock(), pace = volPace(clk.mins);
+  const hasCols = LIVE && LIVE.rows && Object.values(LIVE.rows).some(r => r.closeyest != null);
+  app.append($(`<div class="livebar"><span class="dot ${LIVE && hasCols ? "on" : "off"}"></span><span>${!LIVE ? (LIVE_ERR ? `Couldn't load live prices (${esc(LIVE_ERR)}).` : "Loading live prices…")
+    : !hasCols ? "The live sheet only has prices so far: the full Intraday view needs its extra columns." 
+    : `<b>${clk.open ? "Session open" : "Market closed"}</b> · ${clk.label} · Google prices fetched ${LIVE.fetched.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} (Google runs up to ~20 min behind) · refreshes every 3 min`}</span><button>Refresh</button></div>`));
+  app.querySelector(".livebar:last-child button").addEventListener("click", () => fetchLive());
+  if (!hasCols) return;
+  const pc = (v, d = 2) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
+  const cls = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "dn" : "";
+  // 1. Market pulse
+  const tile = (k, label) => { const r = liveRow(k); return `<div class="itile"><small>${esc(label)}</small><b class="${cls(r && r.chg)}">${r ? pc(r.chg) : "–"}</b><span class="meta">${r ? fmt(r.price, r.price < 100 ? 2 : 0) : ""}</span></div>`; };
+  const spread = (a, b, label, note) => { const x = liveRow(a), y = liveRow(b); const v = x && y ? x.chg - y.chg : null;
+    return `<div class="itile"><small>${esc(label)}</small><b class="${cls(v)}">${v == null ? "–" : (v > 0 ? "+" : "") + (v * 100).toFixed(2) + " pts"}</b><span class="meta">${esc(note)}</span></div>`; };
+  app.append($(`<section class="icard card regcard"><div class="kicker">Market pulse</div>
+    <div class="igrid">${Object.entries(I.pulse).map(([k, l]) => tile(k, l)).join("")}</div>
+    <div class="igrid" style="margin-top:8px">${spread("RSP", "SPY", "Equal weight vs cap weight", "RSP minus SPY: positive = broad")}${spread("QQEW", "QQQ", "Nasdaq equal vs cap", "QQEW minus QQQ")}${spread("IWM", "SPY", "Small vs large caps", "IWM minus SPY")}</div>
+    <div class="ibars" style="margin-top:10px">${Object.entries(I.sector_etfs).map(([k, l]) => ({ k, l, r: liveRow(k) })).filter(x => x.r).sort((a, b) => b.r.chg - a.r.chg)
+      .map(x => `<div class="ibar"><span>${esc(x.l)} <small class="meta">${x.k}</small></span><i class="${cls(x.r.chg)}" style="width:${Math.min(100, Math.abs(x.r.chg) * 2500)}%"></i><b class="${cls(x.r.chg)}">${pc(x.r.chg)}</b></div>`).join("")}</div></section>`));
+  // 2. Who's moving the index
+  const sec = $(`<section class="icard card regcard"><div class="kicker">Who's moving the index</div><div class="ibtns"></div><div class="ibody"></div></section>`);
+  sec.querySelector(".ibtns").append(chips("Index", [["^SPX", "S&P 500"], ["^NDX", "Nasdaq-100"]], ID, "idx", rerenderPanel));
+  const M = indexMovers(ID.idx), mx = Math.max(1, ...M.rows.map(r => Math.abs(r.bp)));
+  const list = (rows) => rows.map(r => `<tr><td class="l"><b>${r.t}</b> <small class="meta">${esc(r.sector)}</small></td><td class="num ${cls(r.chg)}">${pc(r.chg)}</td><td class="num">${(r.w * 100).toFixed(2)}%</td>
+    <td class="num ${cls(r.bp)}"><span class="ibp"><i class="${cls(r.bp)}" style="width:${Math.abs(r.bp) / mx * 100}%"></i></span>${r.bp > 0 ? "+" : ""}${r.bp.toFixed(1)}</td>
+    <td class="num">${r.volume && r.vavg && pace ? (r.volume / (r.vavg * pace)).toFixed(1) + "×" : "–"}</td></tr>`).join("");
+  const hdr = `<thead><tr><th class="l">Stock</th><th>Change</th><th>Weight</th><th>Contribution<small>basis points</small></th><th>Rel. volume<small>paced</small></th></tr></thead>`;
+  const ups = M.rows.filter(r => r.bp > 0).sort((a, b) => b.bp - a.bp).slice(0, 15), dns = M.rows.filter(r => r.bp < 0).sort((a, b) => a.bp - b.bp).slice(0, 15);
+  sec.querySelector(".ibody").append($(`<div>
+    <div class="igrid" style="margin:8px 0">
+      <div class="itile"><small>Reconstructed return</small><b class="${cls(M.ret)}">${pc(M.ret)}</b><span class="meta">${M.rows.length} stocks with data</span></div>
+      <div class="itile"><small>Index actual</small><b class="${cls(M.actual)}">${pc(M.actual)}</b><span class="meta">${M.actual != null ? "gap " + ((M.ret - M.actual) * 100).toFixed(2) + " pts" : ""}</span></div>
+      <div class="itile"><small>Equal-weight return</small><b class="${cls(M.eq)}">${pc(M.eq)}</b><span class="meta">cap minus equal ${((M.ret - M.eq) * 100).toFixed(2)} pts</span></div>
+      <div class="itile"><small>Advancers / decliners</small><b>${M.adv} / ${M.dec}</b><span class="meta">${M.share != null ? Math.round(M.share * 100) + "% moving with the index" : ""}</span></div>
+      <div class="itile"><small>Top 10 movers' share of the move</small><b>${M.t10share != null ? Math.round(M.t10share * 100) + "%" : "–"}</b><span class="meta">${M.top10.toFixed(0)} of ${M.net.toFixed(0)} bp</span></div>
+      <div class="itile"><small>Day type (provisional)</small><b>${M.type}</b><span class="meta">10 largest companies ${M.big10 > 0 ? "+" : ""}${M.big10.toFixed(0)} bp</span></div>
+    </div>
+    <div class="isplit"><div><h3 class="ih">Pushing up</h3><div class="scroll"><table class="grid">${hdr}<tbody>${list(ups)}</tbody></table></div></div>
+      <div><h3 class="ih">Pushing down</h3><div class="scroll"><table class="grid">${hdr}<tbody>${list(dns)}</tbody></table></div></div></div>
+    <h3 class="ih">By sector</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Sector</th><th>Weight</th><th>Avg change</th><th>Contribution<small>bp</small></th><th>Share up</th></tr></thead><tbody>
+      ${M.sectors.map(s => `<tr><td class="l">${esc(s.sector)}</td><td class="num">${(s.w * 100).toFixed(1)}%</td><td class="num ${cls(s.avg)}">${pc(s.avg)}</td><td class="num ${cls(s.bp)}">${s.bp > 0 ? "+" : ""}${s.bp.toFixed(1)}</td><td class="num">${Math.round(s.upShare * 100)}%</td></tr>`).join("")}</tbody></table></div>
+    <div class="note" style="padding:8px 0 0">Contribution = weight at the prior close × today's change, so the column adds up to the index return. Weights are Google market caps (not float-adjusted; GOOG, FOX and NWS left out because Google repeats the whole company's cap on both classes), so the reconstructed return runs a little off the real index. Day type: Flat under ±0.02%; Broad when ${Math.round(I.day_type.broad_share * 100)}%+ of stocks move with the index and the top 10 make up at most ${Math.round(I.day_type.broad_top10 * 100)}% of the move; Narrow when the top 10 make up ${Math.round(I.day_type.narrow_top10 * 100)}%+ or cap weight beats equal weight by ${(I.day_type.narrow_gap * 100).toFixed(1)}+ pts. Starting guesses from your tracker, not tested rules.</div></div>`));
+  app.append(sec);
+  // 3. Live breadth on our stocks (vs the same stocks' last full session)
+  const st = (T.stocks || []).filter(s => s.is_stock);
+  let a = 0, d = 0, u4 = 0, d4 = 0, u4v = 0, d4v = 0, ya = 0, yd = 0, yu4 = 0, yd4 = 0, n = 0;
+  st.forEach(s => { if (s.today != null) { if (s.today > 0) ya++; else if (s.today < 0) yd++; if (s.today >= 0.04) yu4++; if (s.today <= -0.04) yd4++; }
+    const r = liveRow(s.t); if (!r) return; n++;
+    if (r.chg > 0) a++; else if (r.chg < 0) d++;
+    const rv = r.volume && s.v50 && pace ? r.volume / (s.v50 * pace) : null;
+    if (r.chg >= 0.04) { u4++; if (rv != null && rv >= 1) u4v++; } if (r.chg <= -0.04) { d4++; if (rv != null && rv >= 1) d4v++; } });
+  const sameDay = LIVE.spyDate && T.date && LIVE.spyDate === T.date;
+  app.append($(`<section class="icard card regcard"><div class="kicker">Live breadth · our ${n} theme stocks</div>
+    <div class="igrid" style="margin-top:8px">
+      <div class="itile"><small>Up / down</small><b>${a} / ${d}</b><span class="meta">${n ? Math.round(a / n * 100) : 0}% up · last full session ${ya} / ${yd}</span></div>
+      <div class="itile"><small>Up 4%+</small><b class="up">${u4}</b><span class="meta">${u4v} on above-normal volume · last session ${yu4}</span></div>
+      <div class="itile"><small>Down 4%+</small><b class="dn">${d4}</b><span class="meta">${d4v} on above-normal volume · last session ${yd4}</span></div>
+      <div class="itile"><small>4% ratio</small><b class="${u4 >= d4 ? "up" : "dn"}">${d4 ? (u4 / d4).toFixed(2) : u4 ? "∞" : "–"}</b><span class="meta">up 4% ÷ down 4%</span></div>
+    </div>
+    <div class="note" style="padding:8px 0 0">${sameDay ? "Google's latest session is the one already on the Breadth tab, so these match yesterday's close until the next session starts. " : ""}Counts our tracked stocks only, so they're smaller than the Breadth tab's whole-market numbers; "last session" uses the same stocks for a fair comparison. "Above-normal volume" = volume so far above the 50-day average, paced for the time of day.</div></section>`));
+  // 4. Theme heat
+  const heat = (groups) => groups.map(g => { const ch = (g.members || []).map(t => liveRow(t)).filter(Boolean).map(r => r.chg); return { name: g.theme, n: ch.length, avg: ch.length ? ch.reduce((x, y) => x + y, 0) / ch.length : null, up: ch.filter(x => x > 0).length }; })
+    .filter(g => g.n >= 3 && g.avg != null).sort((x, y) => y.avg - x.avg);
+  const th = heat(T.themes || []), sb = heat(T.subthemes || []);
+  const hrows = (rs) => rs.map(g => `<tr><td class="l">${esc(g.name)}</td><td class="num ${cls(g.avg)}">${pc(g.avg)}</td><td class="num">${g.up}/${g.n}</td></tr>`).join("");
+  const htab = (title, rs) => `<div><h3 class="ih">${title}</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Group</th><th>Avg change</th><th>Up</th></tr></thead><tbody>${hrows(rs)}</tbody></table></div></div>`;
+  app.append($(`<section class="icard card regcard"><div class="kicker">Theme heat · today</div>
+    <div class="isplit">${htab("Leading themes", th.slice(0, 8))}${htab("Lagging themes", th.slice(-6).reverse())}</div>
+    <div class="isplit">${htab("Leading sub-themes", sb.slice(0, 8))}${htab("Lagging sub-themes", sb.slice(-6).reverse())}</div></section>`));
+  // 5. In play: relative volume and gaps
+  const pool = {};
+  st.forEach(s => { const r = liveRow(s.t); if (r) pool[s.t] = { t: s.t, name: s.name, r, avg: s.v50, sub: s.sub }; });
+  Object.values(I.members || {}).flat().forEach(([t]) => { if (pool[t]) return; const r = liveRow(t); if (r) pool[t] = { t, r, avg: r.volumeavg }; });
+  const P = Object.values(pool).filter(x => x.r.price >= 5);
+  const rv = P.filter(x => x.avg && pace && x.r.volume >= 100000).map(x => ({ ...x, rv: x.r.volume / (x.avg * pace) })).sort((a, b) => b.rv - a.rv).slice(0, 15);
+  const gapsU = P.filter(x => x.r.gap != null && x.r.gap >= 0.02).sort((a, b) => b.r.gap - a.r.gap).slice(0, 10);
+  const gapsD = P.filter(x => x.r.gap != null && x.r.gap <= -0.02).sort((a, b) => a.r.gap - b.r.gap).slice(0, 10);
+  const nm = (x) => `<td class="l"><b>${x.t}</b> <small class="meta">${esc(x.sub || "")}</small></td>`;
+  const gt = (rs) => `<div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Gap</th><th>Since open</th><th>Change</th><th class="l">Holding?</th></tr></thead><tbody>${rs.map(x => `<tr>${nm(x)}<td class="num ${cls(x.r.gap)}">${pc(x.r.gap, 1)}</td><td class="num ${cls(x.r.fromOpen)}">${pc(x.r.fromOpen, 1)}</td><td class="num ${cls(x.r.chg)}">${pc(x.r.chg, 1)}</td><td class="l">${x.r.fromOpen == null ? "" : (x.r.gap > 0) === (x.r.fromOpen > 0) ? "Gap and go" : "Fading"}</td></tr>`).join("") || '<tr><td class="l meta" colspan="5">None yet.</td></tr>'}</tbody></table></div>`;
+  app.append($(`<section class="icard card regcard"><div class="kicker">In play</div>
+    <h3 class="ih">Heaviest relative volume ${pace ? "" : '<small class="meta">(starts once the session opens)</small>'}</h3>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Rel. volume<small>paced</small></th><th>Change</th><th>Gap</th><th>Since open</th></tr></thead><tbody>
+      ${rv.map(x => `<tr>${nm(x)}<td class="num"><b>${x.rv.toFixed(1)}×</b></td><td class="num ${cls(x.r.chg)}">${pc(x.r.chg, 1)}</td><td class="num ${cls(x.r.gap)}">${pc(x.r.gap, 1)}</td><td class="num ${cls(x.r.fromOpen)}">${pc(x.r.fromOpen, 1)}</td></tr>`).join("") || '<tr><td class="l meta" colspan="5">No volume data yet.</td></tr>'}</tbody></table></div>
+    <div class="isplit"><div><h3 class="ih">Gapped up 2%+</h3>${gt(gapsU)}</div><div><h3 class="ih">Gapped down 2%+</h3>${gt(gapsD)}</div></div>
+    <div class="note" style="padding:8px 0 0">Our tracked stocks plus the S&P 500 and Nasdaq-100, $5+. Relative volume compares volume so far with the 50-day average, scaled to the share of a normal day done by now (your tracker's volume curve). "Gap and go" = still moving in the gap's direction since the open.</div></section>`));
+  // 6. Your trades, live
+  const X = T.trade_setups || {}, PB = T.playbook || {}, SB = T.scoreboard || {};
+  const items = [];
+  (PB.picks || []).forEach(c => items.push({ t: c.t, where: "Top pick #" + ((PB.picks || []).indexOf(c) + 1), setup: c.setup, setup_name: c.setup_name, trig: c.trigger, row: (X.rows || {})[c.t] }));
+  (X.setups || []).forEach(S => S.top.forEach(t => { if (!items.some(i => i.t === t && i.setup === S.key)) items.push({ t, where: S.name, setup: S.key, setup_name: S.name, row: X.rows[t],
+    trig: S.key === "kq" ? X.rows[t].kq_pivot : S.key === "vcp" ? X.rows[t].vcp_pivot : null }); }));
+  (PB.pick_watch || []).forEach(w => items.push({ t: w.t, where: "Watch (not actionable yet)", setup_name: w.setup_name, trig: w.trigger, row: (X.rows || {})[w.t] }));
+  const statusOf = (it, r) => {
+    if (!r) return ["meta", "no live price"];
+    if (it.trig) { const dist = r.price / it.trig - 1; return dist >= 0 ? ["up", "Triggered: through $" + (+it.trig).toFixed(2)] : ["", `${pc(dist, 1)} to trigger $${(+it.trig).toFixed(2)}`]; }
+    if (it.setup === "ath" && it.row && it.row.ath) { const dist = r.price / it.row.ath - 1; return dist >= -0.001 ? ["up", "At / through the all-time high"] : ["", `${pc(dist, 1)} to ATH $${it.row.ath.toFixed(2)}`]; }
+    return ["", ""];
+  };
+  const trows = items.map(it => { const r = liveRow(it.t), [c, txt] = statusOf(it, r);
+    return `<tr><td class="l"><b>${it.t}</b> <small class="meta">${esc(it.where)}</small></td><td class="l">${esc(it.setup_name || "")}</td><td class="num">${r ? r.price.toFixed(2) : "–"}</td><td class="num ${cls(r && r.chg)}">${r ? pc(r.chg, 1) : "–"}</td><td class="l ${c}">${txt}</td></tr>`; }).join("");
+  const opens = (SB.open || []).filter(o => o.status === "open" && o.entry).map(o => { const r = liveRow(o.t); const stop = o.setup === "vcp" && o.vcp_stop ? o.vcp_stop : o.entry * (1 - (o.stop_pct || 0));
+    return `<tr><td class="l"><b>${o.t}</b> <small class="meta">picked ${o.date.slice(5)}</small></td><td class="num">${(+o.entry).toFixed(2)}</td><td class="num">${r ? r.price.toFixed(2) : "–"}</td><td class="num ${cls(r && r.price / o.entry - 1)}">${r ? pc(r.price / o.entry - 1, 1) : "–"}</td><td class="l ${r && r.price <= stop ? "dn" : ""}">${r ? (r.price <= stop ? "Stop hit (≈$" + stop.toFixed(2) + ")" : "Above stop ≈$" + stop.toFixed(2)) : ""}</td></tr>`; }).join("");
+  app.append($(`<section class="icard card regcard"><div class="kicker">Your trades, live</div>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th class="l">Setup</th><th>Price</th><th>Change</th><th class="l">Status</th></tr></thead><tbody>${trows}</tbody></table></div>
+    ${opens ? `<h3 class="ih">Scoreboard trades in progress</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Entry</th><th>Price</th><th>Since entry</th><th class="l">Stop</th></tr></thead><tbody>${opens}</tbody></table></div>` : ""}
+    <div class="note" style="padding:8px 0 0">Flag and VCP names show "Triggered" once Google's price trades through the pivot; that's a cue to check the chart, not an order. ATH Magnet names flag when they reach the all-time high.</div></section>`));
 }
 
 /* ---------- Conviction tags (tradesetups.TAGS; evidence from trade_bt.tag_stats) ---------- */
