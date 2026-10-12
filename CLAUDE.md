@@ -58,7 +58,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   `data/levels.json`, fetched in the daily run for new/stale tickers (`config.LEVELS_ENABLED`; tests switch it off)
 - `kq.py` KQ breakout screen → `DATA.kq` (Basing / Extended / Not this setup or failing a rule); "⬇ KQ list" button exports it to TradingView
 - `site.py` + `template.html` single self-contained page (tabs: Breadth, Trade Setups, Themes, Browse, Setups, Stocks; TradingView export modal)
-- `data/themes.csv` (theme,ticker,role) 79 themes · `data/subthemes.csv` (group,subtheme,ticker) 119 peer groups
+- `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 127 peer groups (swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added)
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
 ## Definitions

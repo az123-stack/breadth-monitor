@@ -1,36 +1,40 @@
 group,subtheme,ticker
 AI Infrastructure,AI Accelerators & GPUs,NVDA
 AI Infrastructure,AI Accelerators & GPUs,AMD
-AI Infrastructure,Custom Silicon & Networking Chips,AVGO
-AI Infrastructure,Custom Silicon & Networking Chips,MRVL
-AI Infrastructure,Custom Silicon & Networking Chips,ALAB
-AI Infrastructure,Custom Silicon & Networking Chips,CRDO
-AI Infrastructure,Custom Silicon & Networking Chips,ARM
 AI Infrastructure,AI Servers & Integrators,SMCI
 AI Infrastructure,AI Servers & Integrators,CLS
 AI Infrastructure,AI Servers & Integrators,JBL
 AI Infrastructure,AI Servers & Integrators,FLEX
 AI Infrastructure,AI Servers & Integrators,WYFI
-AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",DELL
-AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",HPE
-AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",NTNX
-AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",PSTG
-AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",NTAP
-AI Infrastructure,Memory & Storage Media,MU
-AI Infrastructure,Memory & Storage Media,SNDK
-AI Infrastructure,Memory & Storage Media,WDC
-AI Infrastructure,Memory & Storage Media,STX
+AI Infrastructure,AI Servers & Integrators,SANM
+AI Infrastructure,AI Servers & Integrators,PLXS
+AI Infrastructure,AI Servers & Integrators,BHE
+AI Infrastructure,AI Servers & Integrators,TTMI
+AI Infrastructure,Custom Silicon & Networking Chips,AVGO
+AI Infrastructure,Custom Silicon & Networking Chips,MRVL
+AI Infrastructure,Custom Silicon & Networking Chips,ALAB
+AI Infrastructure,Custom Silicon & Networking Chips,CRDO
+AI Infrastructure,Custom Silicon & Networking Chips,ARM
+AI Infrastructure,Custom Silicon & Networking Chips,MXL
+AI Infrastructure,Custom Silicon & Networking Chips,SMTC
+AI Infrastructure,Custom Silicon & Networking Chips,SITM
 AI Infrastructure,Data Center Networking,ANET
 AI Infrastructure,Data Center Networking,CSCO
 AI Infrastructure,Data Center Networking,CIEN
 AI Infrastructure,Data Center Networking,NOK
-AI Infrastructure,Optical Components & Transceivers,LITE
-AI Infrastructure,Optical Components & Transceivers,COHR
-AI Infrastructure,Optical Components & Transceivers,AAOI
-AI Infrastructure,Optical Components & Transceivers,FN
-AI Infrastructure,Optical Components & Transceivers,POET
-AI Infrastructure,Optical Components & Transceivers,IPGP
-AI Infrastructure,Optical Components & Transceivers,MTSI
+AI Infrastructure,Data Center REITs,EQIX
+AI Infrastructure,Data Center REITs,DLR
+AI Infrastructure,Data Center REITs,IRM
+AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",DELL
+AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",HPE
+AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",NTNX
+AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",P
+AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",NTAP
+AI Infrastructure,"Enterprise AI Infrastructure (Servers, Storage, HCI)",PENG
+AI Infrastructure,Memory & Storage Media,MU
+AI Infrastructure,Memory & Storage Media,SNDK
+AI Infrastructure,Memory & Storage Media,WDC
+AI Infrastructure,Memory & Storage Media,STX
 AI Infrastructure,Neoclouds & GPU Hosting,CRWV
 AI Infrastructure,Neoclouds & GPU Hosting,NBIS
 AI Infrastructure,Neoclouds & GPU Hosting,IREN
@@ -39,204 +43,39 @@ AI Infrastructure,Neoclouds & GPU Hosting,CORZ
 AI Infrastructure,Neoclouds & GPU Hosting,WULF
 AI Infrastructure,Neoclouds & GPU Hosting,CIFR
 AI Infrastructure,Neoclouds & GPU Hosting,GLXY
-AI Infrastructure,Data Center REITs,EQIX
-AI Infrastructure,Data Center REITs,DLR
-AI Infrastructure,Data Center REITs,IRM
-Semiconductors,Semicap Equipment,ASML
-Semiconductors,Semicap Equipment,AMAT
-Semiconductors,Semicap Equipment,LRCX
-Semiconductors,Semicap Equipment,KLAC
-Semiconductors,Semicap Equipment,TER
-Semiconductors,Semicap Equipment,FORM
-Semiconductors,Foundry,TSM
-Semiconductors,Foundry,INTC
-Semiconductors,Analog & Power Semis,ADI
-Semiconductors,Analog & Power Semis,TXN
-Semiconductors,Analog & Power Semis,ON
-Semiconductors,Analog & Power Semis,NXPI
-Semiconductors,Analog & Power Semis,MPWR
-Semiconductors,Mobile & Edge Chips,QCOM
-Software,Hyperscalers,MSFT
-Software,Hyperscalers,AMZN
-Software,Hyperscalers,GOOGL
-Software,Hyperscalers,ORCL
-Software,Hyperscalers,META
-Software,AI Applications & Platforms,PLTR
-Software,AI Applications & Platforms,AI
-Software,AI Applications & Platforms,SOUN
-Software,AI Applications & Platforms,BBAI
-Software,AI Applications & Platforms,APP
-Software,AI Applications & Platforms,PATH
-Software,Enterprise SaaS,CRM
-Software,Enterprise SaaS,NOW
-Software,Enterprise SaaS,WDAY
-Software,Enterprise SaaS,ADBE
-Software,Enterprise SaaS,INTU
-Software,Enterprise SaaS,TEAM
-Software,Enterprise SaaS,HUBS
-Software,Enterprise SaaS,SAP
-Software,Enterprise SaaS,BILL
-Software,Data & Observability,SNOW
-Software,Data & Observability,MDB
-Software,Data & Observability,DDOG
-Software,Data & Observability,ESTC
-Software,Data & Observability,CFLT
-Software,Data & Observability,DOCN
-Software,Data & Observability,IBM
-Software,Design & Engineering Software,CDNS
-Software,Design & Engineering Software,SNPS
-Software,Design & Engineering Software,ADSK
-Software,Cybersecurity Platforms,CRWD
-Software,Cybersecurity Platforms,PANW
-Software,Cybersecurity Platforms,FTNT
-Software,Cybersecurity Platforms,ZS
-Software,Cybersecurity Platforms,NET
-Software,Cybersecurity Platforms,CHKP
-Software,Identity & Security Tools,OKTA
-Software,Identity & Security Tools,S
-Software,Identity & Security Tools,CYBR
-Software,Identity & Security Tools,QLYS
-Software,Identity & Security Tools,TENB
-Software,Identity & Security Tools,RPD
-Software,Identity & Security Tools,VRNS
-Internet & Consumer Tech,E-Commerce Marketplaces,SHOP
-Internet & Consumer Tech,E-Commerce Marketplaces,MELI
-Internet & Consumer Tech,E-Commerce Marketplaces,ETSY
-Internet & Consumer Tech,E-Commerce Marketplaces,EBAY
-Internet & Consumer Tech,E-Commerce Marketplaces,W
-Internet & Consumer Tech,E-Commerce Marketplaces,CHWY
-Internet & Consumer Tech,E-Commerce Marketplaces,CPNG
-Internet & Consumer Tech,E-Commerce Marketplaces,REAL
-Internet & Consumer Tech,E-Commerce Marketplaces,PRTS
-Internet & Consumer Tech,E-Commerce Marketplaces,BYON
-Internet & Consumer Tech,E-Commerce Marketplaces,GLBE
-Internet & Consumer Tech,E-Commerce Marketplaces,CART
-Internet & Consumer Tech,E-Commerce Marketplaces,JMIA
-Internet & Consumer Tech,China Internet,BABA
-Internet & Consumer Tech,China Internet,PDD
-Internet & Consumer Tech,China Internet,JD
-Internet & Consumer Tech,China Internet,BIDU
-Internet & Consumer Tech,China Internet,NTES
-Internet & Consumer Tech,China Internet,BILI
-Internet & Consumer Tech,China Internet,IQ
-Internet & Consumer Tech,China Internet,TME
-Internet & Consumer Tech,China Internet,BEKE
-Internet & Consumer Tech,China Internet,TCOM
-Internet & Consumer Tech,China Internet,FUTU
-Internet & Consumer Tech,China Internet,YUMC
-Internet & Consumer Tech,China Internet,ZTO
-Internet & Consumer Tech,Social & Ad Platforms,SNAP
-Internet & Consumer Tech,Social & Ad Platforms,PINS
-Internet & Consumer Tech,Social & Ad Platforms,RDDT
-Internet & Consumer Tech,Social & Ad Platforms,MTCH
-Internet & Consumer Tech,Social & Ad Platforms,BMBL
-Internet & Consumer Tech,Social & Ad Platforms,YELP
-Internet & Consumer Tech,Social & Ad Platforms,ZG
-Internet & Consumer Tech,Social & Ad Platforms,DJT
-Internet & Consumer Tech,Social & Ad Platforms,NXDR
-Internet & Consumer Tech,Social & Ad Platforms,TTD
-Internet & Consumer Tech,Streaming & Media,NFLX
-Internet & Consumer Tech,Streaming & Media,SPOT
-Internet & Consumer Tech,Streaming & Media,ROKU
-Internet & Consumer Tech,Gaming Publishers & Platforms,TTWO
-Internet & Consumer Tech,Gaming Publishers & Platforms,EA
-Internet & Consumer Tech,Gaming Publishers & Platforms,RBLX
-Internet & Consumer Tech,Gaming Publishers & Platforms,U
-Internet & Consumer Tech,Gaming Publishers & Platforms,SONY
-Internet & Consumer Tech,Gaming Publishers & Platforms,PLTK
-Internet & Consumer Tech,Gaming Publishers & Platforms,SCPL
-Internet & Consumer Tech,Gaming Publishers & Platforms,GRVY
-Internet & Consumer Tech,Travel & Gig Platforms,ABNB
-Internet & Consumer Tech,Travel & Gig Platforms,UBER
-Internet & Consumer Tech,Travel & Gig Platforms,DASH
-Internet & Consumer Tech,Travel & Gig Platforms,BKNG
-Internet & Consumer Tech,Travel & Gig Platforms,MMYT
-Internet & Consumer Tech,Travel & Gig Platforms,YTRA
-Internet & Consumer Tech,Travel & Gig Platforms,GRAB
-Internet & Consumer Tech,Travel & Gig Platforms,SE
-Internet & Consumer Tech,Consumer Apps,DUOL
-Internet & Consumer Tech,Consumer Apps,HIMS
-Fintech & Crypto,Payments & Networks,V
-Fintech & Crypto,Payments & Networks,MA
-Fintech & Crypto,Payments & Networks,PYPL
-Fintech & Crypto,Payments & Networks,XYZ
-Fintech & Crypto,Payments & Networks,TOST
-Fintech & Crypto,Digital Banks & Lenders,SOFI
-Fintech & Crypto,Digital Banks & Lenders,NU
-Fintech & Crypto,Digital Banks & Lenders,AFRM
-Fintech & Crypto,Digital Banks & Lenders,UPST
-Fintech & Crypto,Crypto Exchanges & Brokers,COIN
-Fintech & Crypto,Crypto Exchanges & Brokers,HOOD
-Fintech & Crypto,Crypto Exchanges & Brokers,CRCL
-Fintech & Crypto,Crypto Exchanges & Brokers,CME
-Fintech & Crypto,Bitcoin Treasury Companies,MSTR
-Fintech & Crypto,Ethereum Treasury Companies,BMNR
-Fintech & Crypto,Ethereum Treasury Companies,SBET
-Fintech & Crypto,Ethereum Treasury Companies,BTCS
-Fintech & Crypto,Bitcoin Miners,MARA
-Fintech & Crypto,Bitcoin Miners,RIOT
-Fintech & Crypto,Bitcoin Miners,CLSK
-Fintech & Crypto,Bitcoin Miners,HUT
-Fintech & Crypto,Bitcoin Miners,BITF
-Fintech & Crypto,Bitcoin Miners,HIVE
-Fintech & Crypto,Bitcoin Miners,BTDR
-Fintech & Crypto,Bitcoin Miners,BTBT
-Robotics & Autonomy,Robotaxi & Self-Driving,TSLA
-Robotics & Autonomy,Robotaxi & Self-Driving,MBLY
-Robotics & Autonomy,Robotaxi & Self-Driving,AUR
-Robotics & Autonomy,Robotaxi & Self-Driving,PONY
-Robotics & Autonomy,Robotaxi & Self-Driving,WRD
-Robotics & Autonomy,Lidar & Vision,LAZR
-Robotics & Autonomy,Lidar & Vision,OUST
-Robotics & Autonomy,Lidar & Vision,HSAI
-Robotics & Autonomy,Lidar & Vision,INVZ
-Robotics & Autonomy,Lidar & Vision,CGNX
-Robotics & Autonomy,Industrial & Surgical Robots,ISRG
-Robotics & Autonomy,Industrial & Surgical Robots,ROK
-Robotics & Autonomy,Industrial & Surgical Robots,SYM
-Robotics & Autonomy,Industrial & Surgical Robots,SERV
-Robotics & Autonomy,Industrial & Surgical Robots,PRCT
-Robotics & Autonomy,Industrial & Surgical Robots,RR
-Robotics & Autonomy,Industrial & Surgical Robots,KSCP
-Robotics & Autonomy,Industrial & Surgical Robots,ZBRA
-Robotics & Autonomy,Industrial & Surgical Robots,NDSN
-Robotics & Autonomy,EV Makers,RIVN
-Robotics & Autonomy,EV Makers,LCID
-Robotics & Autonomy,EV Makers,NIO
-Robotics & Autonomy,EV Makers,XPEV
-Robotics & Autonomy,EV Makers,LI
-Robotics & Autonomy,Auto Tech Suppliers,APTV
-Consumer,Display & Electronics (Korea),LPL
-Quantum,Quantum Computing,IONQ
-Quantum,Quantum Computing,RGTI
-Quantum,Quantum Computing,QBTS
-Quantum,Quantum Computing,QUBT
-Quantum,Quantum Computing,ARQQ
-Quantum,Quantum Computing,LAES
-Quantum,Quantum Computing,QMCO
-Aerospace & Defense,Defense Primes,LMT
-Aerospace & Defense,Defense Primes,NOC
-Aerospace & Defense,Defense Primes,GD
-Aerospace & Defense,Defense Primes,RTX
-Aerospace & Defense,Defense Primes,LHX
-Aerospace & Defense,Defense Primes,HII
-Aerospace & Defense,Defense IT & Services,BAH
-Aerospace & Defense,Defense IT & Services,CACI
-Aerospace & Defense,Defense IT & Services,SAIC
-Aerospace & Defense,Defense IT & Services,LDOS
-Aerospace & Defense,Defense IT & Services,PSN
-Aerospace & Defense,Defense Tech & Electronics,AXON
-Aerospace & Defense,Defense Tech & Electronics,KTOS
-Aerospace & Defense,Defense Tech & Electronics,MRCY
-Aerospace & Defense,Defense Tech & Electronics,DRS
-Aerospace & Defense,Defense Tech & Electronics,CW
+AI Infrastructure,Optical Components & Transceivers,LITE
+AI Infrastructure,Optical Components & Transceivers,COHR
+AI Infrastructure,Optical Components & Transceivers,AAOI
+AI Infrastructure,Optical Components & Transceivers,FN
+AI Infrastructure,Optical Components & Transceivers,POET
+AI Infrastructure,Optical Components & Transceivers,IPGP
+AI Infrastructure,Optical Components & Transceivers,MTSI
+AI Infrastructure,Optical Components & Transceivers,AXTI
 Aerospace & Defense,Commercial Aerospace,BA
 Aerospace & Defense,Commercial Aerospace,GE
 Aerospace & Defense,Commercial Aerospace,HWM
 Aerospace & Defense,Commercial Aerospace,TDG
 Aerospace & Defense,Commercial Aerospace,HEI
 Aerospace & Defense,Commercial Aerospace,TXT
-Aerospace & Defense,Commercial Aerospace,ERJ
+Aerospace & Defense,Commercial Aerospace,EMBJ
+Aerospace & Defense,Commercial Aerospace,ATI
+Aerospace & Defense,Commercial Aerospace,DCO
+Aerospace & Defense,Defense IT & Services,BAH
+Aerospace & Defense,Defense IT & Services,CACI
+Aerospace & Defense,Defense IT & Services,SAIC
+Aerospace & Defense,Defense IT & Services,LDOS
+Aerospace & Defense,Defense IT & Services,PSN
+Aerospace & Defense,Defense Primes,LMT
+Aerospace & Defense,Defense Primes,NOC
+Aerospace & Defense,Defense Primes,GD
+Aerospace & Defense,Defense Primes,RTX
+Aerospace & Defense,Defense Primes,LHX
+Aerospace & Defense,Defense Primes,HII
+Aerospace & Defense,Defense Tech & Electronics,AXON
+Aerospace & Defense,Defense Tech & Electronics,KTOS
+Aerospace & Defense,Defense Tech & Electronics,MRCY
+Aerospace & Defense,Defense Tech & Electronics,DRS
+Aerospace & Defense,Defense Tech & Electronics,CW
 Aerospace & Defense,Military Drones & Counter-UAS,AVAV
 Aerospace & Defense,Military Drones & Counter-UAS,RCAT
 Aerospace & Defense,Military Drones & Counter-UAS,UMAC
@@ -247,220 +86,12 @@ Aerospace & Defense,Military Drones & Counter-UAS,PDYN
 Aerospace & Defense,eVTOL & Air Taxis,JOBY
 Aerospace & Defense,eVTOL & Air Taxis,ACHR
 Aerospace & Defense,eVTOL & Air Taxis,EH
-Space,Launch & Space Systems,RKLB
-Space,Launch & Space Systems,FLY
-Space,Launch & Space Systems,RDW
-Space,Launch & Space Systems,KRMN
-Space,Launch & Space Systems,SPCE
-Space,Launch & Space Systems,LUNR
-Space,Satellite Connectivity & Imaging,ASTS
-Space,Satellite Connectivity & Imaging,IRDM
-Space,Satellite Connectivity & Imaging,GSAT
-Space,Satellite Connectivity & Imaging,SATS
-Space,Satellite Connectivity & Imaging,PL
-Space,Satellite Connectivity & Imaging,BKSY
-Power & Grid,Nuclear Reactors (SMR),OKLO
-Power & Grid,Nuclear Reactors (SMR),SMR
-Power & Grid,Nuclear Reactors (SMR),NNE
-Power & Grid,Nuclear Fuel & Enrichment,LEU
-Power & Grid,Nuclear Fuel & Enrichment,BWXT
-Power & Grid,Independent Power Producers,CEG
-Power & Grid,Independent Power Producers,VST
-Power & Grid,Independent Power Producers,TLN
-Power & Grid,Independent Power Producers,NRG
-Power & Grid,Gas Turbines & Grid Equipment,GEV
-Power & Grid,Gas Turbines & Grid Equipment,ETN
-Power & Grid,Gas Turbines & Grid Equipment,HUBB
-Power & Grid,Gas Turbines & Grid Equipment,POWL
-Power & Grid,Gas Turbines & Grid Equipment,AMSC
-Power & Grid,Gas Turbines & Grid Equipment,PLPC
-Power & Grid,Gas Turbines & Grid Equipment,AYI
-Power & Grid,Gas Turbines & Grid Equipment,ESE
-Power & Grid,Gas Turbines & Grid Equipment,ITRI
-Power & Grid,Data Center Power & Cooling,VRT
-Power & Grid,Data Center Power & Cooling,NVT
-Power & Grid,Data Center Power & Cooling,MOD
-Power & Grid,On-site Power & Fuel Cells,BE
-Power & Grid,On-site Power & Fuel Cells,PLUG
-Power & Grid,On-site Power & Fuel Cells,FCEL
-Power & Grid,On-site Power & Fuel Cells,BLDP
-Power & Grid,On-site Power & Fuel Cells,GNRC
-Power & Grid,On-site Power & Fuel Cells,CMI
-Power & Grid,On-site Power & Fuel Cells,CAT
-Power & Grid,On-site Power & Fuel Cells,BW
-Power & Grid,On-site Power & Fuel Cells,AROC
-Power & Grid,Grid & Electrical Contractors,PWR
-Power & Grid,Grid & Electrical Contractors,MTZ
-Power & Grid,Grid & Electrical Contractors,EME
-Power & Grid,Grid & Electrical Contractors,PRIM
-Power & Grid,Grid & Electrical Contractors,MYRG
-Power & Grid,Grid & Electrical Contractors,IESC
-Power & Grid,Grid & Electrical Contractors,DY
-Power & Grid,Grid & Electrical Contractors,AGX
-Power & Grid,Grid & Electrical Contractors,FIX
-Power & Grid,Regulated Utilities,NEE
-Power & Grid,Regulated Utilities,SO
-Power & Grid,Regulated Utilities,DUK
-Power & Grid,Regulated Utilities,AEP
-Power & Grid,Regulated Utilities,D
-Power & Grid,Regulated Utilities,EXC
-Power & Grid,Regulated Utilities,XEL
-Power & Grid,Regulated Utilities,SRE
-Power & Grid,Regulated Utilities,PCG
-Power & Grid,Regulated Utilities,ED
-Power & Grid,Regulated Utilities,ETR
-Power & Grid,Regulated Utilities,PEG
-Clean Energy,Solar Manufacturers,FSLR
-Clean Energy,Solar Manufacturers,CSIQ
-Clean Energy,Solar Manufacturers,JKS
-Clean Energy,Solar Manufacturers,DQ
-Clean Energy,Solar Manufacturers,MAXN
-Clean Energy,Solar Manufacturers,SOL
-Clean Energy,Solar Inverters & Trackers,ENPH
-Clean Energy,Solar Inverters & Trackers,SEDG
-Clean Energy,Solar Inverters & Trackers,NXT
-Clean Energy,Solar Inverters & Trackers,ARRY
-Clean Energy,Solar Inverters & Trackers,SHLS
-Clean Energy,Solar Inverters & Trackers,TYGO
-Clean Energy,Solar Inverters & Trackers,ZEO
-Clean Energy,Solar Inverters & Trackers,TE
-Clean Energy,Residential Solar & Yieldcos,RUN
-Clean Energy,Residential Solar & Yieldcos,CWEN
-Clean Energy,Residential Solar & Yieldcos,BEP
-Clean Energy,Residential Solar & Yieldcos,BEPC
-Clean Energy,Residential Solar & Yieldcos,AES
-Clean Energy,Residential Solar & Yieldcos,HASI
-Clean Energy,Residential Solar & Yieldcos,ORA
-Clean Energy,Batteries & Storage,FLNC
-Clean Energy,Batteries & Storage,EOSE
-Clean Energy,Batteries & Storage,ENVX
-Clean Energy,Batteries & Storage,QS
-Clean Energy,Batteries & Storage,SLDP
-Clean Energy,Batteries & Storage,AMPX
-Clean Energy,Batteries & Storage,ESS
-Clean Energy,Batteries & Storage,MVST
-Clean Energy,Lithium,ALB
-Clean Energy,Lithium,SQM
-Clean Energy,Lithium,LAC
-Clean Energy,Lithium,SGML
-Clean Energy,Lithium,LAR
-Clean Energy,Lithium,ATLX
-Clean Energy,Lithium,IONR
-Clean Energy,Industrial Gases & Hydrogen,APD
-Clean Energy,Industrial Gases & Hydrogen,LIN
-Clean Energy,Industrial Gases & Hydrogen,CLNE
-Energy,Integrated & Large-cap Oil,XOM
-Energy,Integrated & Large-cap Oil,CVX
-Energy,Integrated & Large-cap Oil,COP
-Energy,Integrated & Large-cap Oil,SHEL
-Energy,Integrated & Large-cap Oil,TTE
-Energy,Integrated & Large-cap Oil,BP
-Energy,Integrated & Large-cap Oil,PBR
-Energy,Integrated & Large-cap Oil,CVE
-Energy,Integrated & Large-cap Oil,SU
-Energy,Integrated & Large-cap Oil,YPF
-Energy,Integrated & Large-cap Oil,VIST
-Energy,Shale E&P,EOG
-Energy,Shale E&P,OXY
-Energy,Shale E&P,DVN
-Energy,Shale E&P,FANG
-Energy,Shale E&P,APA
-Energy,Natural Gas Producers,EQT
-Energy,Natural Gas Producers,AR
-Energy,Natural Gas Producers,RRC
-Energy,Natural Gas Producers,CNX
-Energy,Natural Gas Producers,EXE
-Energy,Natural Gas Producers,CTRA
-Energy,Natural Gas Producers,GPOR
-Energy,LNG & Midstream,LNG
-Energy,LNG & Midstream,CQP
-Energy,LNG & Midstream,KMI
-Energy,LNG & Midstream,WMB
-Energy,LNG & Midstream,AM
-Energy,LNG & Midstream,DTM
-Energy,LNG & Midstream,NFE
-Energy,Refiners,PSX
-Energy,Refiners,MPC
-Energy,Refiners,VLO
-Energy,Oil Services & Drillers,SLB
-Energy,Oil Services & Drillers,HAL
-Energy,Oil Services & Drillers,BKR
-Energy,Oil Services & Drillers,FTI
-Energy,Oil Services & Drillers,NOV
-Energy,Oil Services & Drillers,TS
-Energy,Oil Services & Drillers,NE
-Energy,Oil Services & Drillers,RIG
-Energy,Oil Services & Drillers,WFRD
-Energy,Oil Services & Drillers,VAL
-Energy,Oil Services & Drillers,LBRT
-Energy,Oil Services & Drillers,PTEN
-Energy,Oil Services & Drillers,HP
-Energy,Oil Services & Drillers,TDW
-Energy,Uranium Miners,CCJ
-Energy,Uranium Miners,NXE
-Energy,Uranium Miners,UEC
-Energy,Uranium Miners,DNN
-Energy,Uranium Miners,UUUU
-Energy,Uranium Miners,URG
-Energy,Uranium Miners,EU
-Metals & Mining,Gold Majors & Royalties,NEM
-Metals & Mining,Gold Majors & Royalties,AEM
-Metals & Mining,Gold Majors & Royalties,B
-Metals & Mining,Gold Majors & Royalties,WPM
-Metals & Mining,Gold Majors & Royalties,FNV
-Metals & Mining,Gold Majors & Royalties,RGLD
-Metals & Mining,Gold Majors & Royalties,OR
-Metals & Mining,Gold Majors & Royalties,KGC
-Metals & Mining,Gold Majors & Royalties,AU
-Metals & Mining,Gold Majors & Royalties,GFI
-Metals & Mining,Gold Majors & Royalties,HMY
-Metals & Mining,Gold Mid-tiers,AGI
-Metals & Mining,Gold Mid-tiers,EGO
-Metals & Mining,Gold Mid-tiers,NGD
-Metals & Mining,Gold Mid-tiers,IAG
-Metals & Mining,Gold Mid-tiers,SBSW
-Metals & Mining,Silver Miners,PAAS
-Metals & Mining,Silver Miners,CDE
-Metals & Mining,Silver Miners,HL
-Metals & Mining,Silver Miners,AG
-Metals & Mining,Silver Miners,EXK
-Metals & Mining,Silver Miners,FSM
-Metals & Mining,Silver Miners,SSRM
-Metals & Mining,Silver Miners,SVM
-Metals & Mining,Silver Miners,ASM
-Metals & Mining,Silver Miners,USAS
-Metals & Mining,Copper Miners,FCX
-Metals & Mining,Copper Miners,SCCO
-Metals & Mining,Copper Miners,TECK
-Metals & Mining,Copper Miners,HBM
-Metals & Mining,Copper Miners,ERO
-Metals & Mining,Copper Miners,CMCL
-Metals & Mining,Copper Miners,IE
-Metals & Mining,Copper Miners,TGB
-Metals & Mining,Diversified Miners,BHP
-Metals & Mining,Diversified Miners,RIO
-Metals & Mining,Diversified Miners,VALE
-Metals & Mining,Diversified Miners,NEXA
-Metals & Mining,Aluminum,AA
-Metals & Mining,Aluminum,CENX
-Metals & Mining,Rare Earths & Critical Minerals,MP
-Metals & Mining,Rare Earths & Critical Minerals,USAR
-Metals & Mining,Rare Earths & Critical Minerals,UAMY
-Metals & Mining,Rare Earths & Critical Minerals,NB
-Metals & Mining,Rare Earths & Critical Minerals,TMC
-Metals & Mining,Steel,NUE
-Metals & Mining,Steel,STLD
-Metals & Mining,Steel,RS
-Metals & Mining,Steel,CLF
-Metals & Mining,Steel,CMC
-Metals & Mining,Steel,TX
-Metals & Mining,Steel,MT
-Metals & Mining,Steel,GGB
-Metals & Mining,Steel,PKX
-Metals & Mining,Commodity ETFs,SLV
-Metals & Mining,Commodity ETFs,CORN
-Metals & Mining,Commodity ETFs,WEAT
-Metals & Mining,Commodity ETFs,SOYB
+Agriculture,Farm Equipment & Ag Processing,DE
+Agriculture,Farm Equipment & Ag Processing,AGCO
+Agriculture,Farm Equipment & Ag Processing,CNH
+Agriculture,Farm Equipment & Ag Processing,ADM
+Agriculture,Farm Equipment & Ag Processing,BG
+Agriculture,Farm Equipment & Ag Processing,LW
 Agriculture,Fertilizers & Crop Inputs,NTR
 Agriculture,Fertilizers & Crop Inputs,CF
 Agriculture,Fertilizers & Crop Inputs,MOS
@@ -468,12 +99,64 @@ Agriculture,Fertilizers & Crop Inputs,IPI
 Agriculture,Fertilizers & Crop Inputs,FMC
 Agriculture,Fertilizers & Crop Inputs,CTVA
 Agriculture,Fertilizers & Crop Inputs,CMP
-Agriculture,Farm Equipment & Ag Processing,DE
-Agriculture,Farm Equipment & Ag Processing,AGCO
-Agriculture,Farm Equipment & Ag Processing,CNH
-Agriculture,Farm Equipment & Ag Processing,ADM
-Agriculture,Farm Equipment & Ag Processing,BG
-Agriculture,Farm Equipment & Ag Processing,LW
+Biotech & Health,AI Drug Discovery & Synbio,RXRX
+Biotech & Health,AI Drug Discovery & Synbio,ABSI
+Biotech & Health,AI Drug Discovery & Synbio,SDGR
+Biotech & Health,AI Drug Discovery & Synbio,DNA
+Biotech & Health,AI Drug Discovery & Synbio,ABCL
+Biotech & Health,CROs,MEDP
+Biotech & Health,CROs,CRL
+Biotech & Health,CROs,FTRE
+Biotech & Health,Diabetes & Cardio Devices,DXCM
+Biotech & Health,Diabetes & Cardio Devices,PODD
+Biotech & Health,Diabetes & Cardio Devices,IRTC
+Biotech & Health,Diabetes & Cardio Devices,TMDX
+Biotech & Health,Diabetes & Cardio Devices,RMD
+Biotech & Health,Gene Editing,CRSP
+Biotech & Health,Gene Editing,NTLA
+Biotech & Health,Gene Editing,BEAM
+Biotech & Health,Gene Editing,EDIT
+Biotech & Health,Genomics & Diagnostics,ILMN
+Biotech & Health,Genomics & Diagnostics,PACB
+Biotech & Health,Genomics & Diagnostics,TXG
+Biotech & Health,Genomics & Diagnostics,NTRA
+Biotech & Health,Genomics & Diagnostics,GH
+Biotech & Health,Genomics & Diagnostics,VCYT
+Biotech & Health,Genomics & Diagnostics,WGS
+Biotech & Health,Genomics & Diagnostics,QGEN
+Biotech & Health,Genomics & Diagnostics,TWST
+Biotech & Health,Genomics & Diagnostics,CDNA
+Biotech & Health,Genomics & Diagnostics,TEM
+Biotech & Health,Genomics & Diagnostics,ADPT
+Biotech & Health,Genomics & Diagnostics,PSNL
+Biotech & Health,Genomics & Diagnostics,NEO
+Biotech & Health,Genomics & Diagnostics,CAI
+Biotech & Health,Genomics & Diagnostics,HTFL
+Biotech & Health,Healthcare Providers,THC
+Biotech & Health,Healthcare Providers,CON
+Biotech & Health,Healthcare Providers,BTSG
+Biotech & Health,Healthcare Providers,AVAH
+Biotech & Health,Healthcare Providers,LFST
+Biotech & Health,Healthcare Providers,NHC
+Biotech & Health,Healthcare Providers,PACS
+Biotech & Health,Immunology & Inflammation,SYRE
+Biotech & Health,Immunology & Inflammation,ORKA
+Biotech & Health,Immunology & Inflammation,KNSA
+Biotech & Health,Immunology & Inflammation,DNTH
+Biotech & Health,Immunology & Inflammation,PTGX
+Biotech & Health,Immunology & Inflammation,TGTX
+Biotech & Health,Immunology & Inflammation,KYMR
+Biotech & Health,Large-cap Biotech,VRTX
+Biotech & Health,Large-cap Biotech,REGN
+Biotech & Health,Large-cap Biotech,ALNY
+Biotech & Health,Large-cap Biotech,ARGX
+Biotech & Health,Large-cap Biotech,INSM
+Biotech & Health,Large-cap Biotech,NBIX
+Biotech & Health,Large-cap Biotech,INCY
+Biotech & Health,Large-cap Biotech,UTHR
+Biotech & Health,Large-cap Biotech,BMRN
+Biotech & Health,Large-cap Biotech,BNTX
+Biotech & Health,Large-cap Biotech,ONC
 Biotech & Health,Large-cap Pharma,LLY
 Biotech & Health,Large-cap Pharma,NVO
 Biotech & Health,Large-cap Pharma,MRK
@@ -492,49 +175,16 @@ Biotech & Health,Large-cap Pharma,TEVA
 Biotech & Health,Large-cap Pharma,VTRS
 Biotech & Health,Large-cap Pharma,RDY
 Biotech & Health,Large-cap Pharma,ZTS
-Biotech & Health,Obesity & Metabolic,VKTX
-Biotech & Health,Obesity & Metabolic,MDGL
-Biotech & Health,Large-cap Biotech,VRTX
-Biotech & Health,Large-cap Biotech,REGN
-Biotech & Health,Large-cap Biotech,ALNY
-Biotech & Health,Large-cap Biotech,ARGX
-Biotech & Health,Large-cap Biotech,INSM
-Biotech & Health,Large-cap Biotech,NBIX
-Biotech & Health,Large-cap Biotech,INCY
-Biotech & Health,Large-cap Biotech,UTHR
-Biotech & Health,Large-cap Biotech,BMRN
-Biotech & Health,Large-cap Biotech,BNTX
-Biotech & Health,Large-cap Biotech,ONC
-Biotech & Health,Mid-cap Biotech,EXEL
-Biotech & Health,Mid-cap Biotech,RVMD
-Biotech & Health,Mid-cap Biotech,IONS
-Biotech & Health,Mid-cap Biotech,SRPT
-Biotech & Health,Mid-cap Biotech,RARE
-Biotech & Health,Mid-cap Biotech,MRNA
-Biotech & Health,Mid-cap Biotech,LEGN
-Biotech & Health,Mid-cap Biotech,CYTK
-Biotech & Health,Mid-cap Biotech,KRYS
-Biotech & Health,Mid-cap Biotech,AXSM
-Biotech & Health,Mid-cap Biotech,PTCT
-Biotech & Health,Gene Editing,CRSP
-Biotech & Health,Gene Editing,NTLA
-Biotech & Health,Gene Editing,BEAM
-Biotech & Health,Gene Editing,EDIT
-Biotech & Health,Genomics & Diagnostics,ILMN
-Biotech & Health,Genomics & Diagnostics,PACB
-Biotech & Health,Genomics & Diagnostics,TXG
-Biotech & Health,Genomics & Diagnostics,NTRA
-Biotech & Health,Genomics & Diagnostics,GH
-Biotech & Health,Genomics & Diagnostics,VCYT
-Biotech & Health,Genomics & Diagnostics,WGS
-Biotech & Health,Genomics & Diagnostics,QGEN
-Biotech & Health,Genomics & Diagnostics,TWST
-Biotech & Health,Genomics & Diagnostics,CDNA
-Biotech & Health,Genomics & Diagnostics,TEM
-Biotech & Health,AI Drug Discovery & Synbio,RXRX
-Biotech & Health,AI Drug Discovery & Synbio,ABSI
-Biotech & Health,AI Drug Discovery & Synbio,SDGR
-Biotech & Health,AI Drug Discovery & Synbio,DNA
+Biotech & Health,Large-cap Pharma,OGN
+Biotech & Health,Large-cap Pharma,AMRX
+Biotech & Health,Life Science Tools,RVTY
+Biotech & Health,Life Science Tools,AVTR
+Biotech & Health,Life Science Tools,AZTA
+Biotech & Health,Life Science Tools,NEOG
+Biotech & Health,Managed Care,HUM
+Biotech & Health,Managed Care,CNC
+Biotech & Health,Managed Care,OSCR
+Biotech & Health,Managed Care,AGL
 Biotech & Health,Medical Devices,BSX
 Biotech & Health,Medical Devices,SYK
 Biotech & Health,Medical Devices,MDT
@@ -548,55 +198,203 @@ Biotech & Health,Medical Devices,GMED
 Biotech & Health,Medical Devices,NVST
 Biotech & Health,Medical Devices,LIVN
 Biotech & Health,Medical Devices,GEHC
-Biotech & Health,Diabetes & Cardio Devices,DXCM
-Biotech & Health,Diabetes & Cardio Devices,PODD
-Biotech & Health,Diabetes & Cardio Devices,IRTC
-Biotech & Health,Diabetes & Cardio Devices,TMDX
-Biotech & Health,Diabetes & Cardio Devices,RMD
-Biotech & Health,CROs,MEDP
-Financials,Money-center Banks,JPM
-Financials,Money-center Banks,BAC
-Financials,Money-center Banks,WFC
-Financials,Money-center Banks,C
-Financials,Investment Banks & Brokers,GS
-Financials,Investment Banks & Brokers,MS
-Financials,Investment Banks & Brokers,SCHW
-Financials,Investment Banks & Brokers,BK
-Financials,Super-regional Banks,USB
-Financials,Super-regional Banks,PNC
-Financials,Super-regional Banks,TFC
-Financials,Super-regional Banks,COF
-Financials,Super-regional Banks,FITB
-Financials,Super-regional Banks,MTB
-Financials,Super-regional Banks,KEY
-Financials,Super-regional Banks,RF
-Financials,Super-regional Banks,CFG
-Financials,Super-regional Banks,HBAN
-Financials,Regional & Community Banks,WAL
-Financials,Regional & Community Banks,ZION
-Financials,Regional & Community Banks,CMA
-Financials,Regional & Community Banks,EWBC
-Financials,Regional & Community Banks,UMBF
-Financials,Regional & Community Banks,FFIN
-Financials,Regional & Community Banks,CATY
-Financials,Regional & Community Banks,BANR
-Financials,Regional & Community Banks,CVBF
-Financials,Regional & Community Banks,NBTB
-Financials,Regional & Community Banks,IBCP
-Financials,Regional & Community Banks,TOWN
-Financials,Regional & Community Banks,BANC
-Financials,P&C Insurers,PGR
-Financials,P&C Insurers,TRV
-Financials,P&C Insurers,CB
-Financials,P&C Insurers,ALL
-Financials,P&C Insurers,HIG
-Financials,P&C Insurers,ACGL
-Financials,P&C Insurers,WRB
-Financials,P&C Insurers,L
-Financials,Life Insurers,MET
-Financials,Life Insurers,PRU
-Financials,Life Insurers,AFL
-Financials,Life Insurers,AIG
+Biotech & Health,Medical Devices,HAE
+Biotech & Health,Medical Devices,ATRC
+Biotech & Health,Medical Devices,GKOS
+Biotech & Health,Medical Devices,ITGR
+Biotech & Health,Medical Devices,PLSE
+Biotech & Health,Mid-cap Biotech,EXEL
+Biotech & Health,Mid-cap Biotech,RVMD
+Biotech & Health,Mid-cap Biotech,IONS
+Biotech & Health,Mid-cap Biotech,SRPT
+Biotech & Health,Mid-cap Biotech,RARE
+Biotech & Health,Mid-cap Biotech,MRNA
+Biotech & Health,Mid-cap Biotech,LEGN
+Biotech & Health,Mid-cap Biotech,CYTK
+Biotech & Health,Mid-cap Biotech,KRYS
+Biotech & Health,Mid-cap Biotech,AXSM
+Biotech & Health,Mid-cap Biotech,PTCT
+Biotech & Health,Mid-cap Biotech,CORT
+Biotech & Health,Mid-cap Biotech,PRAX
+Biotech & Health,Mid-cap Biotech,AMLX
+Biotech & Health,Mid-cap Biotech,EWTX
+Biotech & Health,Mid-cap Biotech,TVTX
+Biotech & Health,Mid-cap Biotech,ROIV
+Biotech & Health,Mid-cap Biotech,KOD
+Biotech & Health,Mid-cap Biotech,OMER
+Biotech & Health,Mid-cap Biotech,HALO
+Biotech & Health,Mid-cap Biotech,PCVX
+Biotech & Health,Mid-cap Biotech,NVAX
+Biotech & Health,Obesity & Metabolic,VKTX
+Biotech & Health,Obesity & Metabolic,MDGL
+Biotech & Health,Oncology Biotech,IOVA
+Biotech & Health,Oncology Biotech,IBRX
+Biotech & Health,Oncology Biotech,REPL
+Biotech & Health,Oncology Biotech,ERAS
+Biotech & Health,Oncology Biotech,TNGX
+Biotech & Health,Oncology Biotech,RLAY
+Biotech & Health,Oncology Biotech,NRIX
+Biotech & Health,Oncology Biotech,XNCR
+Clean Energy,Batteries & Storage,FLNC
+Clean Energy,Batteries & Storage,EOSE
+Clean Energy,Batteries & Storage,ENVX
+Clean Energy,Batteries & Storage,QS
+Clean Energy,Batteries & Storage,SLDP
+Clean Energy,Batteries & Storage,AMPX
+Clean Energy,Batteries & Storage,ESS
+Clean Energy,Batteries & Storage,MVST
+Clean Energy,Industrial Gases & Hydrogen,APD
+Clean Energy,Industrial Gases & Hydrogen,LIN
+Clean Energy,Industrial Gases & Hydrogen,CLNE
+Clean Energy,Lithium,ALB
+Clean Energy,Lithium,SQM
+Clean Energy,Lithium,LAC
+Clean Energy,Lithium,SGML
+Clean Energy,Lithium,LAR
+Clean Energy,Lithium,ATLX
+Clean Energy,Lithium,IONR
+Clean Energy,Residential Solar & Yieldcos,RUN
+Clean Energy,Residential Solar & Yieldcos,CWEN
+Clean Energy,Residential Solar & Yieldcos,BEP
+Clean Energy,Residential Solar & Yieldcos,BEPC
+Clean Energy,Residential Solar & Yieldcos,AES
+Clean Energy,Residential Solar & Yieldcos,HASI
+Clean Energy,Residential Solar & Yieldcos,ORA
+Clean Energy,Solar Inverters & Trackers,ENPH
+Clean Energy,Solar Inverters & Trackers,SEDG
+Clean Energy,Solar Inverters & Trackers,NXT
+Clean Energy,Solar Inverters & Trackers,ARRY
+Clean Energy,Solar Inverters & Trackers,SHLS
+Clean Energy,Solar Inverters & Trackers,TYGO
+Clean Energy,Solar Inverters & Trackers,ZEO
+Clean Energy,Solar Inverters & Trackers,TE
+Clean Energy,Solar Manufacturers,FSLR
+Clean Energy,Solar Manufacturers,CSIQ
+Clean Energy,Solar Manufacturers,JKS
+Clean Energy,Solar Manufacturers,DQ
+Consumer,Airlines,UAL
+Consumer,Airlines,DAL
+Consumer,Airlines,AAL
+Consumer,Airlines,LUV
+Consumer,Airlines,ALK
+Consumer,Airlines,JBLU
+Consumer,Airlines,ALGT
+Consumer,Airlines,SKYW
+Consumer,Airlines,ULCC
+Consumer,Airlines,RYAAY
+Consumer,Airlines,CPA
+Consumer,Autos (Japan),TM
+Consumer,Autos (Japan),HMC
+Consumer,Cannabis,TLRY
+Consumer,Cannabis,CGC
+Consumer,Cannabis,CRON
+Consumer,Cannabis,SNDL
+Consumer,Cannabis,ACB
+Consumer,Cannabis,OGI
+Consumer,Cannabis,GRWG
+Consumer,Casinos & Gaming Equipment,MGM
+Consumer,Casinos & Gaming Equipment,CZR
+Consumer,Casinos & Gaming Equipment,PENN
+Consumer,Casinos & Gaming Equipment,BALY
+Consumer,Casinos & Gaming Equipment,ACEL
+Consumer,Consumer Brands,CELH
+Consumer,Consumer Brands,ELF
+Consumer,Consumer Brands,ANF
+Consumer,Consumer Brands,DEO
+Consumer,Consumer Brands,RACE
+Consumer,Consumer Brands,UL
+Consumer,Consumer Brands,ABEV
+Consumer,Consumer Brands,SN
+Consumer,Consumer Brands,FIGS
+Consumer,Display & Electronics (Korea),LPL
+Consumer,Online Sports Betting,DKNG
+Consumer,Online Sports Betting,FLUT
+Consumer,Online Sports Betting,RSI
+Consumer,Online Sports Betting,SGHC
+Consumer,Restaurants,TXRH
+Consumer,Restaurants,WING
+Consumer,Restaurants,CAVA
+Consumer,Restaurants,CAKE
+Consumer,Restaurants,BJRI
+Consumer,Restaurants,CBRL
+Consumer,Used Autos,CVNA
+Energy,Integrated & Large-cap Oil,XOM
+Energy,Integrated & Large-cap Oil,CVX
+Energy,Integrated & Large-cap Oil,COP
+Energy,Integrated & Large-cap Oil,SHEL
+Energy,Integrated & Large-cap Oil,TTE
+Energy,Integrated & Large-cap Oil,BP
+Energy,Integrated & Large-cap Oil,PBR
+Energy,Integrated & Large-cap Oil,CVE
+Energy,Integrated & Large-cap Oil,SU
+Energy,Integrated & Large-cap Oil,YPF
+Energy,Integrated & Large-cap Oil,VIST
+Energy,LNG & Midstream,LNG
+Energy,LNG & Midstream,CQP
+Energy,LNG & Midstream,KMI
+Energy,LNG & Midstream,WMB
+Energy,LNG & Midstream,AM
+Energy,LNG & Midstream,DTM
+Energy,LNG & Midstream,NFE
+Energy,Natural Gas Producers,EQT
+Energy,Natural Gas Producers,AR
+Energy,Natural Gas Producers,RRC
+Energy,Natural Gas Producers,CNX
+Energy,Natural Gas Producers,EXE
+Energy,Natural Gas Producers,GPOR
+Energy,Oil Services & Drillers,SLB
+Energy,Oil Services & Drillers,HAL
+Energy,Oil Services & Drillers,BKR
+Energy,Oil Services & Drillers,FTI
+Energy,Oil Services & Drillers,NOV
+Energy,Oil Services & Drillers,TS
+Energy,Oil Services & Drillers,NE
+Energy,Oil Services & Drillers,RIG
+Energy,Oil Services & Drillers,WFRD
+Energy,Oil Services & Drillers,VAL
+Energy,Oil Services & Drillers,LBRT
+Energy,Oil Services & Drillers,PTEN
+Energy,Oil Services & Drillers,HP
+Energy,Oil Services & Drillers,TDW
+Energy,Oil Services & Drillers,OII
+Energy,Oil Services & Drillers,WTTR
+Energy,Refiners,PSX
+Energy,Refiners,MPC
+Energy,Refiners,VLO
+Energy,Refiners,PBF
+Energy,Refiners,DINO
+Energy,Refiners,CVI
+Energy,Refiners,DK
+Energy,Refiners,PARR
+Energy,Refiners,CLMT
+Energy,Shale E&P,EOG
+Energy,Shale E&P,OXY
+Energy,Shale E&P,DVN
+Energy,Shale E&P,FANG
+Energy,Shale E&P,APA
+Energy,Shale E&P,PR
+Energy,Shale E&P,SM
+Energy,Shale E&P,OVV
+Energy,Shale E&P,TALO
+Energy,Tankers & Shipping,FRO
+Energy,Tankers & Shipping,DHT
+Energy,Tankers & Shipping,INSW
+Energy,Tankers & Shipping,TNK
+Energy,Tankers & Shipping,ECO
+Energy,Tankers & Shipping,TRMD
+Energy,Tankers & Shipping,HAFN
+Energy,Tankers & Shipping,LPG
+Energy,Tankers & Shipping,DAC
+Energy,Tankers & Shipping,ZIM
+Energy,Tankers & Shipping,MATX
+Energy,Tankers & Shipping,CMBT
+Energy,Uranium Miners,CCJ
+Energy,Uranium Miners,NXE
+Energy,Uranium Miners,UEC
+Energy,Uranium Miners,DNN
+Energy,Uranium Miners,UUUU
+Energy,Uranium Miners,URG
+Energy,Uranium Miners,EU
 Financials,Global & EM Banks,HSBC
 Financials,Global & EM Banks,SAN
 Financials,Global & EM Banks,MUFG
@@ -614,52 +412,98 @@ Financials,Global & EM Banks,BAP
 Financials,Global & EM Banks,CIB
 Financials,Global & EM Banks,IX
 Financials,Global & EM Banks,NMR
-Real Estate & Housing,Homebuilders,DHI
-Real Estate & Housing,Homebuilders,PHM
-Real Estate & Housing,Homebuilders,NVR
-Real Estate & Housing,Homebuilders,LEN
-Real Estate & Housing,Homebuilders,TOL
-Real Estate & Housing,Homebuilders,TMHC
-Real Estate & Housing,Homebuilders,MHO
-Real Estate & Housing,Homebuilders,KBH
-Real Estate & Housing,Homebuilders,MTH
-Real Estate & Housing,Homebuilders,SKY
-Real Estate & Housing,Building Products,IBP
-Real Estate & Housing,Building Products,TREX
-Real Estate & Housing,Building Products,MAS
-Real Estate & Housing,Building Products,FBIN
-Real Estate & Housing,Building Products,AWI
-Real Estate & Housing,Building Products,CSL
-Real Estate & Housing,Building Products,BLDR
-Real Estate & Housing,REITs,PLD
-Real Estate & Housing,REITs,PSA
-Real Estate & Housing,REITs,O
-Real Estate & Housing,REITs,WELL
-Real Estate & Housing,REITs,SPG
-Real Estate & Housing,REITs,AVB
-Real Estate & Housing,REITs,EQR
-Real Estate & Housing,REITs,VTR
-Real Estate & Housing,REITs,IIPR
-Real Estate & Housing,Tower REITs,AMT
-Real Estate & Housing,Tower REITs,CCI
-Real Estate & Housing,Tower REITs,SBAC
+Financials,Investment Banks & Brokers,GS
+Financials,Investment Banks & Brokers,MS
+Financials,Investment Banks & Brokers,SCHW
+Financials,Investment Banks & Brokers,BNY
+Financials,Investment Banks & Brokers,MRX
+Financials,Investment Banks & Brokers,XP
+Financials,Life Insurers,MET
+Financials,Life Insurers,PRU
+Financials,Life Insurers,AFL
+Financials,Life Insurers,AIG
+Financials,Money-center Banks,JPM
+Financials,Money-center Banks,BAC
+Financials,Money-center Banks,WFC
+Financials,Money-center Banks,C
+Financials,P&C Insurers,PGR
+Financials,P&C Insurers,TRV
+Financials,P&C Insurers,CB
+Financials,P&C Insurers,ALL
+Financials,P&C Insurers,HIG
+Financials,P&C Insurers,ACGL
+Financials,P&C Insurers,WRB
+Financials,P&C Insurers,L
+Financials,P&C Insurers,SLDE
+Financials,P&C Insurers,ARX
+Financials,Regional & Community Banks,WAL
+Financials,Regional & Community Banks,ZION
+Financials,Regional & Community Banks,EWBC
+Financials,Regional & Community Banks,UMBF
+Financials,Regional & Community Banks,FFIN
+Financials,Regional & Community Banks,CATY
+Financials,Regional & Community Banks,BANR
+Financials,Regional & Community Banks,CVBF
+Financials,Regional & Community Banks,NBTB
+Financials,Regional & Community Banks,IBCP
+Financials,Regional & Community Banks,TOWN
+Financials,Regional & Community Banks,BANC
+Financials,Regional & Community Banks,CLBK
+Financials,Super-regional Banks,USB
+Financials,Super-regional Banks,PNC
+Financials,Super-regional Banks,TFC
+Financials,Super-regional Banks,COF
+Financials,Super-regional Banks,FITB
+Financials,Super-regional Banks,MTB
+Financials,Super-regional Banks,KEY
+Financials,Super-regional Banks,RF
+Financials,Super-regional Banks,CFG
+Financials,Super-regional Banks,HBAN
+Fintech & Crypto,Bitcoin Miners,MARA
+Fintech & Crypto,Bitcoin Miners,RIOT
+Fintech & Crypto,Bitcoin Miners,CLSK
+Fintech & Crypto,Bitcoin Miners,HUT
+Fintech & Crypto,Bitcoin Miners,HIVE
+Fintech & Crypto,Bitcoin Miners,BTDR
+Fintech & Crypto,Bitcoin Miners,BTBT
+Fintech & Crypto,Bitcoin Treasury Companies,MSTR
+Fintech & Crypto,Bitcoin Treasury Companies,ASST
+Fintech & Crypto,Crypto Exchanges & Brokers,COIN
+Fintech & Crypto,Crypto Exchanges & Brokers,HOOD
+Fintech & Crypto,Crypto Exchanges & Brokers,CRCL
+Fintech & Crypto,Crypto Exchanges & Brokers,CME
+Fintech & Crypto,Crypto Exchanges & Brokers,SECZ
+Fintech & Crypto,Digital Banks & Lenders,SOFI
+Fintech & Crypto,Digital Banks & Lenders,NU
+Fintech & Crypto,Digital Banks & Lenders,AFRM
+Fintech & Crypto,Digital Banks & Lenders,UPST
+Fintech & Crypto,Digital Banks & Lenders,DAVE
+Fintech & Crypto,Digital Banks & Lenders,CHYM
+Fintech & Crypto,Digital Banks & Lenders,SEZL
+Fintech & Crypto,Ethereum Treasury Companies,BMNR
+Fintech & Crypto,Ethereum Treasury Companies,SBET
+Fintech & Crypto,Ethereum Treasury Companies,BTCS
+Fintech & Crypto,Payments & Networks,V
+Fintech & Crypto,Payments & Networks,MA
+Fintech & Crypto,Payments & Networks,PYPL
+Fintech & Crypto,Payments & Networks,XYZ
+Fintech & Crypto,Payments & Networks,TOST
+Fintech & Crypto,Payments & Networks,RELY
+Industrials,Trucking & Logistics,SAIA
+Industrials,Trucking & Logistics,RXO
+Infrastructure,Aggregates & Materials,VMC
+Infrastructure,Aggregates & Materials,MLM
 Infrastructure,Engineering & Construction,ACM
 Infrastructure,Engineering & Construction,FLR
 Infrastructure,Engineering & Construction,STRL
 Infrastructure,Engineering & Construction,ROAD
 Infrastructure,Engineering & Construction,GVA
-Infrastructure,Aggregates & Materials,VMC
-Infrastructure,Aggregates & Materials,MLM
-Infrastructure,Industrial Distribution & Rental,FAST
-Infrastructure,Industrial Distribution & Rental,URI
 Infrastructure,Industrial Automation,EMR
 Infrastructure,Industrial Automation,AME
 Infrastructure,Industrial Automation,HON
 Infrastructure,Industrial Automation,CARR
-Infrastructure,Water Utilities,AWK
-Infrastructure,Water Utilities,WTRG
-Infrastructure,Water Utilities,CWT
-Infrastructure,Water Utilities,MSEX
+Infrastructure,Industrial Distribution & Rental,FAST
+Infrastructure,Industrial Distribution & Rental,URI
 Infrastructure,Water Technology,XYL
 Infrastructure,Water Technology,PNR
 Infrastructure,Water Technology,WMS
@@ -667,58 +511,350 @@ Infrastructure,Water Technology,ERII
 Infrastructure,Water Technology,ZWS
 Infrastructure,Water Technology,FELE
 Infrastructure,Water Technology,VLTO
-Consumer,Airlines,UAL
-Consumer,Airlines,DAL
-Consumer,Airlines,AAL
-Consumer,Airlines,LUV
-Consumer,Airlines,ALK
-Consumer,Airlines,JBLU
-Consumer,Airlines,ALGT
-Consumer,Airlines,SKYW
-Consumer,Airlines,ULCC
-Consumer,Airlines,SNCY
-Consumer,Airlines,RYAAY
-Consumer,Airlines,CPA
-Consumer,Online Sports Betting,DKNG
-Consumer,Online Sports Betting,FLUT
-Consumer,Online Sports Betting,RSI
-Consumer,Online Sports Betting,SGHC
-Consumer,Casinos & Gaming Equipment,MGM
-Consumer,Casinos & Gaming Equipment,CZR
-Consumer,Casinos & Gaming Equipment,PENN
-Consumer,Casinos & Gaming Equipment,BALY
-Consumer,Casinos & Gaming Equipment,ACEL
-Consumer,Casinos & Gaming Equipment,GDEN
-Consumer,Casinos & Gaming Equipment,LNW
-Consumer,Casinos & Gaming Equipment,EVRI
-Consumer,Restaurants,TXRH
-Consumer,Restaurants,WING
-Consumer,Restaurants,CAVA
-Consumer,Consumer Brands,CELH
-Consumer,Consumer Brands,ELF
-Consumer,Consumer Brands,ANF
-Consumer,Consumer Brands,DEO
-Consumer,Consumer Brands,RACE
-Consumer,Consumer Brands,UL
-Consumer,Consumer Brands,ABEV
-Consumer,Cannabis,TLRY
-Consumer,Cannabis,CGC
-Consumer,Cannabis,CRON
-Consumer,Cannabis,SNDL
-Consumer,Cannabis,ACB
-Consumer,Cannabis,OGI
-Consumer,Cannabis,GRWG
-Consumer,Used Autos,CVNA
-Consumer,Autos (Japan),TM
-Consumer,Autos (Japan),HMC
+Infrastructure,Water Utilities,AWK
+Infrastructure,Water Utilities,WTRG
+Infrastructure,Water Utilities,CWT
+Infrastructure,Water Utilities,MSEX
+International,India IT Services,INFY
+International,India IT Services,WIT
+International,India IT Services,SIFY
+Internet & Consumer Tech,China Internet,BABA
+Internet & Consumer Tech,China Internet,PDD
+Internet & Consumer Tech,China Internet,JD
+Internet & Consumer Tech,China Internet,BIDU
+Internet & Consumer Tech,China Internet,NTES
+Internet & Consumer Tech,China Internet,BILI
+Internet & Consumer Tech,China Internet,IQ
+Internet & Consumer Tech,China Internet,TME
+Internet & Consumer Tech,China Internet,BEKE
+Internet & Consumer Tech,China Internet,TCOM
+Internet & Consumer Tech,China Internet,FUTU
+Internet & Consumer Tech,China Internet,YUMC
+Internet & Consumer Tech,China Internet,ZTO
+Internet & Consumer Tech,Consumer Apps,DUOL
+Internet & Consumer Tech,Consumer Apps,HIMS
+Internet & Consumer Tech,Consumer Apps,HNGE
+Internet & Consumer Tech,E-Commerce Marketplaces,SHOP
+Internet & Consumer Tech,E-Commerce Marketplaces,MELI
+Internet & Consumer Tech,E-Commerce Marketplaces,ETSY
+Internet & Consumer Tech,E-Commerce Marketplaces,EBAY
+Internet & Consumer Tech,E-Commerce Marketplaces,W
+Internet & Consumer Tech,E-Commerce Marketplaces,CHWY
+Internet & Consumer Tech,E-Commerce Marketplaces,CPNG
+Internet & Consumer Tech,E-Commerce Marketplaces,REAL
+Internet & Consumer Tech,E-Commerce Marketplaces,PRTS
+Internet & Consumer Tech,E-Commerce Marketplaces,GLBE
+Internet & Consumer Tech,E-Commerce Marketplaces,CART
+Internet & Consumer Tech,E-Commerce Marketplaces,JMIA
+Internet & Consumer Tech,Gaming Publishers & Platforms,TTWO
+Internet & Consumer Tech,Gaming Publishers & Platforms,RBLX
+Internet & Consumer Tech,Gaming Publishers & Platforms,U
+Internet & Consumer Tech,Gaming Publishers & Platforms,SONY
+Internet & Consumer Tech,Gaming Publishers & Platforms,PLTK
+Internet & Consumer Tech,Gaming Publishers & Platforms,GRVY
+Internet & Consumer Tech,Social & Ad Platforms,SNAP
+Internet & Consumer Tech,Social & Ad Platforms,PINS
+Internet & Consumer Tech,Social & Ad Platforms,RDDT
+Internet & Consumer Tech,Social & Ad Platforms,MTCH
+Internet & Consumer Tech,Social & Ad Platforms,BMBL
+Internet & Consumer Tech,Social & Ad Platforms,YELP
+Internet & Consumer Tech,Social & Ad Platforms,ZG
+Internet & Consumer Tech,Social & Ad Platforms,DJT
+Internet & Consumer Tech,Social & Ad Platforms,NXDR
+Internet & Consumer Tech,Social & Ad Platforms,TTD
+Internet & Consumer Tech,Social & Ad Platforms,ZETA
+Internet & Consumer Tech,Social & Ad Platforms,MGNI
+Internet & Consumer Tech,Social & Ad Platforms,APPS
+Internet & Consumer Tech,Streaming & Media,NFLX
+Internet & Consumer Tech,Streaming & Media,SPOT
+Internet & Consumer Tech,Streaming & Media,ROKU
+Internet & Consumer Tech,Travel & Gig Platforms,ABNB
+Internet & Consumer Tech,Travel & Gig Platforms,UBER
+Internet & Consumer Tech,Travel & Gig Platforms,DASH
+Internet & Consumer Tech,Travel & Gig Platforms,BKNG
+Internet & Consumer Tech,Travel & Gig Platforms,MMYT
+Internet & Consumer Tech,Travel & Gig Platforms,YTRA
+Internet & Consumer Tech,Travel & Gig Platforms,GRAB
+Internet & Consumer Tech,Travel & Gig Platforms,SE
+Metals & Mining,Aluminum,AA
+Metals & Mining,Aluminum,CENX
+Metals & Mining,Commodity ETFs,SLV
+Metals & Mining,Commodity ETFs,CORN
+Metals & Mining,Commodity ETFs,WEAT
+Metals & Mining,Commodity ETFs,SOYB
+Metals & Mining,Copper Miners,FCX
+Metals & Mining,Copper Miners,SCCO
+Metals & Mining,Copper Miners,TECK
+Metals & Mining,Copper Miners,HBM
+Metals & Mining,Copper Miners,ERO
+Metals & Mining,Copper Miners,CMCL
+Metals & Mining,Copper Miners,IE
+Metals & Mining,Copper Miners,TGB
+Metals & Mining,Diversified Miners,BHP
+Metals & Mining,Diversified Miners,RIO
+Metals & Mining,Diversified Miners,VALE
+Metals & Mining,Diversified Miners,NEXA
+Metals & Mining,Gold Majors & Royalties,NEM
+Metals & Mining,Gold Majors & Royalties,AEM
+Metals & Mining,Gold Majors & Royalties,B
+Metals & Mining,Gold Majors & Royalties,WPM
+Metals & Mining,Gold Majors & Royalties,FNV
+Metals & Mining,Gold Majors & Royalties,RGLD
+Metals & Mining,Gold Majors & Royalties,OR
+Metals & Mining,Gold Majors & Royalties,KGC
+Metals & Mining,Gold Majors & Royalties,AU
+Metals & Mining,Gold Majors & Royalties,GFI
+Metals & Mining,Gold Majors & Royalties,HMY
+Metals & Mining,Gold Mid-tiers,AGI
+Metals & Mining,Gold Mid-tiers,EGO
+Metals & Mining,Gold Mid-tiers,IAG
+Metals & Mining,Gold Mid-tiers,SBSW
+Metals & Mining,Gold Mid-tiers,AUGO
+Metals & Mining,Gold Mid-tiers,CGAU
+Metals & Mining,Rare Earths & Critical Minerals,MP
+Metals & Mining,Rare Earths & Critical Minerals,USAR
+Metals & Mining,Rare Earths & Critical Minerals,UAMY
+Metals & Mining,Rare Earths & Critical Minerals,NB
+Metals & Mining,Rare Earths & Critical Minerals,TMC
+Metals & Mining,Rare Earths & Critical Minerals,MTRN
+Metals & Mining,Silver Miners,PAAS
+Metals & Mining,Silver Miners,CDE
+Metals & Mining,Silver Miners,HL
+Metals & Mining,Silver Miners,AG
+Metals & Mining,Silver Miners,EXK
+Metals & Mining,Silver Miners,FSM
+Metals & Mining,Silver Miners,SSRM
+Metals & Mining,Silver Miners,SVM
+Metals & Mining,Silver Miners,ASM
+Metals & Mining,Silver Miners,USAS
+Metals & Mining,Silver Miners,AYA
+Metals & Mining,Steel,NUE
+Metals & Mining,Steel,STLD
+Metals & Mining,Steel,RS
+Metals & Mining,Steel,CLF
+Metals & Mining,Steel,CMC
+Metals & Mining,Steel,TX
+Metals & Mining,Steel,MT
+Metals & Mining,Steel,GGB
+Metals & Mining,Steel,PKX
+Power & Grid,Data Center Power & Cooling,VRT
+Power & Grid,Data Center Power & Cooling,NVT
+Power & Grid,Data Center Power & Cooling,MOD
+Power & Grid,Data Center Power & Cooling,VICR
+Power & Grid,Data Center Power & Cooling,SEI
+Power & Grid,Gas Turbines & Grid Equipment,GEV
+Power & Grid,Gas Turbines & Grid Equipment,ETN
+Power & Grid,Gas Turbines & Grid Equipment,HUBB
+Power & Grid,Gas Turbines & Grid Equipment,POWL
+Power & Grid,Gas Turbines & Grid Equipment,AMSC
+Power & Grid,Gas Turbines & Grid Equipment,PLPC
+Power & Grid,Gas Turbines & Grid Equipment,AYI
+Power & Grid,Gas Turbines & Grid Equipment,ESE
+Power & Grid,Gas Turbines & Grid Equipment,ITRI
+Power & Grid,Gas Turbines & Grid Equipment,ATKR
+Power & Grid,Grid & Electrical Contractors,PWR
+Power & Grid,Grid & Electrical Contractors,MTZ
+Power & Grid,Grid & Electrical Contractors,EME
+Power & Grid,Grid & Electrical Contractors,PRIM
+Power & Grid,Grid & Electrical Contractors,MYRG
+Power & Grid,Grid & Electrical Contractors,IESC
+Power & Grid,Grid & Electrical Contractors,DY
+Power & Grid,Grid & Electrical Contractors,AGX
+Power & Grid,Grid & Electrical Contractors,FIX
+Power & Grid,Independent Power Producers,CEG
+Power & Grid,Independent Power Producers,VST
+Power & Grid,Independent Power Producers,TLN
+Power & Grid,Independent Power Producers,NRG
+Power & Grid,Nuclear Fuel & Enrichment,LEU
+Power & Grid,Nuclear Fuel & Enrichment,BWXT
+Power & Grid,Nuclear Reactors (SMR),OKLO
+Power & Grid,Nuclear Reactors (SMR),SMR
+Power & Grid,Nuclear Reactors (SMR),NNE
+Power & Grid,On-site Power & Fuel Cells,BE
+Power & Grid,On-site Power & Fuel Cells,PLUG
+Power & Grid,On-site Power & Fuel Cells,FCEL
+Power & Grid,On-site Power & Fuel Cells,BLDP
+Power & Grid,On-site Power & Fuel Cells,GNRC
+Power & Grid,On-site Power & Fuel Cells,CMI
+Power & Grid,On-site Power & Fuel Cells,CAT
+Power & Grid,On-site Power & Fuel Cells,BW
+Power & Grid,On-site Power & Fuel Cells,AROC
+Power & Grid,Regulated Utilities,NEE
+Power & Grid,Regulated Utilities,SO
+Power & Grid,Regulated Utilities,DUK
+Power & Grid,Regulated Utilities,AEP
+Power & Grid,Regulated Utilities,D
+Power & Grid,Regulated Utilities,EXC
+Power & Grid,Regulated Utilities,XEL
+Power & Grid,Regulated Utilities,SRE
+Power & Grid,Regulated Utilities,PCG
+Power & Grid,Regulated Utilities,ED
+Power & Grid,Regulated Utilities,ETR
+Power & Grid,Regulated Utilities,PEG
+Quantum,Quantum Computing,IONQ
+Quantum,Quantum Computing,RGTI
+Quantum,Quantum Computing,QBTS
+Quantum,Quantum Computing,QUBT
+Quantum,Quantum Computing,ARQQ
+Quantum,Quantum Computing,LAES
+Quantum,Quantum Computing,QMCO
+Real Estate & Housing,Building Products,IBP
+Real Estate & Housing,Building Products,TREX
+Real Estate & Housing,Building Products,MAS
+Real Estate & Housing,Building Products,FBIN
+Real Estate & Housing,Building Products,AWI
+Real Estate & Housing,Building Products,CSL
+Real Estate & Housing,Building Products,BLDR
+Real Estate & Housing,Homebuilders,DHI
+Real Estate & Housing,Homebuilders,PHM
+Real Estate & Housing,Homebuilders,NVR
+Real Estate & Housing,Homebuilders,LEN
+Real Estate & Housing,Homebuilders,TOL
+Real Estate & Housing,Homebuilders,MHO
+Real Estate & Housing,Homebuilders,KBH
+Real Estate & Housing,Homebuilders,MTH
+Real Estate & Housing,Homebuilders,SKY
+Real Estate & Housing,Homebuilders,BZH
+Real Estate & Housing,REITs,PLD
+Real Estate & Housing,REITs,PSA
+Real Estate & Housing,REITs,O
+Real Estate & Housing,REITs,WELL
+Real Estate & Housing,REITs,SPG
+Real Estate & Housing,REITs,VTR
+Real Estate & Housing,REITs,IIPR
+Real Estate & Housing,Tower REITs,AMT
+Real Estate & Housing,Tower REITs,CCI
+Real Estate & Housing,Tower REITs,SBAC
+Robotics & Autonomy,Auto Tech Suppliers,APTV
+Robotics & Autonomy,EV Makers,RIVN
+Robotics & Autonomy,EV Makers,LCID
+Robotics & Autonomy,EV Makers,NIO
+Robotics & Autonomy,EV Makers,XPEV
+Robotics & Autonomy,EV Makers,LI
+Robotics & Autonomy,Industrial & Surgical Robots,ISRG
+Robotics & Autonomy,Industrial & Surgical Robots,ROK
+Robotics & Autonomy,Industrial & Surgical Robots,SYM
+Robotics & Autonomy,Industrial & Surgical Robots,SERV
+Robotics & Autonomy,Industrial & Surgical Robots,PRCT
+Robotics & Autonomy,Industrial & Surgical Robots,RR
+Robotics & Autonomy,Industrial & Surgical Robots,KSCP
+Robotics & Autonomy,Industrial & Surgical Robots,ZBRA
+Robotics & Autonomy,Industrial & Surgical Robots,NDSN
+Robotics & Autonomy,Lidar & Vision,LAZR
+Robotics & Autonomy,Lidar & Vision,OUST
+Robotics & Autonomy,Lidar & Vision,HSAI
+Robotics & Autonomy,Lidar & Vision,INVZ
+Robotics & Autonomy,Lidar & Vision,CGNX
+Robotics & Autonomy,Robotaxi & Self-Driving,TSLA
+Robotics & Autonomy,Robotaxi & Self-Driving,MBLY
+Robotics & Autonomy,Robotaxi & Self-Driving,AUR
+Robotics & Autonomy,Robotaxi & Self-Driving,PONY
+Robotics & Autonomy,Robotaxi & Self-Driving,WRD
+Semiconductors,Analog & Power Semis,ADI
+Semiconductors,Analog & Power Semis,TXN
+Semiconductors,Analog & Power Semis,ON
+Semiconductors,Analog & Power Semis,NXPI
+Semiconductors,Analog & Power Semis,MPWR
+Semiconductors,Analog & Power Semis,VSH
+Semiconductors,Analog & Power Semis,DIOD
+Semiconductors,Foundry,TSM
+Semiconductors,Foundry,INTC
+Semiconductors,Foundry,TSEM
+Semiconductors,Mobile & Edge Chips,QCOM
+Semiconductors,Mobile & Edge Chips,SYNA
+Semiconductors,Mobile & Edge Chips,AMBQ
+Semiconductors,Semicap Equipment,ASML
+Semiconductors,Semicap Equipment,AMAT
+Semiconductors,Semicap Equipment,LRCX
+Semiconductors,Semicap Equipment,KLAC
+Semiconductors,Semicap Equipment,TER
+Semiconductors,Semicap Equipment,FORM
+Semiconductors,Semicap Equipment,AEHR
+Semiconductors,Semicap Equipment,COHU
+Semiconductors,Semicap Equipment,ONTO
+Semiconductors,Semicap Equipment,KLIC
+Semiconductors,Semicap Equipment,UCTT
+Semiconductors,Semicap Equipment,ICHR
+Semiconductors,Semicap Equipment,ENTG
+Semiconductors,Semicap Equipment,VECO
+Software,AI Applications & Platforms,PLTR
+Software,AI Applications & Platforms,AI
+Software,AI Applications & Platforms,SOUN
+Software,AI Applications & Platforms,BBAI
+Software,AI Applications & Platforms,APP
+Software,AI Applications & Platforms,PATH
+Software,Cloud Communications,TWLO
+Software,Cloud Communications,RNG
+Software,Cloud Communications,FIVN
+Software,Cloud Communications,BAND
+Software,Cybersecurity Platforms,CRWD
+Software,Cybersecurity Platforms,PANW
+Software,Cybersecurity Platforms,FTNT
+Software,Cybersecurity Platforms,ZS
+Software,Cybersecurity Platforms,NET
+Software,Cybersecurity Platforms,CHKP
+Software,Cybersecurity Platforms,NTSK
+Software,Cybersecurity Platforms,RBRK
+Software,Data & Observability,SNOW
+Software,Data & Observability,MDB
+Software,Data & Observability,DDOG
+Software,Data & Observability,ESTC
+Software,Data & Observability,DOCN
+Software,Data & Observability,IBM
+Software,Data & Observability,DT
+Software,Data & Observability,PD
+Software,Data & Observability,AMPL
+Software,Design & Engineering Software,CDNS
+Software,Design & Engineering Software,SNPS
+Software,Design & Engineering Software,ADSK
+Software,Design & Engineering Software,PTC
+Software,Developer & DevOps Tools,GTLB
+Software,Developer & DevOps Tools,FROG
+Software,Developer & DevOps Tools,FSLY
+Software,Enterprise SaaS,CRM
+Software,Enterprise SaaS,NOW
+Software,Enterprise SaaS,WDAY
+Software,Enterprise SaaS,ADBE
+Software,Enterprise SaaS,INTU
+Software,Enterprise SaaS,TEAM
+Software,Enterprise SaaS,HUBS
+Software,Enterprise SaaS,SAP
+Software,Enterprise SaaS,BILL
+Software,Enterprise SaaS,PAYC
+Software,Enterprise SaaS,VEEV
+Software,Enterprise SaaS,APPN
+Software,Enterprise SaaS,FRSH
+Software,Enterprise SaaS,INTA
+Software,Hyperscalers,MSFT
+Software,Hyperscalers,AMZN
+Software,Hyperscalers,GOOGL
+Software,Hyperscalers,ORCL
+Software,Hyperscalers,META
+Software,Identity & Security Tools,OKTA
+Software,Identity & Security Tools,S
+Software,Identity & Security Tools,QLYS
+Software,Identity & Security Tools,TENB
+Software,Identity & Security Tools,RPD
+Software,Identity & Security Tools,VRNS
+Software,Identity & Security Tools,SAIL
+Space,Launch & Space Systems,RKLB
+Space,Launch & Space Systems,FLY
+Space,Launch & Space Systems,RDW
+Space,Launch & Space Systems,KRMN
+Space,Launch & Space Systems,SPCE
+Space,Launch & Space Systems,LUNR
+Space,Launch & Space Systems,SPCX
+Space,Satellite Connectivity & Imaging,ASTS
+Space,Satellite Connectivity & Imaging,IRDM
+Space,Satellite Connectivity & Imaging,GSAT
+Space,Satellite Connectivity & Imaging,ECHO
+Space,Satellite Connectivity & Imaging,PL
+Space,Satellite Connectivity & Imaging,BKSY
+Space,Satellite Connectivity & Imaging,VSAT
+Telecom,Telecom Equipment & Test,ERIC
+Telecom,Telecom Equipment & Test,KEYS
+Telecom,Telecom Equipment & Test,VIAV
 Telecom,Wireless Carriers,TMUS
 Telecom,Wireless Carriers,VZ
 Telecom,Wireless Carriers,T
 Telecom,Wireless Carriers,KEP
-Telecom,Telecom Equipment & Test,ERIC
-Telecom,Telecom Equipment & Test,KEYS
-Telecom,Telecom Equipment & Test,VIAV
-Industrials,Trucking & Logistics,SAIA
-International,India IT Services,INFY
-International,India IT Services,WIT
-International,India IT Services,SIFY

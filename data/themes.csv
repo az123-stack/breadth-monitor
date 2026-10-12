@@ -83,7 +83,7 @@ AI & ROBOTICS - Robotics,CGNX,member
 AI & ROBOTICS - Robotics,PDYN,member
 AI & ROBOTICS - Robotics,TSLA,member
 AI & ROBOTICS - Robotics,NVDA,member
-AI DATA CENTER - Storage,PSTG,member
+AI DATA CENTER - Storage,P,member
 AI DATA CENTER - Storage,STX,member
 AI DATA CENTER - Storage,WDC,member
 AI DATA CENTER - Storage,NTAP,member
@@ -104,6 +104,11 @@ AI DATA CENTER - Systems,VRT,member
 AI DATA CENTER - Systems,ALAB,member
 AI DATA CENTER - Systems,CRDO,member
 AI DATA CENTER - Systems,WYFI,member
+AI DATA CENTER - Systems,PENG,member
+AI DATA CENTER - Systems,SANM,member
+AI DATA CENTER - Systems,PLXS,member
+AI DATA CENTER - Systems,BHE,member
+AI DATA CENTER - Systems,TTMI,member
 BIOTECH - Biotech,XBI,etf
 BIOTECH - Biotech,IBB,etf
 BIOTECH - Biotech,VRTX,member
@@ -130,6 +135,32 @@ BIOTECH - Biotech,KRYS,member
 BIOTECH - Biotech,VKTX,member
 BIOTECH - Biotech,AXSM,member
 BIOTECH - Biotech,PTCT,member
+BIOTECH - Biotech,IOVA,member
+BIOTECH - Biotech,IBRX,member
+BIOTECH - Biotech,REPL,member
+BIOTECH - Biotech,ERAS,member
+BIOTECH - Biotech,TNGX,member
+BIOTECH - Biotech,RLAY,member
+BIOTECH - Biotech,NRIX,member
+BIOTECH - Biotech,XNCR,member
+BIOTECH - Biotech,SYRE,member
+BIOTECH - Biotech,ORKA,member
+BIOTECH - Biotech,KNSA,member
+BIOTECH - Biotech,DNTH,member
+BIOTECH - Biotech,PTGX,member
+BIOTECH - Biotech,TGTX,member
+BIOTECH - Biotech,KYMR,member
+BIOTECH - Biotech,CORT,member
+BIOTECH - Biotech,PRAX,member
+BIOTECH - Biotech,AMLX,member
+BIOTECH - Biotech,EWTX,member
+BIOTECH - Biotech,TVTX,member
+BIOTECH - Biotech,ROIV,member
+BIOTECH - Biotech,KOD,member
+BIOTECH - Biotech,OMER,member
+BIOTECH - Biotech,HALO,member
+BIOTECH - Biotech,PCVX,member
+BIOTECH - Biotech,NVAX,member
 BIOTECH - Genomics,ARKG,etf
 BIOTECH - Genomics,CRSP,member
 BIOTECH - Genomics,NTLA,member
@@ -150,6 +181,16 @@ BIOTECH - Genomics,DNA,member
 BIOTECH - Genomics,ABSI,member
 BIOTECH - Genomics,SDGR,member
 BIOTECH - Genomics,CDNA,member
+BIOTECH - Genomics,ABCL,member
+BIOTECH - Genomics,ADPT,member
+BIOTECH - Genomics,PSNL,member
+BIOTECH - Genomics,NEO,member
+BIOTECH - Genomics,CAI,member
+BIOTECH - Genomics,HTFL,member
+BIOTECH - Genomics,RVTY,member
+BIOTECH - Genomics,AVTR,member
+BIOTECH - Genomics,AZTA,member
+BIOTECH - Genomics,NEOG,member
 BIOTECH - Medical Devices,IHI,etf
 BIOTECH - Medical Devices,ISRG,member
 BIOTECH - Medical Devices,BSX,member
@@ -170,6 +211,11 @@ BIOTECH - Medical Devices,IRTC,member
 BIOTECH - Medical Devices,TMDX,member
 BIOTECH - Medical Devices,RMD,member
 BIOTECH - Medical Devices,LIVN,member
+BIOTECH - Medical Devices,HAE,member
+BIOTECH - Medical Devices,ATRC,member
+BIOTECH - Medical Devices,GKOS,member
+BIOTECH - Medical Devices,ITGR,member
+BIOTECH - Medical Devices,PLSE,member
 BIOTECH - Pharma,PPH,etf
 BIOTECH - Pharma,XPH,etf
 BIOTECH - Pharma,LLY,member
@@ -189,6 +235,10 @@ BIOTECH - Pharma,TAK,member
 BIOTECH - Pharma,ZTS,member
 BIOTECH - Pharma,VTRS,member
 BIOTECH - Pharma,TEVA,member
+BIOTECH - Pharma,CRL,member
+BIOTECH - Pharma,FTRE,member
+BIOTECH - Pharma,OGN,member
+BIOTECH - Pharma,AMRX,member
 BROAD MARKET,SPY,etf
 BROAD MARKET,QQQ,etf
 BROAD MARKET,IWM,etf
@@ -214,6 +264,12 @@ BROAD MARKET,RDDT,member
 BROAD MARKET,AXON,member
 BROAD MARKET,CAVA,member
 BROAD MARKET,ALAB,member
+BROAD MARKET,RXO,member
+BROAD MARKET,CAKE,member
+BROAD MARKET,BJRI,member
+BROAD MARKET,CBRL,member
+BROAD MARKET,SN,member
+BROAD MARKET,FIGS,member
 CANNABIS,MSOS,etf
 CANNABIS,MJ,etf
 CANNABIS,CNBS,etf
@@ -254,8 +310,6 @@ CLEAN ENERGY - Broad,ARRY,member
 CLEAN ENERGY - Broad,NXT,member
 CLEAN ENERGY - Broad,AES,member
 CLEAN ENERGY - Broad,BE,member
-CLEAN ENERGY - Hydrogen,HDRO,etf
-CLEAN ENERGY - Hydrogen,HJEN,etf
 CLEAN ENERGY - Hydrogen,PLUG,member
 CLEAN ENERGY - Hydrogen,BE,member
 CLEAN ENERGY - Hydrogen,FCEL,member
@@ -282,9 +336,7 @@ CLEAN ENERGY - Solar,SHLS,member
 CLEAN ENERGY - Solar,CSIQ,member
 CLEAN ENERGY - Solar,JKS,member
 CLEAN ENERGY - Solar,CWEN,member
-CLEAN ENERGY - Solar,MAXN,member
 CLEAN ENERGY - Solar,DQ,member
-CLEAN ENERGY - Solar,SOL,member
 CLEAN ENERGY - Solar,TYGO,member
 CLEAN ENERGY - Solar,ZEO,member
 CLEAN ENERGY - Wind,FAN,etf
@@ -303,7 +355,6 @@ CONSUMER - Airlines,JBLU,member
 CONSUMER - Airlines,ALGT,member
 CONSUMER - Airlines,SKYW,member
 CONSUMER - Airlines,ULCC,member
-CONSUMER - Airlines,SNCY,member
 CONSUMER - Airlines,RYAAY,member
 CONSUMER - Airlines,CPA,member
 CONSUMER - E-Commerce,IBUY,etf
@@ -322,19 +373,16 @@ CONSUMER - E-Commerce,SE,member
 CONSUMER - E-Commerce,CPNG,member
 CONSUMER - E-Commerce,REAL,member
 CONSUMER - E-Commerce,PRTS,member
-CONSUMER - E-Commerce,BYON,member
 CONSUMER - E-Commerce,GLBE,member
 CONSUMER - E-Commerce,CART,member
 CONSUMER - Gaming,HERO,etf
 CONSUMER - Gaming,ESPO,etf
 CONSUMER - Gaming,TTWO,member
-CONSUMER - Gaming,EA,member
 CONSUMER - Gaming,RBLX,member
 CONSUMER - Gaming,U,member
 CONSUMER - Gaming,NTES,member
 CONSUMER - Gaming,SONY,member
 CONSUMER - Gaming,PLTK,member
-CONSUMER - Gaming,SCPL,member
 CONSUMER - Gaming,GRVY,member
 CONSUMER - Gaming,MSFT,member
 CONSUMER - Social Media,SOCL,etf
@@ -351,6 +399,9 @@ CONSUMER - Social Media,NFLX,member
 CONSUMER - Social Media,TME,member
 CONSUMER - Social Media,DJT,member
 CONSUMER - Social Media,NXDR,member
+CONSUMER - Social Media,ZETA,member
+CONSUMER - Social Media,MGNI,member
+CONSUMER - Social Media,APPS,member
 CONSUMER - Sports Betting,BETZ,etf
 CONSUMER - Sports Betting,DKNG,member
 CONSUMER - Sports Betting,FLUT,member
@@ -360,13 +411,11 @@ CONSUMER - Sports Betting,MGM,member
 CONSUMER - Sports Betting,CZR,member
 CONSUMER - Sports Betting,BALY,member
 CONSUMER - Sports Betting,ACEL,member
-CONSUMER - Sports Betting,GDEN,member
 CONSUMER - Sports Betting,SGHC,member
-CONSUMER - Sports Betting,LNW,member
-CONSUMER - Sports Betting,EVRI,member
 CRYPTO - Bitcoin,IBIT,etf
 CRYPTO - Bitcoin,FBTC,etf
 CRYPTO - Bitcoin,MSTR,member
+CRYPTO - Bitcoin,ASST,member
 CRYPTO - Blockchain,BKCH,etf
 CRYPTO - Blockchain,BLOK,etf
 CRYPTO - Blockchain,COIN,member
@@ -377,6 +426,7 @@ CRYPTO - Blockchain,BTCS,member
 CRYPTO - Blockchain,BMNR,member
 CRYPTO - Blockchain,SBET,member
 CRYPTO - Blockchain,CME,member
+CRYPTO - Blockchain,SECZ,member
 CRYPTO - Ethereum,ETHE,etf
 CRYPTO - Ethereum,ETHA,etf
 CRYPTO - Ethereum,BMNR,member
@@ -400,7 +450,6 @@ CRYPTO - Miners,IREN,member
 CRYPTO - Miners,WULF,member
 CRYPTO - Miners,CIFR,member
 CRYPTO - Miners,BTBT,member
-CRYPTO - Miners,BITF,member
 CRYPTO - Miners,HIVE,member
 CRYPTO - Miners,BTDR,member
 CRYPTO - Miners,GLXY,member
@@ -426,8 +475,10 @@ DEFENSE - Aerospace,TXT,member
 DEFENSE - Aerospace,HWM,member
 DEFENSE - Aerospace,LHX,member
 DEFENSE - Aerospace,GE,member
-DEFENSE - Aerospace,ERJ,member
+DEFENSE - Aerospace,EMBJ,member
 DEFENSE - Aerospace,AXON,member
+DEFENSE - Aerospace,ATI,member
+DEFENSE - Aerospace,DCO,member
 DEFENSE - Defense Tech,XAR,etf
 DEFENSE - Defense Tech,SHLD,etf
 DEFENSE - Defense Tech,LHX,member
@@ -467,7 +518,6 @@ ENERGY - Natural Gas,AR,member
 ENERGY - Natural Gas,RRC,member
 ENERGY - Natural Gas,CNX,member
 ENERGY - Natural Gas,EXE,member
-ENERGY - Natural Gas,CTRA,member
 ENERGY - Natural Gas,GPOR,member
 ENERGY - Natural Gas,AM,member
 ENERGY - Natural Gas,CQP,member
@@ -503,6 +553,16 @@ ENERGY - Oil,SU,member
 ENERGY - Oil,PSX,member
 ENERGY - Oil,MPC,member
 ENERGY - Oil,VLO,member
+ENERGY - Oil,PBF,member
+ENERGY - Oil,DINO,member
+ENERGY - Oil,CVI,member
+ENERGY - Oil,DK,member
+ENERGY - Oil,PARR,member
+ENERGY - Oil,CLMT,member
+ENERGY - Oil,PR,member
+ENERGY - Oil,SM,member
+ENERGY - Oil,OVV,member
+ENERGY - Oil,TALO,member
 ENERGY - Oil Services,OIH,etf
 ENERGY - Oil Services,SLB,member
 ENERGY - Oil Services,BKR,member
@@ -518,6 +578,8 @@ ENERGY - Oil Services,LBRT,member
 ENERGY - Oil Services,PTEN,member
 ENERGY - Oil Services,HP,member
 ENERGY - Oil Services,TDW,member
+ENERGY - Oil Services,OII,member
+ENERGY - Oil Services,WTTR,member
 ENERGY - Uranium,URA,etf
 ENERGY - Uranium,URNM,etf
 ENERGY - Uranium,CCJ,member
@@ -541,7 +603,9 @@ FINANCIALS - Big Banks,PNC,member
 FINANCIALS - Big Banks,TFC,member
 FINANCIALS - Big Banks,COF,member
 FINANCIALS - Big Banks,SCHW,member
-FINANCIALS - Big Banks,BK,member
+FINANCIALS - Big Banks,BNY,member
+FINANCIALS - Big Banks,MRX,member
+FINANCIALS - Big Banks,XP,member
 FINANCIALS - Insurance,IAK,etf
 FINANCIALS - Insurance,KIE,etf
 FINANCIALS - Insurance,PGR,member
@@ -556,6 +620,8 @@ FINANCIALS - Insurance,AIG,member
 FINANCIALS - Insurance,L,member
 FINANCIALS - Insurance,ACGL,member
 FINANCIALS - Insurance,WRB,member
+FINANCIALS - Insurance,SLDE,member
+FINANCIALS - Insurance,ARX,member
 FINANCIALS - Regional Banks,KRE,etf
 FINANCIALS - Regional Banks,WAL,member
 FINANCIALS - Regional Banks,ZION,member
@@ -565,7 +631,6 @@ FINANCIALS - Regional Banks,CFG,member
 FINANCIALS - Regional Banks,HBAN,member
 FINANCIALS - Regional Banks,FITB,member
 FINANCIALS - Regional Banks,MTB,member
-FINANCIALS - Regional Banks,CMA,member
 FINANCIALS - Regional Banks,EWBC,member
 FINANCIALS - Regional Banks,UMBF,member
 FINANCIALS - Regional Banks,FFIN,member
@@ -576,6 +641,18 @@ FINANCIALS - Regional Banks,NBTB,member
 FINANCIALS - Regional Banks,IBCP,member
 FINANCIALS - Regional Banks,TOWN,member
 FINANCIALS - Regional Banks,BANC,member
+FINANCIALS - Regional Banks,CLBK,member
+HEALTHCARE - Services,HUM,member
+HEALTHCARE - Services,CNC,member
+HEALTHCARE - Services,OSCR,member
+HEALTHCARE - Services,AGL,member
+HEALTHCARE - Services,THC,member
+HEALTHCARE - Services,CON,member
+HEALTHCARE - Services,BTSG,member
+HEALTHCARE - Services,AVAH,member
+HEALTHCARE - Services,LFST,member
+HEALTHCARE - Services,NHC,member
+HEALTHCARE - Services,PACS,member
 INFRASTRUCTURE - Construction,PAVE,etf
 INFRASTRUCTURE - Construction,PWR,member
 INFRASTRUCTURE - Construction,FAST,member
@@ -599,7 +676,6 @@ INFRASTRUCTURE - Homebuilders,PHM,member
 INFRASTRUCTURE - Homebuilders,NVR,member
 INFRASTRUCTURE - Homebuilders,LEN,member
 INFRASTRUCTURE - Homebuilders,TOL,member
-INFRASTRUCTURE - Homebuilders,TMHC,member
 INFRASTRUCTURE - Homebuilders,MHO,member
 INFRASTRUCTURE - Homebuilders,KBH,member
 INFRASTRUCTURE - Homebuilders,MTH,member
@@ -611,6 +687,7 @@ INFRASTRUCTURE - Homebuilders,FBIN,member
 INFRASTRUCTURE - Homebuilders,AWI,member
 INFRASTRUCTURE - Homebuilders,CSL,member
 INFRASTRUCTURE - Homebuilders,BLDR,member
+INFRASTRUCTURE - Homebuilders,BZH,member
 INFRASTRUCTURE - REITs,VNQ,etf
 INFRASTRUCTURE - REITs,PLD,member
 INFRASTRUCTURE - REITs,EQIX,member
@@ -619,10 +696,8 @@ INFRASTRUCTURE - REITs,O,member
 INFRASTRUCTURE - REITs,WELL,member
 INFRASTRUCTURE - REITs,DLR,member
 INFRASTRUCTURE - REITs,SPG,member
-INFRASTRUCTURE - REITs,AVB,member
 INFRASTRUCTURE - REITs,AMT,member
 INFRASTRUCTURE - REITs,CCI,member
-INFRASTRUCTURE - REITs,EQR,member
 INFRASTRUCTURE - REITs,VTR,member
 INFRASTRUCTURE - REITs,IRM,member
 INFRASTRUCTURE - Water,PHO,etf
@@ -744,6 +819,7 @@ INTERNATIONAL - Latin America,SQM,member
 INTERNATIONAL - Latin America,CIB,member
 INTERNATIONAL - Latin America,VIST,member
 INTERNATIONAL - Latin America,BSBR,member
+INTERNATIONAL - Latin America,XP,member
 MATERIALS - Agriculture,MOO,etf
 MATERIALS - Agriculture,DE,member
 MATERIALS - Agriculture,NTR,member
@@ -807,6 +883,8 @@ POWER & GRID - Data Center Power,TLN,member
 POWER & GRID - Data Center Power,BE,member
 POWER & GRID - Data Center Power,ITRI,member
 POWER & GRID - Data Center Power,POWL,member
+POWER & GRID - Data Center Power,VICR,member
+POWER & GRID - Data Center Power,SEI,member
 POWER & GRID - Generation,CEG,member
 POWER & GRID - Generation,VST,member
 POWER & GRID - Generation,NRG,member
@@ -827,6 +905,7 @@ POWER & GRID - Grid,NVT,member
 POWER & GRID - Grid,AYI,member
 POWER & GRID - Grid,ITRI,member
 POWER & GRID - Grid,ESE,member
+POWER & GRID - Grid,ATKR,member
 POWER & GRID - Grid Transmission,MTZ,member
 POWER & GRID - Grid Transmission,EME,member
 POWER & GRID - Grid Transmission,PRIM,member
@@ -870,10 +949,11 @@ PRECIOUS METALS - Gold Miners,GFI,member
 PRECIOUS METALS - Gold Miners,AGI,member
 PRECIOUS METALS - Gold Miners,RGLD,member
 PRECIOUS METALS - Gold Miners,EGO,member
-PRECIOUS METALS - Gold Miners,NGD,member
 PRECIOUS METALS - Gold Miners,IAG,member
 PRECIOUS METALS - Gold Miners,OR,member
 PRECIOUS METALS - Gold Miners,HMY,member
+PRECIOUS METALS - Gold Miners,AUGO,member
+PRECIOUS METALS - Gold Miners,CGAU,member
 PRECIOUS METALS - Silver Miners,SIL,etf
 PRECIOUS METALS - Silver Miners,SILJ,etf
 PRECIOUS METALS - Silver Miners,PAAS,member
@@ -886,6 +966,7 @@ PRECIOUS METALS - Silver Miners,SSRM,member
 PRECIOUS METALS - Silver Miners,SVM,member
 PRECIOUS METALS - Silver Miners,ASM,member
 PRECIOUS METALS - Silver Miners,USAS,member
+PRECIOUS METALS - Silver Miners,AYA,member
 RARE EARTH,REMX,etf
 RARE EARTH,MP,member
 RARE EARTH,USAR,member
@@ -895,6 +976,7 @@ RARE EARTH,ALB,member
 RARE EARTH,SQM,member
 RARE EARTH,ATLX,member
 RARE EARTH,TMC,member
+RARE EARTH,MTRN,member
 SPACE,UFO,etf
 SPACE,ARKX,etf
 SPACE,RKLB,member
@@ -907,12 +989,13 @@ SPACE,BA,member
 SPACE,LMT,member
 SPACE,NOC,member
 SPACE,IRDM,member
-SPACE,SATS,member
+SPACE,ECHO,member
 SPACE,GSAT,member
 SPACE,BKSY,member
 SPACE,KRMN,member
 SPACE,FLY,member
-TECH - 5G & Telecom,FIVG,etf
+SPACE,SPCX,member
+SPACE,VSAT,member
 TECH - 5G & Telecom,IYZ,etf
 TECH - 5G & Telecom,TMUS,member
 TECH - 5G & Telecom,VZ,member
@@ -941,7 +1024,12 @@ TECH - Cloud,DOCN,member
 TECH - Cloud,MDB,member
 TECH - Cloud,DDOG,member
 TECH - Cloud,ESTC,member
-TECH - Cloud,CFLT,member
+TECH - Cloud,DT,member
+TECH - Cloud,PD,member
+TECH - Cloud,AMPL,member
+TECH - Cloud,GTLB,member
+TECH - Cloud,FROG,member
+TECH - Cloud,FSLY,member
 TECH - Cybersecurity,CIBR,etf
 TECH - Cybersecurity,HACK,etf
 TECH - Cybersecurity,CRWD,member
@@ -950,7 +1038,6 @@ TECH - Cybersecurity,FTNT,member
 TECH - Cybersecurity,ZS,member
 TECH - Cybersecurity,OKTA,member
 TECH - Cybersecurity,S,member
-TECH - Cybersecurity,CYBR,member
 TECH - Cybersecurity,QLYS,member
 TECH - Cybersecurity,NET,member
 TECH - Cybersecurity,CHKP,member
@@ -958,6 +1045,9 @@ TECH - Cybersecurity,TENB,member
 TECH - Cybersecurity,RPD,member
 TECH - Cybersecurity,VRNS,member
 TECH - Cybersecurity,CSCO,member
+TECH - Cybersecurity,NTSK,member
+TECH - Cybersecurity,RBRK,member
+TECH - Cybersecurity,SAIL,member
 TECH - Fintech,FINX,etf
 TECH - Fintech,ARKF,etf
 TECH - Fintech,HOOD,member
@@ -975,6 +1065,10 @@ TECH - Fintech,GRAB,member
 TECH - Fintech,MA,member
 TECH - Fintech,V,member
 TECH - Fintech,COIN,member
+TECH - Fintech,DAVE,member
+TECH - Fintech,CHYM,member
+TECH - Fintech,SEZL,member
+TECH - Fintech,RELY,member
 TECH - Internet,FDN,etf
 TECH - Internet,OGIG,etf
 TECH - Internet,SHOP,member
@@ -989,6 +1083,7 @@ TECH - Internet,DASH,member
 TECH - Internet,BKNG,member
 TECH - Internet,EBAY,member
 TECH - Internet,NFLX,member
+TECH - Internet,HNGE,member
 TECH - Optics & Photonics,LITE,member
 TECH - Optics & Photonics,COHR,member
 TECH - Optics & Photonics,CIEN,member
@@ -1001,6 +1096,7 @@ TECH - Optics & Photonics,CRDO,member
 TECH - Optics & Photonics,POET,member
 TECH - Optics & Photonics,ALAB,member
 TECH - Optics & Photonics,NOK,member
+TECH - Optics & Photonics,AXTI,member
 TECH - Semiconductors,SMH,etf
 TECH - Semiconductors,SOXX,etf
 TECH - Semiconductors,NVDA,member
@@ -1021,6 +1117,22 @@ TECH - Semiconductors,TXN,member
 TECH - Semiconductors,MPWR,member
 TECH - Semiconductors,NXPI,member
 TECH - Semiconductors,ARM,member
+TECH - Semiconductors,MXL,member
+TECH - Semiconductors,SMTC,member
+TECH - Semiconductors,SITM,member
+TECH - Semiconductors,AEHR,member
+TECH - Semiconductors,COHU,member
+TECH - Semiconductors,ONTO,member
+TECH - Semiconductors,KLIC,member
+TECH - Semiconductors,UCTT,member
+TECH - Semiconductors,ICHR,member
+TECH - Semiconductors,ENTG,member
+TECH - Semiconductors,VECO,member
+TECH - Semiconductors,VSH,member
+TECH - Semiconductors,DIOD,member
+TECH - Semiconductors,TSEM,member
+TECH - Semiconductors,SYNA,member
+TECH - Semiconductors,AMBQ,member
 TECH - Software,IGV,etf
 TECH - Software,ORCL,member
 TECH - Software,MSFT,member
@@ -1039,3 +1151,25 @@ TECH - Software,ADSK,member
 TECH - Software,CDNS,member
 TECH - Software,SNPS,member
 TECH - Software,APP,member
+TECH - Software,TWLO,member
+TECH - Software,RNG,member
+TECH - Software,FIVN,member
+TECH - Software,BAND,member
+TECH - Software,PAYC,member
+TECH - Software,VEEV,member
+TECH - Software,APPN,member
+TECH - Software,FRSH,member
+TECH - Software,INTA,member
+TECH - Software,PTC,member
+TRANSPORT - Shipping,FRO,member
+TRANSPORT - Shipping,DHT,member
+TRANSPORT - Shipping,INSW,member
+TRANSPORT - Shipping,TNK,member
+TRANSPORT - Shipping,ECO,member
+TRANSPORT - Shipping,TRMD,member
+TRANSPORT - Shipping,HAFN,member
+TRANSPORT - Shipping,LPG,member
+TRANSPORT - Shipping,DAC,member
+TRANSPORT - Shipping,ZIM,member
+TRANSPORT - Shipping,MATX,member
+TRANSPORT - Shipping,CMBT,member
