@@ -65,7 +65,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - Breadth universe: US common stocks ≥ $3 (ETFs/ADRs in themes excluded from breadth).
   4% up/down needs volume > prior day and ≥ 100k. T2108 = % above 40-day MA.
 - RS Rating 1–99: 63/126/189/252-day returns weighted 40/20/20/20, percentile vs liquid stocks.
-  ★ RS line vs SPY at 1-yr high; ⚑ same while price below its high.
+  ★ RS line vs SPY at 1-yr high today; ⚑ "RS line ahead of price": RS line 1-yr high within the last 5 sessions
+  while price is still 3%+ below its 52-wk high (`strength.LEAD_DAYS`).
 - Theme Strength 0–100: percentile composite of relative perf vs SPY 5–90D (50%),
   % above EMA21/50 (25%), median RS Rating (25%); groups < 5 stocks shrunk toward 50.
 - Anticipation: RS ≥ 85, ≤ 10% off high, ADR ≥ 4, 5-day range ≤ 1.5 ADR, volume dry-up ≤ 0.7.

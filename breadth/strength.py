@@ -79,14 +79,20 @@ def rs_ratings(close, liquid, days):
 
 
 def rs_line_flags(close, spy):
-    """RS line (close/SPY) at a 1-year high, and the same while price itself is
-    still below its high (the classic 'RS leads price' tell)."""
+    """RS line (close/SPY) at a 1-year high today (star), and 'RS leads price' (flag):
+    the RS line made a new 1-year high within the last LEAD_DAYS sessions while
+    price is still 3%+ below its own 52-week high - relative strength out in
+    front of price, the classic early tell."""
     if spy is None:
         return None, None
     rsl = close.div(spy, axis=0)
     nh = rsl >= rsl.rolling(252, min_periods=120).max() * 0.999
+    recent = nh.astype(float).rolling(LEAD_DAYS, min_periods=1).max() > 0
     price_hi = close >= close.rolling(252, min_periods=120).max() * 0.97
-    return nh, nh & ~price_hi
+    return nh, recent & ~price_hi
+
+
+LEAD_DAYS = 5
 
 
 # ---------------------------------------------------------------------------

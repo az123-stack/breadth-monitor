@@ -1054,7 +1054,7 @@ const stockCols = (ranks) => [
   { k: "rs", h: "3M %" }, { k: "setup", h: "Sheet setup<small>/ 10</small>" }, { k: "price", h: "Price" },
 ];
 const rsTint = (v) => v == null ? "" : v >= 90 ? "g3" : v >= 80 ? "g2" : v >= 70 ? "g1" : v <= 20 ? "r2" : v <= 35 ? "r1" : "";
-const rsCell = (s) => `<td class="num ${rsTint(s.rsr)}">${s.rsr ?? "–"}${s.rs_lead ? ' <span title="RS line at a 1-year high while price is still below its high: relative strength leading price">⚑</span>' : s.rs_nh ? ' <span title="RS line (vs SPY) at a 1-year high">★</span>' : ""}</td>`;
+const rsCell = (s) => `<td class="num ${rsTint(s.rsr)}">${s.rsr ?? "–"}${s.rs_lead ? ' <span title="RS line made a 1-year high in the last 5 days while price is still 3%+ below its high: relative strength leading price">⚑</span>' : s.rs_nh ? ' <span title="RS line (vs SPY) at a 1-year high">★</span>' : ""}</td>`;
 const tightCell = (v) => `<td class="num ${v == null ? "" : v <= 1.25 ? "g2" : v <= 1.5 ? "g1" : ""}">${v == null ? "–" : v.toFixed(2) + "×"}</td>`;
 const dryCell = (v) => `<td class="num ${v == null ? "" : v <= 0.6 ? "g2" : v <= 0.8 ? "g1" : v >= 1.5 ? "r1" : ""}">${v == null ? "–" : v.toFixed(2)}</td>`;
 // show: "sub" shows the stock's sub-theme under its name, "themes" its themes, "both" both
@@ -1586,7 +1586,7 @@ const EXPORT_DEFS = [
     get: (T, L) => L.bursts.filter(r => r.lynch >= 5).map(r => r.t) },
   { id: "ant", on: true, label: "Anticipation · tight coils", why: "Tight, quiet coils in RS 85+ leaders near highs (whole market)",
     get: (T, L) => L.anticipation.map(r => r.t) },
-  { id: "lead", on: true, label: "RS leads price ⚑", why: "RS line vs SPY at a 1-year high while price is still below its high",
+  { id: "lead", on: true, label: "RS line ahead of price ⚑", why: "RS line vs SPY made a 1-year high in the last 5 days while price is still 3%+ below its own high",
     get: (T) => byRS(T.stocks.filter(s => s.rs_lead)) },
   { id: "star", on: true, label: "RS line new high ★", why: "RS line vs SPY at a 1-year high",
     get: (T) => byRS(T.stocks.filter(s => s.rs_nh)) },
