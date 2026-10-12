@@ -1,7 +1,7 @@
 """Intraday tab: what the page needs to read the live Google Sheet during the session.
 
 The live sheet ("Breadth Monitor – Live Prices") has one row per symbol:
-  ticker | price | closeyest | open | volume | marketcap | volumeavg | index | symbol
+  ticker | index | symbol | price | closeyest | open | volume | marketcap | volumeavg
 'symbol' is what GOOGLEFINANCE is asked for (usually the ticker; index and crypto
 rows use Google's own codes). marketcap and volumeavg are only filled for S&P 500 /
 Nasdaq-100 members (index = 1) to keep the sheet light.
@@ -14,6 +14,8 @@ GOOG, FOX and NWS are left out of the weights: Google reports the whole company'
 market cap on both share classes.
 
 `python -m breadth.intraday --sheet-rows` prints the sheet's ticker/index/symbol rows.
+Each build writes them to data/live_sheet.csv; the sheet's A4 cell is
+=IMPORTDATA("<raw GitHub URL of data/live_sheet.csv>"), so it follows theme changes on its own.
 """
 import argparse
 import csv
@@ -70,6 +72,11 @@ def sheet_rows():
     for t in sorted(tick):
         rows.append([t, 1 if t in idx else 0, SYMBOL_OVERRIDE.get(t, t)])
     return rows
+
+
+def write_sheet_csv():
+    with open(config.DATA_DIR / "live_sheet.csv", "w", newline="") as f:
+        csv.writer(f).writerows(sheet_rows())
 
 
 if __name__ == "__main__":

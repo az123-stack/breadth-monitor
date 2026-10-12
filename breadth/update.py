@@ -12,7 +12,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from . import config, kq, metrics, site, store, themes
+from . import config, intraday, kq, metrics, site, store, themes
 from .massive import MassiveClient, MassiveError
 
 log = logging.getLogger("breadth")
@@ -197,6 +197,10 @@ def recompute_and_publish(bars, splits, universe, state):
         except Exception as e:
             log.exception("setup review failed: %s", e)
     site.build(history, theme_data, kq_data)
+    try:
+        intraday.write_sheet_csv()
+    except Exception as e:  # never block the page on this
+        log.warning("live sheet ticker list skipped: %s", e)
     return history
 
 

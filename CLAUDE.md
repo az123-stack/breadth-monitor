@@ -20,10 +20,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   ("Breadth Monitor – Live Prices", id `1_R08vZphNLMB4MUJSl_bNPx5DjVVy29tMV8WFaOQkSs`,
   URL in `config.LIVE_CSV_URL`) and recomputes themes/stocks in the browser.
   Browser math mirrors Python exactly. Breadth tab stays end-of-day.
-  Sheet layout (row 1 header): ticker | price | closeyest | open | volume | marketcap | volumeavg | index | symbol;
-  rows 2-3 `_asof` (=NOW()) and `_spytime`. Formulas ask GOOGLEFINANCE for column I (`symbol`); marketcap/volumeavg only
-  where index = 1. Rows come from `python -m breadth.intraday --sheet-rows` (pulse symbols, sector ETFs, theme stocks,
-  S&P 500 + Nasdaq-100). When theme tickers change, re-sync the sheet's A/H/I columns and extend formulas.
+  Sheet layout (row 1 header): ticker | index | symbol | price | closeyest | open | volume | marketcap | volumeavg;
+  rows 2-3 `_asof` (=NOW()) and `_spytime`. A4 = IMPORTDATA of the raw GitHub `data/live_sheet.csv` (written every build
+  by `intraday.write_sheet_csv`: pulse symbols, sector ETFs, theme stocks, S&P 500 + Nasdaq-100), so ticker changes
+  reach the sheet on their own. D:I formulas (rows 4-1400) ask GOOGLEFINANCE for column C (`symbol`);
+  marketcap/volumeavg only where index = 1. If the list ever passes ~1,390 rows, extend the formulas.
   The page parser reads the header, so old 2-column sheets still work.
 
 ## Code map
