@@ -188,7 +188,7 @@ def recompute_and_publish(bars, splits, universe, state):
             if pb.get("picks"):
                 ledger.record(theme_data["date"], pb["picks"], pb.get("pick_cands") or [])
             ledger.settle(adjusted)
-            theme_data["scoreboard"] = ledger.summary(adjusted)
+            theme_data["scoreboard"] = ledger.summary(adjusted, history=history)
         except Exception as e:
             log.exception("pick scoreboard failed: %s", e)
         try:
@@ -196,7 +196,13 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["setup_review"] = review.evaluate(theme_data, history)
         except Exception as e:
             log.exception("setup review failed: %s", e)
-    site.build(history, theme_data, kq_data)
+    macro_data = None
+    try:
+        from . import macro
+        macro_data = macro.build(adjusted)
+    except Exception as e:  # optional strip; never block the page
+        log.exception("macro strip failed: %s", e)
+    site.build(history, theme_data, kq_data, macro_data)
     try:
         intraday.write_sheet_csv()
     except Exception as e:  # never block the page on this
@@ -255,6 +261,12 @@ def main(argv=None):
                 LV.refresh(store.theme_tickers() & set(universe))
         except Exception as e:
             log.warning("levels refresh skipped: %s", e)
+        try:   # macro drivers strip (Yahoo futures; cached, ETF fallback)
+            from . import macro
+            if config.LEVELS_ENABLED:
+                macro.refresh()
+        except Exception as e:
+            log.warning("macro refresh skipped: %s", e)
     else:
         splits = store.load_splits()
         universe = store.load_universe()

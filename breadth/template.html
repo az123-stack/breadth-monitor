@@ -334,6 +334,59 @@ tr.drill > td { padding: 0 0 10px 0; background: var(--surface-0); }
 footer { color: var(--text-muted); font-size: 12px; margin-top: 18px; line-height: 1.6; }
 footer a { color: var(--text-secondary); }
 .empty { padding: 40px; text-align: center; color: var(--text-secondary); }
+
+/* ---------- Rotation tab: macro strip, pair charts, timeline, scorecard ---------- */
+.mstrip { padding: 14px 16px; margin-bottom: 12px; }
+.mstrip .kicker { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+.mstrip .kicker a { color: var(--text-secondary); text-transform: none; letter-spacing: 0; font-weight: 500; }
+.mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; margin-top: 10px; }
+.mstrip.compact .mgrid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+@media (max-width: 520px) { .mgrid, .mstrip.compact .mgrid { grid-template-columns: 1fr 1fr; gap: 6px; } .mtile { padding: 7px 8px; } .mtop .spark { width: 56px; } .mv2 { font-size: 16px; } .mdrvs { display: none; } .lc svg text { font-size: 17px; } }
+.mtile { border: 1px solid var(--border); border-radius: 10px; padding: 9px 11px; background: var(--surface-0); min-width: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.mk { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.mk small { font-weight: 400; color: var(--text-muted); }
+.mv2 { font-size: 19px; font-weight: 600; margin: 2px 0 4px; }
+.mstrip.compact .mv2 { font-size: 16px; }
+.mchgs { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11.5px; color: var(--text-muted); }
+.mchg { padding: 0 4px; border-radius: 4px; color: var(--text-primary); font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11.5px; }
+.spark { display: block; flex: none; }
+.mrange { position: relative; height: 4px; border-radius: 2px; background: var(--neutral-mid); margin: 8px 0 2px; }
+.mrange i { position: absolute; top: -3px; width: 4px; height: 10px; margin-left: -2px; border-radius: 2px; background: var(--text-secondary); }
+.mdrvs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+.mdrv { font-size: 11px; color: var(--text-secondary); background: var(--neutral-mid); border-radius: 5px; padding: 1px 6px; }
+.mdrv b.up { color: var(--good); } .mdrv b.dn { color: var(--critical); }
+.pairsel select { max-width: 220px; }
+.pairsel .pswap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; cursor: pointer; color: var(--text-primary); }
+.pbody .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin: 4px 0 2px; }
+.lc { position: relative; margin-top: 6px; }
+.lct { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin: 6px 0 2px; }
+.lc svg { display: block; overflow: visible; }
+.lc svg text { fill: var(--text-muted); font-size: 11px; font-family: Inter, system-ui, sans-serif; }
+.lc svg text.lclab { fill: var(--text-secondary); font-size: 11px; }
+.lsw { display: inline-block; width: 10px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: 3px; }
+.pchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pchip { background: var(--surface-0); border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px; font: inherit; font-size: 12.5px; color: var(--text-secondary); cursor: pointer; text-align: left; }
+.pchip b { color: var(--text-primary); font-weight: 600; } .pchip .up { color: var(--good); }
+.pchip:hover { border-color: var(--text-muted); }
+.tlwrap { position: relative; overflow-x: auto; margin-top: 10px; }
+.tltable { display: inline-block; min-width: 100%; }
+.tlrow { display: flex; align-items: center; gap: 0; border-bottom: 1px solid var(--grid); }
+.tlhead { font-size: 11.5px; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+.tln { position: sticky; left: 0; background: var(--surface-1); z-index: 1; width: 190px; flex: none; padding: 3px 8px 3px 0; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tln small { font-weight: 400; color: var(--text-muted); font-size: 11px; margin-left: 6px; }
+.tlc { width: 50px; flex: none; text-align: right; padding-right: 8px; font-size: 12px; }
+.tlm { position: relative; height: 16px; flex: none; margin-left: 6px; }
+.tlm span { position: absolute; top: 1px; border-left: 1px solid var(--border); padding-left: 3px; }
+.tlcells { display: flex; flex: none; margin-left: 6px; }
+.tlcells i { display: block; width: 6px; height: 14px; }
+.tlcells i:hover { outline: 1px solid var(--text-primary); }
+@media (max-width: 520px) { .tln { width: 120px; } .tln small { display: none; } .tlc { width: 38px; padding-right: 4px; } }
+.scorecard h3.sch { font-size: 13.5px; margin: 12px 0 4px; }
+.scorecard .spark { display: inline-block; vertical-align: middle; margin-left: 6px; }
+.scgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 900px) { .scgrid { grid-template-columns: 1fr; } }
+table.grid.sc { font-size: 12.5px; }
 </style>
 </head>
 <body>
@@ -355,7 +408,7 @@ const TONES = {
 };
 
 let TAB = "breadth";
-try { const h = location.hash.slice(1); if (["breadth", "intraday", "trades", "themes", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
+try { const h = location.hash.slice(1); if (["breadth", "intraday", "trades", "themes", "rotation", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
 
 function render() {
   const app = document.getElementById("app");
@@ -389,6 +442,7 @@ function render() {
     <button role="tab" data-tab="intraday">Intraday</button>
     <button role="tab" data-tab="trades">Trade Setups</button>
     <button role="tab" data-tab="themes">Themes</button>
+    <button role="tab" data-tab="rotation">Rotation</button>
     <button role="tab" data-tab="browse">Browse</button>
     <button role="tab" data-tab="setups">Setups</button>
     <button role="tab" data-tab="stocks">Stocks</button></nav>`);
@@ -404,6 +458,7 @@ function render() {
     else if (TAB === "setups") renderSetups(panel);
     else if (TAB === "trades") renderTrades(panel);
     else if (TAB === "intraday") renderIntraday(panel);
+    else if (TAB === "rotation") renderRotation(panel);
     else renderBreadth(panel);
   };
   tabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
@@ -412,6 +467,274 @@ function render() {
     show();
   }));
   show();
+}
+
+/* ---------- Macro drivers strip ---------- */
+const MACRO_SCALE = { d1: 0.015, d5: 0.04, d30: 0.1, d90: 0.2 };
+function macroVal(m) {
+  if (m.unit === "pct") return m.last.toFixed(2) + "%";
+  const v = Math.abs(m.last), d = v >= 1000 ? 0 : v >= 100 ? 1 : v >= 10 ? 2 : 3;
+  return (m.unit === "$" ? "$" : "") + Number(m.last).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+function macroChg(m, k) {
+  const v = m[k];
+  if (v == null) return '<span class="meta">–</span>';
+  if (m.unit === "pct") {                       // yields: basis points
+    const bp = Math.round(v * 100), c = tint(v, MACRO_SCALE[k] * 4);
+    return `<span class="mchg ${c}">${bp > 0 ? "+" : ""}${bp} bp</span>`;
+  }
+  return `<span class="mchg ${tint(v, MACRO_SCALE[k])}">${pct(v)}</span>`;
+}
+function sparkSVG(vals, w = 120, h = 30) {
+  const v = vals.filter(x => x != null);
+  if (v.length < 2) return "";
+  const lo = Math.min(...v), hi = Math.max(...v), span = hi - lo || 1;
+  const pts = v.map((y, i) => `${(i / (v.length - 1) * (w - 4) + 2).toFixed(1)},${(h - 3 - (y - lo) / span * (h - 6)).toFixed(1)}`);
+  const [lx, ly] = pts[pts.length - 1].split(",");
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><polyline points="${pts.join(" ")}" fill="none" stroke="var(--s1)" stroke-width="1.5" stroke-linejoin="round"/><circle cx="${lx}" cy="${ly}" r="2.5" fill="var(--s1)"/></svg>`;
+}
+const subStrength = () => { const M = {}; ((DATA.themes || {}).subthemes || []).forEach(r => { M[r.theme] = r; }); return M; };
+function macroStrip(compact) {
+  const L = DATA.macro || [];
+  if (!L.length) return $('<div></div>');
+  const SM = subStrength();
+  const tiles = L.map(m => {
+    const drv = (m.drives || []).map(n => SM[n] ? `<span class="mdrv" title="${esc(n)}: Theme Strength ${SM[n].strength ?? "–"}, rank ${SM[n].s_rank ?? "–"}">${esc(n)} <b class="${(SM[n].strength ?? 50) >= 70 ? "up" : (SM[n].strength ?? 50) <= 30 ? "dn" : ""}">${SM[n].strength == null ? "–" : Math.round(SM[n].strength)}</b></span>` : "").join("");
+    const pos = m.pos == null ? "" : `<div class="mrange" title="Where it sits in its 1-year range (low to high)"><i style="left:${Math.round(m.pos * 100)}%"></i></div>`;
+    return `<div class="mtile" title="${esc(m.label)} · ${esc(m.src)} · close ${esc(m.date)}">
+      <div class="mtop"><span class="mk">${esc(m.label)}${m.src.startsWith("ETF") ? ` <small>${esc(m.src)}</small>` : ""}</span>${sparkSVG(m.spark.slice(compact ? -40 : -90), compact ? 64 : 110, compact ? 22 : 30)}</div>
+      <div class="mv2 num">${macroVal(m)}</div>
+      <div class="mchgs"><span>1D ${macroChg(m, "d1")}</span><span>5D ${macroChg(m, "d5")}</span><span>1M ${macroChg(m, "d30")}</span>${compact ? "" : `<span>3M ${macroChg(m, "d90")}</span>`}</div>
+      ${compact ? "" : pos + (drv ? `<div class="mdrvs">${drv}</div>` : "")}</div>`;
+  }).join("");
+  const asof = L.map(m => m.date).sort().pop();
+  const el = $(`<section class="card mstrip${compact ? " compact" : ""}"><div class="kicker">Macro drivers · closes through ${shortDate(asof)}${compact ? ' · <a href="#rotation" class="mgo">full view on Rotation ›</a>' : ""}</div>
+    <div class="mgrid">${tiles}</div>
+    ${compact ? "" : `<div class="note" style="padding:8px 0 0">Futures and index closes from Yahoo Finance, refreshed in the morning run. The 3-2-1 crack spread is the refining margin in $/bbl: (2 × gasoline + 1 × diesel − 3 × crude) ÷ 3, so it rises when fuel outruns crude. The bar under each value shows where it sits in its 1-year range. Each tile lists the sub-themes it drives with their Theme Strength today (green 70+, red 30 or less). Tiles marked ETF fell back to the ETF in our own data because the futures feed was missing.</div>`}</section>`);
+  const go = el.querySelector(".mgo");
+  if (go) go.addEventListener("click", (e) => { e.preventDefault(); const b = document.querySelector('nav.tabs button[data-tab="rotation"]'); if (b) { b.click(); window.scrollTo(0, 0); } });
+  return el;
+}
+
+/* ---------- small line chart used by the pair panel ---------- */
+function lineChart(dates, series, opts = {}) {
+  const Wc = 720, Hc = opts.h || 200, m = { t: 12, r: 64, b: 22, l: 44 };
+  const el = $(`<div class="lc">${opts.title ? `<div class="lct">${opts.title}</div>` : ""}<div class="lcbox"></div></div>`);
+  const all = series.flatMap(s => s.vals.filter(v => v != null));
+  if (!all.length) return el;
+  let lo = Math.min(...all), hi = Math.max(...all);
+  const pad = (hi - lo) * 0.08 || 1; lo -= pad; hi += pad;
+  const n = dates.length, x = (i) => m.l + i * (Wc - m.l - m.r) / Math.max(1, n - 1), y = (v) => m.t + (hi - v) / (hi - lo) * (Hc - m.t - m.b);
+  const svg = S("svg", { viewBox: `0 0 ${Wc} ${Hc}`, width: "100%", role: "img", "aria-label": opts.title || "chart" });
+  el.querySelector(".lcbox").append(svg);
+  const step = (hi - lo) / 4;
+  for (let k = 0; k <= 4; k++) {
+    const v = lo + k * step;
+    S("line", { x1: m.l, x2: Wc - m.r, y1: y(v), y2: y(v), stroke: "var(--grid)", "stroke-width": 1 }, svg);
+    const t = S("text", { x: m.l - 6, y: y(v) + 4, "text-anchor": "end" }, svg); t.textContent = (opts.fmt || (v => v.toFixed(0)))(v);
+  }
+  if (opts.ref != null && opts.ref > lo && opts.ref < hi) S("line", { x1: m.l, x2: Wc - m.r, y1: y(opts.ref), y2: y(opts.ref), stroke: "var(--text-muted)", "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
+  const ticks = Math.min(6, n);
+  for (let k = 0; k < ticks; k++) {
+    const i = Math.round(k * (n - 1) / Math.max(1, ticks - 1));
+    const t = S("text", { x: x(i), y: Hc - 5, "text-anchor": k === 0 ? "start" : k === ticks - 1 ? "end" : "middle" }, svg); t.textContent = shortDate(dates[i]);
+  }
+  series.forEach(s => {
+    let d = "", pen = false;
+    s.vals.forEach((v, i) => { if (v == null) { pen = false; return; } d += (pen ? "L" : "M") + x(i).toFixed(1) + "," + y(v).toFixed(1); pen = true; });
+    S("path", { d, fill: "none", stroke: s.color, "stroke-width": s.w || 2, "stroke-dasharray": s.dash || "", "stroke-linejoin": "round" }, svg);
+    for (let i = n - 1; i >= 0; i--) if (s.vals[i] != null) {
+      if (!s.dash) S("circle", { cx: x(i), cy: y(s.vals[i]), r: 4, fill: s.color, stroke: "var(--surface-1)", "stroke-width": 2 }, svg);
+      if (s.label) { const t = S("text", { x: x(i) + 8, y: y(s.vals[i]) + 4, class: "lclab" }, svg); t.textContent = s.label; }
+      break;
+    }
+  });
+  const tip = $('<div class="tip"></div>'); el.append(tip);
+  const cross = S("line", { y1: m.t, y2: Hc - m.b, stroke: "var(--text-muted)", "stroke-width": 1, "stroke-dasharray": "3 3", opacity: 0 }, svg);
+  const hit = S("rect", { x: m.l, y: 0, width: Wc - m.l - m.r, height: Hc, fill: "transparent" }, svg);
+  const move = (ev) => {
+    const p = ev.touches ? ev.touches[0] : ev, r = svg.getBoundingClientRect();
+    const sx = (p.clientX - r.left) * Wc / r.width;
+    const i = Math.max(0, Math.min(n - 1, Math.round((sx - m.l) / ((Wc - m.l - m.r) / Math.max(1, n - 1)))));
+    cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("opacity", 1);
+    tip.innerHTML = `<b>${longDate(dates[i])}</b>` + series.filter(s => s.name).map(s => `<div><span><i class="lsw" style="background:${s.color}"></i>${esc(s.name)}</span><span class="num">${s.vals[i] == null ? "–" : (opts.fmt || (v => v.toFixed(1)))(s.vals[i])}</span></div>`).join("");
+    const er = el.getBoundingClientRect(), px = r.left - er.left + x(i) * r.width / Wc, tw = tip.offsetWidth;
+    tip.style.left = (px + 14 + tw < er.width - 4 ? px + 14 : Math.max(4, px - 14 - tw)) + "px";
+    tip.style.top = (r.top - er.top + 4) + "px"; tip.style.opacity = 1;
+  };
+  const leave = () => { cross.setAttribute("opacity", 0); tip.style.opacity = 0; };
+  hit.addEventListener("mousemove", move); hit.addEventListener("touchmove", move, { passive: true });
+  hit.addEventListener("touchstart", move, { passive: true });
+  hit.addEventListener("mouseleave", leave); hit.addEventListener("touchend", leave);
+  return el;
+}
+
+/* ---------- Pair charts ---------- */
+function groupByKey() {
+  const T = DATA.themes, M = {};
+  (T.themes || []).forEach(r => { if (r.px) M["t:" + r.theme] = { ...r, kind: "Theme" }; });
+  (T.subthemes || []).forEach(r => { if (r.px) M["s:" + r.theme] = { ...r, kind: "Sub-theme" }; });
+  return M;
+}
+function pairFinder(G, win = 20) {
+  const bySec = {};
+  Object.entries(G).filter(([k]) => k.startsWith("s:")).forEach(([k, r]) => { (bySec[r.group] = bySec[r.group] || []).push([k, r]); });
+  const out = [];
+  Object.entries(bySec).forEach(([sec, list]) => {
+    for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
+      const [ka, a] = list[i], [kb, b] = list[j], n = a.px.length;
+      if (n <= win || b.px.length !== n) continue;
+      const ra = a.px[n - 1] / a.px[n - 1 - win], rb = b.px[n - 1] / b.px[n - 1 - win];
+      const ch = ra / rb - 1;
+      out.push(ch >= 0 ? { a: ka, b: kb, ch, sec } : { a: kb, b: ka, ch: rb / ra - 1, sec });
+    }
+  });
+  out.sort((p, q) => q.ch - p.ch);
+  const used = new Set(), perSec = {}, pick = [];       // each group once, at most 2 pairs per sector
+  for (const p of out) {
+    if (used.has(p.a) || used.has(p.b) || (perSec[p.sec] || 0) >= 2) continue;
+    pick.push(p); used.add(p.a); used.add(p.b); perSec[p.sec] = (perSec[p.sec] || 0) + 1;
+    if (pick.length >= 8) break;
+  }
+  return pick;
+}
+function pairCard() {
+  UI.pair = UI.pair || { a: "s:Refiners", b: "s:Shale E&P", win: 90 };
+  const T = DATA.themes, G = groupByKey(), U = UI.pair, D = T.px_dates || [];
+  if (!D.length || !Object.keys(G).length) return $('<div class="card empty">Pair charts appear after the next data run.</div>');
+  if (!G[U.a]) U.a = Object.keys(G).find(k => k.startsWith("s:")); if (!G[U.b] || U.b === U.a) U.b = Object.keys(G).find(k => k.startsWith("s:") && k !== U.a);
+  const opt = (sel) => ["t", "s"].map(p => `<optgroup label="${p === "t" ? "Themes" : "Sub-themes"}">${Object.keys(G).filter(k => k.startsWith(p + ":")).sort((x, y) => x.localeCompare(y)).map(k => `<option value="${esc(k)}"${k === sel ? " selected" : ""}>${esc(k.slice(2))}</option>`).join("")}</optgroup>`).join("");
+  const card = $(`<section class="card regcard"><div class="kicker">Pair chart · which of two groups is leading</div>
+    <div class="filters pairsel"><select class="pa" aria-label="First group">${opt(U.a)}</select><span class="meta">vs</span><select class="pb" aria-label="Second group">${opt(U.b)}</select><button class="pswap" title="Swap">⇄</button></div>
+    <div class="pbody"></div>
+    <div class="pfind"><div class="meta" style="margin:10px 0 6px"><b>Biggest swings inside a sector, last 20 sessions</b> · click to chart</div><div class="pchips"></div></div>
+    <div class="note" style="padding:8px 0 0">Each group is an equal-weight index of its stocks (start = 100), so one big name can't dominate. The ratio is the first group ÷ the second: rising means the first is outperforming, and the dashed line is its 20-day average. A ratio crossing above its average is an early sign of rotation into the first group. Window: up to ${D.length} sessions.</div></section>`);
+  const f = card.querySelector(".pairsel");
+  const ws = { win: String(U.win) };
+  f.append(chips("Window", [["30", "30D"], ["90", "90D"], [String(D.length - 1), "All"]], ws, "win", () => { U.win = +ws.win; draw(); }));
+  const body = card.querySelector(".pbody");
+  const draw = () => {
+    const A = G[U.a], B = G[U.b], n = D.length, w = Math.min(U.win, n - 1), s0 = n - 1 - w;
+    const dd = D.slice(s0), na = A.px.slice(s0).map(v => v / A.px[s0] * 100), nb = B.px.slice(s0).map(v => v / B.px[s0] * 100);
+    const ratio = na.map((v, i) => v / nb[i] * 100);
+    const ma = ratio.map((_, i) => { const full = A.px.slice(0, s0 + i + 1).map((v, k) => v / B.px[k]); if (full.length < 20) return null; const t = full.slice(-20); return t.reduce((s, x) => s + x, 0) / 20 / (A.px[s0] / B.px[s0]) * 100; });
+    const last = ratio.length - 1, r10 = last >= 10 ? ratio[last] / ratio[last - 10] - 1 : null;
+    const lead = ratio[last] >= 100 ? A : B, above = ma[last] != null && ratio[last] > ma[last];
+    const msg = `Over ${w} sessions <b>${esc(A.theme)}</b> ${pct(na[last] / 100 - 1)}, <b>${esc(B.theme)}</b> ${pct(nb[last] / 100 - 1)}: ${esc(lead.theme)} leads by ${pct(Math.abs(ratio[last] / 100 - 1)).replace("+", "")}. `
+      + (r10 == null ? "" : `Last 10 sessions the ratio moved ${pct(r10)}, ${above ? `and it's above its 20-day average (momentum with ${esc(A.theme)})` : `and it's below its 20-day average (momentum with ${esc(B.theme)})`}.`)
+      + ` Strength now: ${esc(A.theme)} ${A.strength ?? "–"} (#${A.s_rank ?? "–"}), ${esc(B.theme)} ${B.strength ?? "–"} (#${B.s_rank ?? "–"}).`;
+    body.innerHTML = "";
+    body.append($(`<p style="margin:8px 0 4px">${msg}</p>`));
+    const legend = `<div class="legend"><span><i class="lsw" style="background:var(--s1)"></i>${esc(A.theme)}</span><span><i class="lsw" style="background:var(--s2)"></i>${esc(B.theme)}</span></div>`;
+    body.append($(legend));
+    body.append(lineChart(dd, [{ name: A.theme, vals: na, color: "var(--s1)" }, { name: B.theme, vals: nb, color: "var(--s2)" }],
+      { title: "Each group, indexed to 100", fmt: v => v.toFixed(0), ref: 100, h: 190 }));
+    body.append(lineChart(dd, [{ name: "20-day avg", vals: ma, color: "var(--text-muted)", dash: "4 3", w: 1.5 }, { name: `Ratio ${A.theme} ÷ ${B.theme}`, vals: ratio, color: "var(--s1)" }],
+      { title: `Ratio: ${esc(A.theme)} ÷ ${esc(B.theme)} (rising = ${esc(A.theme)} leading)`, fmt: v => v.toFixed(1), ref: 100, h: 170 }));
+  };
+  card.querySelector(".pa").addEventListener("change", e => { U.a = e.target.value; draw(); });
+  card.querySelector(".pb").addEventListener("change", e => { U.b = e.target.value; draw(); });
+  card.querySelector(".pswap").addEventListener("click", () => { [U.a, U.b] = [U.b, U.a]; card.querySelector(".pa").value = U.a; card.querySelector(".pb").value = U.b; draw(); });
+  const pc = card.querySelector(".pchips");
+  pairFinder(G).forEach(p => {
+    const b = $(`<button class="pchip" title="${esc(p.sec)}"><b>${esc(p.a.slice(2))}</b> over ${esc(p.b.slice(2))} <span class="num up">${pct(p.ch)}</span></button>`);
+    b.addEventListener("click", () => { U.a = p.a; U.b = p.b; card.querySelector(".pa").value = U.a; card.querySelector(".pb").value = U.b; draw(); card.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    pc.append(b);
+  });
+  draw();
+  return card;
+}
+
+/* ---------- Theme timeline heatmap ---------- */
+function timelineCard() {
+  UI.tl = UI.tl || { view: "sub", sort: "now", n: "40", q: "" };
+  const T = DATA.themes, D = T.timeline_dates || [], U = UI.tl;
+  if (!D.length) return $('<div class="card empty">The theme timeline appears after the next data run.</div>');
+  const card = $(`<section class="card regcard tlcard"><div class="kicker">Theme timeline · Strength over the last ${D.length} sessions</div>
+    <div class="filters tlf"></div><div class="tlwrap"></div>
+    <div class="note" style="padding:8px 0 0">Each row is a ${U.view === "sub" ? "sub-theme" : "theme"}, each cell one session, colored by Theme Strength: deep green near 100 (leading), gray around 50, red near 0 (lagging). Read across a row to see a group building strength (red → green) or fading (green → red). Rank Δ is places gained in the ranking over 20 and 60 sessions. Hover a cell for its date, Strength and rank.</div></section>`);
+  const f = card.querySelector(".tlf");
+  const redraw = () => { const c = timelineCard(); card.replaceWith(c); };
+  f.append(chips("View", [["theme", "Themes"], ["sub", "Sub-themes"]], U, "view", redraw));
+  f.append(chips("Sort", [["now", "Rank now"], ["up", "Biggest climbers (20D)"], ["down", "Biggest fallers (20D)"]], U, "sort", redraw));
+  f.append(chips("Show", [["40", "Top 40"], ["all", "All"]], U, "n", redraw));
+  const qi = $('<input type="search" placeholder="Search">'); qi.value = U.q; f.append(qi);
+  qi.addEventListener("change", e => { U.q = e.target.value.trim().toLowerCase(); redraw(); });
+  const rows = (U.view === "sub" ? T.subthemes : T.themes).filter(r => r.s_hist && r.s_hist.length === D.length);
+  // rank on every date across all groups of this view
+  const ranks = rows.map(() => new Array(D.length).fill(null));
+  for (let i = 0; i < D.length; i++) {
+    const order = rows.map((r, k) => [r.s_hist[i], k]).filter(x => x[0] != null).sort((a, b) => b[0] - a[0]);
+    order.forEach(([, k], p) => { ranks[k][i] = p + 1; });
+  }
+  const L = D.length - 1;
+  let list = rows.map((r, k) => ({ r, rk: ranks[k], now: ranks[k][L], d20: ranks[k][L - 20] != null && ranks[k][L] != null ? ranks[k][L - 20] - ranks[k][L] : null,
+    d60: ranks[k][L - 60] != null && ranks[k][L] != null ? ranks[k][L - 60] - ranks[k][L] : null }));
+  if (U.q) list = list.filter(o => o.r.theme.toLowerCase().includes(U.q) || (o.r.group || "").toLowerCase().includes(U.q));
+  list.sort(U.sort === "up" ? (a, b) => (b.d20 ?? -1e9) - (a.d20 ?? -1e9) : U.sort === "down" ? (a, b) => (a.d20 ?? 1e9) - (b.d20 ?? 1e9) : (a, b) => (a.now ?? 1e9) - (b.now ?? 1e9));
+  if (U.n !== "all" && !U.q) list = list.slice(0, 40);
+  const cw = 6, ch = 14, Wd = D.length * cw;
+  const months = []; D.forEach((d, i) => { if (i === 0 || d.slice(5, 7) !== D[i - 1].slice(5, 7)) months.push([i, d]); });
+  const wrap = card.querySelector(".tlwrap");
+  const mv = (v) => v == null ? '<span class="mv">–</span>' : v === 0 ? '<span class="mv">·</span>' : `<span class="mv ${v > 0 ? "up" : "dn"}">${v > 0 ? "▲" : "▼"}${Math.abs(v)}</span>`;
+  const head = `<div class="tlrow tlhead"><div class="tln">${U.view === "sub" ? "Sub-theme" : "Theme"}</div><div class="tlc num">Rank</div><div class="tlc">Δ 20D</div><div class="tlc">Δ 60D</div>
+    <div class="tlm" style="width:${Wd}px">${months.map(([i, d]) => `<span style="left:${i * cw}px">${new Date(d + "T12:00:00").toLocaleDateString(undefined, { month: "short" })}</span>`).join("")}</div></div>`;
+  const tbl = $(`<div class="tltable">${head}</div>`);
+  const tip = $('<div class="tip"></div>');
+  const color = (s) => {
+    if (s == null) return "transparent";
+    const k = Math.min(1, Math.abs(s - 50) / 50);
+    return `color-mix(in srgb, ${s >= 50 ? "var(--pos)" : "var(--neg)"} ${Math.round(8 + k * 72)}%, var(--neutral-mid))`;
+  };
+  list.forEach(o => {
+    const row = $(`<div class="tlrow"><div class="tln" title="${esc(o.r.theme)}">${esc(o.r.theme)}<small>${esc(o.r.group || (o.r.n + " stocks"))}</small></div><div class="tlc num">${o.now ?? "–"}</div><div class="tlc">${mv(o.d20)}</div><div class="tlc">${mv(o.d60)}</div><div class="tlcells" style="width:${Wd}px"></div></div>`);
+    const cells = row.querySelector(".tlcells");
+    cells.innerHTML = o.r.s_hist.map((s, i) => `<i style="background:${color(s)}" data-i="${i}"></i>`).join("");
+    cells.addEventListener("mousemove", (ev) => {
+      const i = +(ev.target.dataset && ev.target.dataset.i); if (!(i >= 0)) return;
+      tip.innerHTML = `<b>${esc(o.r.theme)}</b><div><span>${longDate(D[i])}</span><span></span></div><div><span>Strength</span><span class="num">${o.r.s_hist[i] ?? "–"}</span></div><div><span>Rank</span><span class="num">${o.rk[i] ?? "–"} of ${rows.length}</span></div>`;
+      const wr = wrap.getBoundingClientRect(), tr = ev.target.getBoundingClientRect(), tw = tip.offsetWidth;
+      const px = tr.left - wr.left + wrap.scrollLeft;
+      tip.style.left = (tr.left - wr.left + 12 + tw < wr.width ? px + 12 : px - 12 - tw) + "px";
+      tip.style.top = (tr.top - wr.top + 16) + "px"; tip.style.opacity = 1;
+    });
+    cells.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+    tbl.append(row);
+  });
+  wrap.append(tbl); wrap.append(tip);
+  return card;
+}
+
+/* ---------- Rotation tab ---------- */
+function renderRotation(app) {
+  if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  app.append(macroStrip(false));
+  app.append(pairCard());
+  app.append(timelineCard());
+}
+
+/* ---------- Pick scorecard (by setup / regime) ---------- */
+const SETUP_NAME = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP" };
+const REG_NAME = { thrust: "After a thrust", strong: "Strong breadth", mixed: "Mixed breadth", weak: "Weak breadth", unknown: "Unknown" };
+function scorecardHTML(B) {
+  const C = B && B.card, R = ((DATA.themes || {}).trade_bt || {}).pick_replay;
+  const rcell = (v) => v == null ? '<td class="num meta">–</td>' : `<td class="num ${v >= 0.3 ? "g2" : v > 0 ? "g1" : v <= -0.3 ? "r2" : "r1"}">${v >= 0 ? "+" : ""}${v.toFixed(2)}R</td>`;
+  const liveTbl = (obj, names, head) => `<table class="grid sc"><thead><tr><th class="l">${head}</th><th>Trades</th><th>Win %</th><th>Avg R</th><th>Total R</th><th>Avg return</th><th>Stopped</th></tr></thead><tbody>
+    ${Object.entries(obj).sort((a, b) => b[1].n - a[1].n).map(([k, o]) => `<tr><td class="l">${esc(names[k] || k)}</td><td class="num">${o.n}</td><td class="num">${Math.round(o.win * 100)}%</td>${rcell(o.avg_r)}${rcell(o.total_r)}${retCell(o.avg_ret, "d5")}<td class="num">${Math.round(o.stops * 100)}%</td></tr>`).join("")}</tbody></table>`;
+  const repTbl = (obj, names, head) => `<table class="grid sc"><thead><tr><th class="l">${head}</th><th>Days</th><th>#1 pick<small>avg 5-day</small></th><th>Win %</th><th>Avg candidate<small>same days</small></th><th>Beat it</th></tr></thead><tbody>
+    ${Object.entries(obj).sort((a, b) => b[1].n - a[1].n).map(([k, o]) => `<tr><td class="l">${esc(names[k] || k)}</td><td class="num">${o.n}</td>${retCell(o.ret, "d5")}<td class="num">${Math.round(o.win * 100)}%</td>${retCell(o.cand, "d5")}<td class="num ${o.beat >= 0.55 ? "g1" : o.beat <= 0.45 ? "r1" : ""}">${Math.round(o.beat * 100)}%</td></tr>`).join("")}</tbody></table>`;
+  const live = C ? `<h3 class="sch">Live picks · ${C.all.n} closed · ${Math.round(C.all.win * 100)}% winners · ${C.all.avg_r == null ? "–" : (C.all.avg_r >= 0 ? "+" : "") + C.all.avg_r.toFixed(2) + "R"} a trade</h3>
+      ${C.curve && C.curve.length > 2 ? `<div class="meta">Cumulative R ${sparkSVG(C.curve, 160, 30)}</div>` : ""}
+      <div class="scgrid"><div class="scroll">${liveTbl(C.by_setup, SETUP_NAME, "By setup")}</div><div class="scroll">${liveTbl(C.by_regime, REG_NAME, "By breadth state")}</div></div>`
+    : `<h3 class="sch">Live picks</h3><p class="meta" style="margin:4px 0">No closed picks yet. The live scorecard fills in as picks finish their 5-session hold; until then, the replay below shows how the same pick rule did on past data.</p>`;
+  const bd = R && R.breakdown;
+  const rep = bd ? `<h3 class="sch">Replay of the pick rule · ${R.days} past sessions (${esc(R.from)} to ${esc(R.to)})</h3>
+      <p class="meta" style="margin:2px 0 6px">Each past day, the #1 actionable pick traded the live way (next-session entry, ${R.hold}-session hold, no stop) against the average candidate that day. #1 pick ${pct(R.pick_ret)} vs ${pct(R.avg_ret)} a trade, beat it on ${Math.round(R.beat * 100)}% of days (t = ${R.t}${Math.abs(R.t) < 2 ? ", not statistically solid yet" : ""}).
+      ${R.edge_curve && R.edge_curve.length > 2 ? `<br>Cumulative edge over the average candidate ${sparkSVG(R.edge_curve, 160, 30)}` : ""}</p>
+      <div class="scgrid"><div class="scroll">${repTbl(bd.setup, SETUP_NAME, "By setup")}</div><div class="scroll">${repTbl(bd.regime, REG_NAME, "By breadth state")}</div></div>
+      <details class="kqsec" style="margin-top:8px"><summary>By month</summary><div class="scroll">${repTbl(bd.month, {}, "Month")}</div></details>` : "";
+  return `<div class="scorecard">${live}${rep}
+    <div class="note" style="padding:8px 0 0">R = result ÷ the risk to the stop (risk floored at 0.3 ADR, as in the setup backtest), so +1R means the trade made what it risked. Breadth state is the playbook's state on the day of the pick. Small samples swing a lot: treat any row with fewer than ~20 trades as a hint, not a verdict.</div></div>`;
 }
 
 function renderBreadth(app) {
@@ -427,6 +750,7 @@ function renderBreadth(app) {
       <ul>${R.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
     </div></section>`));
 
+  if (DATA.macro && DATA.macro.length) app.append(macroStrip(true));
   const pct = (k) => P[k] != null ? `${ord(P[k])} percentile of your history` : "building history";
   const tiles = [
     ["Up 4%+ today", fmt(last.up4), last.up4_avg40 != null ? `40-day avg ${fmt(last.up4_avg40)}` : pct("up4")],
@@ -1733,6 +2057,7 @@ function scoreboardCard(B) {
   return $(`<section class="card regcard"><div class="kicker">Pick scoreboard · live results of the daily top picks</div>
     <p style="margin:6px 0 8px">${sum}</p>
     ${rows.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="l">Picked</th><th>#</th><th class="l">Ticker</th><th class="l">Setup</th><th>Entry</th><th>Result<small>with stop</small></th><th>Held 5 days<small>no stop</small></th><th>Candidates avg<small>same day</small></th><th class="l">Outcome</th></tr></thead><tbody>${body}</tbody></table></div>` : ""}
+    <details class="kqsec" open style="margin-top:10px"><summary><b>Scorecard</b> · win rate and R by setup and breadth state</summary>${scorecardHTML(B)}</details>
     <div class="note" style="padding:8px 0 0">Logged automatically every morning, traded the way you would: entry the next session (the open, or the trigger for flags and VCPs, which may not fill), stop 1 ADR below the fill (entry-day low for flags, the VCP stop for VCPs), exit at the close 5 sessions after entry. "Candidates avg" is what buying a random name from the same list at the same open would have made. Give it 2–3 months before reading much into it.</div></section>`);
 }
 

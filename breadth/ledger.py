@@ -21,7 +21,7 @@ from . import config
 
 HOLD = 5
 COLS = ["date", "rank", "t", "setup", "rsr", "price", "entry_type", "trigger", "stop_pct", "vcp_stop", "cands",
-        "status", "entry", "exit_date", "ret", "ret_nostop", "stop_hit", "cand_ret"]
+        "status", "entry", "exit_date", "ret", "ret_nostop", "stop_hit", "cand_ret", "risk"]
 
 
 def _path():
@@ -69,7 +69,7 @@ def settle(adjusted, df=None):
         return df
     for col in ("exit_date", "stop_hit", "status", "entry_type"):
         df[col] = df[col].astype(object)
-    for col in ("ret", "ret_nostop", "cand_ret", "entry", "trigger", "vcp_stop", "stop_pct", "price"):
+    for col in ("ret", "ret_nostop", "cand_ret", "entry", "trigger", "vcp_stop", "stop_pct", "price", "risk"):
         df[col] = pd.to_numeric(df[col], errors="coerce")
     tick = set(df.loc[todo, "t"])
     for cs in df.loc[todo, "cands"].dropna():
@@ -103,6 +103,7 @@ def settle(adjusted, df=None):
             stop = float(df.at[k, "vcp_stop"])
         else:
             stop = e * (1 - float(df.at[k, "stop_pct"] or 0))
+        df.at[k, "risk"] = round(float(max(e - stop, 0) / e), 4) if stop == stop else np.nan
         if e_i + HOLD >= n:
             df.at[k, "status"] = "open"
             continue
@@ -129,7 +130,58 @@ def settle(adjusted, df=None):
     return df
 
 
-def summary(adjusted=None, df=None):
+R_FLOOR = 0.3   # risk floored at 0.3 ADR, as in the setup backtest
+
+
+def _r_mult(closed):
+    risk = pd.to_numeric(closed["risk"], errors="coerce")
+    floor = R_FLOOR * pd.to_numeric(closed["stop_pct"], errors="coerce")
+    risk = pd.concat([risk, floor], axis=1).max(axis=1)
+    return (closed["ret"] / risk).where(risk > 0)
+
+
+def _stats(g):
+    r = g["r"].dropna()
+    return {"n": int(len(g)), "win": round(float((g["ret"] > 0).mean()), 3),
+            "avg_ret": round(float(g["ret"].mean()), 4),
+            "avg_r": round(float(r.mean()), 2) if len(r) else None,
+            "total_r": round(float(r.sum()), 2) if len(r) else None,
+            "stops": round(float(g["stop_hit"].astype(str).str.lower().eq("true").mean()), 3)}
+
+
+def _regimes(dates, history):
+    """Playbook state (thrust/strong/mixed/weak) on each pick date, from breadth history."""
+    from . import playbook
+    out = {}
+    if history is None or not len(history):
+        return out
+    h = history[history["complete"]] if "complete" in history.columns else history
+    for d in set(dates):
+        part = h.loc[:pd.Timestamp(d)]
+        if len(part):
+            out[d] = playbook.state_of(part)[0]
+    return out
+
+
+def scorecard(closed, history=None):
+    """Win rate and average R by setup, by breadth state, and setup x state."""
+    if not len(closed):
+        return None
+    c = closed.copy()
+    c["r"] = _r_mult(c)
+    reg = _regimes(c["date"], history)
+    c["regime"] = c["date"].map(reg).fillna("unknown")
+    by_setup = {k: _stats(g) for k, g in c.groupby("setup")}
+    by_regime = {k: _stats(g) for k, g in c.groupby("regime")}
+    cross = {f"{a}|{b}": _stats(g) for (a, b), g in c.groupby(["setup", "regime"])}
+    by_rank = {str(int(k)): _stats(g) for k, g in c.groupby(pd.to_numeric(c["rank"], errors="coerce").fillna(0))}
+    months = {k: _stats(g) for k, g in c.groupby(c["date"].str[:7])}
+    curve = c.sort_values("date")["r"].fillna(0).cumsum().round(2).tolist()
+    return {"all": _stats(c), "by_setup": by_setup, "by_regime": by_regime, "cross": cross,
+            "by_rank": by_rank, "by_month": months, "curve": curve}
+
+
+def summary(adjusted=None, df=None, history=None):
     df = load() if df is None else df
     if df.empty:
         return {"n": 0, "closed": [], "open": [], "no_fill": 0}
@@ -160,4 +212,5 @@ def summary(adjusted=None, df=None):
                     "beat": round(float((rel > 0).mean()), 3) if len(rel) else None,
                     "pnl10k": round(float(closed["ret"].sum() * 10000)),
                     "stops": round(float(closed["stop_hit"].astype(str).str.lower().eq("true").mean()), 3)})
+        out["card"] = scorecard(closed, history)
     return out

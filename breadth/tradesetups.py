@@ -588,7 +588,7 @@ def pick_replay(df, hold=5, min_cands=3):
         return None
     df = df.drop_duplicates(["i", "t"])
     df = df[df["trig_adr"] <= ACTIONABLE_ADR]
-    picks, avgs, nofill = [], [], 0
+    picks, avgs, nofill, meta = [], [], 0, []
     for i, g in df.groupby("i"):
         if len(g) < min_cands or g["filled"].isna().all():
             continue
@@ -600,15 +600,27 @@ def pick_replay(df, hold=5, min_cands=3):
         if best.fwd_next != best.fwd_next or done.empty:
             continue
         picks.append(best.fwd_next); avgs.append(done["fwd_next"].mean())
+        meta.append((best.setup, "thrust" if getattr(best, "thrust", False) else best.regime, best.date))
     if len(picks) < 10:
         return None
     p, a = np.array(picks), np.array(avgs)
+
+    def grp(ix):
+        v, c = p[ix], a[ix]
+        return {"n": int(len(v)), "ret": round(float(v.mean()), 4), "win": round(float((v > 0).mean()), 3),
+                "cand": round(float(c.mean()), 4), "beat": round(float((v > c).mean()), 3)}
+    breakdown = {}
+    for name, pos in (("setup", 0), ("regime", 1), ("month", 2)):
+        keys = [m[pos][:7] if name == "month" else m[pos] for m in meta]
+        breakdown[name] = {k: grp(np.array([q == k for q in keys])) for k in sorted(set(keys))}
+    curve = np.round(np.cumsum(p - a), 4).tolist()
     rel = p - a
     t = float(rel.mean() / (rel.std(ddof=1) / np.sqrt(len(rel)))) if rel.std(ddof=1) > 0 else 0.0
     return {"days": len(p), "no_fill": nofill, "pick_ret": round(float(p.mean()), 4), "avg_ret": round(float(a.mean()), 4),
             "edge": round(float(rel.mean()), 4), "t": round(t, 2), "beat": round(float((rel > 0).mean()), 3),
             "win": round(float((p > 0).mean()), 3), "hold": hold,
-            "from": str(df["date"].min()), "to": str(df["date"].max())}
+            "from": str(df["date"].min()), "to": str(df["date"].max()),
+            "breakdown": breakdown, "edge_curve": curve[::max(1, len(curve) // 120)]}
 
 
 TAGS = {  # key: (label, kind) - kind 'plus' adds conviction, 'warn' is a caution flag

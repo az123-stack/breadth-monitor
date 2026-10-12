@@ -72,7 +72,21 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (SPX/NDX contribution = prior-close Google market cap weight × change, by stock and sector, day type Broad/Narrow/Mixed)
   · live 4% breadth on theme stocks with volume pacing · theme/sub-theme heat · in play (paced relative volume, gaps,
   gap-and-go vs fading) · your trades live (picks, setup rows, triggers/ATH, open scoreboard trades vs stops).
-- `site.py` + `template.html` single self-contained page (tabs: Breadth, Intraday, Trade Setups, Themes, Browse, Setups, Stocks; TradingView export modal)
+- `macro.py` Macro drivers strip → `DATA.macro`: Yahoo daily closes (CL, BZ, RB, HO, NG, GC, SI, HG futures, ^TNX, DX-Y.NYB, ^VIX,
+  BTC-USD) fetched in the daily run (gated by `config.LEVELS_ENABLED`), cached in `data/macro.json`; derived 3-2-1 crack
+  spread (2·RB·42 + HO·42 − 3·CL)/3 $/bbl; missing/stale (> 6 days behind our bars) series fall back to an ETF in our bars
+  (USO, UNG, GLD, SLV, CPER, IBIT) or are dropped. Each tile lists the sub-themes it drives with their Strength.
+  Compact strip on Breadth, full strip on the Rotation tab. Yahoo is blocked in Claude's sandbox: local rebuilds show ETF tiles.
+- Rotation tab (browser-only rendering): macro strip · pair chart (`pairCard`: two groups' equal-weight index, ratio and
+  its 20-day avg; group rows carry `px`, 180 sessions, dates `themes.px_dates`; "biggest swings inside a sector" finder,
+  each group once, ≤ 2 per sector) · theme timeline heatmap (`timelineCard`: rows carry `s_hist` = Strength for
+  `themes.timeline_dates`, 90 sessions; ranks computed in the browser).
+- Strength history uses `strength.group_inputs_many` (numpy, identical numbers to `group_inputs`, tested), which made
+  the 90-day history cheaper than the old 30-day loop.
+- Pick scorecard: `ledger.summary(..., history)` adds `card` (by setup, by playbook state on the pick date, by rank/month,
+  results in R = ret ÷ risk to stop, risk floored at 0.3 ADR; `risk` column in the ledger) and `trade_bt.pick_replay.breakdown`
+  (replayed #1 pick by setup / state / month + cumulative edge curve) fills the card until live picks close.
+- `site.py` + `template.html` single self-contained page (tabs: Breadth, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 127 peer groups (swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added)
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 

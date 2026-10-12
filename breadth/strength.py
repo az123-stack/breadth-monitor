@@ -153,6 +153,51 @@ def group_inputs(close, ema21, ema50, rating_row, members, i, spy_ret):
     return pd.DataFrame(rows).T
 
 
+def group_inputs_many(close, ema21, ema50, ratings, members, rows, spy):
+    """Same numbers as group_inputs, for many rows at once (numpy, ~50x faster).
+    Returns {row index: DataFrame like group_inputs}."""
+    cols = {t: k for k, t in enumerate(close.columns)}
+    C, E21, E50 = close.to_numpy(float), ema21.to_numpy(float), ema50.to_numpy(float)
+    R = ratings.reindex(columns=close.columns) if ratings is not None else None
+    Rv = R.to_numpy(float) if R is not None else None
+    rpos = {d: k for k, d in enumerate(R.index)} if R is not None else {}
+    S = spy.to_numpy(float)
+    gidx = {g: np.array([cols[t] for t in tick if t in cols], dtype=int) for g, tick in members.items()}
+    gidx = {g: ix for g, ix in gidx.items() if len(ix)}
+    out = {}
+    with np.errstate(invalid="ignore", divide="ignore"):
+        for i in rows:
+            ri = rpos.get(close.index[i])
+            res = {}
+            for g, ix in gidx.items():
+                c = C[i, ix]
+                ok = ~np.isnan(c)
+                if not ok.any():
+                    continue
+                rel, wsum = 0.0, 0.0
+                for n, wt in STR_HORIZONS:
+                    if i - n < 0:
+                        continue
+                    r = c[ok] / C[i - n, ix][ok] - 1
+                    r = r[~np.isnan(r)]
+                    if len(r) == 0:
+                        continue
+                    rel += wt * (float(np.median(r)) - float(S[i] / S[i - n] - 1))
+                    wsum += wt
+                part = float(((c[ok] > E21[i, ix][ok]).mean() + (c[ok] > E50[i, ix][ok]).mean()) / 2)
+                lead = np.nan
+                if ri is not None:
+                    rr = Rv[ri, ix][ok]
+                    rr = rr[~np.isnan(rr)]
+                    lead = float(np.median(rr)) if len(rr) else np.nan
+                res[g] = {"rel": rel / wsum if wsum else np.nan, "part": part, "lead": lead, "n": int(ok.sum())}
+            out[i] = pd.DataFrame(res).T
+    return out
+
+
+TIMELINE_DAYS = 90   # strength history kept for the Themes timeline heatmap
+PAIR_DAYS = 180      # sessions of equal-weight group index for the pair charts
+
 SHRINK_N = 5   # groups with fewer members are pulled toward the middle
 
 
@@ -202,24 +247,39 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
     ema50 = t["ema50"]
 
     # ---- group strength, with history for rank change and trail ----
+    tl_days = max(hist_days, TIMELINE_DAYS)
+
     def strength_hist(mem):
         hist = {}
-        for i in range(max(91, last - hist_days + 1), N):
-            if spy is None:
-                break
-            spy_ret = {n: float(spy.iloc[i] / spy.iloc[i - n] - 1) for n, _ in STR_HORIZONS if i - n >= 0}
-            rr = ratings.loc[dates[i]] if dates[i] in ratings.index else None
-            inp = group_inputs(c, ema21, ema50, rr, mem, i, spy_ret)
+        if spy is None:
+            return hist
+        rows = list(range(max(91, last - tl_days + 1), N))
+        for i, inp in group_inputs_many(c, ema21, ema50, ratings, mem, rows, spy).items():
             sc = strength_scores(inp)
             hist[i] = (inp, sc, sc.rank(ascending=False, method="first"))
         return hist
+
+    tl_idx = []
+    day_ret = (c / c.shift(1) - 1).clip(-0.6, 3.0)
+    px_rows = day_ret.iloc[-(PAIR_DAYS - 1):]
+
+    def group_index(tick):
+        """Equal-weight index of the group's members (start 100), last PAIR_DAYS sessions."""
+        tick = [t for t in tick if t in px_rows.columns]
+        if not tick:
+            return None
+        m = px_rows[tick].mean(axis=1, skipna=True).fillna(0.0)
+        lvl = np.concatenate([[100.0], 100.0 * np.cumprod(1 + m.to_numpy())])
+        return [round(float(v), 2) for v in lvl]
 
     def group_out(mem):
         hist = strength_hist(mem)
         if not hist:
             return {}
         inp, sc, rk = hist[last]
-        idx = sorted(hist)
+        allidx = sorted(hist)
+        idx = allidx[-hist_days:]
+        tl_idx[:] = allidx
         out = {}
         for g in sc.index:
             prev = hist.get(last - 5)
@@ -228,6 +288,8 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
                       "s_mv5": (int(prev[2][g] - rk[g]) if prev is not None and g in prev[2].index else None),
                       "s_r_m4": (int(p4[2][g]) if p4 is not None and g in p4[2].index else None),
                       "s_trail": [(_r(hist[i][1].get(g), 0)) for i in idx],
+                      "s_hist": [(_r(hist[i][1].get(g), 0)) for i in allidx],
+                      "px": group_index(mem.get(g, [])),
                       "rel": _r(inp.loc[g, "rel"]), "part": _r(inp.loc[g, "part"], 3), "lead": _r(inp.loc[g, "lead"], 1)}
         return out
 
@@ -334,7 +396,9 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
     except Exception:
         pass
 
-    return {"tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt, "vcp": vcp_live,
+    tl_dates = [dates[i].strftime("%Y-%m-%d") for i in tl_idx]
+    px_dates = [d.strftime("%Y-%m-%d") for d in dates[-PAIR_DAYS:]]
+    return {"timeline_dates": tl_dates, "px_dates": px_dates, "tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt, "vcp": vcp_live,
             "rs_bp": [_r(x, 5) for x in (bps.get(last) if bps.get(last) is not None else [])],
             "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60], "strongest": sl[:40],
                       "counts": {"bursts": len(bl), "anticipation": len(al), "eps": len(el), "strongest": len(sl)}}}

@@ -1,3 +1,3 @@
-date,rank,t,setup,rsr,price,entry_type,trigger,stop_pct,vcp_stop,cands,status,entry,exit_date,ret,ret_nostop,stop_hit,cand_ret
-2026-10-09,1,CLMT,pullback,98.0,56.42,open,,0.0432,,APA;ATKR;CAKE;CLMT;DK;KNSA;MATX;MSFT;MTCH;NHC;OVV;PARR;PR;SCCO;SN,pending,,,,,,
-2026-10-09,2,KNSA,rotation,94.0,79.78,open,,0.0343,,APA;ATKR;CAKE;CLMT;DK;KNSA;MATX;MSFT;MTCH;NHC;OVV;PARR;PR;SCCO;SN,pending,,,,,,
+date,rank,t,setup,rsr,price,entry_type,trigger,stop_pct,vcp_stop,cands,status,entry,exit_date,ret,ret_nostop,stop_hit,cand_ret,risk
+2026-10-09,1,CLMT,pullback,98.0,56.42,open,,0.0432,,APA;ATKR;CAKE;CLMT;DK;KNSA;MATX;MSFT;MTCH;NHC;OVV;PARR;PR;SCCO;SN,pending,,,,,,,
+2026-10-09,2,KNSA,rotation,94.0,79.78,open,,0.0343,,APA;ATKR;CAKE;CLMT;DK;KNSA;MATX;MSFT;MTCH;NHC;OVV;PARR;PR;SCCO;SN,pending,,,,,,,

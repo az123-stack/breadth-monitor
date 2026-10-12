@@ -427,8 +427,65 @@ def test_picks():
         assert df[df.date == "2026-01-06"].iloc[0]["status"] == "no fill"
         sm = ledger.summary(bars)
         assert sm["n"] == 2 and sm["no_fill"] == 1
+        card = sm["card"]   # scorecard: by setup / breadth state, results in R
+        assert card["all"]["n"] == 2 and set(card["by_setup"]) == {"kq", "rotation"}
+        assert card["by_setup"]["rotation"]["avg_r"] > 0 and "unknown" in card["by_regime"]
     finally:
         config.DATA_DIR = old
+
+def test_strength_fast_matches():
+    """The vectorized group strength must give exactly the per-day numbers."""
+    from breadth import strength as S2
+    rng = np.random.default_rng(3)
+    dates = pd.bdate_range("2025-01-01", periods=140)
+    cols = [f"T{k}" for k in range(30)] + ["SPY"]
+    close = pd.DataFrame(100 * np.exp(np.cumsum(rng.normal(0, 0.02, (140, 31)), axis=0)), index=dates, columns=cols)
+    close.iloc[100:, 3] = np.nan                       # a delisted name
+    close.iloc[:50, 7] = np.nan                        # a late listing
+    ema21 = close.ewm(span=21, adjust=False, min_periods=21).mean()
+    ema50 = close.ewm(span=50, adjust=False, min_periods=50).mean()
+    ratings = pd.DataFrame(rng.integers(1, 99, (140, 31)).astype(float), index=dates, columns=cols)
+    mem = {"A": cols[:6], "B": cols[5:14], "C": ["T3", "T7", "ZZZ"], "D": cols[14:30]}
+    rows = list(range(95, 140))
+    fast = S2.group_inputs_many(close, ema21, ema50, ratings, mem, rows, close["SPY"])
+    spy = close["SPY"]
+    for i in rows:
+        sr = {n: float(spy.iloc[i] / spy.iloc[i - n] - 1) for n, _ in S2.STR_HORIZONS if i - n >= 0}
+        a = S2.group_inputs(close, ema21, ema50, ratings.loc[dates[i]], mem, i, sr).astype(float)
+        b = fast[i].astype(float).loc[a.index, a.columns]
+        assert np.allclose(a.values, b.values, equal_nan=True, atol=0, rtol=0), i
+        assert (S2.strength_scores(a) == S2.strength_scores(b)).all()
+    return f"{len(rows)} days"
+
+
+def test_macro_strip():
+    from breadth import macro
+    def chart(vals, start="2026-09-01"):
+        ds = pd.bdate_range(start, periods=len(vals))
+        ts = [int(pd.Timestamp(d).tz_localize("America/New_York").timestamp()) for d in ds]
+        return {"chart": {"result": [{"meta": {"gmtoffset": -14400}, "timestamp": ts,
+                                      "indicators": {"quote": [{"close": vals}]}}]}}
+    rows = macro.parse_chart(chart([70.0, None, 72.0, 75.0]))
+    assert [r[0] for r in rows] == ["2026-09-01", "2026-09-03", "2026-09-04"] and rows[-1][1] == 75.0
+    n = 30
+    cl = macro.parse_chart(chart([80.0] * (n - 1) + [88.0]))
+    rb = macro.parse_chart(chart([2.5] * n)); ho = macro.parse_chart(chart([3.0] * n))
+    tnx = macro.parse_chart(chart([4.0] * (n - 1) + [4.25]))
+    cache = {"crude": {"rows": cl}, "gasoline": {"rows": rb}, "diesel": {"rows": ho}, "tnx": {"rows": tnx}}
+    last = pd.Timestamp(cl[-1][0])
+    bars = pd.DataFrame([{"date": d, "ticker": t, "c": 50.0 + k} for k, d in enumerate(pd.bdate_range(end=last, periods=n))
+                         for t in ("GLD", "AAPL")])
+    out = {m["key"]: m for m in macro.build(bars, cache)}
+    assert out["crude"]["src"] == "futures" and abs(out["crude"]["d1"] - 0.10) < 1e-9
+    # 3-2-1 crack: (2*2.5*42 + 3.0*42 - 3*88) / 3 = 24.0 on the last day
+    assert abs(out["crack"]["last"] - 24.0) < 1e-9 and out["crack"]["src"] == "derived"
+    assert abs(out["tnx"]["d1"] - 0.25) < 1e-9                 # yields change in points, shown as bp
+    assert out["gold"]["src"] == "ETF GLD"                       # no futures cached -> ETF fallback
+    assert "natgas" not in out                                    # no futures, no ETF in bars -> skipped
+    stale = macro.build(bars.assign(date=bars["date"] + pd.Timedelta(days=30)), cache)
+    assert "crude" not in {m["key"] for m in stale}               # stale futures and no USO -> dropped
+    return f"{len(out)} tiles"
+
 
 def test_intraday_sheet_rows():
     from breadth import intraday
