@@ -487,6 +487,38 @@ def test_macro_strip():
     return f"{len(out)} tiles"
 
 
+def test_rotation_ideas():
+    from breadth import rotation
+    rng = np.random.default_rng(5)
+    dates = pd.bdate_range("2025-01-01", periods=160)
+    groups = {"Up": [f"U{k}" for k in range(4)], "Down": [f"D{k}" for k in range(4)],
+              **{f"N{g}": [f"N{g}{k}" for k in range(4)] for g in range(6)}}
+    drift = {"Up": 0.006, "Down": -0.004}
+    rows = []
+    for g, tick in groups.items():
+        for t in tick:
+            p = 50 * np.exp(np.cumsum(rng.normal(drift.get(g, 0.0), 0.01, len(dates))))
+            rows += [{"date": d, "ticker": t, "o": v, "h": v * 1.01, "l": v * 0.99, "c": v, "v": 1e6} for d, v in zip(dates, p)]
+    rows += [{"date": d, "ticker": "SPY", "o": 100.0, "h": 101.0, "l": 99.0, "c": 100.0 + k * 0.01, "v": 1e6} for k, d in enumerate(dates)]
+    bars = pd.DataFrame(rows)
+    last = bars[bars.date == dates[-1]].set_index("ticker")["c"]
+    stocks = [{"t": t, "name": t, "sub": g, "price": float(last[t]), "adr": 4.0, "e21": 0.02 + 0.01 * k, "rsr": 90,
+               "off_hi": -0.02} for g, tick in groups.items() for k, t in enumerate(tick)]
+    td = {"subthemes": [{"theme": g, "group": "Test", "members": tick, "strength": 50, "s_rank": 1} for g, tick in groups.items()],
+          "stocks": stocks, "playbook": {"state": "mixed"}}
+    out = rotation.build(bars, td)
+    names = [i["group"] for i in out["ideas"]]
+    assert names[0] == "Up" and "Down" not in names, names       # strongest relative move first
+    idea = out["ideas"][0]
+    assert idea["stocks"][0]["t"] == "U0" and idea["stocks"][0]["zone"] == "near 21 EMA"   # least stretched first
+    p0 = idea["stocks"][0]
+    assert p0["trigger"] >= p0["price"] and abs(p0["stop"] - p0["trigger"] * 0.96) < 0.02
+    assert "Down" in [a["group"] for a in out["avoid"]]
+    assert out["bt"]["lead"]["all"]["n"] > 0 and out["state_key"] == "mixed"
+    json_ok = __import__("json").dumps(out)
+    return f"{len(out['ideas'])} idea, {len(out['avoid'])} avoid"
+
+
 def test_intraday_sheet_rows():
     from breadth import intraday
     old = config.DATA_DIR

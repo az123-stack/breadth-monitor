@@ -169,6 +169,12 @@ def recompute_and_publish(bars, splits, universe, state):
     except Exception as e:  # the KQ list is optional; never block the page
         log.exception("kq screen failed: %s", e)
         kq_data = None
+    macro_data = None
+    try:
+        from . import macro
+        macro_data = macro.build(adjusted)
+    except Exception as e:  # optional strip; never block the page
+        log.exception("macro strip failed: %s", e)
     if theme_data:
         try:
             from . import levels as LV, tradesetups as TS
@@ -196,12 +202,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["setup_review"] = review.evaluate(theme_data, history)
         except Exception as e:
             log.exception("setup review failed: %s", e)
-    macro_data = None
-    try:
-        from . import macro
-        macro_data = macro.build(adjusted)
-    except Exception as e:  # optional strip; never block the page
-        log.exception("macro strip failed: %s", e)
+        try:
+            from . import rotation
+            theme_data["rotation"] = rotation.build(adjusted, theme_data, kq_data, macro_data, history)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("rotation ideas failed: %s", e)
     site.build(history, theme_data, kq_data, macro_data)
     try:
         intraday.write_sheet_csv()

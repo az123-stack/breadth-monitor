@@ -404,6 +404,35 @@ table.grid.sc { font-size: 12.5px; }
 .pmean { margin: 8px 0 6px; padding: 8px 10px; border-radius: 8px; background: color-mix(in srgb, var(--s1) 9%, transparent); font-size: 13.5px; }
 .pverdict { font-size: 15px; margin: 6px 0 2px; }
 @media (max-width: 520px) { .pcat { display: none; } .prow { flex-wrap: wrap; gap: 4px; } .pname { flex-basis: 100%; } .pbadge { max-width: 100%; } }
+
+.rideas td.nowcol { box-shadow: inset 0 0 0 2px var(--s1); }
+.rideas .rbanner { margin: 8px 0 4px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; border-left: 4px solid; }
+.rbanner.act { background: color-mix(in srgb, var(--good) 12%, transparent); border-color: var(--good); }
+.rbanner.watch { background: color-mix(in srgb, var(--warning) 14%, transparent); border-color: var(--warning); }
+.rgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0; }
+@media (max-width: 1000px) { .rgrid { grid-template-columns: 1fr; } }
+.ridea { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: var(--surface-0); min-width: 0; }
+.rhead { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.rhead h3 { margin: 0 0 2px; font-size: 15px; }
+.rspark { flex: none; text-align: right; } .rspark small { display: block; font-size: 10.5px; color: var(--text-muted); }
+.rwhy { margin-top: 6px; font-size: 13px; } .rwhy ul { list-style: none; padding: 0; margin: 4px 0 0; }
+.rwhy li { margin: 2px 0; padding-left: 20px; position: relative; color: var(--text-secondary); }
+.rwhy li .wi { position: absolute; left: 0; font-weight: 700; } .rwhy li.ok .wi { color: var(--good); } .rwhy li.no .wi { color: var(--critical); }
+.rwhy a { color: var(--text-secondary); font-size: 12px; }
+.rtrade { margin-top: 8px; font-size: 13px; }
+table.grid.rtab { font-size: 12.5px; margin-top: 4px; }
+table.grid.rtab td, table.grid.rtab th { padding-left: 5px; padding-right: 5px; }
+table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+.zone { padding: 1px 6px; border-radius: 5px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.zone.znear21EMA { background: color-mix(in srgb, var(--good) 22%, transparent); }
+.zone.zfair { background: var(--neutral-mid); }
+.zone.zextended { background: color-mix(in srgb, var(--warning) 28%, transparent); }
+.rside { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; font-size: 13px; }
+@media (max-width: 900px) { .rside { grid-template-columns: 1fr; } }
+.rchips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.rchip { background: var(--surface-0); border: 1px solid var(--border); border-radius: 7px; padding: 3px 8px; font: inherit; font-size: 12px; color: var(--text-primary); cursor: pointer; }
+.rchip .up { color: var(--good); } .rchip .dn { color: var(--critical); }
+@media (max-width: 520px) { .rhead { flex-direction: column; } .rspark { text-align: left; } }
 </style>
 </head>
 <body>
@@ -786,9 +815,81 @@ function timelineCard() {
   return card;
 }
 
+/* ---------- Rotation trade ideas ---------- */
+function relSpark(sp, w = 150, h = 38) {
+  const v = sp.rel, m = sp.ma, all = [...v, ...m.filter(x => x != null)];
+  const lo = Math.min(...all), hi = Math.max(...all), span = hi - lo || 1;
+  const pt = (y, i) => `${(i / (v.length - 1) * (w - 4) + 2).toFixed(1)},${(h - 3 - (y - lo) / span * (h - 6)).toFixed(1)}`;
+  const line = (arr) => arr.map((y, i) => y == null ? null : pt(y, i)).filter(Boolean).join(" ");
+  const [lx, ly] = pt(v[v.length - 1], v.length - 1).split(",");
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Group vs SPY, last 60 sessions, with its 20-day average">
+    <polyline points="${line(m)}" fill="none" stroke="var(--text-muted)" stroke-width="1.2" stroke-dasharray="3 2"/>
+    <polyline points="${line(v)}" fill="none" stroke="var(--s1)" stroke-width="1.8" stroke-linejoin="round"/>
+    <circle cx="${lx}" cy="${ly}" r="2.8" fill="var(--s1)"/></svg>`;
+}
+const evTxt = (o) => !o || !o.n || o.edge == null ? "too few cases yet"
+  : `${o.edge >= 0 ? "+" : ""}${(o.edge * 100).toFixed(1)}% vs the average group, ${Math.round(o.win * 100)}% win (n ${o.n}, t ${o.t})`;
+function rotationIdeasCard() {
+  const R = (DATA.themes || {}).rotation;
+  if (!R) return $('<div class="card empty">Rotation trade ideas appear after the next data run.</div>');
+  const B = R.bt || {}, L = B.lead || {}, sk = R.state_key, now = L[sk] || {};
+  const act = now.t != null && now.t >= 2 && now.edge > 0;
+  const stName = { strong: "strong", mixed: "mixed", weak: "weak" }[sk] || sk;
+  const banner = act
+    ? `<div class="rbanner act"><b>Act mode.</b> Breadth is ${R.state === "thrust" ? "in a post-thrust window" : esc(stName)}, and in that state leading groups have paid: ${evTxt(now)} over the next ${B.hold} sessions.</div>`
+    : `<div class="rbanner watch"><b>Watch mode.</b> Breadth is ${esc(stName)}. Here leading groups have only managed ${evTxt(now)}, which isn't a reliable edge. In strong breadth the same signal made ${evTxt(L.strong)}. Build the watchlist now and size up when breadth turns strong (a thrust).${(B.weak || {})[sk] && B.weak[sk].t <= -2 ? ` What <i>has</i> worked in ${esc(stName)} breadth: staying out of the avoid list below, whose groups lagged by ${(B.weak[sk].edge * 100).toFixed(1)}% (t ${B.weak[sk].t}).` : ""}</div>`;
+  const zoneTxt = { "near 21 EMA": "Near 21 EMA", fair: "Fair", extended: "Extended" };
+  const ideaHTML = (it) => {
+    const why = it.why.map(w => `<li class="${w.ok ? "ok" : "no"}"><span class="wi">${w.ok ? "✓" : "✗"}</span>${esc(w.txt)}${w.pair ? ` <a href="#" class="rpair" data-a="${esc(it.group)}" data-b="${esc(w.pair)}">compare ›</a>` : ""}</li>`).join("");
+    const hasSet = it.stocks.some(p => p.setups.length);
+    const rows = it.stocks.map(p => `<tr><td class="l tname">${p.t}${p.star ? ' <span title="RS line at a 1-year high">★</span>' : p.lead ? ' <span title="RS line ahead of price">⚑</span>' : ""}<small>${esc((p.name || "").slice(0, 22))}${p.sub && p.sub !== it.group ? " · " + esc(p.sub) : ""}</small></td>
+      <td class="num ${rsTint(p.rsr)}">${p.rsr ?? "–"}</td><td class="num">${p.adr == null ? "–" : p.adr.toFixed(1) + "%"}</td>
+      <td class="l"><span class="zone z${(p.zone || "").replace(/\W/g, "")}" title="${p.ext == null ? "" : p.ext.toFixed(1) + " ADRs above its 21 EMA"}">${zoneTxt[p.zone] || "–"}${p.ext == null ? "" : " · " + p.ext.toFixed(1)}</span></td>
+      <td class="num">${p.trigger == null ? "–" : "$" + p.trigger.toFixed(2)}</td><td class="num">${p.stop == null ? "–" : "$" + p.stop.toFixed(2)}</td>
+      ${hasSet ? `<td class="l meta">${esc(p.setups.join(", "))}</td>` : ""}</tr>`).join("");
+    return `<article class="ridea">
+      <div class="rhead"><div><h3>${esc(it.group)}</h3><div class="meta">${esc(it.sector)} · Strength ${it.strength ?? "–"} (#${it.s_rank ?? "–"}) · ${it.n} stocks · leading for ${it.days} session${it.days === 1 ? "" : "s"}${it.also.length ? ` · with ${it.also.map(esc).join(", ")}` : ""}</div></div>
+        <div class="rspark">${relSpark(it.spark)}<small>vs SPY, 60 sessions · dashed = 20-day avg</small></div></div>
+      <div class="rwhy"><b>Why it's on the list</b><ul>${why}</ul></div>
+      ${it.stocks.length ? `<div class="rtrade"><b>How to trade it</b> <span class="meta">· buy the group's strength, not its most stretched name: start with the ones nearest their 21 EMA</span>
+        <div class="scroll"><table class="grid rtab"><thead><tr><th class="l">Stock</th><th>RS</th><th>ADR</th><th class="l">Entry zone<small>ADRs above 21 EMA</small></th><th>Buy above<small>5-day high</small></th><th>Stop<small>1 ADR below</small></th>${hasSet ? '<th class="l">Also in</th>' : ""}</tr></thead><tbody>${rows}</tbody></table></div></div>`
+        : `<div class="rtrade meta">No member passes the trade filters (price $10+, ADR 3%+, above its 21 EMA, RS 70+)${it.skipped ? `: ${it.skipped} stock${it.skipped === 1 ? "" : "s"} filtered out` : ""}. Watch the group; trade it when a name sets up.</div>`}
+    </article>`;
+  };
+  const brief = (a, kind) => `<button class="rchip" data-g="${esc(a.group)}"><b>${esc(a.group)}</b> <span class="meta">${esc(a.sector)}</span> <span class="num ${a.r20 >= 0 ? "up" : "dn"}">${pct(a.r20)}</span>${kind === "turn" ? ` <span class="meta">${a.days === 0 ? "today" : a.days + "d ago"}</span>` : ""}</button>`;
+  const evRow = (k, name) => `<tr><td class="l">${name}</td>${["all", "strong", "mixed", "weak"].map(r => { const o = (B[k] || {})[r] || {}; return o.edge == null ? '<td class="num meta">–</td>'
+    : `<td class="num ${r === sk ? "nowcol " : ""}${o.t >= 2 ? "g2" : o.t <= -2 ? "r2" : o.edge > 0 ? "g1" : "r1"}"><b>${o.edge >= 0 ? "+" : ""}${(o.edge * 100).toFixed(1)}%</b><br><span class="meta" style="font-size:11px">${Math.round(o.win * 100)}% win · n ${o.n} · t ${o.t}</span></td>`; }).join("")}</tr>`;
+  const card = $(`<section class="card regcard rideas"><div class="kicker">Rotation trade ideas · where the money is going, and how to trade it</div>
+    ${banner}
+    <p class="meta" style="margin:8px 0 4px">${R.lead_count} sub-theme${R.lead_count === 1 ? " is" : "s are"} <b>leading and accelerating</b> today: beating SPY, above a rising 20-day average, near a 60-day high, and in the top 20% of groups over 20 sessions. In your history that's the rotation signal that paid. A group that is <i>just turning up</i> did not (see the evidence below), so those are listed for watching only.</p>
+    <div class="rgrid">${R.ideas.map(ideaHTML).join("")}</div>
+    ${R.more && R.more.length ? `<p class="meta">Also leading: ${R.more.map(esc).join(", ")}.</p>` : ""}
+    <div class="rside">
+      <div><b>Avoid: money leaving</b> <span class="meta">near a 60-day low vs SPY and still falling. These lagged the average group by ${B.weak && B.weak.all && B.weak.all.edge != null ? (B.weak.all.edge * 100).toFixed(1) + "%" : "–"} over ${B.hold} sessions.</span><div class="rchips">${R.avoid.map(a => brief(a, "avoid")).join("") || '<span class="meta">None today.</span>'}</div></div>
+      <div><b>Turning up: watch only</b> <span class="meta">just crossed above their 20-day average vs SPY. On its own that hasn't led to gains; it becomes an idea if the group keeps leading.</span><div class="rchips">${R.turning.map(a => brief(a, "turn")).join("") || '<span class="meta">None today.</span>'}</div></div>
+    </div>
+    <details class="kqsec" style="margin-top:10px"><summary><b>Does this work?</b> The evidence from your own data</summary>
+      <p class="meta" style="margin:6px 0">Every sub-theme with 4+ stocks, ${esc(B.from || "")} to ${esc(B.to || "")}, ${B.groups} groups. Each cell is how the group did over the next ${B.hold} sessions <b>compared with the average group</b> on the same days. Your current breadth column is outlined.</p>
+      <div class="scroll"><table class="grid"><thead><tr><th class="l">Signal</th><th>All days</th><th>Strong breadth</th><th>Mixed</th><th>Weak</th></tr></thead><tbody>
+        ${evRow("lead", "Leading & accelerating (the ideas)")}${evRow("cross", "Just turned up (cross above 20-day avg)")}${evRow("weak", "Breaking down (avoid list)")}</tbody></table></div>
+      <p class="meta" style="margin:6px 0 0">Stock picking inside a leading group: buying the member closest to its high did worse than the group, and the member nearest its 21 EMA did slightly better (not statistically solid). So the table above puts the least-stretched names first, and spreading across 2–3 of them is closer to what the evidence supports than betting on one. Trade levels: buy above the 5-day high, stop 1 ADR below the entry, same as the pick scoreboard. Caveats: groups were built from today's strong names, which flatters every group (the comparison against the average group cancels most of that); no costs; past results don't guarantee anything.</p></details>
+  </section>`);
+  card.querySelectorAll(".rpair").forEach(a => a.addEventListener("click", (e) => {
+    e.preventDefault();
+    UI.pair = UI.pair || {}; UI.pair.a = "s:" + a.dataset.a; UI.pair.b = "s:" + a.dataset.b;
+    rerenderPanel(); setTimeout(() => { const p = document.querySelector(".pairsel"); if (p) p.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
+  }));
+  card.querySelectorAll(".rchip").forEach(b => b.addEventListener("click", () => {
+    UI.tl = UI.tl || { view: "sub", sort: "now", n: "40", q: "" }; UI.tl.view = "sub"; UI.tl.q = b.dataset.g.toLowerCase();
+    rerenderPanel(); setTimeout(() => { const t = document.querySelector(".tlcard"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
+  }));
+  return card;
+}
+
 /* ---------- Rotation tab ---------- */
 function renderRotation(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  app.append(rotationIdeasCard());
   app.append(macroStrip(false));
   app.append(pairCard());
   app.append(timelineCard());
