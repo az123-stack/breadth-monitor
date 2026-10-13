@@ -54,19 +54,30 @@ def load_members():
     return out
 
 
+_R2K_BARS = None
+
+
+def set_bars(adjusted):
+    """Called by the build so the Russell 2000 weights follow prices since the holdings file date."""
+    global _R2K_BARS
+    _R2K_BARS = adjusted
+
+
 def russell_members():
-    """Russell 2000 rows [ticker, sector] + weights {ticker: %} from the cached IWM holdings."""
     from . import russell
-    rows, asof = russell.load()
-    return rows, asof
+    return russell.load()
 
 
 def payload():
+    from . import russell
     m = load_members()
     r2k, asof = russell_members()
+    w, wdate = russell.weights(_R2K_BARS) if r2k else ({}, None)
     if r2k:
         m["R2K"] = [[r["ticker"], r["sector"]] for r in r2k]
-    return {"members": m, "r2k_weights": {r["ticker"]: r["weight"] for r in r2k}, "r2k_asof": asof, "pulse": {k: v[1] for k, v in PULSE.items()}, "sector_etfs": SECTOR_ETFS,
+    return {"members": m, "r2k_weights": w, "r2k_asof": asof, "r2k_wdate": wdate,
+            "r2k_stale": russell.STALE_DAYS, "r2k_old": russell.OLD_DAYS,
+            "pulse": {k: v[1] for k, v in PULSE.items()}, "sector_etfs": SECTOR_ETFS,
             "dup_classes": sorted(DUP_CLASSES), "volume_profile": VOLUME_PROFILE, "day_type": DAY_TYPE}
 
 

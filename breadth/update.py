@@ -202,6 +202,7 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["setup_review"] = review.evaluate(theme_data, history)
         except Exception as e:
             log.exception("setup review failed: %s", e)
+        intraday.set_bars(adjusted)      # Russell 2000 weights follow prices since the holdings file date
         try:
             theme_data["thrust_watch"] = intraday.thrust_watch(adjusted, history, universe)
         except Exception as e:  # optional panel; never block the page
@@ -276,12 +277,6 @@ def main(argv=None):
                 hve.refresh_ever(hve.candidates(store.apply_splits(bars, splits), universe, store.theme_tickers()))
         except Exception as e:
             log.warning("record volume history skipped: %s", e)
-        try:   # Russell 2000 members and weights (iShares IWM holdings; cached)
-            from . import russell
-            if config.LEVELS_ENABLED:
-                russell.refresh()
-        except Exception as e:
-            log.warning("Russell 2000 holdings skipped: %s", e)
         try:   # macro drivers strip (Yahoo futures; cached, ETF fallback)
             from . import macro
             if config.LEVELS_ENABLED:

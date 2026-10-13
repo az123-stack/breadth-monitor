@@ -625,38 +625,43 @@ def _check_sheet_rows(intraday):
 
 
 def test_russell_holdings():
-    import tempfile
+    import tempfile, shutil, csv as _csv
+    import pandas as pd
     from breadth import intraday, russell
-    sample = ("\ufeffiShares Russell 2000 ETF\nFund Holdings as of,\"Oct 10, 2026\"\nInception Date,\"May 22, 2000\"\n\xa0\n"
+    sample = ("\ufeffiShares Russell 2000 ETF\nFund Holdings as of,\"Oct 12, 2026\"\nInception Date,\"May 22, 2000\"\n\n"
               "Ticker,Name,Sector,Asset Class,Market Value,Weight (%),Notional Value,Quantity,Price,Location,Exchange,Currency,FX Rate,Market Currency,Accrual Date\n"
-              '"AAA","A CO","Health Care","Equity","1,000","0.52","1,000","10","100","United States","NASDAQ","USD","1.00","USD","-"\n'
-              '"BBB","B CO","Industrials","Equity","900","0.31","900","9","100","United States","New York Stock Exchange Inc.","USD","1.00","USD","-"\n'
-              '"XTSLA","CASH","Cash and/or Derivatives","Money Market","5","0.01","5","5","1","United States","-","USD","1.00","USD","-"\n'
-              '"RTYZ6","FUT","Cash and/or Derivatives","Futures","0","0.00","0","1","1","United States","-","USD","1.00","USD","-"\n'
-              "\xa0\nThe content contained herein is owned or licensed by BlackRock\n")
+              '"AAA","A CO","Health Care","Equity","3,000.00","0.36","1,000","10","100","United States","NASDAQ","USD","1.00","USD","-"\n'
+              '"MOG A","MOOG A","Industrials","Equity","1,000.00","0.31","900","9","100","United States","NYSE","USD","1.00","USD","-"\n'
+              '"-","PRIVATE","Health Care","Equity","1.31","0.00","1","1","0","United States","NO MARKET (E.G. UNLISTED)","USD","1.00","USD","-"\n'
+              '"RTYZ6","FUT","Cash and/or Derivatives","Futures","0","0.00","0","1","1","-","Chicago Mercantile Exchange","USD","1.00","USD","-"\n'
+              '"USD","USD CASH","Cash and/or Derivatives","Cash","-44.00","-0.06","-44","-44","100","United States","-","USD","1.00","USD","-"\n')
     rows, asof = russell.parse(sample)
-    assert [r["ticker"] for r in rows] == ["AAA", "BBB"] and asof == "Oct 10, 2026"
-    assert rows[0]["exchange"] == "NASDAQ" and rows[1]["exchange"] == "NYSE" and rows[1]["weight"] == 0.31
+    assert [r["ticker"] for r in rows] == ["AAA", "MOG.A"] and asof == "2026-10-12"
+    assert rows[0]["exchange"] == "NASDAQ" and rows[1]["exchange"] == "NYSE" and rows[0]["mv"] == 3000
     old = config.DATA_DIR
     real = Path(__file__).resolve().parent.parent / "data"
     with tempfile.TemporaryDirectory() as d:
-        import shutil
         for f in ["index_members.csv", "themes.csv", "subthemes.csv"]:
             if (real / f).exists():
                 shutil.copy(real / f, Path(d) / f)
         config.DATA_DIR = Path(d)
         try:
-            import csv as _csv
             with open(russell.path(), "w", newline="") as f:
-                w = _csv.writer(f); w.writerow(["ticker", "weight", "sector", "exchange", "asof"])
-                w.writerow(["AAA", 0.52, "Health Care", "NASDAQ", "Oct 10, 2026"]); w.writerow(["AAPL", 0.1, "Tech", "NASDAQ", "Oct 10, 2026"])
-            rows = intraday.sheet_rows()
-            flags = {r[0]: (r[1], r[2]) for r in rows}
+                w = _csv.writer(f); w.writerow(["ticker", "mv", "sector", "exchange", "asof"])
+                w.writerow(["AAA", 3000, "Health Care", "NASDAQ", "2026-10-12"]); w.writerow(["AAPL", 1000, "Tech", "NASDAQ", "2026-10-12"])
+            flags = {r[0]: (r[1], r[2]) for r in intraday.sheet_rows()}
             assert flags["AAA"] == (2, "NASDAQ:AAA") and flags["AAPL"][0] == 1   # already listed rows keep their flag
+            w0, _ = russell.weights()
+            assert abs(w0["AAA"] - 75) < 1e-6
+            bars = pd.DataFrame({"date": pd.to_datetime(["2026-10-12", "2026-10-13"] * 2), "ticker": ["AAA", "AAA", "AAPL", "AAPL"],
+                                 "c": [10, 10, 10, 20]})
+            w1, wd = russell.weights(bars)                  # AAPL doubled since the file date: 3000 vs 2000
+            assert abs(w1["AAA"] - 60) < 1e-6 and wd == "2026-10-13"
             p = intraday.payload()
-            assert p["members"]["R2K"][0] == ["AAA", "Health Care"] and p["r2k_weights"]["AAA"] == 0.52
+            assert p["members"]["R2K"][0] == ["AAA", "Health Care"] and p["r2k_asof"] == "2026-10-12" and p["r2k_stale"] == russell.STALE_DAYS
         finally:
             config.DATA_DIR = old
+            intraday.set_bars(None)
 
 
 if __name__ == "__main__":

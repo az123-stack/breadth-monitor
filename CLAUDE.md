@@ -22,8 +22,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Browser math mirrors Python exactly. Breadth tab stays end-of-day.
   Sheet layout (row 1 header): ticker | index | symbol | price | closeyest | open | volume | marketcap | volumeavg;
   rows 2-3 `_asof` (=NOW()) and `_spytime`. A4 = IMPORTDATA of the raw GitHub `data/live_sheet.csv` (written every build
-  by `intraday.write_sheet_csv`: pulse symbols, sector ETFs, theme stocks, S&P 500 + Nasdaq-100), so ticker changes
-  reach the sheet on their own. D:I formulas (rows 4-1400) ask GOOGLEFINANCE for column C (`symbol`);
+  by `intraday.write_sheet_csv`: pulse symbols, sector ETFs, theme stocks, S&P 500 + Nasdaq-100, Russell 2000), so ticker changes
+  reach the sheet on their own. D:I formulas (rows 4-3600) ask GOOGLEFINANCE for column C (`symbol`);
   marketcap/volumeavg only where index = 1, open skipped where index = 2 (Russell 2000 rows). Formulas run to row 3600; if the list passes ~3,590 rows, extend them.
   The page parser reads the header, so old 2-column sheets still work.
 
@@ -79,7 +79,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (SPX/NDX contribution = prior-close Google market cap weight × change, by stock and sector, day type Broad/Narrow/Mixed)
   · live 4% breadth on theme stocks with volume pacing · theme/sub-theme heat · in play (paced relative volume, gaps,
   gap-and-go vs fading) · your trades live (picks, setup rows, triggers/ATH, open scoreboard trades vs stops).
-  Russell 2000 option in "Who's moving the index" (Oct 13): `russell.py` fetches iShares' IWM holdings CSV in the daily run (gated by `config.LEVELS_ENABLED`) → `data/russell2000.csv` (ticker, weight %, sector, Google exchange prefix, asof); payload `members.R2K`, `r2k_weights`, `r2k_asof`; contribution uses IWM weights, "IWM actual" vs reconstruction, no rel. volume. Sheet rows for R2K-only names carry index = 2 and symbol `EXCH:TICKER` (price, closeyest, volume only; open/marketcap/volumeavg skipped), so the sheet is ~3,200 rows and its formulas run to row 3600. Thrust watch still uses themes + S&P 500 + Nasdaq-100 only.
+  Russell 2000 option in "Who's moving the index" (Oct 13): iShares and Vanguard block scripted downloads from GitHub (tested),
+  so Adam downloads the IWM "Detailed Holdings" CSV and Claude imports it: `python -m breadth.russell FILE` → `data/russell2000.csv`
+  (ticker, mv = market value, sector, Google exchange prefix, asof). Each build `russell.weights(adjusted)` moves every weight by the
+  price change since the file date (`intraday.set_bars`); payload `members.R2K`, `r2k_weights`, `r2k_asof`, `r2k_wdate`; card shows
+  "IWM actual" vs reconstruction, no rel. volume. Re-upload caution on the card at 45 days (`russell.STALE_DAYS`, red at 75) — when
+  Adam sends a new file, import it, rebuild, commit. Russell rebalances June + December. Sheet rows for R2K-only names carry index = 2
+  and symbol `EXCH:TICKER` (price, closeyest, volume only), so the sheet is ~2,970 rows; formulas run to row 3600.
   Thrust watch (top of Intraday, `thrustWatchCard`) ← `intraday.thrust_watch` → `DATA.themes.thrust_watch`: live list = theme
   stocks + S&P 500 + Nasdaq-100 ∩ universe (~1,027); price-only up 4%+ ($3+) count vs its own 40-day avg: "thrust pace" ≥ 2.5×,
   "getting close" ≥ 2.0×; whole-market estimate = live × median ratio (~2.6); setup = washout in last 10 sessions (same rule as

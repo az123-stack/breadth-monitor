@@ -1,26 +1,27 @@
-"""Russell 2000 members and weights, from iShares' published IWM holdings file.
+"""Russell 2000 members and weights, from an IWM holdings file Adam downloads from iShares.
 
-Fetched in the daily run (free, one request) and cached in data/russell2000.csv:
-  ticker,weight,sector,exchange,asof
-weight = IWM's weight in % (float-adjusted index weights, as of the holdings date).
-The Intraday tab uses it for "Who's moving the index" -> Russell 2000 (IWM).
-If the fetch fails, the cached file is kept.
+iShares and Vanguard block scripted downloads from GitHub's servers (tested Oct 13, 2026), so the
+member list comes from the "Detailed Holdings" CSV on the iShares IWM page, imported with
+    python -m breadth.russell path/to/IWM_holdings.csv
+into data/russell2000.csv (ticker, mv, sector, exchange, asof). Weights are refreshed every build
+from our own closes (market value on the file date x price change since), so only membership goes
+stale. The Intraday tab shows a re-upload caution once the file is STALE_DAYS old.
 """
 import csv
 import io
 import logging
 import re
-
-import requests
+import sys
+from datetime import datetime
 
 from . import config
 
 log = logging.getLogger(__name__)
 
-URL = ("https://www.ishares.com/us/products/239710/ishares-russell-2000-etf/1467271812596.ajax"
-       "?fileType=csv&fileName=IWM_holdings&dataType=fund")
+STALE_DAYS = 45        # caution on the Intraday tab
+OLD_DAYS = 75          # red caution
 # iShares exchange name -> Google Finance prefix (bare tickers can resolve to the wrong listing)
-EXCHANGE = {"nasdaq": "NASDAQ", "new york stock exchange inc.": "NYSE", "nyse arca": "NYSEARCA",
+EXCHANGE = {"nasdaq": "NASDAQ", "nyse": "NYSE", "new york stock exchange inc.": "NYSE", "nyse arca": "NYSEARCA",
             "nyse mkt llc": "NYSEAMERICAN", "cboe bzx formerly known as bats": "BATS"}
 
 
@@ -28,200 +29,92 @@ def path():
     return config.DATA_DIR / "russell2000.csv"
 
 
-def parse(text):
-    """Holdings CSV -> (rows, asof). Keeps equity rows with a positive weight."""
-    text = text.lstrip("﻿")
-    lines = text.splitlines()
-    asof = None
-    for ln in lines[:12]:
-        m = re.search(r"as of,\"?([A-Za-z]{3} \d{1,2}, \d{4})", ln)
-        if m:
-            asof = m.group(1)
-    start = next((i for i, ln in enumerate(lines) if ln.startswith("Ticker,")), None)
-    if start is None:
-        raise ValueError("no holdings header")
-    out = []
-    for r in csv.DictReader(io.StringIO("\n".join(lines[start:]))):
-        t = (r.get("Ticker") or "").strip().upper()
-        if not t or t == "-" or (r.get("Asset Class") or "").strip() != "Equity":
-            continue
-        try:
-            w = float((r.get("Weight (%)") or "").replace(",", ""))
-        except ValueError:
-            continue
-        if w <= 0:
-            continue
-        out.append({"ticker": t.replace(" ", "."), "weight": w, "sector": (r.get("Sector") or "Other").strip(),
-                    "exchange": EXCHANGE.get((r.get("Exchange") or "").strip().lower(), "")})
-    return out, asof
-
-
-UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/126.0 Safari/537.36", "Accept-Language": "en-US,en;q=0.9"}
-PRODUCT = "https://www.ishares.com/us/products/239710/ishares-russell-2000-etf"
-JSON_URL = PRODUCT + "/1467271812596.ajax?tab=all&fileType=json"
-SSGA_URL = ("https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/"
-            "holdings-daily-us-en-twok.xlsx")   # SPDR Russell 2000 (TWOK): same index, fallback
-
-
 def _num(v):
-    if isinstance(v, dict):
-        v = v.get("raw", v.get("display"))
     try:
         return float(str(v).replace(",", "").replace("%", ""))
     except (TypeError, ValueError):
         return None
 
 
-def parse_json(text):
-    """iShares holdings JSON {"aaData": [[ticker, name, sector, asset class, mkt value, weight, ...], ...]}."""
-    import json
-    data = json.loads(text.lstrip("\ufeff"))
-    out = []
-    for row in data.get("aaData", []):
-        if len(row) < 6 or str(row[3]).strip() != "Equity":
-            continue
-        t, w = str(row[0]).strip().upper(), _num(row[5])
-        if not t or t == "-" or not w or w <= 0:
-            continue
-        exch = next((EXCHANGE[str(x).strip().lower()] for x in row if isinstance(x, str) and str(x).strip().lower() in EXCHANGE), "")
-        out.append({"ticker": t.replace(" ", "."), "weight": w, "sector": str(row[2]).strip() or "Other", "exchange": exch})
-    return out, None
-
-
-def parse_ssga(content):
-    """SSGA daily holdings xlsx: header row Name | Ticker | Identifier | SEDOL | Weight | Sector | ..."""
-    import pandas as pd
-    raw = pd.read_excel(io.BytesIO(content), header=None)
-    hdr = next(i for i in range(min(len(raw), 15)) if "Ticker" in [str(x).strip() for x in raw.iloc[i]])
-    df = raw.iloc[hdr + 1:].copy()
-    df.columns = [str(x).strip() for x in raw.iloc[hdr]]
+def parse(text):
+    """Holdings CSV -> (rows, asof 'YYYY-MM-DD'). Listed equity rows with a positive market value."""
+    lines = text.lstrip("\ufeff").splitlines()
     asof = None
-    for i in range(hdr):
-        m = re.search(r"(\d{1,2}-[A-Za-z]{3}-\d{4})", " ".join(str(x) for x in raw.iloc[i]))
+    for ln in lines[:12]:
+        m = re.search(r"as of,\"?([A-Za-z]{3} \d{1,2}, \d{4})", ln)
         if m:
-            asof = m.group(1)
+            asof = datetime.strptime(m.group(1), "%b %d, %Y").date().isoformat()
+    start = next((i for i, ln in enumerate(lines) if ln.startswith("Ticker,")), None)
+    if start is None:
+        raise ValueError("this doesn't look like an iShares holdings file (no 'Ticker,' header)")
     out = []
-    for _, r in df.iterrows():
-        t, w = str(r.get("Ticker") or "").strip().upper(), _num(r.get("Weight"))
-        if not t or t in ("-", "NAN", "CASH_USD") or not w or w <= 0:
+    for r in csv.DictReader(io.StringIO("\n".join(lines[start:]))):
+        t = (r.get("Ticker") or "").strip().upper()
+        if not t or t == "-" or (r.get("Asset Class") or "").strip() != "Equity":
             continue
-        out.append({"ticker": t.replace(" ", "."), "weight": w, "sector": str(r.get("Sector") or "Other").strip(), "exchange": ""})
+        ex = (r.get("Exchange") or "").strip().lower()
+        if ex.startswith("no market"):
+            continue
+        mv = _num(r.get("Market Value")) or 0.0
+        if mv <= 0:
+            continue
+        out.append({"ticker": t.replace(" ", "."), "mv": mv, "sector": (r.get("Sector") or "Other").strip(),
+                    "exchange": EXCHANGE.get(ex, "")})
     return out, asof
 
 
-VANGUARD = "https://investor.vanguard.com/investment-products/etfs/profile/api/VTWO/portfolio-holding/stock"
-
-
-def _find_rows(obj):
-    """First list of dicts in a JSON blob whose items carry a ticker."""
-    if isinstance(obj, list):
-        if obj and isinstance(obj[0], dict) and any("ticker" in k.lower() for k in obj[0]):
-            return obj
-        for x in obj:
-            r = _find_rows(x)
-            if r:
-                return r
-    elif isinstance(obj, dict):
-        for v in obj.values():
-            r = _find_rows(v)
-            if r:
-                return r
-    return None
-
-
-def parse_vanguard_page(text):
-    import json
-    items = _find_rows(json.loads(text)) or []
-    out = []
-    for it in items:
-        k = {key.lower(): key for key in it}
-        t = str(it.get(k.get("ticker", ""), "") or "").strip().upper()
-        wk = next((k[x] for x in k if "weight" in x or x in ("percentofnetassets", "pctofnetassets")), None)
-        w = _num(it.get(wk)) if wk else None
-        sk = next((k[x] for x in k if "sector" in x), None)
-        if t and w and w > 0:
-            out.append({"ticker": t.replace(" ", "."), "weight": w, "sector": str(it.get(sk) or "Other").strip() if sk else "Other", "exchange": ""})
-    return out, len(items)
-
-
-def fetch_vanguard(s):
-    rows, start = [], 1
-    while start < 4000:
-        r = s.get(VANGUARD, params={"start": start, "count": 500}, headers={**UA, "Accept": "application/json"}, timeout=60)
-        r.raise_for_status()
-        got, n = parse_vanguard_page(r.text)
-        if start == 1 and not got:
-            raise ValueError("no rows: " + r.text[:160])
-        rows += got
-        if n < 500:
-            break
-        start += 500
-    return rows, None
-
-
-def refresh(session=None):
-    """Tries iShares CSV (with the product page's cookies), iShares JSON, then SSGA's TWOK file."""
-    s = session or requests.Session()
-    tries = []
-    rows, asof = [], None
-    try:
-        s.get(PRODUCT, headers=UA, timeout=30)          # sets the site's cookies
-    except Exception as e:
-        tries.append({"src": "product page", "error": str(e)[:200]})
-    for name, url, how in [("ishares csv", URL, "csv"), ("ishares json", JSON_URL, "json"), ("vanguard vtwo", VANGUARD, "vg")]:
-        t, r = {"src": name}, None
-        if how == "vg":       # paginated JSON (Vanguard Russell 2000 ETF: same index)
-            try:
-                rows, asof = fetch_vanguard(s)
-                tries.append({**t, "rows": len(rows)})
-                if len(rows) >= 1000:
-                    break
-            except Exception as e:
-                tries.append({**t, "error": str(e)[:300]})
-                rows = []
-            continue
-        try:
-            r = s.get(url, headers={**UA, "Referer": PRODUCT}, timeout=60)
-            t = {"src": name, "http": r.status_code, "type": r.headers.get("content-type"), "bytes": len(r.content)}
-            r.raise_for_status()
-            rows, asof = parse(r.text) if how == "csv" else parse_json(r.text) if how == "json" else parse_ssga(r.content)
-            t["rows"] = len(rows)
-            tries.append(t)
-            if len(rows) >= 1000:
-                break
-        except Exception as e:
-            t["error"] = str(e)[:200]
-            if r is not None and "xlsx" not in name:
-                t["head"] = r.text[:160]
-            tries.append(t)
-            rows = []
-    _status({"ok": len(rows) >= 1000, "rows": len(rows), "asof": asof, "tries": tries})
-    if len(rows) < 1000:      # nothing usable: keep the cached file
-        raise ValueError(f"Russell 2000 holdings unavailable: {tries}")
+def import_file(src):
+    with open(src, encoding="utf-8-sig") as f:
+        rows, asof = parse(f.read())
+    if len(rows) < 1000:
+        raise ValueError(f"only {len(rows)} holdings found: is this the IWM file?")
     with open(path(), "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["ticker", "weight", "sector", "exchange", "asof"])
+        w.writerow(["ticker", "mv", "sector", "exchange", "asof"])
         for x in rows:
-            w.writerow([x["ticker"], x["weight"], x["sector"], x["exchange"], asof or ""])
+            w.writerow([x["ticker"], round(x["mv"], 2), x["sector"], x["exchange"], asof or ""])
     log.info("Russell 2000: %d holdings (as of %s)", len(rows), asof)
-    return len(rows)
-
-
-def _status(d):
-    """Last fetch result (data/russell_status.json), so a failure can be read from the repo."""
-    import json
-    from datetime import datetime, timezone
-    with open(config.DATA_DIR / "russell_status.json", "w") as f:
-        json.dump({"at": datetime.now(timezone.utc).isoformat(timespec="seconds"), **d}, f, indent=1)
+    return len(rows), asof
 
 
 def load():
-    """[{ticker, weight, sector, exchange}], asof — empty if never fetched."""
+    """[{ticker, mv, sector, exchange}], asof — empty if never imported."""
     if not path().exists():
         return [], None
     with open(path()) as f:
         rows = list(csv.DictReader(f))
     for r in rows:
-        r["weight"] = float(r["weight"])
+        r["mv"] = float(r["mv"])
     return rows, (rows[0].get("asof") or None) if rows else None
+
+
+def weights(adjusted=None):
+    """{ticker: weight %}: file market value x (latest close / close on the file date), normalised.
+    Names without bars keep their file value."""
+    rows, asof = load()
+    if not rows:
+        return {}, None
+    mv = {r["ticker"]: r["mv"] for r in rows}
+    last_date = None
+    if adjusted is not None and asof and len(adjusted):
+        import pandas as pd
+        sub = adjusted[adjusted["ticker"].isin(mv)]
+        if len(sub):
+            c = sub.pivot_table(index="date", columns="ticker", values="c").sort_index().ffill()
+            base = c[c.index <= pd.Timestamp(asof)]
+            if len(base):
+                ratio = (c.iloc[-1] / base.iloc[-1]).dropna()
+                ratio = ratio[(ratio > 0.2) & (ratio < 5)]          # ignore bad prints
+                for t, x in ratio.items():
+                    mv[t] *= float(x)
+                last_date = c.index[-1].strftime("%Y-%m-%d")
+    tot = sum(mv.values())
+    return {t: round(v / tot * 100, 5) for t, v in mv.items()}, last_date
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    if len(sys.argv) != 2:
+        sys.exit("usage: python -m breadth.russell path/to/IWM_holdings.csv")
+    n, d = import_file(sys.argv[1])
+    print(f"imported {n} Russell 2000 holdings as of {d}")

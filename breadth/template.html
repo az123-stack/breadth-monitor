@@ -413,6 +413,8 @@ table.grid.hvetab td.tname { max-width: 180px; } table.grid.hvetab td, table.gri
 .rideas td.nowcol { box-shadow: inset 0 0 0 2px var(--s1); }
 .rideas .rbanner { margin: 8px 0 4px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; border-left: 4px solid; }
 .rbanner.act { background: color-mix(in srgb, var(--good) 12%, transparent); border-color: var(--good); }
+.r2kwarn { margin: 8px 0 0; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--warning); background: color-mix(in srgb, var(--warning) 14%, transparent); font-size: 13px; }
+.r2kwarn.old { border-color: var(--critical); background: color-mix(in srgb, var(--critical) 12%, transparent); }
 .rbanner.watch { background: color-mix(in srgb, var(--warning) 14%, transparent); border-color: var(--warning); }
 .rgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0; }
 @media (max-width: 1000px) { .rgrid { grid-template-columns: 1fr; } }
@@ -2279,6 +2281,11 @@ function renderIntraday(app) {
   // 2. Who's moving the index
   const sec = $(`<section class="icard card regcard"><div class="kicker">Who's moving the index</div><div class="ibtns"></div><div class="ibody"></div></section>`);
   sec.querySelector(".ibtns").append(chips("Index", [["^SPX", "S&P 500"], ["^NDX", "Nasdaq-100"]].concat((I.members || {}).R2K ? [["^R2K", "Russell 2000 (IWM)"]] : []), ID, "idx", rerenderPanel));
+  if (I.r2k_asof) {   // Russell 2000 list comes from a holdings file Adam uploads: nudge when it gets old
+    const today = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })), asof = new Date(I.r2k_asof + "T12:00:00");
+    const age = Math.floor((today - asof) / 864e5);
+    if (age >= I.r2k_stale) sec.querySelector(".ibtns").after($(`<div class="r2kwarn ${age >= I.r2k_old ? "old" : ""}">⚠ <b>Time to refresh the Russell 2000 list.</b> Your IWM holdings file is ${age} days old (${longDate(I.r2k_asof)}), so members added or dropped since then are missing. Download a fresh file from ishares.com (IWM page → Holdings → Detailed Holdings and Analytics) and send it to Claude. Russell rebalances in June and December, so refresh right after those too.</div>`));
+  }
   const M = indexMovers(ID.idx), mx = Math.max(1, ...M.rows.map(r => Math.abs(r.bp)));
   const list = (rows) => rows.map(r => `<tr><td class="l"><b>${r.t}</b> <small class="meta">${esc(r.sector)}</small></td><td class="num ${cls(r.chg)}">${pc(r.chg)}</td><td class="num">${(r.w * 100).toFixed(2)}%</td>
     <td class="num ${cls(r.bp)}"><span class="ibp"><i class="${cls(r.bp)}" style="width:${Math.abs(r.bp) / mx * 100}%"></i></span>${r.bp > 0 ? "+" : ""}${r.bp.toFixed(1)}</td>
@@ -2298,7 +2305,7 @@ function renderIntraday(app) {
       <div><h3 class="ih">Pushing down</h3><div class="scroll"><table class="grid">${hdr}<tbody>${list(dns)}</tbody></table></div></div></div>
     <h3 class="ih">By sector</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Sector</th><th>Weight</th><th>Avg change</th><th>Contribution<small>bp</small></th><th>Share up</th></tr></thead><tbody>
       ${M.sectors.map(s => `<tr><td class="l">${esc(s.sector)}</td><td class="num">${(s.w * 100).toFixed(1)}%</td><td class="num ${cls(s.avg)}">${pc(s.avg)}</td><td class="num ${cls(s.bp)}">${s.bp > 0 ? "+" : ""}${s.bp.toFixed(1)}</td><td class="num">${Math.round(s.upShare * 100)}%</td></tr>`).join("")}</tbody></table></div>
-    <div class="note" style="padding:8px 0 0">Contribution = weight at the prior close × today's change, so the column adds up to the index return. ${ID.idx === "^R2K" ? `Russell 2000: weights are IWM's published holdings${I.r2k_asof ? " (as of " + esc(I.r2k_asof) + ")" : ""}, float-adjusted, so the reconstruction tracks IWM closely; relative volume isn't fetched for these ~2,000 names to keep the live sheet light. ` : ""}S&P 500 / Nasdaq-100 weights are Google market caps (not float-adjusted; GOOG, FOX and NWS left out because Google repeats the whole company's cap on both classes), so the reconstructed return runs a little off the real index. Day type: Flat under ±0.02%; Broad when ${Math.round(I.day_type.broad_share * 100)}%+ of stocks move with the index and the top 10 make up at most ${Math.round(I.day_type.broad_top10 * 100)}% of the move; Narrow when the top 10 make up ${Math.round(I.day_type.narrow_top10 * 100)}%+ or cap weight beats equal weight by ${(I.day_type.narrow_gap * 100).toFixed(1)}+ pts. Starting guesses from your tracker, not tested rules.</div></div>`));
+    <div class="note" style="padding:8px 0 0">Contribution = weight at the prior close × today's change, so the column adds up to the index return. ${ID.idx === "^R2K" ? `Russell 2000: members and weights from your IWM holdings file of ${longDate(I.r2k_asof)} (float-adjusted), with each weight moved by the stock's price change since${I.r2k_wdate && I.r2k_wdate !== I.r2k_asof ? " (to " + longDate(I.r2k_wdate) + ")" : ""}, so the reconstruction tracks IWM closely; relative volume isn't fetched for these ~2,000 names to keep the live sheet light. ` : ""}S&P 500 / Nasdaq-100 weights are Google market caps (not float-adjusted; GOOG, FOX and NWS left out because Google repeats the whole company's cap on both classes), so the reconstructed return runs a little off the real index. Day type: Flat under ±0.02%; Broad when ${Math.round(I.day_type.broad_share * 100)}%+ of stocks move with the index and the top 10 make up at most ${Math.round(I.day_type.broad_top10 * 100)}% of the move; Narrow when the top 10 make up ${Math.round(I.day_type.narrow_top10 * 100)}%+ or cap weight beats equal weight by ${(I.day_type.narrow_gap * 100).toFixed(1)}+ pts. Starting guesses from your tracker, not tested rules.</div></div>`));
   app.append(sec);
   // 3. Live breadth on our stocks (vs the same stocks' last full session)
   const st = (T.stocks || []).filter(s => s.is_stock);
