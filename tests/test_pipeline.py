@@ -594,7 +594,7 @@ def test_thrust_watch():
         bars = make_bars(closes, {t: [200000] * n for t in tick})
         hist = metrics.compute(bars)
         w = intraday.thrust_watch(bars, hist, set(tick))
-        assert w["n"] == 40 and w["last"]["live"] == 30
+        assert w["n"] == 40 and 30 <= w["last"]["live"] <= 33          # 30 forced + any random 4% moves
         assert w["pace"] == int(np.ceil(intraday.THRUST_K * w["avg40"])) and w["close"] <= w["pace"]
         assert set(w["setup"]) >= {"met", "t2108_min"}
     finally:
