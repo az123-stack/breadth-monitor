@@ -9,7 +9,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - Owner: Adam (trader, not a developer — explain GitHub steps plainly, step by step)
 
 ## How it runs (fully automated, free)
-- GitHub Actions `.github/workflows/daily.yml`, crons 06:07, 08:37, 10:17 UTC (≈2:07 AM ET, backups 4:37 and 6:17; GitHub skipped the first scheduled run Oct 13) Tue–Sat (
+- GitHub Actions `.github/workflows/daily.yml`, crons 22:37 UTC Mon–Fri, 01:07 and 06:07 UTC Tue–Sat (≈6:37 PM ET same day, backups 9:07 PM and 2:07 AM; GitHub skipped the first scheduled run Oct 13; first evening run tells us when the free plan publishes the day) (
   covers the prior trading day). Manual inputs: `backfill_days`, `extend_history`.
 - Data: Massive (formerly Polygon.io) free plan, 5 calls/min (12.5 s spacing).
   Key lives only in the GitHub secret `MASSIVE_API_KEY` — never ask the user to paste it.
