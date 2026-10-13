@@ -266,6 +266,12 @@ def main(argv=None):
                 LV.refresh(store.theme_tickers() & set(universe))
         except Exception as e:
             log.warning("levels refresh skipped: %s", e)
+        try:   # record-volume candidates: confirm "highest ever" from Yahoo's full daily history
+            from . import hve
+            if config.LEVELS_ENABLED:
+                hve.refresh_ever(hve.candidates(store.apply_splits(bars, splits), universe, store.theme_tickers()))
+        except Exception as e:
+            log.warning("record volume history skipped: %s", e)
         try:   # macro drivers strip (Yahoo futures; cached, ETF fallback)
             from . import macro
             if config.LEVELS_ENABLED:

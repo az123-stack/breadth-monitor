@@ -519,6 +519,37 @@ def test_rotation_ideas():
     return f"{len(out['ideas'])} idea, {len(out['avoid'])} avoid"
 
 
+def test_record_volume():
+    from breadth import hve
+    dates = pd.bdate_range("2025-01-01", periods=300)
+    rows = []
+    for k, d in enumerate(dates):
+        for t, base in (("REC", 1e6), ("FLAT", 1e6), ("SPY", 5e7)):
+            v = base * (1 + 0.1 * np.sin(k))
+            if t == "REC" and k == 297:
+                v = 9e6                                   # record 2 sessions before the end
+            if t == "REC" and k == 298:
+                v = 9.5e6                                 # and again the next day
+            c = 30.0 + (3.0 if t == "REC" and k >= 297 else 0.0)
+            rows.append({"date": d, "ticker": t, "o": c, "h": c * 1.02, "l": c * 0.98, "c": c, "v": v})
+    adj = pd.DataFrame(rows)
+    assert hve.candidates(adj, {"REC", "FLAT"}) == ["REC"]
+    from breadth import strength as S2
+    out = hve.screen(S2.wide_all(adj), None, {"REC", "FLAT"}, {"REC": "Record Co"}, cache={})
+    assert out["count"] == 1 and len(out["rows"]) == 1
+    r = out["rows"][0]
+    assert r["t"] == "REC" and r["date"] == dates[298].strftime("%Y-%m-%d") and r["ago"] == 1 and r["also"]
+    assert r["ever"] is None and r["dow"] == dates[298].strftime("%a")
+    js = {"chart": {"result": [{"meta": {"gmtoffset": 0}, "timestamp": [1262390400, 1262476800, 1700000000],
+                                "indicators": {"quote": [{"volume": [5e6, 2e7, 1e6]}]}}]}}
+    months = hve.parse_months(js)
+    assert months["2010-01"][0] == 20000000
+    cache = {"REC": {"months": months, "first": "2010-01-02"}}
+    assert hve.ever_check(cache, "REC", "2025-01-01", 9.5e6) == ("not ever", "2010-01-03")
+    assert hve.ever_check(cache, "REC", "2025-01-01", 3e7)[0] == "ever"
+    return "ok"
+
+
 def test_intraday_sheet_rows():
     from breadth import intraday
     old = config.DATA_DIR

@@ -396,9 +396,30 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
     except Exception:
         pass
 
+    hve_out = None
+    try:
+        from . import hve as HV, store as _store
+        th_of = {}
+        for g, tk in members.items():
+            for x in tk:
+                th_of.setdefault(x, {})["theme"] = th_of.get(x, {}).get("theme") or g
+        for g, tk in sub_members.items():
+            for x in tk:
+                th_of.setdefault(x, {})["sub"] = g
+        br = _store.load_breadth()
+        hve_reg = None
+        if len(br):
+            br = br[br["complete"]]
+            hve_reg = pd.Series("mixed", index=br.index)
+            hve_reg[(br["ratio5"] >= 1.5) & (br["ratio10"] >= 1.5)] = "strong"
+            hve_reg[br["ratio10"] < 1] = "weak"
+        hve_out = HV.screen(w, rating_full, universe, names, theme_of=th_of, regimes=hve_reg)
+    except Exception as e:
+        import logging
+        logging.getLogger("breadth").exception("record volume screen failed: %s", e)
     tl_dates = [dates[i].strftime("%Y-%m-%d") for i in tl_idx]
     px_dates = [d.strftime("%Y-%m-%d") for d in dates[-PAIR_DAYS:]]
-    return {"timeline_dates": tl_dates, "px_dates": px_dates, "tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt, "vcp": vcp_live,
+    return {"hve": hve_out, "timeline_dates": tl_dates, "px_dates": px_dates, "tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt, "vcp": vcp_live,
             "rs_bp": [_r(x, 5) for x in (bps.get(last) if bps.get(last) is not None else [])],
             "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60], "strongest": sl[:40],
                       "counts": {"bursts": len(bl), "anticipation": len(al), "eps": len(el), "strongest": len(sl)}}}

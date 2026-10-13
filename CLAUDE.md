@@ -87,6 +87,14 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Findings (Feb 2025–Sep 2026): leading & accelerating +1.0% (t 3.1), strong breadth +2.2% (t 3.55, 62% win), mixed +0.3% (n.s.);
   fresh crosses no edge (−0.8% in strong, t −2.2); avoid list −0.4% (t −2.3), mixed −1.0% (t −3.4). Inside a leading group the
   member closest to its 60-day high lagged the group (t −2.0); nearest the 21 EMA slightly better (n.s.).
+- `hve.py` Record volume card on Trade Setups (`hveCard`) → `DATA.themes.hve` (computed inside `strength.build_v2`): stocks
+  (universe + theme tickers, $5+, $20M+ traded) whose volume beat every earlier day in our stored history (250+ sessions
+  needed) in the last 5 sessions, one row per stock (latest record day, `also` = other record days), with day/date, × 50-day
+  avg, × old record, move, close location, gap, record-day high/low, since, RS, $ traded; > 25 records on a day = index/expiry
+  flag. "Ever" check: daily run fetches Yahoo full daily history for candidates (cached `data/hve_ever.json` as monthly max
+  volume, refreshed after 30 days) → "Ever" / "2-yr" (bigger day before our window) / "2-yr*" (unchecked). Shown as a WARNING:
+  up days on record volume lagged SPY (~−5% over 10 sessions, 37% beat SPY, t −2.5; −4% within 3; worse in strong/weak
+  breadth; RS 85+ no better). One-off test: later re-break of the record-day high −1.2% vs SPY, pullbacks holding its low −0.7%.
 - Rotation tab (browser-only rendering): ideas card · pair chart (`pairCard`: two groups' equal-weight index, ratio and
   its 20-day avg; group rows carry `px`, 180 sessions, dates `themes.px_dates`; guided suggestions: `STARTER_PAIRS` (14 curated
   pairs, each with what a rising/falling ratio means; edit in template.html) and "Cousins pulling apart" (correlation of daily

@@ -405,6 +405,9 @@ table.grid.sc { font-size: 12.5px; }
 .pverdict { font-size: 15px; margin: 6px 0 2px; }
 @media (max-width: 520px) { .pcat { display: none; } .prow { flex-wrap: wrap; gap: 4px; } .pname { flex-basis: 100%; } .pbadge { max-width: 100%; } }
 
+table.grid.hvetab { font-size: 12.5px; } table.grid.hvetab td { vertical-align: top; }
+table.grid.hvetab td small, table.grid.hvetab td.tname small { white-space: normal; max-width: 170px; }
+table.grid.hvetab td.tname { max-width: 180px; } table.grid.hvetab td, table.grid.hvetab th { padding-left: 6px; padding-right: 6px; }
 .rideas td.nowcol { box-shadow: inset 0 0 0 2px var(--s1); }
 .rideas .rbanner { margin: 8px 0 4px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; border-left: 4px solid; }
 .rbanner.act { background: color-mix(in srgb, var(--good) 12%, transparent); border-color: var(--good); }
@@ -2140,6 +2143,49 @@ function tsDownload(name, sections) {
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${name}-${T.date}.txt`;
   document.body.append(a); a.click(); a.remove();
 }
+/* ---------- Record volume (highest volume on record, last 5 sessions) ---------- */
+function hveCard(T) {
+  const X = T.hve;
+  if (!X) return $('<div></div>');
+  UI.hve = UI.hve || { dir: "all", scope: "all" };
+  const U = UI.hve, E = X.evidence || {};
+  const f = (o) => !o || o.ret == null ? "–" : `${pct(o.ret)} vs SPY (median ${pct(o.median)}, ${Math.round(o.win * 100)}% beat SPY, n ${o.n})`;
+  const card = $(`<section class="card regcard hvecard"><div class="kicker">Record volume · highest volume on record in the last 5 sessions</div>
+    <div class="rbanner watch" style="margin-top:8px"><b>Read this as a warning, not a buy signal.</b> In your data, stocks that closed up on record volume went on to <b>lag SPY</b>: ${f(E.up)} over the next ${E.hold || 10} sessions, and ${E.up3 && E.up3.ret != null ? pct(E.up3.ret) : "–"} within 3 sessions. ${E.up_rs85 && E.up_rs85.ret != null ? `Leaders (RS 85+) did no better: ${f(E.up_rs85)}. ` : ""}Record volume usually marks a <b>climax</b>: news, a blow-off or a big holder exiting. Use it to avoid chasing, to consider taking profits if you own one, or to watch for a failed move.</div>
+    <div class="filters" style="margin:8px 0 4px"></div>
+    <div class="hvebody"></div>
+    <details class="kqsec" style="margin-top:8px"><summary><b>The evidence</b> · ${esc(E.from || "")} to ${esc(E.to || "")}</summary>
+      <div class="scroll"><table class="grid" style="margin-top:6px"><thead><tr><th class="l">After a record-volume day…</th><th>Next ${E.hold || 10} sessions vs SPY</th><th>Median</th><th>Beat SPY</th><th>Cases</th></tr></thead><tbody>
+      ${[["Up day, closed in the upper half", E.up], ["…in strong breadth", E.up_strong], ["…in mixed breadth", E.up_mixed], ["…in weak breadth", E.up_weak], ["…RS 85+ leaders only", E.up_rs85], ["Down day", E.down], ["Any liquid stock (baseline)", E.base]]
+        .map(([n, o]) => !o || o.ret == null ? "" : `<tr><td class="l">${n}</td>${retCell(o.ret, "d15")}${retCell(o.median, "d15")}<td class="num">${Math.round(o.win * 100)}%</td><td class="num">${o.n.toLocaleString()}</td></tr>`).join("")}</tbody></table></div>
+      <p class="meta" style="margin:6px 0 0">Records are measured against our stored history (split-adjusted, at least 250 sessions, so new listings don't count). Index-rebalance and option-expiry days, when dozens of stocks set records at once, are left out of the test and flagged in the list. The classic follow-up entries were also tested once (Oct 12, 2026) and didn't help: buying a later close above the record day's high averaged −1.2% vs SPY over 10 sessions, and buying pullbacks that held the record day's low −0.7%. No costs; past results don't guarantee anything.</p></details></section>`);
+  const fl = card.querySelector(".filters");
+  const body = card.querySelector(".hvebody");
+  const draw = () => {
+    let rows = X.rows.filter(r => U.dir === "all" || (U.dir === "up" ? r.chg > 0 : r.chg < 0));
+    if (U.scope === "themes") rows = rows.filter(r => r.theme || r.sub);
+    const evr = (r) => r.ever === "ever" ? `<span class="zone znear21EMA" title="Checked against Yahoo's full daily history${r.ever_ref ? " (data from " + esc(r.ever_ref) + ")" : ""}">Ever</span>`
+      : r.ever === "not ever" ? `<span class="zone zfair" title="Bigger volume on ${esc(r.ever_ref)}, before our 2-year window">2-yr</span>`
+      : `<span class="zone zfair" title="Highest in our 2 years of data; the all-time check runs in the morning update">2-yr*</span>`;
+    const close = (l) => l == null ? "" : l >= 0.75 ? "closed near high" : l <= 0.25 ? "closed near low" : "closed mid-range";
+    body.innerHTML = rows.length ? `<div class="scroll"><table class="grid hvetab"><thead><tr><th class="l">Stock</th><th class="l">Record day</th><th>Record</th><th>Volume<small>× 50-day avg</small></th><th>That day</th><th>Since<small>vs record close</small></th><th class="l">Record-day range<small>high / low</small></th><th>RS</th><th>$ traded</th></tr></thead><tbody>
+      ${rows.map(r => `<tr><td class="l tname">${r.t}<small>${esc((r.name || "").slice(0, 24))}${r.sub ? " · " + esc(r.sub) : r.theme ? " · " + esc(r.theme) : ""}</small></td>
+        <td class="l"><b>${r.dow} ${shortDate(r.date)}</b><small class="meta" style="display:block">${r.ago === 0 ? "latest session" : r.ago + " session" + (r.ago === 1 ? "" : "s") + " ago"}${r.also ? " · also " + esc(r.also.join(", ")) : ""}${r.mass ? ` · <span title="${r.day_count} stocks set records that day: likely an index rebalance or expiry">index/expiry day</span>` : ""}</small></td>
+        <td class="num">${evr(r)}</td>
+        <td class="num">${(r.vol / 1e6).toFixed(r.vol >= 1e7 ? 0 : 1)}M<small class="meta" style="display:block">${r.x50 == null ? "" : r.x50 + "× avg"}${r.vs_prev ? "<br>" + r.vs_prev + "× old record" : ""}</small></td>
+        <td class="num ${tint(r.chg, SCALE.d5)}">${pct(r.chg)}<small class="meta" style="display:block">${close(r.loc)}${r.gap != null && Math.abs(r.gap) >= 0.03 ? " · gap " + pct(r.gap, 0) : ""}${Math.abs(r.chg || 0) >= 1 ? " · <b>unusual move: check the chart</b>" : ""}</small></td>
+        ${retCell(r.since, "d5")}
+        <td class="l">$${r.hi} / $${r.lo}<small class="meta" style="display:block">${r.above_lo ? "holding above the low" : "<b>below the record-day low</b>"}</small></td>
+        <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">$${r.dollars >= 1000 ? (r.dollars / 1000).toFixed(1) + "B" : Math.round(r.dollars) + "M"}</td></tr>`).join("")}</tbody></table></div>`
+      : '<p class="meta">No stocks match this filter.</p>';
+  };
+  fl.append(chips("Direction", [["all", `All (${X.count})`], ["up", "Up days"], ["down", "Down days"]], U, "dir", draw));
+  fl.append(chips("Scope", [["all", "All stocks"], ["themes", "In my themes"]], U, "scope", draw));
+  fl.append($(`<span class="meta">Records per day: ${X.days.map(d => `${d.dow} ${d.n}`).join(" · ")}</span>`));
+  draw();
+  return card;
+}
+
 function renderTrades(app) {
   const T = DATA.themes, X = T && T.trade_setups;
   if (!X) { app.append($('<div class="card empty">Trade setups appear after the next data run.</div>')); return; }
@@ -2202,6 +2248,7 @@ function renderTrades(app) {
   });
   app.append(scoreboardCard(T.scoreboard));
   app.append(tagStatsCard((T.trade_bt || {}).tag_stats));
+  app.append(hveCard(T));
   app.append(tsBacktest(T.trade_bt, (T.playbook && T.playbook.state) || now));
 }
 function picksCard(P, T) {

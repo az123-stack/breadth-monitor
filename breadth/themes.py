@@ -352,6 +352,7 @@ def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=No
         "bench": {"ticker": bench, **{k: _r(v) for k, v in bret.items()}},
         "themes": theme_rows, "subthemes": sub_rows, "stocks": stocks, "horizons": SHOW,
         "refs": refs, "ref_keys": list(offs) + ["ema8", "ema21", "ema50"],
+        "hve": v2.get("hve") if v2 else None,
         "timeline_dates": v2.get("timeline_dates") if v2 else None, "px_dates": v2.get("px_dates") if v2 else None,
         "rs_bp": v2["rs_bp"] if v2 else [], "lists": v2["lists"] if v2 else None,
         "leaders": leaders, "trade_bt": v2.get("trade_bt") if v2 else None, "vcp_live": v2.get("vcp") if v2 else None,
