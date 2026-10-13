@@ -463,6 +463,15 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .tg.pother { background: var(--neutral-mid); color: var(--text-secondary); }
 .tg.pliq { background: var(--neutral-mid); color: var(--text-secondary); } .tg.pliq.mid { background: color-mix(in srgb, var(--warning) 25%, transparent); color: var(--text-primary); }
 table.grid.hvetab td.pcell { min-width: 170px; } table.grid.hvetab td.pcell small { max-width: 230px; }
+
+.twcard .twv { font-size: 14.5px; }
+.twcard.pace { border-color: var(--good); box-shadow: inset 4px 0 0 var(--good); } .twcard.close { box-shadow: inset 4px 0 0 var(--warning); }
+.twbar { position: relative; height: 12px; border-radius: 6px; background: var(--neutral-mid); margin: 6px 0 0; }
+.twbar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; background: var(--up); }
+.twcard.pace .twbar .fill { background: var(--good); } .twcard.stale .twbar .fill { opacity: .45; }
+.twbar .mk { position: absolute; top: -3px; height: 18px; border-left: 2px solid var(--warning); }
+.twbar .mk.pace { border-color: var(--good); }
+.twbar .mk b { position: absolute; top: 19px; left: -14px; font-size: 11px; } .twbar .mk small { position: absolute; top: 19px; left: 10px; font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -2206,6 +2215,42 @@ function indexMovers(key) {
   return { rows, ret, eq, adv, dec, share, top10, t10share, big10, net, actual: actual && actual.chg, type,
     sectors: Object.values(sectors).map(s => ({ ...s, avg: s.sum / s.n, upShare: s.up / s.n })).sort((a, b) => b.bp - a.bp) };
 }
+
+/* ---------- Thrust watch (Intraday): live up-4% count on the sheet's stocks vs a calibrated threshold ---------- */
+function thrustWatchCard(W, clk) {
+  if (!W) return $('<div></div>');
+  let up = 0, dn = 0, n = 0;
+  W.tickers.forEach(t => { const r = liveRow(t); if (!r || !(r.price >= 3)) return; n++; if (r.chg >= 0.04) up++; else if (r.chg <= -0.04) dn++; });
+  const stale = LIVE.spyDate && DATA.themes && LIVE.spyDate === DATA.themes.date;   // sheet still shows the session already loaded
+  const x = W.avg40 ? up / W.avg40 : 0, est = W.scale ? Math.round(up * W.scale) : null;
+  const state = x >= W.k ? "pace" : x >= W.k_close ? "close" : "normal";
+  const verdict = stale ? `Showing the last full session (${shortDate(W.last.date)}): ${W.last.live} up 4%. Live counts start once today's session trades.`
+    : state === "pace" ? `<b>⚡ Thrust pace.</b> ${up} of these stocks are up 4%+, ${x.toFixed(1)}× their 40-day average (≈ ${est} across the whole market vs ${W.official_need} needed).`
+    : state === "close" ? `<b>Getting close.</b> ${up} up 4%+, ${x.toFixed(1)}× average. Thrust pace starts at ${W.pace}.`
+    : `${up} up 4%+ (${x.toFixed(1)}× average). Thrust pace starts at ${W.pace}; getting close at ${W.close}.`;
+  const mx = Math.max(W.pace * 1.6, up * 1.1), pctw = (v) => Math.min(100, v / mx * 100);
+  const setup = W.setup.met ? `<span class="tg ppull">✓ set up</span> breadth was washed out in the last 10 sessions (T2108 low ${W.setup.t2108_min}, 10-day ratio low ${W.setup.ratio10_min}), so a big day here would count as a thrust`
+    : `<span class="tg pother">not set up</span> no washout in the last 10 sessions (needs T2108 ≤ ${W.setup.t_level} or 10-day ratio ≤ ${W.setup.r_level}), so a big day would be strong but not an official thrust`;
+  const net = W.net == null ? "" : W.net < 0 ? `Highs − lows (10-day) is ${W.net}: below zero, the kind of backdrop the thrusts that worked came from. Confirmation = that line back above zero within ~5 sessions.`
+    : `Highs − lows (10-day) is +${W.net}: already positive. Past thrusts into an already-strong tape (Jan 5, Feb 6) faded.`;
+  const timeTip = clk && clk.open ? (clk.mins < 330 ? " It's early: counts swing a lot until the last hour, so judge it near the close (3:30–4:00)." : " Late in the session: this is close to what the close will show.") : "";
+  return $(`<section class="icard card regcard twcard ${state} ${stale ? "stale" : ""}"><div class="kicker">Thrust watch · ${W.n.toLocaleString()} live stocks (your themes + S&P 500 + Nasdaq-100)</div>
+    <p class="twv" style="margin:8px 0 6px">${verdict}${stale ? "" : timeTip}</p>
+    <div class="twbar" role="img" aria-label="Live up-4% count against the thrust levels"><i class="fill" style="width:${pctw(stale ? W.last.live : up)}%"></i>
+      <span class="mk" style="left:${pctw(W.close)}%"><b>${W.close}</b><small>close</small></span><span class="mk pace" style="left:${pctw(W.pace)}%"><b>${W.pace}</b><small>thrust</small></span></div>
+    <div class="igrid" style="margin-top:22px">
+      <div class="itile"><small>Up 4%+ now</small><b class="up">${stale ? "–" : up}</b><span class="meta">${stale ? "" : x.toFixed(2) + "× the 40-day avg of " + W.avg40}</span></div>
+      <div class="itile"><small>Down 4%+ now</small><b class="dn">${stale ? "–" : dn}</b><span class="meta">${stale ? "" : n + " stocks priced"}</span></div>
+      <div class="itile"><small>Whole-market estimate</small><b>${stale || est == null ? "–" : "≈ " + est}</b><span class="meta">thrust needs ${W.official_need} (2.5× the 40-day avg)</span></div>
+      <div class="itile"><small>Last session</small><b>${W.last.live}</b><span class="meta">${shortDate(W.last.date)} · whole market ${W.last.official}</span></div>
+    </div>
+    <p class="meta" style="margin:10px 0 0">${setup}.<br>${esc(net)}</p>
+    <details class="kqsec" style="margin-top:8px"><summary><b>How reliable is this gauge?</b></summary>
+      <p class="meta" style="margin:6px 0">Calibrated on ${esc(W.from || "")} onward: this list's up-4% count tracks the whole-market count closely (correlation ${W.corr}; the market runs about ${W.scale}× this list). "Thrust pace" (${W.k}× this list's own 40-day average) caught <b>${W.caught} of ${W.official_days}</b> past thrust-level days, and "getting close" (${W.k_close}×) caught ${W.near_caught}; it also flagged ${W.false_alarms} days that fell just short officially, so treat it as an early read. Counts use price only (up 4%+, $3+), because full-day volume isn't known until the close. The official signal still prints on the Breadth tab the next morning.</p>
+      <div class="scroll"><table class="grid"><thead><tr><th class="l">Past thrust-level day</th><th>This list up 4%</th><th>× its avg</th><th>Whole market</th><th class="l">Gauge</th></tr></thead><tbody>
+      ${W.past.slice().reverse().map(p => `<tr><td class="l">${longDate(p.date)}</td><td class="num">${p.live}</td><td class="num">${p.x}×</td><td class="num">${p.official}</td><td class="l">${p.caught ? "⚡ flagged" : "missed"}</td></tr>`).join("")}</tbody></table></div></details>
+  </section>`);
+}
 function renderIntraday(app) {
   const I = DATA.intraday, T = DATA.themes;
   if (!I) { app.append($('<div class="icard card empty">Intraday data appears after the next build.</div>')); return; }
@@ -2218,6 +2263,8 @@ function renderIntraday(app) {
   if (!hasCols) return;
   const pc = (v, d = 2) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
   const cls = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "dn" : "";
+  // 0. Thrust watch
+  app.append(thrustWatchCard(T && T.thrust_watch, clk));
   // 1. Market pulse
   const tile = (k, label) => { const r = liveRow(k); return `<div class="itile"><small>${esc(label)}</small><b class="${cls(r && r.chg)}">${r ? pc(r.chg) : "–"}</b><span class="meta">${r ? fmt(r.price, r.price < 100 ? 2 : 0) : ""}</span></div>`; };
   const spread = (a, b, label, note) => { const x = liveRow(a), y = liveRow(b); const v = x && y ? x.chg - y.chg : null;

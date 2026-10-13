@@ -85,3 +85,55 @@ if __name__ == "__main__":
     a = ap.parse_args()
     if a.sheet_rows:
         print(json.dumps(sheet_rows()))
+
+
+# ---------------------------------------------------------------------------
+# Thrust watch: gauge a breadth thrust live, on the stocks the Google Sheet prices
+# ---------------------------------------------------------------------------
+THRUST_K = 2.5      # live up-4% count >= 2.5x its own 40-day average  -> "thrust pace"
+CLOSE_K = 2.0       # >= 2.0x -> "getting close"
+
+
+def thrust_watch(adjusted, history, universe):
+    """Calibrates the live list (theme stocks + S&P 500 + Nasdaq-100 that are US common stocks) against the
+    official whole-market 4% count. Price-only rule (close >= $3, up 4%+), since full-day volume isn't known
+    until the close. Returns thresholds for today, the calibration record and the setup condition."""
+    import numpy as np
+    import pandas as pd
+    from . import config as C, store
+    m = load_members()
+    live = sorted((set(store.theme_tickers()) | {t for rows in m.values() for t, _ in rows}) & set(universe))
+    sub = adjusted[adjusted["ticker"].isin(live)]
+    c = sub.pivot_table(index="date", columns="ticker", values="c").sort_index()
+    chg = c / c.shift(1) - 1
+    lup = ((chg >= 0.04) & (c >= 3)).sum(axis=1)
+    ldn = ((chg <= -0.04) & (c >= 3)).sum(axis=1)
+    h = history[history["complete"]] if "complete" in history.columns else history
+    df = pd.DataFrame({"lup": lup, "ldn": ldn}).join(h[["up4", "up4_avg40", "t2108", "ratio10"]], how="inner")
+    df["lavg"] = df["lup"].rolling(40).mean().shift(1)
+    df["avg_prev"] = df["up4_avg40"].shift(1)
+    cal = df.dropna()
+    official = cal["up4"] >= C.EVENT_THRUST_MULT * cal["avg_prev"]
+    flag = cal["lup"] >= THRUST_K * cal["lavg"]
+    near = cal["lup"] >= CLOSE_K * cal["lavg"]
+    scale = float((cal["up4"] / cal["lup"].replace(0, np.nan)).median()) if len(cal) else None
+    lavg_now = float(df["lup"].iloc[-40:].mean())
+    last = h.iloc[-1]
+    t_min = float(h["t2108"].iloc[-10:].min())
+    r_min = float(h["ratio10"].iloc[-10:].min())
+    net = None
+    if "nh10" in h.columns and pd.notna(last.get("nh10")) and pd.notna(last.get("nl10")):
+        net = round(float(last["nh10"] - last["nl10"]), 1)
+    past = [{"date": d.strftime("%Y-%m-%d"), "live": int(cal.at[d, "lup"]), "x": round(float(cal.at[d, "lup"] / cal.at[d, "lavg"]), 2),
+             "official": int(cal.at[d, "up4"]), "caught": bool(flag[d])} for d in cal.index[official]][-10:]
+    return {"tickers": live, "n": len(live), "avg40": round(lavg_now, 1),
+            "pace": int(np.ceil(THRUST_K * lavg_now)), "close": int(np.ceil(CLOSE_K * lavg_now)), "k": THRUST_K, "k_close": CLOSE_K,
+            "official_need": int(np.ceil(C.EVENT_THRUST_MULT * float(last["up4_avg40"]))), "scale": round(scale, 2) if scale else None,
+            "corr": round(float(cal["up4"].corr(cal["lup"])), 3) if len(cal) > 10 else None,
+            "caught": int((flag & official).sum()), "official_days": int(official.sum()),
+            "near_caught": int((near & official).sum()), "false_alarms": int((flag & ~official).sum()),
+            "setup": {"met": bool(t_min <= C.THRUST_LOW_T2108 or r_min <= C.THRUST_LOW_RATIO), "t2108_min": round(t_min, 1),
+                      "ratio10_min": round(r_min, 2), "t_level": C.THRUST_LOW_T2108, "r_level": C.THRUST_LOW_RATIO},
+            "net": net, "last": {"date": df.index[-1].strftime("%Y-%m-%d"), "live": int(df["lup"].iloc[-1]),
+                                  "official": int(last["up4"])}, "past": past,
+            "from": cal.index[0].strftime("%Y-%m-%d") if len(cal) else None}

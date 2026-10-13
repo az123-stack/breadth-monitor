@@ -203,6 +203,10 @@ def recompute_and_publish(bars, splits, universe, state):
         except Exception as e:
             log.exception("setup review failed: %s", e)
         try:
+            theme_data["thrust_watch"] = intraday.thrust_watch(adjusted, history, universe)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("thrust watch failed: %s", e)
+        try:
             from . import rotation
             theme_data["rotation"] = rotation.build(adjusted, theme_data, kq_data, macro_data, history)
         except Exception as e:  # optional panel; never block the page

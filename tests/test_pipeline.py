@@ -580,6 +580,28 @@ def test_new_highs_lows():
     return "ok"
 
 
+def test_thrust_watch():
+    from breadth import intraday
+    old = config.DATA_DIR
+    config.DATA_DIR = Path(__file__).resolve().parent.parent / "data"      # real index member list
+    try:
+        tick = [r[0] for r in intraday.load_members()["SPX"][:40]]
+        n = 120
+        rng = np.random.default_rng(2)
+        closes = {t: list(50 * np.cumprod(1 + rng.normal(0, 0.02, n))) for t in tick}
+        for t in tick[:30]:
+            closes[t][-1] = closes[t][-2] * 1.06                       # a broad up-4% day at the end
+        bars = make_bars(closes, {t: [200000] * n for t in tick})
+        hist = metrics.compute(bars)
+        w = intraday.thrust_watch(bars, hist, set(tick))
+        assert w["n"] == 40 and w["last"]["live"] == 30
+        assert w["pace"] == int(np.ceil(intraday.THRUST_K * w["avg40"])) and w["close"] <= w["pace"]
+        assert set(w["setup"]) >= {"met", "t2108_min"}
+    finally:
+        config.DATA_DIR = old
+    return "ok"
+
+
 def test_intraday_sheet_rows():
     from breadth import intraday
     old = config.DATA_DIR
