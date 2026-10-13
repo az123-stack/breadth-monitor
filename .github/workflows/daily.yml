@@ -5,6 +5,10 @@ on:
     # 10:17 UTC Tue–Sat = 6:17 AM ET in summer (5:17 AM in winter).
     # Each run picks up the previous trading day, so Saturday's run covers Friday.
     - cron: "17 10 * * 2-6"
+    # Backups: GitHub sometimes delays or skips scheduled runs. A rerun with
+    # nothing new just rebuilds the page (a couple of minutes), so these are safe.
+    - cron: "43 11 * * 2-6"
+    - cron: "43 13 * * 2-6"
   workflow_dispatch:
     inputs:
       backfill_days:
