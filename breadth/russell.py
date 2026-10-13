@@ -60,10 +60,17 @@ def refresh(session=None):
     s = session or requests
     r = s.get(URL, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                                           "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"}, timeout=30)
-    r.raise_for_status()
-    rows, asof = parse(r.text)
-    if len(rows) < 1000:      # a partial / error page: keep the cached file
-        raise ValueError(f"only {len(rows)} holdings parsed")
+    status = {"http": r.status_code, "type": r.headers.get("content-type"), "bytes": len(r.content), "head": r.text[:400]}
+    try:
+        r.raise_for_status()
+        rows, asof = parse(r.text)
+        if len(rows) < 1000:      # a partial / error page: keep the cached file
+            raise ValueError(f"only {len(rows)} holdings parsed")
+    except Exception as e:
+        status["error"] = str(e)[:300]
+        _status(status)
+        raise
+    _status({**status, "rows": len(rows), "asof": asof, "head": ""})
     with open(path(), "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["ticker", "weight", "sector", "exchange", "asof"])
@@ -71,6 +78,14 @@ def refresh(session=None):
             w.writerow([x["ticker"], x["weight"], x["sector"], x["exchange"], asof or ""])
     log.info("Russell 2000: %d holdings (as of %s)", len(rows), asof)
     return len(rows)
+
+
+def _status(d):
+    """Last fetch result (data/russell_status.json), so a failure can be read from the repo."""
+    import json
+    from datetime import datetime, timezone
+    with open(config.DATA_DIR / "russell_status.json", "w") as f:
+        json.dump({"at": datetime.now(timezone.utc).isoformat(timespec="seconds"), **d}, f, indent=1)
 
 
 def load():
