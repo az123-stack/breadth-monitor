@@ -36,7 +36,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (liquid stocks with a year of history; high above every prior-year high), `near_hi` / `pct_near` / `pct_near10` (close within
   3% of the 52-week high), `spy_off_hi` (SPY bars passed as `bench`). Need 252 sessions of bars, so `merge` keeps stored values
   when a fresh one is blank. Events: "narrowing" (SPY within 1% of its high, pct_near10 ≤ 60% of its 60-day max, 3 days) and
-  "highs_lead" (nh10 > nl10 for 3 days after nl10 led 15 of 20). Breadth tab: 4 tiles, two charts, table columns.
+  "highs_lead" (nh10 > nl10 for 3 days after nl10 led 15 of 20). Breadth tab: 4 tiles, two charts (highs/lows chart has an
+  orange net line = nh10 − nl10 on the same mirrored scale), table columns.
   First look (Nov 2025–Sep 2026, ~210 days): high pct_near was followed by weaker SPY 20-day returns (corr −0.39, top quartile
   −0.4% vs bottom +3.3%); SPY-near-high divergence days −0.4% vs +1.2% (n 12). Context, not a timing signal.
 - `themes.py` sheet port: theme Score /8, rotation, setup score, long/short pulse, ranks, payload

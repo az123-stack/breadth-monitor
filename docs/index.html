@@ -1433,7 +1433,7 @@ function chartT2108(rows) {
 
 function chartHighsLows(rows) {
   const c = frame("New 52-week highs vs new 52-week lows",
-    '<span><i style="background:var(--up)"></i>New highs</span><span><i style="background:var(--down)"></i>New lows</span><span><i class="line" style="background:var(--text-secondary)"></i>10-day averages</span>');
+    '<span><i style="background:var(--up)"></i>New highs</span><span><i style="background:var(--down)"></i>New lows</span><span><i class="line" style="background:var(--s2);height:3px"></i>Highs − lows (10-day avg)</span><span><i class="line" style="background:var(--text-muted)"></i>10-day avg of each</span>');
   const vals = rows.flatMap(r => [r.nh || 0, r.nl || 0]).sort((a, b) => a - b);
   const mx = niceMax((vals[Math.floor(vals.length * 0.95)] || 10) * 1.05);
   const mid = M.t + (c.h - M.t - M.b) / 2, half = (c.h - M.t - M.b) / 2;
@@ -1449,10 +1449,16 @@ function chartHighsLows(rows) {
   });
   S("line", { x1: M.l, x2: W - M.r, y1: mid, y2: mid, stroke: "var(--text-muted)", "stroke-width": 1 }, c.svg);
   eventLines(c, x, false);
-  S("path", { d: path(rows, x, y, "nh10"), fill: "none", stroke: "var(--text-secondary)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
-  S("path", { d: path(rows, x, yd, "nl10"), fill: "none", stroke: "var(--text-secondary)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  S("path", { d: path(rows, x, y, "nh10"), fill: "none", stroke: "var(--text-muted)", "stroke-width": 1.5, "stroke-linejoin": "round", opacity: 0.8 }, c.svg);
+  S("path", { d: path(rows, x, yd, "nl10"), fill: "none", stroke: "var(--text-muted)", "stroke-width": 1.5, "stroke-linejoin": "round", opacity: 0.8 }, c.svg);
+  // net line: 10-day avg of (highs - lows), plotted on the same scale (above the middle = more highs)
+  const net = rows.map(r => ({ v: r.nh10 == null || r.nl10 == null ? null : r.nh10 - r.nl10 }));
+  const yn = (v) => v >= 0 ? y(v) : yd(-v);
+  S("path", { d: path(net, x, yn, "v"), fill: "none", stroke: "var(--surface-1)", "stroke-width": 5, "stroke-linejoin": "round" }, c.svg);
+  S("path", { d: path(net, x, yn, "v"), fill: "none", stroke: "var(--s2)", "stroke-width": 2.5, "stroke-linejoin": "round" }, c.svg);
+  endLabel(c.svg, x, yn, net, "v", "", "var(--s2)");
   eventMarkers(c, x, y, rows, "nh10", ["highs_lead"]);
-  hover(c, rows, x, [["New highs", r => fmt(r.nh)], ["New lows", r => fmt(r.nl)], ["Highs − lows", r => r.nhnl == null ? "–" : (r.nhnl > 0 ? "+" : "") + fmt(r.nhnl)], ["10-day avg highs / lows", r => r.nh10 == null ? "–" : fmt(r.nh10) + " / " + fmt(r.nl10)]]);
+  hover(c, rows, x, [["New highs", r => fmt(r.nh)], ["New lows", r => fmt(r.nl)], ["Highs − lows", r => r.nhnl == null ? "–" : (r.nhnl > 0 ? "+" : "") + fmt(r.nhnl)], ["Highs − lows, 10-day avg", r => r.nh10 == null ? "–" : ((r.nh10 - r.nl10) > 0 ? "+" : "") + fmt(r.nh10 - r.nl10)], ["10-day avg highs / lows", r => r.nh10 == null ? "–" : fmt(r.nh10) + " / " + fmt(r.nl10)]]);
   return c.el;
 }
 function chartNearHigh(rows) {
