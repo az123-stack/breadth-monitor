@@ -95,6 +95,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   volume, refreshed after 30 days) → "Ever" / "2-yr" (bigger day before our window) / "2-yr*" (unchecked). Shown as a WARNING:
   up days on record volume lagged SPY (~−5% over 10 sessions, 37% beat SPY, t −2.5; −4% within 3; worse in strong/weak
   breadth; RS 85+ no better). One-off test: later re-break of the record-day high −1.2% vs SPY, pullbacks holding its low −0.7%.
+  Table headers sort (`sortable`, state `UI.hve.sort`); card "⬇ TradingView" exports the rows shown in their current order;
+  header "⬇ Trade Setups" adds "Record volume - up days (warning list)" and "- down days" sections; tickers are in `themes.tv`.
 - Money flow card (top of Rotation, `moneyFlowCard`) → `rotation.flow`: Relative Rotation Graph per sub-theme (x = 100 × group/SPY ÷
   its 50-day avg, EMA5; y = 100 × x ÷ x 10 sessions ago; 15-session tails) + volume flow (10-session up-day minus down-day
   dollar volume ÷ total). Tiers: confirmed (leading & accelerating, or Leading quadrant 10/15 sessions + volume flow > 0.15),

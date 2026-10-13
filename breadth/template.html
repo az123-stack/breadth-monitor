@@ -499,7 +499,9 @@ function render() {
     const rank = Object.fromEntries((P.rows || []).map(r => [r.key, r.rank]));
     const picks = (P.picks || []).map(c => c.t);
     tsDownload("trade-setups", [...(picks.length ? [{ name: "Today's top picks", ticks: picks }] : []),
-      ...X.setups.slice().sort((a, b) => (rank[a.key] || 9) - (rank[b.key] || 9)).map(s => ({ name: s.name, ticks: s.top }))]);
+      ...X.setups.slice().sort((a, b) => (rank[a.key] || 9) - (rank[b.key] || 9)).map(s => ({ name: s.name, ticks: s.top })),
+      ...(DATA.themes.hve ? [{ name: "Record volume - up days (warning list)", ticks: DATA.themes.hve.rows.filter(r => r.chg > 0).map(r => r.t) },
+        { name: "Record volume - down days", ticks: DATA.themes.hve.rows.filter(r => r.chg < 0).map(r => r.t) }] : [])]);
   });
   const rf = app.querySelector(".revflag"); if (rf) rf.addEventListener("click", () => {
     const b = app.querySelector('nav.tabs button[data-tab="trades"]'); if (b) b.click();
@@ -2301,27 +2303,43 @@ function hveCard(T) {
       <p class="meta" style="margin:6px 0 0">Records are measured against our stored history (split-adjusted, at least 250 sessions, so new listings don't count). Index-rebalance and option-expiry days, when dozens of stocks set records at once, are left out of the test and flagged in the list. The classic follow-up entries were also tested once (Oct 12, 2026) and didn't help: buying a later close above the record day's high averaged −1.2% vs SPY over 10 sessions, and buying pullbacks that held the record day's low −0.7%. No costs; past results don't guarantee anything.</p></details></section>`);
   const fl = card.querySelector(".filters");
   const body = card.querySelector(".hvebody");
-  const draw = () => {
+  UI.hve.sort = UI.hve.sort || ["ago", 1];
+  X.rows.forEach(r => { r._ev = r.ever === "ever" ? 2 : r.ever === "not ever" ? 1 : 0; r._abs = Math.abs(r.chg || 0); });
+  const cols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "ago", h: "Record day", l: true, asc: true }, { k: "_ev", h: "Record" },
+    { k: "x50", h: "Volume<small>× 50-day avg</small>" }, { k: "chg", h: "That day" }, { k: "since", h: "Since<small>vs record close</small>" },
+    { k: "lo", h: "Record-day range<small>high / low</small>", l: true }, { k: "rsr", h: "RS" }, { k: "dollars", h: "$ traded" }];
+  const filtered = () => {
     let rows = X.rows.filter(r => U.dir === "all" || (U.dir === "up" ? r.chg > 0 : r.chg < 0));
     if (U.scope === "themes") rows = rows.filter(r => r.theme || r.sub);
-    const evr = (r) => r.ever === "ever" ? `<span class="zone znear21EMA" title="Checked against Yahoo's full daily history${r.ever_ref ? " (data from " + esc(r.ever_ref) + ")" : ""}">Ever</span>`
-      : r.ever === "not ever" ? `<span class="zone zfair" title="Bigger volume on ${esc(r.ever_ref)}, before our 2-year window">2-yr</span>`
-      : `<span class="zone zfair" title="Highest in our 2 years of data; the all-time check runs in the morning update">2-yr*</span>`;
-    const close = (l) => l == null ? "" : l >= 0.75 ? "closed near high" : l <= 0.25 ? "closed near low" : "closed mid-range";
-    body.innerHTML = rows.length ? `<div class="scroll"><table class="grid hvetab"><thead><tr><th class="l">Stock</th><th class="l">Record day</th><th>Record</th><th>Volume<small>× 50-day avg</small></th><th>That day</th><th>Since<small>vs record close</small></th><th class="l">Record-day range<small>high / low</small></th><th>RS</th><th>$ traded</th></tr></thead><tbody>
-      ${rows.map(r => `<tr><td class="l tname">${r.t}<small>${esc((r.name || "").slice(0, 24))}${r.sub ? " · " + esc(r.sub) : r.theme ? " · " + esc(r.theme) : ""}</small></td>
+    return rows;
+  };
+  const evr = (r) => r.ever === "ever" ? `<span class="zone znear21EMA" title="Checked against Yahoo's full daily history${r.ever_ref ? " (data from " + esc(r.ever_ref) + ")" : ""}">Ever</span>`
+    : r.ever === "not ever" ? `<span class="zone zfair" title="Bigger volume on ${esc(r.ever_ref)}, before our 2-year window">2-yr</span>`
+    : `<span class="zone zfair" title="Highest in our 2 years of data; the all-time check runs in the morning update">2-yr*</span>`;
+  const close = (l) => l == null ? "" : l >= 0.75 ? "closed near high" : l <= 0.25 ? "closed near low" : "closed mid-range";
+  body.innerHTML = `<div class="scroll"><table class="grid hvetab"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta hveempty" style="display:none">No stocks match this filter.</p>`;
+  const tb = body.querySelector("tbody");
+  let shown = [];
+  const fill = (rows) => {
+    shown = rows;
+    body.querySelector(".hveempty").style.display = rows.length ? "none" : "";
+    tb.innerHTML = rows.map(r => `<tr><td class="l tname">${r.t}<small>${esc((r.name || "").slice(0, 24))}${r.sub ? " · " + esc(r.sub) : r.theme ? " · " + esc(r.theme) : ""}</small></td>
         <td class="l"><b>${r.dow} ${shortDate(r.date)}</b><small class="meta" style="display:block">${r.ago === 0 ? "latest session" : r.ago + " session" + (r.ago === 1 ? "" : "s") + " ago"}${r.also ? " · also " + esc(r.also.join(", ")) : ""}${r.mass ? ` · <span title="${r.day_count} stocks set records that day: likely an index rebalance or expiry">index/expiry day</span>` : ""}</small></td>
         <td class="num">${evr(r)}</td>
         <td class="num">${(r.vol / 1e6).toFixed(r.vol >= 1e7 ? 0 : 1)}M<small class="meta" style="display:block">${r.x50 == null ? "" : r.x50 + "× avg"}${r.vs_prev ? "<br>" + r.vs_prev + "× old record" : ""}</small></td>
         <td class="num ${tint(r.chg, SCALE.d5)}">${pct(r.chg)}<small class="meta" style="display:block">${close(r.loc)}${r.gap != null && Math.abs(r.gap) >= 0.03 ? " · gap " + pct(r.gap, 0) : ""}${Math.abs(r.chg || 0) >= 1 ? " · <b>unusual move: check the chart</b>" : ""}</small></td>
         ${retCell(r.since, "d5")}
         <td class="l">$${r.hi} / $${r.lo}<small class="meta" style="display:block">${r.above_lo ? "holding above the low" : "<b>below the record-day low</b>"}</small></td>
-        <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">$${r.dollars >= 1000 ? (r.dollars / 1000).toFixed(1) + "B" : Math.round(r.dollars) + "M"}</td></tr>`).join("")}</tbody></table></div>`
-      : '<p class="meta">No stocks match this filter.</p>';
+        <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">$${r.dollars >= 1000 ? (r.dollars / 1000).toFixed(1) + "B" : Math.round(r.dollars) + "M"}</td></tr>`).join("");
   };
+  const current = sortable(body.querySelector("table"), cols, filtered, fill, UI.hve.sort);
+  const draw = () => fill(current());
+  const dl = $('<button class="xopen" title="Download the stocks shown, in this order, as a TradingView watchlist">⬇ TradingView</button>');
+  dl.addEventListener("click", () => tsDownload("record-volume", [{ name: `Record volume ${U.dir === "up" ? "up days" : U.dir === "down" ? "down days" : ""}`, ticks: shown.map(r => r.t) }]));
   fl.append(chips("Direction", [["all", `All (${X.count})`], ["up", "Up days"], ["down", "Down days"]], U, "dir", draw));
   fl.append(chips("Scope", [["all", "All stocks"], ["themes", "In my themes"]], U, "scope", draw));
   fl.append($(`<span class="meta">Records per day: ${X.days.map(d => `${d.dow} ${d.n}`).join(" · ")}</span>`));
+  fl.append(dl);
   draw();
   return card;
 }

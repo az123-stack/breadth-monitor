@@ -363,5 +363,6 @@ def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=No
         "missing": [m for m in missing if m in all_t],
         "counts": {"themes": len(theme_rows), "subthemes": len(sub_rows), "stocks": len(stocks)},
         "tv": _tv_map(tv, [s_["t"] for s_ in stocks] + list(etfs_flat(etfs)) + [config.BENCHMARK, "QQQ", "IWM"]
-                      + ([r_["t"] for lst in (v2 or {}).get("lists", {}).values() if isinstance(lst, list) for r_ in lst])),
+                      + ([r_["t"] for lst in (v2 or {}).get("lists", {}).values() if isinstance(lst, list) for r_ in lst])
+                      + [r_["t"] for r_ in (((v2 or {}).get("hve") or {}).get("rows") or [])]),
     }
