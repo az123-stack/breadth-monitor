@@ -2193,9 +2193,11 @@ function liveRow(t) {
   return { ...r, chg, gap: r.open ? r.open / r.closeyest - 1 : null, fromOpen: r.open ? r.price / r.open - 1 : null };
 }
 function indexMovers(key) {
-  const I = DATA.intraday, mem = (I.members || {})[key === "^NDX" ? "NDX" : "SPX"] || [], dup = new Set(I.dup_classes || []);
-  const rows = [];
-  mem.forEach(([t, sector]) => { if (dup.has(t)) return; const r = liveRow(t); if (!r || !r.marketcap) return;
+  const I = DATA.intraday, r2k = key === "^R2K", mem = (I.members || {})[r2k ? "R2K" : key === "^NDX" ? "NDX" : "SPX"] || [], dup = new Set(I.dup_classes || []);
+  const W = I.r2k_weights || {}, rows = [];
+  mem.forEach(([t, sector]) => { if (!r2k && dup.has(t)) return; const r = liveRow(t);
+    if (r2k) { if (!r || !W[t]) return; rows.push({ t, sector, chg: r.chg, cap0: W[t], volume: r.volume, vavg: r.volumeavg }); return; }   // IWM weights (as of the holdings date)
+    if (!r || !r.marketcap) return;
     rows.push({ t, sector, chg: r.chg, cap0: r.marketcap / (1 + r.chg), volume: r.volume, vavg: r.volumeavg }); });
   const tot = rows.reduce((a, r) => a + r.cap0, 0);
   rows.forEach(r => { r.w = r.cap0 / tot; r.bp = r.w * r.chg * 1e4; });
@@ -2204,7 +2206,7 @@ function indexMovers(key) {
   const byAbs = rows.slice().sort((a, b) => Math.abs(b.bp) - Math.abs(a.bp));
   const top10 = byAbs.slice(0, 10).reduce((a, r) => a + r.bp, 0), net = ret * 1e4;
   const big10 = rows.slice().sort((a, b) => b.cap0 - a.cap0).slice(0, 10).reduce((a, r) => a + r.bp, 0);
-  const actual = liveRow(key);
+  const actual = liveRow(r2k ? "IWM" : key);
   const D = I.day_type || {}, share = adv + dec ? (ret >= 0 ? adv : dec) / (adv + dec) : null, t10share = net ? top10 / net : null;
   let type = "Mixed";
   if (Math.abs(ret) < D.flat) type = "Flat";
@@ -2276,7 +2278,7 @@ function renderIntraday(app) {
       .map(x => `<div class="ibar"><span>${esc(x.l)} <small class="meta">${x.k}</small></span><i class="${cls(x.r.chg)}" style="width:${Math.min(100, Math.abs(x.r.chg) * 2500)}%"></i><b class="${cls(x.r.chg)}">${pc(x.r.chg)}</b></div>`).join("")}</div></section>`));
   // 2. Who's moving the index
   const sec = $(`<section class="icard card regcard"><div class="kicker">Who's moving the index</div><div class="ibtns"></div><div class="ibody"></div></section>`);
-  sec.querySelector(".ibtns").append(chips("Index", [["^SPX", "S&P 500"], ["^NDX", "Nasdaq-100"]], ID, "idx", rerenderPanel));
+  sec.querySelector(".ibtns").append(chips("Index", [["^SPX", "S&P 500"], ["^NDX", "Nasdaq-100"]].concat((I.members || {}).R2K ? [["^R2K", "Russell 2000 (IWM)"]] : []), ID, "idx", rerenderPanel));
   const M = indexMovers(ID.idx), mx = Math.max(1, ...M.rows.map(r => Math.abs(r.bp)));
   const list = (rows) => rows.map(r => `<tr><td class="l"><b>${r.t}</b> <small class="meta">${esc(r.sector)}</small></td><td class="num ${cls(r.chg)}">${pc(r.chg)}</td><td class="num">${(r.w * 100).toFixed(2)}%</td>
     <td class="num ${cls(r.bp)}"><span class="ibp"><i class="${cls(r.bp)}" style="width:${Math.abs(r.bp) / mx * 100}%"></i></span>${r.bp > 0 ? "+" : ""}${r.bp.toFixed(1)}</td>
@@ -2286,7 +2288,7 @@ function renderIntraday(app) {
   sec.querySelector(".ibody").append($(`<div>
     <div class="igrid" style="margin:8px 0">
       <div class="itile"><small>Reconstructed return</small><b class="${cls(M.ret)}">${pc(M.ret)}</b><span class="meta">${M.rows.length} stocks with data</span></div>
-      <div class="itile"><small>Index actual</small><b class="${cls(M.actual)}">${pc(M.actual)}</b><span class="meta">${M.actual != null ? "gap " + ((M.ret - M.actual) * 100).toFixed(2) + " pts" : ""}</span></div>
+      <div class="itile"><small>${ID.idx === "^R2K" ? "IWM actual" : "Index actual"}</small><b class="${cls(M.actual)}">${pc(M.actual)}</b><span class="meta">${M.actual != null ? "gap " + ((M.ret - M.actual) * 100).toFixed(2) + " pts" : ""}</span></div>
       <div class="itile"><small>Equal-weight return</small><b class="${cls(M.eq)}">${pc(M.eq)}</b><span class="meta">cap minus equal ${((M.ret - M.eq) * 100).toFixed(2)} pts</span></div>
       <div class="itile"><small>Advancers / decliners</small><b>${M.adv} / ${M.dec}</b><span class="meta">${M.share != null ? Math.round(M.share * 100) + "% moving with the index" : ""}</span></div>
       <div class="itile"><small>Top 10 movers' share of the move</small><b>${M.t10share != null ? Math.round(M.t10share * 100) + "%" : "–"}</b><span class="meta">${M.top10.toFixed(0)} of ${M.net.toFixed(0)} bp</span></div>
@@ -2296,7 +2298,7 @@ function renderIntraday(app) {
       <div><h3 class="ih">Pushing down</h3><div class="scroll"><table class="grid">${hdr}<tbody>${list(dns)}</tbody></table></div></div></div>
     <h3 class="ih">By sector</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Sector</th><th>Weight</th><th>Avg change</th><th>Contribution<small>bp</small></th><th>Share up</th></tr></thead><tbody>
       ${M.sectors.map(s => `<tr><td class="l">${esc(s.sector)}</td><td class="num">${(s.w * 100).toFixed(1)}%</td><td class="num ${cls(s.avg)}">${pc(s.avg)}</td><td class="num ${cls(s.bp)}">${s.bp > 0 ? "+" : ""}${s.bp.toFixed(1)}</td><td class="num">${Math.round(s.upShare * 100)}%</td></tr>`).join("")}</tbody></table></div>
-    <div class="note" style="padding:8px 0 0">Contribution = weight at the prior close × today's change, so the column adds up to the index return. Weights are Google market caps (not float-adjusted; GOOG, FOX and NWS left out because Google repeats the whole company's cap on both classes), so the reconstructed return runs a little off the real index. Day type: Flat under ±0.02%; Broad when ${Math.round(I.day_type.broad_share * 100)}%+ of stocks move with the index and the top 10 make up at most ${Math.round(I.day_type.broad_top10 * 100)}% of the move; Narrow when the top 10 make up ${Math.round(I.day_type.narrow_top10 * 100)}%+ or cap weight beats equal weight by ${(I.day_type.narrow_gap * 100).toFixed(1)}+ pts. Starting guesses from your tracker, not tested rules.</div></div>`));
+    <div class="note" style="padding:8px 0 0">Contribution = weight at the prior close × today's change, so the column adds up to the index return. ${ID.idx === "^R2K" ? `Russell 2000: weights are IWM's published holdings${I.r2k_asof ? " (as of " + esc(I.r2k_asof) + ")" : ""}, float-adjusted, so the reconstruction tracks IWM closely; relative volume isn't fetched for these ~2,000 names to keep the live sheet light. ` : ""}S&P 500 / Nasdaq-100 weights are Google market caps (not float-adjusted; GOOG, FOX and NWS left out because Google repeats the whole company's cap on both classes), so the reconstructed return runs a little off the real index. Day type: Flat under ±0.02%; Broad when ${Math.round(I.day_type.broad_share * 100)}%+ of stocks move with the index and the top 10 make up at most ${Math.round(I.day_type.broad_top10 * 100)}% of the move; Narrow when the top 10 make up ${Math.round(I.day_type.narrow_top10 * 100)}%+ or cap weight beats equal weight by ${(I.day_type.narrow_gap * 100).toFixed(1)}+ pts. Starting guesses from your tracker, not tested rules.</div></div>`));
   app.append(sec);
   // 3. Live breadth on our stocks (vs the same stocks' last full session)
   const st = (T.stocks || []).filter(s => s.is_stock);

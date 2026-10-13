@@ -624,6 +624,41 @@ def _check_sheet_rows(intraday):
     assert len(p["members"]["SPX"]) > 490 and len(p["members"]["NDX"]) > 95
 
 
+def test_russell_holdings():
+    import tempfile
+    from breadth import intraday, russell
+    sample = ("\ufeffiShares Russell 2000 ETF\nFund Holdings as of,\"Oct 10, 2026\"\nInception Date,\"May 22, 2000\"\n\xa0\n"
+              "Ticker,Name,Sector,Asset Class,Market Value,Weight (%),Notional Value,Quantity,Price,Location,Exchange,Currency,FX Rate,Market Currency,Accrual Date\n"
+              '"AAA","A CO","Health Care","Equity","1,000","0.52","1,000","10","100","United States","NASDAQ","USD","1.00","USD","-"\n'
+              '"BBB","B CO","Industrials","Equity","900","0.31","900","9","100","United States","New York Stock Exchange Inc.","USD","1.00","USD","-"\n'
+              '"XTSLA","CASH","Cash and/or Derivatives","Money Market","5","0.01","5","5","1","United States","-","USD","1.00","USD","-"\n'
+              '"RTYZ6","FUT","Cash and/or Derivatives","Futures","0","0.00","0","1","1","United States","-","USD","1.00","USD","-"\n'
+              "\xa0\nThe content contained herein is owned or licensed by BlackRock\n")
+    rows, asof = russell.parse(sample)
+    assert [r["ticker"] for r in rows] == ["AAA", "BBB"] and asof == "Oct 10, 2026"
+    assert rows[0]["exchange"] == "NASDAQ" and rows[1]["exchange"] == "NYSE" and rows[1]["weight"] == 0.31
+    old = config.DATA_DIR
+    real = Path(__file__).resolve().parent.parent / "data"
+    with tempfile.TemporaryDirectory() as d:
+        import shutil
+        for f in ["index_members.csv", "themes.csv", "subthemes.csv"]:
+            if (real / f).exists():
+                shutil.copy(real / f, Path(d) / f)
+        config.DATA_DIR = Path(d)
+        try:
+            import csv as _csv
+            with open(russell.path(), "w", newline="") as f:
+                w = _csv.writer(f); w.writerow(["ticker", "weight", "sector", "exchange", "asof"])
+                w.writerow(["AAA", 0.52, "Health Care", "NASDAQ", "Oct 10, 2026"]); w.writerow(["AAPL", 0.1, "Tech", "NASDAQ", "Oct 10, 2026"])
+            rows = intraday.sheet_rows()
+            flags = {r[0]: (r[1], r[2]) for r in rows}
+            assert flags["AAA"] == (2, "NASDAQ:AAA") and flags["AAPL"][0] == 1   # already listed rows keep their flag
+            p = intraday.payload()
+            assert p["members"]["R2K"][0] == ["AAA", "Health Care"] and p["r2k_weights"]["AAA"] == 0.52
+        finally:
+            config.DATA_DIR = old
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

@@ -54,9 +54,19 @@ def load_members():
     return out
 
 
+def russell_members():
+    """Russell 2000 rows [ticker, sector] + weights {ticker: %} from the cached IWM holdings."""
+    from . import russell
+    rows, asof = russell.load()
+    return rows, asof
+
+
 def payload():
     m = load_members()
-    return {"members": m, "pulse": {k: v[1] for k, v in PULSE.items()}, "sector_etfs": SECTOR_ETFS,
+    r2k, asof = russell_members()
+    if r2k:
+        m["R2K"] = [[r["ticker"], r["sector"]] for r in r2k]
+    return {"members": m, "r2k_weights": {r["ticker"]: r["weight"] for r in r2k}, "r2k_asof": asof, "pulse": {k: v[1] for k, v in PULSE.items()}, "sector_etfs": SECTOR_ETFS,
             "dup_classes": sorted(DUP_CLASSES), "volume_profile": VOLUME_PROFILE, "day_type": DAY_TYPE}
 
 
@@ -71,6 +81,15 @@ def sheet_rows():
         tick.discard(k)
     for t in sorted(tick):
         rows.append([t, 1 if t in idx else 0, SYMBOL_OVERRIDE.get(t, t)])
+    # Russell 2000 members not already listed: flag 2 = price, prior close and volume only (keeps the sheet light)
+    have = {r[0] for r in rows}
+    r2k, _ = russell_members()
+    for r in sorted(r2k, key=lambda x: x["ticker"]):
+        t = r["ticker"]
+        if t in have:
+            continue
+        have.add(t)
+        rows.append([t, 2, SYMBOL_OVERRIDE.get(t, f'{r["exchange"]}:{t}' if r["exchange"] else t)])
     return rows
 
 

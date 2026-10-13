@@ -276,6 +276,12 @@ def main(argv=None):
                 hve.refresh_ever(hve.candidates(store.apply_splits(bars, splits), universe, store.theme_tickers()))
         except Exception as e:
             log.warning("record volume history skipped: %s", e)
+        try:   # Russell 2000 members and weights (iShares IWM holdings; cached)
+            from . import russell
+            if config.LEVELS_ENABLED:
+                russell.refresh()
+        except Exception as e:
+            log.warning("Russell 2000 holdings skipped: %s", e)
         try:   # macro drivers strip (Yahoo futures; cached, ETF fallback)
             from . import macro
             if config.LEVELS_ENABLED:
