@@ -12,7 +12,10 @@ METRIC_COLS = [
     "up4", "dn4", "ratio5", "ratio10", "up4_avg40",
     "up25q", "dn25q", "up25m", "dn25m", "up50m", "dn50m",
     "up13_34", "dn13_34", "t2108", "universe",
+    "nh", "nl", "nhnl", "nh10", "nl10", "near_hi", "pct_near", "pct_near10", "spy_off_hi",
 ]
+HI_DAYS = 252        # 52-week window for new highs / lows
+NEAR_HI = 0.97       # "near a high" = close within 3% of the 52-week high
 LOOKBACK_NEEDED = C.QUARTER_DAYS + 1   # rows needed before every metric is valid
 
 
@@ -22,9 +25,10 @@ def wide(bars):
     return close.astype("float64"), vol.astype("float64")
 
 
-def compute(bars):
+def compute(bars, bench=None):
     """Return a DataFrame indexed by date with METRIC_COLS plus `complete`
-    (True once the full lookback is available for that row)."""
+    (True once the full lookback is available for that row). `bench` = SPY bars
+    (optional) for the leadership-divergence signal."""
     close, vol = wide(bars)
     prev_c, prev_v = close.shift(1), vol.shift(1)
     chg = close / prev_c - 1
@@ -65,6 +69,25 @@ def compute(bars):
         "up50m": up50m, "dn50m": dn50m, "up13_34": up13, "dn13_34": dn13,
         "t2108": t2108, "universe": liquid.sum(axis=1),
     })
+    # ---- 52-week new highs / lows and stocks near their high (liquid stocks with a year of history) ----
+    hp = "h" in bars.columns and "l" in bars.columns
+    high = bars.pivot(index="date", columns="ticker", values="h").reindex_like(close).astype("float64") if hp else close
+    low = bars.pivot(index="date", columns="ticker", values="l").reindex_like(close).astype("float64") if hp else close
+    prior_hi = high.shift(1).rolling(HI_DAYS - 1, min_periods=HI_DAYS - 3).max()
+    prior_lo = low.shift(1).rolling(HI_DAYS - 1, min_periods=HI_DAYS - 3).min()
+    year_ok = liquid & prior_hi.notna()
+    nh = ((high > prior_hi) & year_ok).sum(axis=1)
+    nl = ((low < prior_lo) & year_ok).sum(axis=1)
+    hi52 = np.fmax(prior_hi, high)
+    near = ((close >= NEAR_HI * hi52) & year_ok).sum(axis=1)
+    pct_near = 100 * near / year_ok.sum(axis=1).replace(0, np.nan)
+    out["nh"], out["nl"], out["nhnl"] = nh, nl, nh - nl
+    out["nh10"], out["nl10"] = nh.rolling(10).mean(), nl.rolling(10).mean()
+    out["near_hi"], out["pct_near"], out["pct_near10"] = near, pct_near, pct_near.rolling(10).mean()
+    out["spy_off_hi"] = np.nan
+    if bench is not None and len(bench):
+        sc = bench.drop_duplicates("date").set_index("date")["c"].astype("float64").reindex(close.index)
+        out["spy_off_hi"] = sc / sc.rolling(HI_DAYS, min_periods=HI_DAYS - 3).max() - 1
     out.index.name = "date"
     out["complete"] = np.arange(len(out)) >= LOOKBACK_NEEDED
     # Blank out metrics whose own lookback isn't filled yet.
@@ -73,7 +96,9 @@ def compute(bars):
                       ("up25m", C.MONTH_DAYS), ("dn25m", C.MONTH_DAYS),
                       ("up50m", C.MONTH_DAYS), ("dn50m", C.MONTH_DAYS),
                       ("up13_34", C.D34_DAYS), ("dn13_34", C.D34_DAYS),
-                      ("t2108", C.MA_DAYS + 20), ("up4", 1), ("dn4", 1)]:
+                      ("t2108", C.MA_DAYS + 20), ("up4", 1), ("dn4", 1),
+                      ("nh", HI_DAYS), ("nl", HI_DAYS), ("nhnl", HI_DAYS), ("near_hi", HI_DAYS),
+                      ("pct_near", HI_DAYS), ("nh10", HI_DAYS + 9), ("nl10", HI_DAYS + 9), ("pct_near10", HI_DAYS + 9)]:
         out.loc[n < need, col] = np.nan
     return out
 
@@ -89,6 +114,9 @@ def merge(history, fresh):
     if len(history):
         new_dates = fresh.index.difference(history.index)
         keep = pd.concat([keep, fresh.loc[new_dates.difference(keep.index)]])
+        both = keep.index.intersection(history.index)     # a blank fresh value never erases a stored one
+        if len(both):
+            keep.loc[both] = keep.loc[both].combine_first(history.loc[both, history.columns.intersection(keep.columns)])
         history = history.drop(index=keep.index.intersection(history.index))
         merged = pd.concat([history, keep])
     else:
@@ -219,6 +247,10 @@ EVENT_INFO = {
                  "20-day avg of 4% breakouts ({u20:.0f}) fell below both its 40-day avg and 20-day breakdowns ({d20:.0f}) for 3 days"),
     "extended": ("minor", "Extended",
                  "T2108 reached {t2108:.0f}: broad overbought, pullback risk rises"),
+    "narrowing": ("minor", "Leadership narrowing",
+                  "SPY is within 1% of its 52-week high but only {pct_near10:.1f}% of stocks are near theirs (10-day avg), down from {pn_max:.1f}%"),
+    "highs_lead": ("minor", "New highs take over",
+                   "10-day avg of new 52-week highs ({nh10:.0f}) moved above new lows ({nl10:.0f}) for 3 days after a stretch of lows leading"),
 }
 
 
@@ -240,7 +272,13 @@ def events(history):
         held = cond.rolling(hold).sum() == hold
         return held & ~held.shift(1, fill_value=False)
 
-    buyers = turned_on((c["u20"] > c["up4_avg40"]) & (c["u20"] > c["d20"]))
+    has_hl = "nh10" in c.columns and c["nh10"].notna().any()
+    if has_hl:
+        c["pn_max"] = c["pct_near10"].rolling(60, min_periods=20).max()
+        narrowing = turned_on((c["spy_off_hi"] >= -0.01) & (c["pct_near10"] <= 0.6 * c["pn_max"]))
+        lows_led = (c["nl10"] > c["nh10"]).rolling(20, min_periods=20).sum().shift(3) >= 15
+        highs_lead = turned_on(c["nh10"] > c["nl10"]) & lows_led
+        buyers = turned_on((c["u20"] > c["up4_avg40"]) & (c["u20"] > c["d20"]))
     sellers = turned_on((c["u20"] < c["up4_avg40"]) & (c["u20"] < c["d20"]))
 
     out, last = [], {}
@@ -254,7 +292,7 @@ def events(history):
         last[kind] = i
         r = c.loc[d]
         tier, label, tmpl = EVENT_INFO[kind]
-        vals = {k: (0 if pd.isna(r[k]) else r[k]) for k in ("up4", "mult", "t2108", "u20", "d20")}
+        vals = {k: (0 if k not in r or pd.isna(r[k]) else r[k]) for k in ("up4", "mult", "t2108", "u20", "d20", "pct_near10", "pn_max", "nh10", "nl10")}
         out.append({"date": d.strftime("%Y-%m-%d"), "kind": kind, "tier": tier,
                     "label": label, "detail": tmpl.format(**vals)})
         return True
@@ -275,6 +313,10 @@ def events(history):
             last["side"] = "buyers"
         if sellers.loc[d] and last.get("side") != "sellers" and add("sellers", d, 15):
             last["side"] = "sellers"
+        if has_hl and narrowing.loc[d]:
+            add("narrowing", d, 20)
+        if has_hl and highs_lead.loc[d]:
+            add("highs_lead", d, 20)
     return out
 
 

@@ -75,6 +75,8 @@ h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
 .tile .v { font-size: 26px; font-weight: 600; margin-top: 2px; letter-spacing: -0.02em; }
 .tile .s { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 @media (max-width: 900px) { .tiles { grid-template-columns: repeat(3, 1fr); } }
+.tiles.tiles4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) { .tiles.tiles4 { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 520px) { .tiles { grid-template-columns: repeat(2, 1fr); } .tile .v { font-size: 22px; } }
 
 /* Charts */
@@ -1098,6 +1100,18 @@ function renderBreadth(app) {
   const tl = $('<section class="tiles"></section>');
   tiles.forEach(([k, v, s]) => tl.append($(`<div class="card tile"><div class="k">${k}</div><div class="v num">${v}</div><div class="s">${s}</div></div>`)));
   app.append(tl);
+  if (last.nh != null) {
+    const sg = (v) => v == null ? "–" : (v > 0 ? "+" : "") + fmt(v);
+    const t2 = [
+      ["New 52-wk highs", fmt(last.nh), `10-day avg ${fmt(last.nh10)}`],
+      ["New 52-wk lows", fmt(last.nl), `10-day avg ${fmt(last.nl10)}`],
+      ["Highs − lows", sg(last.nhnl), `10-day avg ${sg(last.nh10 != null ? Math.round(last.nh10 - last.nl10) : null)}`],
+      ["Near a 52-wk high", fmt(last.pct_near, 1) + "%", `${fmt(last.near_hi)} stocks within 3% · 10-day avg ${fmt(last.pct_near10, 1)}%`],
+    ];
+    const tl2 = $('<section class="tiles tiles4"></section>');
+    t2.forEach(([k, v, sub]) => tl2.append($(`<div class="card tile"><div class="k">${k}</div><div class="v num">${v}</div><div class="s">${sub}</div></div>`)));
+    app.append(tl2);
+  }
   IDX = Object.fromEntries(rows.map((r, i) => [r.date, i]));
   EVBY = {}; (DATA.events || []).forEach(e => { (EVBY[e.date] = EVBY[e.date] || []).push(e); });
   app.append(signalsCard());
@@ -1117,13 +1131,17 @@ function renderBreadth(app) {
   charts.append(chartTrend(rows));
   charts.append(chartRatios(rows));
   charts.append(chartT2108(rows));
+  charts.append(chartHighsLows(rows));
+  charts.append(chartNearHigh(rows));
   syncScroll([...charts.querySelectorAll(".scroller")], bar, rows);
   app.append(table(rows));
 
   app.append($(`<footer>
     <b>Definitions.</b> Universe: US common stocks, close ≥ $3. 4% days: close ≥ 4% above (or below) the prior close on volume above the prior day and ≥ 100k.
     5/10-day ratio: sum of 4% up days ÷ sum of 4% down days over the window. 25%/qtr: change over 65 trading days; month: 20 days; 34-day: 13%.
-    Slower metrics and T2108 use stocks with 20-day avg volume ≥ 100k. Table shading compares each value with your own history (darker = beyond the 10th/90th percentile).
+    Slower metrics and T2108 use stocks with 20-day avg volume ≥ 100k.
+    New 52-week highs / lows: liquid stocks with a year of history whose high (low) beat every day of the prior year; "near a high" = close within 3% of the 52-week high.
+    Leadership narrowing: SPY within 1% of its 52-week high while the 10-day average of stocks near their highs is 40%+ below its 60-day peak. New highs take over: the 10-day average of new highs moves above new lows for 3 days after weeks of lows leading. Table shading compares each value with your own history (darker = beyond the 10th/90th percentile).
     Regime thresholds are starter values; calibrate them in <code>breadth/config.py</code>.
     · <a href="breadth.csv">Download full history (CSV)</a></footer>`));
 }
@@ -1136,6 +1154,8 @@ const EV_STYLE = {
   buyers:        { color: "var(--up)",       dash: "",     short: "Buyers",     icon: "up" },
   sellers:       { color: "var(--down)",     dash: "",     short: "Sellers",    icon: "down" },
   extended:      { color: "var(--warning)",  dash: "",     short: "Extended",   icon: "warn" },
+  narrowing:     { color: "var(--warning)",  dash: "",     short: "Narrowing",  icon: "warn" },
+  highs_lead:    { color: "var(--up)",       dash: "",     short: "Highs lead", icon: "up" },
 };
 const EV_ICON = {
   up:   '<path d="M3 13l5-5 3 3 6-6M12 5h5v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -1411,6 +1431,46 @@ function chartT2108(rows) {
   return c.el;
 }
 
+function chartHighsLows(rows) {
+  const c = frame("New 52-week highs vs new 52-week lows",
+    '<span><i style="background:var(--up)"></i>New highs</span><span><i style="background:var(--down)"></i>New lows</span><span><i class="line" style="background:var(--text-secondary)"></i>10-day averages</span>');
+  const vals = rows.flatMap(r => [r.nh || 0, r.nl || 0]).sort((a, b) => a - b);
+  const mx = niceMax((vals[Math.floor(vals.length * 0.95)] || 10) * 1.05);
+  const mid = M.t + (c.h - M.t - M.b) / 2, half = (c.h - M.t - M.b) / 2;
+  const cap = (v) => Math.min(v, mx);
+  const y = (v) => mid - cap(v) / mx * half, yd = (v) => mid + cap(v) / mx * half;
+  const x = axes(c, rows, y, [mx, mx / 2, 0], v => fmt(v));
+  [mx / 2, mx].forEach(t => { S("line", { x1: M.l, x2: W - M.r, y1: yd(t), y2: yd(t), stroke: "var(--grid)" }, c.svg); yLabel(c, yd(t), fmt(t)); });
+  const bw = (W - M.l - M.r) / rows.length, w = Math.max(1, bw - 2);
+  rows.forEach((r, i) => {
+    const x0 = x(i) - w / 2;
+    if (r.nh) S("rect", { x: x0, y: y(r.nh), width: w, height: mid - y(r.nh), rx: Math.min(2, w / 3), fill: "var(--up)" }, c.svg);
+    if (r.nl) S("rect", { x: x0, y: mid, width: w, height: yd(r.nl) - mid, rx: Math.min(2, w / 3), fill: "var(--down)" }, c.svg);
+  });
+  S("line", { x1: M.l, x2: W - M.r, y1: mid, y2: mid, stroke: "var(--text-muted)", "stroke-width": 1 }, c.svg);
+  eventLines(c, x, false);
+  S("path", { d: path(rows, x, y, "nh10"), fill: "none", stroke: "var(--text-secondary)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  S("path", { d: path(rows, x, yd, "nl10"), fill: "none", stroke: "var(--text-secondary)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  eventMarkers(c, x, y, rows, "nh10", ["highs_lead"]);
+  hover(c, rows, x, [["New highs", r => fmt(r.nh)], ["New lows", r => fmt(r.nl)], ["Highs − lows", r => r.nhnl == null ? "–" : (r.nhnl > 0 ? "+" : "") + fmt(r.nhnl)], ["10-day avg highs / lows", r => r.nh10 == null ? "–" : fmt(r.nh10) + " / " + fmt(r.nl10)]]);
+  return c.el;
+}
+function chartNearHigh(rows) {
+  const c = frame("% of stocks within 3% of their 52-week high",
+    '<span><i class="line" style="background:var(--s1)"></i>% near a high</span><span><i class="line" style="background:var(--text-muted)"></i>10-day average</span>');
+  const vals = rows.map(r => r.pct_near).filter(v => v != null).sort((a, b) => a - b);
+  const mx = niceMax((vals[Math.floor(vals.length * 0.98)] || 10) * 1.1);
+  const y = (v) => M.t + (1 - Math.min(v, mx) / mx) * (c.h - M.t - M.b);
+  const x = axes(c, rows, y, [0, mx / 2, mx], v => fmt(v, 0) + "%");
+  S("path", { d: path(rows, x, y, "pct_near10"), fill: "none", stroke: "var(--text-muted)", "stroke-width": 1.5, "stroke-dasharray": "4 3" }, c.svg);
+  S("path", { d: path(rows, x, y, "pct_near"), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  endLabel(c.svg, x, y, rows, "pct_near", "", "var(--s1)");
+  eventLines(c, x, false);
+  eventMarkers(c, x, y, rows, "pct_near10", ["narrowing"]);
+  hover(c, rows, x, [["Near a 52-week high", r => r.pct_near == null ? "–" : fmt(r.pct_near, 1) + "% (" + fmt(r.near_hi) + " stocks)"], ["10-day average", r => r.pct_near10 == null ? "–" : fmt(r.pct_near10, 1) + "%"], ["SPY vs its 52-week high", r => r.spy_off_hi == null ? "–" : pct(r.spy_off_hi)]]);
+  return c.el;
+}
+
 /* ---------- Market Monitor table ---------- */
 const COLS = [
   ["up4", "Up 4%", "today", "up"], ["dn4", "Down 4%", "today", "down"],
@@ -1419,7 +1479,9 @@ const COLS = [
   ["up25m", "Up 25%", "month", "up", 0, true], ["dn25m", "Down 25%", "month", "down"],
   ["up50m", "Up 50%", "month", "up", 0, true], ["dn50m", "Down 50%", "month", "down"],
   ["up13_34", "Up 13%", "34 days", "up", 0, true], ["dn13_34", "Down 13%", "34 days", "down"],
-  ["t2108", "T2108", "% > 40MA", "t2108", 1, true], ["universe", "Stocks", "universe", "none", 0, true],
+  ["t2108", "T2108", "% > 40MA", "t2108", 1, true],
+  ["nh", "New highs", "52-wk", "up", 0, true], ["nl", "New lows", "52-wk", "down"], ["pct_near", "Near high", "% within 3%", "none", 1],
+  ["universe", "Stocks", "universe", "none", 0, true],
 ];
 function shade(key, kind, v) {
   if (v == null) return "";

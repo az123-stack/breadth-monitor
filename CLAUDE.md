@@ -32,7 +32,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - `store.py` parquet bars in `data/bars/` (500 trading days ≈ the free plan's 2-year reach, raw; splits applied in memory),
   themes/subthemes/names loaders, TradingView exchange map
 - `update.py` entry point: `python -m breadth.update [--rebuild-only] [--backfill-days N] [--extend-history]`
-- `metrics.py` breadth metrics, regime classifier, chart events
+- `metrics.py` breadth metrics, regime classifier, chart events. New highs/lows (Oct 12): `nh`, `nl`, `nhnl`, `nh10`, `nl10`
+  (liquid stocks with a year of history; high above every prior-year high), `near_hi` / `pct_near` / `pct_near10` (close within
+  3% of the 52-week high), `spy_off_hi` (SPY bars passed as `bench`). Need 252 sessions of bars, so `merge` keeps stored values
+  when a fresh one is blank. Events: "narrowing" (SPY within 1% of its high, pct_near10 ≤ 60% of its 60-day max, 3 days) and
+  "highs_lead" (nh10 > nl10 for 3 days after nl10 led 15 of 20). Breadth tab: 4 tiles, two charts, table columns.
+  First look (Nov 2025–Sep 2026, ~210 days): high pct_near was followed by weaker SPY 20-day returns (corr −0.39, top quartile
+  −0.4% vs bottom +3.3%); SPY-near-high divergence days −0.4% vs +1.2% (n 12). Context, not a timing signal.
 - `themes.py` sheet port: theme Score /8, rotation, setup score, long/short pulse, ranks, payload
 - `strength.py` v2: RS Rating, RS-line ★/⚑ flags, tightness, Theme Strength
 - `setups.py` momentum bursts (2LYNCH), anticipation, episodic pivots, regime trade stats

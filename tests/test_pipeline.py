@@ -563,6 +563,23 @@ def test_record_volume():
     return "ok"
 
 
+def test_new_highs_lows():
+    n = 300
+    closes = {"UP": [10 + 0.05 * i for i in range(n)], "DN": [40 - 0.05 * i for i in range(n)],
+              "FLAT": [20.0 + (0.5 if i % 2 else 0) for i in range(n)]}
+    vols = {t: [200000 + (i % 3) for i in range(n)] for t in closes}
+    bars = make_bars(closes, vols)
+    m = metrics.compute(bars)
+    assert m["nh"].iloc[:251].isna().all() and m["nh"].iloc[-1] == 1 and m["nl"].iloc[-1] == 1
+    assert m["near_hi"].iloc[-1] == 2 and abs(m["pct_near"].iloc[-1] - 200 / 3) < 1e-6      # UP and FLAT within 3%
+    # a blank fresh value never erases a stored one (the 52-week window needs a year of bars)
+    hist = m.copy()
+    fresh = m.copy(); fresh.loc[fresh.index[260], "nh"] = np.nan
+    merged = metrics.merge(hist, fresh)
+    assert merged.loc[fresh.index[260], "nh"] == hist.loc[fresh.index[260], "nh"]
+    return "ok"
+
+
 def test_intraday_sheet_rows():
     from breadth import intraday
     old = config.DATA_DIR

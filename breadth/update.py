@@ -153,7 +153,7 @@ def recompute_and_publish(bars, splits, universe, state):
     # Breadth stays on the common-stock universe; theme ETFs/ADRs are excluded.
     extras = store.theme_tickers() - set(universe)
     stocks = adjusted[~adjusted["ticker"].isin(extras)]
-    fresh = metrics.compute(stocks)
+    fresh = metrics.compute(stocks, bench=adjusted[adjusted["ticker"] == config.BENCHMARK])
     history = metrics.merge(store.load_breadth(), fresh)
     store.save_breadth(history)
     try:
