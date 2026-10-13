@@ -110,6 +110,56 @@ def parse_ssga(content):
     return out, asof
 
 
+VANGUARD = "https://investor.vanguard.com/investment-products/etfs/profile/api/VTWO/portfolio-holding/stock"
+
+
+def _find_rows(obj):
+    """First list of dicts in a JSON blob whose items carry a ticker."""
+    if isinstance(obj, list):
+        if obj and isinstance(obj[0], dict) and any("ticker" in k.lower() for k in obj[0]):
+            return obj
+        for x in obj:
+            r = _find_rows(x)
+            if r:
+                return r
+    elif isinstance(obj, dict):
+        for v in obj.values():
+            r = _find_rows(v)
+            if r:
+                return r
+    return None
+
+
+def parse_vanguard_page(text):
+    import json
+    items = _find_rows(json.loads(text)) or []
+    out = []
+    for it in items:
+        k = {key.lower(): key for key in it}
+        t = str(it.get(k.get("ticker", ""), "") or "").strip().upper()
+        wk = next((k[x] for x in k if "weight" in x or x in ("percentofnetassets", "pctofnetassets")), None)
+        w = _num(it.get(wk)) if wk else None
+        sk = next((k[x] for x in k if "sector" in x), None)
+        if t and w and w > 0:
+            out.append({"ticker": t.replace(" ", "."), "weight": w, "sector": str(it.get(sk) or "Other").strip() if sk else "Other", "exchange": ""})
+    return out, len(items)
+
+
+def fetch_vanguard(s):
+    rows, start = [], 1
+    while start < 4000:
+        r = s.get(VANGUARD, params={"start": start, "count": 500}, headers={**UA, "Accept": "application/json"}, timeout=60)
+        r.raise_for_status()
+        got, n = parse_vanguard_page(r.text)
+        if start == 1 and not got:
+            raise ValueError("no rows: " + r.text[:160])
+        rows += got
+        if n < 500:
+            break
+        start += 500
+    return rows, None
+
+
 def refresh(session=None):
     """Tries iShares CSV (with the product page's cookies), iShares JSON, then SSGA's TWOK file."""
     s = session or requests.Session()
@@ -119,8 +169,18 @@ def refresh(session=None):
         s.get(PRODUCT, headers=UA, timeout=30)          # sets the site's cookies
     except Exception as e:
         tries.append({"src": "product page", "error": str(e)[:200]})
-    for name, url, how in [("ishares csv", URL, "csv"), ("ishares json", JSON_URL, "json"), ("ssga twok", SSGA_URL, "xlsx")]:
+    for name, url, how in [("ishares csv", URL, "csv"), ("ishares json", JSON_URL, "json"), ("vanguard vtwo", VANGUARD, "vg")]:
         t, r = {"src": name}, None
+        if how == "vg":       # paginated JSON (Vanguard Russell 2000 ETF: same index)
+            try:
+                rows, asof = fetch_vanguard(s)
+                tries.append({**t, "rows": len(rows)})
+                if len(rows) >= 1000:
+                    break
+            except Exception as e:
+                tries.append({**t, "error": str(e)[:300]})
+                rows = []
+            continue
         try:
             r = s.get(url, headers={**UA, "Referer": PRODUCT}, timeout=60)
             t = {"src": name, "http": r.status_code, "type": r.headers.get("content-type"), "bytes": len(r.content)}
