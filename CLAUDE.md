@@ -169,6 +169,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   retracement of the 20-session leg into the record day (touch within 20 sessions, close above), at the hold-day close or on a
   "pop back" (close above the hold day's high within 3 days), with or without a stop 0.5 ADR under the level: negative in both
   halves for all events (−1% to −9% vs SPY); cleaned set slightly positive in train (+0.3 to +2%), negative in test. No edge.
+  By market type (first level touched per event, hold-day close): all events negative in every breadth regime and SPY trend
+  (strong −6.1% t −4.4, mixed −6.8% t −6.6, weak −2.4% t −2.6; SPY uptrend −6.1% t −8.0, downtrend −3.0%); worst in strong/mixed
+  and SPY uptrends. Cleaned set ≈ 0 in all; strong breadth + deeper leg retracements (38.2/61.8%) +2–3% but n 22–31, and strong
+  train +1.8% → test −3.2% (n 13). Strong-breadth sample too small to trust.
 - Limits: survivorship bias in backfill, small strong-regime sample, no costs, no intraday H/L/volume.
 
 ## Working preferences
