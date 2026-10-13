@@ -1,5 +1,5 @@
 {
- "at": "2026-10-13T15:20:21+00:00",
+ "at": "2026-10-13T15:28:03+00:00",
  "ok": false,
  "rows": 0,
  "asof": null,
@@ -8,7 +8,7 @@
    "src": "ishares csv",
    "http": 200,
    "type": "text/csv;charset=UTF-8",
-   "bytes": 1512832,
+   "bytes": 1512972,
    "error": "no holdings header",
    "head": "<!DOCTYPE html>\n<html xmlns=\"http://www.w3.org/1999/xhtml\" prefix=\"og: http://ogp.me/ns#\" lang=\"en-US\" xml:lang=\"en-US\">\n<head>\n<link rel=\"preload\" href=\"/blk-o"
   },
@@ -16,17 +16,13 @@
    "src": "ishares json",
    "http": 200,
    "type": "application/json;charset=UTF-8",
-   "bytes": 1512805,
+   "bytes": 1512945,
    "error": "Expecting value: line 1 column 1 (char 0)",
    "head": "<!DOCTYPE html>\n<html xmlns=\"http://www.w3.org/1999/xhtml\" prefix=\"og: http://ogp.me/ns#\" lang=\"en-US\" xml:lang=\"en-US\">\n<head>\n<link rel=\"preload\" href=\"/blk-o"
   },
   {
-   "src": "ssga twok",
-   "http": 404,
-   "type": "text/html;charset=utf-8",
-   "bytes": 42302,
-   "error": "404 Client Error: Not Found for url: https://www.ssga.com/library-content/products/fund-data/etfs/us/holdings-daily-us-en-twok.xlsx",
-   "head": "\n\n\n\n\n\n\n\n\n\n<!DOCTYPE HTML>\n<html lang=\"en\" dir=\"ltr\">\n\n   \n   <head>\n    <meta charset=\"UTF-8\"/>\n    <title>404 Error Page</title>\n    \n    \n    <meta name=\"temp"
+   "src": "vanguard vtwo",
+   "error": "Expecting value: line 1 column 1 (char 0)"
   }
  ]
 }
