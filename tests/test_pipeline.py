@@ -515,6 +515,10 @@ def test_rotation_ideas():
     assert p0["trigger"] >= p0["price"] and abs(p0["stop"] - p0["trigger"] * 0.96) < 0.02
     assert "Down" in [a["group"] for a in out["avoid"]]
     assert out["bt"]["lead"]["all"]["n"] > 0 and out["state_key"] == "mixed"
+    fl = {r["g"]: r for r in out["flow"]["rows"]}                  # money flow tiers
+    assert fl["Up"]["tier"] in ("confirmed", "steady") and fl["Down"]["tier"] == "outflow", (fl["Up"]["tier"], fl["Down"]["tier"])
+    assert fl["Up"]["x"] > 100 and fl["Down"]["x"] < 100 and len(fl["Up"]["tail"]) == out["flow"]["tail_days"]
+    assert out["flow"]["stock_group"]["U0"] == "Up" and "confirmed" in out["flow"]["evidence"]
     json_ok = __import__("json").dumps(out)
     return f"{len(out['ideas'])} idea, {len(out['avoid'])} avoid"
 

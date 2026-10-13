@@ -207,8 +207,12 @@ def screen(w, rating, universe, names, theme_of=None, cache=None, regimes=None):
     rows = sorted(latest.values(), key=lambda r: (r["ago"], -(r["dollars"] or 0)))
     ev = None
     try:
+        if "SPY" not in w["c"].columns:
+            raise LookupError("no SPY")
         ev = evidence(c, v, h, l, w["c"]["SPY"], rating.reindex(index=c.index, columns=c.columns) if rating is not None else None,
                       regimes if regimes is not None else pd.Series(dtype=object), liq)
+    except LookupError:
+        ev = None
     except Exception as e:
         log.exception("hve evidence failed: %s", e)
     return {"rows": rows[:120], "count": len(rows), "evidence": ev,

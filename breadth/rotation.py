@@ -33,7 +33,7 @@ def _wide(adjusted, tickers):
     sub = adjusted[adjusted["ticker"].isin(tickers)]
     piv = lambda k: sub.pivot_table(index="date", columns="ticker", values=k).sort_index()
     c = piv("c")
-    return c, piv("h").reindex_like(c), piv("l").reindex_like(c)
+    return c, piv("h").reindex_like(c), piv("v").reindex_like(c)
 
 
 def group_frames(close, members, bench="SPY"):
@@ -152,13 +152,114 @@ def stock_plan(s, hi5):
             "risk": round(adr, 4) if adr else None, "star": bool(s.get("rs_nh")), "lead": bool(s.get("rs_lead"))}
 
 
+
+# ---------------------------------------------------------------------------
+# Money flow: Relative Rotation Graph + volume accumulation, with confidence tiers
+# ---------------------------------------------------------------------------
+TIERS = [  # key, label, plain meaning
+    ("confirmed", "Confirmed inflow", "Money has been flowing in and it's still accelerating, or it's been leading for weeks with buying volume behind it."),
+    ("steady", "Steady inflow", "Leading SPY on most days for three weeks; volume isn't confirming it as strongly."),
+    ("new", "New this week", "Just moved into the Leading corner. Early: on its own this hasn't shown an edge yet."),
+    ("fading", "Fading", "Still ahead of SPY but losing momentum: money is starting to slow."),
+    ("bouncing", "Bouncing", "Was lagging and is improving. These bounces have tended to fail."),
+    ("outflow", "Outflow", "Lagging SPY and losing momentum, or volume shows selling: money leaving."),
+    ("neutral", "No clear flow", ""),
+]
+SUSTAIN = (10, 15)    # in the Leading quadrant on at least 10 of the last 15 sessions
+ACC_MIN = 0.15        # 10-day up-volume minus down-volume, as a share of dollar volume
+TAIL = 15             # sessions of tail on the graph
+
+
+def flow_frames(close, vol, members, F):
+    rel = F["rel"]
+    x = (100 * rel / rel.rolling(50).mean()).ewm(span=5, adjust=False).mean()   # trend vs SPY (RS-Ratio)
+    y = 100 * x / x.shift(10)                                                  # momentum of that trend (RS-Momentum)
+    dv = close * vol
+    sg = np.sign(close / close.shift(1) - 1)
+    acc, part = {}, {}
+    for g in rel.columns:
+        t = [q for q in members[g] if q in close.columns]
+        acc[g] = (dv[t] * sg[t]).sum(axis=1).rolling(10).sum() / dv[t].sum(axis=1).rolling(10).sum()
+        d = dv[t].sum(axis=1)
+        part[g] = d.rolling(10).mean() / d.rolling(50).mean()
+    acc, part = pd.DataFrame(acc), pd.DataFrame(part)
+    lead = (x > 100) & (y > 100)
+    sust = lead.rolling(SUSTAIN[1]).sum() >= SUSTAIN[0]
+    new = lead & ~lead.shift(5, fill_value=False).astype(bool)
+    accp = acc > ACC_MIN
+    conf = F["lead"] | (sust & accp)
+    steady = sust & ~conf
+    newt = new & ~sust & ~conf
+    fading = (x > 100) & (y < 100) & ~conf & ~steady
+    outflow = (((x < 100) & (y < 100)) | ((x < 100) & (acc < -ACC_MIN))) & ~conf & ~steady & ~newt
+    bouncing = (x < 100) & (y > 100) & ~newt & ~outflow & ~conf & ~steady
+    tiers = {"confirmed": conf, "steady": steady, "new": newt, "fading": fading, "bouncing": bouncing, "outflow": outflow}
+    return {"x": x, "y": y, "acc": acc, "part": part, "lead": lead, "tiers": tiers}
+
+
+def flow_safe(*a):
+    try:
+        return flow_build(*a)
+    except Exception as e:  # never lose the ideas card over the flow panel
+        import logging
+        logging.getLogger("breadth").exception("money flow failed: %s", e)
+        return None
+
+
+def tier_of(FL, g, i=-1):
+    for k, _, _ in TIERS[:-1]:
+        if bool(FL["tiers"][k][g].iloc[i]):
+            return k
+    return "neutral"
+
+
+def flow_evidence(F, FL, regimes):
+    out = {}
+    for k, _, _ in TIERS[:-1]:
+        e = evidence({"rel": F["rel"], "lead": FL["tiers"][k], "cross": FL["tiers"][k], "weak": FL["tiers"][k]}, regimes)
+        out[k] = e["lead"]
+    e = evidence({"rel": F["rel"], "lead": F["lead"], "cross": F["lead"], "weak": F["lead"]}, regimes)
+    out["_meta"] = {k: e[k] for k in ("hold", "from", "to", "groups")}
+    return out
+
+
+def flow_build(close, vol, members, F, regimes, subs, stocks):
+    FL = flow_frames(close, vol, members, F)
+    x, y, acc, part, rel = FL["x"], FL["y"], FL["acc"], FL["part"], F["rel"]
+    groups = list(rel.columns)
+    rows = []
+    for g in groups:
+        if x[g].iloc[-1] != x[g].iloc[-1] or y[g].iloc[-1] != y[g].iloc[-1]:
+            continue
+        r = subs.get(g, {})
+        tail = [[round(float(x[g].iloc[i]), 2), round(float(y[g].iloc[i]), 2)] for i in range(-TAIL, 0)
+                if x[g].iloc[i] == x[g].iloc[i] and y[g].iloc[i] == y[g].iloc[i]]
+        r5 = rel[g].iloc[-1] / rel[g].iloc[-6] - 1
+        r20 = rel[g].iloc[-1] / rel[g].iloc[-21] - 1
+        rows.append({"g": g, "sector": r.get("group", ""), "tier": tier_of(FL, g), "x": tail[-1][0], "y": tail[-1][1], "tail": tail,
+                     "lead15": int(FL["lead"][g].iloc[-SUSTAIN[1]:].sum()), "acc": round(float(acc[g].iloc[-1]), 3),
+                     "part": round(float(part[g].iloc[-1]), 2) if part[g].iloc[-1] == part[g].iloc[-1] else None,
+                     "r5": round(float(r5), 4), "r20": round(float(r20), 4), "strength": r.get("strength"), "s_rank": r.get("s_rank"),
+                     "tier5": tier_of(FL, g, -6), "n": len([t for t in members[g] if t in close.columns])})
+    order = {k: i for i, (k, _, _) in enumerate(TIERS)}
+    rows.sort(key=lambda r: (order[r["tier"]], r["r20"] if r["tier"] in ("outflow", "fading") else -r["r20"]))
+    stock_tier = {}
+    for g in groups:
+        for t in members[g]:
+            stock_tier[t] = g
+    return {"rows": rows, "tiers": [{"k": k, "label": l, "desc": d} for k, l, d in TIERS],
+            "evidence": flow_evidence(F, FL, regimes), "tail_days": TAIL,
+            "dates": [close.index[-TAIL].strftime("%Y-%m-%d"), close.index[-1].strftime("%Y-%m-%d")],
+            "stock_group": {t: g for t, g in stock_tier.items() if t in (stocks or {})}}
+
+
 def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub_members=None):
     T = theme_data or {}
     subs = {r["theme"]: r for r in T.get("subthemes") or []}
     if sub_members is None:
         sub_members = {g: r.get("members") or [] for g, r in subs.items()}
     tick = sorted({t for v in sub_members.values() for t in v} | {"SPY"})
-    close, high, _ = _wide(adjusted, tick)
+    close, high, vol = _wide(adjusted, tick)
     if "SPY" not in close.columns or len(close) < HI_DAYS + MA + 5:
         return None
     F = group_frames(close, sub_members)
@@ -258,4 +359,5 @@ def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub
             "ideas": ideas, "lead_count": len(lead_now),
             "more": [g for g in lead_now if g not in chosen and not any(g in v for v in also.values())], "avoid": [brief(g) for g in avoid],
             "turning": [{**brief(g), "days": int(len(F["cross"][g]) - 1 - np.flatnonzero(F["cross"][g].to_numpy())[-1])} for g in turning],
-            "bt": ev, "spark_dates": [d.strftime("%Y-%m-%d") for d in dates[-60:]]}
+            "bt": ev, "spark_dates": [d.strftime("%Y-%m-%d") for d in dates[-60:]],
+            "flow": flow_safe(close, vol, sub_members, F, regimes, subs, stocks)}

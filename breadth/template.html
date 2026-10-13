@@ -436,6 +436,25 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .rchip { background: var(--surface-0); border: 1px solid var(--border); border-radius: 7px; padding: 3px 8px; font: inherit; font-size: 12px; color: var(--text-primary); cursor: pointer; }
 .rchip .up { color: var(--good); } .rchip .dn { color: var(--critical); }
 @media (max-width: 520px) { .rhead { flex-direction: column; } .rspark { text-align: left; } }
+
+.flowcard .flook { margin: 10px 0 4px; } .flowcard .flook input { width: min(360px, 100%); background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font: inherit; font-size: 13.5px; }
+.flookout { margin-top: 6px; font-size: 13.5px; color: var(--text-primary); } .flookout .meta { font-size: 12.5px; }
+.fgrid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 14px; margin-top: 6px; }
+.fgrid2 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 10px; }
+@media (max-width: 1000px) { .fgrid, .fgrid2 { grid-template-columns: 1fr; } }
+.rrgwrap { position: relative; } .rrgwrap svg { display: block; overflow: visible; }
+.rrgwrap text { font-family: Inter, system-ui, sans-serif; }
+.rrgq { fill: var(--text-secondary); font-size: 13px; font-weight: 700; } .rrgqs { fill: var(--text-muted); font-size: 11px; }
+.rrgax { fill: var(--text-muted); font-size: 11.5px; } .rrglab { fill: var(--text-secondary); font-size: 11px; font-weight: 600; paint-order: stroke; stroke: var(--surface-1); stroke-width: 3px; }
+.rrglab.hi { fill: var(--text-primary); font-size: 12.5px; }
+.flegend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.flegend i, .fdot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: 0; flex: none; }
+.fcol { min-width: 0; } .fcol + .fcol { margin-top: 10px; } .fgrid2 .fcol + .fcol { margin-top: 0; }
+.fhead { font-size: 13.5px; } .fcol > p { margin: 2px 0 6px; font-size: 12px; }
+.fchips { display: flex; flex-direction: column; gap: 4px; }
+.fchip { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; text-align: left; background: var(--surface-0); border: 1px solid var(--border); border-radius: 7px; padding: 5px 8px; font: inherit; font-size: 12.5px; color: var(--text-primary); cursor: pointer; }
+.fchip:hover { border-color: var(--text-muted); } .fchip.on { border-color: var(--s1); box-shadow: inset 3px 0 0 var(--s1); }
+.fchip .fstat { flex-basis: 100%; font-size: 11.5px; color: var(--text-muted); padding-left: 14px; } .fchip .up { color: var(--good); } .fchip .dn { color: var(--critical); }
 </style>
 </head>
 <body>
@@ -889,9 +908,130 @@ function rotationIdeasCard() {
   return card;
 }
 
+/* ---------- Money flow: Relative Rotation Graph + confidence tiers ---------- */
+const TIER_COLOR = { confirmed: "var(--good)", steady: "color-mix(in srgb, var(--good) 55%, var(--text-muted))", new: "var(--s1)",
+  fading: "var(--warning)", bouncing: "var(--text-muted)", outflow: "var(--critical)", neutral: "var(--text-muted)" };
+const TIER_ICON = { confirmed: "▲▲", steady: "▲", new: "◆", fading: "▼", bouncing: "↺", outflow: "▼▼", neutral: "·" };
+function rrgChart(rows, focus, onPick) {
+  const Wc = 720, Hc = 520, m = { t: 18, r: 18, b: 40, l: 48 };
+  const shown = rows.filter(r => r.tier !== "neutral");
+  const xs = shown.flatMap(r => r.tail.map(p => p[0])), ys = shown.flatMap(r => r.tail.map(p => p[1]));
+  const q = (a, p) => { const s = [...a].sort((u, v) => u - v); return s[Math.floor(p * (s.length - 1))]; };
+  const half = (a) => Math.max(Math.abs(q(a, 0.02) - 100), Math.abs(q(a, 0.98) - 100)) * 1.1 || 5;
+  const hx = half(xs), hy = half(ys);
+  const X = (v) => m.l + (Math.max(-hx, Math.min(hx, v - 100)) + hx) / (2 * hx) * (Wc - m.l - m.r);
+  const Y = (v) => m.t + (hy - Math.max(-hy, Math.min(hy, v - 100))) / (2 * hy) * (Hc - m.t - m.b);
+  const svg = S("svg", { viewBox: `0 0 ${Wc} ${Hc}`, width: "100%", role: "img", "aria-label": "Relative rotation graph of sub-themes vs SPY" });
+  const quad = [["Leading", "money flowing in", 1, 1, "var(--good)"], ["Weakening", "inflow slowing", 1, 0, "var(--warning)"],
+    ["Lagging", "money flowing out", 0, 0, "var(--critical)"], ["Improving", "bouncing, not proven", 0, 1, "var(--s1)"]];
+  quad.forEach(([lab, sub, rx, ry, col]) => {
+    const x0 = rx ? X(100) : m.l, x1 = rx ? Wc - m.r : X(100), y0 = ry ? m.t : Y(100), y1 = ry ? Y(100) : Hc - m.b;
+    S("rect", { x: x0, y: y0, width: x1 - x0, height: y1 - y0, fill: col, opacity: 0.06 }, svg);
+    const tx = S("text", { x: rx ? x1 - 8 : x0 + 8, y: ry ? y0 + 16 : y1 - 22, "text-anchor": rx ? "end" : "start", class: "rrgq" }, svg); tx.textContent = lab;
+    const ts = S("text", { x: rx ? x1 - 8 : x0 + 8, y: ry ? y0 + 30 : y1 - 8, "text-anchor": rx ? "end" : "start", class: "rrgqs" }, svg); ts.textContent = sub;
+  });
+  S("line", { x1: X(100), x2: X(100), y1: m.t, y2: Hc - m.b, stroke: "var(--text-muted)", "stroke-width": 1 }, svg);
+  S("line", { x1: m.l, x2: Wc - m.r, y1: Y(100), y2: Y(100), stroke: "var(--text-muted)", "stroke-width": 1 }, svg);
+  const xl = S("text", { x: (m.l + Wc - m.r) / 2, y: Hc - 10, "text-anchor": "middle", class: "rrgax" }, svg); xl.textContent = "Trend vs SPY  →  stronger";
+  const yl = S("text", { x: 14, y: (m.t + Hc - m.b) / 2, "text-anchor": "middle", class: "rrgax", transform: `rotate(-90 14 ${(m.t + Hc - m.b) / 2})` }, svg); yl.textContent = "Momentum  →  accelerating";
+  const tip = $('<div class="tip"></div>');
+  const draw = (r, hi) => {
+    const col = TIER_COLOR[r.tier];
+    const showTail = hi || r.tier === "confirmed" || r.tier === "new";
+    const g = S("g", { class: "rrgdot" + (hi ? " hi" : ""), opacity: focus && !hi ? 0.25 : 1 }, svg);
+    if (showTail && r.tail.length > 1) {
+      S("polyline", { points: r.tail.map(p => `${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(" "), fill: "none", stroke: col, "stroke-width": hi ? 2.2 : 1.4, opacity: hi ? 0.95 : 0.55, "stroke-linejoin": "round" }, g);
+      r.tail.slice(0, -1).forEach((p, i) => { if (i % 5 === 0) S("circle", { cx: X(p[0]), cy: Y(p[1]), r: 1.8, fill: col, opacity: 0.6 }, g); });
+    }
+    const c = S("circle", { cx: X(r.x), cy: Y(r.y), r: hi ? 7 : r.tier === "confirmed" ? 5.5 : 4, fill: col, stroke: "var(--surface-1)", "stroke-width": 2 }, g);
+    if (hi || r.tier === "confirmed") { const t = S("text", { x: X(r.x) + 8, y: Y(r.y) - 6, class: "rrglab" + (hi ? " hi" : "") }, g); t.textContent = r.g.length > 26 ? r.g.slice(0, 25) + "…" : r.g; }
+    const hit = S("circle", { cx: X(r.x), cy: Y(r.y), r: 11, fill: "transparent", style: "cursor:pointer" }, g);
+    const show = () => {
+      tip.innerHTML = `<b>${esc(r.g)}</b><div><span>Flow</span><span>${TIER_ICON[r.tier]} ${esc((DATA.themes.rotation.flow.tiers.find(t => t.k === r.tier) || {}).label || "")}</span></div>
+        <div><span>vs SPY, 5 / 20 sessions</span><span class="num">${pct(r.r5)} / ${pct(r.r20)}</span></div>
+        <div><span>Leading corner</span><span class="num">${r.lead15} of 15 sessions</span></div>
+        <div><span>Volume flow (10 sessions)</span><span class="num">${r.acc >= 0 ? "buying" : "selling"} ${Math.round(Math.abs(r.acc) * 100)}%</span></div>
+        <div><span>Strength</span><span class="num">${r.strength ?? "–"} (#${r.s_rank ?? "–"})</span></div>`;
+      const box = svg.getBoundingClientRect(), wrap = tip.parentNode.getBoundingClientRect();
+      const px = box.left - wrap.left + X(r.x) * box.width / Wc, py = box.top - wrap.top + Y(r.y) * box.height / Hc;
+      const tw = tip.offsetWidth; tip.style.left = (px + 14 + tw < wrap.width ? px + 14 : Math.max(4, px - 14 - tw)) + "px"; tip.style.top = Math.max(0, py - 20) + "px"; tip.style.opacity = 1;
+    };
+    hit.addEventListener("mouseenter", show); hit.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+    hit.addEventListener("click", () => onPick(r.g));
+    return c;
+  };
+  const order = ["neutral", "bouncing", "outflow", "fading", "steady", "new", "confirmed"];
+  shown.slice().sort((a, b) => order.indexOf(a.tier) - order.indexOf(b.tier)).forEach(r => { if (r.g !== focus) draw(r, false); });
+  const fr = rows.find(r => r.g === focus); if (fr) draw(fr, true);
+  const el = $('<div class="rrgwrap"></div>'); el.append(svg); el.append(tip);
+  return el;
+}
+function moneyFlowCard() {
+  const R = (DATA.themes || {}).rotation, FL = R && R.flow;
+  if (!FL) return $('<div class="card empty">The money-flow view appears after the next data run.</div>');
+  UI.flow = UI.flow || { focus: null, q: "" };
+  const U = UI.flow, E = FL.evidence || {}, sk = R.state_key, meta = E._meta || {};
+  const ev = (k) => { const o = (E[k] || {})[sk]; return !o || o.edge == null ? null : o; };
+  const evs = (o) => !o ? "too few cases" : `${o.edge >= 0 ? "+" : ""}${(o.edge * 100).toFixed(1)}% vs the average group (t ${o.t})`;
+  const proven = ["confirmed", "steady"].filter(k => { const o = ev(k); return o && o.edge > 0 && o.t >= 1.3; });
+  const stName = { strong: "strong", mixed: "mixed", weak: "weak" }[sk] || sk;
+  const banner = sk === "weak"
+    ? `<div class="rbanner watch"><b>Careful: breadth is weak.</b> In weak breadth even groups with steady inflow have lagged. Use this to see where money is hiding, but expect leaders to struggle until breadth improves.</div>`
+    : `<div class="rbanner ${proven.length ? "act" : "watch"}"><b>Breadth is ${esc(stName)}.</b> In this state, <b>Confirmed inflow</b> groups have done ${evs(ev("confirmed"))} and <b>Steady inflow</b> ${evs(ev("steady"))} over the next ${meta.hold || 10} sessions. <b>Outflow</b> groups did ${evs(ev("outflow"))}. Trading inside the top two tiers puts the group behind you; avoid the bottom one.</div>`;
+  const by = {}; FL.rows.forEach(r => { (by[r.tier] = by[r.tier] || []).push(r); });
+  const chip = (r) => `<button class="fchip${U.focus === r.g ? " on" : ""}" data-g="${esc(r.g)}"><span class="fdot" style="background:${TIER_COLOR[r.tier]}"></span><b>${esc(r.g)}</b>
+    <span class="meta">${esc(r.sector)}</span><span class="fstat"><span class="num ${r.r20 >= 0 ? "up" : "dn"}">${pct(r.r20)}</span> 20D · ${r.lead15}/15 leading · vol ${r.acc >= 0 ? "buying" : "selling"}${r.tier5 !== r.tier ? ` · <i>was ${esc(r.tier5)}</i>` : ""}</span></button>`;
+  const col = (k, lim) => { const t = FL.tiers.find(x => x.k === k), L = by[k] || [];
+    return `<div class="fcol"><div class="fhead"><span class="fdot" style="background:${TIER_COLOR[k]}"></span><b>${TIER_ICON[k]} ${esc(t.label)}</b> <span class="meta">${L.length}</span></div>
+      <p class="meta">${esc(t.desc)}</p><div class="fchips">${L.slice(0, lim).map(chip).join("") || '<span class="meta">None today.</span>'}${L.length > lim ? `<span class="meta">+${L.length - lim} more (hover the graph)</span>` : ""}</div></div>`; };
+  const card = $(`<section class="card regcard flowcard"><div class="kicker">Money flow · which sub-themes money is moving into, with confidence</div>
+    ${banner}
+    <div class="flook"><input type="search" placeholder="Check a stock or group (e.g. NET, Refiners)" aria-label="Check a stock or group"><div class="flookout meta"></div></div>
+    <div class="fgrid">
+      <div class="fchart"><div class="meta" style="margin:6px 0 2px">Each dot is a sub-theme. <b>Right</b> = beating SPY, <b>up</b> = that lead is growing. Groups usually circle clockwise: Improving → Leading → Weakening → Lagging. Tails show the last ${FL.tail_days} sessions. Click a dot or a name to follow it.</div><div class="frrg"></div>
+        <div class="flegend">${FL.tiers.filter(t => t.k !== "neutral").map(t => `<span><i style="background:${TIER_COLOR[t.k]}"></i>${esc(t.label)}</span>`).join("")}</div></div>
+      <div class="fside">${col("confirmed", 12)}${col("steady", 8)}${col("new", 8)}</div>
+    </div>
+    <div class="fgrid2">${col("fading", 6)}${col("outflow", 10)}${col("bouncing", 6)}</div>
+    <details class="kqsec" style="margin-top:10px"><summary><b>How sure is this?</b> Each tier's track record in your data</summary>
+      <p class="meta" style="margin:6px 0">Every sub-theme with 4+ stocks, ${esc(meta.from || "")} to ${esc(meta.to || "")}. Each cell is how a group in that tier did over the next ${meta.hold || 10} sessions <b>compared with the average group</b> on the same days (t of 2 or more = solid; under 1 = could be luck). Your current breadth column is outlined.</p>
+      <div class="scroll"><table class="grid rideas"><thead><tr><th class="l">Tier</th><th>All days</th><th>Strong breadth</th><th>Mixed</th><th>Weak</th></tr></thead><tbody>
+      ${FL.tiers.filter(t => t.k !== "neutral").map(t => `<tr><td class="l"><span class="fdot" style="background:${TIER_COLOR[t.k]}"></span> ${esc(t.label)}</td>${["all", "strong", "mixed", "weak"].map(r => { const o = (E[t.k] || {})[r] || {};
+        return o.edge == null ? '<td class="num meta">–</td>' : `<td class="num ${r === sk ? "nowcol " : ""}${o.t >= 2 ? "g2" : o.t <= -2 ? "r2" : o.edge > 0 ? "g1" : "r1"}"><b>${o.edge >= 0 ? "+" : ""}${(o.edge * 100).toFixed(1)}%</b><br><span class="meta" style="font-size:11px">${Math.round(o.win * 100)}% win · n ${o.n} · t ${o.t}</span></td>`; }).join("")}</tr>`).join("")}</tbody></table></div>
+      <p class="meta" style="margin:6px 0 0">How it's measured: each sub-theme is an equal-weight index of its stocks, divided by SPY. Trend = that line vs its 50-day average; momentum = the change in trend over 10 sessions (the standard rotation-graph method). Volume flow = dollar volume on up days minus down days over 10 sessions, as a share of all dollar volume. Confirmed = the Rotation tab's "leading & accelerating" signal, or leading on 10 of the last 15 sessions with volume flow above +15%. Volume flow on its own didn't predict anything; it only firms up a lead that's already there.</p></details></section>`);
+  const draw = () => {
+    const box = card.querySelector(".frrg"); box.innerHTML = "";
+    box.append(rrgChart(FL.rows, U.focus, (g) => { U.focus = U.focus === g ? null : g; draw(); }));
+    card.querySelectorAll(".fchip").forEach(b => b.classList.toggle("on", b.dataset.g === U.focus));
+  };
+  card.querySelectorAll(".fchip").forEach(b => b.addEventListener("click", () => { U.focus = U.focus === b.dataset.g ? null : b.dataset.g; draw();
+    card.querySelector(".frrg").scrollIntoView({ behavior: "smooth", block: "nearest" }); }));
+  const inp = card.querySelector(".flook input"), out = card.querySelector(".flookout");
+  const look = () => {
+    const q = inp.value.trim(); U.q = q; if (!q) { out.innerHTML = ""; return; }
+    const tk = q.toUpperCase(), g = FL.stock_group[tk] || (FL.rows.find(r => r.g.toLowerCase().includes(q.toLowerCase())) || {}).g;
+    const r = FL.rows.find(x => x.g === g);
+    if (!r) { out.innerHTML = `No sub-theme found for "${esc(q)}". Only stocks in your sub-theme lists are covered.`; return; }
+    const t = FL.tiers.find(x => x.k === r.tier), o = ev(r.tier);
+    const verdict = ["confirmed", "steady"].includes(r.tier) ? "✅ Money is flowing into this group: a supportive background for a long trade."
+      : r.tier === "new" ? "🟦 New inflow this week: promising but not proven yet. Smaller size, or wait for it to stick."
+      : r.tier === "fading" ? "🟨 Inflow is slowing: fine to hold, less ideal for new buys."
+      : r.tier === "outflow" ? "🟥 Money is leaving this group: a headwind for any long trade in it."
+      : r.tier === "bouncing" ? "⬜ Bouncing from lagging: these bounces have tended to fail. Be skeptical."
+      : "No clear flow either way.";
+    out.innerHTML = `<b>${FL.stock_group[tk] ? esc(tk) + " → " : ""}${esc(r.g)}</b>: ${TIER_ICON[r.tier]} ${esc(t.label)}. ${verdict}
+      <span class="meta">(${pct(r.r20)} vs SPY over 20 sessions, leading ${r.lead15} of 15 sessions, volume ${r.acc >= 0 ? "buying" : "selling"} ${Math.round(Math.abs(r.acc) * 100)}%${o ? `; this tier in ${esc(stName)} breadth: ${evs(o)}` : ""}.)</span>`;
+    U.focus = r.g; draw();
+  };
+  inp.value = U.q || ""; inp.addEventListener("change", look); inp.addEventListener("keyup", (e) => { if (e.key === "Enter") look(); });
+  draw(); if (U.q) look();
+  return card;
+}
+
 /* ---------- Rotation tab ---------- */
 function renderRotation(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  app.append(moneyFlowCard());
   app.append(rotationIdeasCard());
   app.append(macroStrip(false));
   app.append(pairCard());
