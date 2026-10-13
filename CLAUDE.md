@@ -165,6 +165,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   ≥ −30% off high, 60-day > −20%) ≈ flat vs SPY. Only candidate: cleaned + 3–10% below the 52-wk high: +1.9% (t 2.7,
   59% beat, n 130; train +2.1% t 2.7, test +1.35% t 1.0; fades by 20 sessions) vs −0.2% / 47% for ANY liquid stock 3–10%
   off its high. Promising, not proven; re-test as more data arrives.
+  Retracement follow-up (same events, up days): buying a hold of the record day's 50% / 61.8% / low, or of the 38.2 / 50 / 61.8%
+  retracement of the 20-session leg into the record day (touch within 20 sessions, close above), at the hold-day close or on a
+  "pop back" (close above the hold day's high within 3 days), with or without a stop 0.5 ADR under the level: negative in both
+  halves for all events (−1% to −9% vs SPY); cleaned set slightly positive in train (+0.3 to +2%), negative in test. No edge.
 - Limits: survivorship bias in backfill, small strong-regime sample, no costs, no intraday H/L/volume.
 
 ## Working preferences
