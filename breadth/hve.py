@@ -34,6 +34,49 @@ REFRESH_DAYS = 30
 PAUSE = 0.6
 
 
+# Profiles from the Oct 12, 2026 study (2,048 events, first 60% of dates to find, last 40% to check):
+#  spike    up day with gap >= 10%, day >= +20%, volume > 20x avg or > 2.2x the old record. Long: about -15% vs SPY
+#           over 10 sessions. SHORT after the turn (from day 3: close below the record-day low, or below the prior
+#           3-day low while under the record close), cover on close > stop / > 10 EMA / 10 sessions: +6.9% test, 57% win,
+#           but the edge sits in thin names (< $5M/day: worst trade -164%, 8% lose 30%+, ~+0.04R); mid $5-25M ~+0.1R;
+#           liquid $25M+ about 0. No borrow costs in the test.
+#  pullback liquid ($25M+/day, ADR <= 10%), 3-10% below the 52-week high, no spike: +1.9% vs SPY (59% beat, n 130,
+#           held-out half t 1.0). Promising, not proven.
+SPIKE_GAP, SPIKE_DAY, SPIKE_X50, SPIKE_PREV = 0.10, 0.20, 20.0, 2.2
+LIQ_THIN, LIQ_OK = 5e6, 25e6
+TURN_FROM = 3
+
+
+def profile(row, dv50, adr, off_hi, r60):
+    """'spike' | 'pullback' | 'other' for an up day ('down' for down days)."""
+    if (row["chg"] or 0) <= 0:
+        return "down"
+    if ((row["gap"] or 0) >= SPIKE_GAP or (row["chg"] or 0) >= SPIKE_DAY or (row["x50"] or 0) > SPIKE_X50
+            or (row["vs_prev"] or 0) > SPIKE_PREV):
+        return "spike"
+    if dv50 == dv50 and dv50 >= LIQ_OK and adr == adr and adr <= 10 and off_hi == off_hi and -0.10 <= off_hi < -0.03 \
+            and (r60 != r60 or r60 > -0.2):
+        return "pullback"
+    return "other"
+
+
+def short_status(c, h, l, i, last):
+    """Short-watch status of a spike from record day i: wait (before day 3), triggered (turn) or watching."""
+    ago = last - i
+    if ago < TURN_FROM:
+        return {"state": "wait", "day": int(ago), "from": TURN_FROM}
+    rl, rc = float(l[i]), float(c[i])
+    for k in range(i + TURN_FROM, last + 1):
+        below_low = c[k] < rl
+        quick = k >= 3 and c[k] < np.nanmin(l[k - 3:k]) and c[k] < rc
+        if below_low or quick:
+            stop = float(np.nanmax(h[i:k + 1])) if below_low else float(np.nanmax(h[k - 3:k + 1]))
+            return {"state": "triggered", "kind": "below record-day low" if below_low else "below 3-day low",
+                    "k_ago": int(last - k), "entry": round(float(c[k]), 2), "stop": round(stop, 2),
+                    "risk": round(stop / float(c[k]) - 1, 3), "now": round(float(c[last]) / float(c[k]) - 1, 4)}
+    return {"state": "watching", "day": int(ago), "trig_low": round(rl, 2)}
+
+
 def _path():
     return config.DATA_DIR / "hve_ever.json"
 
@@ -176,6 +219,10 @@ def screen(w, rating, universe, names, theme_of=None, cache=None, regimes=None):
     hit = rec & liq
     cnt = hit.sum(axis=1)
     v50 = v.shift(1).rolling(50, min_periods=30).mean()
+    dv50 = (c * v).shift(1).rolling(50, min_periods=30).mean()
+    adr = ((h / l - 1) * 100).rolling(20, min_periods=15).mean()
+    off = c / c.rolling(252, min_periods=200).max() - 1
+    r60 = c.shift(1) / c.shift(61) - 1
     first_stored = c.index[0].strftime("%Y-%m-%d")
     N = len(c)
     last = N - 1
@@ -197,7 +244,18 @@ def screen(w, rating, universe, names, theme_of=None, cache=None, regimes=None):
                          "since": round(float(c[t].iat[last]) / ci - 1, 4), "above_lo": bool(float(c[t].iat[last]) >= lo),
                          "dollars": round(vol * ci / 1e6, 1), "rsr": None if r is None or r != r else int(r),
                          "ever": ever, "ever_ref": ref, "mass": bool(cnt.iat[i] > MASS_DAY), "day_count": int(cnt.iat[i]),
+                         "dv50": round(float(dv50[t].iat[i]) / 1e6, 1) if dv50[t].iat[i] == dv50[t].iat[i] else None,
+                         "liq": None if dv50[t].iat[i] != dv50[t].iat[i] else ("thin" if dv50[t].iat[i] < LIQ_THIN else "mid" if dv50[t].iat[i] < LIQ_OK else "liquid"),
                          **theme_of.get(t, {})})
+    jcol = {t: k for k, t in enumerate(cols)}
+    C_, H_, L_ = c.to_numpy(), h.to_numpy(), l.to_numpy()
+    pos_i = {d: k for k, d in enumerate(c.index)}
+    for r in rows:
+        k, i = jcol[r["t"]], pos_i[pd.Timestamp(r["date"])]
+        r["profile"] = profile(r, float(dv50.iat[i, k]), float(adr.iat[i, k]), float(off.iat[i, k]), float(r60.iat[i, k]))
+        r["adr"] = None if adr.iat[i, k] != adr.iat[i, k] else round(float(adr.iat[i, k]), 1)
+        if r["profile"] == "spike":
+            r["short"] = short_status(C_[:, k], H_[:, k], L_[:, k], i, N - 1)
     latest = {}
     for r in sorted(rows, key=lambda r: r["ago"]):          # one row per stock: its latest record day
         if r["t"] in latest:

@@ -97,6 +97,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   breadth; RS 85+ no better). One-off test: later re-break of the record-day high −1.2% vs SPY, pullbacks holding its low −0.7%.
   Table headers sort (`sortable`, state `UI.hve.sort`); card "⬇ TradingView" exports the rows shown in their current order;
   header "⬇ Trade Setups" adds "Record volume - up days (warning list)" and "- down days" sections; tickers are in `themes.tv`.
+  Profile tags (`hve.profile`, `hve.short_status`, from the Oct 12 study): spike (gap ≥ 10%, day ≥ +20%, × avg > 20 or > 2.2× old
+  record) → "Spike · short watch" with liquidity tag (thin < $5M / mid / liquid ≥ $25M avg $ vol) and status: wait (before day 3),
+  watching (short below record-day low or a 3-day low), triggered (entry, stop = post-pop peak or 4-day high, % to stop, price
+  since); pullback (liquid, ADR ≤ 10, 3–10% off 52-wk high) → "Pullback · watch"; other / down. Profile filter chips; Trade
+  Setups download adds "short watch (turn triggered)" and "(spike, waiting)".
 - Money flow card (top of Rotation, `moneyFlowCard`) → `rotation.flow`: Relative Rotation Graph per sub-theme (x = 100 × group/SPY ÷
   its 50-day avg, EMA5; y = 100 × x ÷ x 10 sessions ago; 15-session tails) + volume flow (10-session up-day minus down-day
   dollar volume ÷ total). Tiers: confirmed (leading & accelerating, or Leading quadrant 10/15 sessions + volume flow > 0.15),

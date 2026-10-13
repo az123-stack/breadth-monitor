@@ -455,6 +455,12 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .fchip { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; text-align: left; background: var(--surface-0); border: 1px solid var(--border); border-radius: 7px; padding: 5px 8px; font: inherit; font-size: 12.5px; color: var(--text-primary); cursor: pointer; }
 .fchip:hover { border-color: var(--text-muted); } .fchip.on { border-color: var(--s1); box-shadow: inset 3px 0 0 var(--s1); }
 .fchip .fstat { flex-basis: 100%; font-size: 11.5px; color: var(--text-muted); padding-left: 14px; } .fchip .up { color: var(--good); } .fchip .dn { color: var(--critical); }
+
+.tg.pspike { background: color-mix(in srgb, var(--critical) 18%, transparent); color: var(--text-primary); }
+.tg.ppull { background: color-mix(in srgb, var(--good) 20%, transparent); color: var(--text-primary); }
+.tg.pother { background: var(--neutral-mid); color: var(--text-secondary); }
+.tg.pliq { background: var(--neutral-mid); color: var(--text-secondary); } .tg.pliq.mid { background: color-mix(in srgb, var(--warning) 25%, transparent); color: var(--text-primary); }
+table.grid.hvetab td.pcell { min-width: 170px; } table.grid.hvetab td.pcell small { max-width: 230px; }
 </style>
 </head>
 <body>
@@ -501,7 +507,9 @@ function render() {
     tsDownload("trade-setups", [...(picks.length ? [{ name: "Today's top picks", ticks: picks }] : []),
       ...X.setups.slice().sort((a, b) => (rank[a.key] || 9) - (rank[b.key] || 9)).map(s => ({ name: s.name, ticks: s.top })),
       ...(DATA.themes.hve ? [{ name: "Record volume - up days (warning list)", ticks: DATA.themes.hve.rows.filter(r => r.chg > 0).map(r => r.t) },
-        { name: "Record volume - down days", ticks: DATA.themes.hve.rows.filter(r => r.chg < 0).map(r => r.t) }] : [])]);
+        { name: "Record volume - down days", ticks: DATA.themes.hve.rows.filter(r => r.chg < 0).map(r => r.t) },
+        { name: "Record volume - short watch (turn triggered)", ticks: DATA.themes.hve.rows.filter(r => r.short && r.short.state === "triggered").map(r => r.t) },
+        { name: "Record volume - short watch (spike, waiting)", ticks: DATA.themes.hve.rows.filter(r => r.profile === "spike" && !(r.short && r.short.state === "triggered")).map(r => r.t) }] : [])]);
   });
   const rf = app.querySelector(".revflag"); if (rf) rf.addEventListener("click", () => {
     const b = app.querySelector('nav.tabs button[data-tab="trades"]'); if (b) b.click();
@@ -2289,11 +2297,12 @@ function tsDownload(name, sections) {
 function hveCard(T) {
   const X = T.hve;
   if (!X) return $('<div></div>');
-  UI.hve = UI.hve || { dir: "all", scope: "all" };
+  UI.hve = UI.hve || { dir: "all", scope: "all", prof: "all" };
   const U = UI.hve, E = X.evidence || {};
   const f = (o) => !o || o.ret == null ? "–" : `${pct(o.ret)} vs SPY (median ${pct(o.median)}, ${Math.round(o.win * 100)}% beat SPY, n ${o.n})`;
   const card = $(`<section class="card regcard hvecard"><div class="kicker">Record volume · highest volume on record in the last 5 sessions</div>
-    <div class="rbanner watch" style="margin-top:8px"><b>Read this as a warning, not a buy signal.</b> In your data, stocks that closed up on record volume went on to <b>lag SPY</b>: ${f(E.up)} over the next ${E.hold || 10} sessions, and ${E.up3 && E.up3.ret != null ? pct(E.up3.ret) : "–"} within 3 sessions. ${E.up_rs85 && E.up_rs85.ret != null ? `Leaders (RS 85+) did no better: ${f(E.up_rs85)}. ` : ""}Record volume usually marks a <b>climax</b>: news, a blow-off or a big holder exiting. Use it to avoid chasing, to consider taking profits if you own one, or to watch for a failed move.</div>
+    <div class="rbanner watch" style="margin-top:8px"><b>Read this as a warning, not a buy signal.</b> In your data, stocks that closed up on record volume went on to <b>lag SPY</b>: ${f(E.up)} over the next ${E.hold || 10} sessions, and ${E.up3 && E.up3.ret != null ? pct(E.up3.ret) : "–"} within 3 sessions. ${E.up_rs85 && E.up_rs85.ret != null ? `Leaders (RS 85+) did no better: ${f(E.up_rs85)}. ` : ""}Record volume usually marks a <b>climax</b>: news, a blow-off or a big holder exiting. Use it to avoid chasing, to consider taking profits if you own one, or to watch for a failed move.
+      <br><b>Profile tags</b> (tested Oct 12, 2026): <b>Spike · short watch</b> = big gap/up-day or extreme volume; shorting it once it turns (from day 3, close below the record-day low or a 3-day low) tested positive, but mostly in thin names that are hard to borrow and can squeeze, so the liquidity tag matters. <b>Pullback · watch</b> = liquid and 3–10% off its high: a promising but unproven long.</div>
     <div class="filters" style="margin:8px 0 4px"></div>
     <div class="hvebody"></div>
     <details class="kqsec" style="margin-top:8px"><summary><b>The evidence</b> · ${esc(E.from || "")} to ${esc(E.to || "")}</summary>
@@ -2304,13 +2313,35 @@ function hveCard(T) {
   const fl = card.querySelector(".filters");
   const body = card.querySelector(".hvebody");
   UI.hve.sort = UI.hve.sort || ["ago", 1];
-  X.rows.forEach(r => { r._ev = r.ever === "ever" ? 2 : r.ever === "not ever" ? 1 : 0; r._abs = Math.abs(r.chg || 0); });
+  X.rows.forEach(r => { r._ev = r.ever === "ever" ? 2 : r.ever === "not ever" ? 1 : 0; r._abs = Math.abs(r.chg || 0);
+    const st = r.short && r.short.state;
+    r._prof = r.profile === "spike" ? (st === "triggered" ? 5 : st === "watching" ? 4 : 3) : r.profile === "pullback" ? 2 : r.profile === "other" ? 1 : 0; });
+  const LIQ = { thin: ["thin", "under $5M a day: hard to borrow, squeeze risk; tested edge tiny once sized to the stop"],
+    mid: ["mid", "$5–25M a day: the best tested risk/reward for this short (about +0.1R a trade)"],
+    liquid: ["liquid", "$25M+ a day: easy to short, but no tested edge here"] };
+  const profCell = (r) => {
+    if (r.profile === "spike") {
+      const sh = r.short || {}, lq = LIQ[r.liq] || ["?", ""];
+      const st = sh.state === "wait" ? `wait: day ${sh.day} of ${sh.from}`
+        : sh.state === "watching" ? `watching: short below $${sh.trig_low} (record-day low) or a 3-day low`
+        : sh.state === "triggered" ? `<b>turn triggered</b> ${sh.k_ago === 0 ? "latest session" : sh.k_ago + "d ago"} at $${sh.entry} (${esc(sh.kind)}) · stop $${sh.stop} (${Math.round(sh.risk * 100)}% away) · price since ${pct(sh.now)}` : "";
+      return `<span class="tg pspike" title="Spike profile: gap 10%+, up 20%+, or volume over 20× normal or 2.2× the old record. Long: lagged SPY by ~15% over 10 sessions. Shorting the turn tested positive (+6.9% held-out, 57% win), but almost all of it in thin names.">Spike · short watch</span>
+        <span class="tg pliq ${r.liq || ""}" title="${esc(lq[1])}">${lq[0]}</span><small class="meta" style="display:block">${st}</small>`;
+    }
+    if (r.profile === "pullback") return `<span class="tg ppull" title="Liquid, 3–10% below its 52-week high, no spike: +1.9% vs SPY over 10 sessions in the study (59% beat), but not proven on the held-out half">Pullback · watch</span><small class="meta" style="display:block">promising, unproven long</small>`;
+    if (r.profile === "other") return `<span class="tg pother" title="Up day without the spike or pullback profile: roughly in line with SPY afterwards">No edge</span>`;
+    return `<span class="tg pother">Down day</span>`;
+  };
   const cols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "ago", h: "Record day", l: true, asc: true }, { k: "_ev", h: "Record" },
     { k: "x50", h: "Volume<small>× 50-day avg</small>" }, { k: "chg", h: "That day" }, { k: "since", h: "Since<small>vs record close</small>" },
-    { k: "lo", h: "Record-day range<small>high / low</small>", l: true }, { k: "rsr", h: "RS" }, { k: "dollars", h: "$ traded" }];
+    { k: "lo", h: "Record-day range<small>high / low</small>", l: true }, { k: "rsr", h: "RS" }, { k: "dollars", h: "$ traded" },
+    { k: "_prof", h: "Profile<small>tested read</small>", l: true }];
   const filtered = () => {
     let rows = X.rows.filter(r => U.dir === "all" || (U.dir === "up" ? r.chg > 0 : r.chg < 0));
     if (U.scope === "themes") rows = rows.filter(r => r.theme || r.sub);
+    if (U.prof === "short") rows = rows.filter(r => r.profile === "spike");
+    else if (U.prof === "trig") rows = rows.filter(r => r.short && r.short.state === "triggered");
+    else if (U.prof === "pull") rows = rows.filter(r => r.profile === "pullback");
     return rows;
   };
   const evr = (r) => r.ever === "ever" ? `<span class="zone znear21EMA" title="Checked against Yahoo's full daily history${r.ever_ref ? " (data from " + esc(r.ever_ref) + ")" : ""}">Ever</span>`
@@ -2330,7 +2361,8 @@ function hveCard(T) {
         <td class="num ${tint(r.chg, SCALE.d5)}">${pct(r.chg)}<small class="meta" style="display:block">${close(r.loc)}${r.gap != null && Math.abs(r.gap) >= 0.03 ? " · gap " + pct(r.gap, 0) : ""}${Math.abs(r.chg || 0) >= 1 ? " · <b>unusual move: check the chart</b>" : ""}</small></td>
         ${retCell(r.since, "d5")}
         <td class="l">$${r.hi} / $${r.lo}<small class="meta" style="display:block">${r.above_lo ? "holding above the low" : "<b>below the record-day low</b>"}</small></td>
-        <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">$${r.dollars >= 1000 ? (r.dollars / 1000).toFixed(1) + "B" : Math.round(r.dollars) + "M"}</td></tr>`).join("");
+        <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">$${r.dollars >= 1000 ? (r.dollars / 1000).toFixed(1) + "B" : Math.round(r.dollars) + "M"}</td>
+        <td class="l pcell">${profCell(r)}</td></tr>`).join("");
   };
   const current = sortable(body.querySelector("table"), cols, filtered, fill, UI.hve.sort);
   const draw = () => fill(current());
@@ -2338,6 +2370,8 @@ function hveCard(T) {
   dl.addEventListener("click", () => tsDownload("record-volume", [{ name: `Record volume ${U.dir === "up" ? "up days" : U.dir === "down" ? "down days" : ""}`, ticks: shown.map(r => r.t) }]));
   fl.append(chips("Direction", [["all", `All (${X.count})`], ["up", "Up days"], ["down", "Down days"]], U, "dir", draw));
   fl.append(chips("Scope", [["all", "All stocks"], ["themes", "In my themes"]], U, "scope", draw));
+  const nS = X.rows.filter(r => r.profile === "spike").length, nT = X.rows.filter(r => r.short && r.short.state === "triggered").length, nP = X.rows.filter(r => r.profile === "pullback").length;
+  fl.append(chips("Profile", [["all", "Any profile"], ["short", `Short watch (${nS})`], ["trig", `Turn triggered (${nT})`], ["pull", `Pullback watch (${nP})`]], U, "prof", draw));
   fl.append($(`<span class="meta">Records per day: ${X.days.map(d => `${d.dow} ${d.n}`).join(" · ")}</span>`));
   fl.append(dl);
   draw();

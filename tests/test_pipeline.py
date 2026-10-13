@@ -551,6 +551,15 @@ def test_record_volume():
     cache = {"REC": {"months": months, "first": "2010-01-02"}}
     assert hve.ever_check(cache, "REC", "2025-01-01", 9.5e6) == ("not ever", "2010-01-03")
     assert hve.ever_check(cache, "REC", "2025-01-01", 3e7)[0] == "ever"
+    assert "profile" in r
+    base = {"chg": 0.05, "gap": 0.01, "x50": 5, "vs_prev": 1.2}
+    assert hve.profile({**base, "gap": 0.12}, 30e6, 4, -0.05, 0.1) == "spike"
+    assert hve.profile(base, 30e6, 4, -0.05, 0.1) == "pullback"
+    assert hve.profile(base, 3e6, 4, -0.05, 0.1) == "other" and hve.profile({**base, "chg": -0.02}, 30e6, 4, -0.05, 0.1) == "down"
+    cc = np.array([10, 15, 14, 13, 12.5, 12.0]); hh = cc * 1.02; ll = cc * 0.98
+    assert hve.short_status(cc, hh, ll, 1, 2)["state"] == "wait"
+    st = hve.short_status(cc, hh, ll, 1, 5)              # day 4 closes below the record-day low (14.7)
+    assert st["state"] == "triggered" and st["entry"] == 12.5 and st["stop"] == round(15 * 1.02, 2)
     return "ok"
 
 
