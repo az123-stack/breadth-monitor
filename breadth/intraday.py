@@ -156,7 +156,9 @@ def thrust_watch(adjusted, history, universe):
         net = round(float(last["nh10"] - last["nl10"]), 1)
     past = [{"date": d.strftime("%Y-%m-%d"), "live": int(cal.at[d, "lup"]), "x": round(float(cal.at[d, "lup"] / cal.at[d, "lavg"]), 2),
              "official": int(cal.at[d, "up4"]), "caught": bool(flag[d])} for d in cal.index[official]][-10:]
-    return {"tickers": live, "n": len(live), "avg40": round(lavg_now, 1),
+    sp = adjusted[adjusted["ticker"] == C.BENCHMARK].set_index("date")["c"].sort_index()
+    dollar = dollar_flow(sub, c, chg, sp)
+    return {"dollar": dollar, "tickers": live, "n": len(live), "avg40": round(lavg_now, 1),
             "pace": int(np.ceil(THRUST_K * lavg_now)), "close": int(np.ceil(CLOSE_K * lavg_now)), "k": THRUST_K, "k_close": CLOSE_K,
             "official_need": int(np.ceil(C.EVENT_THRUST_MULT * float(last["up4_avg40"]))), "scale": round(scale, 2) if scale else None,
             "corr": round(float(cal["up4"].corr(cal["lup"])), 3) if len(cal) > 10 else None,
@@ -167,3 +169,32 @@ def thrust_watch(adjusted, history, universe):
             "net": net, "last": {"date": df.index[-1].strftime("%Y-%m-%d"), "live": int(df["lup"].iloc[-1]),
                                   "official": int(last["up4"])}, "past": past,
             "from": cal.index[0].strftime("%Y-%m-%d") if len(cal) else None}
+
+
+def dollar_flow(sub, c, chg, spy):
+    """Market-wide dollar pressure on the live list: share of the day's dollar volume traded in falling stocks.
+    Every share sold has a buyer, so this measures who was in control (sellers accepting lower prices), not cash
+    literally leaving. Returns the sorted history (for a percentile in the browser), the last 10 sessions, and how
+    SPY did over the next 5 / 10 sessions after heavy-selling and heavy-buying days."""
+    import numpy as np
+    import pandas as pd
+    v = sub.pivot_table(index="date", columns="ticker", values="v").reindex(index=c.index, columns=c.columns)
+    dv = c * v
+    up, dn = dv.where(chg > 0).sum(axis=1), dv.where(chg < 0).sum(axis=1)
+    share = (dn / (up + dn)).iloc[1:].dropna()
+    if len(share) < 60 or spy is None or not len(spy):
+        return None
+    spy = spy.reindex(c.index)
+    f5, f10 = (spy.shift(-5) / spy - 1).reindex(share.index), (spy.shift(-10) / spy - 1).reindex(share.index)
+
+    def stats(mask):
+        m = mask & f5.notna()
+        if m.sum() < 5:
+            return {"n": int(m.sum())}
+        return {"n": int(m.sum()), "spy5": round(float(f5[m].mean()), 4), "spy10": round(float(f10[m & f10.notna()].mean()), 4),
+                "up5": round(float((f5[m] > 0).mean()), 3)}
+    return {"hist": [round(float(x), 3) for x in np.sort(share.to_numpy())],
+            "last": [[d.strftime("%Y-%m-%d"), round(float(x), 3), round(float((up - dn).get(d, 0)) / 1e9, 1)] for d, x in share.iloc[-10:].items()],
+            "median": round(float(share.median()), 3), "from": share.index[0].strftime("%Y-%m-%d"),
+            "fwd": {"sell80": stats(share >= 0.80), "sell70": stats((share >= 0.70) & (share < 0.80)), "all": stats(share > -1),
+                    "buy30": stats((share <= 0.30) & (share > 0.20)), "buy20": stats(share <= 0.20)}}

@@ -165,6 +165,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   volume × sign(change) ($M/$B), flow × avg day (÷ group's 50-day avg $ volume), trend into today = `rotation.flow` tier at the last
   close, read (still being bought / fresh buying / leader being sold / still being sold). Bullets: leaving (top 4 net outflow), going
   into (top 4 net inflow), risk-on/off (avg XLU/XLP/XLV/XLRE vs XLK/SMH/XLY/XLC), IWM−SPY, RSP−SPY, groups up, leaders being sold.
+  Whole-market block on top (`thrust_watch.dollar` from `intraday.dollar_flow`): share of the day's dollar volume in falling stocks on
+  the ~1,027-stock live list, percentile vs ~2 years (sorted `hist`), last 10 sessions as mini bars, haven moves (TLT, UUP, GLD, VIX),
+  and SPY next 5/10 sessions after similar days (bins: ≥ 80%, 70–80%, ≤ 20%, 20–30% falling). Calibration Oct 2024–Oct 2026: median
+  47%; ≥ 70% days (n 35) SPY +1.3% next 5 sessions, up 83% (all days +0.3%, 58%); ≥ 80% (n 26) +0.7%, 65%. Not a buy signal.
+  Oct 14, 2026: ≈ 73% in falling stocks (theme stocks alone 83.5%, ~95th percentile), TLT +0.7%, UUP +0.3%, GLD −1.5%, VIX +10.5%.
   Oct 14 read: out of AI infra (Neoclouds −11.6% on 2.4× volume, custom silicon, AI servers, optical, hyperscalers, memory, quantum,
   BTC miners, SMR) into large-cap pharma, defense primes, biotech, managed care, oil majors, utilities; 16 of 102 groups up.
 - Rotation tab (browser-only rendering): ideas card · pair chart (`pairCard`: two groups' equal-weight index, ratio and

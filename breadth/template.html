@@ -417,6 +417,14 @@ table.grid.hvetab td.tname { max-width: 180px; } table.grid.hvetab td, table.gri
 .rideas td.nowcol { box-shadow: inset 0 0 0 2px var(--s1); }
 .rideas .rbanner { margin: 8px 0 4px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; border-left: 4px solid; }
 .rbanner.act { background: color-mix(in srgb, var(--good) 12%, transparent); border-color: var(--good); }
+.dfwrap { display: flex; gap: 16px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; padding: 10px 12px; margin: 8px 0; border: 1px solid var(--grid); border-radius: 10px; }
+.dfwrap > div:first-child { flex: 1 1 380px; }
+.dfbars { display: flex; gap: 4px; align-items: flex-end; height: 70px; }
+.dfb { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 22px; height: 100%; }
+.dfb i { display: block; width: 14px; background: var(--text-secondary); opacity: .55; border-radius: 3px 3px 0 0; }
+.dfb i.dn { background: var(--critical); opacity: .85; } .dfb i.up { background: var(--good); opacity: .85; }
+.dfb.now i { outline: 2px solid var(--text-primary); }
+.dfb small { font-size: 9.5px; color: var(--text-secondary); margin-top: 2px; }
 .r2kwarn { margin: 8px 0 0; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--warning); background: color-mix(in srgb, var(--warning) 14%, transparent); font-size: 13px; }
 .r2kwarn.old { border-color: var(--critical); background: color-mix(in srgb, var(--critical) 12%, transparent); }
 .rbanner.watch { background: color-mix(in srgb, var(--warning) 14%, transparent); border-color: var(--warning); }
@@ -1064,6 +1072,7 @@ function moneyFlowCard() {
    Net $ flow = Σ over a group's stocks of (dollar volume today × +1 if up, −1 if down): up-volume minus down-volume dollars.
    Trend into today = the group's money-flow tier at the last close (rotation.flow), so a leader being sold stands out. */
 const MT = { lvl: "sub" };
+const fmtB = (x) => x >= 1e9 ? "$" + (x / 1e9).toFixed(1) + "B" : "$" + Math.round(x / 1e6) + "M";
 const TIER_LABEL = { confirmed: "Confirmed inflow", steady: "Steady inflow", new: "New inflow", fading: "Fading", bouncing: "Bouncing", outflow: "Outflow" };
 function moneyTodayCard() {
   const T = DATA.themes, I = DATA.intraday || {}, pc = pcI, cls = clsI;
@@ -1112,12 +1121,35 @@ function moneyTodayCard() {
       <td class="num ${cls(x.flowDay)}">${x.flowDay == null ? "–" : (x.flowDay > 0 ? "+" : "") + x.flowDay.toFixed(2)}</td>
       <td class="l">${x.tier ? esc(TIER_LABEL[x.tier] || x.tier) : '<span class="meta">–</span>'}</td><td class="l ${x.read === "Leader being sold" ? "dn" : x.read.startsWith("Fresh") ? "up" : ""}">${x.read}</td>
       <td class="num">${x.strength == null ? "–" : Math.round(x.strength)}</td></tr>`).join("") || '<tr><td class="l meta" colspan="10">None.</td></tr>'}</tbody></table></div>`;
+  // Whole market: share of today's dollar volume in falling stocks (same ~1,000-stock list as the thrust watch)
+  const W = (T.thrust_watch || {}), DF = W.dollar;
+  let mkt = "";
+  if (DF && W.tickers) {
+    let u = 0, dn = 0;
+    W.tickers.forEach(t => { const r = liveRow(t); if (!r || !r.volume) return; const x = r.price * r.volume; if (r.chg > 0) u += x; else if (r.chg < 0) dn += x; });
+    const share = u + dn ? dn / (u + dn) : null;
+    if (share != null) {
+      const H = DF.hist, pctl = Math.round(H.filter(x => x < share).length / H.length * 100);
+      const bin = share >= 0.8 ? DF.fwd.sell80 : share >= 0.7 ? DF.fwd.sell70 : share <= 0.2 ? DF.fwd.buy20 : share <= 0.3 ? DF.fwd.buy30 : null, A = DF.fwd.all;
+      const lvl = share >= 0.8 ? "Heavy selling" : share >= 0.65 ? "Selling" : share <= 0.2 ? "Heavy buying" : share <= 0.35 ? "Buying" : "Balanced";
+      const haven = [["TLT", "Treasuries (TLT)"], ["UUP", "Dollar (UUP)"], ["GLD", "Gold (GLD)"], ["^VIX", "VIX"]].map(([k, l]) => { const r = liveRow(k); return r ? `${l} ${pc(r.chg, 1)}` : null; }).filter(Boolean).join(" · ");
+      const bars = (DF.last || []).map(([d, x]) => `<span class="dfb" title="${shortDate(d)}: ${Math.round(x * 100)}% of dollars in falling stocks"><i style="height:${Math.round(x * 100)}%" class="${x >= 0.65 ? "dn" : x <= 0.35 ? "up" : ""}"></i><small>${shortDate(d).replace(/^\w+ /, "")}</small></span>`).join("")
+        + `<span class="dfb now" title="Today: ${Math.round(share * 100)}%"><i style="height:${Math.round(share * 100)}%" class="${share >= 0.65 ? "dn" : share <= 0.35 ? "up" : ""}"></i><small>now</small></span>`;
+      mkt = `<div class="dfwrap"><div><div class="kicker" style="margin:0">Whole market · ${W.n.toLocaleString()} stocks</div>
+        <p style="margin:6px 0 4px"><b class="${share >= 0.65 ? "dn" : share <= 0.35 ? "up" : ""}">${lvl}:</b> ${Math.round(share * 100)}% of today's dollar volume traded in falling stocks
+        (${fmtB(u)} in rising vs ${fmtB(dn)} in falling). That's ${share >= DF.median ? "heavier selling" : "lighter selling"} than ${share >= DF.median ? pctl : 100 - pctl}% of sessions since ${shortDate(DF.from)} (a normal day is ${Math.round(DF.median * 100)}%).</p>
+        ${bin && bin.n >= 5 ? `<p class="meta" style="margin:0 0 4px">After past days like this (${share >= 0.7 ? "70%+" : "30% or less"} in falling stocks, n ${bin.n}), SPY averaged ${pc(bin.spy5, 1)} over the next 5 sessions (up ${Math.round(bin.up5 * 100)}% of the time) vs ${pc(A.spy5, 1)} on an average day. ${share >= 0.7 ? "Heavy selling days have tended to bounce short term; it's context, not a buy signal." : ""}</p>` : ""}
+        ${haven ? `<p class="meta" style="margin:0">Where money hides: ${haven}.</p>` : ""}</div>
+        <div class="dfbars" aria-label="Share of dollar volume in falling stocks, last sessions">${bars}</div></div>`;
+    }
+  }
   body.append($(`<div>
     ${sameDay ? `<p class="meta" style="margin:6px 0">The sheet still shows the last full session (${longDate(T.date)}); today's flows start once the market opens.</p>` : ""}
+    ${mkt}
     <ul style="margin:8px 0 0;padding-left:18px;line-height:1.55">${bullets.map(b => `<li>${b}</li>`).join("")}</ul>
     <h3 class="ih">Money coming in <small class="meta">groups up on the day, ranked by net dollar flow</small></h3>${tbl(ins.slice(0, 12))}
     <h3 class="ih">Money going out <small class="meta">groups down on the day, biggest net dollar outflow first</small></h3>${tbl(outs.slice(0, 12))}
-    <div class="note" style="padding:8px 0 0">Net $ flow adds up each stock's dollar volume today, counted as positive when the stock is up and negative when it's down, so big, heavily traded names carry the most weight (that's where the real money is). Flow × avg day divides it by the group's normal daily dollar volume, which puts small and large groups on the same scale. Rel. volume = dollar volume so far vs the 50-day average, paced for the time of day; bold at 1.2× or more. "Trend into today" is the group's money-flow tier at the last close (Rotation tab → money flow card), so "leader being sold" flags groups that had been in inflow and are now being hit. Uses your theme and sub-theme stocks with Google's live prices (up to ~20 min behind). Click any header to sort.</div></div>`));
+    <div class="note" style="padding:8px 0 0">Every share sold has a buyer, so "money leaving" really means sellers were in control and accepted lower prices; the whole-market line measures how lopsided that was. Net $ flow adds up each stock's dollar volume today, counted as positive when the stock is up and negative when it's down, so big, heavily traded names carry the most weight (that's where the real money is). Flow × avg day divides it by the group's normal daily dollar volume, which puts small and large groups on the same scale. Rel. volume = dollar volume so far vs the 50-day average, paced for the time of day; bold at 1.2× or more. "Trend into today" is the group's money-flow tier at the last close (Rotation tab → money flow card), so "leader being sold" flags groups that had been in inflow and are now being hit. Uses your theme and sub-theme stocks with Google's live prices (up to ~20 min behind). Click any header to sort.</div></div>`));
   return sec;
 }
 function renderRotation(app) {
