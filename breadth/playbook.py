@@ -27,6 +27,7 @@ TYPES = [  # key, name, source, where to find the names
     ("rotation", "Rotation Rookie", "trade", "Trade Setups"),
     ("pullback", "Leader Pullback", "trade", "Trade Setups"),
     ("ath", "ATH Magnet", "trade", "Trade Setups"),
+    ("round", "Round Number Magnet", "trade", "Trade Setups"),
     ("kq", "Qullamaggie Flag", "trade", "Trade Setups"),
     ("vcp", "Minervini VCP", "trade", "Trade Setups"),
     ("bursts", "Momentum bursts (2LYNCH 5+)", "lists", "Setups tab"),
@@ -206,6 +207,9 @@ def plan(key, r):
     if key == "ath":
         return {"entry": f"Buy at the open (last close {_p(price)}) as it presses the high", "stop": "1 ADR below your fill" + f" (~{_p(stop1)})",
                 "target": f"Through the all-time high {_p(r['ath'])} ({r['ath_pct'] * 100:+.1f}%); hold ~5 days"}
+    if key == "round" and r.get("round_lvl"):
+        return {"entry": f"Buy at the open (last close {_p(price)}) as it closes in on {_p(r['round_lvl'])}", "stop": "1 ADR below your fill" + f" (~{_p(stop1)})",
+                "target": f"Tag {_p(r['round_lvl'])} ({r['round_pct'] * 100:+.1f}%, {r['round_adr']} ADR); a close above it can run, otherwise take it at the level"}
     if key == "pullback":
         e21 = price / (1 + r["e21"]) if r.get("e21") is not None else None
         return {"entry": f"Buy at the open, near the 21 EMA{f' (~{_p(e21)})' if e21 else ''}", "stop": "1 ADR below your fill" + f" (~{_p(stop1)})",

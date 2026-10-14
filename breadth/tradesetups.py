@@ -18,6 +18,10 @@ Qullamaggie Flag KQ screen 'Basing' list (breadth/kq.py), any theme. HTF tag whe
                 prior leg was +90% or more. Trade: buy the break of the 5-day high,
                 stop at the entry day's low, sell half after 3 days, trail the rest
                 on a close below the 10 EMA (20 EMA variant also tested).
+Round Number Magnet  strong stock just under a big round number ($50, $100, $150, $200...)
+                RS >= 85, above the 21 and 50 EMAs, ADR >= 2.5%, the next round level no more
+                than 1.5 ADRs above the close. "Fresh" when the level is above the 52-week high
+                (first test in a year). Trade: buy the open, stop 1 ADR, hold ~5 days.
 Minervini VCP   trend template (above rising 150/200 SMA, 50 > 150 > 200, 30%+ off
                 the 52-week low, within 15% of the high), RS >= 70, contracting
                 ranges (10-day < 0.6x 20-day, 20-day < 0.8x 40-day) and volume
@@ -42,6 +46,7 @@ SETUPS = [
     ("pullback", "Leader Pullback", "Leader back at its 21 EMA, uptrend intact, sellers drying up: buy the dip, not the chase."),
     ("rotation", "Rotation Rookie", "A theme or sub-theme money is newly moving into; the stock hasn't run yet."),
     ("kq", "Qullamaggie Flag", "High-ADR top performer basing in a tight flag after a big leg (any theme). Buy the flag break, stop low of day, hold 3-5 days, trail the 10 EMA."),
+    ("round", "Round Number Magnet", "Strong stock a short hop under a big round number ($50, $100, $200...): the level draws price in, and a clean break above it often runs."),
     ("vcp", "Minervini VCP", "Young Stage 2 trend tightening up with volume drying out. Buy the pivot break, stop under the last contraction (max 8%), hold while above the 50-day."),
 ]
 RULES = {
@@ -50,8 +55,29 @@ RULES = {
     "rotation": {"rs": 80, "theme_rise": 10, "theme_str": 55, "sub_rise": 15, "sub_str": 60,
                  "off_lo": -0.12, "off_hi": -0.03, "e21_hi": 0.06},
     "kq": {"htf_leg": 90},
+    "round": {"rs": 85, "adr": 2.5, "dist_adr": 1.5, "min_pct": 0.002},
     "vcp": {"rs": 70, "off": -0.15, "low_up": 0.30, "r10": 0.6, "r20": 0.8, "vdry": 0.9, "stop_cap": 0.08},
 }
+
+
+def round_levels():
+    """Big round numbers: 10, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250, then every 100 to 1,000,
+    every 500 to 5,000 and every 1,000 above."""
+    lv = [10, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250] + list(range(300, 1001, 100)) + list(range(1500, 5001, 500)) + list(range(6000, 100001, 1000))
+    return np.array(sorted(set(lv)), dtype=float)
+
+
+ROUND = round_levels()
+
+
+def next_round(price, min_pct=0.002):
+    """Smallest round level at least min_pct above the price (None past the table)."""
+    i = int(np.searchsorted(ROUND, price * (1 + min_pct), side="left"))
+    return float(ROUND[i]) if i < len(ROUND) else None
+
+
+def is_century(level):
+    return level is not None and (level % 100 == 0 or level == 50)
 
 
 def _num(v, d=9.0):
@@ -148,6 +174,16 @@ def build(stocks, themes, subthemes, kq=None, lists=None, levels=None, vcp=None)
         kqr = basing.get(s["t"])
         if kqr:
             hit.add("kq")
+        R = RULES["round"]
+        lvl = next_round(s["price"], R["min_pct"])
+        rnd = None
+        if lvl and adr > 0:
+            dist = lvl / s["price"] - 1
+            h52 = s["price"] / (1 + off) if off > -1 else None
+            rnd = {"round_lvl": lvl, "round_pct": round(dist, 4), "round_adr": round(dist * 100 / adr, 2),
+                   "round_fresh": bool(h52 and lvl > h52), "round_century": is_century(lvl)}
+            if (rs >= R["rs"] and _num(e21, -1) > 0 and _num(e50, -1) > 0 and adr >= R["adr"] and rnd["round_adr"] <= R["dist_adr"]):
+                hit.add("round")
         vr = vcp.get(s["t"])
         if vr and rs >= RULES["vcp"]["rs"]:
             hit.add("vcp")
@@ -163,6 +199,8 @@ def build(stocks, themes, subthemes, kq=None, lists=None, levels=None, vcp=None)
             "tags": tags_of(s, kqr),
             **m,
         }
+        if rnd:
+            rows[s["t"]].update(rnd)
         if kqr:
             rows[s["t"]].update({"kq_leg": kqr.get("leg"), "kq_rng10": kqr.get("rng10"), "kq_ext": kqr.get("ext"),
                                  "htf": (kqr.get("leg") or 0) >= RULES["kq"]["htf_leg"], "kq_pivot": kqr.get("pivot")})
@@ -176,6 +214,8 @@ def build(stocks, themes, subthemes, kq=None, lists=None, levels=None, vcp=None)
             cand.sort(key=lambda r: (_num(r.get("kq_rng10")), -r["rsr"], r["t"]))
         elif key == "vcp":   # tightest contraction first, then RS
             cand.sort(key=lambda r: (_num(r.get("vcp_r10")), -r["rsr"], r["t"]))
+        elif key == "round":   # fresh tests and century marks first, then the Leaders score
+            cand.sort(key=lambda r: (not r.get("round_fresh"), not r.get("round_century"), -r["score"], r["t"]))
         else:
             cand.sort(key=lambda r: (-r["score"], -r["rsr"], r["t"]))
         out.append({"key": key, "name": name, "desc": desc, "count": len(cand), "top": [r["t"] for r in cand[:TOP]]})
@@ -353,6 +393,18 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
     masks["rotation"] = (base_ok & in_rise & (rating >= R["rs"]) & (rs5 >= 0) & (off >= R["off_lo"]) & (off <= R["off_hi"])
                          & (e21 >= 0) & (e21 <= R["e21_hi"]))
     masks["kq"] = base_ok & _kq_basing(w, w_all["c"])
+    RN = RULES["round"]
+    Cv = c.to_numpy()
+    with np.errstate(invalid="ignore"):
+        idx = np.searchsorted(ROUND, np.nan_to_num(Cv, nan=0.0) * (1 + RN["min_pct"]), side="left")
+    LVL = np.where(idx < len(ROUND), ROUND[np.minimum(idx, len(ROUND) - 1)], np.nan)
+    LVL[~np.isfinite(Cv)] = np.nan
+    lvl_df = pd.DataFrame(LVL, index=dates, columns=cols)
+    r_adr = (lvl_df / c - 1) * 100 / t["adr"]
+    masks["round"] = (base_ok & (rating >= RN["rs"]) & (e21 > 0) & (e50 > 0) & (t["adr"] >= RN["adr"]) & (r_adr <= RN["dist_adr"]))
+    h52_df = w["h"].rolling(252, min_periods=60).max()
+    round_fresh = lvl_df > h52_df
+    round_century = (lvl_df % 100 == 0) | (lvl_df == 50)
     vm, VF = vcp_mask(w, t, long_sma=150)
     masks["vcp"] = base_ok & vm & (rating >= RULES["vcp"]["rs"])
     burst, checks, lynch, ep = SU.masks(w, t, liquid_all[cols])
@@ -554,6 +606,26 @@ def backtest(w_all, t_all, ratings, liquid_all, members, sub_members, focus, bre
         out.setdefault("recent", {})[key] = summarize([x for x in r if x[0] >= N - hold - RECENT])["all"]
         allres += r
     out["kq_trail20"] = summarize(sim_kq(masks["kq"], 20))
+    # Round Number Magnet detail: did the level get tagged / closed above, fresh vs retest, century marks vs smaller levels
+    def touch(mask):
+        m = _new(mask)
+        o = {}
+        for k in ("all", "strong", "mixed", "weak"):
+            tt, cl = [], []
+            for i, j in np.argwhere(m):
+                if i < first or i + hold >= N or (k != "all" and regime[i] != k):
+                    continue
+                L_ = LVL[i, j]
+                tt.append(np.nanmax(H[i + 1:i + hold + 1, j]) >= L_)
+                cl.append(np.nanmax(C[i + 1:i + hold + 1, j]) >= L_)
+            o[k] = {"n": len(tt), "touch": round(float(np.mean(tt)), 3) if tt else None, "close_above": round(float(np.mean(cl)), 3) if cl else None}
+        return o
+    rmask = masks["round"]
+    uptrend = base_ok & (rating >= RN["rs"]) & (e21 > 0) & (e50 > 0) & (t["adr"] >= RN["adr"])
+    out["round"] = {"fresh": summarize(outcomes(rmask & round_fresh)), "retest": summarize(outcomes(rmask & ~round_fresh)),
+                    "century": summarize(outcomes(rmask & round_century)), "smaller": summarize(outcomes(rmask & ~round_century)),
+                    "base": summarize(outcomes(uptrend & ~(r_adr <= RN["dist_adr"]), dedupe=False, every=5)),
+                    "touch": touch(rmask), "touch_fresh": touch(rmask & round_fresh)}
     out["exits"] = {"kq": "buy above the 5-day high, stop entry-day low, half out after 3 days, rest on a close below the 10 EMA",
                     "vcp": "buy above the 10-day high, stop under the 10-day low (max 8%), exit on a close below the 50-day",
                     "other": f"buy the close, stop 1 ADR, exit after {hold} sessions"}

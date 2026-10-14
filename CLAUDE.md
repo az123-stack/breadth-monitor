@@ -59,7 +59,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - `strength.py` v2: RS Rating, RS-line ★/⚑ flags, tightness, Theme Strength
 - `setups.py` momentum bursts (2LYNCH), anticipation, episodic pivots, regime trade stats
 - `leaders.py` Leaders ranking → `DATA.themes.leaders`; Setups tab "Leaders" panel (Top 10 / One per group), recomputed live in the browser by `leadersJS`
-- `tradesetups.py` Trade Setups tab: ATH Magnet, Leader Pullback, Rotation Rookie, Qullamaggie Flag, Minervini VCP (top 5 each by Leaders score;
+- `tradesetups.py` Trade Setups tab: ATH Magnet, Round Number Magnet, Leader Pullback, Rotation Rookie, Qullamaggie Flag, Minervini VCP (top 5 each by Leaders score;
   Q-Flag by flag tightness, VCP by contraction;
   "setups hit" angles, magnet levels) → `DATA.themes.trade_setups`; backtest of every setup + confluence → `DATA.themes.trade_bt`
 - `review.py` "⚑ Review setups" flag (header button + card on Trade Setups) → `DATA.themes.setup_review`; checks regime change
@@ -193,6 +193,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Leader Pullback RS ≥ 85, group ≥ 70, within 3% of 21 EMA, above 50 EMA, 4–20% off high, vol dry ≤ 0.9 ·
   Rotation Rookie theme up 10+ Strength ranks in 4 wks (≥ 55) or sub-theme up 15+ (≥ 60), RS ≥ 80 not falling,
   3–12% off high, 0–6% above 21 EMA · Qullamaggie Flag = KQ Basing, any theme, HTF tag at 90%+ leg; "on deck" = KQ Extended ·
+  Round Number Magnet (Oct 14) = RS ≥ 85, above 21 & 50 EMA, ADR ≥ 2.5, next big round number (`tradesetups.ROUND`: 10, 20, 25, 30, 40,
+  50, 75, 100, 150, 200, 250, every 100 to 1,000, every 500 to 5,000, every 1,000 above; ≥ 0.2% above the close) within 1.5 ADRs;
+  row fields `round_lvl/pct/adr`, `round_fresh` (level above the 52-wk high), `round_century` (multiple of 100, or 50); ranked fresh →
+  century → Leaders score; plan = buy open, stop 1 ADR, target the level. Backtest = buy close, stop 1 ADR, 5 sessions, plus
+  `trade_bt.round` (fresh / retest / century / smaller / base = same strong stocks NOT near a level, touch + close-above rates) ·
   Minervini VCP = trend template (150/200 SMA live; 100/150 in backtest), RS ≥ 70, ≤ 15% off high, ranges 10d < 0.6×20d,
   20d < 0.8×40d, vol dry ≤ 0.9. (Coiled Leader was replaced by Qullamaggie Flag on Oct 11.)
   Backtest: new signals; ATH/Pullback/Rotation buy close, stop 1 ADR, exit 5 sessions. Q-Flag: buy above 5-day high
@@ -209,6 +214,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   EPs without a catalyst check lose in every regime.
 - Trade Setups (Mar–Oct 2026, mixed breadth): Rotation +0.29R, Pullback +0.22R, ATH Magnet +0.12R (tags the high 81%
   vs 76% for any near-high stock), Coiled +0.12R; RS 80+ baseline +0.10R. Confluence (2+ angles) ≈ same R as 1 angle.
+- Round Number Magnet first backtest (Oct 14, 2026, ~Mar–Oct 2026): all +0.12R (n 1,859) vs the same strong stocks not near a level
+  +0.11R → the level alone adds little. Edge sits in fresh levels in good tape: after a thrust +0.30R all / +0.42R fresh vs base +0.20R;
+  strong breadth fresh +0.36R vs base +0.22R; mixed fresh +0.07R vs base +0.17R; weak −0.01R (base −0.10R). Century marks ($50/$100/$200…)
+  +0.01R vs smaller levels +0.18R (centuries act more like resistance). Level traded within 5 sessions 57% (closed above 42%); fresh 50% / 36%.
 - Record-volume "tells" study (Oct 12, 2026; 2,048 events Oct 2025–Sep 2026, no index/expiry days; 10-session return vs
   SPY, clipped ±50%; tells found on the first 60% by date, checked on the last 40%): all events −4.9% train / −7.7% test.
   Consistent AVOID tells (both halves): gap up 10%+ or up 20%+ (−15 to −18%), volume > 20× avg or > 2.2× old record,

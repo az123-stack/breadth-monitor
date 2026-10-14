@@ -2535,6 +2535,7 @@ function yourTradesCard(kicker, note) {
   const statusOf = (it, r) => {
     if (!r) return ["meta", "no live price"];
     if (it.trig) { const dist = r.price / it.trig - 1; return dist >= 0 ? ["up", "Triggered: through $" + (+it.trig).toFixed(2)] : ["", `${pc(dist, 1)} to trigger $${(+it.trig).toFixed(2)}`]; }
+    if (it.setup === "round" && it.row && it.row.round_lvl) { const dist = r.price / it.row.round_lvl - 1; return dist >= -0.001 ? ["up", "At / through $" + it.row.round_lvl] : ["", `${pc(dist, 1)} to $${it.row.round_lvl}`]; }
     if (it.setup === "ath" && it.row && it.row.ath) { const dist = r.price / it.row.ath - 1; return dist >= -0.001 ? ["up", "At / through the all-time high"] : ["", `${pc(dist, 1)} to ATH $${it.row.ath.toFixed(2)}`]; }
     return ["", ""];
   };
@@ -2647,8 +2648,8 @@ function tagStatsCard(S) {
 }
 
 /* ---------- Trade Setups tab (breadth/tradesetups.py) ---------- */
-const ANG_LABEL = { ath: "ATH", pullback: "Pullback", rotation: "Rotation", kq: "Q-Flag", vcp: "VCP", burst: "Burst", antic: "Coil" };
-const ANG_TITLE = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP",
+const ANG_LABEL = { ath: "ATH", round: "Round #", pullback: "Pullback", rotation: "Rotation", kq: "Q-Flag", vcp: "VCP", burst: "Burst", antic: "Coil" };
+const ANG_TITLE = { ath: "ATH Magnet", round: "Round Number Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP",
   burst: "2LYNCH 5+ momentum burst today", antic: "Anticipation list (tight, quiet coil)" };
 function tsDownload(name, sections) {
   const T = DATA.themes, tv = T.tv || {};
@@ -2774,9 +2775,10 @@ function renderTrades(app) {
   };
   const athCell = (r) => `<td class="num magcell">${r.ath.toFixed(2)}<small>${r.ath_ok ? "all-time" : "52-wk (ATH unverified)"} · ${pct(r.ath_pct)}${r.ath_adr != null ? ` · ${r.ath_adr} ADR` : ""}</small></td>`;
   const grpCell = (r) => `<td class="num">${Math.round(r.grp)}<small class="meta" style="display:block;font-size:11px">${r.rising ? "rising: " + esc(r.rising.replace(/^[A-Z &]+ - /, "")) : r.theme_str != null && r.theme_str >= r.sub_str ? "theme" : "sub-theme"}</small></td>`;
-  const angles = (r) => `<td class="l">${["ath", "pullback", "rotation", "kq", "vcp", "burst", "antic"].filter(k => r.angles.includes(k)).map(k => `<span class="ang on" title="${ANG_TITLE[k]}">${ANG_LABEL[k]}</span>`).join("")}${(r.tags || []).length ? `<div>${tagBadges(r.tags, ["burst", "antic"])}</div>` : ""}<small class="meta" style="display:block">${r.hits} angle${r.hits > 1 ? "s" : ""} · ${convCount(r.tags)} tag${convCount(r.tags) === 1 ? "" : "s"}${r.leader ? " · Leaders top 10" : ""}</small></td>`;
+  const angles = (r) => `<td class="l">${["ath", "round", "pullback", "rotation", "kq", "vcp", "burst", "antic"].filter(k => r.angles.includes(k)).map(k => `<span class="ang on" title="${ANG_TITLE[k]}">${ANG_LABEL[k]}</span>`).join("")}${(r.tags || []).length ? `<div>${tagBadges(r.tags, ["burst", "antic"])}</div>` : ""}<small class="meta" style="display:block">${r.hits} angle${r.hits > 1 ? "s" : ""} · ${convCount(r.tags)} tag${convCount(r.tags) === 1 ? "" : "s"}${r.leader ? " · Leaders top 10" : ""}</small></td>`;
   const COLS = {
     ath: [["mag", "ATH<small>distance</small>", athCell]],
+    round: [["round_adr", "Round level<small>distance</small>", r => `<td class="num magcell">$${r.round_lvl?.toLocaleString() ?? "–"}<small>${pct(r.round_pct)} · ${r.round_adr ?? "–"} ADR${r.round_fresh ? ' · <b>fresh</b>' : ""}${r.round_century ? " · century" : ""}</small></td>`]],
     pullback: [["e21", "vs 21 EMA", r => `<td class="num">${pct(r.e21)}</td>`], ["vdry", "Vol dry<small>5d ÷ 50d</small>", r => `<td class="num">${r.vdry?.toFixed(2) ?? "–"}</td>`]],
     rotation: [["e21", "vs 21 EMA", r => `<td class="num">${pct(r.e21)}</td>`], ["rsr5", "RS Δ<small>5 days</small>", r => `<td class="num">${r.rsr5 == null ? "–" : (r.rsr5 > 0 ? "+" : "") + r.rsr5}</td>`]],
     kq: [["kq_leg", "Prior leg<small>60 days</small>", r => `<td class="num">${r.kq_leg == null ? "–" : "+" + r.kq_leg + "%"}${r.htf ? ' <span class="ang on" title="High tight flag: 90%+ leg">HTF</span>' : ""}</td>`],
@@ -2866,16 +2868,22 @@ function tsBacktest(B, now) {
   const REG = { thrust: "After a thrust", strong: "Strong", mixed: "Mixed", weak: "Weak", all: "All days" };
   const cell = (o, k) => !o || !o.n ? `<td class="num meta ${k === now ? "nowcol" : ""}">–</td>` :
     `<td class="num ${k === now ? "nowcol" : ""} ${o.avg_r >= 0.1 ? "g2" : o.avg_r > 0 ? "g1" : o.avg_r <= -0.1 ? "r2" : "r1"}"><b>${o.avg_r >= 0 ? "+" : ""}${o.avg_r.toFixed(2)}R</b> · ${Math.round(o.win * 100)}% win<br><span class="meta" style="font-size:11px">high ${Math.round(o.hit_hi * 100)}% · +1 ADR ${Math.round(o.hit_adr * 100)}% · n ${o.n}</span></td>`;
-  const rows = [["ath", "ATH Magnet"], ["pullback", "Leader Pullback"], ["rotation", "Rotation Rookie"],
+  const rows = [["ath", "ATH Magnet"], ["round", "Round Number Magnet<small>buy close, stop 1 ADR, 5 days</small>"], ["pullback", "Leader Pullback"], ["rotation", "Rotation Rookie"],
       ["kq", "Qullamaggie Flag<small>trail 10 EMA</small>"], ["vcp", "Minervini VCP<small>hold above the 50-day</small>"]]
     .map(([k, n]) => [n, B.setups[k], ""])
     .concat(B.kq_trail20 ? [["Qullamaggie Flag, 20 EMA trail<small>same entries, looser trail</small>", B.kq_trail20, "basel"]] : [])
+    .concat(B.round ? [["Round #: fresh level<small>above the 52-week high: first test in a year</small>", B.round.fresh, "basel"],
+      ["Round #: retest<small>it traded above the level within the year</small>", B.round.retest, "basel"],
+      ["Round #: century marks<small>$50, $100, $200, $300…</small>", B.round.century, "basel"],
+      ["Round #: smaller levels<small>$10–$40, $75, $150, $250, $1,500…</small>", B.round.smaller, "basel"],
+      ["Baseline: same strong stocks NOT near a round number<small>what the round level adds; every 5th day</small>", B.round.base, "basel"]] : [])
     .concat([["Baseline: any stock within 3% of its high<small>no RS or theme filter: what ATH Magnet's filters add</small>", B.base_near, "basel"],
       ["Baseline: any stock with RS 80+<small>sampled every 5th day</small>", B.base, "basel"],
       ["On 1 setup", B.confluence["1"], "basel"], ["On 2+ setups at once<small>confluence</small>", B.confluence["2+"], "basel"]]);
   return $(`<section class="card regcard"><div class="kicker">How these setups have traded · ${B.from} to ${B.to}</div>
     <div class="scroll"><table class="grid btgrid regtab"><thead><tr><th class="l">Signal</th>${["thrust", "strong", "mixed", "weak", "all"].map(k => `<th class="${k === now ? "nowcol" : ""}">${REG[k]}${["strong", "mixed", "weak"].includes(k) ? " breadth" : ""}<small>${k === "all" ? "" : (B.days[k] ?? "–") + (k === "thrust" ? " sessions after" : " days")}${k === now ? " · today" : ""}</small></th>`).join("")}</tr></thead>
     <tbody>${rows.map(([n, o, c]) => `<tr class="${c}"><td class="l">${n}</td>${["thrust", "strong", "mixed", "weak", "all"].map(k => cell(o && o[k], k)).join("")}</tr>`).join("")}</tbody></table></div>
+    ${B.round && B.round.touch ? `<p class="meta" style="margin:8px 0 0"><b>Round Number Magnet, did the level get hit?</b> Within ${B.hold} sessions the round number traded ${["all", "strong", "mixed", "weak"].filter(k => B.round.touch[k] && B.round.touch[k].n).map(k => `${k === "all" ? "overall" : "in " + k + " breadth"} ${Math.round(B.round.touch[k].touch * 100)}% of the time (closed above it ${Math.round(B.round.touch[k].close_above * 100)}%, n ${B.round.touch[k].n})`).join("; ")}.${B.round.touch_fresh && B.round.touch_fresh.all.n ? ` Fresh levels: tagged ${Math.round(B.round.touch_fresh.all.touch * 100)}%, closed above ${Math.round(B.round.touch_fresh.all.close_above * 100)}% (n ${B.round.touch_fresh.all.n}).` : ""}</p>` : ""}
     <div class="note" style="padding:8px 0 0">Every qualifying stock, not just the top 5; each new signal (not on that list in the prior 5 sessions) counts once. ATH Magnet, Pullback and Rotation: buy the close, stop 1 ADR below, sell ${B.hold} sessions later. ${B.exits ? `Qullamaggie Flag: ${B.exits.kq}. Minervini VCP: ${B.exits.vcp} (the backtest uses a 100/150-day template, since only a year of bars is stored).` : ""} R = result ÷ the risk to the stop. <b>Hit high</b> = traded at or above its 52-week high within ${B.hold} sessions (the backtest can't see older all-time highs). <b>+1 ADR</b> = rallied one ADR above entry within ${B.hold} sessions — the move a short-dated option needs. <b>After a thrust</b> = the 25 sessions after a major Breadth thrust or Follow-through (overlaps the regime columns). No commissions, slippage or option pricing; small samples, especially in strong breadth and after thrusts. Past results, not a promise.</div></section>`);
 }
 
