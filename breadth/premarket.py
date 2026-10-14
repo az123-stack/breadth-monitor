@@ -84,6 +84,9 @@ def parse(res, today):
     return [round(last_p, 4), round(prev, 4) if prev else None, int(vol), last_t]
 
 
+MOVER_PCT = 0.015     # second pass: pre-market volume for anything indicated 1.5%+ either way
+VOLUME_MAX = 400
+ETF_FIRST = ["SPY", "QQQ", "IWM", "DIA", "RSP", "XLK", "XLC", "XLY", "XLF", "XLV", "XLI", "XLE", "XLB", "XLP", "XLU", "XLRE", "SMH", "IGV", "XBI"]
 BUDGET_S = 240        # stop fetching after 4 minutes and write what we have (the loop runs every 10 min)
 
 
@@ -165,6 +168,28 @@ def run():
         err = str(e)[:200]
         log.warning("spark failed (%s); falling back to one chart call per symbol", err)
         method, got = "chart", fetch_chart(session, syms, today, deadline, diag)
+    if method == "spark":   # spark has prices but no volume: one chart call each for the movers + ETFs to get it
+        want = [y for y, v in got.items() if v and v[0] is not None and v[1] and abs(v[0] / v[1] - 1) >= MOVER_PCT]
+        want = list(dict.fromkeys(ETF_FIRST + sorted(want, key=lambda y: -abs(got[y][0] / got[y][1] - 1))))[:VOLUME_MAX]
+        vol_deadline = time.monotonic() + max(30, deadline - time.monotonic() + 60)
+        for y in want:
+            if time.monotonic() > vol_deadline:
+                diag["volume_timeout"] = True
+                break
+            try:
+                r = session.get(CHART.format(s=y), params={"range": "1d", "interval": "5m", "includePrePost": "true"}, headers=UA, timeout=10)
+                diag.setdefault("vol_status", {}); diag["vol_status"][str(r.status_code)] = diag["vol_status"].get(str(r.status_code), 0) + 1
+                if r.status_code == 200:
+                    res = ((r.json().get("chart") or {}).get("result") or [None])[0]
+                    v = parse(res, today) if res else None
+                    if v and v[0] is not None:
+                        got[y] = v
+                elif r.status_code == 429:
+                    time.sleep(3)
+            except requests.RequestException:
+                pass
+            time.sleep(0.15)
+        diag["volume_for"] = len(want)
     rows = {t: got[y] for t, y in ysym.items() if got.get(y) and got[y][0] is not None}
     fut = {k: got[k] for k in FUTURES if got.get(k) and got[k][0] is not None}
     out = {"asof": now.strftime("%Y-%m-%dT%H:%M"), "date": today, "method": method, "spark_error": err,
