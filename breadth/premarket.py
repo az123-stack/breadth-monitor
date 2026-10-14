@@ -65,6 +65,12 @@ def parse(res, today):
     closes, vols = q.get("close") or [], q.get("volume") or []
     prev = meta.get("chartPreviousClose") or meta.get("previousClose")
     reg = ((meta.get("currentTradingPeriod") or {}).get("regular") or {}).get("start")
+    # Before the open Yahoo's chartPreviousClose is the close TWO sessions back (checked Oct 14, 2026: MU 989.04 =
+    # Oct 12 close, not Oct 13's 953.19). The last regular close is regularMarketPrice while regularMarketTime is
+    # before today's regular start. Futures/crypto trade now, so their regularMarketTime is today: keep chartPreviousClose.
+    rmp, rmt = meta.get("regularMarketPrice"), meta.get("regularMarketTime")
+    if rmp and rmt and reg and rmt < reg and datetime.fromtimestamp(rmt, ET).date().isoformat() < today:
+        prev = rmp
     last_p = last_t = None
     vol = bars = 0
     for i, t in enumerate(ts):

@@ -2369,10 +2369,15 @@ setInterval(() => { if (document.visibilityState === "visible" && TAB === "prema
 // Yahoo pre-market rows in the same shape the live sheet rows have, so the shared Intraday cards work on them.
 function pmRows() {
   const out = {}, M = stockMap ? stockMap() : {};
-  Object.entries(PM.rows || {}).forEach(([t, [p, prev, vol, last, bars]]) => {
+  Object.entries(PM.rows || {}).forEach(([t, [p, prev0, vol, last, bars]]) => {
+    let prev = prev0;
     if (p == null || !prev) return;
     const g = LIVE && LIVE.rows && LIVE.rows[t];
     const shares = g && g.marketcap && g.price ? g.marketcap / g.price : null;   // Google cap ÷ price = shares
+    // Cross-check the previous close with Google: before today's session Google's price IS the last close
+    // (after the open its closeyest is). Yahoo once handed us the close from two sessions back.
+    const gClose = g && (LIVE.spyDate && LIVE.spyDate >= PM.date ? g.closeyest : g.price);
+    if (gClose && Math.abs(prev / gClose - 1) > 0.003) prev = gClose;
     out[t] = { price: p, closeyest: prev, open: null, volume: vol || 0, bars: bars || 0, last,
       marketcap: shares ? shares * p : null, volumeavg: (g && g.volumeavg) || (M[t] && M[t].v50) || null };
   });
