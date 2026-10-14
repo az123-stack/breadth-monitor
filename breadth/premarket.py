@@ -11,7 +11,9 @@ last pre-market trade.
 
 docs/premarket.json:
   {"asof": "2026-10-14T08:10", "date": "2026-10-14", "method": "spark", "n": 2950, "errors": 0,
-   "rows": {"NVDA": [pre_price, prev_close, pre_volume, "08:09"], ...},
+   "rows": {"NVDA": [pre_price, prev_close, pre_volume, "08:09", active_bars], ...},
+Yahoo reports 0 volume for pre-market bars (checked Oct 14, 2026), so activity = number of 5-minute pre-market bars
+with a trade ("active_bars") plus the last trade time.
    "futures": {"ES=F": [price, prev_close, null, "08:09"], ...}}
 """
 import argparse
@@ -64,7 +66,7 @@ def parse(res, today):
     prev = meta.get("chartPreviousClose") or meta.get("previousClose")
     reg = ((meta.get("currentTradingPeriod") or {}).get("regular") or {}).get("start")
     last_p = last_t = None
-    vol = 0
+    vol = bars = 0
     for i, t in enumerate(ts):
         d = datetime.fromtimestamp(t, ET)
         if d.date().isoformat() != today or (reg and t >= reg):
@@ -72,6 +74,7 @@ def parse(res, today):
         c = closes[i] if i < len(closes) else None
         if c is not None:
             last_p, last_t = c, d.strftime("%H:%M")
+            bars += 1
         v = vols[i] if i < len(vols) else None
         if v:
             vol += v
@@ -80,13 +83,10 @@ def parse(res, today):
         rt = meta.get("regularMarketTime")
         last_t = datetime.fromtimestamp(rt, ET).strftime("%H:%M") if rt else None
         if last_p is None or not rt or datetime.fromtimestamp(rt, ET).date().isoformat() != today:
-            return [None, round(prev, 4) if prev else None, 0, None]
-    return [round(last_p, 4), round(prev, 4) if prev else None, int(vol), last_t]
+            return [None, round(prev, 4) if prev else None, 0, None, 0]
+    return [round(last_p, 4), round(prev, 4) if prev else None, int(vol), last_t, bars]
 
 
-MOVER_PCT = 0.015     # second pass: pre-market volume for anything indicated 1.5%+ either way
-VOLUME_MAX = 400
-ETF_FIRST = ["SPY", "QQQ", "IWM", "DIA", "RSP", "XLK", "XLC", "XLY", "XLF", "XLV", "XLI", "XLE", "XLB", "XLP", "XLU", "XLRE", "SMH", "IGV", "XBI"]
 BUDGET_S = 240        # stop fetching after 4 minutes and write what we have (the loop runs every 10 min)
 
 
@@ -168,28 +168,6 @@ def run():
         err = str(e)[:200]
         log.warning("spark failed (%s); falling back to one chart call per symbol", err)
         method, got = "chart", fetch_chart(session, syms, today, deadline, diag)
-    if method == "spark":   # spark has prices but no volume: one chart call each for the movers + ETFs to get it
-        want = [y for y, v in got.items() if v and v[0] is not None and v[1] and abs(v[0] / v[1] - 1) >= MOVER_PCT]
-        want = list(dict.fromkeys(ETF_FIRST + sorted(want, key=lambda y: -abs(got[y][0] / got[y][1] - 1))))[:VOLUME_MAX]
-        vol_deadline = time.monotonic() + max(30, deadline - time.monotonic() + 60)
-        for y in want:
-            if time.monotonic() > vol_deadline:
-                diag["volume_timeout"] = True
-                break
-            try:
-                r = session.get(CHART.format(s=y), params={"range": "1d", "interval": "5m", "includePrePost": "true"}, headers=UA, timeout=10)
-                diag.setdefault("vol_status", {}); diag["vol_status"][str(r.status_code)] = diag["vol_status"].get(str(r.status_code), 0) + 1
-                if r.status_code == 200:
-                    res = ((r.json().get("chart") or {}).get("result") or [None])[0]
-                    v = parse(res, today) if res else None
-                    if v and v[0] is not None:
-                        got[y] = v
-                elif r.status_code == 429:
-                    time.sleep(3)
-            except requests.RequestException:
-                pass
-            time.sleep(0.15)
-        diag["volume_for"] = len(want)
     rows = {t: got[y] for t, y in ysym.items() if got.get(y) and got[y][0] is not None}
     fut = {k: got[k] for k in FUTURES if got.get(k) and got[k][0] is not None}
     out = {"asof": now.strftime("%Y-%m-%dT%H:%M"), "date": today, "method": method, "spark_error": err,

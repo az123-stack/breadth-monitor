@@ -2369,11 +2369,11 @@ setInterval(() => { if (document.visibilityState === "visible" && TAB === "prema
 // Yahoo pre-market rows in the same shape the live sheet rows have, so the shared Intraday cards work on them.
 function pmRows() {
   const out = {}, M = stockMap ? stockMap() : {};
-  Object.entries(PM.rows || {}).forEach(([t, [p, prev, vol]]) => {
+  Object.entries(PM.rows || {}).forEach(([t, [p, prev, vol, last, bars]]) => {
     if (p == null || !prev) return;
     const g = LIVE && LIVE.rows && LIVE.rows[t];
     const shares = g && g.marketcap && g.price ? g.marketcap / g.price : null;   // Google cap ÷ price = shares
-    out[t] = { price: p, closeyest: prev, open: null, volume: vol || 0,
+    out[t] = { price: p, closeyest: prev, open: null, volume: vol || 0, bars: bars || 0, last,
       marketcap: shares ? shares * p : null, volumeavg: (g && g.volumeavg) || (M[t] && M[t].v50) || null };
   });
   return out;
@@ -2405,10 +2405,13 @@ function renderPremarketCards(app, I, T, R) {
   const seen = new Set();
   const add = (t, extra) => { if (seen.has(t)) return; const r = liveRow(t); if (!r) return; seen.add(t);
     const s = M[t] || {}, avg = r.volumeavg || s.v50 || null;
-    pool.push({ t, r, sub: s.sub || extra, rsr: s.rsr, adr: s.adr, avg, pctDay: avg ? r.volume / avg : null, dvol: r.volume * r.price, ours: !!M[t] }); };
+    pool.push({ t, r, sub: s.sub || extra, rsr: s.rsr, adr: s.adr, avg, ours: !!M[t] }); };
   (T.stocks || []).filter(s => s.is_stock).forEach(s => add(s.t));
   ["SPX", "NDX"].forEach(k => ((I.members || {})[k] || []).forEach(([t, sec]) => add(t, sec)));
-  const real = (x) => (x.pctDay != null && x.pctDay >= 0.01) || x.dvol >= 1e6;   // enough pre-market trading to mean something
+  // Yahoo gives no pre-market volume, so "real" = traded in 6+ five-minute pre-market bars and within 30 min of the snapshot
+  const asofMin = PM.asof ? +PM.asof.slice(11, 13) * 60 + +PM.asof.slice(14, 16) : null;
+  const ago = (x) => x.r.last && asofMin != null ? asofMin - (+x.r.last.slice(0, 2) * 60 + +x.r.last.slice(3, 5)) : null;
+  const real = (x) => x.r.bars >= 6 && (ago(x) ?? 99) <= 30;
   const liquid = (x) => x.r.price >= 5 && (!x.avg || x.avg * x.r.price >= 5e6);
   const X = (T.trade_setups || {}).rows || {}, picks = new Set(((T.playbook || {}).picks || []).map(c => c.t));
   const tag = (x) => picks.has(x.t) ? ' <span class="tg ppull">pick</span>' : X[x.t] ? ' <span class="tg ppull">setup</span>' : "";
@@ -2425,11 +2428,11 @@ function renderPremarketCards(app, I, T, R) {
   const fut = [["ES=F", "S&P"], ["NQ=F", "Nasdaq"], ["RTY=F", "Russell"]].map(([k, l]) => fchg(k) == null ? "" : `${l} ${pc(fchg(k))}`).filter(Boolean).join(" · ");
   const bullets = [
     fut ? `<b>Futures:</b> ${fut}.` : "",
-    `<b>Breadth of the gaps:</b> ${up} of your ${ours.length} theme stocks indicated up, ${dn} down; ${g4u} gapping up 4%+ and ${g4d} down 4%+ on real pre-market volume.`,
+    `<b>Breadth of the gaps:</b> ${up} of your ${ours.length} theme stocks indicated up, ${dn} down; ${g4u} gapping up 4%+ and ${g4d} down 4%+ with steady pre-market trading.`,
     MV.rows.length ? `<b>S&P 500 indicated ${pc(MV.ret)}</b> (equal-weight ${pc(MV.eq)}), Nasdaq-100 ${pc(MN.ret)}. Biggest drivers: ${top3}. Shape so far: <b>${MV.type}</b>${MV.t10share != null ? ` (top 10 names = ${Math.round(Math.abs(MV.t10share) * 100)}% of the move)` : ""}.` : "",
     subs.length ? `<b>Money is gapping into</b> ${subs.slice(0, 3).map(g => `${esc(g.name)} ${pc(g.avg, 1)}`).join(", ")}; <b>out of</b> ${subs.slice(-3).reverse().map(g => `${esc(g.name)} ${pc(g.avg, 1)}`).join(", ")}.` : "",
     mine.length ? `<b>Your names:</b> ${mine.slice(0, 5).map(x => `${x.t} ${pc(x.r.chg, 1)}`).join(", ")}${mine.length > 5 ? ` (+${mine.length - 5} more below)` : ""}.` : "",
-    eps.length ? `<b>Possible EPs to check:</b> ${eps.slice(0, 5).map(x => `${x.t} ${pc(x.r.chg, 0)}`).join(", ")}: gapping 8%+ on real volume; check the news first.` : "",
+    eps.length ? `<b>Possible EPs to check:</b> ${eps.slice(0, 5).map(x => `${x.t} ${pc(x.r.chg, 0)}`).join(", ")}: gapping 8%+ with steady trading; check the news first.` : "",
   ].filter(Boolean);
   app.append($(`<section class="icard card regcard"><div class="kicker">Morning read · ${PM.asof ? PM.asof.slice(11, 16) + " ET" : ""}</div><ul style="margin:8px 0 0;padding-left:18px;line-height:1.55">${bullets.map(b => `<li>${b}</li>`).join("")}</ul></section>`));
   // Futures & macro
@@ -2446,33 +2449,31 @@ function renderPremarketCards(app, I, T, R) {
       .map(x => `<div class="ibar"><span>${esc(x.l)} <small class="meta">${x.k}</small></span><i class="${cls(x.r.chg)}" style="width:${Math.min(100, Math.abs(x.r.chg) * 2500)}%"></i><b class="${cls(x.r.chg)}">${pc(x.r.chg)}</b></div>`).join("")}</div>
     <div class="note" style="padding:8px 0 0">Futures trade nearly 24 hours, so they're the cleanest read on the open. ETF and stock moves are their latest pre-market trade vs yesterday's close; thinly traded ETFs can sit on a stale print.</div></section>`));
   // What's moving the index
-  app.append(indexMoversCard({ kicker: "What's moving the index pre-market", volHead: "Pre-mkt volume<small>% of avg day</small>",
-    vol: (r) => r.volume && r.vavg ? (r.volume / r.vavg * 100).toFixed(1) + "%" : "–" }));
+  app.append(indexMoversCard({ kicker: "What's moving the index pre-market", volHead: "Activity<small>5-min bars traded</small>",
+    vol: (r) => { const q = R[r.t]; return q && q.bars ? q.bars + (q.last ? ` <small class="meta">${q.last}</small>` : "") : "–"; } }));
   // Gap breadth on our stocks
   const sameMeta = (k) => `last session ${T.stocks.filter(s => s.is_stock && s.today != null && (k === "u" ? s.today >= 0.04 : s.today <= -0.04)).length} closed ${k === "u" ? "up" : "down"} 4%+`;
   app.append($(`<section class="icard card regcard"><div class="kicker">Pre-market breadth · your ${ours.length} theme stocks with a quote</div>
     <div class="igrid" style="margin-top:8px">
       <div class="itile"><small>Indicated up / down</small><b>${up} / ${dn}</b><span class="meta">${ours.length ? Math.round(up / ours.length * 100) : 0}% up</span></div>
-      <div class="itile"><small>Gapping up 4%+</small><b class="up">${g4u}</b><span class="meta">on real volume · ${ours.filter(x => x.r.chg >= 0.04).length} incl. thin · ${sameMeta("u")}</span></div>
-      <div class="itile"><small>Gapping down 4%+</small><b class="dn">${g4d}</b><span class="meta">on real volume · ${ours.filter(x => x.r.chg <= -0.04).length} incl. thin · ${sameMeta("d")}</span></div>
+      <div class="itile"><small>Gapping up 4%+</small><b class="up">${g4u}</b><span class="meta">steady trading · ${ours.filter(x => x.r.chg >= 0.04).length} incl. thin prints · ${sameMeta("u")}</span></div>
+      <div class="itile"><small>Gapping down 4%+</small><b class="dn">${g4d}</b><span class="meta">steady trading · ${ours.filter(x => x.r.chg <= -0.04).length} incl. thin prints · ${sameMeta("d")}</span></div>
       <div class="itile"><small>Quoted pre-market</small><b>${PM.n}</b><span class="meta">of ${PM.asked} tracked symbols</span></div>
     </div>
-    <div class="note" style="padding:8px 0 0">"Real volume" = pre-market volume at least 1% of the stock's average day, or $1M+ traded. Many stocks don't trade at all before the open; they show yesterday's close and count as flat.</div></section>`));
+    <div class="note" style="padding:8px 0 0">Yahoo doesn't publish pre-market volume, so "steady trading" means the stock traded in at least 6 of the five-minute pre-market bars (half an hour's worth) and within 30 minutes of the snapshot. Stocks with no pre-market trade aren't counted.</div></section>`));
   // Theme gaps
   app.append(themeHeatCard("Theme gaps · pre-market (average indicated change)"));
   // Gappers
-  const gl = (rs) => `<div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Gap</th><th>Pre-mkt volume</th><th>% of avg day</th><th>RS</th><th>ADR</th><th class="l">Last trade</th></tr></thead><tbody>${rs.map(x => `<tr><td class="l"><b>${x.t}</b>${tag(x)} <small class="meta">${esc(x.sub || "")}</small></td>
-    <td class="num ${cls(x.r.chg)}"><b>${pc(x.r.chg, 1)}</b></td><td class="num">${x.r.volume ? fmtK(x.r.volume) : "–"}</td><td class="num">${x.pctDay == null ? "–" : (x.pctDay * 100).toFixed(1) + "%"}</td>
-    <td class="num ${rsTint(x.rsr)}">${x.rsr ?? "–"}</td><td class="num">${x.adr == null ? "–" : x.adr.toFixed(1)}</td><td class="l meta">${esc((PM.rows[x.t] || [])[3] || "")}</td></tr>`).join("") || '<tr><td class="l meta" colspan="7">None.</td></tr>'}</tbody></table></div>`;
+  const gl = (rs) => `<div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Gap</th><th>In ADRs</th><th>Activity<small>5-min bars traded</small></th><th class="l">Last trade</th><th>RS</th></tr></thead><tbody>${rs.map(x => `<tr><td class="l"><b>${x.t}</b>${tag(x)} <small class="meta">${esc(x.sub || "")}</small></td>
+    <td class="num ${cls(x.r.chg)}"><b>${pc(x.r.chg, 1)}</b></td><td class="num">${x.adr ? (x.r.chg * 100 / x.adr > 0 ? "+" : "") + (x.r.chg * 100 / x.adr).toFixed(1) : "–"}</td><td class="num">${x.r.bars || "–"}</td>
+    <td class="l meta">${esc(x.r.last || "")}</td><td class="num ${rsTint(x.rsr)}">${x.rsr ?? "–"}</td></tr>`).join("") || '<tr><td class="l meta" colspan="6">None.</td></tr>'}</tbody></table></div>`;
   const gU = pool.filter(x => liquid(x) && real(x) && x.r.chg >= 0.02).sort((a, b) => b.r.chg - a.r.chg).slice(0, 20);
   const gD = pool.filter(x => liquid(x) && real(x) && x.r.chg <= -0.02).sort((a, b) => a.r.chg - b.r.chg).slice(0, 15);
-  const act = pool.filter(x => liquid(x) && x.pctDay != null).sort((a, b) => b.pctDay - a.pctDay).slice(0, 12);
-  app.append($(`<section class="icard card regcard"><div class="kicker">Gappers & pre-market volume</div>
-    <h3 class="ih">Gapping up 2%+ <small class="meta">real volume, $5+, liquid</small></h3>${gl(gU)}
+  app.append($(`<section class="icard card regcard"><div class="kicker">Gappers</div>
+    <h3 class="ih">Gapping up 2%+ <small class="meta">steady pre-market trading, $5+, liquid</small></h3>${gl(gU)}
     <h3 class="ih">Gapping down 2%+</h3>${gl(gD)}
-    <h3 class="ih">Heaviest pre-market volume <small class="meta">vs a normal full day</small></h3>${gl(act)}
-    ${eps.length ? `<h3 class="ih">Possible episodic pivots <small class="meta">gap 8%+ on real volume: check the catalyst (earnings, news) before treating it as an EP</small></h3>${gl(eps.slice(0, 10))}` : ""}
-    <div class="note" style="padding:8px 0 0">Your theme stocks plus the S&P 500 and Nasdaq-100. Liquid = $5M+ average daily dollar volume. Pre-market moves on thin volume often reverse at the open, so read the volume column before the gap. "pick" / "setup" = on today's Trade Setups.</div></section>`));
+    ${eps.length ? `<h3 class="ih">Possible episodic pivots <small class="meta">gap 8%+ with steady trading: check the catalyst (earnings, news) before treating it as an EP</small></h3>${gl(eps.slice(0, 10))}` : ""}
+    <div class="note" style="padding:8px 0 0">Your theme stocks plus the S&P 500 and Nasdaq-100. Liquid = $5M+ average daily dollar volume. Moves that only printed a few times often reverse at the open, so check the activity column before the gap. In ADRs = the gap divided by the stock's average daily range. "pick" / "setup" = on today's Trade Setups.</div></section>`));
   // Your trades
   app.append(yourTradesCard("Your trades vs pre-market", `Prices are the latest pre-market trade. "Triggered" means it's indicated through the pivot; the trigger only counts once it trades there after the open. Scoreboard stops are checked against the pre-market price too.`));
 }
