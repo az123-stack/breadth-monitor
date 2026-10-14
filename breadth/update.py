@@ -276,13 +276,17 @@ def main(argv=None):
         universe = refresh_universe(client, state)
         keep = universe | store.theme_tickers()
         end = today_et()
-        have_today = len(bars) and bars["date"].max().date() >= end
-        if args.wait_until and end.weekday() < 5 and not have_today and datetime.now(ET).hour >= 16:
+        # Waiting mode: the free plan unlocks a session only after midnight ET (403 before that; measured Oct 13:
+        # 403 every 15 min until 23:58, published at 00:13). After 4 PM wait for today; otherwise for the last weekday.
+        now = datetime.now(ET)
+        target = end if now.hour >= 16 else max(weekdays(end - timedelta(days=7), end - timedelta(days=1)))
+        have = len(bars) and bars["date"].max().date() >= target
+        if args.wait_until and target.weekday() < 5 and not have:
             hh, mm = map(int, args.wait_until.split(":"))
-            until = datetime.combine(end, datetime.min.time(), ET).replace(hour=hh, minute=mm)
-            if until <= datetime.now(ET):
+            until = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
+            if until <= now:
                 until += timedelta(days=1)
-            wait_for_day(client, end, until)
+            wait_for_day(client, target, until)
         if args.backfill_days:
             start = end - timedelta(days=args.backfill_days)
         elif len(bars):

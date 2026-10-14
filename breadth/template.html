@@ -1101,7 +1101,7 @@ function renderBreadth(app) {
   // Stale-data check: each night's update loads that session (Massive's free plan publishes it overnight), so by
   // morning the last row should be the previous weekday.
   const prevWk = (() => { const d = new Date(etToday() + "T12:00:00"); do d.setDate(d.getDate() - 1); while ([0, 6].includes(d.getDay())); return d.toISOString().slice(0, 10); })();
-  if (last && last.date < prevWk) app.append($(`<div class="r2kwarn" style="margin:0 0 12px">⚠ <b>Breadth data runs through ${longDate(last.date)}.</b> ${longDate(prevWk)}'s numbers haven't loaded yet (unless the market was closed that day). The evening update starts at 6:41 PM ET and waits for Massive to publish (until 1 AM), with a 5:48 AM backup; if this is still here after 7 AM, ask Claude to check the update.</div>`));
+  if (last && last.date < prevWk) app.append($(`<div class="r2kwarn" style="margin:0 0 12px">⚠ <b>Breadth data runs through ${longDate(last.date)}.</b> ${longDate(prevWk)}'s numbers haven't loaded yet (unless the market was closed that day). Massive's free plan releases each day just after midnight ET, so the update runs at 12:17–12:25 AM with morning backups; if this is still here after 7 AM, ask Claude to check the update.</div>`));
   if (DATA.macro && DATA.macro.length) app.append(macroStrip(true));
   const pct = (k) => P[k] != null ? `${ord(P[k])} percentile of your history` : "building history";
   const tiles = [

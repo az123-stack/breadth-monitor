@@ -2,14 +2,14 @@ name: Breadth update
 
 on:
   schedule:
-    # Evening runs grab the day's bars soon after Massive publishes them; the
-    # overnight run is a backup. Off the busy top of the hour (GitHub delays or
-    # skips scheduled runs when busy). ET shown for summer; winter is 1 hour earlier.
-    # A day that isn't published yet is skipped and picked up by the next run;
-    # a rerun with nothing new just rebuilds the page in a couple of minutes.
-    - cron: "37 22 * * 1-5"   # 6:37 PM ET Mon-Fri
-    - cron: "7 1 * * 2-6"     # 9:07 PM ET Mon-Fri (backup)
-    - cron: "7 6 * * 2-6"     # 2:07 AM ET (last backup)
+    # Massive's free plan unlocks a trading day only after midnight ET (403 "not on plan" before that;
+    # measured Oct 13-14, 2026: published by 00:13). Cron is UTC, so two times cover both clock seasons:
+    # 04:17 UTC = 12:17 AM EDT (summer) and 05:17 UTC = 12:17 AM EST (winter); the other one is a harmless
+    # rerun / early miss. 10:17 UTC (6:17 / 5:17 AM ET) is the morning backup. A Claude scheduled task also
+    # dispatches at 12:25 AM ET because GitHub's scheduler skipped runs on this repo for its first days.
+    - cron: "17 4 * * 2-6"
+    - cron: "17 5 * * 2-6"
+    - cron: "17 10 * * 2-6"
   workflow_dispatch:
     inputs:
       backfill_days:

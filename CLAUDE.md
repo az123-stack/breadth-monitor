@@ -9,16 +9,18 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - Owner: Adam (trader, not a developer — explain GitHub steps plainly, step by step)
 
 ## How it runs (fully automated, free)
-- GitHub Actions `.github/workflows/daily.yml`, crons 22:37 UTC Mon–Fri, 01:07 and 06:07 UTC Tue–Sat (≈6:37 PM ET same day, backups 9:07 PM and 2:07 AM).
-  **GitHub's scheduler has never fired a single scheduled run on this repo** (Oct 10–13: every run was workflow_dispatch, cause unknown),
-  so Claude scheduled tasks dispatch it: "Market Monitor evening update kick" (6:41 PM ET Mon–Fri, dispatches with input
-  `wait_until=01:00`: `update.py --wait-until` asks Massive for today's grouped bars every 15 min until they appear or 1:00 AM,
-  logging every check to `data/massive_publish.csv` (time, result: published / empty / 403 not on plan yet) — read it to learn
-  when the free plan publishes and retune the schedule) and "Market Monitor daily update kick" (5:48 AM ET Tue–Sat backup), via
-  `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/daily.yml/dispatches -f ref=main` (gh GraphQL commands like
-  `gh workflow run` are blocked in Claude sessions; use REST). A 7:44 PM ET manual run on Oct 13 did NOT get that day's bars: Massive's
-  free plan publishes overnight. Breadth tab shows a ⚠ banner when the last row is older than the previous weekday (
-  covers the prior trading day). Manual inputs: `backfill_days`, `extend_history`.
+- **When data arrives**: Massive's free plan returns 403 "not on plan" for a trading day until midnight ET, then serves it
+  (measured Oct 13–14, 2026 via `data/massive_publish.csv`: 403 every 15 min 20:28–23:58, published 00:13). So no evening run can
+  get the same day; the update runs just after midnight. GitHub Actions `.github/workflows/daily.yml` crons 04:17 + 05:17 UTC
+  Tue–Sat (12:17 AM ET summer / winter; the other is a harmless rerun) and 10:17 UTC morning backup. GitHub's scheduler skipped every
+  scheduled run Oct 10–13, then fired from Oct 14 (01:21Z, 06:00Z), so Claude scheduled tasks also dispatch it:
+  "Market Monitor evening update kick" (despite the name, 12:25 AM ET Tue–Sat, input `wait_until=02:30`) and
+  "Market Monitor daily update kick" (5:48 AM ET Tue–Sat backup; skips if the previous weekday is loaded). Dispatch via
+  `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/daily.yml/dispatches -f ref=main [-f 'inputs[wait_until]=HH:MM']`
+  (gh GraphQL commands like `gh workflow run` are blocked in Claude sessions; use REST). `update.py --wait-until HH:MM` checks Massive
+  every 15 min for the target day (today after 4 PM, else the last weekday) until it appears or HH:MM, logging each check to
+  `data/massive_publish.csv`. Breadth tab shows a ⚠ banner when the last row is older than the previous weekday.
+  Manual inputs: `backfill_days`, `extend_history`, `wait_until`.
 - Data: Massive (formerly Polygon.io) free plan, 5 calls/min (12.5 s spacing).
   Key lives only in the GitHub secret `MASSIVE_API_KEY` — never ask the user to paste it.
 - Workflow commits data + rebuilt `docs/index.html`; push step retries with
