@@ -160,6 +160,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   flow < −0.15). Evidence per tier × regime recomputed each build. Findings: confirmed +0.8% vs avg group (t 2.9), strong +1.8%
   (t 3.4); steady mixed +1.0% (t 1.9); new ≈ 0; outflow −0.5% (t −2.5); bouncing −0.5% (t −2.4), strong −1.6%; weak breadth
   breaks the inflow tiers; volume flow alone ≈ 0. Lookup box maps a ticker (`stock_group`) or group name to its tier.
+- "Where's the money going · today" (`moneyTodayCard`, Oct 14; top of Rotation tab and on Intraday after theme heat): live from the
+  Google Sheet, per sub-theme / theme (chips, 3+ stocks): avg change, vs SPY, up/n, paced relative $ volume, net $ flow = Σ dollar
+  volume × sign(change) ($M/$B), flow × avg day (÷ group's 50-day avg $ volume), trend into today = `rotation.flow` tier at the last
+  close, read (still being bought / fresh buying / leader being sold / still being sold). Bullets: leaving (top 4 net outflow), going
+  into (top 4 net inflow), risk-on/off (avg XLU/XLP/XLV/XLRE vs XLK/SMH/XLY/XLC), IWM−SPY, RSP−SPY, groups up, leaders being sold.
+  Oct 14 read: out of AI infra (Neoclouds −11.6% on 2.4× volume, custom silicon, AI servers, optical, hyperscalers, memory, quantum,
+  BTC miners, SMR) into large-cap pharma, defense primes, biotech, managed care, oil majors, utilities; 16 of 102 groups up.
 - Rotation tab (browser-only rendering): ideas card · pair chart (`pairCard`: two groups' equal-weight index, ratio and
   its 20-day avg; group rows carry `px`, 180 sessions, dates `themes.px_dates`; guided suggestions: `STARTER_PAIRS` (14 curated
   pairs, each with what a rising/falling ratio means; edit in template.html) and "Cousins pulling apart" (correlation of daily

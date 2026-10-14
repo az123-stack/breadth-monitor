@@ -1060,8 +1060,69 @@ function moneyFlowCard() {
 }
 
 /* ---------- Rotation tab ---------- */
+/* ---------- Where's the money going (Rotation + Intraday): live group moves weighted by dollar volume ----------
+   Net $ flow = Σ over a group's stocks of (dollar volume today × +1 if up, −1 if down): up-volume minus down-volume dollars.
+   Trend into today = the group's money-flow tier at the last close (rotation.flow), so a leader being sold stands out. */
+const MT = { lvl: "sub" };
+const TIER_LABEL = { confirmed: "Confirmed inflow", steady: "Steady inflow", new: "New inflow", fading: "Fading", bouncing: "Bouncing", outflow: "Outflow" };
+function moneyTodayCard() {
+  const T = DATA.themes, I = DATA.intraday || {}, pc = pcI, cls = clsI;
+  const sec = $(`<section class="icard card regcard"><div class="kicker">Where's the money going · today</div><div class="ibtns"></div><div class="ibody"></div></section>`);
+  sec.querySelector(".ibtns").append(chips("Level", [["sub", "Sub-themes"], ["theme", "Themes"]], MT, "lvl", rerenderPanel));
+  const body = sec.querySelector(".ibody");
+  if (!LIVE || !LIVE.rows || !Object.values(LIVE.rows).some(r => r.closeyest != null)) { body.append($('<p class="meta">Needs live prices from your Google Sheet; loading…</p>')); return sec; }
+  const clk = nyClock(), pace = clk.mins <= 0 ? 1 : volPace(clk.mins);
+  const sameDay = LIVE.spyDate && T.date && LIVE.spyDate === T.date;
+  const M = stockMap(), spy = liveRow("SPY"), spyChg = spy ? spy.chg : 0;
+  const tierOf = Object.fromEntries((((T.rotation || {}).flow || {}).rows || []).map(r => [r.g, r]));
+  const groups = (MT.lvl === "theme" ? T.themes : T.subthemes) || [];
+  const rows = groups.map(g => {
+    const mem = (g.members || []).map(t => ({ t, r: liveRow(t), s: M[t] })).filter(x => x.r && x.s && x.s.is_stock);
+    if (mem.length < 3) return null;
+    let flow = 0, dv = 0, av = 0, up = 0, sum = 0;
+    mem.forEach(({ r, s }) => { const d = r.price * (r.volume || 0); dv += d; flow += (r.chg > 0 ? 1 : r.chg < 0 ? -1 : 0) * d; if (s.v50) av += r.price * s.v50; sum += r.chg; if (r.chg > 0) up++; });
+    const avg = sum / mem.length, tr = tierOf[g.theme] || {};
+    const rv = av && pace ? dv / (av * pace) : null;
+    const tier = tr.tier || null, inflowTier = ["confirmed", "steady", "new"].includes(tier);
+    const read = avg > 0 ? (inflowTier ? "Still being bought" : tier === "outflow" || tier === "bouncing" ? "Fresh buying (was out of favor)" : "Fresh buying")
+      : (inflowTier ? "Leader being sold" : tier === "outflow" ? "Still being sold" : "Selling");
+    return { name: g.theme, n: mem.length, avg, rel: avg - spyChg, up, rv, flow: flow / 1e6, flowDay: av ? flow / av : null, tier, read, strength: g.strength };
+  }).filter(Boolean);
+  const heavy = (x) => x.rv != null && x.rv >= 1.2;
+  const ins = rows.filter(x => x.avg > 0 && x.flow > 0).sort((a, b) => b.flow - a.flow);
+  const outs = rows.filter(x => x.avg < 0 && x.flow < 0).sort((a, b) => a.flow - b.flow);
+  const etf = (k) => { const r = liveRow(k); return r ? r.chg : null; };
+  const avgOf = (ks) => { const v = ks.map(etf).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const def = avgOf(["XLU", "XLP", "XLV", "XLRE"]), off = avgOf(["XLK", "SMH", "XLY", "XLC"]);
+  const spread = (a, b) => { const x = etf(a), y = etf(b); return x != null && y != null ? x - y : null; };
+  const pts = (v) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(2)} pts`;
+  const nm = (x) => `${esc(x.name.replace(/^[A-Z &]+ - /, ""))} ${pc(x.avg, 1)}${heavy(x) ? ` (${x.rv.toFixed(1)}× volume)` : ""}`;
+  const dvo = def != null && off != null ? def - off : null;
+  const bullets = [
+    outs.length ? `<b>Leaving:</b> ${outs.slice(0, 4).map(nm).join(", ")}.` : "",
+    ins.length ? `<b>Going into:</b> ${ins.slice(0, 4).map(nm).join(", ")}.` : "<b>Going into:</b> nothing clear: few groups are up on real dollar volume.",
+    dvo != null ? `<b>${dvo > 0.005 ? "Risk-off" : dvo < -0.005 ? "Risk-on" : "No clear tilt"}:</b> defensive sectors (utilities, staples, health care, real estate) ${pc(def)} vs growth sectors (tech, semis, discretionary, communication) ${pc(off)}, a ${pts(dvo)} spread.` : "",
+    `<b>Size and breadth:</b> small caps vs large ${pts(spread("IWM", "SPY"))}, equal weight vs cap weight ${pts(spread("RSP", "SPY"))}; ${rows.filter(x => x.avg > 0).length} of ${rows.length} groups up.`,
+    (() => { const ls = rows.filter(x => x.read === "Leader being sold").sort((a, b) => a.flow - b.flow); return ls.length ? `<b>Leaders being sold:</b> ${ls.slice(0, 5).map(x => esc(x.name.replace(/^[A-Z &]+ - /, ""))).join(", ")}: groups that were in confirmed or steady inflow at the last close and are down hard today. One day doesn't end a trend; watch whether the selling continues for a few sessions.` : ""; })(),
+  ].filter(Boolean);
+  const fmtM = (v) => `${v > 0 ? "+" : v < 0 ? "−" : ""}$${Math.abs(v) >= 1000 ? (Math.abs(v) / 1000).toFixed(1) + "B" : Math.round(Math.abs(v)) + "M"}`;
+  const tbl = (rs) => `<div class="scroll"><table class="grid"><thead><tr><th class="l">Group</th><th>Avg change</th><th>vs SPY</th><th>Up</th><th>Rel. volume<small>paced</small></th><th>Net $ flow<small>up − down $ volume</small></th><th>Flow<small>× avg day</small></th><th class="l">Trend into today<small>last close</small></th><th class="l">Read</th><th>Strength</th></tr></thead><tbody>
+    ${rs.map(x => `<tr><td class="l">${esc(x.name)}</td><td class="num ${cls(x.avg)}">${pc(x.avg)}</td><td class="num ${cls(x.rel)}">${pts(x.rel)}</td><td class="num">${x.up}/${x.n}</td>
+      <td class="num">${x.rv == null ? "–" : (heavy(x) ? "<b>" : "") + x.rv.toFixed(2) + "×" + (heavy(x) ? "</b>" : "")}</td><td class="num ${cls(x.flow)}" data-v="${x.flow}">${fmtM(x.flow)}</td>
+      <td class="num ${cls(x.flowDay)}">${x.flowDay == null ? "–" : (x.flowDay > 0 ? "+" : "") + x.flowDay.toFixed(2)}</td>
+      <td class="l">${x.tier ? esc(TIER_LABEL[x.tier] || x.tier) : '<span class="meta">–</span>'}</td><td class="l ${x.read === "Leader being sold" ? "dn" : x.read.startsWith("Fresh") ? "up" : ""}">${x.read}</td>
+      <td class="num">${x.strength == null ? "–" : Math.round(x.strength)}</td></tr>`).join("") || '<tr><td class="l meta" colspan="10">None.</td></tr>'}</tbody></table></div>`;
+  body.append($(`<div>
+    ${sameDay ? `<p class="meta" style="margin:6px 0">The sheet still shows the last full session (${longDate(T.date)}); today's flows start once the market opens.</p>` : ""}
+    <ul style="margin:8px 0 0;padding-left:18px;line-height:1.55">${bullets.map(b => `<li>${b}</li>`).join("")}</ul>
+    <h3 class="ih">Money coming in <small class="meta">groups up on the day, ranked by net dollar flow</small></h3>${tbl(ins.slice(0, 12))}
+    <h3 class="ih">Money going out <small class="meta">groups down on the day, biggest net dollar outflow first</small></h3>${tbl(outs.slice(0, 12))}
+    <div class="note" style="padding:8px 0 0">Net $ flow adds up each stock's dollar volume today, counted as positive when the stock is up and negative when it's down, so big, heavily traded names carry the most weight (that's where the real money is). Flow × avg day divides it by the group's normal daily dollar volume, which puts small and large groups on the same scale. Rel. volume = dollar volume so far vs the 50-day average, paced for the time of day; bold at 1.2× or more. "Trend into today" is the group's money-flow tier at the last close (Rotation tab → money flow card), so "leader being sold" flags groups that had been in inflow and are now being hit. Uses your theme and sub-theme stocks with Google's live prices (up to ~20 min behind). Click any header to sort.</div></div>`));
+  return sec;
+}
 function renderRotation(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  app.append(moneyTodayCard());
   app.append(moneyFlowCard());
   app.append(rotationIdeasCard());
   app.append(macroStrip(false));
@@ -2654,6 +2715,7 @@ function renderIntraday(app) {
     <div class="note" style="padding:8px 0 0">${sameDay ? "Google's latest session is the one already on the Breadth tab, so these match yesterday's close until the next session starts. " : ""}Counts our tracked stocks only, so they're smaller than the Breadth tab's whole-market numbers; "last session" uses the same stocks for a fair comparison. "Above-normal volume" = volume so far above the 50-day average, paced for the time of day.</div></section>`));
   // 4. Theme heat
   app.append(themeHeatCard("Theme heat · today"));
+  app.append(moneyTodayCard());
   // 5. In play: relative volume and gaps
   const pool = {};
   st.forEach(s => { const r = liveRow(s.t); if (r) pool[s.t] = { t: s.t, name: s.name, r, avg: s.v50, sub: s.sub }; });
