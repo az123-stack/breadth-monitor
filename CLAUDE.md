@@ -112,7 +112,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - `premarket.py` + `.github/workflows/premarket.yml` → `docs/premarket.json` → **Pre-market tab** (`renderPremarket`, Oct 14): Yahoo
   `v7/finance/spark` (20 symbols/call, 150 calls ≈ 45 s) for every live-sheet symbol + futures/macro (ES, NQ, RTY, YM, CL, NG, GC, SI,
   HG, ZN, ^TNX, DXY, BTC, ETH); row = [pre price, prev close, volume (always 0: Yahoo reports no pre-market volume), last trade
-  HH:MM, active 5-min pre-market bars]. User-Agent must be the plain "Mozilla/5.0 (breadth-monitor)" — a browser-looking UA gets 429
+  HH:MM, active 5-min pre-market bars]. Previous close: before the open Yahoo's `chartPreviousClose` is the close TWO sessions back (Oct 14 bug: every
+  change included yesterday's move), so `parse` uses `regularMarketPrice` while `regularMarketTime` is before today's regular start;
+  the page also cross-checks against Google (pre-open Google price = last close) and prefers it when they differ > 0.3%.
+  User-Agent must be the plain "Mozilla/5.0 (breadth-monitor)" — a browser-looking UA gets 429
   on every call from GitHub runners. 4-min budget, `diag` in the JSON records HTTP statuses. Workflow loops every 10 min until 9:31
   ET, committing each snapshot (crons 09:52 + 10:52 UTC Mon–Fri, plus the 5:48 AM Claude task dispatches it). Page reads
   `premarket.json` from Pages every 2 min; `pmRows()` turns it into live-sheet-shaped rows (market cap = Google shares × pre price,
