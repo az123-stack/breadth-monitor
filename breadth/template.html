@@ -2376,6 +2376,8 @@ function pmRows() {
     out[t] = { price: p, closeyest: prev, open: null, volume: vol || 0, bars: bars || 0, last,
       marketcap: shares ? shares * p : null, volumeavg: (g && g.volumeavg) || (M[t] && M[t].v50) || null };
   });
+  // the cash indexes don't trade pre-market: their futures stand in for "Index actual"
+  [["^SPX", "ES=F"], ["^NDX", "NQ=F"]].forEach(([k, f]) => { const q = (PM.futures || {})[f]; if (q && q[0] != null && q[1]) out[k] = { price: q[0], closeyest: q[1], volume: 0 }; });
   return out;
 }
 function renderPremarket(app) {

@@ -109,6 +109,17 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   "getting close" ≥ 2.0×; whole-market estimate = live × median ratio (~2.6); setup = washout in last 10 sessions (same rule as
   the thrust event); highs−lows backdrop. Calibration (Mar 2025–Oct 2026): corr 0.91 with the official count; 2.5× caught 10/13
   thrust-level days (2.0×: 11/13), 10 near-miss false alarms. Official signal still prints next morning.
+- `premarket.py` + `.github/workflows/premarket.yml` → `docs/premarket.json` → **Pre-market tab** (`renderPremarket`, Oct 14): Yahoo
+  `v7/finance/spark` (20 symbols/call, 150 calls ≈ 45 s) for every live-sheet symbol + futures/macro (ES, NQ, RTY, YM, CL, NG, GC, SI,
+  HG, ZN, ^TNX, DXY, BTC, ETH); row = [pre price, prev close, volume (always 0: Yahoo reports no pre-market volume), last trade
+  HH:MM, active 5-min pre-market bars]. User-Agent must be the plain "Mozilla/5.0 (breadth-monitor)" — a browser-looking UA gets 429
+  on every call from GitHub runners. 4-min budget, `diag` in the JSON records HTTP statuses. Workflow loops every 10 min until 9:31
+  ET, committing each snapshot (crons 09:52 + 10:52 UTC Mon–Fri, plus the 5:48 AM Claude task dispatches it). Page reads
+  `premarket.json` from Pages every 2 min; `pmRows()` turns it into live-sheet-shaped rows (market cap = Google shares × pre price,
+  ^SPX/^NDX = ES/NQ futures) and sets `ROWS_OVERRIDE` so the shared cards (`indexMoversCard`, `themeHeatCard`, `yourTradesCard`, also
+  used by Intraday) read pre-market prices through `liveRow`. Cards: morning read (plain-English bullets), futures/macro/ETFs/sectors,
+  what's moving the index, gap breadth on theme stocks, theme gaps, gappers (steady trading = 6+ active bars and a trade within 30
+  min; $5+, $5M+ avg $ vol; gap in ADRs), possible EPs (8%+ gap, steady trading), your trades vs pre-market.
 - `macro.py` Macro drivers strip → `DATA.macro`: Yahoo daily closes (CL, BZ, RB, HO, NG, GC, SI, HG futures, ^TNX, DX-Y.NYB, ^VIX,
   BTC-USD) fetched in the daily run (gated by `config.LEVELS_ENABLED`), cached in `data/macro.json`; derived 3-2-1 crack
   spread (2·RB·42 + HO·42 − 3·CL)/3 $/bbl; missing/stale (> 6 days behind our bars) series fall back to an ETF in our bars
@@ -157,7 +168,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - Pick scorecard: `ledger.summary(..., history)` adds `card` (by setup, by playbook state on the pick date, by rank/month,
   results in R = ret ÷ risk to stop, risk floored at 0.3 ADR; `risk` column in the ledger) and `trade_bt.pick_replay.breakdown`
   (replayed #1 pick by setup / state / month + cumulative edge curve) fills the card until live picks close.
-- `site.py` + `template.html` single self-contained page (tabs: Breadth, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
+- `site.py` + `template.html` single self-contained page (tabs: Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 127 peer groups (swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added)
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
