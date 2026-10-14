@@ -1098,6 +1098,10 @@ function renderBreadth(app) {
       <ul>${R.reasons.map(r => `<li>${r}</li>`).join("")}</ul>
     </div></section>`));
 
+  // Stale-data check: each night's update loads that session (Massive's free plan publishes it overnight), so by
+  // morning the last row should be the previous weekday.
+  const prevWk = (() => { const d = new Date(etToday() + "T12:00:00"); do d.setDate(d.getDate() - 1); while ([0, 6].includes(d.getDay())); return d.toISOString().slice(0, 10); })();
+  if (last && last.date < prevWk) app.append($(`<div class="r2kwarn" style="margin:0 0 12px">⚠ <b>Breadth data runs through ${longDate(last.date)}.</b> ${longDate(prevWk)}'s numbers haven't loaded yet (unless the market was closed that day). The update runs overnight and again at 5:48 AM ET; if this is still here after 7 AM, ask Claude to check the update.</div>`));
   if (DATA.macro && DATA.macro.length) app.append(macroStrip(true));
   const pct = (k) => P[k] != null ? `${ord(P[k])} percentile of your history` : "building history";
   const tiles = [
@@ -1553,23 +1557,33 @@ function csvSplit(line) {
 const liveNum = (v) => { if (v == null || v === "") return null; const n = parseFloat(String(v).replace(/[$,%\s]/g, "")); return isFinite(n) ? n : null; };
 // Live sheet (header-aware): ticker | index | symbol | price | closeyest | open | volume | marketcap | volumeavg (older sheets: ticker | price)
 function parseLiveCSV(text) {
-  const prices = {}, rows = {}; let spyTime = null, asof = null, cols = null;
+  const prices = {}, rows = {}, anchors = {}; let spyTime = null, asof = null, cols = null;
   text.split(/\r?\n/).forEach(line => {
     if (!line.trim()) return;
     const f = csvSplit(line), k = (f[0] || "").replace(/^"|"$/g, "");
     if (k === "ticker") { cols = f.map(x => x.toLowerCase()); return; }
     if (k === "_spytime") { spyTime = f[1]; return; }
-    if (k === "_asof") { asof = f[1]; return; }
+    if (k === "_asof") { asof = f[1]; (cols || []).forEach((c, i) => { if (/^at\d+$/.test(c) && f[i] && f[i] !== "0") anchors[c] = f[i]; }); return; }
     if (!k || k[0] === "_") return;
     const key = k.toUpperCase(), r = {};
-    (cols || ["ticker", "price"]).forEach((c, i) => { if (i > 0 && c !== "symbol") r[c] = liveNum(f[i]); });
+    (cols || ["ticker", "price"]).forEach((c, i) => { if (i === 0 || c === "symbol") return;
+      if (/^at\d+$/.test(c)) { r[c] = parseAnchor(f[i], key); return; }   // frozen "TICKER|price|volume" at 10:00 / 11:00 ET
+      r[c] = liveNum(f[i]); });
     if (r.price != null && r.price > 0) prices[key] = r.price;
     rows[key] = r;
   });
   let spyDate = null;
   const m = spyTime && spyTime.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (m) spyDate = `${m[3]}-${m[1].padStart(2, "0")}-${m[2].padStart(2, "0")}`;
-  return { prices, rows, spyTime, spyDate, asof };
+  return { prices, rows, spyTime, spyDate, asof, anchors };
+}
+// Sheet columns at10 / at11 freeze each row as "TICKER|price|volume" the first time the sheet recalculates after
+// 10:00 / 11:00 ET (blank before that on weekdays). A row whose ticker moved since then reads "TICKER|x" (ignored).
+function parseAnchor(v, key) {
+  if (!v) return null; const [t, p, vol] = String(v).split("|");
+  if ((t || "").toUpperCase() !== key) return null;
+  const px = liveNum(p); if (px == null || px <= 0) return null;
+  return { p: px, v: liveNum(vol) };
 }
 
 async function fetchLive() {
@@ -2188,7 +2202,7 @@ function volPace(mins) {
   for (let i = 1; i < P.length; i++) if (mins <= P[i][0]) { const [a, x] = P[i - 1], [b, y] = P[i]; return x + (y - x) * (mins - a) / (b - a); }
   return 1;
 }
-const ID = { idx: "^SPX" };
+const ID = { idx: "^SPX", at: "at10", lu: "ours", ls: "move" };
 function liveRow(t) {
   const r = LIVE && LIVE.rows && LIVE.rows[t]; if (!r || r.price == null || !r.closeyest) return null;
   const chg = r.price / r.closeyest - 1; if (!isFinite(chg) || Math.abs(chg) > 0.6) return null;
@@ -2254,6 +2268,85 @@ function thrustWatchCard(W, clk) {
       <div class="scroll"><table class="grid"><thead><tr><th class="l">Past thrust-level day</th><th>This list up 4%</th><th>× its avg</th><th>Whole market</th><th class="l">Gauge</th></tr></thead><tbody>
       ${W.past.slice().reverse().map(p => `<tr><td class="l">${longDate(p.date)}</td><td class="num">${p.live}</td><td class="num">${p.x}×</td><td class="num">${p.official}</td><td class="l">${p.caught ? "⚡ flagged" : "missed"}</td></tr>`).join("")}</tbody></table></div></details>
   </section>`);
+}
+/* ---------- Second-half movers (Intraday): what's catching a bid since 10:00 / 11:00 ET ----------
+   Anchor prices come from the live sheet's at10 / at11 columns (frozen at the first recalc after that time). */
+function etToday() {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).map(x => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}`;
+}
+function lateMovers(at, withR2K) {
+  const I = DATA.intraday, T = DATA.themes, pool = {};
+  (T.stocks || []).filter(s => s.is_stock).forEach(s => { pool[s.t] = { t: s.t, sub: s.sub, adr: s.adr, rsr: s.rsr, avg: s.v50, ours: true }; });
+  ["SPX", "NDX"].concat(withR2K ? ["R2K"] : []).forEach(k => ((I.members || {})[k] || []).forEach(([t, sector]) => { if (!pool[t]) pool[t] = { t, sub: sector, idx: k }; }));
+  const spy = liveRow("SPY"), spyA = spy && spy[at], spySince = spyA ? spy.price / spyA.p - 1 : 0;
+  const X = (T.trade_setups || {}).rows || {}, picks = new Set(((T.playbook || {}).picks || []).map(c => c.t));
+  const out = [];
+  Object.values(pool).forEach(x => {
+    const r = liveRow(x.t); if (!r || !r[at] || !(r.price >= 5)) return;
+    const a = r[at], since = r.price / a.p - 1; if (!isFinite(since) || Math.abs(since) > 0.5) return;
+    const avg = x.avg || r.volumeavg || null, am = a.p / r.closeyest - 1;
+    out.push({ ...x, r, since, am, rel: since - spySince, adrX: x.adr ? since * 100 / x.adr : null,
+      vsince: a.v != null && r.volume != null ? Math.max(0, r.volume - a.v) : null, avg,
+      mine: picks.has(x.t) ? "pick" : X[x.t] ? "setup" : "" });
+  });
+  return { rows: out, spySince };
+}
+function lateMoversCard(clk, pace) {
+  const at = ID.at, target = at === "at11" ? 90 : 30, label = at === "at11" ? "11:00" : "10:00";
+  const sec = $(`<section class="icard card regcard"><div class="kicker">Second-half movers · what's catching a bid since ${label} ET</div><div class="ibtns"></div><div class="ibody"></div></section>`);
+  const bt = sec.querySelector(".ibtns");
+  bt.append(chips("Since", [["at10", "Since 10:00"], ["at11", "Since 11:00"]], ID, "at", rerenderPanel));
+  bt.append(document.createTextNode(" "));
+  bt.append(chips("Stocks", [["ours", "Themes + S&P/Nasdaq"], ["all", "+ Russell 2000"]], ID, "lu", rerenderPanel));
+  bt.append(document.createTextNode(" "));
+  bt.append(chips("Sort", [["move", "Biggest move"], ["adr", "Move in ADRs"], ["vol", "Volume since"]], ID, "ls", rerenderPanel));
+  const body = sec.querySelector(".ibody"), A = (LIVE && LIVE.anchors) || {}, stamp = A[at];
+  const msg = (t) => { body.append($(`<p class="meta" style="margin:8px 0">${t}</p>`)); return sec; };
+  if (!LIVE.rows || !Object.values(LIVE.rows).some(r => r[at] !== undefined))
+    return msg(`The live sheet doesn't have the ${esc(at)} column yet, so there's no ${label} snapshot to compare against.`);
+  if (!stamp) return msg(clk.open && clk.mins < target ? `Starts at ${label} ET: the sheet freezes every stock's price then, and this card tracks what moves after it.`
+    : `No ${label} snapshot yet for today. The sheet takes it the first time it recalculates after ${label} ET (usually within a minute or two).`);
+  const aDate = stamp.slice(0, 10), [hh, mm] = stamp.slice(11, 16).split(":").map(Number), aMin = hh * 60 + mm - 570;
+  if (!LIVE.spyDate || aDate !== LIVE.spyDate) return msg(`The ${label} snapshot (${esc(stamp)}) isn't from the session the sheet is showing (${esc(LIVE.spyDate || "?")}), so it's skipped. A fresh one is taken at ${label} ET on the next trading day.`);
+  const late = aMin - target > 15;
+  const L = lateMovers(at, ID.lu === "all");
+  L.rows.forEach(x => { const exp = x.avg && pace != null ? x.avg * Math.max(0, pace - volPace(Math.max(1, aMin))) : null;
+    x.rv = x.vsince != null && exp > 0 && x.vsince >= 20000 ? x.vsince / exp : null; });
+  const pc = (v, d = 1) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
+  const cls = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "dn" : "";
+  const idx = [["SPY", "S&P 500"], ["QQQ", "Nasdaq-100"], ["IWM", "Russell 2000"], ["RSP", "Equal-weight S&P"]].map(([k, l]) => { const r = liveRow(k), a = r && r[at];
+    const v = a ? r.price / a.p - 1 : null;
+    return `<div class="itile"><small>${l} since ${label}</small><b class="${cls(v)}">${pc(v, 2)}</b><span class="meta">${a ? "before: " + pc(a.p / r.closeyest - 1, 2) + " · now " + pc(r.chg, 2) : ""}</span></div>`; }).join("");
+  const kind = (x) => x.since > 0 ? (x.am <= -0.005 && x.r.chg > 0 ? "Red → green" : x.am >= 0.01 ? "Extending" : x.am <= -0.005 ? "Bouncing (still red)" : "New mover")
+    : (x.am >= 0.005 && x.r.chg < 0 ? "Green → red" : x.am >= 0.01 ? "Giving it back" : "Sliding");
+  const liquid = (x) => x.avg ? x.avg * x.r.price >= 5e6 : (x.r.volume || 0) * x.r.price >= 3e6;
+  const key = ID.ls === "vol" ? (x) => x.rv ?? -1 : ID.ls === "adr" ? (x) => x.adrX ?? x.since * 100 / 3 : (x) => x.since;
+  const bids = L.rows.filter(x => liquid(x) && x.since >= 0.01 && x.rel > 0).sort((a, b) => key(b) - key(a)).slice(0, 20);
+  const asks = L.rows.filter(x => liquid(x) && x.since <= -0.01 && x.rel < 0).sort((a, b) => ID.ls === "vol" ? key(b) - key(a) : key(a) - key(b)).slice(0, 10);
+  const nm = (x) => `<td class="l"><b>${x.t}</b>${x.mine ? ` <span class="tg ppull" title="${x.mine === "pick" ? "Today's top pick" : "On a Trade Setups list"}">${x.mine === "pick" ? "pick" : "setup"}</span>` : ""} <small class="meta">${esc(x.sub || "")}</small></td>`;
+  const rowsHtml = (rs) => rs.map(x => `<tr>${nm(x)}<td class="num ${cls(x.since)}"><b>${pc(x.since)}</b></td><td class="num">${x.adrX == null ? "–" : (x.adrX > 0 ? "+" : "") + x.adrX.toFixed(1)}</td>
+    <td class="num ${cls(x.am)}">${pc(x.am)}</td><td class="num ${cls(x.r.chg)}">${pc(x.r.chg)}</td><td class="num">${x.rv == null ? "–" : x.rv.toFixed(1) + "×"}</td>
+    <td class="num ${rsTint(x.rsr)}">${x.rsr ?? "–"}</td><td class="l">${kind(x)}</td></tr>`).join("");
+  const hdr = `<thead><tr><th class="l">Stock</th><th>Since ${label}</th><th>In ADRs</th><th>Before ${label}<small>vs prior close</small></th><th>Day</th><th>Volume since<small>vs normal</small></th><th>RS</th><th class="l">Pattern</th></tr></thead>`;
+  // groups: average move since the anchor
+  const grp = (groups) => groups.map(g => { const m = (g.members || []).map(t => { const r = liveRow(t), a = r && r[at]; return a ? r.price / a.p - 1 : null; }).filter(v => v != null && Math.abs(v) < 0.5);
+    return { name: g.theme, n: m.length, avg: m.length ? m.reduce((p, q) => p + q, 0) / m.length : null, up: m.filter(v => v > 0).length }; }).filter(g => g.n >= 3).sort((a, b) => b.avg - a.avg);
+  const T = DATA.themes, gs = grp(T.subthemes || []), gt = grp(T.themes || []);
+  const gtab = (title, rs) => `<div><h3 class="ih">${title}</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Group</th><th>Avg since ${label}</th><th>Up since</th></tr></thead><tbody>${rs.map(g => `<tr><td class="l">${esc(g.name)}</td><td class="num ${cls(g.avg)}">${pc(g.avg, 2)}</td><td class="num">${g.up}/${g.n}</td></tr>`).join("") || '<tr><td class="l meta" colspan="3">–</td></tr>'}</tbody></table></div></div>`;
+  const upShare = L.rows.length ? L.rows.filter(x => x.rel > 0).length / L.rows.length : null;
+  body.append($(`<div>
+    ${late ? `<div class="r2kwarn">⚠ The sheet took this snapshot at ${esc(stamp.slice(11, 16))} ET instead of ${label} (it only freezes prices when it recalculates), so moves are measured from ${esc(stamp.slice(11, 16))}.</div>` : ""}
+    <div class="igrid" style="margin:8px 0">${idx}
+      <div class="itile"><small>Beating SPY since ${label}</small><b>${upShare == null ? "–" : Math.round(upShare * 100) + "%"}</b><span class="meta">${L.rows.length} stocks with a snapshot</span></div></div>
+    <h3 class="ih">Catching a bid <small class="meta">up 1%+ since ${label} and beating SPY (${pc(L.spySince, 2)})</small></h3>
+    <div class="scroll"><table class="grid">${hdr}<tbody>${rowsHtml(bids) || '<tr><td class="l meta" colspan="8">Nothing up 1%+ since then yet.</td></tr>'}</tbody></table></div>
+    <h3 class="ih">Losing it <small class="meta">down 1%+ since ${label} and lagging SPY</small></h3>
+    <div class="scroll"><table class="grid">${hdr}<tbody>${rowsHtml(asks) || '<tr><td class="l meta" colspan="8">Nothing down 1%+ since then.</td></tr>'}</tbody></table></div>
+    <div class="isplit">${gtab("Sub-themes bid since " + label, gs.slice(0, 8))}${gtab("Sub-themes sold since " + label, gs.slice(-5).reverse())}</div>
+    <div class="isplit">${gtab("Themes bid since " + label, gt.slice(0, 6))}${gtab("Themes sold since " + label, gt.slice(-4).reverse())}</div>
+    <div class="note" style="padding:8px 0 0">The sheet freezes every stock's Google price and volume at ${label} ET (first recalculation after it), so this card shows who's moving after the opening rush settles. Google prices run up to ~20 min behind, so the "${label}" price can be from a bit earlier. In ADRs = the move since ${label} divided by the stock's average daily range (theme stocks only). Volume since vs normal = volume traded since ${label} ÷ what a normal day trades in that stretch (your tracker's volume curve × 50-day average). Pattern: red → green = was down at ${label}, now up on the day; extending = already up 1%+ at ${label} and still going; new mover = flat at ${label}. $5+ stocks with $5M+ average daily dollar volume. "pick" / "setup" = on today's Trade Setups.</div></div>`));
+  return sec;
 }
 function renderIntraday(app) {
   const I = DATA.intraday, T = DATA.themes;
@@ -2349,6 +2442,8 @@ function renderIntraday(app) {
       ${rv.map(x => `<tr>${nm(x)}<td class="num"><b>${x.rv.toFixed(1)}×</b></td><td class="num ${cls(x.r.chg)}">${pc(x.r.chg, 1)}</td><td class="num ${cls(x.r.gap)}">${pc(x.r.gap, 1)}</td><td class="num ${cls(x.r.fromOpen)}">${pc(x.r.fromOpen, 1)}</td></tr>`).join("") || '<tr><td class="l meta" colspan="5">No volume data yet.</td></tr>'}</tbody></table></div>
     <div class="isplit"><div><h3 class="ih">Gapped up 2%+</h3>${gt(gapsU)}</div><div><h3 class="ih">Gapped down 2%+</h3>${gt(gapsD)}</div></div>
     <div class="note" style="padding:8px 0 0">Our tracked stocks plus the S&P 500 and Nasdaq-100, $5+. Relative volume compares volume so far with the 50-day average, scaled to the share of a normal day done by now (your tracker's volume curve). "Gap and go" = still moving in the gap's direction since the open.</div></section>`));
+  // 5b. Second-half movers (since 10:00 / 11:00 ET)
+  app.append(lateMoversCard(clk, pace));
   // 6. Your trades, live
   const X = T.trade_setups || {}, PB = T.playbook || {}, SB = T.scoreboard || {};
   const items = [];

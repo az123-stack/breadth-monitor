@@ -9,7 +9,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - Owner: Adam (trader, not a developer — explain GitHub steps plainly, step by step)
 
 ## How it runs (fully automated, free)
-- GitHub Actions `.github/workflows/daily.yml`, crons 22:37 UTC Mon–Fri, 01:07 and 06:07 UTC Tue–Sat (≈6:37 PM ET same day, backups 9:07 PM and 2:07 AM; GitHub skipped the first scheduled run Oct 13; first evening run tells us when the free plan publishes the day) (
+- GitHub Actions `.github/workflows/daily.yml`, crons 22:37 UTC Mon–Fri, 01:07 and 06:07 UTC Tue–Sat (≈6:37 PM ET same day, backups 9:07 PM and 2:07 AM).
+  **GitHub's scheduler has never fired a single scheduled run on this repo** (Oct 10–13: every run was workflow_dispatch, cause unknown),
+  so a Claude scheduled task "Market Monitor daily update kick" (5:48 AM ET Tue–Sat) dispatches the workflow via
+  `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/daily.yml/dispatches -f ref=main` (gh GraphQL commands like
+  `gh workflow run` are blocked in Claude sessions; use REST). A 7:44 PM ET manual run on Oct 13 did NOT get that day's bars: Massive's
+  free plan publishes overnight. Breadth tab shows a ⚠ banner when the last row is older than the previous weekday (
   covers the prior trading day). Manual inputs: `backfill_days`, `extend_history`.
 - Data: Massive (formerly Polygon.io) free plan, 5 calls/min (12.5 s spacing).
   Key lives only in the GitHub secret `MASSIVE_API_KEY` — never ask the user to paste it.
@@ -26,6 +31,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   reach the sheet on their own. D:I formulas (rows 4-3600) ask GOOGLEFINANCE for column C (`symbol`);
   marketcap/volumeavg only where index = 1, open skipped where index = 2 (Russell 2000 rows). Formulas run to row 3600; if the list passes ~3,590 rows, extend them.
   The page parser reads the header, so old 2-column sheets still work.
+  Columns J:K `at10` / `at11` (Oct 13) freeze each row as "TICKER|price|volume" at the first recalc after 10:00 / 11:00 ET, using
+  iterative calculation (File → Settings → Calculation, max 1 iteration — must stay ON) and self-referencing formulas; blank before
+  that time on weekdays, held overnight/weekends; a row whose ticker moved reads "TICKER|x" (page ignores it). J2/K2 hold the freeze
+  time ("yyyy-mm-dd hh:mm" ET). The sheet's timezone is America/Los_Angeles, so formulas use NOW()+3/24 for ET — if the sheet timezone
+  changes, fix those. Self-reference starts at 0, hence the OR(J4="",J4=0) checks.
 
 ## Code map
 - `breadth/config.py` settings and thresholds · `massive.py` API client
@@ -78,7 +88,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   market pulse (indexes, RSP−SPY, IWM−SPY, VIX, bonds, dollar, gold, oil, BTC, sector ETFs) · who's moving the index
   (SPX/NDX contribution = prior-close Google market cap weight × change, by stock and sector, day type Broad/Narrow/Mixed)
   · live 4% breadth on theme stocks with volume pacing · theme/sub-theme heat · in play (paced relative volume, gaps,
-  gap-and-go vs fading) · your trades live (picks, setup rows, triggers/ATH, open scoreboard trades vs stops).
+  gap-and-go vs fading) · second-half movers (`lateMoversCard`: since 10:00 / 11:00 from the sheet's at10/at11 columns; chips for
+  anchor, + Russell 2000, sort by move / move in ADRs / volume since vs normal (vol − anchor vol ÷ 50d avg × curve share); "catching
+  a bid" = up 1%+ since and beating SPY, "losing it" = down 1%+ and lagging; pattern red→green / extending / new mover; sub-theme
+  and theme averages since the anchor; $5+, $5M+ avg $ vol; warns when the freeze ran 15+ min late) · your trades live (picks, setup rows, triggers/ATH, open scoreboard trades vs stops).
   Russell 2000 option in "Who's moving the index" (Oct 13): iShares and Vanguard block scripted downloads from GitHub (tested),
   so Adam downloads the IWM "Detailed Holdings" CSV and Claude imports it: `python -m breadth.russell FILE` → `data/russell2000.csv`
   (ticker, mv = market value, sector, Google exchange prefix, asof). Each build `russell.weights(adjusted)` moves every weight by the
