@@ -16,6 +16,10 @@ on:
         description: "Calendar days of history to load (first run: 730). Leave 0 for a normal update."
         required: false
         default: "0"
+      wait_until:
+        description: "Evening runs: wait for today's data until this ET time (e.g. 01:00), checking every 15 min. Blank = don't wait."
+        required: false
+        default: ""
       extend_history:
         description: "Refetch older history for long-term returns (one-off, ~70 min)"
         type: boolean
@@ -47,11 +51,14 @@ jobs:
           MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
           BACKFILL_DAYS: ${{ github.event.inputs.backfill_days || '0' }}
           EXTEND: ${{ github.event.inputs.extend_history || 'false' }}
+          WAIT_UNTIL: ${{ github.event.inputs.wait_until || '' }}
         run: |
           if [ "$BACKFILL_DAYS" != "0" ]; then
             python -m breadth.update --backfill-days "$BACKFILL_DAYS"
           elif [ "$EXTEND" = "true" ]; then
             python -m breadth.update --extend-history
+          elif [ -n "$WAIT_UNTIL" ]; then
+            python -m breadth.update --wait-until "$WAIT_UNTIL"
           else
             python -m breadth.update
           fi

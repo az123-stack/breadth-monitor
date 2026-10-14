@@ -3,6 +3,7 @@
     python -m breadth.update                    # daily incremental run
     python -m breadth.update --backfill-days 730  # first-time history load
     python -m breadth.update --rebuild-only     # recompute + site, no API calls
+    python -m breadth.update --wait-until 01:00 # evening run: wait (checking every 15 min) for today's bars
 """
 import argparse
 import logging
@@ -29,6 +30,41 @@ def weekdays(start, end):
         if d.weekday() < 5:
             yield d
         d += timedelta(days=1)
+
+
+PUBLISH_LOG = config.DATA_DIR / "massive_publish.csv"   # every "is today's data out yet?" check
+
+
+def log_check(day, result, n=0):
+    import csv
+    new = not PUBLISH_LOG.exists()
+    with open(PUBLISH_LOG, "a", newline="") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(["checked_at_et", "day", "result", "bars"])
+        w.writerow([datetime.now(ET).strftime("%Y-%m-%d %H:%M"), day.isoformat(), result, n])
+
+
+def wait_for_day(client, day, until, every_min=15):
+    """Ask Massive for `day`'s grouped bars every `every_min` minutes until they appear or `until`
+    (an ET datetime) passes. Each check is logged to data/massive_publish.csv so we learn when the
+    free plan publishes. Returns True once the day is out."""
+    import time
+    while True:
+        try:
+            rows = client.grouped_daily(day)
+            result, n = ("published", len(rows)) if len(rows) >= 1000 else ("empty" if not rows else "partial", len(rows))
+        except MassiveError as e:
+            result, n = ("403 not on plan yet" if "403" in str(e) else "error: " + str(e)[:80]), 0
+        log_check(day, result, n)
+        log.info("%s check for %s: %s (%d bars)", datetime.now(ET).strftime("%H:%M ET"), day, result, n)
+        if result == "published":
+            return True
+        nxt = datetime.now(ET) + timedelta(minutes=every_min)
+        if nxt > until:
+            log.info("stopped waiting at %s; the morning run will pick %s up", datetime.now(ET).strftime("%H:%M ET"), day)
+            return False
+        time.sleep(every_min * 60)
 
 
 def refresh_universe(client, state, force=False):
@@ -225,6 +261,8 @@ def main(argv=None):
     p.add_argument("--backfill-days", type=int, default=0,
                    help="calendar days of history to load (free plan: up to ~730)")
     p.add_argument("--rebuild-only", action="store_true")
+    p.add_argument("--wait-until", default="",
+                   help="HH:MM ET (after midnight = next day): on a weekday evening, wait for today's bars until then")
     p.add_argument("--extend-history", action="store_true",
                    help="refetch older days (pruned earlier) up to KEEP_TRADING_DAYS, incl. theme ETFs/ADRs")
     args = p.parse_args(argv)
@@ -238,6 +276,13 @@ def main(argv=None):
         universe = refresh_universe(client, state)
         keep = universe | store.theme_tickers()
         end = today_et()
+        have_today = len(bars) and bars["date"].max().date() >= end
+        if args.wait_until and end.weekday() < 5 and not have_today and datetime.now(ET).hour >= 16:
+            hh, mm = map(int, args.wait_until.split(":"))
+            until = datetime.combine(end, datetime.min.time(), ET).replace(hour=hh, minute=mm)
+            if until <= datetime.now(ET):
+                until += timedelta(days=1)
+            wait_for_day(client, end, until)
         if args.backfill_days:
             start = end - timedelta(days=args.backfill_days)
         elif len(bars):
