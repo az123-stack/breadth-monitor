@@ -306,6 +306,10 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .chips button[aria-pressed="true"] { background: var(--neutral-mid); color: var(--text-primary); font-weight: 600; }
 table.grid th { cursor: pointer; user-select: none; }
 table.grid th[aria-sort] { color: var(--text-primary); }
+.panel table > thead th { cursor: pointer; user-select: none; }
+.panel table > thead th:hover { color: var(--text-primary); }
+.panel table > thead th[aria-sort="descending"]::after { content: " ▾"; }
+.panel table > thead th[aria-sort="ascending"]::after { content: " ▴"; }
 table.grid th[aria-sort="descending"]::after { content: " ▾"; }
 table.grid th[aria-sort="ascending"]::after { content: " ▴"; }
 table.grid td.l, table.grid th.l { text-align: left; }
@@ -554,6 +558,7 @@ function render() {
     else if (TAB === "premarket") renderPremarket(panel);
     else if (TAB === "rotation") renderRotation(panel);
     else renderBreadth(panel);
+    reapplySorts(panel);
   };
   tabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
     TAB = b.dataset.tab;
@@ -1528,7 +1533,7 @@ function table(rows) {
   el.querySelector("thead").innerHTML = "<tr><th>Date</th>" + COLS.map(c => `<th class="${c[5] ? "grp" : ""}">${c[1]}<small>${c[2]}</small></th>`).join("") + "</tr>";
   const body = el.querySelector("tbody");
   const fill = (n) => {
-    body.innerHTML = rows.slice(-n).reverse().map(r => "<tr><td>" + shortDate(r.date) + "</td>" +
+    body.innerHTML = rows.slice(-n).reverse().map(r => "<tr><td data-v=\"" + Date.parse(r.date + "T12:00:00") + "\">" + shortDate(r.date) + "</td>" +
       COLS.map(c => `<td class="num ${c[5] ? "grp " : ""}${shade(c[0], c[3], r[c[0]])}">${fmt(r[c[0]], c[4] || 0)}</td>`).join("") + "</tr>").join("");
   };
   el.querySelectorAll(".toggle button").forEach(b => b.addEventListener("click", () => {
@@ -1758,6 +1763,7 @@ function rerenderPanel() {
   else if (TAB === "browse") renderBrowse(panel); else if (TAB === "setups") renderSetups(panel);
   else if (TAB === "trades") renderTrades(panel);
   else if (TAB === "intraday") renderIntraday(panel); else if (TAB === "premarket") renderPremarket(panel); else if (TAB === "rotation") renderRotation(panel); else renderBreadth(panel);
+  reapplySorts(panel);
   window.scrollTo(0, y);
 }
 setInterval(() => { if (document.visibilityState === "visible" && (TAB !== "breadth")) fetchLive(); }, 3 * 60 * 1000);
@@ -1788,6 +1794,7 @@ const badge = (r) => `<span class="badge" title="${r.class.toLowerCase()}"><i st
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 function sortable(table, cols, getRows, draw, state) {
+  table.dataset.ownSort = "1";   // sorts its own data; the generic click-to-sort below leaves it alone
   let key = state[0], dir = state[1];
   const ths = table.querySelectorAll(":scope > thead th");
   const mark = () => ths.forEach((th, i) => { if (cols[i].k === key) th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending"); else th.removeAttribute("aria-sort"); });
@@ -1808,6 +1815,56 @@ function sortRows(rows, key, dir) {
     if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
     return (typeof x === "string" ? x.localeCompare(y) : x - y) * dir;
   });
+}
+/* ---------- Click-to-sort for every other table: click a header to sort by that column, click again to flip.
+   The choice is remembered per table (section + sub-heading + headers) and re-applied after each live refresh. ---------- */
+const AUTOSORT = {};
+function cellVal(td) {
+  if (!td) return null;
+  if (td.dataset.v != null && td.dataset.v !== "" && isFinite(+td.dataset.v)) return +td.dataset.v;
+  const t = (td.dataset.v ?? td.innerText ?? "").trim().split("\n")[0].trim();
+  if (!t || /^[–—-]$/.test(t)) return null;
+  const n = t.replace(/[,$\s]/g, "").replace(/\u2212/g, "-").match(/^([+-]?\d*\.?\d+)([KMB]?)/i);
+  if (n) { const u = n[2].toUpperCase(); return parseFloat(n[1]) * (u === "K" ? 1e3 : u === "M" ? 1e6 : u === "B" ? 1e9 : 1); }
+  const tm = t.match(/^(\d{1,2}):(\d{2})/); if (tm) return +tm[1] * 60 + +tm[2];
+  // dates shown as "Oct 13" or "Tue, Oct 13, 2026": sort by the date (no year → the latest one not in the future)
+  const dm = t.match(/(?:^|\s)(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.? (\d{1,2})(?:,? (\d{4}))?/);
+  if (dm) { const now = new Date(); let y = dm[3] ? +dm[3] : now.getFullYear(); let d = new Date(`${dm[1]} ${dm[2]}, ${y}`);
+    if (!dm[3] && d - now > 2 * 864e5) d = new Date(`${dm[1]} ${dm[2]}, ${y - 1}`); if (!isNaN(d)) return d.getTime(); }
+  return t.toLowerCase();
+}
+function tableKey(table) {
+  const sec = table.closest("section, .card") || document.body;
+  const title = ((sec.querySelector(".kicker, h2") || {}).textContent || "").slice(0, 60);
+  let sub = "";
+  for (const el of sec.querySelectorAll("h3, table")) { if (el === table) break; if (el.tagName === "H3") sub = el.textContent.slice(0, 60); }
+  const heads = [...table.querySelectorAll(":scope > thead th")].map(th => th.textContent.trim()).join("|");
+  return title + "§" + sub + "§" + heads;
+}
+function sortTable(table, col, dir) {
+  const tb = table.tBodies[0]; if (!tb) return;
+  const rows = [...tb.rows];
+  if (rows.length < 2 || rows.some(r => [...r.cells].some(c => c.colSpan > 1))) return;   // placeholder / detail rows: leave alone
+  const vals = new Map(rows.map(r => [r, cellVal(r.cells[col])]));
+  rows.sort((a, b) => {
+    const x = vals.get(a), y = vals.get(b);
+    if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+    return (typeof x === "string" || typeof y === "string" ? String(x).localeCompare(String(y)) : x - y) * dir;
+  });
+  rows.forEach(r => tb.appendChild(r));
+  table.querySelectorAll(":scope > thead th").forEach((th, i) => { if (i === col) th.setAttribute("aria-sort", dir > 0 ? "ascending" : "descending"); else th.removeAttribute("aria-sort"); });
+}
+document.addEventListener("click", (e) => {
+  const th = e.target.closest && e.target.closest(".panel table > thead th"); if (!th) return;
+  const table = th.closest("table"); if (table.dataset.ownSort) return;
+  const col = th.cellIndex, key = tableKey(table), prev = AUTOSORT[key];
+  const first = table.tBodies[0] && [...table.tBodies[0].rows].map(r => cellVal(r.cells[col])).find(v => v != null);
+  const dir = prev && prev[0] === col ? -prev[1] : (typeof first === "string" ? 1 : -1);   // numbers: biggest first; text: A–Z
+  AUTOSORT[key] = [col, dir]; sortTable(table, col, dir);
+});
+function reapplySorts(root) {
+  if (!Object.keys(AUTOSORT).length || !root) return;
+  root.querySelectorAll("table").forEach(t => { if (t.dataset.ownSort) return; const s = AUTOSORT[tableKey(t)]; if (s) sortTable(t, s[0], s[1]); });
 }
 // A small segmented control bound to a key on a state object.
 function chips(label, options, state, key, onChange) {

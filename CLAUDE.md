@@ -171,6 +171,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - Pick scorecard: `ledger.summary(..., history)` adds `card` (by setup, by playbook state on the pick date, by rank/month,
   results in R = ret ÷ risk to stop, risk floored at 0.3 ADR; `risk` column in the ledger) and `trade_bt.pick_replay.breakdown`
   (replayed #1 pick by setup / state / month + cumulative edge curve) fills the card until live picks close.
+- Click-to-sort (Oct 14): every `.panel table` header sorts (generic delegated handler: `cellVal` parses numbers incl. %, ×, $, K/M/B,
+  HH:MM, "Oct 13"-style dates, `data-v` overrides; first click = biggest / newest first, text A–Z). Choice kept in `AUTOSORT` keyed by
+  section title + sub-heading + headers and re-applied by `reapplySorts` after every render/live refresh. Tables built with
+  `sortable()` (data-driven sort) carry `data-own-sort` and are skipped. Tables with colspan rows aren't sorted.
 - `site.py` + `template.html` single self-contained page (tabs: Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 127 peer groups (swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added)
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
