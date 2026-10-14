@@ -29,7 +29,7 @@ from . import config
 log = logging.getLogger("breadth.premarket")
 ET = ZoneInfo("America/New_York")
 OUT = config.ROOT / "docs" / "premarket.json"
-UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36"}
+UA = {"User-Agent": "Mozilla/5.0 (breadth-monitor)"}   # same as macro.py; Yahoo 429s browser-looking UAs without cookies
 SPARK = "https://query1.finance.yahoo.com/v7/finance/spark"
 CHART = "https://query1.finance.yahoo.com/v8/finance/chart/{s}"
 
