@@ -482,6 +482,7 @@ table.grid.hvetab td.pcell { min-width: 170px; } table.grid.hvetab td.pcell smal
 const DATA = /*__DATA__*/null;
 
 const $ = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstElementChild; };
+const fmtK = (v) => v == null ? "–" : v >= 1e6 ? (v / 1e6).toFixed(1) + "M" : v >= 1e3 ? Math.round(v / 1e3) + "K" : String(Math.round(v));
 const fmt = (v, d = 0) => v == null ? "–" : Number(v).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
 const ord = (n) => n == null ? "" : n + (["th","st","nd","rd"][(n % 100 - 20) % 10] || ["th","st","nd","rd"][n % 100] || "th");
 const shortDate = (s) => { const d = new Date(s + "T12:00:00"); return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }); };
@@ -495,7 +496,7 @@ const TONES = {
 };
 
 let TAB = "breadth";
-try { const h = location.hash.slice(1); if (["breadth", "intraday", "trades", "themes", "rotation", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
+try { const h = location.hash.slice(1); if (["breadth", "premarket", "intraday", "trades", "themes", "rotation", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
 
 function render() {
   const app = document.getElementById("app");
@@ -530,6 +531,7 @@ function render() {
   });
   const tabs = $(`<nav class="tabs" role="tablist">
     <button role="tab" data-tab="breadth">Breadth</button>
+    <button role="tab" data-tab="premarket">Pre-market</button>
     <button role="tab" data-tab="intraday">Intraday</button>
     <button role="tab" data-tab="trades">Trade Setups</button>
     <button role="tab" data-tab="themes">Themes</button>
@@ -549,6 +551,7 @@ function render() {
     else if (TAB === "setups") renderSetups(panel);
     else if (TAB === "trades") renderTrades(panel);
     else if (TAB === "intraday") renderIntraday(panel);
+    else if (TAB === "premarket") renderPremarket(panel);
     else if (TAB === "rotation") renderRotation(panel);
     else renderBreadth(panel);
   };
@@ -1754,7 +1757,7 @@ function rerenderPanel() {
   if (TAB === "themes") renderThemes(panel); else if (TAB === "stocks") renderStocks(panel);
   else if (TAB === "browse") renderBrowse(panel); else if (TAB === "setups") renderSetups(panel);
   else if (TAB === "trades") renderTrades(panel);
-  else if (TAB === "intraday") renderIntraday(panel); else if (TAB === "rotation") renderRotation(panel); else renderBreadth(panel);
+  else if (TAB === "intraday") renderIntraday(panel); else if (TAB === "premarket") renderPremarket(panel); else if (TAB === "rotation") renderRotation(panel); else renderBreadth(panel);
   window.scrollTo(0, y);
 }
 setInterval(() => { if (document.visibilityState === "visible" && (TAB !== "breadth")) fetchLive(); }, 3 * 60 * 1000);
@@ -2203,8 +2206,9 @@ function volPace(mins) {
   return 1;
 }
 const ID = { idx: "^SPX", at: "at10", lu: "ours", ls: "move" };
+let ROWS_OVERRIDE = null;   // Pre-market tab swaps in Yahoo pre-market rows while it renders the shared cards
 function liveRow(t) {
-  const r = LIVE && LIVE.rows && LIVE.rows[t]; if (!r || r.price == null || !r.closeyest) return null;
+  const r = ROWS_OVERRIDE ? ROWS_OVERRIDE[t] : LIVE && LIVE.rows && LIVE.rows[t]; if (!r || r.price == null || !r.closeyest) return null;
   const chg = r.price / r.closeyest - 1; if (!isFinite(chg) || Math.abs(chg) > 0.6) return null;
   return { ...r, chg, gap: r.open ? r.open / r.closeyest - 1 : null, fromOpen: r.open ? r.price / r.open - 1 : null };
 }
@@ -2348,6 +2352,198 @@ function lateMoversCard(clk, pace) {
     <div class="note" style="padding:8px 0 0">The sheet freezes every stock's Google price and volume at ${label} ET (first recalculation after it), so this card shows who's moving after the opening rush settles. Google prices run up to ~20 min behind, so the "${label}" price can be from a bit earlier. In ADRs = the move since ${label} divided by the stock's average daily range (theme stocks only). Volume since vs normal = volume traded since ${label} ÷ what a normal day trades in that stretch (your tracker's volume curve × 50-day average). Pattern: red → green = was down at ${label}, now up on the day; extending = already up 1%+ at ${label} and still going; new mover = flat at ${label}. $5+ stocks with $5M+ average daily dollar volume. "pick" / "setup" = on today's Trade Setups.</div></div>`));
   return sec;
 }
+/* =================== Pre-market tab (breadth/premarket.py -> docs/premarket.json) =================== */
+let PM = null, PM_ERR = null, PM_BUSY = false;
+async function fetchPM() {
+  if (PM_BUSY) return; PM_BUSY = true;
+  try {
+    const r = await fetch("premarket.json?cb=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status === 404 ? "no pre-market file yet" : "HTTP " + r.status);
+    PM = { ...(await r.json()), fetched: new Date() }; PM_ERR = null;
+  } catch (e) { PM_ERR = String(e.message || e); }
+  PM_BUSY = false;
+  if (TAB === "premarket") rerenderPanel();
+}
+setInterval(() => { if (document.visibilityState === "visible" && TAB === "premarket") fetchPM(); }, 2 * 60 * 1000);
+
+// Yahoo pre-market rows in the same shape the live sheet rows have, so the shared Intraday cards work on them.
+function pmRows() {
+  const out = {}, M = stockMap ? stockMap() : {};
+  Object.entries(PM.rows || {}).forEach(([t, [p, prev, vol]]) => {
+    if (p == null || !prev) return;
+    const g = LIVE && LIVE.rows && LIVE.rows[t];
+    const shares = g && g.marketcap && g.price ? g.marketcap / g.price : null;   // Google cap ÷ price = shares
+    out[t] = { price: p, closeyest: prev, open: null, volume: vol || 0,
+      marketcap: shares ? shares * p : null, volumeavg: (g && g.volumeavg) || (M[t] && M[t].v50) || null };
+  });
+  return out;
+}
+function renderPremarket(app) {
+  const I = DATA.intraday, T = DATA.themes;
+  if (!PM && !PM_ERR) fetchPM();
+  if (!LIVE && !LIVE_BUSY && !LIVE_ERR) fetchLive();
+  const clk = nyClock(), today = etToday();
+  const fresh = PM && PM.date === today, afterOpen = fresh && clk.mins >= 0;
+  const asof = PM && PM.asof ? PM.asof.slice(11, 16) : "";
+  const status = !PM ? (PM_ERR ? `No pre-market snapshot yet (${esc(PM_ERR)}). The first one appears around 6 AM ET on trading days.` : "Loading pre-market quotes…")
+    : !fresh ? `Showing the last pre-market snapshot: <b>${longDate(PM.date)} ${asof} ET</b>. Today's first one appears around 6 AM ET on trading days.`
+    : afterOpen ? `<b>${clk.open ? "Market's open" : "After the open"}</b>: this is today's last pre-market snapshot (${asof} ET). The Intraday tab has the live session.`
+    : `<b>Pre-market</b> · Yahoo quotes as of <b>${asof} ET</b> · refreshed about every 10 min until the open (the page checks every 2 min) · ${clk.label} now`;
+  const bar = $(`<div class="livebar"><span class="dot ${fresh && !afterOpen ? "on" : "off"}"></span><span>${status}</span><button>Refresh</button></div>`);
+  bar.querySelector("button").addEventListener("click", () => fetchPM());
+  app.append(bar);
+  if (!PM) return;
+  const R = pmRows(); ROWS_OVERRIDE = R;
+  try { renderPremarketCards(app, I, T, R); } finally { ROWS_OVERRIDE = null; }
+}
+function renderPremarketCards(app, I, T, R) {
+  const pc = pcI, cls = clsI, F = PM.futures || {}, FL = PM.futures_labels || {};
+  const fchg = (k) => { const f = F[k]; return f && f[0] != null && f[1] ? f[0] / f[1] - 1 : null; };
+  const M = stockMap();
+  // pool: theme stocks + index members, with avg volume and RS
+  const pool = [];
+  const seen = new Set();
+  const add = (t, extra) => { if (seen.has(t)) return; const r = liveRow(t); if (!r) return; seen.add(t);
+    const s = M[t] || {}, avg = r.volumeavg || s.v50 || null;
+    pool.push({ t, r, sub: s.sub || extra, rsr: s.rsr, adr: s.adr, avg, pctDay: avg ? r.volume / avg : null, dvol: r.volume * r.price, ours: !!M[t] }); };
+  (T.stocks || []).filter(s => s.is_stock).forEach(s => add(s.t));
+  ["SPX", "NDX"].forEach(k => ((I.members || {})[k] || []).forEach(([t, sec]) => add(t, sec)));
+  const real = (x) => (x.pctDay != null && x.pctDay >= 0.01) || x.dvol >= 1e6;   // enough pre-market trading to mean something
+  const liquid = (x) => x.r.price >= 5 && (!x.avg || x.avg * x.r.price >= 5e6);
+  const X = (T.trade_setups || {}).rows || {}, picks = new Set(((T.playbook || {}).picks || []).map(c => c.t));
+  const tag = (x) => picks.has(x.t) ? ' <span class="tg ppull">pick</span>' : X[x.t] ? ' <span class="tg ppull">setup</span>' : "";
+  // Morning read
+  const ours = pool.filter(x => x.ours), up = ours.filter(x => x.r.chg > 0.001).length, dn = ours.filter(x => x.r.chg < -0.001).length;
+  const g4u = ours.filter(x => x.r.chg >= 0.04 && real(x)).length, g4d = ours.filter(x => x.r.chg <= -0.04 && real(x)).length;
+  const MV = indexMovers("^SPX"), MN = indexMovers("^NDX");
+  const top3 = MV.rows.slice().sort((a, b) => Math.abs(b.bp) - Math.abs(a.bp)).slice(0, 3).map(r => `${r.t} ${pc(r.chg, 1)}`).join(", ");
+  const heat = (groups) => groups.map(g => { const ch = (g.members || []).map(t => liveRow(t)).filter(Boolean).map(r => r.chg);
+    return { name: g.theme, n: ch.length, avg: ch.length ? ch.reduce((a, b) => a + b, 0) / ch.length : null }; }).filter(g => g.n >= 3).sort((a, b) => b.avg - a.avg);
+  const subs = heat(T.subthemes || []);
+  const mine = pool.filter(x => picks.has(x.t) || X[x.t]).sort((a, b) => Math.abs(b.r.chg) - Math.abs(a.r.chg));
+  const eps = pool.filter(x => liquid(x) && x.r.chg >= 0.08 && real(x)).sort((a, b) => b.r.chg - a.r.chg);
+  const fut = [["ES=F", "S&P"], ["NQ=F", "Nasdaq"], ["RTY=F", "Russell"]].map(([k, l]) => fchg(k) == null ? "" : `${l} ${pc(fchg(k))}`).filter(Boolean).join(" · ");
+  const bullets = [
+    fut ? `<b>Futures:</b> ${fut}.` : "",
+    `<b>Breadth of the gaps:</b> ${up} of your ${ours.length} theme stocks indicated up, ${dn} down; ${g4u} gapping up 4%+ and ${g4d} down 4%+ on real pre-market volume.`,
+    MV.rows.length ? `<b>S&P 500 indicated ${pc(MV.ret)}</b> (equal-weight ${pc(MV.eq)}), Nasdaq-100 ${pc(MN.ret)}. Biggest drivers: ${top3}. Shape so far: <b>${MV.type}</b>${MV.t10share != null ? ` (top 10 names = ${Math.round(Math.abs(MV.t10share) * 100)}% of the move)` : ""}.` : "",
+    subs.length ? `<b>Money is gapping into</b> ${subs.slice(0, 3).map(g => `${esc(g.name)} ${pc(g.avg, 1)}`).join(", ")}; <b>out of</b> ${subs.slice(-3).reverse().map(g => `${esc(g.name)} ${pc(g.avg, 1)}`).join(", ")}.` : "",
+    mine.length ? `<b>Your names:</b> ${mine.slice(0, 5).map(x => `${x.t} ${pc(x.r.chg, 1)}`).join(", ")}${mine.length > 5 ? ` (+${mine.length - 5} more below)` : ""}.` : "",
+    eps.length ? `<b>Possible EPs to check:</b> ${eps.slice(0, 5).map(x => `${x.t} ${pc(x.r.chg, 0)}`).join(", ")}: gapping 8%+ on real volume; check the news first.` : "",
+  ].filter(Boolean);
+  app.append($(`<section class="icard card regcard"><div class="kicker">Morning read · ${PM.asof ? PM.asof.slice(11, 16) + " ET" : ""}</div><ul style="margin:8px 0 0;padding-left:18px;line-height:1.55">${bullets.map(b => `<li>${b}</li>`).join("")}</ul></section>`));
+  // Futures & macro
+  const ftile = (k) => { const f = F[k], v = fchg(k); if (!f) return "";
+    return `<div class="itile"><small>${esc(FL[k] || k)}</small><b class="${cls(v)}">${pc(v)}</b><span class="meta">${fmt(f[0], f[0] < 100 ? 2 : 0)}${f[3] ? " · " + f[3] : ""}</span></div>`; };
+  const tile = (k, label) => { const r = liveRow(k); return r ? `<div class="itile"><small>${esc(label)}</small><b class="${cls(r.chg)}">${pc(r.chg)}</b><span class="meta">${fmt(r.price, r.price < 100 ? 2 : 0)}</span></div>` : ""; };
+  const spread = (a, b, label, note) => { const x = liveRow(a), y = liveRow(b); const v = x && y ? x.chg - y.chg : null;
+    return v == null ? "" : `<div class="itile"><small>${esc(label)}</small><b class="${cls(v)}">${(v > 0 ? "+" : "") + (v * 100).toFixed(2) + " pts"}</b><span class="meta">${esc(note)}</span></div>`; };
+  app.append($(`<section class="icard card regcard"><div class="kicker">Futures, macro & ETFs</div>
+    <div class="igrid">${Object.keys(FL).map(ftile).join("")}</div>
+    <div class="igrid" style="margin-top:8px">${[["SPY", "SPY"], ["QQQ", "QQQ"], ["IWM", "IWM"], ["DIA", "DIA"], ["RSP", "RSP (equal weight)"], ["TLT", "TLT"], ["GLD", "GLD"], ["USO", "USO"]].map(([k, l]) => tile(k, l)).join("")}
+      ${spread("RSP", "SPY", "Equal weight vs cap weight", "RSP minus SPY: positive = broad")}${spread("IWM", "SPY", "Small vs large caps", "IWM minus SPY")}</div>
+    <div class="ibars" style="margin-top:10px">${Object.entries(I.sector_etfs).map(([k, l]) => ({ k, l, r: liveRow(k) })).filter(x => x.r).sort((a, b) => b.r.chg - a.r.chg)
+      .map(x => `<div class="ibar"><span>${esc(x.l)} <small class="meta">${x.k}</small></span><i class="${cls(x.r.chg)}" style="width:${Math.min(100, Math.abs(x.r.chg) * 2500)}%"></i><b class="${cls(x.r.chg)}">${pc(x.r.chg)}</b></div>`).join("")}</div>
+    <div class="note" style="padding:8px 0 0">Futures trade nearly 24 hours, so they're the cleanest read on the open. ETF and stock moves are their latest pre-market trade vs yesterday's close; thinly traded ETFs can sit on a stale print.</div></section>`));
+  // What's moving the index
+  app.append(indexMoversCard({ kicker: "What's moving the index pre-market", volHead: "Pre-mkt volume<small>% of avg day</small>",
+    vol: (r) => r.volume && r.vavg ? (r.volume / r.vavg * 100).toFixed(1) + "%" : "–" }));
+  // Gap breadth on our stocks
+  const sameMeta = (k) => `last session ${T.stocks.filter(s => s.is_stock && s.today != null && (k === "u" ? s.today >= 0.04 : s.today <= -0.04)).length} closed ${k === "u" ? "up" : "down"} 4%+`;
+  app.append($(`<section class="icard card regcard"><div class="kicker">Pre-market breadth · your ${ours.length} theme stocks with a quote</div>
+    <div class="igrid" style="margin-top:8px">
+      <div class="itile"><small>Indicated up / down</small><b>${up} / ${dn}</b><span class="meta">${ours.length ? Math.round(up / ours.length * 100) : 0}% up</span></div>
+      <div class="itile"><small>Gapping up 4%+</small><b class="up">${g4u}</b><span class="meta">on real volume · ${ours.filter(x => x.r.chg >= 0.04).length} incl. thin · ${sameMeta("u")}</span></div>
+      <div class="itile"><small>Gapping down 4%+</small><b class="dn">${g4d}</b><span class="meta">on real volume · ${ours.filter(x => x.r.chg <= -0.04).length} incl. thin · ${sameMeta("d")}</span></div>
+      <div class="itile"><small>Quoted pre-market</small><b>${PM.n}</b><span class="meta">of ${PM.asked} tracked symbols</span></div>
+    </div>
+    <div class="note" style="padding:8px 0 0">"Real volume" = pre-market volume at least 1% of the stock's average day, or $1M+ traded. Many stocks don't trade at all before the open; they show yesterday's close and count as flat.</div></section>`));
+  // Theme gaps
+  app.append(themeHeatCard("Theme gaps · pre-market (average indicated change)"));
+  // Gappers
+  const gl = (rs) => `<div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Gap</th><th>Pre-mkt volume</th><th>% of avg day</th><th>RS</th><th>ADR</th><th class="l">Last trade</th></tr></thead><tbody>${rs.map(x => `<tr><td class="l"><b>${x.t}</b>${tag(x)} <small class="meta">${esc(x.sub || "")}</small></td>
+    <td class="num ${cls(x.r.chg)}"><b>${pc(x.r.chg, 1)}</b></td><td class="num">${x.r.volume ? fmtK(x.r.volume) : "–"}</td><td class="num">${x.pctDay == null ? "–" : (x.pctDay * 100).toFixed(1) + "%"}</td>
+    <td class="num ${rsTint(x.rsr)}">${x.rsr ?? "–"}</td><td class="num">${x.adr == null ? "–" : x.adr.toFixed(1)}</td><td class="l meta">${esc((PM.rows[x.t] || [])[3] || "")}</td></tr>`).join("") || '<tr><td class="l meta" colspan="7">None.</td></tr>'}</tbody></table></div>`;
+  const gU = pool.filter(x => liquid(x) && real(x) && x.r.chg >= 0.02).sort((a, b) => b.r.chg - a.r.chg).slice(0, 20);
+  const gD = pool.filter(x => liquid(x) && real(x) && x.r.chg <= -0.02).sort((a, b) => a.r.chg - b.r.chg).slice(0, 15);
+  const act = pool.filter(x => liquid(x) && x.pctDay != null).sort((a, b) => b.pctDay - a.pctDay).slice(0, 12);
+  app.append($(`<section class="icard card regcard"><div class="kicker">Gappers & pre-market volume</div>
+    <h3 class="ih">Gapping up 2%+ <small class="meta">real volume, $5+, liquid</small></h3>${gl(gU)}
+    <h3 class="ih">Gapping down 2%+</h3>${gl(gD)}
+    <h3 class="ih">Heaviest pre-market volume <small class="meta">vs a normal full day</small></h3>${gl(act)}
+    ${eps.length ? `<h3 class="ih">Possible episodic pivots <small class="meta">gap 8%+ on real volume: check the catalyst (earnings, news) before treating it as an EP</small></h3>${gl(eps.slice(0, 10))}` : ""}
+    <div class="note" style="padding:8px 0 0">Your theme stocks plus the S&P 500 and Nasdaq-100. Liquid = $5M+ average daily dollar volume. Pre-market moves on thin volume often reverse at the open, so read the volume column before the gap. "pick" / "setup" = on today's Trade Setups.</div></section>`));
+  // Your trades
+  app.append(yourTradesCard("Your trades vs pre-market", `Prices are the latest pre-market trade. "Triggered" means it's indicated through the pivot; the trigger only counts once it trades there after the open. Scoreboard stops are checked against the pre-market price too.`));
+}
+/* ---------- Shared Intraday / Pre-market cards (read prices through liveRow, so ROWS_OVERRIDE swaps the source) ---------- */
+const pcI = (v, d = 2) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
+const clsI = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "dn" : "";
+function indexMoversCard(o) {
+  const I = DATA.intraday, pc = pcI, cls = clsI;
+  const sec = $(`<section class="icard card regcard"><div class="kicker">${o.kicker}</div><div class="ibtns"></div><div class="ibody"></div></section>`);
+  sec.querySelector(".ibtns").append(chips("Index", [["^SPX", "S&P 500"], ["^NDX", "Nasdaq-100"]].concat((I.members || {}).R2K ? [["^R2K", "Russell 2000 (IWM)"]] : []), ID, "idx", rerenderPanel));
+  if (I.r2k_asof) {   // Russell 2000 list comes from a holdings file Adam uploads: nudge when it gets old
+    const today = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })), asof = new Date(I.r2k_asof + "T12:00:00");
+    const age = Math.floor((today - asof) / 864e5);
+    if (age >= I.r2k_stale) sec.querySelector(".ibtns").after($(`<div class="r2kwarn ${age >= I.r2k_old ? "old" : ""}">⚠ <b>Time to refresh the Russell 2000 list.</b> Your IWM holdings file is ${age} days old (${longDate(I.r2k_asof)}), so members added or dropped since then are missing. Download a fresh file from ishares.com (IWM page → Holdings → Detailed Holdings and Analytics) and send it to Claude. Russell rebalances in June and December, so refresh right after those too.</div>`));
+  }
+  const M = indexMovers(ID.idx), mx = Math.max(1, ...M.rows.map(r => Math.abs(r.bp)));
+  const list = (rows) => rows.map(r => `<tr><td class="l"><b>${r.t}</b> <small class="meta">${esc(r.sector)}</small></td><td class="num ${cls(r.chg)}">${pc(r.chg)}</td><td class="num">${(r.w * 100).toFixed(2)}%</td>
+    <td class="num ${cls(r.bp)}"><span class="ibp"><i class="${cls(r.bp)}" style="width:${Math.abs(r.bp) / mx * 100}%"></i></span>${r.bp > 0 ? "+" : ""}${r.bp.toFixed(1)}</td>
+    <td class="num">${o.vol(r)}</td></tr>`).join("");
+  const hdr = `<thead><tr><th class="l">Stock</th><th>Change</th><th>Weight</th><th>Contribution<small>basis points</small></th><th>${o.volHead}</th></tr></thead>`;
+  const ups = M.rows.filter(r => r.bp > 0).sort((a, b) => b.bp - a.bp).slice(0, 15), dns = M.rows.filter(r => r.bp < 0).sort((a, b) => a.bp - b.bp).slice(0, 15);
+  sec.querySelector(".ibody").append($(`<div>
+    <div class="igrid" style="margin:8px 0">
+      <div class="itile"><small>Reconstructed return</small><b class="${cls(M.ret)}">${pc(M.ret)}</b><span class="meta">${M.rows.length} stocks with data</span></div>
+      <div class="itile"><small>${ID.idx === "^R2K" ? "IWM actual" : "Index actual"}</small><b class="${cls(M.actual)}">${pc(M.actual)}</b><span class="meta">${M.actual != null ? "gap " + ((M.ret - M.actual) * 100).toFixed(2) + " pts" : ""}</span></div>
+      <div class="itile"><small>Equal-weight return</small><b class="${cls(M.eq)}">${pc(M.eq)}</b><span class="meta">cap minus equal ${((M.ret - M.eq) * 100).toFixed(2)} pts</span></div>
+      <div class="itile"><small>Advancers / decliners</small><b>${M.adv} / ${M.dec}</b><span class="meta">${M.share != null ? Math.round(M.share * 100) + "% moving with the index" : ""}</span></div>
+      <div class="itile"><small>Top 10 movers' share of the move</small><b>${M.t10share != null ? Math.round(M.t10share * 100) + "%" : "–"}</b><span class="meta">${M.top10.toFixed(0)} of ${M.net.toFixed(0)} bp</span></div>
+      <div class="itile"><small>Day type (provisional)</small><b>${M.type}</b><span class="meta">10 largest companies ${M.big10 > 0 ? "+" : ""}${M.big10.toFixed(0)} bp</span></div>
+    </div>
+    <div class="isplit"><div><h3 class="ih">Pushing up</h3><div class="scroll"><table class="grid">${hdr}<tbody>${list(ups)}</tbody></table></div></div>
+      <div><h3 class="ih">Pushing down</h3><div class="scroll"><table class="grid">${hdr}<tbody>${list(dns)}</tbody></table></div></div></div>
+    <h3 class="ih">By sector</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Sector</th><th>Weight</th><th>Avg change</th><th>Contribution<small>bp</small></th><th>Share up</th></tr></thead><tbody>
+      ${M.sectors.map(s => `<tr><td class="l">${esc(s.sector)}</td><td class="num">${(s.w * 100).toFixed(1)}%</td><td class="num ${cls(s.avg)}">${pc(s.avg)}</td><td class="num ${cls(s.bp)}">${s.bp > 0 ? "+" : ""}${s.bp.toFixed(1)}</td><td class="num">${Math.round(s.upShare * 100)}%</td></tr>`).join("")}</tbody></table></div>
+    <div class="note" style="padding:8px 0 0">Contribution = weight at the prior close × today's change, so the column adds up to the index return. ${ID.idx === "^R2K" ? `Russell 2000: members and weights from your IWM holdings file of ${longDate(I.r2k_asof)} (float-adjusted), with each weight moved by the stock's price change since${I.r2k_wdate && I.r2k_wdate !== I.r2k_asof ? " (to " + longDate(I.r2k_wdate) + ")" : ""}, so the reconstruction tracks IWM closely; relative volume isn't fetched for these ~2,000 names to keep the live sheet light. ` : ""}S&P 500 / Nasdaq-100 weights are Google market caps (not float-adjusted; GOOG, FOX and NWS left out because Google repeats the whole company's cap on both classes), so the reconstructed return runs a little off the real index. Day type: Flat under ±0.02%; Broad when ${Math.round(I.day_type.broad_share * 100)}%+ of stocks move with the index and the top 10 make up at most ${Math.round(I.day_type.broad_top10 * 100)}% of the move; Narrow when the top 10 make up ${Math.round(I.day_type.narrow_top10 * 100)}%+ or cap weight beats equal weight by ${(I.day_type.narrow_gap * 100).toFixed(1)}+ pts. Starting guesses from your tracker, not tested rules.</div></div>`));
+  return sec;
+}
+function themeHeatCard(kicker) {
+  const T = DATA.themes, pc = pcI, cls = clsI;
+  const heat = (groups) => groups.map(g => { const ch = (g.members || []).map(t => liveRow(t)).filter(Boolean).map(r => r.chg); return { name: g.theme, n: ch.length, avg: ch.length ? ch.reduce((x, y) => x + y, 0) / ch.length : null, up: ch.filter(x => x > 0).length }; })
+    .filter(g => g.n >= 3 && g.avg != null).sort((x, y) => y.avg - x.avg);
+  const th = heat(T.themes || []), sb = heat(T.subthemes || []);
+  const hrows = (rs) => rs.map(g => `<tr><td class="l">${esc(g.name)}</td><td class="num ${cls(g.avg)}">${pc(g.avg)}</td><td class="num">${g.up}/${g.n}</td></tr>`).join("");
+  const htab = (title, rs) => `<div><h3 class="ih">${title}</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Group</th><th>Avg change</th><th>Up</th></tr></thead><tbody>${hrows(rs)}</tbody></table></div></div>`;
+  return $(`<section class="icard card regcard"><div class="kicker">${kicker}</div>
+    <div class="isplit">${htab("Leading themes", th.slice(0, 8))}${htab("Lagging themes", th.slice(-6).reverse())}</div>
+    <div class="isplit">${htab("Leading sub-themes", sb.slice(0, 8))}${htab("Lagging sub-themes", sb.slice(-6).reverse())}</div></section>`);
+}
+function yourTradesCard(kicker, note) {
+  const T = DATA.themes, pc = pcI, cls = clsI;
+  const X = T.trade_setups || {}, PB = T.playbook || {}, SB = T.scoreboard || {};
+  const items = [];
+  (PB.picks || []).forEach(c => items.push({ t: c.t, where: "Top pick #" + ((PB.picks || []).indexOf(c) + 1), setup: c.setup, setup_name: c.setup_name, trig: c.trigger, row: (X.rows || {})[c.t] }));
+  (X.setups || []).forEach(S => S.top.forEach(t => { if (!items.some(i => i.t === t && i.setup === S.key)) items.push({ t, where: S.name, setup: S.key, setup_name: S.name, row: X.rows[t],
+    trig: S.key === "kq" ? X.rows[t].kq_pivot : S.key === "vcp" ? X.rows[t].vcp_pivot : null }); }));
+  (PB.pick_watch || []).forEach(w => items.push({ t: w.t, where: "Watch (not actionable yet)", setup_name: w.setup_name, trig: w.trigger, row: (X.rows || {})[w.t] }));
+  const statusOf = (it, r) => {
+    if (!r) return ["meta", "no live price"];
+    if (it.trig) { const dist = r.price / it.trig - 1; return dist >= 0 ? ["up", "Triggered: through $" + (+it.trig).toFixed(2)] : ["", `${pc(dist, 1)} to trigger $${(+it.trig).toFixed(2)}`]; }
+    if (it.setup === "ath" && it.row && it.row.ath) { const dist = r.price / it.row.ath - 1; return dist >= -0.001 ? ["up", "At / through the all-time high"] : ["", `${pc(dist, 1)} to ATH $${it.row.ath.toFixed(2)}`]; }
+    return ["", ""];
+  };
+  const trows = items.map(it => { const r = liveRow(it.t), [c, txt] = statusOf(it, r);
+    return `<tr><td class="l"><b>${it.t}</b> <small class="meta">${esc(it.where)}</small></td><td class="l">${esc(it.setup_name || "")}</td><td class="num">${r ? r.price.toFixed(2) : "–"}</td><td class="num ${cls(r && r.chg)}">${r ? pc(r.chg, 1) : "–"}</td><td class="l ${c}">${txt}</td></tr>`; }).join("");
+  const opens = (SB.open || []).filter(o => o.status === "open" && o.entry).map(o => { const r = liveRow(o.t); const stop = o.setup === "vcp" && o.vcp_stop ? o.vcp_stop : o.entry * (1 - (o.stop_pct || 0));
+    return `<tr><td class="l"><b>${o.t}</b> <small class="meta">picked ${o.date.slice(5)}</small></td><td class="num">${(+o.entry).toFixed(2)}</td><td class="num">${r ? r.price.toFixed(2) : "–"}</td><td class="num ${cls(r && r.price / o.entry - 1)}">${r ? pc(r.price / o.entry - 1, 1) : "–"}</td><td class="l ${r && r.price <= stop ? "dn" : ""}">${r ? (r.price <= stop ? "Stop hit (≈$" + stop.toFixed(2) + ")" : "Above stop ≈$" + stop.toFixed(2)) : ""}</td></tr>`; }).join("");
+  return $(`<section class="icard card regcard"><div class="kicker">${kicker}</div>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th class="l">Setup</th><th>Price</th><th>Change</th><th class="l">Status</th></tr></thead><tbody>${trows}</tbody></table></div>
+    ${opens ? `<h3 class="ih">Scoreboard trades in progress</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Entry</th><th>Price</th><th>Since entry</th><th class="l">Stop</th></tr></thead><tbody>${opens}</tbody></table></div>` : ""}
+    <div class="note" style="padding:8px 0 0">${note || `Flag and VCP names show "Triggered" once Google's price trades through the pivot; that's a cue to check the chart, not an order. ATH Magnet names flag when they reach the all-time high.`}</div></section>`);
+}
 function renderIntraday(app) {
   const I = DATA.intraday, T = DATA.themes;
   if (!I) { app.append($('<div class="icard card empty">Intraday data appears after the next build.</div>')); return; }
@@ -2372,34 +2568,7 @@ function renderIntraday(app) {
     <div class="ibars" style="margin-top:10px">${Object.entries(I.sector_etfs).map(([k, l]) => ({ k, l, r: liveRow(k) })).filter(x => x.r).sort((a, b) => b.r.chg - a.r.chg)
       .map(x => `<div class="ibar"><span>${esc(x.l)} <small class="meta">${x.k}</small></span><i class="${cls(x.r.chg)}" style="width:${Math.min(100, Math.abs(x.r.chg) * 2500)}%"></i><b class="${cls(x.r.chg)}">${pc(x.r.chg)}</b></div>`).join("")}</div></section>`));
   // 2. Who's moving the index
-  const sec = $(`<section class="icard card regcard"><div class="kicker">Who's moving the index</div><div class="ibtns"></div><div class="ibody"></div></section>`);
-  sec.querySelector(".ibtns").append(chips("Index", [["^SPX", "S&P 500"], ["^NDX", "Nasdaq-100"]].concat((I.members || {}).R2K ? [["^R2K", "Russell 2000 (IWM)"]] : []), ID, "idx", rerenderPanel));
-  if (I.r2k_asof) {   // Russell 2000 list comes from a holdings file Adam uploads: nudge when it gets old
-    const today = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })), asof = new Date(I.r2k_asof + "T12:00:00");
-    const age = Math.floor((today - asof) / 864e5);
-    if (age >= I.r2k_stale) sec.querySelector(".ibtns").after($(`<div class="r2kwarn ${age >= I.r2k_old ? "old" : ""}">⚠ <b>Time to refresh the Russell 2000 list.</b> Your IWM holdings file is ${age} days old (${longDate(I.r2k_asof)}), so members added or dropped since then are missing. Download a fresh file from ishares.com (IWM page → Holdings → Detailed Holdings and Analytics) and send it to Claude. Russell rebalances in June and December, so refresh right after those too.</div>`));
-  }
-  const M = indexMovers(ID.idx), mx = Math.max(1, ...M.rows.map(r => Math.abs(r.bp)));
-  const list = (rows) => rows.map(r => `<tr><td class="l"><b>${r.t}</b> <small class="meta">${esc(r.sector)}</small></td><td class="num ${cls(r.chg)}">${pc(r.chg)}</td><td class="num">${(r.w * 100).toFixed(2)}%</td>
-    <td class="num ${cls(r.bp)}"><span class="ibp"><i class="${cls(r.bp)}" style="width:${Math.abs(r.bp) / mx * 100}%"></i></span>${r.bp > 0 ? "+" : ""}${r.bp.toFixed(1)}</td>
-    <td class="num">${r.volume && r.vavg && pace ? (r.volume / (r.vavg * pace)).toFixed(1) + "×" : "–"}</td></tr>`).join("");
-  const hdr = `<thead><tr><th class="l">Stock</th><th>Change</th><th>Weight</th><th>Contribution<small>basis points</small></th><th>Rel. volume<small>paced</small></th></tr></thead>`;
-  const ups = M.rows.filter(r => r.bp > 0).sort((a, b) => b.bp - a.bp).slice(0, 15), dns = M.rows.filter(r => r.bp < 0).sort((a, b) => a.bp - b.bp).slice(0, 15);
-  sec.querySelector(".ibody").append($(`<div>
-    <div class="igrid" style="margin:8px 0">
-      <div class="itile"><small>Reconstructed return</small><b class="${cls(M.ret)}">${pc(M.ret)}</b><span class="meta">${M.rows.length} stocks with data</span></div>
-      <div class="itile"><small>${ID.idx === "^R2K" ? "IWM actual" : "Index actual"}</small><b class="${cls(M.actual)}">${pc(M.actual)}</b><span class="meta">${M.actual != null ? "gap " + ((M.ret - M.actual) * 100).toFixed(2) + " pts" : ""}</span></div>
-      <div class="itile"><small>Equal-weight return</small><b class="${cls(M.eq)}">${pc(M.eq)}</b><span class="meta">cap minus equal ${((M.ret - M.eq) * 100).toFixed(2)} pts</span></div>
-      <div class="itile"><small>Advancers / decliners</small><b>${M.adv} / ${M.dec}</b><span class="meta">${M.share != null ? Math.round(M.share * 100) + "% moving with the index" : ""}</span></div>
-      <div class="itile"><small>Top 10 movers' share of the move</small><b>${M.t10share != null ? Math.round(M.t10share * 100) + "%" : "–"}</b><span class="meta">${M.top10.toFixed(0)} of ${M.net.toFixed(0)} bp</span></div>
-      <div class="itile"><small>Day type (provisional)</small><b>${M.type}</b><span class="meta">10 largest companies ${M.big10 > 0 ? "+" : ""}${M.big10.toFixed(0)} bp</span></div>
-    </div>
-    <div class="isplit"><div><h3 class="ih">Pushing up</h3><div class="scroll"><table class="grid">${hdr}<tbody>${list(ups)}</tbody></table></div></div>
-      <div><h3 class="ih">Pushing down</h3><div class="scroll"><table class="grid">${hdr}<tbody>${list(dns)}</tbody></table></div></div></div>
-    <h3 class="ih">By sector</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Sector</th><th>Weight</th><th>Avg change</th><th>Contribution<small>bp</small></th><th>Share up</th></tr></thead><tbody>
-      ${M.sectors.map(s => `<tr><td class="l">${esc(s.sector)}</td><td class="num">${(s.w * 100).toFixed(1)}%</td><td class="num ${cls(s.avg)}">${pc(s.avg)}</td><td class="num ${cls(s.bp)}">${s.bp > 0 ? "+" : ""}${s.bp.toFixed(1)}</td><td class="num">${Math.round(s.upShare * 100)}%</td></tr>`).join("")}</tbody></table></div>
-    <div class="note" style="padding:8px 0 0">Contribution = weight at the prior close × today's change, so the column adds up to the index return. ${ID.idx === "^R2K" ? `Russell 2000: members and weights from your IWM holdings file of ${longDate(I.r2k_asof)} (float-adjusted), with each weight moved by the stock's price change since${I.r2k_wdate && I.r2k_wdate !== I.r2k_asof ? " (to " + longDate(I.r2k_wdate) + ")" : ""}, so the reconstruction tracks IWM closely; relative volume isn't fetched for these ~2,000 names to keep the live sheet light. ` : ""}S&P 500 / Nasdaq-100 weights are Google market caps (not float-adjusted; GOOG, FOX and NWS left out because Google repeats the whole company's cap on both classes), so the reconstructed return runs a little off the real index. Day type: Flat under ±0.02%; Broad when ${Math.round(I.day_type.broad_share * 100)}%+ of stocks move with the index and the top 10 make up at most ${Math.round(I.day_type.broad_top10 * 100)}% of the move; Narrow when the top 10 make up ${Math.round(I.day_type.narrow_top10 * 100)}%+ or cap weight beats equal weight by ${(I.day_type.narrow_gap * 100).toFixed(1)}+ pts. Starting guesses from your tracker, not tested rules.</div></div>`));
-  app.append(sec);
+  app.append(indexMoversCard({ kicker: "Who's moving the index", volHead: "Rel. volume<small>paced</small>", vol: (r) => r.volume && r.vavg && pace ? (r.volume / (r.vavg * pace)).toFixed(1) + "×" : "–" }));
   // 3. Live breadth on our stocks (vs the same stocks' last full session)
   const st = (T.stocks || []).filter(s => s.is_stock);
   let a = 0, d = 0, u4 = 0, d4 = 0, u4v = 0, d4v = 0, ya = 0, yd = 0, yu4 = 0, yd4 = 0, n = 0;
@@ -2418,14 +2587,7 @@ function renderIntraday(app) {
     </div>
     <div class="note" style="padding:8px 0 0">${sameDay ? "Google's latest session is the one already on the Breadth tab, so these match yesterday's close until the next session starts. " : ""}Counts our tracked stocks only, so they're smaller than the Breadth tab's whole-market numbers; "last session" uses the same stocks for a fair comparison. "Above-normal volume" = volume so far above the 50-day average, paced for the time of day.</div></section>`));
   // 4. Theme heat
-  const heat = (groups) => groups.map(g => { const ch = (g.members || []).map(t => liveRow(t)).filter(Boolean).map(r => r.chg); return { name: g.theme, n: ch.length, avg: ch.length ? ch.reduce((x, y) => x + y, 0) / ch.length : null, up: ch.filter(x => x > 0).length }; })
-    .filter(g => g.n >= 3 && g.avg != null).sort((x, y) => y.avg - x.avg);
-  const th = heat(T.themes || []), sb = heat(T.subthemes || []);
-  const hrows = (rs) => rs.map(g => `<tr><td class="l">${esc(g.name)}</td><td class="num ${cls(g.avg)}">${pc(g.avg)}</td><td class="num">${g.up}/${g.n}</td></tr>`).join("");
-  const htab = (title, rs) => `<div><h3 class="ih">${title}</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Group</th><th>Avg change</th><th>Up</th></tr></thead><tbody>${hrows(rs)}</tbody></table></div></div>`;
-  app.append($(`<section class="icard card regcard"><div class="kicker">Theme heat · today</div>
-    <div class="isplit">${htab("Leading themes", th.slice(0, 8))}${htab("Lagging themes", th.slice(-6).reverse())}</div>
-    <div class="isplit">${htab("Leading sub-themes", sb.slice(0, 8))}${htab("Lagging sub-themes", sb.slice(-6).reverse())}</div></section>`));
+  app.append(themeHeatCard("Theme heat · today"));
   // 5. In play: relative volume and gaps
   const pool = {};
   st.forEach(s => { const r = liveRow(s.t); if (r) pool[s.t] = { t: s.t, name: s.name, r, avg: s.v50, sub: s.sub }; });
@@ -2445,26 +2607,7 @@ function renderIntraday(app) {
   // 5b. Second-half movers (since 10:00 / 11:00 ET)
   app.append(lateMoversCard(clk, pace));
   // 6. Your trades, live
-  const X = T.trade_setups || {}, PB = T.playbook || {}, SB = T.scoreboard || {};
-  const items = [];
-  (PB.picks || []).forEach(c => items.push({ t: c.t, where: "Top pick #" + ((PB.picks || []).indexOf(c) + 1), setup: c.setup, setup_name: c.setup_name, trig: c.trigger, row: (X.rows || {})[c.t] }));
-  (X.setups || []).forEach(S => S.top.forEach(t => { if (!items.some(i => i.t === t && i.setup === S.key)) items.push({ t, where: S.name, setup: S.key, setup_name: S.name, row: X.rows[t],
-    trig: S.key === "kq" ? X.rows[t].kq_pivot : S.key === "vcp" ? X.rows[t].vcp_pivot : null }); }));
-  (PB.pick_watch || []).forEach(w => items.push({ t: w.t, where: "Watch (not actionable yet)", setup_name: w.setup_name, trig: w.trigger, row: (X.rows || {})[w.t] }));
-  const statusOf = (it, r) => {
-    if (!r) return ["meta", "no live price"];
-    if (it.trig) { const dist = r.price / it.trig - 1; return dist >= 0 ? ["up", "Triggered: through $" + (+it.trig).toFixed(2)] : ["", `${pc(dist, 1)} to trigger $${(+it.trig).toFixed(2)}`]; }
-    if (it.setup === "ath" && it.row && it.row.ath) { const dist = r.price / it.row.ath - 1; return dist >= -0.001 ? ["up", "At / through the all-time high"] : ["", `${pc(dist, 1)} to ATH $${it.row.ath.toFixed(2)}`]; }
-    return ["", ""];
-  };
-  const trows = items.map(it => { const r = liveRow(it.t), [c, txt] = statusOf(it, r);
-    return `<tr><td class="l"><b>${it.t}</b> <small class="meta">${esc(it.where)}</small></td><td class="l">${esc(it.setup_name || "")}</td><td class="num">${r ? r.price.toFixed(2) : "–"}</td><td class="num ${cls(r && r.chg)}">${r ? pc(r.chg, 1) : "–"}</td><td class="l ${c}">${txt}</td></tr>`; }).join("");
-  const opens = (SB.open || []).filter(o => o.status === "open" && o.entry).map(o => { const r = liveRow(o.t); const stop = o.setup === "vcp" && o.vcp_stop ? o.vcp_stop : o.entry * (1 - (o.stop_pct || 0));
-    return `<tr><td class="l"><b>${o.t}</b> <small class="meta">picked ${o.date.slice(5)}</small></td><td class="num">${(+o.entry).toFixed(2)}</td><td class="num">${r ? r.price.toFixed(2) : "–"}</td><td class="num ${cls(r && r.price / o.entry - 1)}">${r ? pc(r.price / o.entry - 1, 1) : "–"}</td><td class="l ${r && r.price <= stop ? "dn" : ""}">${r ? (r.price <= stop ? "Stop hit (≈$" + stop.toFixed(2) + ")" : "Above stop ≈$" + stop.toFixed(2)) : ""}</td></tr>`; }).join("");
-  app.append($(`<section class="icard card regcard"><div class="kicker">Your trades, live</div>
-    <div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th class="l">Setup</th><th>Price</th><th>Change</th><th class="l">Status</th></tr></thead><tbody>${trows}</tbody></table></div>
-    ${opens ? `<h3 class="ih">Scoreboard trades in progress</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Entry</th><th>Price</th><th>Since entry</th><th class="l">Stop</th></tr></thead><tbody>${opens}</tbody></table></div>` : ""}
-    <div class="note" style="padding:8px 0 0">Flag and VCP names show "Triggered" once Google's price trades through the pivot; that's a cue to check the chart, not an order. ATH Magnet names flag when they reach the all-time high.</div></section>`));
+  app.append(yourTradesCard("Your trades, live"));
 }
 
 /* ---------- Conviction tags (tradesetups.TAGS; evidence from trade_bt.tag_stats) ---------- */

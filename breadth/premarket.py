@@ -84,66 +84,94 @@ def parse(res, today):
     return [round(last_p, 4), round(prev, 4) if prev else None, int(vol), last_t]
 
 
-def fetch_spark(session, syms, today):
+BUDGET_S = 240        # stop fetching after 4 minutes and write what we have (the loop runs every 10 min)
+
+
+def fetch_spark(session, syms, today, deadline, diag):
     out = {}
     for i in range(0, len(syms), 20):
+        if time.monotonic() > deadline:
+            diag["spark_timeout"] = True
+            break
         chunk = syms[i:i + 20]
-        r = session.get(SPARK, params={"symbols": ",".join(chunk), "range": "1d", "interval": "5m", "includePrePost": "true"},
-                        headers=UA, timeout=30)
+        try:
+            r = session.get(SPARK, params={"symbols": ",".join(chunk), "range": "1d", "interval": "5m", "includePrePost": "true"},
+                            headers=UA, timeout=15)
+        except requests.RequestException as e:
+            diag.setdefault("spark_net", 0); diag["spark_net"] += 1
+            continue
+        diag.setdefault("spark_status", {}); diag["spark_status"][str(r.status_code)] = diag["spark_status"].get(str(r.status_code), 0) + 1
         if r.status_code != 200:
-            raise RuntimeError(f"spark HTTP {r.status_code}: {r.text[:120]}")
+            if i == 0:   # refused on the first call: don't keep hammering
+                raise RuntimeError(f"spark HTTP {r.status_code}: {r.text[:120]}")
+            time.sleep(2)
+            continue
         for item in (r.json().get("spark") or {}).get("result") or []:
             resp = (item.get("response") or [None])[0]
             if resp:
                 out[item["symbol"]] = parse(resp, today)
-        time.sleep(0.3)
+        time.sleep(0.2)
     return out
 
 
-def fetch_chart(session, syms, today, workers=6):
-    errors = []
-
+def fetch_chart(session, syms, today, deadline, diag, workers=4):
     def one(s):
-        for attempt in range(3):
-            try:
-                r = session.get(CHART.format(s=s), params={"range": "1d", "interval": "5m", "includePrePost": "true"},
-                                headers=UA, timeout=20)
-                if r.status_code == 429:
-                    time.sleep(5 * (attempt + 1)); continue
-                if r.status_code != 200:
-                    return s, None
-                res = ((r.json().get("chart") or {}).get("result") or [None])[0]
-                return s, parse(res, today) if res else None
-            except Exception as e:  # network hiccup
-                errors.append(str(e)[:80]); time.sleep(2)
-        return s, None
+        if time.monotonic() > deadline:
+            return s, None
+        try:
+            r = session.get(CHART.format(s=s), params={"range": "1d", "interval": "5m", "includePrePost": "true"},
+                            headers=UA, timeout=10)
+        except requests.RequestException:
+            return s, None
+        k = str(r.status_code)
+        diag.setdefault("chart_status", {}); diag["chart_status"][k] = diag["chart_status"].get(k, 0) + 1
+        if r.status_code != 200:
+            if r.status_code == 429:
+                time.sleep(2)
+            return s, None
+        res = ((r.json().get("chart") or {}).get("result") or [None])[0]
+        return s, parse(res, today) if res else None
 
     with ThreadPoolExecutor(workers) as ex:
         return {s: v for s, v in ex.map(one, syms) if v}
 
 
+def priority(keys):
+    """Futures, pulse symbols, sector ETFs, theme stocks and S&P 500 / Nasdaq-100 first; Russell 2000-only names last."""
+    import csv
+    idx = {}
+    with open(config.DATA_DIR / "live_sheet.csv") as f:
+        for r in csv.reader(f):
+            if r and len(r) > 1:
+                idx[r[0]] = r[1]
+    return sorted(keys, key=lambda t: 1 if idx.get(t) == "2" else 0)
+
+
 def run():
+    t0 = time.monotonic()
     now = datetime.now(ET)
     today = now.date().isoformat()
-    keys = tickers()
+    keys = priority(tickers())
     ysym = {t: yahoo_symbol(t) for t in keys}
-    syms = sorted(set(ysym.values()) | set(FUTURES))
+    syms = list(FUTURES) + [s for s in dict.fromkeys(ysym.values()) if s not in FUTURES]
     session = requests.Session()
-    method, err = "spark", None
+    diag, method, err = {}, "spark", None
+    deadline = t0 + BUDGET_S
     try:
-        got = fetch_spark(session, syms, today)
-        if len(got) < len(syms) * 0.5:
+        got = fetch_spark(session, syms, today, deadline, diag)
+        if len(got) < 50:
             raise RuntimeError(f"spark returned only {len(got)} of {len(syms)}")
     except Exception as e:
         err = str(e)[:200]
         log.warning("spark failed (%s); falling back to one chart call per symbol", err)
-        method, got = "chart", fetch_chart(session, syms, today)
+        method, got = "chart", fetch_chart(session, syms, today, deadline, diag)
     rows = {t: got[y] for t, y in ysym.items() if got.get(y) and got[y][0] is not None}
     fut = {k: got[k] for k in FUTURES if got.get(k) and got[k][0] is not None}
     out = {"asof": now.strftime("%Y-%m-%dT%H:%M"), "date": today, "method": method, "spark_error": err,
-           "n": len(rows), "asked": len(keys), "rows": rows, "futures": fut, "futures_labels": FUTURES}
+           "n": len(rows), "asked": len(keys), "secs": round(time.monotonic() - t0), "diag": diag,
+           "rows": rows, "futures": fut, "futures_labels": FUTURES}
     OUT.write_text(json.dumps(out, separators=(",", ":")))
-    log.info("pre-market: %d of %d symbols priced via %s, %d futures", len(rows), len(keys), method, len(fut))
+    log.info("pre-market: %d of %d symbols priced via %s, %d futures, %ds %s", len(rows), len(keys), method, len(fut), out["secs"], diag)
     return out
 
 
