@@ -11,7 +11,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 ## How it runs (fully automated, free)
 - GitHub Actions `.github/workflows/daily.yml`, crons 22:37 UTC Mon–Fri, 01:07 and 06:07 UTC Tue–Sat (≈6:37 PM ET same day, backups 9:07 PM and 2:07 AM).
   **GitHub's scheduler has never fired a single scheduled run on this repo** (Oct 10–13: every run was workflow_dispatch, cause unknown),
-  so a Claude scheduled task "Market Monitor daily update kick" (5:48 AM ET Tue–Sat) dispatches the workflow via
+  so Claude scheduled tasks dispatch it: "Market Monitor evening update kick" (6:41 PM + 9:41 PM ET Mon–Fri, skips if today is
+  already loaded, reports when Massive had published) and "Market Monitor daily update kick" (5:48 AM ET Tue–Sat backup), via
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/daily.yml/dispatches -f ref=main` (gh GraphQL commands like
   `gh workflow run` are blocked in Claude sessions; use REST). A 7:44 PM ET manual run on Oct 13 did NOT get that day's bars: Massive's
   free plan publishes overnight. Breadth tab shows a ⚠ banner when the last row is older than the previous weekday (
