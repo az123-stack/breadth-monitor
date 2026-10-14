@@ -1,0 +1,49 @@
+name: Pre-market quotes
+
+# Fetches Yahoo pre-market prices every 10 minutes until 9:31 AM ET and commits docs/premarket.json
+# (the dashboard's Pre-market tab reads it). Cron is UTC: 09:52 = 5:52 AM EDT (summer), 10:52 = 5:52 AM EST
+# (winter); the other one queues behind and exits at the open. A Claude scheduled task also dispatches it
+# at 5:48 AM ET, because GitHub's scheduler skipped runs on this repo in its first days.
+on:
+  schedule:
+    - cron: "52 9 * * 1-5"
+    - cron: "52 10 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: premarket
+  cancel-in-progress: false
+
+jobs:
+  quotes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Fetch pre-market quotes until the open
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          end=$(TZ=America/New_York date -d "09:31" +%s)
+          while [ "$(date +%s)" -lt "$end" ]; do
+            python -m breadth.premarket || echo "fetch failed, retrying next round"
+            git add docs/premarket.json
+            if ! git diff --cached --quiet; then
+              git commit -qm "Pre-market $(TZ=America/New_York date +%H:%M) ET"
+              for i in 1 2 3; do
+                git push -q && break
+                git pull -q --rebase -X theirs || { git rebase --abort; break; }
+              done
+            fi
+            left=$(( end - $(date +%s) ))
+            [ "$left" -le 0 ] && break
+            sleep $(( left < 600 ? left : 600 ))
+          done
