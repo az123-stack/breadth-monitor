@@ -218,6 +218,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   mid $5–25M A +8.8% / B +0.14R; liquid $25M+ ≈ 0 (A +0.3%, B −1.2% test, C −2%). Non-spike: no edge. Bear flag weakest.
 - Limits: survivorship bias in backfill, small strong-regime sample, no costs, no intraday H/L/volume.
 
+## Play ideas Adam logged (not built yet — ask where they go before building)
+- Oct 13, 2026 — "Theme breadth play": any theme at 95–100% breadth (share of its stocks up; Energy-Oil hit it Oct 13) should be
+  flagged every day, and he wants to look at / play its top 2 stocks.
+- Oct 13, 2026 — "Top late mover": the strongest mover after the morning window (window not yet defined in this repo's history;
+  confirm with Adam — likely after the first 30–60 min).
+
 ## Working preferences
 - Start every answer with a TL;DR, then detail.
 - Ship working changes; verify with `--rebuild-only`, the tests, and a headless browser check before pushing.
