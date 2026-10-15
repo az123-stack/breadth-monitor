@@ -262,6 +262,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   rrg, ign20, ago) + `ignition.spy`; `liveIgnition()` in the browser finishes today's checks from Google prices + `refs` ema21 when
   `liveActive()` (sheet session newer than our bars). Verified Oct 13 (copy with that day's bars removed, Oct 13 bars as "live"): 14/15
   flagged groups identical status + checks, breadth/flow/RS-rank within ~0.02; the miss was RRG-only warming (RRG stays last close).
+- "Day 1" group breakout study (Oct 14, 2026, `tools/ignition_study/day1.py`, prompted by large-cap pharma breaking out of 2-month
+  bear flags on Oct 14 while scoring 0/4 on ignition: index 2.7% below its 40-day high, 10-day flow −0.01, breadth 67%, RS-rank +9).
+  DAY 1 = group beats SPY by 2%+ on 1.3×+ normal $ volume, half its members close above their prior 10-day closing high, group 3–15%
+  below its 60-day high the day before. Alone: no edge (20d +1.3% vs base +1.4%, n 264); strong breadth +2.7% (t 1.0), otherwise −0.4%.
+  Follow-through decides it: Day 1 still above its close 3 sessions later → next 20 sessions +3.4% (n 132); faded → −0.7% (n 129).
+  39% of Day-1 events (106/272) became an IGNITION within 15 sessions. Not built yet (offered as a "Day 1 / follow-through" tier).
 - Record-volume "tells" study (Oct 12, 2026; 2,048 events Oct 2025–Sep 2026, no index/expiry days; 10-session return vs
   SPY, clipped ±50%; tells found on the first 60% by date, checked on the last 40%): all events −4.9% train / −7.7% test.
   Consistent AVOID tells (both halves): gap up 10%+ or up 20%+ (−15 to −18%), volume > 20× avg or > 2.2× old record,
