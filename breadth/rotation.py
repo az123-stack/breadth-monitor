@@ -361,7 +361,7 @@ def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub
             "turning": [{**brief(g), "days": int(len(F["cross"][g]) - 1 - np.flatnonzero(F["cross"][g].to_numpy())[-1])} for g in turning],
             "bt": ev, "spark_dates": [d.strftime("%Y-%m-%d") for d in dates[-60:]],
             "flow": flow_safe(close, vol, sub_members, F, regimes, subs, stocks),
-            "ignition": ignition_safe(close, sub_members, F, flow_frames(close, vol, sub_members, F), history, subs, stocks, in_setups, drives)}
+            "ignition": ignition_safe(close, sub_members, F, flow_frames(close, vol, sub_members, F), history, subs, stocks, in_setups, drives, vol)}
 
 
 # ---------------------------------------------------------------------------
@@ -395,7 +395,7 @@ def ignition_frames(close, members, F, FL):
     return {"C": C, "ign": ign, "events": events, "br": br, "drk": drk, "rk": rk, "thrust": thrust, "rrg": rrg}
 
 
-def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, drives):
+def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, drives, vol=None):
     X = ignition_frames(close, members, F, FL)
     rel, I, dates = F["rel"], F["idx"], F["rel"].index
     ev, n = X["events"], len(dates)
@@ -463,9 +463,29 @@ def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, driv
                      "r20": round(float(F["r20"][g].iloc[-1]), 4), "strength": r.get("strength"), "s_rank": r.get("s_rank"),
                      "drivers": drivers(g), "stocks": top_stocks(g)})
     rows.sort(key=lambda r: (r["status"] != "ignition", r["ago"] if r["ago"] is not None else 99, -r["n_met"], -r["r20"]))
+    # Pieces the browser needs to finish today's checks from live Google prices (template.html liveIgnition):
+    # idx = group index at the last close, hi39 = max of the last 39 closes (today makes 40), rel20 / rk10 = the group's
+    # relative line and RS-rank 20 / 10 sessions before today, f9 / d9 = signed / total dollar volume of the last 9
+    # sessions (today makes 10), brmin9 = lowest breadth of the last 9 sessions, ign20 = an ignition in the last 20 sessions.
+    live = {}
+    if vol is not None:
+        dv = close * vol.reindex_like(close)
+        sg = np.sign(close / close.shift(1) - 1)
+        for g in rel.columns:
+            t = [q for q in members[g] if q in close.columns]
+            if len(I[g].dropna()) < 41:
+                continue
+            f = lambda v: None if v != v else round(float(v), 6)
+            live[g] = {"m": t, "idx": f(I[g].iloc[-1]), "hi39": f(I[g].iloc[-39:].max()), "rel20": f(rel[g].iloc[-20]),
+                       "rk10": f(X["rk"][g].iloc[-10]), "f9": f((dv[t] * sg[t]).sum(axis=1).iloc[-9:].sum()),
+                       "d9": f(dv[t].sum(axis=1).iloc[-9:].sum()), "brmin9": f(X["br"][g].iloc[-9:].min()),
+                       "thrust9": bool(X["thrust"][g].iloc[-9:].any()), "rrg": bool(X["rrg"][g].iloc[-1]),
+                       "ign20": bool(X["ign"][g].iloc[-20:].any()), "ago": int(n - 1 - np.flatnonzero(ev[g].to_numpy())[-1]) if ev[g].any() else None,
+                       "rel": f(rel[g].iloc[-1]), "sector": subs.get(g, {}).get("group", ""), "strength": subs.get(g, {}).get("strength"),
+                       "drivers": drivers(g), "stocks": top_stocks(g)}
     gate = bool(r10.iloc[-1] >= IGN["strong_ratio"]) if r10.iloc[-1] == r10.iloc[-1] else False
     return {"rows": rows, "bt": bt, "recent": recent[:12], "ratio10": round(float(r10.iloc[-1]), 2) if r10.iloc[-1] == r10.iloc[-1] else None,
-            "act": gate, "rules": IGN, "labels": IGN_LABEL, "date": dates[-1].strftime("%Y-%m-%d")}
+            "act": gate, "rules": IGN, "labels": IGN_LABEL, "date": dates[-1].strftime("%Y-%m-%d"), "live": live, "spy": round(float(close["SPY"].iloc[-1]), 4)}
 
 
 def ignition_safe(*a):

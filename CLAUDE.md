@@ -258,6 +258,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   evidence recomputed each build (all / strong / other vs base, next 20 sessions), 🔥 Ignition (fired in last 5 sessions, rel since),
   Warming up (3 of 4 checks, or group breadth thrust in 10 days + RRG leading), checks as of last close, breadth, flow, RS-rank Δ, 20d vs
   SPY, macro drivers (d30, up = +8% or yield up), Strength, top 4 stocks by RS with Trade Setups tags; recent ignitions (60 sessions).
+  Live (Oct 14): `ignition.live[g]` (members, idx, hi39, rel20, rk10, f9/d9 signed/total $ vol of the last 9 sessions, brmin9, thrust9,
+  rrg, ign20, ago) + `ignition.spy`; `liveIgnition()` in the browser finishes today's checks from Google prices + `refs` ema21 when
+  `liveActive()` (sheet session newer than our bars). Verified Oct 13 (copy with that day's bars removed, Oct 13 bars as "live"): 14/15
+  flagged groups identical status + checks, breadth/flow/RS-rank within ~0.02; the miss was RRG-only warming (RRG stays last close).
 - Record-volume "tells" study (Oct 12, 2026; 2,048 events Oct 2025–Sep 2026, no index/expiry days; 10-session return vs
   SPY, clipped ±50%; tells found on the first 60% by date, checked on the last 40%): all events −4.9% train / −7.7% test.
   Consistent AVOID tells (both halves): gap up 10%+ or up 20%+ (−15 to −18%), volume > 20× avg or > 2.2× old record,

@@ -1158,10 +1158,52 @@ function moneyTodayCard() {
   return sec;
 }
 /* ---------- Group ignition (rotation.ignition_build; study in tools/ignition_study) ---------- */
+// Today's ignition checks from live Google prices: mirrors rotation.ignition_frames for one more session on top of
+// the last close (inputs in rotation.ignition.live). Returns rows shaped like the nightly ones, or null.
+function liveIgnition(X) {
+  const L = X.live || {}, T = DATA.themes, ix = Object.fromEntries((T.ref_keys || []).map((k, i) => [k, i]));
+  const spy = liveRow("SPY"); if (!spy || !X.spy || !Object.keys(L).length) return null;
+  const spyNow = X.spy * (1 + spy.chg), a = 2 / 22, R = X.rules, out = {};
+  Object.entries(L).forEach(([g, q]) => {
+    let rets = [], dvT = 0, fT = 0, above = 0, cnt = 0;
+    q.m.forEach(t => { const r = liveRow(t); if (!r) return;
+      rets.push(Math.max(-0.6, Math.min(3, r.chg))); cnt++;
+      const d = r.price * (r.volume || 0); dvT += d; fT += Math.sign(r.chg) * d;
+      const ref = T.refs && T.refs[t], e = ref ? ref[ix.ema21] : null;
+      if (e != null && r.price > r.price * a + e * (1 - a)) above++; });
+    if (!rets.length || q.idx == null) return;
+    const idx = q.idx * (1 + rets.reduce((x, y) => x + y, 0) / rets.length), rel = idx / spyNow;
+    out[g] = { q, idx, rel, r20: q.rel20 ? rel / q.rel20 - 1 : null, br: cnt ? above / cnt : null,
+      flow: (q.d9 || 0) + dvT ? ((q.f9 || 0) + fT) / ((q.d9 || 0) + dvT) : null };
+  });
+  // RS rank = percentile of the 20-day relative move across groups (average rank for ties, like pandas)
+  const vals = Object.entries(out).filter(([, o]) => o.r20 != null).sort((x, y) => x[1].r20 - y[1].r20);
+  for (let i = 0; i < vals.length;) { let j = i; while (j + 1 < vals.length && vals[j + 1][1].r20 === vals[i][1].r20) j++;
+    const rk = ((i + j) / 2 + 1) / vals.length; for (let k = i; k <= j; k++) vals[k][1].rk = rk; i = j + 1; }
+  const prev = Object.fromEntries((X.rows || []).map(r => [r.g, r]));
+  const rows = [];
+  Object.entries(out).forEach(([g, o]) => {
+    const q = o.q, drk = o.rk != null && q.rk10 != null ? o.rk - q.rk10 : null;
+    const met = { base: q.hi39 != null && o.idx >= q.hi39, flow: o.flow != null && o.flow > R.acc, breadth: o.br != null && o.br >= R.br, jump: drk != null && drk >= R.drk };
+    const nmet = Object.values(met).filter(Boolean).length, all4 = nmet === 4;
+    const thrust10 = q.thrust9 || (o.br != null && o.br >= R.br && Math.min(q.brmin9 ?? 1, o.br) <= 0.2);
+    let status = null, ago = null, since = null;
+    if (all4 && !q.ign20) { status = "ignition"; ago = 0; since = 0; }
+    else if (q.ago != null && q.ago + 1 < R.recent) { status = "ignition"; ago = q.ago + 1; const p = prev[g]; since = p && p.since != null && q.rel ? (1 + p.since) * (o.rel / q.rel) - 1 : null; }
+    else if (nmet >= 3 || (thrust10 && q.rrg)) status = "warming";
+    if (!status) return;
+    rows.push({ g, sector: q.sector, status, ago, since, met, n_met: nmet, thrust10, rrg: q.rrg, breadth: o.br, flow: o.flow, drk, r20: o.r20,
+      strength: q.strength, drivers: q.drivers || [], stocks: q.stocks || [] });
+  });
+  rows.sort((x, y) => (x.status !== "ignition") - (y.status !== "ignition") || (x.ago ?? 99) - (y.ago ?? 99) || y.n_met - x.n_met || (y.r20 ?? 0) - (x.r20 ?? 0));
+  return rows;
+}
 function ignitionCard() {
   const X = ((DATA.themes || {}).rotation || {}).ignition;
   if (!X) return $('<div></div>');
   const B = X.bt || {}, L = X.labels || {}, pc = pcI, cls = clsI;
+  const live = liveActive() && LIVE && LIVE.rows ? liveIgnition(X) : null;
+  const R0 = live || X.rows;
   const pp = (o) => o && o.n ? `${pc(o.avg, 1)} avg, median ${pc(o.med, 1)}, ${Math.round(o.win * 100)}% beat SPY (n ${o.n})` : "–";
   const gate = X.act
     ? `<div class="r2kwarn" style="border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)">✅ <b>Act:</b> breadth is strong (10-day ratio ${X.ratio10} ≥ ${X.rules.strong_ratio}). This is when ignitions have paid: ${pp(B.strong)} over the next ${B.fwd} sessions.</div>`
@@ -1174,10 +1216,12 @@ function ignitionCard() {
     <td class="l">${chk(r)}</td><td class="num">${r.breadth == null ? "–" : Math.round(r.breadth * 100) + "%"}</td><td class="num ${cls(r.flow)}">${r.flow == null ? "–" : (r.flow > 0 ? "+" : "") + r.flow.toFixed(2)}</td>
     <td class="num ${cls(r.drk)}">${r.drk == null ? "–" : (r.drk > 0 ? "+" : "") + Math.round(r.drk * 100)}</td><td class="num ${cls(r.r20)}">${pc(r.r20, 1)}</td>
     <td class="l">${drv(r)}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td><td class="l">${stk(r)}</td></tr>`;
-  const hdr = `<thead><tr><th class="l">Sub-theme</th><th class="l">Status</th><th class="l">The 4 checks<small>as of the last close</small></th><th>Breadth<small>% above 21 EMA</small></th><th>Dollar flow<small>10-day net</small></th><th>RS rank Δ<small>10 sessions, pts</small></th><th>vs SPY<small>20 sessions</small></th><th class="l">Macro driver<small>1 month</small></th><th>Strength</th><th class="l">Top stocks<small>by RS</small></th></tr></thead>`;
-  const fired = X.rows.filter(r => r.status === "ignition"), warm = X.rows.filter(r => r.status === "warming");
+  const hdr = `<thead><tr><th class="l">Sub-theme</th><th class="l">Status</th><th class="l">The 4 checks<small>${live ? "with today's prices" : "as of the last close"}</small></th><th>Breadth<small>% above 21 EMA</small></th><th>Dollar flow<small>10-day net</small></th><th>RS rank Δ<small>10 sessions, pts</small></th><th>vs SPY<small>20 sessions</small></th><th class="l">Macro driver<small>1 month</small></th><th>Strength</th><th class="l">Top stocks<small>by RS</small></th></tr></thead>`;
+  const fired = R0.filter(r => r.status === "ignition"), warm = R0.filter(r => r.status === "warming");
+  const clk = nyClock();
+  const asof = live ? (clk.open ? `live · ${clk.label} (Google prices, up to ~20 min behind)` : `today's close (Google prices) · official numbers after tonight's update`) : `${longDate(X.date)} close`;
   const rec = (X.recent || []).map(r => `<tr><td class="l" data-v="${Date.parse(r.date + "T12:00:00")}">${shortDate(r.date)}</td><td class="l">${esc(r.g)}</td><td class="num ${cls(r.since)}">${pc(r.since, 1)}</td><td class="num ${cls(r.idx_since)}">${pc(r.idx_since, 1)}</td><td class="l">${r.strong ? "strong" : '<span class="meta">not strong</span>'}</td></tr>`).join("");
-  return $(`<section class="icard card regcard"><div class="kicker">Group ignition · sub-themes lighting up · ${longDate(X.date)} close</div>
+  return $(`<section class="icard card regcard"><div class="kicker">Group ignition · sub-themes lighting up · ${asof}</div>
     ${gate}
     <p class="meta" style="margin:8px 0">An <b>ignition</b> is the day four signs of money moving into a sub-theme line up at once: the group breaks out of a 40-day base, net dollar flow over 10 days tops +0.25, 80%+ of its stocks are above their 21 EMA, and its relative-strength rank jumps 30+ points in 10 sessions. Since ${shortDate(B.from)} that happened ${B.all ? B.all.n : "–"} times across all sub-themes: next ${B.fwd} sessions vs SPY ${pp(B.all)}, against ${pc(B.base && B.base.avg, 1)} for any group on any day.</p>
     <h3 class="ih">🔥 Ignition <small class="meta">fired in the last ${X.rules.recent} sessions</small></h3>
@@ -1186,7 +1230,7 @@ function ignitionCard() {
     <div class="scroll"><table class="grid">${hdr}<tbody>${warm.map(row).join("") || '<tr><td class="l meta" colspan="10">Nothing warming up.</td></tr>'}</tbody></table></div>
     <details class="kqsec" style="margin-top:8px"><summary><b>Recent ignitions and how they did</b> <span class="meta">last 60 sessions</span></summary>
       <div class="scroll"><table class="grid"><thead><tr><th class="l">Date</th><th class="l">Sub-theme</th><th>Since, vs SPY</th><th>Since, group</th><th class="l">Breadth then</th></tr></thead><tbody>${rec || '<tr><td class="l meta" colspan="5">None.</td></tr>'}</tbody></table></div></details>
-    <div class="note" style="padding:8px 0 0">How to use it: put "warming up" groups on your watch list (Refiners showed a breadth thrust inside the group and moved into the rotation graph's leading quadrant ~1 week before its July ignition). Act on an ignition when breadth is strong, trading the group's leaders (top stocks by RS; check the Trade Setups tags for an entry). A day or two later, a 60-day relative high and the money-flow card's "confirmed" tier confirm it, at a higher price. Macro drivers (crack spread, oil, gold, copper…) rising 8%+ in a month looked like a plus (+5.5% vs +3.6%) but on only 16 cases. Backtest uses each group's equal-weight index vs SPY, no costs, ~2 years; false starts happen (Refiners May 2026: −3%).</div></section>`);
+    <div class="note" style="padding:8px 0 0">How to use it: put "warming up" groups on your watch list (Refiners showed a breadth thrust inside the group and moved into the rotation graph's leading quadrant ~1 week before its July ignition). Act on an ignition when breadth is strong, trading the group's leaders (top stocks by RS; check the Trade Setups tags for an entry). A day or two later, a 60-day relative high and the money-flow card's "confirmed" tier confirm it, at a higher price. Macro drivers (crack spread, oil, gold, copper…) rising 8%+ in a month looked like a plus (+5.5% vs +3.6%) but on only 16 cases. Backtest uses each group's equal-weight index vs SPY, no costs, ~2 years; false starts happen (Refiners May 2026: −3%). During the session (and after the close until tonight's update) the four checks are recomputed from your Google Sheet's live prices; the rotation-graph position and the track record stay as of the last close.</div></section>`);
 }
 function renderRotation(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
