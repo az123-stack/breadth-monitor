@@ -1146,17 +1146,14 @@ function moneyTodayCard() {
       ${bin && bin.n >= 5 ? `<p class="meta" style="margin:0 0 4px">After past days like this (${share >= 0.7 ? "70%+" : "30% or less"} in falling stocks, n ${bin.n}), SPY averaged ${pc(bin.spy5, 1)} over the next 5 sessions (up ${Math.round(bin.up5 * 100)}% of the time) vs ${pc(A.spy5, 1)} on an average day.${share >= 0.7 ? " Heavy selling days have tended to bounce short term; context, not a buy signal." : ""}</p>` : ""}
       ${haven ? `<p class="meta" style="margin:0">Where money hides: ${haven}.</p>` : ""}</div>
       <div class="dfbars" aria-label="Share of dollar volume in falling stocks, last sessions">${bars}</div></div>
-      <div class="kicker" style="margin:12px 0 0">Step 2 · ${state === "out" ? "Money is leaving: what's being sold hardest, and what's holding up" : state === "in" ? "Money is coming in: where it's going" : "Rotation: what's being bought and what's being sold"}</div>`;
+      <div class="kicker" style="margin:12px 0 0">Step 2 · Which groups are seeing inflow vs outflow${state === "out" ? " (money is leaving overall: inflows are relative strength)" : state === "in" ? " (money is coming in: the inflow list is where it's going)" : ""}</div>`;
   }
   body.append($(`<div>
     ${sameDay ? `<p class="meta" style="margin:6px 0">The sheet still shows the last full session (${longDate(T.date)}); today's flows start once the market opens.</p>` : ""}
     ${mkt}
     <ul style="margin:8px 0 0;padding-left:18px;line-height:1.55">${bullets.map(b => `<li>${b}</li>`).join("")}</ul>
-    ${state === "out"
-      ? `<h3 class="ih">Being sold hardest <small class="meta">groups down on the day, biggest net dollar outflow first</small></h3>${tbl(outs.slice(0, 12))}
-         <details class="kqsec" style="margin-top:8px"><summary><b>Holding up best (${ins.length})</b> <span class="meta">groups still up: relative strength while money leaves, not new money. Watch these when buying returns.</span></summary>${tbl(ins.slice(0, 12))}</details>`
-      : `<h3 class="ih">${state === "in" ? "Where the new money is going" : "Being bought (rotating into)"} <small class="meta">groups up on the day, ranked by net dollar flow</small></h3>${tbl(ins.slice(0, 12))}
-         <h3 class="ih">${state === "in" ? "Still being sold" : "Being sold (rotating out of)"} <small class="meta">groups down on the day, biggest net dollar outflow first</small></h3>${tbl(outs.slice(0, 12))}`}
+    <h3 class="ih">Money coming in <small class="meta">groups up on the day, ranked by net dollar flow${state === "out" ? " · while money leaves the market these are holding up, not new money" : ""}</small></h3>${tbl(ins.slice(0, 12))}
+    <h3 class="ih">Money going out <small class="meta">groups down on the day, biggest net dollar outflow first</small></h3>${tbl(outs.slice(0, 12))}
     <div class="note" style="padding:8px 0 0">Every share sold has a buyer, so "money leaving" really means sellers were in control and accepted lower prices; the whole-market line measures how lopsided that was. Net $ flow adds up each stock's dollar volume today, counted as positive when the stock is up and negative when it's down, so big, heavily traded names carry the most weight (that's where the real money is). Flow × avg day divides it by the group's normal daily dollar volume, which puts small and large groups on the same scale. Rel. volume = dollar volume so far vs the 50-day average, paced for the time of day; bold at 1.2× or more. "Trend into today" is the group's money-flow tier at the last close (Rotation tab → money flow card), so "leader being sold" flags groups that had been in inflow and are now being hit. Uses your theme and sub-theme stocks with Google's live prices (up to ~20 min behind). Click any header to sort.</div></div>`));
   return sec;
 }

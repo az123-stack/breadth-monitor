@@ -175,8 +175,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   47%; ≥ 70% days (n 35) SPY +1.3% next 5 sessions, up 83% (all days +0.3%, 58%); ≥ 80% (n 26) +0.7%, 65%. Not a buy signal.
   Oct 14, 2026: ≈ 73% in falling stocks (theme stocks alone 83.5%, ~95th percentile), TLT +0.7%, UUP +0.3%, GLD −1.5%, VIX +10.5%.
   Two-step layout (Oct 14): Step 1 verdict from the whole-market share in falling stocks (≥ 60% "money is leaving", ≤ 40% "coming in",
-  else "mixed: rotating") with net $ today and 5 sessions (`dollar.last` third field = net $B); Step 2 tables follow the verdict: leaving →
-  "being sold hardest" + collapsed "holding up best (not new money)"; coming in → "where the new money is going" first; mixed → both.
+  else "mixed: rotating") with net $ today and 5 sessions (`dollar.last` third field = net $B); Step 2 always shows both tables, "Money coming in"
+  then "Money going out" (Adam prefers both visible); on leaving days the inflow table is labeled as relative strength, not new money.
   Oct 14 read: out of AI infra (Neoclouds −11.6% on 2.4× volume, custom silicon, AI servers, optical, hyperscalers, memory, quantum,
   BTC miners, SMR) into large-cap pharma, defense primes, biotech, managed care, oil majors, utilities; 16 of 102 groups up.
 - Rotation tab (browser-only rendering): ideas card · pair chart (`pairCard`: two groups' equal-weight index, ratio and
