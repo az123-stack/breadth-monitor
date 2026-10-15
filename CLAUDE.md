@@ -224,7 +224,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   scheduled tasks: "Market Monitor story · morning" (8:40 AM ET Mon–Fri, `--slot am`: official close + pre-market) and "· after the close"
   (4:50 PM ET Mon–Fri, `--slot pm`: `data/close_snapshot.csv` saved by `.github/workflows/close.yml` at 4:25 PM ET from the Google Sheet;
   the task dispatches that workflow if the snapshot is stale). Each run: clone, `python3 -m breadth.story facts --slot X` (stdlib only),
-  write per `story_guide.md` (incl. "Why it's moving": WebSearch the catalyst for each group on the fact sheet's WHY research list, classify catalyst / rotation / sympathy / unexplained, inline source links rendered by `mdLite`), `python3 -m breadth.story publish --slot X --title ... --branch ... --file ch.md --push` (commits only
+  write per `story_guide.md` (incl. "Why it's moving": WebSearch the catalyst for each group on the fact sheet's WHY research list, classify catalyst / rotation / sympathy / unexplained, inline source links rendered by `mdLite`; plus a "How markets work" teaching point tied to the day, a new pattern each chapter), `python3 -m breadth.story publish --slot X --title ... --branch ... --file ch.md --push` (commits only
   docs/story.json via `gh api` PUT). First chapter (Oct 14 pm, "The AI money is leaving") written by hand.
   Comeback study (`tools/ignition_study/comeback.py`, Feb 2025–Oct 2026): heavy-selling day in an outflow streak (n 18) → SPY median +1.7%
   next 10 sessions, sold-hardest sub-themes +4.3% vs SPY (median +3.2%, 78%) vs held-up +0.5%; ex Mar–Apr 2025 +3.9%; any 70%+ day (n 24)

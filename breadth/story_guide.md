@@ -23,7 +23,7 @@ story he can absorb in two minutes, and it must CONTINUE the story from the prev
 - Evidence lines (historical tendencies) are context, never promises. Say "has tended to", "historically", give n when small.
 - Name groups and stocks specifically. Every "trade" line should point at concrete groups/stocks from the fact sheet
   (ignitions, Day 1s, leaders, held-up / sold-hardest baskets, picks). No position sizing advice beyond "small / normal / press".
-- 350–600 words. Markdown: short paragraphs, **bold** lead-ins, "- " bullets. No headings deeper than "**Bold:**" lead-ins.
+- 400–650 words. Markdown: short paragraphs, **bold** lead-ins, "- " bullets. No headings deeper than "**Bold:**" lead-ins.
 
 ## Structure (keep these lead-ins so chapters read the same every day)
 **Where we are:** 2–4 sentences: the story so far + today's update (money in/out, how much, where it went, breadth, indexes).
@@ -36,6 +36,13 @@ story he can absorb in two minutes, and it must CONTINUE the story from the prev
 **Leaderboard:** 2–3 bullets: strongest sub-themes and what moved in/out of the top 10, best stocks, notable changes.
 **Your trades:** 1–3 bullets on picks / open trades (trigger, stop proximity) in the context of the story.
 **Next tell:** 1–3 specific things to watch next session (a follow-through day, a level, a group).
+**How markets work:** one short teaching point (3–5 sentences) drawn from what is happening right now, so Adam builds
+  pattern recognition. Name the pattern (e.g. "when tech stalls, money parks in health care"), explain the mechanism
+  (who is buying/selling and why: earnings that don't depend on the economy, fund mandates that must stay invested,
+  rate sensitivity, short covering, sector rotation through the cycle), say when it usually holds and when it breaks,
+  and how a swing trader uses it. Tie it to the dashboard's own evidence when there is some (comeback study, ignition,
+  Day-1 follow-through, record-volume warnings) and mark general market knowledge as such. Pick a new pattern each time:
+  check the previous chapters in the fact sheet and don't repeat one unless today adds something new.
 
 ## Slots
 - am (about 8:40 AM ET): official close of the last session + pre-market. Frame today's open against the story.
