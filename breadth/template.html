@@ -3327,7 +3327,6 @@ function renderIntraday(app) {
     <div class="note" style="padding:8px 0 0">${sameDay ? "Google's latest session is the one already on the Breadth tab, so these match yesterday's close until the next session starts. " : ""}Counts our tracked stocks only, so they're smaller than the Breadth tab's whole-market numbers; "last session" uses the same stocks for a fair comparison. "Above-normal volume" = volume so far above the 50-day average, paced for the time of day.</div></section>`));
   // 4. Theme heat
   app.append(themeHeatCard("Theme heat · today"));
-  app.append(moneyTodayCard());
   // 5. In play: relative volume and gaps
   const pool = {};
   st.forEach(s => { const r = liveRow(s.t); if (r) pool[s.t] = { t: s.t, name: s.name, r, avg: s.v50, sub: s.sub }; });

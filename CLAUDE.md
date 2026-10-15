@@ -173,7 +173,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   flow < −0.15). Evidence per tier × regime recomputed each build. Findings: confirmed +0.8% vs avg group (t 2.9), strong +1.8%
   (t 3.4); steady mixed +1.0% (t 1.9); new ≈ 0; outflow −0.5% (t −2.5); bouncing −0.5% (t −2.4), strong −1.6%; weak breadth
   breaks the inflow tiers; volume flow alone ≈ 0. Lookup box maps a ticker (`stock_group`) or group name to its tier.
-- "Where's the money going · today" (`moneyTodayCard`, Oct 14; top of Rotation tab and on Intraday after theme heat): live from the
+- "Where's the money going · today" (`moneyTodayCard`, Oct 14; top of the Rotation tab only — removed from Intraday Oct 15 at Adam's request): live from the
   Google Sheet, per sub-theme / theme (chips, 3+ stocks): avg change, vs SPY, up/n, paced relative $ volume, net $ flow = Σ dollar
   volume × sign(change) ($M/$B), flow × avg day (÷ group's 50-day avg $ volume), trend into today = `rotation.flow` tier at the last
   close, read (still being bought / fresh buying / leader being sold / still being sold). Bullets: leaving (top 4 net outflow), going
