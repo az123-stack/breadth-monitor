@@ -277,6 +277,8 @@ def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=No
     for th, tick in members.items():
         for t in tick:
             stock_themes.setdefault(t, []).append(th)
+    for t in sub_of:            # sub-theme-only stocks (e.g. WMT, COST, AAPL): listed with no theme
+        stock_themes.setdefault(t, [])
     cols = f["close"].columns
     def rs_rank(i):
         s = f["rs"].iloc[i][[t for t in stock_themes if t in cols]].dropna().sort_values(ascending=False)
@@ -288,7 +290,7 @@ def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=No
             continue
         s = {k: f[k].iloc[last][t] for k in list(HORIZONS) + ["rs", "st", "lt", "e8", "e21", "e50"]}
         ths_sorted = sorted(ths, key=lambda x: -score_of.get(x, -1))
-        best = score_of.get(ths_sorted[0], 0)
+        best = score_of.get(ths_sorted[0], 0) if ths_sorted else 0
         pts = setup_score(best, s)
         sub = sub_of.get(t)
         stocks.append({
