@@ -1198,7 +1198,7 @@ function liveIgnition(X, out) {
     else if (nmet >= 3 || (thrust10 && q.rrg)) status = "warming";
     if (!status) return;
     rows.push({ g, sector: q.sector, status, ago, since, met, n_met: nmet, thrust10, rrg: q.rrg, breadth: o.br, flow: o.flow, drk, r20: o.r20,
-      strength: q.strength, drivers: q.drivers || [], stocks: q.stocks || [] });
+      strength: q.strength, drivers: q.drivers || [], stocks: q.stocks || [], lead: q.lead });
   });
   rows.sort((x, y) => (x.status !== "ignition") - (y.status !== "ignition") || (x.ago ?? 99) - (y.ago ?? 99) || y.n_met - x.n_met || (y.r20 ?? 0) - (x.r20 ?? 0));
   return rows;
@@ -1217,7 +1217,7 @@ function liveDay1(X, G) {
     const miss = Object.keys(ok).filter(k => !ok[k]);
     if (r1 >= R.r1 && miss.length === 1) near.push({ g, r1, rv, brk, off: z.off, miss: miss[0] });
     if (r1 >= R.r1 && !miss.length)
-      rows.push({ g, date: null, ago: 0, rel_d1: o.rel, r1, rv, brk, d3: null, since: 0, today: true, sector: o.q.sector, strength: o.q.strength, stocks: o.q.stocks || [] }); });
+      rows.push({ g, date: null, ago: 0, rel_d1: o.rel, r1, rv, brk, d3: null, since: 0, today: true, sector: o.q.sector, strength: o.q.strength, stocks: o.q.stocks || [], lead: o.q.lead }); });
   rows.sort((x, y) => x.ago - y.ago || (y.r1 ?? 0) - (x.r1 ?? 0));
   rows.near = near.sort((x, y) => y.r1 - x.r1);
   return rows;
@@ -1233,12 +1233,12 @@ function day1Section(X, live) {
     return `<span class="tg ${r.since > 0 ? "ppull" : "pother"}">Session ${r.ago} of ${R.ft} · ${r.since > 0 ? "holding" : "slipping"}</span>`;
   };
   const stk = (r) => (r.stocks || []).map(s => `<b>${s.t}</b> <small class="meta">RS ${s.rsr ?? "–"}${s.setups && s.setups.length ? " · " + esc(s.setups[0]) : ""}</small>`).join("<br>");
-  const tr = rows.map(r => `<tr><td class="l"><b>${esc(r.g)}</b><small class="meta" style="display:block">${esc(r.sector || "")}</small></td>
+  const tr = rows.map(r => `<tr><td class="l"><b>${esc(r.g)}</b><small class="meta" style="display:block">${esc(r.sector || "")}${r.lead ? (r.lead.ok ? " · ★ has leaders" : " · no leaders yet") : ""}</small></td>
     <td class="l" data-v="${r.today ? Date.now() : Date.parse(r.date + "T12:00:00")}">${r.today ? "today" : shortDate(r.date)}</td><td class="num ${cls(r.r1)}">${pc(r.r1, 1)}</td>
     <td class="num">${r.rv == null ? "–" : r.rv.toFixed(1) + "×"}</td><td class="num">${r.brk == null ? "–" : Math.round(r.brk * 100) + "%"}</td>
     <td class="l">${ft(r)}</td><td class="num ${cls(r.since)}">${pc(r.since, 1)}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td><td class="l">${stk(r)}</td></tr>`).join("");
   return `<h3 class="ih">Day 1 · watch for follow-through <small class="meta">a group breakout day that hasn't (yet) become an ignition</small></h3>
-    <p class="meta" style="margin:4px 0 6px">A <b>Day 1</b> = the group beats SPY by ${Math.round(R.r1 * 100)}%+ on ${R.rv}×+ its normal dollar volume, at least half its stocks close above their 10-day closing high, and the group started 3–15% below its 60-day high. On its own it's a coin flip (next 20 sessions ${pp(B.all)}; strong breadth ${pp(B.strong)}, otherwise ${pp(B.other)}). <b>The next ${R.ft} sessions decide it:</b> still above the Day-1 close vs SPY → next 20 sessions ${pp(B.held)}; faded → ${pp(B.faded)}. About 4 in 10 became an ignition within 15 sessions.</p>
+    <p class="meta" style="margin:4px 0 6px">A <b>Day 1</b> = the group beats SPY by ${Math.round(R.r1 * 100)}%+ on ${R.rv}×+ its normal dollar volume, at least half its stocks close above their 10-day closing high, and the group started 3–15% below its 60-day high. On its own it's a coin flip (next 20 sessions ${pp(B.all)}; strong breadth ${pp(B.strong)}, otherwise ${pp(B.other)}). <b>The next ${R.ft} sessions decide it:</b> still above the Day-1 close vs SPY → next 20 sessions ${pp(B.held)}; faded → ${pp(B.faded)}. Held <i>and</i> the group has leaders → ${pp(B.held_lead)}. About 4 in 10 became an ignition within 15 sessions.</p>
     <div class="scroll"><table class="grid"><thead><tr><th class="l">Sub-theme</th><th class="l">Day 1</th><th>Move vs SPY<small>that day</small></th><th>$ volume<small>× normal${live && nyClock().open ? ", paced" : ""}</small></th><th>Breaking out<small>% above 10-day high</small></th><th class="l">Follow-through</th><th>Since Day 1<small>vs SPY</small></th><th>Strength</th><th class="l">Top stocks<small>by RS</small></th></tr></thead>
     <tbody>${tr || `<tr><td class="l meta" colspan="9">No Day-1 breakouts in the last ${R.show} sessions.</td></tr>`}</tbody></table></div>
     ${live && live.near && live.near.length ? `<p class="meta" style="margin:4px 0">Almost a Day 1 today (one rule short): ${live.near.map(n => `<b>${esc(n.g)}</b> ${pc(n.r1, 1)} vs SPY, ${n.miss === "vol" ? `$ volume only ${n.rv == null ? "–" : n.rv.toFixed(2) + "×"} (needs ${R.rv}×)` : n.miss === "brk" ? `only ${Math.round(n.brk * 100)}% above their 10-day high (needs ${Math.round(R.brk * 100)}%)` : n.off > R.off_hi ? `already within 3% of its 60-day high` : `more than 15% below its 60-day high`}`).join(" · ")}. Volume can still change the call by the close.</p>` : ""}`;
@@ -1251,14 +1251,19 @@ function ignitionCard() {
   const live = G ? liveIgnition(X, G) : null, d1live = G ? liveDay1(X, G) : null;
   const R0 = live || X.rows;
   const pp = (o) => o && o.n ? `${pc(o.avg, 1)} avg, median ${pc(o.med, 1)}, ${Math.round(o.win * 100)}% beat SPY (n ${o.n})` : "–";
+  const gd = X.rules.gate_days || 15;
   const gate = X.act
-    ? `<div class="r2kwarn" style="border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)">✅ <b>Act:</b> breadth is strong (10-day ratio ${X.ratio10} ≥ ${X.rules.strong_ratio}). This is when ignitions have paid: ${pp(B.strong)} over the next ${B.fwd} sessions.</div>`
-    : `<div class="r2kwarn">👀 <b>Watch only:</b> breadth isn't strong (10-day ratio ${X.ratio10 ?? "–"}, needs ${X.rules.strong_ratio}+). Ignitions outside strong breadth had no real edge (${pp(B.other)} vs ${pc(B.base && B.base.avg, 1)} for any group). Build the watch list now; act when breadth turns strong or a thrust prints.</div>`;
+    ? `<div class="r2kwarn" style="border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)">✅ <b>Act:</b> breadth has been strong in the last ${gd} sessions (10-day ratio peaked at ${X.peak15 ?? X.ratio10} ≥ ${X.rules.strong_ratio}; today ${X.ratio10}). Ignitions in that window: ${pp(B.strong)} over the next ${B.fwd} sessions. Best when the group also has leaders (grade A).</div>`
+    : `<div class="r2kwarn">👀 <b>Watch only:</b> the 10-day ratio hasn't reached ${X.rules.strong_ratio} in the last ${gd} sessions (peak ${X.peak15 ?? "–"}, today ${X.ratio10 ?? "–"}). Only ${B.other ? B.other.n : "–"} ignitions in ~2 years came outside a strong-breadth window (${pp(B.other)}), too few to lean on, and most of the proven edge sits inside it. Build the watch list now; act when breadth turns strong or a thrust prints.</div>`;
+  const ld = (r) => { const z = r.lead; if (!z) return "";
+    const grade = z.ok && X.act ? "A" : z.ok || X.act ? "B" : "C";
+    const t = `members' median RS ${z.rsmed ?? "–"} (needs ${X.rules.lead_rs}) · ${z.near == null ? "–" : Math.round(z.near * 100) + "%"} within 3% of a 52-wk high (needs ${Math.round(X.rules.lead_near * 100)}%), as of the last close`;
+    return `<small class="meta" style="display:block" title="${esc(t)}">${r.status === "ignition" ? `<b class="${grade === "A" ? "up" : grade === "C" ? "dn" : ""}">Grade ${grade}</b> · ` : ""}${z.ok ? "★ has leaders" : "no leaders yet"} (RS ${z.rsmed ?? "–"} · ${z.near == null ? "–" : Math.round(z.near * 100) + "%"} near highs)</small>`; };
   const chk = (r) => Object.keys(L).map(k => `<span class="ang ${r.met[k] ? "on" : ""}" title="${esc(L[k])}">${r.met[k] ? "✓" : "✗"} ${{ base: "Base", flow: "Flow", breadth: "Breadth", jump: "RS jump" }[k]}</span>`).join("");
   const drv = (r) => (r.drivers || []).map(d => `<span class="${d.up ? "up" : "dn"}" title="${esc(d.label)} over the last month">${esc(d.label)} ${d.unit === "pct" ? (d.d30 * 100).toFixed(0) + " bp" : pc(d.d30, 0)}</span>`).join("<br>") || '<span class="meta">–</span>';
   const stk = (r) => r.stocks.map(s => `<b>${s.t}</b> <small class="meta">RS ${s.rsr ?? "–"}${s.setups && s.setups.length ? " · " + esc(s.setups[0]) : ""}</small>`).join("<br>");
   const row = (r) => `<tr><td class="l"><b>${esc(r.g)}</b><small class="meta" style="display:block">${esc(r.sector || "")}</small></td>
-    <td class="l">${r.status === "ignition" ? `<span class="tg ppull">🔥 Ignition</span><small class="meta" style="display:block">${r.ago === 0 ? "today" : r.ago + " session" + (r.ago > 1 ? "s" : "") + " ago"} · since ${pc(r.since, 1)} vs SPY</small>` : `<span class="tg pother">Warming up</span><small class="meta" style="display:block">${r.n_met} of 4${r.thrust10 ? " · breadth thrust" : ""}${r.rrg ? " · rotation leading" : ""}</small>`}</td>
+    <td class="l">${r.status === "ignition" ? `<span class="tg ppull">🔥 Ignition</span><small class="meta" style="display:block">${r.ago === 0 ? "today" : r.ago + " session" + (r.ago > 1 ? "s" : "") + " ago"} · since ${pc(r.since, 1)} vs SPY</small>` : `<span class="tg pother">Warming up</span><small class="meta" style="display:block">${r.n_met} of 4${r.thrust10 ? " · breadth thrust" : ""}${r.rrg ? " · rotation leading" : ""}</small>`}${ld(r)}</td>
     <td class="l">${chk(r)}</td><td class="num">${r.breadth == null ? "–" : Math.round(r.breadth * 100) + "%"}</td><td class="num ${cls(r.flow)}">${r.flow == null ? "–" : (r.flow > 0 ? "+" : "") + r.flow.toFixed(2)}</td>
     <td class="num ${cls(r.drk)}">${r.drk == null ? "–" : (r.drk > 0 ? "+" : "") + Math.round(r.drk * 100)}</td><td class="num ${cls(r.r20)}">${pc(r.r20, 1)}</td>
     <td class="l">${drv(r)}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td><td class="l">${stk(r)}</td></tr>`;
@@ -1266,17 +1271,17 @@ function ignitionCard() {
   const fired = R0.filter(r => r.status === "ignition"), warm = R0.filter(r => r.status === "warming");
   const clk = nyClock();
   const asof = live ? (clk.open ? `live · ${clk.label} (Google prices, up to ~20 min behind)` : `today's close (Google prices) · official numbers after tonight's update`) : `${longDate(X.date)} close`;
-  const rec = (X.recent || []).map(r => `<tr><td class="l" data-v="${Date.parse(r.date + "T12:00:00")}">${shortDate(r.date)}</td><td class="l">${esc(r.g)}</td><td class="num ${cls(r.since)}">${pc(r.since, 1)}</td><td class="num ${cls(r.idx_since)}">${pc(r.idx_since, 1)}</td><td class="l">${r.strong ? "strong" : '<span class="meta">not strong</span>'}</td></tr>`).join("");
+  const rec = (X.recent || []).map(r => `<tr><td class="l" data-v="${Date.parse(r.date + "T12:00:00")}">${shortDate(r.date)}</td><td class="l">${esc(r.g)}</td><td class="num ${cls(r.since)}">${pc(r.since, 1)}</td><td class="num ${cls(r.idx_since)}">${pc(r.idx_since, 1)}</td><td class="l">${r.strong ? "strong" : '<span class="meta">not strong</span>'}</td><td class="l">${r.lead ? "★ yes" : '<span class="meta">no</span>'}</td></tr>`).join("");
   return $(`<section class="icard card regcard"><div class="kicker">Group ignition · sub-themes lighting up · ${asof}</div>
     ${gate}
-    <p class="meta" style="margin:8px 0">An <b>ignition</b> is the day four signs of money moving into a sub-theme line up at once: the group breaks out of a 40-day base, net dollar flow over 10 days tops +0.25, 80%+ of its stocks are above their 21 EMA, and its relative-strength rank jumps 30+ points in 10 sessions. Since ${shortDate(B.from)} that happened ${B.all ? B.all.n : "–"} times across all sub-themes: next ${B.fwd} sessions vs SPY ${pp(B.all)}, against ${pc(B.base && B.base.avg, 1)} for any group on any day.</p>
+    <p class="meta" style="margin:8px 0">An <b>ignition</b> is the day four signs of money moving into a sub-theme line up at once: the group breaks out of a 40-day base, net dollar flow over 10 days tops +0.25, 80%+ of its stocks are above their 21 EMA, and its relative-strength rank jumps 30+ points in 10 sessions. Since ${shortDate(B.from)} that happened ${B.all ? B.all.n : "–"} times across all sub-themes: next ${B.fwd} sessions vs SPY ${pp(B.all)}, against ${pc(B.base && B.base.avg, 1)} for any group on any day. <b>Leaders matter:</b> when the group already had leaders (members' median RS ${X.rules.lead_rs}+ or ${Math.round(X.rules.lead_near * 100)}%+ of its stocks within 3% of a 52-week high) ${pp(B.lead)}; without them ${pp(B.nolead)}. Grade A = leaders + strong breadth in the last ${gd} sessions (${pp(B.lead_strong)}), B = one of the two, C = neither (no edge).</p>
     <h3 class="ih">🔥 Ignition <small class="meta">fired in the last ${X.rules.recent} sessions</small></h3>
     <div class="scroll"><table class="grid">${hdr}<tbody>${fired.map(row).join("") || '<tr><td class="l meta" colspan="10">None in the last few sessions.</td></tr>'}</tbody></table></div>
     ${day1Section(X, d1live)}
     <h3 class="ih">Warming up <small class="meta">3 of the 4 checks, or a breadth thrust inside the group plus rotation-graph leading: the watch list</small></h3>
     <div class="scroll"><table class="grid">${hdr}<tbody>${warm.map(row).join("") || '<tr><td class="l meta" colspan="10">Nothing warming up.</td></tr>'}</tbody></table></div>
     <details class="kqsec" style="margin-top:8px"><summary><b>Recent ignitions and how they did</b> <span class="meta">last 60 sessions</span></summary>
-      <div class="scroll"><table class="grid"><thead><tr><th class="l">Date</th><th class="l">Sub-theme</th><th>Since, vs SPY</th><th>Since, group</th><th class="l">Breadth then</th></tr></thead><tbody>${rec || '<tr><td class="l meta" colspan="5">None.</td></tr>'}</tbody></table></div></details>
+      <div class="scroll"><table class="grid"><thead><tr><th class="l">Date</th><th class="l">Sub-theme</th><th>Since, vs SPY</th><th>Since, group</th><th class="l">Breadth then<small>last ${gd} sessions</small></th><th class="l">Leaders then</th></tr></thead><tbody>${rec || '<tr><td class="l meta" colspan="6">None.</td></tr>'}</tbody></table></div></details>
     <div class="note" style="padding:8px 0 0">How to use it: put "warming up" groups on your watch list (Refiners showed a breadth thrust inside the group and moved into the rotation graph's leading quadrant ~1 week before its July ignition). Act on an ignition when breadth is strong, trading the group's leaders (top stocks by RS; check the Trade Setups tags for an entry). A day or two later, a 60-day relative high and the money-flow card's "confirmed" tier confirm it, at a higher price. Macro drivers (crack spread, oil, gold, copper…) rising 8%+ in a month looked like a plus (+5.5% vs +3.6%) but on only 16 cases. Backtest uses each group's equal-weight index vs SPY, no costs, ~2 years; false starts happen (Refiners May 2026: −3%). During the session (and after the close until tonight's update) the four checks are recomputed from your Google Sheet's live prices; the rotation-graph position and the track record stay as of the last close.</div></section>`);
 }
 function renderRotation(app) {

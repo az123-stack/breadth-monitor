@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 .venv/
 frames.pkl
+tools/ignition_study/cy_*.pkl

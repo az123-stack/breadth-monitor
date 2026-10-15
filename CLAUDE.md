@@ -272,6 +272,20 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   dv50, off, d1_20)} → "Day 1 · watch for follow-through" section of the Group ignition card (between Ignition and Warming up);
   browser `liveDay1` (with `ignLiveGroups`, shared with `liveIgnition`) adds today's Day 1s from Google prices (dollar volume paced by
   `volPace` while open), rolls follow-through forward, and lists "almost a Day 1" groups one rule short (Oct 14: Large-cap Pharma 1.16×).
+- Cybersecurity case study + ignition iteration (Oct 14, 2026; `tools/ignition_study/cyber.py`, `cyber2.py`, `iterate*.py`; train/test
+  halves split Dec 26, 2025). Cybersecurity Platforms and Identity & Security Tools both bottomed Apr 10, 2026 (rel −45% / −56% vs
+  Jun 2025) and ran +131% / +166%. Sequence: group breadth thrust from a washout Apr 21/22 (+16–23% off the low; Identity already
+  3 of 4 = warming) → flow > 0.25 Apr 24 → IGNITION May 7 for both (+29–30% off the low; next 40 sessions +28% / +55% vs SPY) →
+  re-ignitions Jul 2–6, Aug 13, Sep 17, Oct 9 as they kept making highs. No Day 1 at the start (V-bottoms, > 15% below the 60-day high).
+  The same-day gate said "watch" on May 7 (10-day ratio 1.40) although ratio hit 2.95 on Apr 17. Across all groups: leaders present
+  (members' median 63-day RS pct ≥ 70 or 25%+ within 3% of a 52-wk high) +4.7% 20d / +8.1% 40d vs +2.0% / +3.0% without (base
+  +1.9% / +3.9%), both halves; leaders + strong today +5.8%, leaders + strong only within 15 sessions +4.0% (40d +9.8%), no leaders +
+  not strong −0.5%. Not useful: group breadth thrust alone (+1.4%, ≈ base), tight 40-day base (worse, +0.6%), coming from a 25%+
+  drawdown (test half ≈ 0). Re-ignitions ≈ first ignitions at 40d. Identity's May 7 ignition had NO leaders (RS med 36) and still ran:
+  grades are odds, not vetoes. Built: `IGN.gate_days` 15 (Act = ratio10 ≥ 1.5 any of the last 15 sessions, `ignition.peak15`),
+  `ignition_frames` → `rsmed`, `near`, `lead`; rows/live/day1 rows carry `lead {ok, rsmed, near}`; bt adds lead / nolead /
+  lead_strong / lead_other / c, day1 bt adds lead / nolead / held_lead / held_nolead; card shows Grade A (leaders + strong window) /
+  B / C on ignitions, "★ has leaders" / "no leaders yet" on every row, Leaders column in recent ignitions.
 - Record-volume "tells" study (Oct 12, 2026; 2,048 events Oct 2025–Sep 2026, no index/expiry days; 10-session return vs
   SPY, clipped ±50%; tells found on the first 60% by date, checked on the last 40%): all events −4.9% train / −7.7% test.
   Consistent AVOID tells (both halves): gap up 10%+ or up 20%+ (−15 to −18%), volume > 20× avg or > 2.2× old record,

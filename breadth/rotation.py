@@ -371,7 +371,13 @@ def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub
 # Across 101 sub-themes it beat the average group over the next 20 sessions (+2.9% vs +1.4%), but only in strong
 # breadth (10-day ratio >= 1.5: +4.0%); otherwise no edge. Evidence is recomputed every build.
 # ---------------------------------------------------------------------------
-IGN = {"hi": 40, "acc": 0.25, "br": 0.80, "drk": 0.30, "gap": 20, "recent": 5, "fwd": 20, "strong_ratio": 1.5, "driver_up": 0.08}
+IGN = {"hi": 40, "acc": 0.25, "br": 0.80, "drk": 0.30, "gap": 20, "recent": 5, "fwd": 20, "strong_ratio": 1.5, "driver_up": 0.08,
+       "gate_days": 15, "lead_rs": 70, "lead_near": 0.25}
+# Iteration after the cybersecurity case study (Oct 14, tools/ignition_study/iterate.py, train/test halves):
+# - gate = 10-day ratio >= 1.5 on ANY of the last 15 sessions (same-day gate missed Cybersecurity's May 7 ignition at 1.40;
+#   ignitions outside both ~ +0.3% vs +2.0% for "not strong today").
+# - leaders present = members' median 63-day RS percentile >= 70 OR 25%+ of members within 3% of their 52-week high:
+#   with leaders +4.7% (20d) / +8.1% (40d) vs SPY, without +2.0% / +3.0% (base +1.9% / +3.9%), held in both halves.
 # Day 1 (Oct 14 study, tools/ignition_study/day1.py): group beats SPY by 2%+ on 1.3x+ its 50-day dollar volume, half its
 # members close above their prior 10-day closing high, coming out of a 3-15% pullback (vs its 60-day high, the day before).
 # Alone no edge; the next 3 sessions decide it: still above the Day-1 close -> next 20 sessions +3.4% vs SPY; faded -> -0.7%.
@@ -396,7 +402,18 @@ def ignition_frames(close, members, F, FL):
     events = ign & ~prior
     thrust = C["breadth"] & (br.rolling(10).min() <= 0.2)
     rrg = (FL["x"] > 100) & (FL["y"] > 100)
-    return {"C": C, "ign": ign, "events": events, "br": br, "drk": drk, "rk": rk, "thrust": thrust, "rrg": rrg}
+    rs63 = (close / close.shift(63) - 1).rank(axis=1, pct=True) * 99
+    hi252 = close.rolling(252, min_periods=200).max()
+    rsmed, near = {}, {}
+    for g in I.columns:
+        t = [x for x in members[g] if x in close.columns]
+        n = close[t].notna().sum(axis=1).replace(0, np.nan)
+        rsmed[g] = rs63[t].median(axis=1)
+        near[g] = (close[t] >= 0.97 * hi252[t]).sum(axis=1) / n
+    rsmed, near = pd.DataFrame(rsmed), pd.DataFrame(near)
+    lead = (rsmed >= IGN["lead_rs"]) | (near >= IGN["lead_near"])
+    return {"C": C, "ign": ign, "events": events, "br": br, "drk": drk, "rk": rk, "thrust": thrust, "rrg": rrg,
+            "rsmed": rsmed, "near": near, "lead": lead}
 
 
 def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, drives, vol=None):
@@ -406,8 +423,9 @@ def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, driv
     fwd = rel.shift(-IGN["fwd"]) / rel - 1
     h = history[history["complete"]] if history is not None and "complete" in history.columns else history
     r10 = (h["ratio10"].reindex(dates).ffill() if h is not None and len(h) else pd.Series(np.nan, index=dates))
-    strong = (r10 >= IGN["strong_ratio"]).to_numpy()[:, None]
+    strong = (r10.rolling(IGN["gate_days"], min_periods=1).max() >= IGN["strong_ratio"]).to_numpy()[:, None]
     warm = 60
+    L = X["lead"]
 
     def stat(mask):
         v = fwd.where(mask).iloc[warm:].stack().dropna()
@@ -415,6 +433,7 @@ def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, driv
                 "med": round(float(v.median()), 4) if v.size else None, "win": round(float((v > 0).mean()), 3) if v.size else None}
     base = stat(pd.DataFrame(True, index=dates, columns=rel.columns))
     bt = {"all": stat(ev), "strong": stat(ev & strong), "other": stat(ev & ~strong), "base": base, "fwd": IGN["fwd"],
+          "lead": stat(ev & L), "nolead": stat(ev & ~L), "lead_strong": stat(ev & L & strong), "lead_other": stat(ev & L & ~strong), "c": stat(ev & ~L & ~strong),
           "from": dates[warm].strftime("%Y-%m-%d")}
     # recent ignitions across all groups, with how they did since
     recent = []
@@ -424,7 +443,7 @@ def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, driv
         g = rel.columns[j]
         recent.append({"g": g, "date": dates[i].strftime("%Y-%m-%d"), "ago": int(n - 1 - i),
                        "since": round(float(rel[g].iloc[-1] / rel[g].iloc[i] - 1), 4), "idx_since": round(float(I[g].iloc[-1] / I[g].iloc[i] - 1), 4),
-                       "strong": bool(strong[i, 0])})
+                       "strong": bool(strong[i, 0]), "lead": bool(L[g].iloc[i])})
     recent.sort(key=lambda r: r["ago"])
 
     def drivers(g):
@@ -442,6 +461,10 @@ def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, driv
         mem.sort(key=lambda s: -(s.get("rsr") or 0))
         return [{"t": s["t"], "rsr": s.get("rsr"), "price": s.get("price"), "off_hi": s.get("off_hi"), "e21": s.get("e21"),
                  "adr": s.get("adr"), "setups": in_setups.get(s["t"], [])} for s in mem[:4]]
+
+    def leaders(g):
+        rm, nr = X["rsmed"][g].iloc[-1], X["near"][g].iloc[-1]
+        return {"ok": bool(L[g].iloc[-1]), "rsmed": None if rm != rm else round(float(rm)), "near": None if nr != nr else round(float(nr), 2)}
 
     rows = []
     for g in rel.columns:
@@ -465,7 +488,7 @@ def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, driv
                      "flow": round(float(FL["acc"][g].iloc[-1]), 2) if FL["acc"][g].iloc[-1] == FL["acc"][g].iloc[-1] else None,
                      "drk": round(float(X["drk"][g].iloc[-1]), 2) if X["drk"][g].iloc[-1] == X["drk"][g].iloc[-1] else None,
                      "r20": round(float(F["r20"][g].iloc[-1]), 4), "strength": r.get("strength"), "s_rank": r.get("s_rank"),
-                     "drivers": drivers(g), "stocks": top_stocks(g)})
+                     "drivers": drivers(g), "stocks": top_stocks(g), "lead": leaders(g)})
     rows.sort(key=lambda r: (r["status"] != "ignition", r["ago"] if r["ago"] is not None else 99, -r["n_met"], -r["r20"]))
     # Pieces the browser needs to finish today's checks from live Google prices (template.html liveIgnition):
     # idx = group index at the last close, hi39 = max of the last 39 closes (today makes 40), rel20 / rk10 = the group's
@@ -486,7 +509,7 @@ def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, driv
                        "thrust9": bool(X["thrust"][g].iloc[-9:].any()), "rrg": bool(X["rrg"][g].iloc[-1]),
                        "ign20": bool(X["ign"][g].iloc[-20:].any()), "ago": int(n - 1 - np.flatnonzero(ev[g].to_numpy())[-1]) if ev[g].any() else None,
                        "rel": f(rel[g].iloc[-1]), "sector": subs.get(g, {}).get("group", ""), "strength": subs.get(g, {}).get("strength"),
-                       "drivers": drivers(g), "stocks": top_stocks(g)}
+                       "drivers": drivers(g), "stocks": top_stocks(g), "lead": leaders(g)}
     # ---- Day 1 / follow-through ----
     day1 = None
     if vol is not None:
@@ -510,7 +533,9 @@ def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, driv
             v = F_.where(mask).iloc[warm:].stack().dropna()
             return {"n": int(v.size), "avg": round(float(v.mean()), 4) if v.size else None, "win": round(float((v > 0).mean()), 3) if v.size else None}
         d1bt = {"all": st2(d1e, fwd), "strong": st2(d1e & strong, fwd), "other": st2(d1e & ~strong, fwd),
-                "held": st2(d1e & (ft > 0), f_after), "faded": st2(d1e & (ft <= 0), f_after)}
+                "held": st2(d1e & (ft > 0), f_after), "faded": st2(d1e & (ft <= 0), f_after),
+                "lead": st2(d1e & L, fwd), "nolead": st2(d1e & ~L, fwd),
+                "held_lead": st2(d1e & (ft > 0) & L, f_after), "held_nolead": st2(d1e & (ft > 0) & ~L, f_after)}
         drow = []
         for i, j in np.argwhere(d1e.to_numpy()):
             ago = n - 1 - i
@@ -522,16 +547,18 @@ def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, driv
             drow.append({"g": g, "date": dates[i].strftime("%Y-%m-%d"), "ago": int(ago), "rel_d1": round(rel_d1, 6),
                          "r1": round(float(r1[g].iloc[i]), 4), "rv": round(float(rvx[g].iloc[i]), 2), "brk": round(float(brk[g].iloc[i]), 2),
                          "d3": None if d3 is None else round(d3, 4), "since": round(float(rel[g].iloc[-1] / rel_d1 - 1), 4),
-                         "sector": subs.get(g, {}).get("group", ""), "strength": subs.get(g, {}).get("strength"), "stocks": top_stocks(g)})
+                         "sector": subs.get(g, {}).get("group", ""), "strength": subs.get(g, {}).get("strength"), "stocks": top_stocks(g),
+                         "lead": leaders(g)})
         drow.sort(key=lambda r: r["ago"])
         day1 = {"rows": drow, "bt": d1bt, "rules": DAY1,
                 "live": {g: {"hi10": {t: round(float(close[t].iloc[-10:].max()), 4) for t in members[g] if t in close.columns and close[t].iloc[-10:].notna().any()},
                              "dv50": round(float(dvv[[t for t in members[g] if t in close.columns]].sum(axis=1).iloc[-50:].mean()), 2),
                              "off": round(float(I[g].iloc[-1] / I[g].iloc[-60:].max() - 1), 4), "d1_20": bool(d1[g].iloc[-20:].any())}
                          for g in rel.columns if len(I[g].dropna()) >= 61}}
-    gate = bool(r10.iloc[-1] >= IGN["strong_ratio"]) if r10.iloc[-1] == r10.iloc[-1] else False
+    gate = bool(strong[-1, 0])
+    peak15 = r10.iloc[-IGN["gate_days"]:].max()
     return {"rows": rows, "bt": bt, "recent": recent[:12], "ratio10": round(float(r10.iloc[-1]), 2) if r10.iloc[-1] == r10.iloc[-1] else None,
-            "act": gate, "rules": IGN, "labels": IGN_LABEL, "date": dates[-1].strftime("%Y-%m-%d"), "live": live, "spy": round(float(close["SPY"].iloc[-1]), 4), "day1": day1}
+            "act": gate, "peak15": None if peak15 != peak15 else round(float(peak15), 2), "rules": IGN, "labels": IGN_LABEL, "date": dates[-1].strftime("%Y-%m-%d"), "live": live, "spy": round(float(close["SPY"].iloc[-1]), 4), "day1": day1}
 
 
 def ignition_safe(*a):
