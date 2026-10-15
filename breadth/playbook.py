@@ -142,7 +142,7 @@ def trigger_of(key, r):
     return trig, (trig / r["price"] - 1) * 100 / r["adr"]
 
 
-def picks(theme_data, pb, n=2):
+def picks(theme_data, pb, n=2, ctx=None):
     """Today's top trades, actionable today. Rule (it did best in a day-by-day replay of our
     own history - trade_bt.pick_replay - and is simple enough not to be curve-fit): take the
     top 5 of every Focus setup for today's market (Selective too if fewer than n are
@@ -166,8 +166,9 @@ def picks(theme_data, pb, n=2):
                 (cands if dist <= ACTIONABLE_ADR else watch).append(c)
         if len({c["t"] for c in cands}) >= n:
             break
-    cands.sort(key=lambda c: pick_key(c["row"]["rsr"], c["row"].get("d60")))
-    watch.sort(key=lambda c: pick_key(c["row"]["rsr"], c["row"].get("d60")))
+    score = (lambda c: ctx(c["row"])[0]) if ctx else (lambda c: 0)
+    cands.sort(key=lambda c: (-score(c),) + pick_key(c["row"]["rsr"], c["row"].get("d60")))
+    watch.sort(key=lambda c: (-score(c),) + pick_key(c["row"]["rsr"], c["row"].get("d60")))
     pb["pick_cands"] = sorted({c["t"] for c in cands})
     pb["pick_watch"] = [{"t": c["t"], "setup_name": c["setup_name"], "rsr": c["row"]["rsr"], "trigger": c["trigger"],
                          "dist_pct": round((c["trigger"] / c["row"]["price"] - 1), 4), "trig_adr": c["trig_adr"]}
@@ -179,7 +180,8 @@ def picks(theme_data, pb, n=2):
             continue
         seen_t.add(c["t"]); seen_g.add(g)
         r = c.pop("row")
-        c.update({"rsr": r["rsr"], "d60": r.get("d60"), "name": r.get("name", ""), "sub": g, "price": r.get("price"),
+        cs, cnotes = ctx(r) if ctx else (0, [])
+        c.update({"ctx": cs, "ctx_notes": cnotes, "rsr": r["rsr"], "d60": r.get("d60"), "name": r.get("name", ""), "sub": g, "price": r.get("price"),
                   "adr": r.get("adr"), "tags": r.get("tags") or [], "vcp_stop": r.get("vcp_stop") if c["setup"] == "vcp" else None,
                   "entry_type": "trigger" if c["trigger"] else "open",
                   "plan": plan(c["setup"], r), "why": why(c, pb, r), "risk10k": risk10k(c["setup"], r)})
@@ -187,6 +189,52 @@ def picks(theme_data, pb, n=2):
         if len(out) == n:
             break
     return out
+
+
+# Group / money-flow context (Oct 15 study, tools/picks_context/: 5,394 past setup signals, actionable 5-session result).
+# +1 group ignited in the last 20 sessions with leaders (+1.95% vs +1.10%, t 2.2, both halves positive); during an outflow
+# episode (5-day avg of dn_share >= 55%): +1 group among the sold-hardest fifth over 5 sessions (+6.5% vs +1.2%, n 47, t 2.6,
+# both halves), -1 group among the held-up fifth (+0.6% vs +2.3%, t -2.6, both halves). Money-flow tiers and warming-up
+# showed no consistent edge. Top-2 replay: +1.96% a pick vs +1.66% for RS-only (halves +2.07/+1.83 vs +2.06/+1.13; weak
+# breadth +2.02% vs +0.52%). The rule ranks candidates by this score first, then RS / 60-day gain as before.
+CTX = {"ign_days": 20, "episode": 55}
+
+
+def context_fn(theme_data, history):
+    from . import story
+    X = ((theme_data.get("rotation") or {}).get("ignition") or {})
+    ign = {r["g"] for r in X.get("recent", []) if r.get("ago", 99) < CTX["ign_days"] and r.get("lead")}
+    ign |= {r["g"] for r in X.get("rows", []) if r.get("status") == "ignition" and (r.get("lead") or {}).get("ok")}
+    ds = [x for x in (history["dn_share"].tolist() if history is not None and "dn_share" in history else []) if x == x][-5:]
+    episode = bool(ds) and sum(ds) / len(ds) >= CTX["episode"]
+    B = story.baskets(theme_data) or {}
+    sold = {r["theme"] for r in B.get("sold", [])}
+    held = {r["theme"] for r in B.get("held", [])}
+
+    def fn(r):
+        g, score, notes = r.get("sub"), 0, []
+        if g in ign:
+            score += 1; notes.append(f"its group ({g}) ignited in the last {CTX['ign_days']} sessions with leaders")
+        if episode and g in sold:
+            score += 1; notes.append(f"strong stock in a group sold hard this week while money left the market (snapback candidate)")
+        if episode and g in held:
+            score -= 1; notes.append(f"its group held up during the selling: those have lagged once the selling ends")
+        return score, notes
+    return fn, {"episode": episode, "ign": sorted(ign), "sold": sorted(sold), "held": sorted(held)}
+
+
+def rerank(theme_data, history):
+    """Re-pick today's top trades once rotation/ignition data exists (it is built after the playbook)."""
+    pb = theme_data.get("playbook")
+    if not pb:
+        return
+    fn, info = context_fn(theme_data, history)
+    pb["picks"] = picks(theme_data, pb, ctx=fn)
+    for c in pb["picks"]:
+        if c.get("ctx_notes"):
+            c["why"] = c["why"].rstrip(".") + "; " + "; ".join(c["ctx_notes"]) + "."
+    pb["context"] = {**info, "rule": "group context first (+1 ignited with leaders; in an outflow episode +1 sold-hardest group, "
+                                     "-1 held-up group), then highest RS, then 60-day gain"}
 
 
 def risk10k(key, r):
@@ -230,7 +278,7 @@ def plan(key, r):
 
 
 def why(c, pb, r):
-    bits = [f"Highest RS among today's {c['verdict'].lower()} setups: RS {int(r['rsr'])}" + (" ★" if r.get("star") else "")
+    bits = [f"{'Best group context, then highest RS' if c.get('ctx') else 'Highest RS'} among today's {c['verdict'].lower()} setups: RS {int(r['rsr'])}" + (" ★" if r.get("star") else "")
             + (f", {r['d60'] * 100:+.0f}% in 60 days" if r.get("d60") is not None else "")]
     bits.append(f"{c['setup_name']} is {c['verdict'].lower()} in {pb['label'].lower()} ({c['avg_r']:+.2f}R a trade)")
     if r.get("htf"):

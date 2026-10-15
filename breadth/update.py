@@ -224,6 +224,21 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["playbook"] = playbook.build(theme_data, history)
         except Exception as e:
             log.exception("playbook failed: %s", e)
+        intraday.set_bars(adjusted)      # Russell 2000 weights follow prices since the holdings file date
+        try:
+            theme_data["thrust_watch"] = intraday.thrust_watch(adjusted, history, universe)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("thrust watch failed: %s", e)
+        try:
+            from . import rotation
+            theme_data["rotation"] = rotation.build(adjusted, theme_data, kq_data, macro_data, history)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("rotation ideas failed: %s", e)
+        try:   # top picks: re-rank with group / money-flow context now that rotation + ignition exist
+            from . import playbook
+            playbook.rerank(theme_data, history)
+        except Exception as e:
+            log.exception("pick re-rank failed: %s", e)
         try:
             from . import ledger
             pb = theme_data.get("playbook") or {}
@@ -238,16 +253,6 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["setup_review"] = review.evaluate(theme_data, history)
         except Exception as e:
             log.exception("setup review failed: %s", e)
-        intraday.set_bars(adjusted)      # Russell 2000 weights follow prices since the holdings file date
-        try:
-            theme_data["thrust_watch"] = intraday.thrust_watch(adjusted, history, universe)
-        except Exception as e:  # optional panel; never block the page
-            log.exception("thrust watch failed: %s", e)
-        try:
-            from . import rotation
-            theme_data["rotation"] = rotation.build(adjusted, theme_data, kq_data, macro_data, history)
-        except Exception as e:  # optional panel; never block the page
-            log.exception("rotation ideas failed: %s", e)
     site.build(history, theme_data, kq_data, macro_data)
     try:
         intraday.write_sheet_csv()

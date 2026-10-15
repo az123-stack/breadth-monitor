@@ -80,6 +80,15 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   actionable), keep ACTIONABLE ones (flag/VCP trigger within 1 ADR of close, `ACTIONABLE_ADR`; others buy next open),
   highest RS, ties on 60-day gain, one per sub-theme; the rest go to `pick_watch`. Replay (`trade_bt.pick_replay`) trades
   it the same way (next-session entry, trigger fills, 5-session hold, no stop) vs the average actionable candidate.
+- Pick context re-rank (Oct 15; `playbook.context_fn` / `rerank`, called in update.py right after `rotation.build`, before the ledger
+  records the picks): candidates are ranked by group context first, then RS / 60-day gain: +1 sub-theme ignited in the last 20 sessions
+  with leaders (`ignition.recent` / rows); during an outflow episode (5-day avg `dn_share` ≥ 55%) +1 sold-hardest fifth and −1 held-up
+  fifth over 5 sessions (`story.baskets`). Picks carry `ctx`, `ctx_notes` (appended to `why`); `playbook.context` = info + rule.
+  Study (`tools/picks_context/`: capture.py wraps `TS.backtest(signals=True)` during a rebuild → signals.pkl; test.py, picks.py; 5,394
+  signals Mar 2025–Oct 2026, actionable 5-session result): ignited 20d +1.90% vs +1.06% (t 2.4, halves +0.8/+0.9), + leaders +1.95% vs
+  +1.10%; in outflow episodes sold-hardest group +6.5% vs +1.2% (n 47, t 2.6, both halves), held-up +0.6% vs +2.3% (t −2.6, both halves);
+  money-flow tiers / flow > 0.25 / warming / group breadth: no consistent edge. Top-2 replay +1.96% a pick vs +1.66% RS-only (halves
+  +2.07/+1.83 vs +2.06/+1.13; weak breadth +2.02% vs +0.52%). `trade_bt.pick_replay` still replays the old RS-only rule.
 - Pick scoreboard (`ledger.py` → `data/pick_ledger.csv`, `DATA.themes.scoreboard`): logs picks each morning; next session
   entry (open, or trigger → may be "no fill"), stop 1 ADR / entry-day low (flag) / VCP stop, exit close 5 sessions later.
   Scores `ret` (with stop), `ret_nostop`, and `cand_ret` (avg candidate, next open, 5 sessions). Research export:
