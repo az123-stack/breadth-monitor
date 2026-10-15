@@ -372,6 +372,10 @@ def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub
 # breadth (10-day ratio >= 1.5: +4.0%); otherwise no edge. Evidence is recomputed every build.
 # ---------------------------------------------------------------------------
 IGN = {"hi": 40, "acc": 0.25, "br": 0.80, "drk": 0.30, "gap": 20, "recent": 5, "fwd": 20, "strong_ratio": 1.5, "driver_up": 0.08}
+# Day 1 (Oct 14 study, tools/ignition_study/day1.py): group beats SPY by 2%+ on 1.3x+ its 50-day dollar volume, half its
+# members close above their prior 10-day closing high, coming out of a 3-15% pullback (vs its 60-day high, the day before).
+# Alone no edge; the next 3 sessions decide it: still above the Day-1 close -> next 20 sessions +3.4% vs SPY; faded -> -0.7%.
+DAY1 = {"r1": 0.02, "rv": 1.3, "brk": 0.5, "off_lo": -0.15, "off_hi": -0.03, "ft": 3, "show": 6}
 IGN_LABEL = {"base": "Base breakout (40-day high)", "flow": "Net dollar flow > +0.25", "breadth": "80%+ above 21 EMA", "jump": "RS rank up 30+ pts in 10d"}
 
 
@@ -483,9 +487,51 @@ def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, driv
                        "ign20": bool(X["ign"][g].iloc[-20:].any()), "ago": int(n - 1 - np.flatnonzero(ev[g].to_numpy())[-1]) if ev[g].any() else None,
                        "rel": f(rel[g].iloc[-1]), "sector": subs.get(g, {}).get("group", ""), "strength": subs.get(g, {}).get("strength"),
                        "drivers": drivers(g), "stocks": top_stocks(g)}
+    # ---- Day 1 / follow-through ----
+    day1 = None
+    if vol is not None:
+        dvv = close * vol.reindex_like(close)
+        hi10 = close.shift(1).rolling(10).max()
+        brk, rvx = {}, {}
+        for g in rel.columns:
+            t = [q for q in members[g] if q in close.columns]
+            nn = close[t].notna().sum(axis=1).replace(0, np.nan)
+            brk[g] = (close[t] > hi10[t]).sum(axis=1) / nn
+            d = dvv[t].sum(axis=1)
+            rvx[g] = d / d.rolling(50).mean().shift(1)
+        brk, rvx = pd.DataFrame(brk), pd.DataFrame(rvx)
+        r1 = rel / rel.shift(1) - 1
+        off = (I / I.rolling(60).max() - 1).shift(1)
+        d1 = (r1 >= DAY1["r1"]) & (rvx >= DAY1["rv"]) & (brk >= DAY1["brk"]) & (off <= DAY1["off_hi"]) & (off >= DAY1["off_lo"])
+        d1e = d1 & ~(d1.shift(1).astype(float).rolling(IGN["gap"], min_periods=1).max().fillna(0) > 0)
+        ft = rel.shift(-DAY1["ft"]) / rel - 1                       # day-3 follow-through vs SPY
+        f_after = rel.shift(-(DAY1["ft"] + IGN["fwd"])) / rel.shift(-DAY1["ft"]) - 1   # next 20 sessions, entered on day 3
+        def st2(mask, F_):
+            v = F_.where(mask).iloc[warm:].stack().dropna()
+            return {"n": int(v.size), "avg": round(float(v.mean()), 4) if v.size else None, "win": round(float((v > 0).mean()), 3) if v.size else None}
+        d1bt = {"all": st2(d1e, fwd), "strong": st2(d1e & strong, fwd), "other": st2(d1e & ~strong, fwd),
+                "held": st2(d1e & (ft > 0), f_after), "faded": st2(d1e & (ft <= 0), f_after)}
+        drow = []
+        for i, j in np.argwhere(d1e.to_numpy()):
+            ago = n - 1 - i
+            if ago >= DAY1["show"]:
+                continue
+            g = rel.columns[j]
+            rel_d1 = float(rel[g].iloc[i])
+            d3 = float(rel[g].iloc[i + DAY1["ft"]] / rel_d1 - 1) if ago >= DAY1["ft"] else None
+            drow.append({"g": g, "date": dates[i].strftime("%Y-%m-%d"), "ago": int(ago), "rel_d1": round(rel_d1, 6),
+                         "r1": round(float(r1[g].iloc[i]), 4), "rv": round(float(rvx[g].iloc[i]), 2), "brk": round(float(brk[g].iloc[i]), 2),
+                         "d3": None if d3 is None else round(d3, 4), "since": round(float(rel[g].iloc[-1] / rel_d1 - 1), 4),
+                         "sector": subs.get(g, {}).get("group", ""), "strength": subs.get(g, {}).get("strength"), "stocks": top_stocks(g)})
+        drow.sort(key=lambda r: r["ago"])
+        day1 = {"rows": drow, "bt": d1bt, "rules": DAY1,
+                "live": {g: {"hi10": {t: round(float(close[t].iloc[-10:].max()), 4) for t in members[g] if t in close.columns and close[t].iloc[-10:].notna().any()},
+                             "dv50": round(float(dvv[[t for t in members[g] if t in close.columns]].sum(axis=1).iloc[-50:].mean()), 2),
+                             "off": round(float(I[g].iloc[-1] / I[g].iloc[-60:].max() - 1), 4), "d1_20": bool(d1[g].iloc[-20:].any())}
+                         for g in rel.columns if len(I[g].dropna()) >= 61}}
     gate = bool(r10.iloc[-1] >= IGN["strong_ratio"]) if r10.iloc[-1] == r10.iloc[-1] else False
     return {"rows": rows, "bt": bt, "recent": recent[:12], "ratio10": round(float(r10.iloc[-1]), 2) if r10.iloc[-1] == r10.iloc[-1] else None,
-            "act": gate, "rules": IGN, "labels": IGN_LABEL, "date": dates[-1].strftime("%Y-%m-%d"), "live": live, "spy": round(float(close["SPY"].iloc[-1]), 4)}
+            "act": gate, "rules": IGN, "labels": IGN_LABEL, "date": dates[-1].strftime("%Y-%m-%d"), "live": live, "spy": round(float(close["SPY"].iloc[-1]), 4), "day1": day1}
 
 
 def ignition_safe(*a):

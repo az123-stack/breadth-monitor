@@ -1160,10 +1160,10 @@ function moneyTodayCard() {
 /* ---------- Group ignition (rotation.ignition_build; study in tools/ignition_study) ---------- */
 // Today's ignition checks from live Google prices: mirrors rotation.ignition_frames for one more session on top of
 // the last close (inputs in rotation.ignition.live). Returns rows shaped like the nightly ones, or null.
-function liveIgnition(X) {
+function ignLiveGroups(X) {
   const L = X.live || {}, T = DATA.themes, ix = Object.fromEntries((T.ref_keys || []).map((k, i) => [k, i]));
   const spy = liveRow("SPY"); if (!spy || !X.spy || !Object.keys(L).length) return null;
-  const spyNow = X.spy * (1 + spy.chg), a = 2 / 22, R = X.rules, out = {};
+  const spyNow = X.spy * (1 + spy.chg), a = 2 / 22, out = {};
   Object.entries(L).forEach(([g, q]) => {
     let rets = [], dvT = 0, fT = 0, above = 0, cnt = 0;
     q.m.forEach(t => { const r = liveRow(t); if (!r) return;
@@ -1173,13 +1173,18 @@ function liveIgnition(X) {
       if (e != null && r.price > r.price * a + e * (1 - a)) above++; });
     if (!rets.length || q.idx == null) return;
     const idx = q.idx * (1 + rets.reduce((x, y) => x + y, 0) / rets.length), rel = idx / spyNow;
-    out[g] = { q, idx, rel, r20: q.rel20 ? rel / q.rel20 - 1 : null, br: cnt ? above / cnt : null,
+    out[g] = { q, idx, rel, dvT, r20: q.rel20 ? rel / q.rel20 - 1 : null, br: cnt ? above / cnt : null,
       flow: (q.d9 || 0) + dvT ? ((q.f9 || 0) + fT) / ((q.d9 || 0) + dvT) : null };
   });
   // RS rank = percentile of the 20-day relative move across groups (average rank for ties, like pandas)
   const vals = Object.entries(out).filter(([, o]) => o.r20 != null).sort((x, y) => x[1].r20 - y[1].r20);
   for (let i = 0; i < vals.length;) { let j = i; while (j + 1 < vals.length && vals[j + 1][1].r20 === vals[i][1].r20) j++;
     const rk = ((i + j) / 2 + 1) / vals.length; for (let k = i; k <= j; k++) vals[k][1].rk = rk; i = j + 1; }
+  return out;
+}
+function liveIgnition(X, out) {
+  out = out || ignLiveGroups(X); if (!out) return null;
+  const R = X.rules;
   const prev = Object.fromEntries((X.rows || []).map(r => [r.g, r]));
   const rows = [];
   Object.entries(out).forEach(([g, o]) => {
@@ -1198,11 +1203,52 @@ function liveIgnition(X) {
   rows.sort((x, y) => (x.status !== "ignition") - (y.status !== "ignition") || (x.ago ?? 99) - (y.ago ?? 99) || y.n_met - x.n_met || (y.r20 ?? 0) - (x.r20 ?? 0));
   return rows;
 }
+// Day 1 / follow-through from live prices: mirrors the Day-1 block of rotation.ignition_build for one more session.
+function liveDay1(X, G) {
+  const D = X.day1; if (!D || !G) return null;
+  const R = D.rules, pace = nyClock().open ? volPace(nyClock().mins) : 1, rows = [], near = [];
+  (D.rows || []).forEach(r => { const o = G[r.g], ago = r.ago + 1; if (ago >= R.show) return;
+    const since = o ? o.rel / r.rel_d1 - 1 : r.since;
+    rows.push({ ...r, ago, since, d3: r.d3 != null ? r.d3 : (ago >= R.ft ? since : null), d3live: r.d3 == null && ago >= R.ft }); });
+  Object.entries(D.live || {}).forEach(([g, z]) => { const o = G[g]; if (!o || z.d1_20 || !o.q.rel) return;
+    let up = 0, n = 0; Object.entries(z.hi10).forEach(([t, h]) => { const r = liveRow(t); if (!r) return; n++; if (r.price > h) up++; });
+    const r1 = o.rel / o.q.rel - 1, rv = pace && z.dv50 ? o.dvT / pace / z.dv50 : null, brk = n ? up / n : null;
+    const ok = { vol: rv != null && rv >= R.rv, brk: brk != null && brk >= R.brk, off: z.off <= R.off_hi && z.off >= R.off_lo };
+    const miss = Object.keys(ok).filter(k => !ok[k]);
+    if (r1 >= R.r1 && miss.length === 1) near.push({ g, r1, rv, brk, off: z.off, miss: miss[0] });
+    if (r1 >= R.r1 && !miss.length)
+      rows.push({ g, date: null, ago: 0, rel_d1: o.rel, r1, rv, brk, d3: null, since: 0, today: true, sector: o.q.sector, strength: o.q.strength, stocks: o.q.stocks || [] }); });
+  rows.sort((x, y) => x.ago - y.ago || (y.r1 ?? 0) - (x.r1 ?? 0));
+  rows.near = near.sort((x, y) => y.r1 - x.r1);
+  return rows;
+}
+function day1Section(X, live) {
+  const D = X.day1; if (!D) return "";
+  const B = D.bt || {}, R = D.rules, pc = pcI, cls = clsI, rows = live || D.rows || [];
+  const pp = (o) => o && o.n ? `${pc(o.avg, 1)} (${Math.round(o.win * 100)}% beat SPY, n ${o.n})` : "–";
+  const ft = (r) => {
+    if (r.ago === 0) return `<span class="tg pother">Day 1 ${r.today ? "today" : ""}</span><small class="meta" style="display:block">watch the next ${R.ft} sessions</small>`;
+    if (r.d3 != null) return r.d3 > 0 ? `<span class="tg ppull">✓ Held</span><small class="meta" style="display:block">${pc(r.d3, 1)} vs SPY after ${R.ft} sessions${r.d3live ? " (live)" : ""}</small>`
+      : `<span class="tg pspike">✗ Faded</span><small class="meta" style="display:block">${pc(r.d3, 1)} vs SPY after ${R.ft} sessions${r.d3live ? " (live)" : ""}</small>`;
+    return `<span class="tg ${r.since > 0 ? "ppull" : "pother"}">Session ${r.ago} of ${R.ft} · ${r.since > 0 ? "holding" : "slipping"}</span>`;
+  };
+  const stk = (r) => (r.stocks || []).map(s => `<b>${s.t}</b> <small class="meta">RS ${s.rsr ?? "–"}${s.setups && s.setups.length ? " · " + esc(s.setups[0]) : ""}</small>`).join("<br>");
+  const tr = rows.map(r => `<tr><td class="l"><b>${esc(r.g)}</b><small class="meta" style="display:block">${esc(r.sector || "")}</small></td>
+    <td class="l" data-v="${r.today ? Date.now() : Date.parse(r.date + "T12:00:00")}">${r.today ? "today" : shortDate(r.date)}</td><td class="num ${cls(r.r1)}">${pc(r.r1, 1)}</td>
+    <td class="num">${r.rv == null ? "–" : r.rv.toFixed(1) + "×"}</td><td class="num">${r.brk == null ? "–" : Math.round(r.brk * 100) + "%"}</td>
+    <td class="l">${ft(r)}</td><td class="num ${cls(r.since)}">${pc(r.since, 1)}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td><td class="l">${stk(r)}</td></tr>`).join("");
+  return `<h3 class="ih">Day 1 · watch for follow-through <small class="meta">a group breakout day that hasn't (yet) become an ignition</small></h3>
+    <p class="meta" style="margin:4px 0 6px">A <b>Day 1</b> = the group beats SPY by ${Math.round(R.r1 * 100)}%+ on ${R.rv}×+ its normal dollar volume, at least half its stocks close above their 10-day closing high, and the group started 3–15% below its 60-day high. On its own it's a coin flip (next 20 sessions ${pp(B.all)}; strong breadth ${pp(B.strong)}, otherwise ${pp(B.other)}). <b>The next ${R.ft} sessions decide it:</b> still above the Day-1 close vs SPY → next 20 sessions ${pp(B.held)}; faded → ${pp(B.faded)}. About 4 in 10 became an ignition within 15 sessions.</p>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Sub-theme</th><th class="l">Day 1</th><th>Move vs SPY<small>that day</small></th><th>$ volume<small>× normal${live && nyClock().open ? ", paced" : ""}</small></th><th>Breaking out<small>% above 10-day high</small></th><th class="l">Follow-through</th><th>Since Day 1<small>vs SPY</small></th><th>Strength</th><th class="l">Top stocks<small>by RS</small></th></tr></thead>
+    <tbody>${tr || `<tr><td class="l meta" colspan="9">No Day-1 breakouts in the last ${R.show} sessions.</td></tr>`}</tbody></table></div>
+    ${live && live.near && live.near.length ? `<p class="meta" style="margin:4px 0">Almost a Day 1 today (one rule short): ${live.near.map(n => `<b>${esc(n.g)}</b> ${pc(n.r1, 1)} vs SPY, ${n.miss === "vol" ? `$ volume only ${n.rv == null ? "–" : n.rv.toFixed(2) + "×"} (needs ${R.rv}×)` : n.miss === "brk" ? `only ${Math.round(n.brk * 100)}% above their 10-day high (needs ${Math.round(R.brk * 100)}%)` : n.off > R.off_hi ? `already within 3% of its 60-day high` : `more than 15% below its 60-day high`}`).join(" · ")}. Volume can still change the call by the close.</p>` : ""}`;
+}
 function ignitionCard() {
   const X = ((DATA.themes || {}).rotation || {}).ignition;
   if (!X) return $('<div></div>');
   const B = X.bt || {}, L = X.labels || {}, pc = pcI, cls = clsI;
-  const live = liveActive() && LIVE && LIVE.rows ? liveIgnition(X) : null;
+  const G = liveActive() && LIVE && LIVE.rows ? ignLiveGroups(X) : null;
+  const live = G ? liveIgnition(X, G) : null, d1live = G ? liveDay1(X, G) : null;
   const R0 = live || X.rows;
   const pp = (o) => o && o.n ? `${pc(o.avg, 1)} avg, median ${pc(o.med, 1)}, ${Math.round(o.win * 100)}% beat SPY (n ${o.n})` : "–";
   const gate = X.act
@@ -1226,6 +1272,7 @@ function ignitionCard() {
     <p class="meta" style="margin:8px 0">An <b>ignition</b> is the day four signs of money moving into a sub-theme line up at once: the group breaks out of a 40-day base, net dollar flow over 10 days tops +0.25, 80%+ of its stocks are above their 21 EMA, and its relative-strength rank jumps 30+ points in 10 sessions. Since ${shortDate(B.from)} that happened ${B.all ? B.all.n : "–"} times across all sub-themes: next ${B.fwd} sessions vs SPY ${pp(B.all)}, against ${pc(B.base && B.base.avg, 1)} for any group on any day.</p>
     <h3 class="ih">🔥 Ignition <small class="meta">fired in the last ${X.rules.recent} sessions</small></h3>
     <div class="scroll"><table class="grid">${hdr}<tbody>${fired.map(row).join("") || '<tr><td class="l meta" colspan="10">None in the last few sessions.</td></tr>'}</tbody></table></div>
+    ${day1Section(X, d1live)}
     <h3 class="ih">Warming up <small class="meta">3 of the 4 checks, or a breadth thrust inside the group plus rotation-graph leading: the watch list</small></h3>
     <div class="scroll"><table class="grid">${hdr}<tbody>${warm.map(row).join("") || '<tr><td class="l meta" colspan="10">Nothing warming up.</td></tr>'}</tbody></table></div>
     <details class="kqsec" style="margin-top:8px"><summary><b>Recent ignitions and how they did</b> <span class="meta">last 60 sessions</span></summary>

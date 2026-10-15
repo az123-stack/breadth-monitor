@@ -267,7 +267,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   DAY 1 = group beats SPY by 2%+ on 1.3×+ normal $ volume, half its members close above their prior 10-day closing high, group 3–15%
   below its 60-day high the day before. Alone: no edge (20d +1.3% vs base +1.4%, n 264); strong breadth +2.7% (t 1.0), otherwise −0.4%.
   Follow-through decides it: Day 1 still above its close 3 sessions later → next 20 sessions +3.4% (n 132); faded → −0.7% (n 129).
-  39% of Day-1 events (106/272) became an IGNITION within 15 sessions. Not built yet (offered as a "Day 1 / follow-through" tier).
+  39% of Day-1 events (106/272) became an IGNITION within 15 sessions. Built Oct 14: `rotation.DAY1` rules, `ignition.day1` = {rows (Day 1 in last 6
+  sessions: rel_d1, r1, rv, brk, d3 = rel 3 sessions later, since), bt (all/strong/other/held/faded), live (per group hi10 per stock,
+  dv50, off, d1_20)} → "Day 1 · watch for follow-through" section of the Group ignition card (between Ignition and Warming up);
+  browser `liveDay1` (with `ignLiveGroups`, shared with `liveIgnition`) adds today's Day 1s from Google prices (dollar volume paced by
+  `volPace` while open), rolls follow-through forward, and lists "almost a Day 1" groups one rule short (Oct 14: Large-cap Pharma 1.16×).
 - Record-volume "tells" study (Oct 12, 2026; 2,048 events Oct 2025–Sep 2026, no index/expiry days; 10-session return vs
   SPY, clipped ±50%; tells found on the first 60% by date, checked on the last 40%): all events −4.9% train / −7.7% test.
   Consistent AVOID tells (both halves): gap up 10%+ or up 20%+ (−15 to −18%), volume > 20× avg or > 2.2× old record,
