@@ -250,6 +250,11 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .rocard.now { border-color: var(--s1); } .rocard .rob { padding: 0 16px 14px; }
 .rocard .rob .ih { margin-top: 14px; } .rol { margin: 6px 0 0; padding-left: 18px; line-height: 1.55; } .rol li { margin: 2px 0; }
 .rogo { white-space: nowrap; font-size: 12.5px; }
+.stcard { margin-bottom: 12px; } .stcols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+@media (max-width: 760px) { .stcols { grid-template-columns: 1fr; } }
+.stcol { border: 1px solid var(--border, rgba(127,127,127,.25)); border-radius: 10px; padding: 10px 12px; opacity: .85; }
+.stcol.on { border-color: var(--s1); opacity: 1; } .stsig { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }
+.stchap { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border, rgba(127,127,127,.25)); } .stchap p { margin: 6px 0; line-height: 1.55; }
 .kqsec summary { cursor: pointer; font-size: 12.5px; color: var(--text-secondary); padding: 2px 0; }
 .kqtab { width: 100%; border-collapse: collapse; font-size: 12px; margin: 4px 0 6px; }
 .kqtab th, .kqtab td { text-align: left; padding: 3px 6px; border-top: 1px solid var(--grid); vertical-align: top; }
@@ -2879,6 +2884,88 @@ function roBoard(live) {
   return `<h3 class="ih">Leaderboard <small class="meta">${live && LIVE_T ? "live from Google prices" : "official close " + shortDate(T0.date)} · ${roGo("themes", "Themes")} ${roGo("setups", "Leaders")}</small></h3>${tbl}${roList(notes)}`;
 }
 
+/* ---------- The story (top of Read-out): scenario tracker (mirrors breadth/story.py scenario/baskets) + Claude's chapters (docs/story.json) ---------- */
+let STORYJ = null, STORY_ERR = null, STORY_BUSY = false;
+async function fetchStory() {
+  if (STORY_BUSY) return; STORY_BUSY = true;
+  try { const r = await fetch("story.json?cb=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw new Error(r.status === 404 ? "no chapters yet" : "HTTP " + r.status); STORYJ = await r.json(); STORY_ERR = null; }
+  catch (e) { STORY_ERR = String(e.message || e); }
+  STORY_BUSY = false; if (TAB === "readout") rerenderPanel();
+}
+setInterval(() => { if (document.visibilityState === "visible" && TAB === "readout") fetchStory(); }, 10 * 60 * 1000);
+const SR = { leave: 60, come: 40, streak5: 55, lookback: 10, basket: 0.2 };
+function storyState(shares, live) {
+  const s = shares.filter(x => x != null); if (live != null) s.push(live);
+  if (!s.length) return { branch: "none", label: "No data", latest: null, series: [] };
+  const last = s[s.length - 1];
+  const ep = (i) => { const w = s.slice(Math.max(0, i - 4), i + 1); return w.reduce((a, b) => a + b, 0) / w.length >= SR.streak5 || w.filter(x => x >= SR.leave).length >= 2; };
+  let recent = false; for (let i = Math.max(0, s.length - 1 - SR.lookback); i < s.length - 1; i++) if (ep(i)) recent = true;
+  const epNow = ep(s.length - 1), w5 = s.slice(-5), avg5 = w5.reduce((a, b) => a + b, 0) / w5.length;
+  const [branch, label] = last >= SR.leave ? ["A", "Money is still leaving"] : last <= SR.come && (recent || epNow) ? ["B", "Money is coming back"]
+    : recent || epNow ? ["W", "Selling paused: waiting for the market to pick a side"] : ["none", "No outflow story right now"];
+  return { branch, label, latest: last, avg5, left5: w5.filter(x => x >= SR.leave).length, recent, series: s.slice(-10) };
+}
+function storyBaskets(T) {
+  const subs = (T.subthemes || []).filter(r => r.vs_d5 != null && (r.n || 0) >= 3); if (!subs.length) return null;
+  const v = subs.map(r => r.vs_d5).sort((a, b) => a - b), k = Math.max(1, Math.floor(v.length * SR.basket));
+  const lo = v[k - 1], hi = v[v.length - k], med = v[Math.floor(v.length / 2)];
+  const past = subs.filter(r => (r.s_hist || []).length >= 11).map(r => r.s_hist[r.s_hist.length - 11]).sort((a, b) => b - a);
+  const cut = past.length ? past[Math.max(0, Math.floor(past.length * SR.basket) - 1)] : 999;
+  const lead = subs.filter(r => (r.s_hist || []).length >= 11 && r.s_hist[r.s_hist.length - 11] >= cut);
+  return { sold: subs.filter(r => r.vs_d5 <= lo).sort((a, b) => a.vs_d5 - b.vs_d5), held: subs.filter(r => r.vs_d5 >= hi).sort((a, b) => b.vs_d5 - a.vs_d5),
+    lead_sold: lead.filter(r => r.vs_d5 <= med).sort((a, b) => a.vs_d5 - b.vs_d5) };
+}
+function mdLite(md) {
+  const inl = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/(^|[\s(])\*(?!\s)(.+?)\*(?=[\s).,;:!?]|$)/g, "$1<i>$2</i>");
+  return String(md || "").split(/\n{2,}/).map(block => { const lines = block.split("\n");
+    if (lines.every(l => /^\s*[-•] /.test(l))) return `<ul class="rol">${lines.map(l => `<li>${inl(l.replace(/^\s*[-•] /, ""))}</li>`).join("")}</ul>`;
+    return lines.map(l => /^\s*[-•] /.test(l) ? `<ul class="rol"><li>${inl(l.replace(/^\s*[-•] /, ""))}</li></ul>` : `<p>${inl(l)}</p>`).join(""); }).join("");
+}
+function storyCard() {
+  const T = DATA.themes, rows = DATA.rows, last = rows[rows.length - 1], pc = pcI;
+  if (!STORYJ && !STORY_ERR && !STORY_BUSY) fetchStory();
+  const live = liveActive() && LIVE && LIVE.rows && Object.values(LIVE.rows).some(r => r.closeyest != null && r.volume);
+  const m = live ? roMoney() : null, liveShare = m && m.share != null ? m.share * 100 : null;
+  const sc = storyState(rows.slice(-40).map(r => r.dn_share), liveShare);
+  const dates = rows.slice(-10).map(r => r.date).concat(liveShare != null ? ["today"] : []).slice(-sc.series.length);
+  const bars = sc.series.map((x, i) => `<span class="dfb${dates[i] === "today" ? " now" : ""}" title="${dates[i] === "today" ? "Today (live)" : shortDate(dates[i])}: ${Math.round(x)}% of dollars in falling stocks"><i style="height:${Math.round(x)}%" class="${x >= 60 ? "dn" : x <= 40 ? "up" : ""}"></i><small>${dates[i] === "today" ? "now" : shortDate(dates[i]).replace(/^\w+ /, "")}</small></span>`).join("");
+  const B = storyBaskets(T) || { sold: [], held: [], lead_sold: [] };
+  const avgToday = (rs) => { if (!live) return null; const v = rs.map(g => { const ch = (g.members || []).map(t => liveRow(t)).filter(Boolean).map(r => r.chg); return ch.length >= 3 ? ch.reduce((a, b) => a + b, 0) / ch.length : null; }).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const aS = avgToday(B.sold), aH = avgToday(B.held);
+  const where = aS == null || aH == null ? null : aS - aH > 0.01 ? ["up", "Snapback in what was sold"] : aH - aS > 0.01 ? ["", "Money staying in what held up"] : ["", "No clear preference yet"];
+  const W = T.thrust_watch || {};
+  const sig = (on, txt) => `<span class="ang ${on ? "on" : ""}">${on ? "✓" : "✗"} ${txt}</span>`;
+  const upDn = m ? m.up4 > m.dn4 : last.up4 > last.dn4;
+  const sigA = [sig(sc.latest >= SR.leave, `${live ? "today" : "last session"} ${Math.round(sc.latest)}% in falling stocks (≥ ${SR.leave}%)`), sig(sc.avg5 >= SR.streak5, `5-day average ${Math.round(sc.avg5)}% (≥ ${SR.streak5}%)`),
+    sig((last.nl || 0) > (last.nh || 0), `new lows ${last.nl} > highs ${last.nh} (last close)`), m && W.avg40 ? sig(m.x < W.k_close, `thrust gauge cold (${m.x.toFixed(1)}×)`) : ""].join("");
+  const sigB = [sig(sc.latest <= SR.come, `share ≤ ${SR.come}%`), sig(upDn, `more stocks up 4% than down ${m ? `(${m.up4} vs ${m.dn4} live)` : `(${last.up4} vs ${last.dn4})`}`),
+    m && W.avg40 ? sig(m.x >= W.k_close, `thrust gauge ≥ ${W.k_close}× (${m.x.toFixed(1)}×)`) : "", where ? sig(aS > aH + 0.01, `sold groups bouncing (${pc(aS, 1)} vs ${pc(aH, 1)})`) : ""].join("");
+  const L = leadersJS(getT(), 400), top1 = {}; L.forEach(s => { if (s.sub && !top1[s.sub]) top1[s.sub] = s; });
+  const ign = Object.fromEntries((((T.rotation || {}).ignition || {}).rows || []).filter(r => r.status === "ignition").map(r => [r.g, r]));
+  const gl = (rs, n) => rs.slice(0, n).map(g => `<b>${roNm(g.theme)}</b> <small class="meta">${pc(g.vs_d5, 1)} 5d${top1[g.theme] ? " · " + top1[g.theme].t : ""}${ign[g.theme] ? " · 🔥" : ""}</small>`).join(", ");
+  const card = (k, title, body) => `<div class="stcol ${sc.branch === k ? "on" : ""}"><div class="kicker" style="margin:0 0 4px">${title}${sc.branch === k ? ' <span class="tg ppull">current</span>' : ""}</div>${body}</div>`;
+  const playA = `<div class="stsig">${sigA}</div>${roList([
+    `<b>History says:</b> heavy-selling days inside a streak were followed by SPY +1.7% (median) over 10 sessions, led by the groups sold hardest (+4.3% vs SPY, 78% of the time). Don't press shorts into 70%+ days.`,
+    B.lead_sold.length ? `<b>Snapback list</b> (60-day leaders sold hardest this week): ${gl(B.lead_sold, 5)}.` : "",
+    B.held.length ? `<b>Hold only relative strength:</b> ${gl(B.held, 5)}.` : "",
+    `Small size until the selling stops; cash is a position.`])}`;
+  const playB = `<div class="stsig">${sigB}</div>${roList([
+    `<b>History says:</b> once a calm "money is back" day prints, the bounce in sold groups has usually run (≈ flat after); the groups that held up beat SPY by +1.7% over 10 sessions and 60-day leaders +3.1% over 20.`,
+    B.held.length ? `<b>Where to look:</b> ${gl(B.held, 6)}.` : "",
+    `Trade Day-1 follow-throughs and ignitions with leaders; if a breadth thrust prints, switch to the post-thrust playbook and press.`])}`;
+  const ch = (STORYJ && STORYJ.chapters) || [], cur = ch[ch.length - 1];
+  const chap = cur ? `<div class="stchap"><div class="kicker" style="margin:0">Latest chapter · ${longDate(cur.date)} ${cur.slot === "am" ? "morning" : "after the close"}${cur.written ? ` · written ${cur.written.slice(11, 16)} ET` : ""}</div>
+      <h3 style="margin:4px 0 6px">${esc(cur.title)}</h3>${mdLite(cur.md)}
+      ${ch.length > 1 ? `<details class="kqsec"><summary><b>Earlier chapters</b> <span class="meta">${ch.length - 1}</span></summary>${ch.slice(0, -1).reverse().map(c => `<details class="kqsec" style="margin-left:8px"><summary>${longDate(c.date)} ${c.slot === "am" ? "AM" : "PM"} · ${esc(c.title)} <span class="meta">branch ${esc(c.branch || "")}</span></summary>${mdLite(c.md)}</details>`).join("")}</details>` : ""}</div>`
+    : `<p class="meta">${STORY_ERR && STORY_ERR !== "no chapters yet" ? `Couldn't load the chapters (${esc(STORY_ERR)}).` : "The first chapter arrives with the next scheduled write-up (about 8:40 AM and 4:50 PM ET on trading days)."}</p>`;
+  return $(`<section class="card stcard"><div class="kicker">The story · money in or out of the market</div>
+    <div class="dfwrap"><div><div class="mtv ${sc.branch === "A" ? "dn" : sc.branch === "B" ? "up" : ""}">${sc.branch === "A" ? "A · " : sc.branch === "B" ? "B · " : ""}${esc(sc.label)}</div>
+      <p style="margin:2px 0 4px">${live ? "Today so far" : "Last session"}: ${Math.round(sc.latest)}% of dollar volume in falling stocks; ${sc.left5} of the last 5 sessions at 60%+; 5-day average ${Math.round(sc.avg5)}%.${where ? ` Today: sold-hardest groups ${pc(aS, 1)} vs held-up groups ${pc(aH, 1)} → <b class="${where[0]}">${where[1]}</b>.` : ""}</p></div>
+      <div class="dfbars" aria-label="Share of dollar volume in falling stocks, last sessions">${bars}</div></div>
+    <div class="stcols">${card("A", "Scenario A · money keeps leaving", playA)}${card("B", "Scenario B · money comes back", playB)}</div>
+    ${chap}
+    <div class="note" style="padding:8px 0 0">The tracker updates with every price refresh: A when 60%+ of dollar volume is in falling stocks, B when it drops to 40% or less after a run of selling, "paused" in between. Baskets: the fifth of sub-themes that fell most / held up best vs SPY over the last 5 sessions (last close); "60-day leaders" = top fifth by Strength 10 sessions ago. Evidence from ${"Feb 2025–Oct 2026"}: small samples (9–18 episodes), context not a signal. Chapters are written by Claude from the dashboard's own numbers each morning and after the close.</div></section>`);
+}
 function roCard(key, phase, title, when, verdict, body) {
   const open = UIRO.open[key] ?? (key === phase);
   return `<details class="card rocard ${key === phase ? "now" : ""}" data-k="${key}" ${open ? "open" : ""}><summary><div class="roh"><span class="rot">${title}${key === phase ? ' <span class="tg ppull">now</span>' : ""}</span><span class="meta">${when}</span></div>${verdict ? `<div class="rov">${verdict}</div>` : ""}</summary><div class="rob">${body}</div></details>`;
@@ -2935,6 +3022,7 @@ function renderReadout(app) {
     live: roCard("live", phase, "📈 During the market", "9:30 AM–4:00 PM ET · live Google prices", liveV, liveBody),
     post: roCard("post", phase, "🌙 Post-market", "from the 4:00 PM close · Google closing prices", postV, postBody) };
   const order = [phase, ...["pre", "live", "post"].filter(k => k !== phase)];
+  app.append(storyCard());
   const wrap = $(`<div class="ro">${order.map(k => cards[k]).join("")}
     <div class="note" style="padding:8px 0 0">Each card opens on its own part of the day (Eastern time). Pre-market uses the official overnight numbers plus Yahoo pre-market quotes; during the market and at the close it uses your Google Sheet's live prices; the overnight update replaces the close estimates with official numbers. Links jump to the tab with the full detail.</div></div>`);
   wrap.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault();

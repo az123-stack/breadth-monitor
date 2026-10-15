@@ -206,6 +206,21 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (live: vs last close via `LIVE_T`; official: vs 5 sessions ago from `s_hist`), hottest, top-10 ins/outs, climbers/slippers, best
   stocks (Leaders score, one per sub-theme), strongest anywhere (`lists.strongest`), new top-10 stocks (live) / RS jumpers (official).
   `dn_share` in breadth rows is in percent (`roDs` converts). Links (`data-go`) switch tabs.
+- **The story** (Oct 15; `breadth/story.py`, `story_guide.md`, top of the Read-out tab `storyCard`): scenario tracker A "money keeps
+  leaving" (latest share of $ volume in falling stocks ≥ 60%) / B "comes back" (≤ 40% after an outflow episode = 5-day avg ≥ 55% or 2+
+  days ≥ 60% within 10 sessions) / W paused; Python `scenario()` and browser `storyState()` must stay identical (same for `baskets` /
+  `storyBaskets`: bottom / top 20% of sub-themes by `vs_d5` = sold hardest / held up; 60-day-leader proxy = top 20% Strength 10 sessions
+  ago). Signals chips, "where it's going today" (sold vs held basket live), playbooks per branch with the comeback-study evidence.
+  Chapters in `docs/story.json` (page fetches from Pages every 10 min; `mdLite` renders **bold** / bullets), written by two Claude
+  scheduled tasks: "Market Monitor story · morning" (8:40 AM ET Mon–Fri, `--slot am`: official close + pre-market) and "· after the close"
+  (4:50 PM ET Mon–Fri, `--slot pm`: `data/close_snapshot.csv` saved by `.github/workflows/close.yml` at 4:25 PM ET from the Google Sheet;
+  the task dispatches that workflow if the snapshot is stale). Each run: clone, `python3 -m breadth.story facts --slot X` (stdlib only),
+  write per `story_guide.md`, `python3 -m breadth.story publish --slot X --title ... --branch ... --file ch.md --push` (commits only
+  docs/story.json via `gh api` PUT). First chapter (Oct 14 pm, "The AI money is leaving") written by hand.
+  Comeback study (`tools/ignition_study/comeback.py`, Feb 2025–Oct 2026): heavy-selling day in an outflow streak (n 18) → SPY median +1.7%
+  next 10 sessions, sold-hardest sub-themes +4.3% vs SPY (median +3.2%, 78%) vs held-up +0.5%; ex Mar–Apr 2025 +3.9%; any 70%+ day (n 24)
+  sold +1.9% / held +1.0%. First calm comeback day (n 9) → SPY median −1.2% next 10, held-up +1.7%, middle +1.5%, sold −0.1%; 60-day
+  leaders +3.1% over 20. Read: snapbacks start around the heavy-selling days; after a calm comeback day follow what held up.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 127 peer groups (swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added)
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

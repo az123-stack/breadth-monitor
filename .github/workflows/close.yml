@@ -1,0 +1,41 @@
+name: Close snapshot
+
+# Saves the Google Sheet's closing prices (data/close_snapshot.csv) a few minutes after the 4:00 PM ET close, so the
+# post-market story chapter (written by a Claude scheduled task at ~4:50 PM ET) has today's numbers. Cron is UTC:
+# 20:25 = 4:25 PM EDT (summer), 21:25 = 4:25 PM EST (winter); the other run is a harmless refresh. The Claude task
+# also dispatches this workflow if the snapshot is missing when it runs.
+on:
+  schedule:
+    - cron: "25 20 * * 1-5"
+    - cron: "25 21 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: close-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Save closing prices from the live Google Sheet
+        run: python -m breadth.story snapshot
+      - name: Commit
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          git add data/close_snapshot.csv
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -qm "Close snapshot $(TZ=America/New_York date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git push -q && break
+            git pull -q --rebase -X theirs || { git rebase --abort; break; }
+          done
