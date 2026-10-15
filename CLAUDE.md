@@ -51,7 +51,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (liquid stocks with a year of history; high above every prior-year high), `near_hi` / `pct_near` / `pct_near10` (close within
   3% of the 52-week high), `spy_off_hi` (SPY bars passed as `bench`). Need 252 sessions of bars, so `merge` keeps stored values
   when a fresh one is blank. Events: "narrowing" (SPY within 1% of its high, pct_near10 ≤ 60% of its 60-day max, 3 days) and
-  "highs_lead" (nh10 > nl10 for 3 days after nl10 led 15 of 20). Breadth tab: 4 tiles, two charts (highs/lows chart has an
+  "highs_lead" (nh10 > nl10 for 3 days after nl10 led 15 of 20).
+  Dollar flow (Oct 14): `dv_up` / `dv_dn` ($B of close × volume in rising / falling universe stocks $3+), `dv_net`, `dv_net5`, `dn_share`
+  (% in falling), `dn_share10`, `dv_rel` (total $ vol ÷ prior 50-day avg); full ~2-year history from stored bars (median dn_share 47%);
+  Breadth tab "Money in or out" tile row (≥ 60% leaving / ≤ 40% coming in), "Money in or out" chart (net $ bars + 10-day avg), table
+  columns "$ in falling" and "Net $". Breadth tab: 4 tiles, two charts (highs/lows chart has an
   orange net line = nh10 − nl10 on the same mirrored scale), table columns.
   First look (Nov 2025–Sep 2026, ~210 days): high pct_near was followed by weaker SPY 20-day returns (corr −0.39, top quartile
   −0.4% vs bottom +3.3%); SPY-near-high divergence days −0.4% vs +1.2% (n 12). Context, not a timing signal.
@@ -170,6 +174,9 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   and SPY next 5/10 sessions after similar days (bins: ≥ 80%, 70–80%, ≤ 20%, 20–30% falling). Calibration Oct 2024–Oct 2026: median
   47%; ≥ 70% days (n 35) SPY +1.3% next 5 sessions, up 83% (all days +0.3%, 58%); ≥ 80% (n 26) +0.7%, 65%. Not a buy signal.
   Oct 14, 2026: ≈ 73% in falling stocks (theme stocks alone 83.5%, ~95th percentile), TLT +0.7%, UUP +0.3%, GLD −1.5%, VIX +10.5%.
+  Two-step layout (Oct 14): Step 1 verdict from the whole-market share in falling stocks (≥ 60% "money is leaving", ≤ 40% "coming in",
+  else "mixed: rotating") with net $ today and 5 sessions (`dollar.last` third field = net $B); Step 2 tables follow the verdict: leaving →
+  "being sold hardest" + collapsed "holding up best (not new money)"; coming in → "where the new money is going" first; mixed → both.
   Oct 14 read: out of AI infra (Neoclouds −11.6% on 2.4× volume, custom silicon, AI servers, optical, hyperscalers, memory, quantum,
   BTC miners, SMR) into large-cap pharma, defense primes, biotech, managed care, oil majors, utilities; 16 of 102 groups up.
 - Rotation tab (browser-only rendering): ideas card · pair chart (`pairCard`: two groups' equal-weight index, ratio and

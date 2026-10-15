@@ -13,6 +13,7 @@ METRIC_COLS = [
     "up25q", "dn25q", "up25m", "dn25m", "up50m", "dn50m",
     "up13_34", "dn13_34", "t2108", "universe",
     "nh", "nl", "nhnl", "nh10", "nl10", "near_hi", "pct_near", "pct_near10", "spy_off_hi",
+    "dv_up", "dv_dn", "dv_net", "dv_net5", "dn_share", "dn_share10", "dv_rel",
 ]
 HI_DAYS = 252        # 52-week window for new highs / lows
 NEAR_HI = 0.97       # "near a high" = close within 3% of the 52-week high
@@ -88,6 +89,16 @@ def compute(bars, bench=None):
     if bench is not None and len(bench):
         sc = bench.drop_duplicates("date").set_index("date")["c"].astype("float64").reindex(close.index)
         out["spy_off_hi"] = sc / sc.rolling(HI_DAYS, min_periods=HI_DAYS - 3).max() - 1
+    # ---- Dollar volume: is money pressing into rising or falling stocks? (universe stocks $3+) ----
+    # Every share sold has a buyer; this measures which side was in control (who accepted the price change).
+    dv = (close * vol).where(price_ok & chg.notna())
+    d_up, d_dn = dv.where(chg > 0).sum(axis=1), dv.where(chg < 0).sum(axis=1)
+    tot = dv.sum(axis=1)
+    out["dv_up"], out["dv_dn"], out["dv_net"] = d_up / 1e9, d_dn / 1e9, (d_up - d_dn) / 1e9
+    out["dv_net5"] = out["dv_net"].rolling(5).sum()
+    out["dn_share"] = 100 * d_dn / (d_up + d_dn).replace(0, np.nan)
+    out["dn_share10"] = out["dn_share"].rolling(10).mean()
+    out["dv_rel"] = tot / tot.rolling(50, min_periods=40).mean().shift(1)
     out.index.name = "date"
     out["complete"] = np.arange(len(out)) >= LOOKBACK_NEEDED
     # Blank out metrics whose own lookback isn't filled yet.
@@ -98,7 +109,8 @@ def compute(bars, bench=None):
                       ("up13_34", C.D34_DAYS), ("dn13_34", C.D34_DAYS),
                       ("t2108", C.MA_DAYS + 20), ("up4", 1), ("dn4", 1),
                       ("nh", HI_DAYS), ("nl", HI_DAYS), ("nhnl", HI_DAYS), ("near_hi", HI_DAYS),
-                      ("pct_near", HI_DAYS), ("nh10", HI_DAYS + 9), ("nl10", HI_DAYS + 9), ("pct_near10", HI_DAYS + 9)]:
+                      ("pct_near", HI_DAYS), ("nh10", HI_DAYS + 9), ("nl10", HI_DAYS + 9), ("pct_near10", HI_DAYS + 9),
+                      ("dv_up", 1), ("dv_dn", 1), ("dv_net", 1), ("dn_share", 1), ("dv_net5", 5), ("dn_share10", 10), ("dv_rel", 41)]:
         out.loc[n < need, col] = np.nan
     return out
 

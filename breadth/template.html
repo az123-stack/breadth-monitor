@@ -417,6 +417,8 @@ table.grid.hvetab td.tname { max-width: 180px; } table.grid.hvetab td, table.gri
 .rideas td.nowcol { box-shadow: inset 0 0 0 2px var(--s1); }
 .rideas .rbanner { margin: 8px 0 4px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; border-left: 4px solid; }
 .rbanner.act { background: color-mix(in srgb, var(--good) 12%, transparent); border-color: var(--good); }
+.mtv { font-size: 20px; font-weight: 700; margin: 4px 0 2px; }
+.mtv.dn { color: var(--critical); } .mtv.up { color: var(--good); }
 .dfwrap { display: flex; gap: 16px; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; padding: 10px 12px; margin: 8px 0; border: 1px solid var(--grid); border-radius: 10px; }
 .dfwrap > div:first-child { flex: 1 1 380px; }
 .dfbars { display: flex; gap: 4px; align-items: flex-end; height: 70px; }
@@ -1098,6 +1100,12 @@ function moneyTodayCard() {
     return { name: g.theme, n: mem.length, avg, rel: avg - spyChg, up, rv, flow: flow / 1e6, flowDay: av ? flow / av : null, tier, read, strength: g.strength };
   }).filter(Boolean);
   const heavy = (x) => x.rv != null && x.rv >= 1.2;
+  // Step 1: whole market (same ~1,000-stock list as the thrust watch): which side is the money pressing?
+  const W = (T.thrust_watch || {}), DF = W.dollar;
+  let mU = 0, mD = 0;
+  (W.tickers || []).forEach(t => { const r = liveRow(t); if (!r || !r.volume) return; const x = r.price * r.volume; if (r.chg > 0) mU += x; else if (r.chg < 0) mD += x; });
+  const share = mU + mD ? mD / (mU + mD) : null;
+  const state = share == null ? "mixed" : share >= 0.6 ? "out" : share <= 0.4 ? "in" : "mixed";
   const ins = rows.filter(x => x.avg > 0 && x.flow > 0).sort((a, b) => b.flow - a.flow);
   const outs = rows.filter(x => x.avg < 0 && x.flow < 0).sort((a, b) => a.flow - b.flow);
   const etf = (k) => { const r = liveRow(k); return r ? r.chg : null; };
@@ -1109,7 +1117,7 @@ function moneyTodayCard() {
   const dvo = def != null && off != null ? def - off : null;
   const bullets = [
     outs.length ? `<b>Leaving:</b> ${outs.slice(0, 4).map(nm).join(", ")}.` : "",
-    ins.length ? `<b>Going into:</b> ${ins.slice(0, 4).map(nm).join(", ")}.` : "<b>Going into:</b> nothing clear: few groups are up on real dollar volume.",
+    ins.length ? `<b>${state === "out" ? "Holding up best (not new money)" : "Going into"}:</b> ${ins.slice(0, 4).map(nm).join(", ")}.` : "<b>Going into:</b> nothing clear: few groups are up on real dollar volume.",
     dvo != null ? `<b>${dvo > 0.005 ? "Risk-off" : dvo < -0.005 ? "Risk-on" : "No clear tilt"}:</b> defensive sectors (utilities, staples, health care, real estate) ${pc(def)} vs growth sectors (tech, semis, discretionary, communication) ${pc(off)}, a ${pts(dvo)} spread.` : "",
     `<b>Size and breadth:</b> small caps vs large ${pts(spread("IWM", "SPY"))}, equal weight vs cap weight ${pts(spread("RSP", "SPY"))}; ${rows.filter(x => x.avg > 0).length} of ${rows.length} groups up.`,
     (() => { const ls = rows.filter(x => x.read === "Leader being sold").sort((a, b) => a.flow - b.flow); return ls.length ? `<b>Leaders being sold:</b> ${ls.slice(0, 5).map(x => esc(x.name.replace(/^[A-Z &]+ - /, ""))).join(", ")}: groups that were in confirmed or steady inflow at the last close and are down hard today. One day doesn't end a trend; watch whether the selling continues for a few sessions.` : ""; })(),
@@ -1121,34 +1129,34 @@ function moneyTodayCard() {
       <td class="num ${cls(x.flowDay)}">${x.flowDay == null ? "–" : (x.flowDay > 0 ? "+" : "") + x.flowDay.toFixed(2)}</td>
       <td class="l">${x.tier ? esc(TIER_LABEL[x.tier] || x.tier) : '<span class="meta">–</span>'}</td><td class="l ${x.read === "Leader being sold" ? "dn" : x.read.startsWith("Fresh") ? "up" : ""}">${x.read}</td>
       <td class="num">${x.strength == null ? "–" : Math.round(x.strength)}</td></tr>`).join("") || '<tr><td class="l meta" colspan="10">None.</td></tr>'}</tbody></table></div>`;
-  // Whole market: share of today's dollar volume in falling stocks (same ~1,000-stock list as the thrust watch)
-  const W = (T.thrust_watch || {}), DF = W.dollar;
   let mkt = "";
-  if (DF && W.tickers) {
-    let u = 0, dn = 0;
-    W.tickers.forEach(t => { const r = liveRow(t); if (!r || !r.volume) return; const x = r.price * r.volume; if (r.chg > 0) u += x; else if (r.chg < 0) dn += x; });
-    const share = u + dn ? dn / (u + dn) : null;
-    if (share != null) {
-      const H = DF.hist, pctl = Math.round(H.filter(x => x < share).length / H.length * 100);
-      const bin = share >= 0.8 ? DF.fwd.sell80 : share >= 0.7 ? DF.fwd.sell70 : share <= 0.2 ? DF.fwd.buy20 : share <= 0.3 ? DF.fwd.buy30 : null, A = DF.fwd.all;
-      const lvl = share >= 0.8 ? "Heavy selling" : share >= 0.65 ? "Selling" : share <= 0.2 ? "Heavy buying" : share <= 0.35 ? "Buying" : "Balanced";
-      const haven = [["TLT", "Treasuries (TLT)"], ["UUP", "Dollar (UUP)"], ["GLD", "Gold (GLD)"], ["^VIX", "VIX"]].map(([k, l]) => { const r = liveRow(k); return r ? `${l} ${pc(r.chg, 1)}` : null; }).filter(Boolean).join(" · ");
-      const bars = (DF.last || []).map(([d, x]) => `<span class="dfb" title="${shortDate(d)}: ${Math.round(x * 100)}% of dollars in falling stocks"><i style="height:${Math.round(x * 100)}%" class="${x >= 0.65 ? "dn" : x <= 0.35 ? "up" : ""}"></i><small>${shortDate(d).replace(/^\w+ /, "")}</small></span>`).join("")
-        + `<span class="dfb now" title="Today: ${Math.round(share * 100)}%"><i style="height:${Math.round(share * 100)}%" class="${share >= 0.65 ? "dn" : share <= 0.35 ? "up" : ""}"></i><small>now</small></span>`;
-      mkt = `<div class="dfwrap"><div><div class="kicker" style="margin:0">Whole market · ${W.n.toLocaleString()} stocks</div>
-        <p style="margin:6px 0 4px"><b class="${share >= 0.65 ? "dn" : share <= 0.35 ? "up" : ""}">${lvl}:</b> ${Math.round(share * 100)}% of today's dollar volume traded in falling stocks
-        (${fmtB(u)} in rising vs ${fmtB(dn)} in falling). That's ${share >= DF.median ? "heavier selling" : "lighter selling"} than ${share >= DF.median ? pctl : 100 - pctl}% of sessions since ${shortDate(DF.from)} (a normal day is ${Math.round(DF.median * 100)}%).</p>
-        ${bin && bin.n >= 5 ? `<p class="meta" style="margin:0 0 4px">After past days like this (${share >= 0.7 ? "70%+" : "30% or less"} in falling stocks, n ${bin.n}), SPY averaged ${pc(bin.spy5, 1)} over the next 5 sessions (up ${Math.round(bin.up5 * 100)}% of the time) vs ${pc(A.spy5, 1)} on an average day. ${share >= 0.7 ? "Heavy selling days have tended to bounce short term; it's context, not a buy signal." : ""}</p>` : ""}
-        ${haven ? `<p class="meta" style="margin:0">Where money hides: ${haven}.</p>` : ""}</div>
-        <div class="dfbars" aria-label="Share of dollar volume in falling stocks, last sessions">${bars}</div></div>`;
-    }
+  if (share != null) {
+    const H = DF && DF.hist, pctl = H ? Math.round(H.filter(x => x < share).length / H.length * 100) : null;
+    const bin = !DF ? null : share >= 0.8 ? DF.fwd.sell80 : share >= 0.7 ? DF.fwd.sell70 : share <= 0.2 ? DF.fwd.buy20 : share <= 0.3 ? DF.fwd.buy30 : null, A = DF && DF.fwd.all;
+    const net = (mU - mD) / 1e9, prior = ((DF && DF.last) || []).slice(sameDay ? -5 : -4).filter(x => !sameDay || true);
+    const net5 = sameDay ? null : prior.reduce((acc, x) => acc + (x[2] || 0), 0) + net;
+    const head = state === "out" ? ["dn", "Money is leaving the market"] : state === "in" ? ["up", "Money is coming into the market"] : ["", "Mixed: money is rotating, not leaving"];
+    const haven = [["TLT", "Treasuries (TLT)"], ["UUP", "Dollar (UUP)"], ["GLD", "Gold (GLD)"], ["^VIX", "VIX"]].map(([k, l]) => { const r = liveRow(k); return r ? `${l} ${pc(r.chg, 1)}` : null; }).filter(Boolean).join(" · ");
+    const bars = ((DF && DF.last) || []).map(([d, x]) => `<span class="dfb" title="${shortDate(d)}: ${Math.round(x * 100)}% of dollars in falling stocks"><i style="height:${Math.round(x * 100)}%" class="${x >= 0.6 ? "dn" : x <= 0.4 ? "up" : ""}"></i><small>${shortDate(d).replace(/^\w+ /, "")}</small></span>`).join("")
+      + (sameDay ? "" : `<span class="dfb now" title="Today: ${Math.round(share * 100)}%"><i style="height:${Math.round(share * 100)}%" class="${share >= 0.6 ? "dn" : share <= 0.4 ? "up" : ""}"></i><small>now</small></span>`);
+    mkt = `<div class="dfwrap"><div><div class="kicker" style="margin:0">Step 1 · Is money coming in or going out? · ${(W.n || 0).toLocaleString()} stocks</div>
+      <div class="mtv ${head[0]}">${head[1]}</div>
+      <p style="margin:2px 0 4px">${Math.round(share * 100)}% of ${sameDay ? "the last session's" : "today's"} dollar volume traded in falling stocks: ${fmtB(mU)} in rising vs ${fmtB(mD)} in falling, net <b class="${net >= 0 ? "up" : "dn"}">${net >= 0 ? "+" : "−"}$${Math.abs(net).toFixed(0)}B</b>${net5 != null ? ` (5 sessions: ${net5 >= 0 ? "+" : "−"}$${Math.abs(net5).toFixed(0)}B)` : ""}.
+      ${pctl != null ? `That's ${share >= DF.median ? `heavier selling than ${pctl}%` : `lighter selling than ${100 - pctl}%`} of sessions since ${shortDate(DF.from)} (normal ≈ ${Math.round(DF.median * 100)}%).` : ""}</p>
+      ${bin && bin.n >= 5 ? `<p class="meta" style="margin:0 0 4px">After past days like this (${share >= 0.7 ? "70%+" : "30% or less"} in falling stocks, n ${bin.n}), SPY averaged ${pc(bin.spy5, 1)} over the next 5 sessions (up ${Math.round(bin.up5 * 100)}% of the time) vs ${pc(A.spy5, 1)} on an average day.${share >= 0.7 ? " Heavy selling days have tended to bounce short term; context, not a buy signal." : ""}</p>` : ""}
+      ${haven ? `<p class="meta" style="margin:0">Where money hides: ${haven}.</p>` : ""}</div>
+      <div class="dfbars" aria-label="Share of dollar volume in falling stocks, last sessions">${bars}</div></div>
+      <div class="kicker" style="margin:12px 0 0">Step 2 · ${state === "out" ? "Money is leaving: what's being sold hardest, and what's holding up" : state === "in" ? "Money is coming in: where it's going" : "Rotation: what's being bought and what's being sold"}</div>`;
   }
   body.append($(`<div>
     ${sameDay ? `<p class="meta" style="margin:6px 0">The sheet still shows the last full session (${longDate(T.date)}); today's flows start once the market opens.</p>` : ""}
     ${mkt}
     <ul style="margin:8px 0 0;padding-left:18px;line-height:1.55">${bullets.map(b => `<li>${b}</li>`).join("")}</ul>
-    <h3 class="ih">Money coming in <small class="meta">groups up on the day, ranked by net dollar flow</small></h3>${tbl(ins.slice(0, 12))}
-    <h3 class="ih">Money going out <small class="meta">groups down on the day, biggest net dollar outflow first</small></h3>${tbl(outs.slice(0, 12))}
+    ${state === "out"
+      ? `<h3 class="ih">Being sold hardest <small class="meta">groups down on the day, biggest net dollar outflow first</small></h3>${tbl(outs.slice(0, 12))}
+         <details class="kqsec" style="margin-top:8px"><summary><b>Holding up best (${ins.length})</b> <span class="meta">groups still up: relative strength while money leaves, not new money. Watch these when buying returns.</span></summary>${tbl(ins.slice(0, 12))}</details>`
+      : `<h3 class="ih">${state === "in" ? "Where the new money is going" : "Being bought (rotating into)"} <small class="meta">groups up on the day, ranked by net dollar flow</small></h3>${tbl(ins.slice(0, 12))}
+         <h3 class="ih">${state === "in" ? "Still being sold" : "Being sold (rotating out of)"} <small class="meta">groups down on the day, biggest net dollar outflow first</small></h3>${tbl(outs.slice(0, 12))}`}
     <div class="note" style="padding:8px 0 0">Every share sold has a buyer, so "money leaving" really means sellers were in control and accepted lower prices; the whole-market line measures how lopsided that was. Net $ flow adds up each stock's dollar volume today, counted as positive when the stock is up and negative when it's down, so big, heavily traded names carry the most weight (that's where the real money is). Flow × avg day divides it by the group's normal daily dollar volume, which puts small and large groups on the same scale. Rel. volume = dollar volume so far vs the 50-day average, paced for the time of day; bold at 1.2× or more. "Trend into today" is the group's money-flow tier at the last close (Rotation tab → money flow card), so "leader being sold" flags groups that had been in inflow and are now being hit. Uses your theme and sub-theme stocks with Google's live prices (up to ~20 min behind). Click any header to sort.</div></div>`));
   return sec;
 }
@@ -1228,6 +1236,21 @@ function renderBreadth(app) {
     t2.forEach(([k, v, sub]) => tl2.append($(`<div class="card tile"><div class="k">${k}</div><div class="v num">${v}</div><div class="s">${sub}</div></div>`)));
     app.append(tl2);
   }
+  if (last.dn_share != null) {
+    const hist = rows.map(r => r.dn_share).filter(v => v != null), med = hist.slice().sort((a, b) => a - b)[Math.floor(hist.length / 2)];
+    const pr = Math.round(hist.filter(v => v < last.dn_share).length / hist.length * 100);
+    const B = (v) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + "$" + fmt(Math.abs(v), 0) + "B";
+    const verdict = last.dn_share >= 60 ? ["dn", "Money leaving"] : last.dn_share <= 40 ? ["up", "Money coming in"] : ["", "Mixed / rotating"];
+    const t3 = [
+      ["Money in or out · " + shortDate(last.date), `<span class="${verdict[0]}">${verdict[1]}</span>`, `${fmt(last.dn_share, 0)}% of dollar volume in falling stocks · ${last.dn_share >= med ? "heavier selling than " + pr : "lighter than " + (100 - pr)}% of days`],
+      ["Net dollars", B(last.dv_net), `rising − falling stocks · 5-day ${B(last.dv_net5)}`],
+      ["Selling share, 10-day avg", fmt(last.dn_share10, 0) + "%", `normal is ~${fmt(med, 0)}% · above = sellers in control lately`],
+      ["Total dollar volume", fmt(last.dv_rel, 2) + "×", `vs 50-day avg ($${fmt(last.dv_up + last.dv_dn, 0)}B today)`],
+    ];
+    const tl3 = $('<section class="tiles tiles4"></section>');
+    t3.forEach(([k, v, sub]) => tl3.append($(`<div class="card tile"><div class="k">${k}</div><div class="v num">${v}</div><div class="s">${sub}</div></div>`)));
+    app.append(tl3);
+  }
   IDX = Object.fromEntries(rows.map((r, i) => [r.date, i]));
   EVBY = {}; (DATA.events || []).forEach(e => { (EVBY[e.date] = EVBY[e.date] || []).push(e); });
   app.append(signalsCard());
@@ -1249,6 +1272,7 @@ function renderBreadth(app) {
   charts.append(chartT2108(rows));
   charts.append(chartHighsLows(rows));
   charts.append(chartNearHigh(rows));
+  if (rows.some(r => r.dv_net != null)) charts.append(chartMoney(rows));
   syncScroll([...charts.querySelectorAll(".scroller")], bar, rows);
   app.append(table(rows));
 
@@ -1258,6 +1282,7 @@ function renderBreadth(app) {
     Slower metrics and T2108 use stocks with 20-day avg volume ≥ 100k.
     New 52-week highs / lows: liquid stocks with a year of history whose high (low) beat every day of the prior year; "near a high" = close within 3% of the 52-week high.
     Leadership narrowing: SPY within 1% of its 52-week high while the 10-day average of stocks near their highs is 40%+ below its 60-day peak. New highs take over: the 10-day average of new highs moves above new lows for 3 days after weeks of lows leading. Table shading compares each value with your own history (darker = beyond the 10th/90th percentile).
+    Money in or out: each stock's dollar volume (close × volume, $3+ stocks) counted toward rising or falling stocks; "$ in falling" = the falling side's share, net $ = rising − falling. Every share sold has a buyer, so this shows which side was in control, not cash literally leaving. 60%+ in falling stocks = money leaving, 40% or less = coming in.
     Regime thresholds are starter values; calibrate them in <code>breadth/config.py</code>.
     · <a href="breadth.csv">Download full history (CSV)</a></footer>`));
 }
@@ -1577,6 +1602,28 @@ function chartHighsLows(rows) {
   hover(c, rows, x, [["New highs", r => fmt(r.nh)], ["New lows", r => fmt(r.nl)], ["Highs − lows", r => r.nhnl == null ? "–" : (r.nhnl > 0 ? "+" : "") + fmt(r.nhnl)], ["Highs − lows, 10-day avg", r => r.nh10 == null ? "–" : ((r.nh10 - r.nl10) > 0 ? "+" : "") + fmt(r.nh10 - r.nl10)], ["10-day avg highs / lows", r => r.nh10 == null ? "–" : fmt(r.nh10) + " / " + fmt(r.nl10)]]);
   return c.el;
 }
+function chartMoney(rows) {
+  const c = frame("Money in or out: dollar volume in rising minus falling stocks ($B)",
+    '<span><i style="background:var(--up)"></i>More $ in rising stocks</span><span><i style="background:var(--down)"></i>More $ in falling stocks</span><span><i class="line" style="background:var(--s2);height:3px"></i>10-day average</span>');
+  const net10 = rows.map((r, i) => { const w = rows.slice(Math.max(0, i - 9), i + 1).map(q => q.dv_net).filter(v => v != null); return { v: w.length === 10 ? w.reduce((a, b) => a + b, 0) / 10 : null }; });
+  const vals = rows.map(r => Math.abs(r.dv_net || 0)).sort((a, b) => a - b);
+  const mx = niceMax((vals[Math.floor(vals.length * 0.97)] || 10) * 1.05);
+  const mid = M.t + (c.h - M.t - M.b) / 2, half = (c.h - M.t - M.b) / 2;
+  const yv = (v) => mid - Math.max(-mx, Math.min(mx, v)) / mx * half;
+  const x = axes(c, rows, (v) => mid - Math.min(v, mx) / mx * half, [mx, mx / 2, 0], v => "+" + fmt(v));
+  [mx / 2, mx].forEach(t => { S("line", { x1: M.l, x2: W - M.r, y1: yv(-t), y2: yv(-t), stroke: "var(--grid)" }, c.svg); yLabel(c, yv(-t), "−" + fmt(t)); });
+  const bw = (W - M.l - M.r) / rows.length, w = Math.max(1, bw - 2);
+  rows.forEach((r, i) => { if (r.dv_net == null) return; const y0 = yv(r.dv_net);
+    S("rect", { x: x(i) - w / 2, y: Math.min(y0, mid), width: w, height: Math.abs(y0 - mid), rx: Math.min(2, w / 3), fill: r.dv_net >= 0 ? "var(--up)" : "var(--down)" }, c.svg); });
+  S("line", { x1: M.l, x2: W - M.r, y1: mid, y2: mid, stroke: "var(--text-muted)", "stroke-width": 1 }, c.svg);
+  eventLines(c, x, false);
+  S("path", { d: path(net10, x, yv, "v"), fill: "none", stroke: "var(--surface-1)", "stroke-width": 5, "stroke-linejoin": "round" }, c.svg);
+  S("path", { d: path(net10, x, yv, "v"), fill: "none", stroke: "var(--s2)", "stroke-width": 2.5, "stroke-linejoin": "round" }, c.svg);
+  const B = (v) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + "$" + fmt(Math.abs(v), 0) + "B";
+  hover(c, rows, x, [["Net (rising − falling)", r => B(r.dv_net)], ["In rising / falling stocks", r => r.dv_up == null ? "–" : "$" + fmt(r.dv_up, 0) + "B / $" + fmt(r.dv_dn, 0) + "B"],
+    ["Share in falling stocks", r => r.dn_share == null ? "–" : fmt(r.dn_share, 0) + "%"], ["5-day net", r => B(r.dv_net5)], ["Total $ volume vs 50-day avg", r => r.dv_rel == null ? "–" : fmt(r.dv_rel, 2) + "×"]]);
+  return c.el;
+}
 function chartNearHigh(rows) {
   const c = frame("% of stocks within 3% of their 52-week high",
     '<span><i class="line" style="background:var(--s1)"></i>% near a high</span><span><i class="line" style="background:var(--text-muted)"></i>10-day average</span>');
@@ -1603,6 +1650,7 @@ const COLS = [
   ["up13_34", "Up 13%", "34 days", "up", 0, true], ["dn13_34", "Down 13%", "34 days", "down"],
   ["t2108", "T2108", "% > 40MA", "t2108", 1, true],
   ["nh", "New highs", "52-wk", "up", 0, true], ["nl", "New lows", "52-wk", "down"], ["pct_near", "Near high", "% within 3%", "none", 1],
+  ["dn_share", "$ in falling", "% of $ vol", "none", 0, true], ["dv_net", "Net $", "$B, rising − falling", "none", 0],
   ["universe", "Stocks", "universe", "none", 0, true],
 ];
 function shade(key, kind, v) {
