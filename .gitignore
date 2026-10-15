@@ -3,3 +3,4 @@ __pycache__/
 .venv/
 frames.pkl
 tools/ignition_study/cy_*.pkl
+tools/picks_context/*.pkl
