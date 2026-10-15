@@ -244,6 +244,16 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   +0.11R → the level alone adds little. Edge sits in fresh levels in good tape: after a thrust +0.30R all / +0.42R fresh vs base +0.20R;
   strong breadth fresh +0.36R vs base +0.22R; mixed fresh +0.07R vs base +0.17R; weak −0.01R (base −0.10R). Century marks ($50/$100/$200…)
   +0.01R vs smaller levels +0.18R (centuries act more like resistance). Level traded within 5 sessions 57% (closed above 42%); fresh 50% / 36%.
+- Group ignition study (Oct 14, 2026; `tools/ignition_study/`; 101 sub-themes, Jan 2025–Oct 2026, event = first day in 20, outcome =
+  group vs SPY). Refiners' run (Jun 18 low → +100% by Oct 13 vs SPY +4%) fired in order: crack spread +14% (20d) Jun 24 → group breadth
+  0% → 89% above 21 EMA by Jun 29 → RRG leading Jun 30 → dollar flow +0.43, RS-rank +45 pts/10d and 40-day base breakout Jul 6
+  (index +16% off the low) → rel 60-day high + confirmed tier Jul 8–9 (+23%). IGNITION = group index at 40-day high + 10-day dollar flow
+  > +0.25 + 80%+ of members above 21 EMA + RS-rank (20d rel return pct) up 30+ pts in 10 sessions: all groups 20d +2.9% vs base +1.4%
+  (median +1.3% vs +0.3%, t 1.9; 40d +5.0% vs +3.4%, win 57% vs 47%), both halves similar. In strong breadth (10-day ratio ≥ 1.5)
+  +4.0% (edge +2.6 pts, t 2.4); otherwise no edge (−0.25). Market money net in vs out (dn_share10) made no difference. Macro driver up
+  8%+ in 20d +5.5% (n 16) vs +3.6% (n 52) — small sample. Singles: dollar flow alone, RS jump alone, RRG leading alone ≈ base or worse;
+  base breakout +2.5%, rel 60d high +2.7%. Refiners IGNITION dates: May 12 2025 (+27% 40d), Aug 29 2025 (+11.5%), Feb 11 2026 (+20%),
+  May 4 2026 (−3%, false start), Jul 6 2026 (+37%), Sep 2 2026 (+9% 20d). Not built into the dashboard yet.
 - Record-volume "tells" study (Oct 12, 2026; 2,048 events Oct 2025–Sep 2026, no index/expiry days; 10-session return vs
   SPY, clipped ±50%; tells found on the first 60% by date, checked on the last 40%): all events −4.9% train / −7.7% test.
   Consistent AVOID tells (both halves): gap up 10%+ or up 20%+ (−15 to −18%), volume > 20× avg or > 2.2× old record,
