@@ -215,6 +215,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (live: vs last close via `LIVE_T`; official: vs 5 sessions ago from `s_hist`), hottest, top-10 ins/outs, climbers/slippers, best
   stocks (Leaders score, one per sub-theme), strongest anywhere (`lists.strongest`), new top-10 stocks (live) / RS jumpers (official).
   `dn_share` in breadth rows is in percent (`roDs` converts). Links (`data-go`) switch tabs.
+  Oct 15: schedule strip on top (`roSchedule`, `RO_SCHED`: official data ~12:15–1 AM, pre-market quotes ~6–9:30, morning chapter
+  ~8:50, live 9:30–4, post read-out 4:00, after-close chapter ~5:00; "Next:" line + last chapter). "What's driving the S&P 500" by
+  sub-theme in every card (`roContrib`): columns last close (`intraday.prev_contrib` from data/close_snapshot.csv, used when its date =
+  the official date) · pre-market (today's premarket.json via `pmRows`) · now / today's close (live), top 4 up / down in bp, plus a
+  one-line "leadership changed / still" read. Pre-market + Intraday "who's moving the index" cards: Group by Sector / Sub-theme chips
+  (`ID.grp`, `groupContrib`; stocks outside every sub-theme → "Other · <sector>"; `intraday.sub_of` from subthemes.csv covers the
+  index names not in the theme stock list; 245 of 503 S&P names have a sub-theme).
 - **The story** (Oct 15; `breadth/story.py`, `story_guide.md`, top of the Read-out tab `storyCard`): scenario tracker A "money keeps
   leaving" (latest share of $ volume in falling stocks ≥ 60%) / B "comes back" (≤ 40% after an outflow episode = 5-day avg ≥ 55% or 2+
   days ≥ 60% within 10 sessions) / W paused; Python `scenario()` and browser `storyState()` must stay identical (same for `baskets` /

@@ -78,7 +78,58 @@ def payload():
     return {"members": m, "r2k_weights": w, "r2k_asof": asof, "r2k_wdate": wdate,
             "r2k_stale": russell.STALE_DAYS, "r2k_old": russell.OLD_DAYS,
             "pulse": {k: v[1] for k, v in PULSE.items()}, "sector_etfs": SECTOR_ETFS,
-            "dup_classes": sorted(DUP_CLASSES), "volume_profile": VOLUME_PROFILE, "day_type": DAY_TYPE}
+            "dup_classes": sorted(DUP_CLASSES), "volume_profile": VOLUME_PROFILE, "day_type": DAY_TYPE,
+            "sub_of": sub_of(), "prev_contrib": prev_contrib(m)}
+
+
+def sub_of():
+    """ticker -> its sub-theme (data/subthemes.csv: one peer group per stock), for grouping index contribution."""
+    import csv
+    out = {}
+    try:
+        with open(config.SUBTHEMES_FILE) as f:
+            for r in csv.DictReader(f):
+                out.setdefault(r["ticker"], r["subtheme"])
+    except OSError:
+        pass
+    return out
+
+
+def prev_contrib(m):
+    """S&P 500 contribution by sub-theme for the session in data/close_snapshot.csv (Google closing prices saved at
+    ~4:25 PM ET by the Close snapshot workflow), so the Read-out can compare now / pre-market / yesterday's close.
+    Same math as the browser's indexMovers: weight = prior-close Google market cap, contribution = weight x change."""
+    try:
+        from . import story
+        rows, date = story.read_csv_rows((config.DATA_DIR / "close_snapshot.csv").read_text())
+    except Exception:
+        return None
+    so = sub_of()
+    caps, chgs, sect = {}, {}, {}
+    for t, sector in m.get("SPX", []):
+        if t in DUP_CLASSES:
+            continue
+        r = rows.get(t) or {}
+        p, c0, mc = r.get("price"), r.get("closeyest"), r.get("marketcap")
+        if not p or not c0 or not mc:
+            continue
+        ch = p / c0 - 1
+        if abs(ch) > 0.6:
+            continue
+        caps[t], chgs[t], sect[t] = mc / (1 + ch), ch, sector
+    tot = sum(caps.values())
+    if not tot:
+        return None
+    G = {}
+    for t, cap in caps.items():
+        k = so.get(t) or f"Other · {sect[t]}"
+        g = G.setdefault(k, {"bp": 0.0, "n": 0, "sum": 0.0, "top": []})
+        bp = cap / tot * chgs[t] * 1e4
+        g["bp"] += bp; g["n"] += 1; g["sum"] += chgs[t]; g["top"].append((abs(bp), t, round(bp, 1)))
+    subs = sorted(([k, round(g["bp"], 1), round(g["sum"] / g["n"], 4), [x[1] for x in sorted(g["top"], reverse=True)[:3]]]
+                   for k, g in G.items()), key=lambda x: -x[1])
+    ret = sum(caps[t] / tot * chgs[t] for t in caps)
+    return {"date": date, "ret": round(ret, 5), "subs": subs}
 
 
 def sheet_rows():

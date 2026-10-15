@@ -250,6 +250,9 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .rocard.now { border-color: var(--s1); } .rocard .rob { padding: 0 16px 14px; }
 .rocard .rob .ih { margin-top: 14px; } .rol { margin: 6px 0 0; padding-left: 18px; line-height: 1.55; } .rol li { margin: 2px 0; }
 .rogo { white-space: nowrap; font-size: 12.5px; }
+.rocols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-top: 6px; }
+.rocol { border: 1px solid var(--border, rgba(127,127,127,.25)); border-radius: 10px; padding: 8px 10px; }
+.rosched { flex-wrap: wrap; } .rosched details ul { margin: 4px 0; }
 .stcard { margin-bottom: 12px; } .stcols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
 @media (max-width: 760px) { .stcols { grid-template-columns: 1fr; } }
 .stcol { border: 1px solid var(--border, rgba(127,127,127,.25)); border-radius: 10px; padding: 10px 12px; opacity: .85; }
@@ -2542,7 +2545,7 @@ function volPace(mins) {
   for (let i = 1; i < P.length; i++) if (mins <= P[i][0]) { const [a, x] = P[i - 1], [b, y] = P[i]; return x + (y - x) * (mins - a) / (b - a); }
   return 1;
 }
-const ID = { idx: "^SPX", at: "at10", lu: "ours", ls: "move" };
+const ID = { idx: "^SPX", at: "at10", lu: "ours", ls: "move", grp: "sector" };
 let ROWS_OVERRIDE = null;   // Pre-market tab swaps in Yahoo pre-market rows while it renders the shared cards
 function liveRow(t) {
   const r = ROWS_OVERRIDE ? ROWS_OVERRIDE[t] : LIVE && LIVE.rows && LIVE.rows[t]; if (!r || r.price == null || !r.closeyest) return null;
@@ -2966,6 +2969,43 @@ function storyCard() {
     ${chap}
     <div class="note" style="padding:8px 0 0">The tracker updates with every price refresh: A when 60%+ of dollar volume is in falling stocks, B when it drops to 40% or less after a run of selling, "paused" in between. Baskets: the fifth of sub-themes that fell most / held up best vs SPY over the last 5 sessions (last close); "60-day leaders" = top fifth by Strength 10 sessions ago. Evidence from ${"Feb 2025–Oct 2026"}: small samples (9–18 episodes), context not a signal. Chapters are written by Claude from the dashboard's own numbers each morning and after the close.</div></section>`);
 }
+/* ---------- Read-out: who drove the S&P 500, by sub-theme, across periods; and when each update lands ---------- */
+function roContrib(phase) {
+  const T = DATA.themes, I = DATA.intraday || {}, pc = pcI, cols = [];
+  const pick = (list) => { const up = list.filter(x => x.bp > 0.05).slice(0, 4), dn = list.filter(x => x.bp < -0.05).slice(-4).reverse(); return { up, dn }; };
+  const P = I.prev_contrib;
+  if (P && P.subs && P.date === T.date) cols.push({ lab: `Last close · ${shortDate(P.date)}`, ret: P.ret, ...pick(P.subs.map(([g, bp, avg, top]) => ({ sector: g, bp, avg, top: top.map(t => ({ t })) }))) });
+  if (PM && PM.date === etToday()) { ROWS_OVERRIDE = pmRows(); try { const M = indexMovers("^SPX"); if (M.rows.length) cols.push({ lab: `Pre-market · ${(PM.asof || "").slice(11, 16)} ET`, ret: M.ret, ...pick(groupContrib(M.rows)) }); } finally { ROWS_OVERRIDE = null; } }
+  if (liveActive() && LIVE && LIVE.rows) { const M = indexMovers("^SPX"); if (M.rows.length) cols.push({ lab: nyClock().open ? `Now · ${nyClock().label}` : "Today's close (Google)", ret: M.ret, ...pick(groupContrib(M.rows)) }); }
+  if (!cols.length) return "";
+  const li = (x) => `<li><b>${roNm(x.sector)}</b> <span class="${clsI(x.bp)}">${x.bp > 0 ? "+" : ""}${x.bp.toFixed(1)} bp</span> <small class="meta">${pc(x.avg, 1)}${x.top && x.top.length ? " · " + x.top.slice(0, 3).map(r => r.t).join(", ") : ""}</small></li>`;
+  const col = (c) => `<div class="rocol"><div class="kicker" style="margin:0">${c.lab} · S&P <b class="${clsI(c.ret)}">${pc(c.ret)}</b></div>
+    <small class="meta">Pushing up</small><ul class="rol">${c.up.map(li).join("") || "<li class='meta'>–</li>"}</ul>
+    <small class="meta">Pushing down</small><ul class="rol">${c.dn.map(li).join("") || "<li class='meta'>–</li>"}</ul></div>`;
+  const a = cols[0], z = cols[cols.length - 1];
+  let shift = "";
+  if (cols.length > 1) { const lead = (c) => c.up[0] && c.up[0].sector, drag = (c) => c.dn[0] && c.dn[0].sector;
+    shift = `<p class="meta" style="margin:6px 0 0">${lead(a) === lead(z) ? `${roNm(lead(z))} is still doing the most lifting` : `Leadership changed: ${roNm(lead(a) || "–")} led ${a.lab.split(" · ")[0].toLowerCase()}, now ${roNm(lead(z) || "–")}`}; ${drag(a) === drag(z) ? `${roNm(drag(z))} is still the biggest drag.` : `biggest drag went from ${roNm(drag(a) || "–")} to ${roNm(drag(z) || "–")}.`}</p>`; }
+  return `<h3 class="ih">What's driving the S&P 500 <small class="meta">by sub-theme, basis points of the index move (contribution = weight × change)</small></h3><div class="rocols">${cols.map(col).join("")}</div>${shift}`;
+}
+const RO_SCHED = [
+  [-555, "~12:15–1:00 AM", "Official numbers for the last session (Massive): Breadth tab, setups, top picks"],
+  [-210, "~6:00 AM–9:30", "Pre-market quotes, every 10 min"],
+  [-40, "~8:50 AM", "Morning story chapter (written 8:40)"],
+  [0, "9:30 AM–4:00 PM", "Live prices from your Google Sheet, every 3 min (~20 min behind)"],
+  [390, "4:00 PM", "Post-market read-out from Google's closing prices"],
+  [445, "~5:00 PM", "After-the-close story chapter (written 4:50)"],
+];
+function roSchedule() {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short" }).formatToParts(new Date()).map(x => [x.type, x.value]));
+  const wk = !["Sat", "Sun"].includes(p.weekday), m = nyClock().mins;
+  let nxt = wk ? RO_SCHED.find(e => e[0] > m) : null;
+  const when = nxt ? nxt[1] : p.weekday === "Fri" || !wk ? "Monday ~6:00 AM" : "tomorrow ~12:15 AM";
+  const what = nxt ? nxt[2] : !wk || p.weekday === "Fri" ? "Pre-market quotes (Friday's official numbers land Saturday ~12:15 AM)" : "Official numbers for today's session";
+  const ch = (STORYJ && STORYJ.chapters) || [], last = ch[ch.length - 1];
+  return $(`<div class="livebar rosched"><span class="dot on"></span><span><b>Next:</b> ${esc(what)} · <b>${esc(when)} ET</b>${last ? ` <span class="meta">· last chapter ${shortDate(last.date)} ${last.slot === "am" ? "morning" : "after the close"}</span>` : ""}</span>
+    <details class="kqsec" style="margin-left:auto"><summary>Daily schedule</summary><ul class="rol">${RO_SCHED.map(e => `<li${nxt === e ? ' style="font-weight:600"' : ""}><b>${e[1]}</b> ${esc(e[2])}</li>`).join("")}</ul></details></div>`);
+}
 function roCard(key, phase, title, when, verdict, body) {
   const open = UIRO.open[key] ?? (key === phase);
   return `<details class="card rocard ${key === phase ? "now" : ""}" data-k="${key}" ${open ? "open" : ""}><summary><div class="roh"><span class="rot">${title}${key === phase ? ' <span class="tg ppull">now</span>' : ""}</span><span class="meta">${when}</span></div>${verdict ? `<div class="rov">${verdict}</div>` : ""}</summary><div class="rob">${body}</div></details>`;
@@ -2987,6 +3027,7 @@ function renderReadout(app) {
   const preBody = (stale ? `<div class="r2kwarn">⚠ The official numbers still end at ${longDate(T.date)}; the overnight update hasn't landed yet.</div>` : "")
     + roSec("Market state <span class=\"meta\">official close " + shortDate(T.date) + "</span>", roMarket(false))
     + roSec("Overnight & the open", roOvernight())
+    + roContrib("pre")
     + (() => { ROWS_OVERRIDE = PM && PM.date === etToday() ? pmRows() : null; try { return roSec("Your plan today", roTrades("pre")); } finally { ROWS_OVERRIDE = null; } })()
     + roSec("Groups to watch", roGroups(false))
     + roBoard(false);
@@ -2996,7 +3037,7 @@ function renderReadout(app) {
     const m = roMoney(), MV = indexMovers("^SPX");
     liveV = `${MV.type} day · S&P <b class="${clsI(MV.actual ?? MV.ret)}">${pcI(MV.actual ?? MV.ret)}</b> · money ${m.state === "out" ? "leaving" : m.state === "in" ? "coming in" : "rotating"}${m.share != null ? ` (${Math.round(m.share * 100)}% in falling stocks)` : ""} · ${m.groups.filter(x => x.avg > 0).length}/${m.groups.length} sub-themes up${m.W && m.x >= m.W.k ? " · ⚡ thrust pace" : ""}`;
     liveBody = `<p class="meta" style="margin:6px 0">Google prices fetched ${LIVE.fetched.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} (up to ~20 min behind) · refreshes every 3 min.</p>`
-      + roSec("The market", roLiveMarket(m, !clk.open)) + roSec("Your trades", roTrades("live")) + roSec("Group signals (live)", roGroups(true)) + roSec("After the morning", roLate()) + roBoard(true);
+      + roSec("The market", roLiveMarket(m, !clk.open)) + roContrib("live") + roSec("Your trades", roTrades("live")) + roSec("Group signals (live)", roGroups(true)) + roSec("After the morning", roLate()) + roBoard(true);
   } else liveBody = `<p class="meta">Starts when the market opens at 9:30 ET (Google prices${LIVE_ERR ? `; couldn't load them: ${esc(LIVE_ERR)}` : ""}). The pre-market card covers the morning.</p>`;
   // --- post-market card ---
   let postV, postBody;
@@ -3012,7 +3053,7 @@ function renderReadout(app) {
       if (warm.length) tmr.push(`<b>Warming up with leaders (watch list):</b> ${warm.map(r => roNm(r.g)).join(", ")}.`); }
     tmr.push(`Tomorrow's picks and setups are rebuilt by the overnight update (Massive data lands ~12:15 AM ET) and appear in the pre-market card.`);
     postBody = `<p class="meta" style="margin:6px 0">Estimates from Google's closing prices; official numbers replace them overnight.</p>`
-      + roSec("How the day closed", roLiveMarket(m, true)) + roSec("Your trades at the close", roTrades("post")) + roSec("Group signals at the close", roGroups(true)) + roSec("For tomorrow", tmr) + roBoard(true);
+      + roSec("How the day closed", roLiveMarket(m, true)) + roContrib("post") + roSec("Your trades at the close", roTrades("post")) + roSec("Group signals at the close", roGroups(true)) + roSec("For tomorrow", tmr) + roBoard(true);
   } else {
     postV = `Last session (${shortDate(T.date)}, official): ${last.up4} up 4% / ${last.dn4} down · ${last.dn_share == null ? "" : Math.round(roDs(last.dn_share) * 100) + "% of dollars in falling stocks"} · ${esc(R.label || "")}`;
     postBody = `<p class="meta" style="margin:6px 0">${phase === "post" ? "Today's close appears once Google shows the new session." : "Today's post-market read-out arrives at the 4:00 PM close."} Below: the official recap of ${longDate(T.date)}.</p>`
@@ -3022,6 +3063,7 @@ function renderReadout(app) {
     live: roCard("live", phase, "📈 During the market", "9:30 AM–4:00 PM ET · live Google prices", liveV, liveBody),
     post: roCard("post", phase, "🌙 Post-market", "from the 4:00 PM close · Google closing prices", postV, postBody) };
   const order = [phase, ...["pre", "live", "post"].filter(k => k !== phase)];
+  app.append(roSchedule());
   app.append(storyCard());
   const wrap = $(`<div class="ro">${order.map(k => cards[k]).join("")}
     <div class="note" style="padding:8px 0 0">Each card opens on its own part of the day (Eastern time). Pre-market uses the official overnight numbers plus Yahoo pre-market quotes; during the market and at the close it uses your Google Sheet's live prices; the overnight update replaces the close estimates with official numbers. Links jump to the tab with the full detail.</div></div>`);
@@ -3191,10 +3233,20 @@ function indexMoversCard(o) {
     </div>
     <div class="isplit"><div><h3 class="ih">Pushing up</h3><div class="scroll"><table class="grid">${hdr}<tbody>${list(ups)}</tbody></table></div></div>
       <div><h3 class="ih">Pushing down</h3><div class="scroll"><table class="grid">${hdr}<tbody>${list(dns)}</tbody></table></div></div></div>
-    <h3 class="ih">By sector</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Sector</th><th>Weight</th><th>Avg change</th><th>Contribution<small>bp</small></th><th>Share up</th></tr></thead><tbody>
-      ${M.sectors.map(s => `<tr><td class="l">${esc(s.sector)}</td><td class="num">${(s.w * 100).toFixed(1)}%</td><td class="num ${cls(s.avg)}">${pc(s.avg)}</td><td class="num ${cls(s.bp)}">${s.bp > 0 ? "+" : ""}${s.bp.toFixed(1)}</td><td class="num">${Math.round(s.upShare * 100)}%</td></tr>`).join("")}</tbody></table></div>
+    <h3 class="ih">By ${ID.grp === "sub" ? "sub-theme" : "sector"}</h3><div class="ibtns grpchips"></div><div class="scroll"><table class="grid"><thead><tr><th class="l">${ID.grp === "sub" ? "Sub-theme" : "Sector"}</th><th>Weight</th><th>Avg change</th><th>Contribution<small>bp</small></th><th>Share up</th>${ID.grp === "sub" ? '<th class="l">Biggest contributors</th>' : ""}</tr></thead><tbody>
+      ${(ID.grp === "sub" ? groupContrib(M.rows) : M.sectors).map(s => `<tr><td class="l">${esc(s.sector)}</td><td class="num">${(s.w * 100).toFixed(1)}%</td><td class="num ${cls(s.avg)}">${pc(s.avg)}</td><td class="num ${cls(s.bp)}">${s.bp > 0 ? "+" : ""}${s.bp.toFixed(1)}</td><td class="num">${Math.round(s.upShare * 100)}%</td>${ID.grp === "sub" ? `<td class="l meta">${s.top.map(r => `${r.t} ${r.bp > 0 ? "+" : ""}${r.bp.toFixed(1)}`).join(", ")}</td>` : ""}</tr>`).join("")}</tbody></table></div>
     <div class="note" style="padding:8px 0 0">Contribution = weight at the prior close × today's change, so the column adds up to the index return. ${ID.idx === "^R2K" ? `Russell 2000: members and weights from your IWM holdings file of ${longDate(I.r2k_asof)} (float-adjusted), with each weight moved by the stock's price change since${I.r2k_wdate && I.r2k_wdate !== I.r2k_asof ? " (to " + longDate(I.r2k_wdate) + ")" : ""}, so the reconstruction tracks IWM closely; relative volume isn't fetched for these ~2,000 names to keep the live sheet light. ` : ""}S&P 500 / Nasdaq-100 weights are Google market caps (not float-adjusted; GOOG, FOX and NWS left out because Google repeats the whole company's cap on both classes), so the reconstructed return runs a little off the real index. Day type: Flat under ±0.02%; Broad when ${Math.round(I.day_type.broad_share * 100)}%+ of stocks move with the index and the top 10 make up at most ${Math.round(I.day_type.broad_top10 * 100)}% of the move; Narrow when the top 10 make up ${Math.round(I.day_type.narrow_top10 * 100)}%+ or cap weight beats equal weight by ${(I.day_type.narrow_gap * 100).toFixed(1)}+ pts. Starting guesses from your tracker, not tested rules.</div></div>`));
+  const gc = sec.querySelector(".grpchips"); if (gc) gc.append(chips("Group by", [["sector", "Sector"], ["sub", "Sub-theme"]], ID, "grp", rerenderPanel));
   return sec;
+}
+// Index rows (from indexMovers) grouped by our sub-themes; stocks outside every sub-theme go to "Not in a sub-theme".
+function groupContrib(rows) {
+  const M = stockMap(), G = {};
+  const SO = (DATA.intraday || {}).sub_of || {};
+  rows.forEach(r => { const k = (M[r.t] && M[r.t].sub) || SO[r.t] || "Other · " + (r.sector || "unknown");
+    const g = G[k] ||= { sector: k, w: 0, bp: 0, n: 0, up: 0, sum: 0, top: [] }; g.w += r.w; g.bp += r.bp; g.n++; g.sum += r.chg; if (r.chg > 0) g.up++; g.top.push(r); });
+  return Object.values(G).map(g => ({ ...g, avg: g.sum / g.n, upShare: g.up / g.n, top: g.top.sort((a, b) => Math.abs(b.bp) - Math.abs(a.bp)).slice(0, 3) }))
+    .sort((a, b) => b.bp - a.bp);
 }
 function themeHeatCard(kicker) {
   const T = DATA.themes, pc = pcI, cls = clsI;
