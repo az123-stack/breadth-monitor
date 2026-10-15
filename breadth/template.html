@@ -243,6 +243,13 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .xbtns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .xopens { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 .kqsec { margin-top: 6px; }
+.rocard { margin-bottom: 12px; padding: 0; } .rocard > summary { cursor: pointer; list-style: none; padding: 14px 16px; }
+.rocard > summary::-webkit-details-marker { display: none; }
+.rocard .roh { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+.rocard .rot { font-size: 17px; font-weight: 650; } .rocard .rov { margin-top: 4px; font-size: 14px; color: var(--text-secondary); }
+.rocard.now { border-color: var(--s1); } .rocard .rob { padding: 0 16px 14px; }
+.rocard .rob .ih { margin-top: 14px; } .rol { margin: 6px 0 0; padding-left: 18px; line-height: 1.55; } .rol li { margin: 2px 0; }
+.rogo { white-space: nowrap; font-size: 12.5px; }
 .kqsec summary { cursor: pointer; font-size: 12.5px; color: var(--text-secondary); padding: 2px 0; }
 .kqtab { width: 100%; border-collapse: collapse; font-size: 12px; margin: 4px 0 6px; }
 .kqtab th, .kqtab td { text-align: left; padding: 3px 6px; border-top: 1px solid var(--grid); vertical-align: top; }
@@ -509,8 +516,8 @@ const TONES = {
   neutral: { color: "var(--text-muted)", icon: '<path d="M4 12h16M4 7h10M4 17h13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' },
 };
 
-let TAB = "breadth";
-try { const h = location.hash.slice(1); if (["breadth", "premarket", "intraday", "trades", "themes", "rotation", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
+let TAB = "readout";
+try { const h = location.hash.slice(1); if (["readout", "breadth", "premarket", "intraday", "trades", "themes", "rotation", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
 
 function render() {
   const app = document.getElementById("app");
@@ -544,6 +551,7 @@ function render() {
     setTimeout(() => { const c = document.querySelector(".revcard"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); }, 50);
   });
   const tabs = $(`<nav class="tabs" role="tablist">
+    <button role="tab" data-tab="readout">Read-out</button>
     <button role="tab" data-tab="breadth">Breadth</button>
     <button role="tab" data-tab="premarket">Pre-market</button>
     <button role="tab" data-tab="intraday">Intraday</button>
@@ -567,6 +575,7 @@ function render() {
     else if (TAB === "intraday") renderIntraday(panel);
     else if (TAB === "premarket") renderPremarket(panel);
     else if (TAB === "rotation") renderRotation(panel);
+    else if (TAB === "readout") renderReadout(panel);
     else renderBreadth(panel);
     reapplySorts(panel);
   };
@@ -2028,7 +2037,7 @@ function rerenderPanel() {
   if (TAB === "themes") renderThemes(panel); else if (TAB === "stocks") renderStocks(panel);
   else if (TAB === "browse") renderBrowse(panel); else if (TAB === "setups") renderSetups(panel);
   else if (TAB === "trades") renderTrades(panel);
-  else if (TAB === "intraday") renderIntraday(panel); else if (TAB === "premarket") renderPremarket(panel); else if (TAB === "rotation") renderRotation(panel); else renderBreadth(panel);
+  else if (TAB === "intraday") renderIntraday(panel); else if (TAB === "premarket") renderPremarket(panel); else if (TAB === "rotation") renderRotation(panel); else if (TAB === "readout") renderReadout(panel); else renderBreadth(panel);
   reapplySorts(panel);
   window.scrollTo(0, y);
 }
@@ -2675,6 +2684,264 @@ function lateMoversCard(clk, pace) {
     <div class="note" style="padding:8px 0 0">The sheet freezes every stock's Google price and volume at ${label} ET (first recalculation after it), so this card shows who's moving after the opening rush settles. Google prices run up to ~20 min behind, so the "${label}" price can be from a bit earlier. In ADRs = the move since ${label} divided by the stock's average daily range (theme stocks only). Volume since vs normal = volume traded since ${label} ÷ what a normal day trades in that stretch (your tracker's volume curve × 50-day average). Pattern: red → green = was down at ${label}, now up on the day; extending = already up 1%+ at ${label} and still going; new mover = flat at ${label}. $5+ stocks with $5M+ average daily dollar volume. "pick" / "setup" = on today's Trade Setups.</div></div>`));
   return sec;
 }
+/* =================== Read-out tab: one card per part of the day (pre-market, during the market, post-market) ===================
+   Pre-market (4:00–9:30 ET): official close (Massive, loaded ~12:15 AM) + Yahoo pre-market snapshot.
+   During (9:30–16:00): Google Sheet live prices. Post-market (16:00 → next weekday 4:00): Google prices at the close;
+   once the midnight update lands, the post card switches to the official recap of that session.
+   Every card ends with the leaderboard: strongest sub-themes, best stocks and what changed. */
+const UIRO = { open: {}, phase: null };
+function roPhase() {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false })
+    .formatToParts(new Date()).map(x => [x.type, x.value]));
+  const m = (+p.hour % 24) * 60 + +p.minute, wk = !["Sat", "Sun"].includes(p.weekday);
+  return wk && m >= 240 && m < 570 ? "pre" : wk && m >= 570 && m < 960 ? "live" : "post";
+}
+const roNm = (s) => esc(String(s || "").replace(/^[A-Z &]+ - /, ""));
+const roGo = (tab, txt) => `<a href="#${tab}" class="rogo" data-go="${tab}">${txt} ›</a>`;
+const roList = (items) => `<ul class="rol">${items.filter(Boolean).map(x => `<li>${x}</li>`).join("")}</ul>`;
+const roSec = (title, items, link) => { const it = (items || []).filter(Boolean); return it.length ? `<h3 class="ih">${title}${link ? ` <small class="meta">${link}</small>` : ""}</h3>${roList(it)}` : ""; };
+const roPts = (v) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(2)} pts`;
+const roB = (v) => `${v >= 0 ? "+" : "−"}$${Math.abs(v / 1e9).toFixed(0)}B`;
+const roDs = (v) => v == null ? null : v > 1 ? v / 100 : v;   // breadth.csv stores dn_share in percent
+const roGrade = (r, act) => { const l = r.lead && r.lead.ok; return l && act ? "A" : l || act ? "B" : "C"; };
+
+// --- official market state (last close) ---
+function roMarket(short) {
+  const T = DATA.themes, R = DATA.regime || {}, last = DATA.rows[DATA.rows.length - 1], P = T.playbook || {}, pc = pcI;
+  const W = T.thrust_watch || {}, ev = (DATA.events || []);
+  const out = [];
+  out.push(`<b>Regime: ${esc(R.label || "–")}.</b> ${esc(R.advice || "")}`);
+  out.push(`<b>Breadth:</b> ${last.up4} stocks up 4%+ vs ${last.dn4} down · 5-day ratio ${last.ratio5} · 10-day ${last.ratio10} · T2108 ${Math.round(last.t2108)}% · new highs ${last.nh ?? "–"} vs lows ${last.nl ?? "–"}.`);
+  if (last.dn_share != null) { const s = roDs(last.dn_share), st = s >= 0.6 ? "money left the market" : s <= 0.4 ? "money came into the market" : "money rotated (no clear side)";
+    out.push(`<b>Money:</b> ${Math.round(s * 100)}% of dollar volume was in falling stocks: ${st}${last.dv_net != null ? ` (net ${last.dv_net >= 0 ? "+" : "−"}$${Math.abs(last.dv_net).toFixed(0)}B` + (last.dv_net5 != null ? `, 5 sessions ${last.dv_net5 >= 0 ? "+" : "−"}$${Math.abs(last.dv_net5).toFixed(0)}B)` : ")") : ""}. 10-day average ${Math.round((roDs(last.dn_share10) ?? s) * 100)}%.`); }
+  const th = ev.filter(e => (e.kind === "thrust" || e.kind === "followthrough") && e.tier === "major").pop();
+  const inWin = P.state === "thrust";
+  out.push(inWin && th ? `<b>⚡ Post-thrust window</b> (${esc(th.label)} on ${shortDate(th.date)}): the best time to press long setups.`
+    : W.setup && W.setup.met ? `<b>Thrust setup: ✓ washed out</b> in the last 10 sessions, so a big up day would count as a breadth thrust. Watch the thrust gauge during the day.`
+    : `<b>No thrust setup:</b> no washout in the last 10 sessions; a big up day would be strong but not an official thrust.`);
+  if (!short) {
+    const f = (P.rows || []).filter(r => r.verdict === "Focus").map(r => esc(r.name)), a = (P.rows || []).filter(r => r.verdict === "Avoid").map(r => esc(r.name));
+    out.push(`<b>Playbook (${esc(P.label || "")}):</b> focus on ${f.join(", ") || "nothing (no setup has a proven edge here)"}${a.length ? `; avoid ${a.join(", ")}` : ""}. ${roGo("trades", "Trade Setups")}`);
+    const recent = ev.filter(e => e.date >= DATA.rows[Math.max(0, DATA.rows.length - 3)].date && !(e.kind === "thrust" || e.kind === "followthrough"));
+    if (recent.length) out.push(`<b>Signals in the last 3 sessions:</b> ${recent.map(e => `${esc(e.label)} (${shortDate(e.date)})`).join(", ")}.`);
+    const RV = T.setup_review; if (RV && RV.flag) out.push(`<b>⚑ Review your trade setups:</b> ${RV.reasons.map(r => esc(r.text || r.reason || r.kind)).slice(0, 2).join("; ")}.`);
+  }
+  return out;
+}
+
+// --- group signals: ignitions, Day 1 follow-through, warming up ---
+function roGroups(live) {
+  const X = ((DATA.themes || {}).rotation || {}).ignition; if (!X) return [];
+  let rows = X.rows || [], d1 = (X.day1 || {}).rows || [], near = [];
+  if (live) { const G = ignLiveGroups(X); if (G) { rows = liveIgnition(X, G) || rows; const d = liveDay1(X, G); if (d) { d1 = d; near = d.near || []; } } }
+  const pc = pcI, out = [], FT = ((X.day1 || {}).rules || {}).ft || 3;
+  const ign = rows.filter(r => r.status === "ignition");
+  ign.forEach(r => out.push(`🔥 <b>${roNm(r.g)}</b> ${r.ago === 0 ? (live ? (nyClock().open ? "is igniting today" : "ignited today (close estimate)") : "ignited at the close") : `ignited ${r.ago} session${r.ago > 1 ? "s" : ""} ago (${pc(r.since, 1)} vs SPY since)`} · <b>Grade ${roGrade(r, X.act)}</b>${r.lead && r.lead.ok ? " · ★ has leaders" : ""}${r.stocks && r.stocks.length ? ` · leaders ${r.stocks.slice(0, 3).map(s => s.t).join(", ")}` : ""}`));
+  d1.forEach(r => out.push(r.ago === 0 ? `🟢 <b>${roNm(r.g)}</b>: Day 1 ${live ? "today" : "at the close"} (${pc(r.r1, 1)} vs SPY on ${r.rv ? r.rv.toFixed(1) + "×" : "–"} volume). Watch the next ${FT} sessions.`
+    : r.d3 != null ? `${r.d3 > 0 ? "✓" : "✗"} <b>${roNm(r.g)}</b> Day 1 (${shortDate(r.date)}) ${r.d3 > 0 ? "held" : "faded"}: ${pc(r.d3, 1)} vs SPY after ${FT} sessions${r.d3 > 0 ? " — held Day 1s averaged +3.4% over the next 20 sessions" : ""}.`
+    : `⏳ <b>${roNm(r.g)}</b> Day 1 (${shortDate(r.date)}): session ${r.ago} of ${FT}, ${r.since > 0 ? "holding" : "slipping"} (${pc(r.since, 1)} vs SPY).`));
+  if (near.length) out.push(`Almost a Day 1: ${near.slice(0, 3).map(n => `<b>${roNm(n.g)}</b> ${pc(n.r1, 1)} (missing ${n.miss === "vol" ? "volume" : n.miss === "brk" ? "breakouts" : "the pullback rule"})`).join(", ")}.`);
+  const warm = rows.filter(r => r.status === "warming").slice(0, 5);
+  if (warm.length) out.push(`<b>Warming up:</b> ${warm.map(r => `${roNm(r.g)} ${r.n_met}/4${r.lead && r.lead.ok ? " ★" : ""}`).join(", ")}.`);
+  if (out.length) out.push(`<span class="meta">${X.act ? "✅ Act: breadth has been strong in the last 15 sessions." : "👀 Watch only: breadth hasn't been strong in the last 15 sessions."} ${roGo("rotation", "Group ignition card")}</span>`);
+  return out;
+}
+
+// --- your plan / trades (reads prices through liveRow, so it works on pre-market rows too) ---
+function roTrades(mode) {
+  const T = DATA.themes, PB = T.playbook || {}, X = T.trade_setups || {}, SB = T.scoreboard || {}, pc = pcI, out = [];
+  (PB.picks || []).forEach((c, i) => { const r = liveRow(c.t), px = r ? r.price : null;
+    let st = "";
+    if (c.trigger && px) { const d = px / c.trigger - 1; st = d >= 0 ? `<b class="up">through the trigger</b> $${(+c.trigger).toFixed(2)}${mode === "pre" ? " (pre-market; it counts once it trades there after the open)" : ""}` : `${pc(-d, 1)} below the trigger $${(+c.trigger).toFixed(2)}`; }
+    else if (c.entry_type === "open") st = mode === "pre" ? "plan: buy the open" : "bought at the open (plan)";
+    out.push(`<b>Pick #${i + 1} ${c.t}</b> · ${esc(c.setup_name)}${px ? ` · ${mode === "pre" ? "pre-market" : "now"} $${px.toFixed(2)} (${pc(r.chg, 1)})` : ""} · ${st}${mode === "pre" && c.plan ? `<br><small class="meta">Stop: ${esc(c.plan.stop)} · ${esc(c.plan.target)}</small>` : ""}`); });
+  if (!(PB.picks || []).length) out.push("No top picks today: no setup is actionable in this state.");
+  const trig = [];
+  (X.setups || []).forEach(S => (S.top || []).forEach(t => { const row = (X.rows || {})[t], pv = S.key === "kq" ? row && row.kq_pivot : S.key === "vcp" ? row && row.vcp_pivot : null, r = liveRow(t);
+    if (pv && r && r.price >= pv && !(PB.picks || []).some(c => c.t === t)) trig.push(`${t} (${esc(S.name)})`); }));
+  if (trig.length) out.push(`<b>Setups through their pivot ${mode === "pre" ? "pre-market" : "now"}:</b> ${trig.join(", ")}.`);
+  (SB.open || []).filter(o => o.status === "open" && o.entry).forEach(o => { const r = liveRow(o.t); if (!r) return;
+    const stop = o.setup === "vcp" && o.vcp_stop ? o.vcp_stop : o.entry * (1 - (o.stop_pct || 0)), g = r.price / o.entry - 1;
+    out.push(`<b>Open trade ${o.t}</b> (picked ${shortDate(o.date)}): ${pc(g, 1)} since entry · ${r.price <= stop ? `<b class="dn">at/below the stop ≈$${stop.toFixed(2)}</b>` : r.price <= stop * 1.01 ? `<b>within 1% of the stop ≈$${stop.toFixed(2)}</b>` : `stop ≈$${stop.toFixed(2)}`}`); });
+  out.push(`<span class="meta">${roGo(mode === "pre" ? "premarket" : mode === "live" ? "intraday" : "trades", mode === "pre" ? "Pre-market tab" : mode === "live" ? "Intraday tab" : "Trade Setups")}</span>`);
+  return out;
+}
+
+// --- live market (Google prices) ---
+function roMoney() {
+  const T = DATA.themes, W = T.thrust_watch || {}, M = stockMap(); let mU = 0, mD = 0, up = 0, dn = 0;
+  (W.tickers || []).forEach(t => { const r = liveRow(t); if (!r) return; if (r.price >= 3) { if (r.chg >= 0.04) up++; else if (r.chg <= -0.04) dn++; }
+    if (!r.volume) return; const x = r.price * r.volume; if (r.chg > 0) mU += x; else if (r.chg < 0) mD += x; });
+  const share = mU + mD ? mD / (mU + mD) : null, spy = liveRow("SPY");
+  const groups = (T.subthemes || []).map(g => { const mem = (g.members || []).map(t => ({ r: liveRow(t), s: M[t] })).filter(x => x.r && x.s && x.s.is_stock); if (mem.length < 3) return null;
+    let f = 0, sum = 0, u = 0; mem.forEach(({ r }) => { f += Math.sign(r.chg) * r.price * (r.volume || 0); sum += r.chg; if (r.chg > 0) u++; });
+    return { name: g.theme, avg: sum / mem.length, flow: f, up: u, n: mem.length }; }).filter(Boolean);
+  return { share, state: share == null ? "mixed" : share >= 0.6 ? "out" : share <= 0.4 ? "in" : "mixed", mU, mD, up4: up, dn4: dn, x: W.avg40 ? up / W.avg40 : null, W, groups, spy: spy ? spy.chg : null };
+}
+function roLiveMarket(m, closed) {
+  const pc = pcI, out = [], MV = indexMovers("^SPX");
+  const idx = [["SPY", "S&P 500"], ["QQQ", "Nasdaq-100"], ["IWM", "Russell 2000"], ["RSP", "equal weight"]].map(([k, l]) => { const r = liveRow(k); return r ? `${l} <b class="${clsI(r.chg)}">${pc(r.chg, 2)}</b>` : ""; }).filter(Boolean).join(" · ");
+  const drv = MV.rows.slice().sort((a, b) => Math.abs(b.bp) - Math.abs(a.bp)).slice(0, 4).map(r => `${r.t} ${pc(r.chg, 1)}`).join(", ");
+  out.push(`<b>Indexes${closed ? " at the close" : ""}:</b> ${idx}. <b>${MV.type}</b> day${MV.t10share != null ? ` (top 10 names = ${Math.round(Math.abs(MV.t10share) * 100)}% of the S&P move)` : ""}; biggest index movers ${drv}. ${roGo("intraday", "who's moving the index")}`);
+  if (m.share != null) out.push(`<b>Money: ${m.state === "out" ? "leaving the market" : m.state === "in" ? "coming into the market" : "rotating, not leaving"}</b> — ${Math.round(m.share * 100)}% of dollar volume in falling stocks (net ${roB(m.mU - m.mD)}). ${roGo("rotation", "money card")}`);
+  const g = m.groups.slice().sort((a, b) => b.flow - a.flow), ins = g.filter(x => x.avg > 0 && x.flow > 0).slice(0, 4), outs = g.filter(x => x.avg < 0 && x.flow < 0).slice(-4).reverse();
+  if (ins.length) out.push(`<b>${m.state === "out" ? "Holding up best" : "Going into"}:</b> ${ins.map(x => `${roNm(x.name)} ${pc(x.avg, 1)}`).join(", ")}.`);
+  if (outs.length) out.push(`<b>Leaving:</b> ${outs.map(x => `${roNm(x.name)} ${pc(x.avg, 1)}`).join(", ")}. ${m.groups.filter(x => x.avg > 0).length} of ${m.groups.length} sub-themes up.`);
+  const W = m.W;
+  if (W && W.avg40) out.push(`<b>Thrust gauge:</b> ${m.up4} up 4%+ vs ${m.dn4} down on the live list, ${m.x.toFixed(1)}× normal${m.x >= W.k ? " — <b>⚡ thrust pace</b>" : m.x >= W.k_close ? " — <b>getting close</b>" : ""} (thrust pace ${W.pace}).${W.setup && W.setup.met ? " Breadth was washed out recently, so a thrust would count." : ""}${!closed && nyClock().mins < 330 ? " Judge it near the close." : ""}`);
+  const haven = [["TLT", "bonds"], ["GLD", "gold"], ["UUP", "dollar"], ["^VIX", "VIX"]].map(([k, l]) => { const r = liveRow(k); return r ? `${l} ${pc(r.chg, 1)}` : ""; }).filter(Boolean).join(", ");
+  if (haven) out.push(`<b>Havens:</b> ${haven}.`);
+  return out;
+}
+function roLate() {
+  const at = LIVE && LIVE.anchors ? (LIVE.anchors.at11 ? "at11" : LIVE.anchors.at10 ? "at10" : null) : null; if (!at) return [];
+  const label = at === "at11" ? "11:00" : "10:00", pc = pcI, L = lateMovers(at, false);
+  const liquid = (x) => x.avg ? x.avg * x.r.price >= 5e6 : false;
+  const bids = L.rows.filter(x => liquid(x) && x.since >= 0.01 && x.rel > 0).sort((a, b) => b.since - a.since).slice(0, 6);
+  const asks = L.rows.filter(x => liquid(x) && x.since <= -0.01 && x.rel < 0).sort((a, b) => a.since - b.since).slice(0, 4);
+  const out = [];
+  if (bids.length) out.push(`<b>Catching a bid since ${label}:</b> ${bids.map(x => `${x.t} ${pc(x.since, 1)}`).join(", ")}.`);
+  if (asks.length) out.push(`<b>Losing it since ${label}:</b> ${asks.map(x => `${x.t} ${pc(x.since, 1)}`).join(", ")}.`);
+  if (out.length) out.push(`<span class="meta">${roGo("intraday", "second-half movers")}</span>`);
+  return out;
+}
+
+// --- pre-market snapshot (Yahoo) ---
+function roOvernight() {
+  if (!PM) return [PM_ERR ? `No pre-market snapshot yet (${esc(PM_ERR)}).` : "Loading pre-market quotes…"];
+  if (PM.date !== etToday()) return [`No pre-market snapshot for today yet (last one ${longDate(PM.date)} ${(PM.asof || "").slice(11, 16)} ET). The first lands around 6 AM ET on trading days.`];
+  const T = DATA.themes, I = DATA.intraday || {}, pc = pcI, F = PM.futures || {}, out = [];
+  const fc = (k) => { const f = F[k]; return f && f[0] != null && f[1] ? f[0] / f[1] - 1 : null; };
+  ROWS_OVERRIDE = pmRows();
+  try {
+    const fut = [["ES=F", "S&P"], ["NQ=F", "Nasdaq"], ["RTY=F", "Russell"]].map(([k, l]) => fc(k) == null ? "" : `${l} <b class="${clsI(fc(k))}">${pc(fc(k))}</b>`).filter(Boolean).join(" · ");
+    const tnx = F["^TNX"], bp = tnx && tnx[1] ? Math.round((tnx[0] - tnx[1]) * 100) : null;
+    const mac = [["CL=F", "oil"], ["GC=F", "gold"], ["DX-Y.NYB", "dollar"], ["BTC-USD", "bitcoin"]].map(([k, l]) => fc(k) == null ? "" : `${l} ${pc(fc(k), 1)}`).filter(Boolean);
+    if (bp != null) mac.splice(1, 0, `10-yr yield ${bp > 0 ? "+" : ""}${bp} bp`);
+    out.push(`<b>Futures:</b> ${fut || "–"}. ${mac.join(", ")}.`);
+    const MV = indexMovers("^SPX");
+    if (MV.rows.length) out.push(`<b>S&P indicated ${pc(MV.ret)}</b> (equal weight ${pc(MV.eq)}): ${MV.rows.slice().sort((a, b) => Math.abs(b.bp) - Math.abs(a.bp)).slice(0, 4).map(r => `${r.t} ${pc(r.chg, 1)}`).join(", ")} doing the most.`);
+    const st = (T.stocks || []).filter(s => s.is_stock).map(s => ({ s, r: liveRow(s.t) })).filter(x => x.r);
+    const real = (x) => (x.r.bars || 0) >= 6;
+    const up = st.filter(x => x.r.chg > 0.001).length, dn = st.filter(x => x.r.chg < -0.001).length;
+    out.push(`<b>Gaps:</b> ${up} of your ${st.length} theme stocks indicated up, ${dn} down; ${st.filter(x => x.r.chg >= 0.04 && real(x)).length} gapping up 4%+ and ${st.filter(x => x.r.chg <= -0.04 && real(x)).length} down 4%+ with steady trading.`);
+    const heat = (T.subthemes || []).map(g => { const ch = (g.members || []).map(t => liveRow(t)).filter(Boolean).map(r => r.chg); return { name: g.theme, n: ch.length, avg: ch.length ? ch.reduce((a, b) => a + b, 0) / ch.length : null }; })
+      .filter(g => g.n >= 3).sort((a, b) => b.avg - a.avg);
+    if (heat.length) out.push(`<b>Gapping into</b> ${heat.slice(0, 3).map(g => `${roNm(g.name)} ${pc(g.avg, 1)}`).join(", ")}; <b>out of</b> ${heat.slice(-3).reverse().map(g => `${roNm(g.name)} ${pc(g.avg, 1)}`).join(", ")}.`);
+    const seen = new Set(), pool = [];
+    st.forEach(x => { seen.add(x.s.t); pool.push({ t: x.s.t, r: x.r }); });
+    ["SPX", "NDX"].forEach(k => ((I.members || {})[k] || []).forEach(([t]) => { if (seen.has(t)) return; const r = liveRow(t); if (r) { seen.add(t); pool.push({ t, r }); } }));
+    const eps = pool.filter(x => x.r.price >= 5 && x.r.chg >= 0.08 && real(x)).sort((a, b) => b.r.chg - a.r.chg);
+    if (eps.length) out.push(`<b>Possible EPs (check the news):</b> ${eps.slice(0, 6).map(x => `${x.t} ${pc(x.r.chg, 0)}`).join(", ")}.`);
+    out.push(`<span class="meta">Yahoo snapshot ${(PM.asof || "").slice(11, 16)} ET, refreshed about every 10 min until the open. ${roGo("premarket", "Pre-market tab")}</span>`);
+  } finally { ROWS_OVERRIDE = null; }
+  return out;
+}
+
+// --- leaderboard: strongest sub-themes, best stocks, what changed ---
+function roBoard(live) {
+  const T0 = DATA.themes, pc = pcI, base = T0.subthemes || [];
+  const S = live && LIVE_T ? LIVE_T.subthemes : base;
+  const prev = {};
+  if (live && LIVE_T) base.forEach(r => { prev[r.theme] = r.s_rank; });
+  else base.map(r => [r.theme, (r.s_hist || [])[(r.s_hist || []).length - 6]]).filter(x => x[1] != null).sort((a, b) => b[1] - a[1]).forEach(([g], i) => { prev[g] = i + 1; });
+  const since = live && LIVE_T ? "vs the last close" : "vs 5 sessions ago";
+  const ranked = S.filter(r => r.strength != null && r.s_rank != null).slice().sort((a, b) => a.s_rank - b.s_rank);
+  const L = leadersJS(getT(), 400), top1 = {}; L.forEach(s => { if (s.sub && !top1[s.sub]) top1[s.sub] = s; });
+  const mv = (r) => prev[r.theme] != null ? prev[r.theme] - r.s_rank : null;
+  const arrow = (d) => d == null || d === 0 ? '<span class="meta">–</span>' : d > 0 ? `<span class="up">▲ ${d}</span>` : `<span class="dn">▼ ${-d}</span>`;
+  const tbl = `<div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Sub-theme</th><th>Strength</th><th>Rank move<small>${since}</small></th><th>${live && LIVE_T ? "Today" : "Last session"}</th><th>5 days<small>vs SPY</small></th><th>1 month<small>vs SPY</small></th><th class="l">Top stock<small>Leaders score</small></th></tr></thead><tbody>
+    ${ranked.slice(0, 8).map(r => { const s = top1[r.theme]; return `<tr><td class="num">${r.s_rank}</td><td class="l"><b>${roNm(r.theme)}</b></td><td class="num">${Math.round(r.strength)}</td><td class="num">${arrow(mv(r))}</td>
+      <td class="num ${clsI(r.today)}">${pc(r.today, 1)}</td><td class="num ${clsI(r.vs_d5)}">${pc(r.vs_d5, 1)}</td><td class="num ${clsI(r.vs_d30)}">${pc(r.vs_d30, 1)}</td><td class="l">${s ? `<b>${s.t}</b> <small class="meta">RS ${s.rsr}</small>` : "–"}</td></tr>`; }).join("")}</tbody></table></div>`;
+  const notes = [];
+  const hot = S.filter(r => r.n >= 3 && r.today != null).slice().sort((a, b) => b.today - a.today).slice(0, 3);
+  notes.push(`<b>Hottest ${live && LIVE_T ? "today" : "last session"}:</b> ${hot.map(r => `${roNm(r.theme)} ${pc(r.today, 1)}`).join(", ")}.${live && LIVE_T ? "" : ` <b>Best month vs SPY:</b> ${S.filter(r => r.vs_d30 != null).slice().sort((a, b) => b.vs_d30 - a.vs_d30).slice(0, 3).map(r => `${roNm(r.theme)} ${pc(r.vs_d30, 0)}`).join(", ")}.`}`);
+  const newIn = ranked.slice(0, 10).filter(r => prev[r.theme] != null && prev[r.theme] > 10), rk = Object.fromEntries(ranked.map(r => [r.theme, r.s_rank]));
+  const outTop = Object.entries(prev).filter(([g, p]) => p <= 10 && (rk[g] || 99) > 10).map(([g]) => g);
+  if (newIn.length || outTop.length) notes.push(`<b>Top 10 changes ${since}:</b> ${newIn.length ? `in: ${newIn.map(r => `${roNm(r.theme)} (#${r.s_rank}, was #${prev[r.theme]})`).join(", ")}` : ""}${newIn.length && outTop.length ? "; " : ""}${outTop.length ? `out: ${outTop.map(g => `${roNm(g)} (now #${rk[g] ?? "–"})`).join(", ")}` : ""}.`);
+  const lim = live && LIVE_T ? 5 : 10;
+  const up = ranked.filter(r => (mv(r) ?? 0) >= lim && r.s_rank <= 40).sort((a, b) => mv(b) - mv(a)).slice(0, 4);
+  const dn = ranked.filter(r => prev[r.theme] <= 15 && (mv(r) ?? 0) <= -Math.ceil(lim * 0.8)).sort((a, b) => mv(a) - mv(b)).slice(0, 4);
+  if (up.length) notes.push(`<b>Climbing fast:</b> ${up.map(r => `${roNm(r.theme)} ▲${mv(r)} to #${r.s_rank}`).join(", ")}.`);
+  if (dn.length) notes.push(`<b>Leaders slipping:</b> ${dn.map(r => `${roNm(r.theme)} ▼${-mv(r)} to #${r.s_rank}`).join(", ")}.`);
+  // stocks
+  const seenSub = new Set(), best = L.filter(s => { const k = s.sub || s.theme; if (seenSub.has(k)) return false; seenSub.add(k); return true; }).slice(0, 5), lr = (t) => { const r = live ? liveRow(t) : null; return r ? ` <span class="${clsI(r.chg)}">${pc(r.chg, 1)}</span>` : ""; };
+  notes.push(`<b>Best stocks (Leaders score, one per sub-theme):</b> ${best.map(s => `<b>${s.t}</b> <small class="meta">RS ${s.rsr} · ${roNm(s.sub || s.theme)}</small>${lr(s.t)}`).join(" · ")}.`);
+  const mk = ((T0.lists || {}).strongest || []).filter(s => !best.some(b => b.t === s.t)).slice(0, 3);
+  if (mk.length) notes.push(`<b>Strongest anywhere in the market:</b> ${mk.map(s => `<b>${s.t}</b> <small class="meta">RS ${s.rsr} · ${s.sub ? roNm(s.sub) : "no theme"}</small>${lr(s.t)}`).join(" · ")}.`);
+  if (live && LIVE_T) {
+    const was = new Set(leadersJS(DATA.themes, 10).map(s => s.t)), now = L.slice(0, 10).filter(s => !was.has(s.t));
+    if (now.length) notes.push(`<b>New in the top 10 stocks today:</b> ${now.map(s => s.t).join(", ")}.`);
+  } else {
+    const jump = (T0.stocks || []).filter(s => s.is_stock && s.rsr >= 85 && s.rsr5 != null && s.rsr5 >= 5 && s.rsr - s.rsr5 >= 15).sort((a, b) => (b.rsr - b.rsr5) - (a.rsr - a.rsr5)).slice(0, 5);
+    if (jump.length) notes.push(`<b>RS jumpers (5 sessions):</b> ${jump.map(s => `${s.t} ${s.rsr5}→${s.rsr}`).join(", ")}.`);
+  }
+  return `<h3 class="ih">Leaderboard <small class="meta">${live && LIVE_T ? "live from Google prices" : "official close " + shortDate(T0.date)} · ${roGo("themes", "Themes")} ${roGo("setups", "Leaders")}</small></h3>${tbl}${roList(notes)}`;
+}
+
+function roCard(key, phase, title, when, verdict, body) {
+  const open = UIRO.open[key] ?? (key === phase);
+  return `<details class="card rocard ${key === phase ? "now" : ""}" data-k="${key}" ${open ? "open" : ""}><summary><div class="roh"><span class="rot">${title}${key === phase ? ' <span class="tg ppull">now</span>' : ""}</span><span class="meta">${when}</span></div>${verdict ? `<div class="rov">${verdict}</div>` : ""}</summary><div class="rob">${body}</div></details>`;
+}
+function renderReadout(app) {
+  const T = DATA.themes, phase = roPhase();
+  if (UIRO.phase !== phase) { UIRO.open = {}; UIRO.phase = phase; }
+  if (!T) { app.append($('<div class="card empty">Theme data isn\'t available yet.</div>')); return; }
+  if (!PM && !PM_ERR && !PM_BUSY) fetchPM();
+  if (!LIVE && !LIVE_BUSY && !LIVE_ERR) fetchLive();
+  const R = DATA.regime || {}, P = T.playbook || {}, last = DATA.rows[DATA.rows.length - 1], clk = nyClock();
+  const live = liveActive() && LIVE && LIVE.rows && Object.values(LIVE.rows).some(r => r.closeyest != null);
+  // staleness: official data should be the previous weekday by 4 AM
+  const d = new Date(etToday() + "T12:00:00"); do { d.setDate(d.getDate() - 1); } while ([0, 6].includes(d.getDay()));
+  const prevWk = d.toISOString().slice(0, 10), stale = (phase !== "post" || clk.mins >= 0) && T.date < prevWk && phase === "pre";
+  // --- pre-market card ---
+  const F = (PM && PM.date === etToday() && PM.futures) || {}, es = F["ES=F"] && F["ES=F"][1] ? F["ES=F"][0] / F["ES=F"][1] - 1 : null;
+  const preV = `${esc(R.label || "")} · playbook: ${esc(P.label || "–")}${es != null ? ` · S&P futures <b class="${clsI(es)}">${pcI(es)}</b>` : ""} · last session ${last.dn_share == null ? "" : roDs(last.dn_share) >= 0.6 ? "money left" : roDs(last.dn_share) <= 0.4 ? "money came in" : "money rotated"}`;
+  const preBody = (stale ? `<div class="r2kwarn">⚠ The official numbers still end at ${longDate(T.date)}; the overnight update hasn't landed yet.</div>` : "")
+    + roSec("Market state <span class=\"meta\">official close " + shortDate(T.date) + "</span>", roMarket(false))
+    + roSec("Overnight & the open", roOvernight())
+    + (() => { ROWS_OVERRIDE = PM && PM.date === etToday() ? pmRows() : null; try { return roSec("Your plan today", roTrades("pre")); } finally { ROWS_OVERRIDE = null; } })()
+    + roSec("Groups to watch", roGroups(false))
+    + roBoard(false);
+  // --- during-the-market card ---
+  let liveV = "", liveBody;
+  if (live) {
+    const m = roMoney(), MV = indexMovers("^SPX");
+    liveV = `${MV.type} day · S&P <b class="${clsI(MV.actual ?? MV.ret)}">${pcI(MV.actual ?? MV.ret)}</b> · money ${m.state === "out" ? "leaving" : m.state === "in" ? "coming in" : "rotating"}${m.share != null ? ` (${Math.round(m.share * 100)}% in falling stocks)` : ""} · ${m.groups.filter(x => x.avg > 0).length}/${m.groups.length} sub-themes up${m.W && m.x >= m.W.k ? " · ⚡ thrust pace" : ""}`;
+    liveBody = `<p class="meta" style="margin:6px 0">Google prices fetched ${LIVE.fetched.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} (up to ~20 min behind) · refreshes every 3 min.</p>`
+      + roSec("The market", roLiveMarket(m, !clk.open)) + roSec("Your trades", roTrades("live")) + roSec("Group signals (live)", roGroups(true)) + roSec("After the morning", roLate()) + roBoard(true);
+  } else liveBody = `<p class="meta">Starts when the market opens at 9:30 ET (Google prices${LIVE_ERR ? `; couldn't load them: ${esc(LIVE_ERR)}` : ""}). The pre-market card covers the morning.</p>`;
+  // --- post-market card ---
+  let postV, postBody;
+  if (live && phase === "post") {
+    const m = roMoney(), MV = indexMovers("^SPX");
+    postV = `Closed: S&P <b class="${clsI(MV.actual ?? MV.ret)}">${pcI(MV.actual ?? MV.ret)}</b> · ${MV.type} · money ${m.state === "out" ? "left" : m.state === "in" ? "came in" : "rotated"}${m.share != null ? ` (${Math.round(m.share * 100)}%)` : ""} · ${m.W && m.x >= m.W.k ? "⚡ thrust-level day (estimate)" : `${m.up4} up 4%+ on the live list`}`;
+    const tmr = [];
+    const X = (T.rotation || {}).ignition;
+    if (X) { const G = ignLiveGroups(X), d1 = G ? liveDay1(X, G) || [] : []; d1.filter(r => r.ago < 3).forEach(r => tmr.push(`<b>${roNm(r.g)}</b>: Day-1 follow-through, session ${r.ago + 1} of 3 tomorrow (${pcI(r.since, 1)} vs SPY so far).`)); }
+    if (X) { const G = ignLiveGroups(X), rows = G ? liveIgnition(X, G) || [] : [];
+      const fire = rows.filter(r => r.status === "ignition" && r.ago === 0), warm = rows.filter(r => r.status === "warming" && r.lead && r.lead.ok).slice(0, 4);
+      if (fire.length) tmr.push(`<b>Fresh ignitions to trade through their leaders:</b> ${fire.map(r => `${roNm(r.g)} (Grade ${roGrade(r, X.act)}: ${(r.stocks || []).slice(0, 2).map(s => s.t).join(", ")})`).join("; ")}.`);
+      if (warm.length) tmr.push(`<b>Warming up with leaders (watch list):</b> ${warm.map(r => roNm(r.g)).join(", ")}.`); }
+    tmr.push(`Tomorrow's picks and setups are rebuilt by the overnight update (Massive data lands ~12:15 AM ET) and appear in the pre-market card.`);
+    postBody = `<p class="meta" style="margin:6px 0">Estimates from Google's closing prices; official numbers replace them overnight.</p>`
+      + roSec("How the day closed", roLiveMarket(m, true)) + roSec("Your trades at the close", roTrades("post")) + roSec("Group signals at the close", roGroups(true)) + roSec("For tomorrow", tmr) + roBoard(true);
+  } else {
+    postV = `Last session (${shortDate(T.date)}, official): ${last.up4} up 4% / ${last.dn4} down · ${last.dn_share == null ? "" : Math.round(roDs(last.dn_share) * 100) + "% of dollars in falling stocks"} · ${esc(R.label || "")}`;
+    postBody = `<p class="meta" style="margin:6px 0">${phase === "post" ? "Today's close appears once Google shows the new session." : "Today's post-market read-out arrives at the 4:00 PM close."} Below: the official recap of ${longDate(T.date)}.</p>`
+      + roSec("The session", roMarket(true)) + roSec("Group signals", roGroups(false)) + roBoard(false);
+  }
+  const cards = { pre: roCard("pre", phase, "☀️ Pre-market", "4:00–9:30 AM ET · official close + pre-market quotes", preV, preBody),
+    live: roCard("live", phase, "📈 During the market", "9:30 AM–4:00 PM ET · live Google prices", liveV, liveBody),
+    post: roCard("post", phase, "🌙 Post-market", "from the 4:00 PM close · Google closing prices", postV, postBody) };
+  const order = [phase, ...["pre", "live", "post"].filter(k => k !== phase)];
+  const wrap = $(`<div class="ro">${order.map(k => cards[k]).join("")}
+    <div class="note" style="padding:8px 0 0">Each card opens on its own part of the day (Eastern time). Pre-market uses the official overnight numbers plus Yahoo pre-market quotes; during the market and at the close it uses your Google Sheet's live prices; the overnight update replaces the close estimates with official numbers. Links jump to the tab with the full detail.</div></div>`);
+  wrap.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault();
+    const b = document.querySelector(`nav.tabs button[data-tab="${a.dataset.go}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
+  wrap.querySelectorAll("details.rocard").forEach(el => el.addEventListener("toggle", () => { UIRO.open[el.dataset.k] = el.open; }));
+  app.append(wrap);
+}
 /* =================== Pre-market tab (breadth/premarket.py -> docs/premarket.json) =================== */
 let PM = null, PM_ERR = null, PM_BUSY = false;
 async function fetchPM() {
@@ -2685,9 +2952,9 @@ async function fetchPM() {
     PM = { ...(await r.json()), fetched: new Date() }; PM_ERR = null;
   } catch (e) { PM_ERR = String(e.message || e); }
   PM_BUSY = false;
-  if (TAB === "premarket") rerenderPanel();
+  if (TAB === "premarket" || TAB === "readout") rerenderPanel();
 }
-setInterval(() => { if (document.visibilityState === "visible" && TAB === "premarket") fetchPM(); }, 2 * 60 * 1000);
+setInterval(() => { if (document.visibilityState === "visible" && (TAB === "premarket" || (TAB === "readout" && roPhase() === "pre"))) fetchPM(); }, 2 * 60 * 1000);
 
 // Yahoo pre-market rows in the same shape the live sheet rows have, so the shared Intraday cards work on them.
 function pmRows() {

@@ -194,7 +194,19 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   HH:MM, "Oct 13"-style dates, `data-v` overrides; first click = biggest / newest first, text A–Z). Choice kept in `AUTOSORT` keyed by
   section title + sub-heading + headers and re-applied by `reapplySorts` after every render/live refresh. Tables built with
   `sortable()` (data-driven sort) carry `data-own-sort` and are skipped. Tables with colspan rows aren't sorted.
-- `site.py` + `template.html` single self-contained page (tabs: Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
+- **Read-out tab** (Oct 14; default landing tab, `renderReadout`, `roPhase`): three `<details>` cards, the current one first and open
+  (open/closed choice kept in `UIRO` until the phase changes). Phases (ET): pre 4:00–9:30 weekdays, live 9:30–16:00, post 16:00 →
+  next weekday 4:00 (Adam: post-market read-out at the close from Google prices; official Massive data is used the next morning in
+  pre-market). Pre = official close (`roMarket`: regime, breadth, money, thrust setup, playbook Focus/Avoid, recent signals, review
+  flag) + Yahoo snapshot (`roOvernight`, via `pmRows`/`ROWS_OVERRIDE`) + plan (`roTrades("pre")`: picks vs trigger, setups through pivot,
+  open scoreboard trades vs stop) + groups (`roGroups`: ignitions with grade, Day-1 follow-through, warming). Live/post (Google,
+  `liveActive`) = `roLiveMarket` (indexes, day type, money share + top in/out sub-themes, thrust gauge, havens), trades, live groups
+  (`liveIgnition`/`liveDay1`, near-misses), `roLate` (since 10/11), and post adds "For tomorrow". Without a newer Google session the
+  post card shows the official recap of the last session. Every card ends with `roBoard`: top 8 sub-themes by Strength with rank move
+  (live: vs last close via `LIVE_T`; official: vs 5 sessions ago from `s_hist`), hottest, top-10 ins/outs, climbers/slippers, best
+  stocks (Leaders score, one per sub-theme), strongest anywhere (`lists.strongest`), new top-10 stocks (live) / RS jumpers (official).
+  `dn_share` in breadth rows is in percent (`roDs` converts). Links (`data-go`) switch tabs.
+- `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 127 peer groups (swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added)
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
