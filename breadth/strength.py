@@ -356,6 +356,7 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
         offh = t["off_high"].iloc[last][tk]
         sc = 0.6 * float(rl[tk]) + 0.4 * _LD.high_score(None if pd.isna(offh) else float(offh))
         sl.append(row(tk, last, {"score": round(sc, 1), "d60": _r(t["d60"].iloc[last][tk]),
+                                 "d5": _r(c.iloc[last][tk] / c.iloc[last - 5][tk] - 1),
                                  "d20": _r(c.iloc[last][tk] / c.iloc[last - 20][tk] - 1),
                                  "e50": _r(c.iloc[last][tk] / ema50.iloc[last][tk] - 1),
                                  "star": bool(nh.iloc[last][tk]) if nh is not None and not pd.isna(nh.iloc[last][tk]) else False}))
