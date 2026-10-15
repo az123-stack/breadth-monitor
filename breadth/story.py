@@ -238,6 +238,13 @@ def facts(slot):
             P(f"- Sub-themes up today: {sum(1 for v in sub_today.values() if v[0] > 0)} of {len(sub_today)}")
     # leaderboard
     subs = sorted([r for r in T.get("subthemes", []) if r.get("s_rank")], key=lambda r: r["s_rank"])
+    explain = []   # (group, reason) for the "why" research
+    if sub_today:
+        srt2 = sorted(sub_today.items(), key=lambda kv: kv[1][1])
+        explain += [(g, f"net $ inflow today {pct(v[0])}") for g, v in srt2[::-1][:3]] + [(g, f"net $ outflow today {pct(v[0])}") for g, v in srt2[:3]]
+    elif B:
+        explain += [(r["theme"], f"held up best over 5 sessions ({pct(r['vs_d5'])} vs SPY)") for r in B["held"][:3]]
+        explain += [(r["theme"], f"sold hardest over 5 sessions ({pct(r['vs_d5'])} vs SPY)") for r in B["sold"][:3]]
     P("\n## Leaderboard (official Strength)")
     for r in subs[:10]:
         h = r.get("s_hist") or []
@@ -293,6 +300,7 @@ def facts(slot):
                     g.append((sum(cs) / len(cs), grp["theme"]))
             g.sort()
             if g:
+                explain += [(n, f"gapping {pct(v)} pre-market") for v, n in g[::-1][:3]] + [(n, f"gapping {pct(v)} pre-market") for v, n in g[:3]]
                 P("- Gapping up most: " + ", ".join(f"{n} {pct(v)}" for v, n in g[::-1][:5]))
                 P("- Gapping down most: " + ", ".join(f"{n} {pct(v)}" for v, n in g[:5]))
             big = sorted(((R[t][0] / R[t][1] - 1, t) for t in R if R[t][0] and R[t][1] and (R[t][4] or 0) >= 6 and R[t][0] >= 5), reverse=True)
@@ -300,6 +308,27 @@ def facts(slot):
             P("- Biggest steady gappers down: " + ", ".join(f"{t} {pct(v, 0)}" for v, t in big[::-1][:8] if v <= -0.04))
         else:
             P(f"\n(No pre-market snapshot for {today} yet.)")
+    # groups whose moves the chapter should explain: the writer searches the news for each
+    for r in (X.get("rows", []) if X else []):
+        if r["status"] == "ignition" and r.get("ago", 9) <= 1:
+            explain.append((r["g"], "fresh ignition"))
+    for r in ((X.get("day1") or {}).get("rows", []) if X else []):
+        if r.get("ago", 9) <= 1:
+            explain.append((r["g"], "fresh Day 1"))
+    stocks_by = {}
+    for s_ in T.get("stocks", []):
+        if s_.get("is_stock") and s_.get("sub"):
+            stocks_by.setdefault(s_["sub"], []).append(s_)
+    seen, lines = set(), []
+    for g, why in explain:
+        if g in seen:
+            continue
+        seen.add(g)
+        top = sorted(stocks_by.get(g, []), key=lambda x: -(x.get("rsr") or 0))[:4]
+        lines.append(f"- {g} ({why}): biggest names {', '.join(x['t'] for x in top) or '–'}")
+    if lines:
+        P("\n## WHY research list: search the news for what is driving each of these (earnings, guidance, policy, macro, deals) and confirm with the price action above")
+        out.extend(lines[:12])
     # previous chapters
     try:
         S = json.loads(STORY.read_text())
