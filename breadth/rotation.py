@@ -360,4 +360,118 @@ def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub
             "more": [g for g in lead_now if g not in chosen and not any(g in v for v in also.values())], "avoid": [brief(g) for g in avoid],
             "turning": [{**brief(g), "days": int(len(F["cross"][g]) - 1 - np.flatnonzero(F["cross"][g].to_numpy())[-1])} for g in turning],
             "bt": ev, "spark_dates": [d.strftime("%Y-%m-%d") for d in dates[-60:]],
-            "flow": flow_safe(close, vol, sub_members, F, regimes, subs, stocks)}
+            "flow": flow_safe(close, vol, sub_members, F, regimes, subs, stocks),
+            "ignition": ignition_safe(close, sub_members, F, flow_frames(close, vol, sub_members, F), history, subs, stocks, in_setups, drives)}
+
+
+# ---------------------------------------------------------------------------
+# Group ignition (Oct 14, 2026 study, tools/ignition_study): the day several independent signs of money moving
+# into a sub-theme line up. IGNITION = group index at a 40-day high (base breakout) + 10-day dollar flow > +0.25
+# + 80%+ of members above their 21 EMA + 20-day relative-return rank up 30+ points in 10 sessions.
+# Across 101 sub-themes it beat the average group over the next 20 sessions (+2.9% vs +1.4%), but only in strong
+# breadth (10-day ratio >= 1.5: +4.0%); otherwise no edge. Evidence is recomputed every build.
+# ---------------------------------------------------------------------------
+IGN = {"hi": 40, "acc": 0.25, "br": 0.80, "drk": 0.30, "gap": 20, "recent": 5, "fwd": 20, "strong_ratio": 1.5, "driver_up": 0.08}
+IGN_LABEL = {"base": "Base breakout (40-day high)", "flow": "Net dollar flow > +0.25", "breadth": "80%+ above 21 EMA", "jump": "RS rank up 30+ pts in 10d"}
+
+
+def ignition_frames(close, members, F, FL):
+    I = F["idx"]
+    ema21 = close.ewm(span=21, adjust=False, min_periods=21).mean()
+    br = {}
+    for g in I.columns:
+        t = [x for x in members[g] if x in close.columns]
+        n = close[t].notna().sum(axis=1).replace(0, np.nan)
+        br[g] = (close[t] > ema21[t]).sum(axis=1) / n
+    br = pd.DataFrame(br)
+    rk = F["r20"].rank(axis=1, pct=True)
+    drk = rk - rk.shift(10)
+    C = {"base": I >= I.rolling(IGN["hi"]).max(), "flow": FL["acc"] > IGN["acc"], "breadth": br >= IGN["br"], "jump": drk >= IGN["drk"]}
+    ign = C["base"] & C["flow"] & C["breadth"] & C["jump"]
+    prior = ign.shift(1).astype(float).rolling(IGN["gap"], min_periods=1).max().fillna(0) > 0
+    events = ign & ~prior
+    thrust = C["breadth"] & (br.rolling(10).min() <= 0.2)
+    rrg = (FL["x"] > 100) & (FL["y"] > 100)
+    return {"C": C, "ign": ign, "events": events, "br": br, "drk": drk, "rk": rk, "thrust": thrust, "rrg": rrg}
+
+
+def ignition_build(close, members, F, FL, history, subs, stocks, in_setups, drives):
+    X = ignition_frames(close, members, F, FL)
+    rel, I, dates = F["rel"], F["idx"], F["rel"].index
+    ev, n = X["events"], len(dates)
+    fwd = rel.shift(-IGN["fwd"]) / rel - 1
+    h = history[history["complete"]] if history is not None and "complete" in history.columns else history
+    r10 = (h["ratio10"].reindex(dates).ffill() if h is not None and len(h) else pd.Series(np.nan, index=dates))
+    strong = (r10 >= IGN["strong_ratio"]).to_numpy()[:, None]
+    warm = 60
+
+    def stat(mask):
+        v = fwd.where(mask).iloc[warm:].stack().dropna()
+        return {"n": int(v.size), "avg": round(float(v.mean()), 4) if v.size else None,
+                "med": round(float(v.median()), 4) if v.size else None, "win": round(float((v > 0).mean()), 3) if v.size else None}
+    base = stat(pd.DataFrame(True, index=dates, columns=rel.columns))
+    bt = {"all": stat(ev), "strong": stat(ev & strong), "other": stat(ev & ~strong), "base": base, "fwd": IGN["fwd"],
+          "from": dates[warm].strftime("%Y-%m-%d")}
+    # recent ignitions across all groups, with how they did since
+    recent = []
+    for i, j in np.argwhere(ev.to_numpy()):
+        if i < n - 60:
+            continue
+        g = rel.columns[j]
+        recent.append({"g": g, "date": dates[i].strftime("%Y-%m-%d"), "ago": int(n - 1 - i),
+                       "since": round(float(rel[g].iloc[-1] / rel[g].iloc[i] - 1), 4), "idx_since": round(float(I[g].iloc[-1] / I[g].iloc[i] - 1), 4),
+                       "strong": bool(strong[i, 0])})
+    recent.sort(key=lambda r: r["ago"])
+
+    def drivers(g):
+        out = []
+        for m in drives.get(g, []):
+            d = m.get("d30")
+            if d is None:
+                continue
+            up = d > 0 if m.get("unit") == "pct" else d >= IGN["driver_up"]
+            out.append({"label": m["label"], "d30": d, "unit": m.get("unit"), "up": bool(up)})
+        return out
+
+    def top_stocks(g):
+        mem = [stocks[t] for t in members.get(g, []) if t in stocks and stocks[t].get("is_stock")]
+        mem.sort(key=lambda s: -(s.get("rsr") or 0))
+        return [{"t": s["t"], "rsr": s.get("rsr"), "price": s.get("price"), "off_hi": s.get("off_hi"), "e21": s.get("e21"),
+                 "adr": s.get("adr"), "setups": in_setups.get(s["t"], [])} for s in mem[:4]]
+
+    rows = []
+    for g in rel.columns:
+        met = {k: bool(X["C"][k][g].iloc[-1]) for k in IGN_LABEL}
+        last_ev = np.flatnonzero(ev[g].to_numpy())
+        ago = int(n - 1 - last_ev[-1]) if len(last_ev) else None
+        thrust10 = bool(X["thrust"][g].iloc[-10:].any())
+        rrg = bool(X["rrg"][g].iloc[-1])
+        if ago is not None and ago < IGN["recent"]:
+            status = "ignition"
+        elif sum(met.values()) >= 3 or (thrust10 and rrg):
+            status = "warming"
+        else:
+            continue
+        r = subs.get(g, {})
+        i0 = n - 1 - ago if ago is not None and ago < IGN["recent"] else None
+        rows.append({"g": g, "sector": r.get("group", ""), "status": status, "ago": ago if status == "ignition" else None,
+                     "since": round(float(rel[g].iloc[-1] / rel[g].iloc[i0] - 1), 4) if i0 is not None else None,
+                     "met": met, "n_met": int(sum(met.values())), "thrust10": thrust10, "rrg": rrg,
+                     "breadth": round(float(X["br"][g].iloc[-1]), 2) if X["br"][g].iloc[-1] == X["br"][g].iloc[-1] else None,
+                     "flow": round(float(FL["acc"][g].iloc[-1]), 2) if FL["acc"][g].iloc[-1] == FL["acc"][g].iloc[-1] else None,
+                     "drk": round(float(X["drk"][g].iloc[-1]), 2) if X["drk"][g].iloc[-1] == X["drk"][g].iloc[-1] else None,
+                     "r20": round(float(F["r20"][g].iloc[-1]), 4), "strength": r.get("strength"), "s_rank": r.get("s_rank"),
+                     "drivers": drivers(g), "stocks": top_stocks(g)})
+    rows.sort(key=lambda r: (r["status"] != "ignition", r["ago"] if r["ago"] is not None else 99, -r["n_met"], -r["r20"]))
+    gate = bool(r10.iloc[-1] >= IGN["strong_ratio"]) if r10.iloc[-1] == r10.iloc[-1] else False
+    return {"rows": rows, "bt": bt, "recent": recent[:12], "ratio10": round(float(r10.iloc[-1]), 2) if r10.iloc[-1] == r10.iloc[-1] else None,
+            "act": gate, "rules": IGN, "labels": IGN_LABEL, "date": dates[-1].strftime("%Y-%m-%d")}
+
+
+def ignition_safe(*a):
+    try:
+        return ignition_build(*a)
+    except Exception as e:  # never lose the rest of the Rotation tab over this card
+        import logging
+        logging.getLogger("breadth").exception("ignition failed: %s", e)
+        return None

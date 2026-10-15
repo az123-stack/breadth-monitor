@@ -1157,9 +1157,41 @@ function moneyTodayCard() {
     <div class="note" style="padding:8px 0 0">Every share sold has a buyer, so "money leaving" really means sellers were in control and accepted lower prices; the whole-market line measures how lopsided that was. Net $ flow adds up each stock's dollar volume today, counted as positive when the stock is up and negative when it's down, so big, heavily traded names carry the most weight (that's where the real money is). Flow × avg day divides it by the group's normal daily dollar volume, which puts small and large groups on the same scale. Rel. volume = dollar volume so far vs the 50-day average, paced for the time of day; bold at 1.2× or more. "Trend into today" is the group's money-flow tier at the last close (Rotation tab → money flow card), so "leader being sold" flags groups that had been in inflow and are now being hit. Uses your theme and sub-theme stocks with Google's live prices (up to ~20 min behind). Click any header to sort.</div></div>`));
   return sec;
 }
+/* ---------- Group ignition (rotation.ignition_build; study in tools/ignition_study) ---------- */
+function ignitionCard() {
+  const X = ((DATA.themes || {}).rotation || {}).ignition;
+  if (!X) return $('<div></div>');
+  const B = X.bt || {}, L = X.labels || {}, pc = pcI, cls = clsI;
+  const pp = (o) => o && o.n ? `${pc(o.avg, 1)} avg, median ${pc(o.med, 1)}, ${Math.round(o.win * 100)}% beat SPY (n ${o.n})` : "–";
+  const gate = X.act
+    ? `<div class="r2kwarn" style="border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)">✅ <b>Act:</b> breadth is strong (10-day ratio ${X.ratio10} ≥ ${X.rules.strong_ratio}). This is when ignitions have paid: ${pp(B.strong)} over the next ${B.fwd} sessions.</div>`
+    : `<div class="r2kwarn">👀 <b>Watch only:</b> breadth isn't strong (10-day ratio ${X.ratio10 ?? "–"}, needs ${X.rules.strong_ratio}+). Ignitions outside strong breadth had no real edge (${pp(B.other)} vs ${pc(B.base && B.base.avg, 1)} for any group). Build the watch list now; act when breadth turns strong or a thrust prints.</div>`;
+  const chk = (r) => Object.keys(L).map(k => `<span class="ang ${r.met[k] ? "on" : ""}" title="${esc(L[k])}">${r.met[k] ? "✓" : "✗"} ${{ base: "Base", flow: "Flow", breadth: "Breadth", jump: "RS jump" }[k]}</span>`).join("");
+  const drv = (r) => (r.drivers || []).map(d => `<span class="${d.up ? "up" : "dn"}" title="${esc(d.label)} over the last month">${esc(d.label)} ${d.unit === "pct" ? (d.d30 * 100).toFixed(0) + " bp" : pc(d.d30, 0)}</span>`).join("<br>") || '<span class="meta">–</span>';
+  const stk = (r) => r.stocks.map(s => `<b>${s.t}</b> <small class="meta">RS ${s.rsr ?? "–"}${s.setups && s.setups.length ? " · " + esc(s.setups[0]) : ""}</small>`).join("<br>");
+  const row = (r) => `<tr><td class="l"><b>${esc(r.g)}</b><small class="meta" style="display:block">${esc(r.sector || "")}</small></td>
+    <td class="l">${r.status === "ignition" ? `<span class="tg ppull">🔥 Ignition</span><small class="meta" style="display:block">${r.ago === 0 ? "today" : r.ago + " session" + (r.ago > 1 ? "s" : "") + " ago"} · since ${pc(r.since, 1)} vs SPY</small>` : `<span class="tg pother">Warming up</span><small class="meta" style="display:block">${r.n_met} of 4${r.thrust10 ? " · breadth thrust" : ""}${r.rrg ? " · rotation leading" : ""}</small>`}</td>
+    <td class="l">${chk(r)}</td><td class="num">${r.breadth == null ? "–" : Math.round(r.breadth * 100) + "%"}</td><td class="num ${cls(r.flow)}">${r.flow == null ? "–" : (r.flow > 0 ? "+" : "") + r.flow.toFixed(2)}</td>
+    <td class="num ${cls(r.drk)}">${r.drk == null ? "–" : (r.drk > 0 ? "+" : "") + Math.round(r.drk * 100)}</td><td class="num ${cls(r.r20)}">${pc(r.r20, 1)}</td>
+    <td class="l">${drv(r)}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td><td class="l">${stk(r)}</td></tr>`;
+  const hdr = `<thead><tr><th class="l">Sub-theme</th><th class="l">Status</th><th class="l">The 4 checks<small>as of the last close</small></th><th>Breadth<small>% above 21 EMA</small></th><th>Dollar flow<small>10-day net</small></th><th>RS rank Δ<small>10 sessions, pts</small></th><th>vs SPY<small>20 sessions</small></th><th class="l">Macro driver<small>1 month</small></th><th>Strength</th><th class="l">Top stocks<small>by RS</small></th></tr></thead>`;
+  const fired = X.rows.filter(r => r.status === "ignition"), warm = X.rows.filter(r => r.status === "warming");
+  const rec = (X.recent || []).map(r => `<tr><td class="l" data-v="${Date.parse(r.date + "T12:00:00")}">${shortDate(r.date)}</td><td class="l">${esc(r.g)}</td><td class="num ${cls(r.since)}">${pc(r.since, 1)}</td><td class="num ${cls(r.idx_since)}">${pc(r.idx_since, 1)}</td><td class="l">${r.strong ? "strong" : '<span class="meta">not strong</span>'}</td></tr>`).join("");
+  return $(`<section class="icard card regcard"><div class="kicker">Group ignition · sub-themes lighting up · ${longDate(X.date)} close</div>
+    ${gate}
+    <p class="meta" style="margin:8px 0">An <b>ignition</b> is the day four signs of money moving into a sub-theme line up at once: the group breaks out of a 40-day base, net dollar flow over 10 days tops +0.25, 80%+ of its stocks are above their 21 EMA, and its relative-strength rank jumps 30+ points in 10 sessions. Since ${shortDate(B.from)} that happened ${B.all ? B.all.n : "–"} times across all sub-themes: next ${B.fwd} sessions vs SPY ${pp(B.all)}, against ${pc(B.base && B.base.avg, 1)} for any group on any day.</p>
+    <h3 class="ih">🔥 Ignition <small class="meta">fired in the last ${X.rules.recent} sessions</small></h3>
+    <div class="scroll"><table class="grid">${hdr}<tbody>${fired.map(row).join("") || '<tr><td class="l meta" colspan="10">None in the last few sessions.</td></tr>'}</tbody></table></div>
+    <h3 class="ih">Warming up <small class="meta">3 of the 4 checks, or a breadth thrust inside the group plus rotation-graph leading: the watch list</small></h3>
+    <div class="scroll"><table class="grid">${hdr}<tbody>${warm.map(row).join("") || '<tr><td class="l meta" colspan="10">Nothing warming up.</td></tr>'}</tbody></table></div>
+    <details class="kqsec" style="margin-top:8px"><summary><b>Recent ignitions and how they did</b> <span class="meta">last 60 sessions</span></summary>
+      <div class="scroll"><table class="grid"><thead><tr><th class="l">Date</th><th class="l">Sub-theme</th><th>Since, vs SPY</th><th>Since, group</th><th class="l">Breadth then</th></tr></thead><tbody>${rec || '<tr><td class="l meta" colspan="5">None.</td></tr>'}</tbody></table></div></details>
+    <div class="note" style="padding:8px 0 0">How to use it: put "warming up" groups on your watch list (Refiners showed a breadth thrust inside the group and moved into the rotation graph's leading quadrant ~1 week before its July ignition). Act on an ignition when breadth is strong, trading the group's leaders (top stocks by RS; check the Trade Setups tags for an entry). A day or two later, a 60-day relative high and the money-flow card's "confirmed" tier confirm it, at a higher price. Macro drivers (crack spread, oil, gold, copper…) rising 8%+ in a month looked like a plus (+5.5% vs +3.6%) but on only 16 cases. Backtest uses each group's equal-weight index vs SPY, no costs, ~2 years; false starts happen (Refiners May 2026: −3%).</div></section>`);
+}
 function renderRotation(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
   app.append(moneyTodayCard());
+  app.append(ignitionCard());
   app.append(moneyFlowCard());
   app.append(rotationIdeasCard());
   app.append(macroStrip(false));
