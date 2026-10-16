@@ -2451,34 +2451,39 @@ function leadersJS(T, n = 25) {
   out.sort((a, c) => c.score - a.score || c.rsr - a.rsr || (a.t < c.t ? -1 : 1));
   return out.slice(0, n);
 }
+function leadChips(T) {
+  const L = T.lists || {};
+  return [["top", "Top 10"], ["div", "1 per group"], ...(L.strongest ? [["mkt", "Any theme"]] : []), ...((L.mega || []).length ? [["mega", "Mega caps"]] : [])];
+}
 function marketLeadersCard(T) {
-  const U = UI.setups, L = (T.lists || {}).strongest || [];
-  const sec = $(`<section class="card tcard leaders"><div class="head"><h2>Leaders <span class="meta">· the strongest stocks in the whole market, in a theme or not, ${longDate(T.date)} close</span></h2></div></section>`);
+  const U = UI.setups, mega = U.lead === "mega", L = ((T.lists || {})[mega ? "mega" : "strongest"]) || [];
+  const sec = $(`<section class="card tcard leaders"><div class="head"><h2>Leaders <span class="meta">· ${mega ? "the strongest mega caps ($200B+), the biggest, most liquid stocks in the market" : "the strongest stocks in the whole market, in a theme or not"}, ${longDate(T.date)} close</span></h2></div></section>`);
   const bar = $('<div class="filters" style="padding:0 16px 8px"></div>');
-  bar.append(chips("Show", [["top", "Top 10"], ["div", "1 per group"], ["mkt", "Any theme"]], U, "lead", rerenderPanel));
+  bar.append(chips("Show", leadChips(T), U, "lead", rerenderPanel));
   sec.append(bar);
   const lv = liveActive() && LIVE && LIVE.rows;
-  const rows = L.slice(0, 25).map((r, i) => { const q = lv ? liveRow(r.t) : null, g = (v) => v == null ? null : q ? (1 + v) * (1 + q.chg) - 1 : v;
+  const rows = L.slice(0, mega ? 100 : 25).map((r, i) => { const q = lv ? liveRow(r.t) : null, g = (v) => v == null ? null : q ? (1 + v) * (1 + q.chg) - 1 : v;
     return { ...r, n: i + 1, today: q ? q.chg : r.chg, d5: g(r.d5), d20: g(r.d20), d60: g(r.d60), live: !!q }; });
   const cols = [{ k: "n", h: "#", asc: true }, { k: "t", h: "Ticker", l: true, asc: true }, { k: "score", h: "Score<small>0–100</small>" },
     { k: "today", h: `Today<small>${lv ? "live where priced" : "last close"}</small>` }, { k: "d5", h: "5 days" },
     { k: "rsr", h: "RS Rating" }, { k: "d20", h: "20 days" }, { k: "d60", h: "60 days" }, { k: "off_hi", h: "Off high<small>52-week</small>" },
-    { k: "e50", h: "vs 50 EMA<small>extension</small>", asc: true }, { k: "adr", h: "ADR %" }, { k: "dvol", h: "$ vol<small>50d, $M</small>" }];
+    { k: "e50", h: "vs 50 EMA<small>extension</small>", asc: true }, { k: "adr", h: "ADR %" }, { k: "dvol", h: "$ vol<small>50d, $M</small>" }, ...(mega ? [{ k: "cap", h: "Mkt cap<small>$B</small>" }] : [])];
   sec.append(listTable(rows, cols, r => `<td class="num">${r.n}</td><td class="l tname">${r.t}<small>${esc((r.name || "").slice(0, 26))} · ${r.sub ? esc(r.sub) : r.theme ? esc(r.theme) : '<i>not in a theme</i>'}</small></td>
     <td class="num"><b>${r.score.toFixed(1)}</b></td>${retCell(r.today, "today")}${retCell(r.d5, "d5")}<td class="num ${rsTint(r.rsr)}">${r.rsr}${r.star ? " ★" : ""}</td>${retCell(r.d20, "d15")}${retCell(r.d60, "d60")}
-    <td class="num">${pct(r.off_hi)}</td><td class="num">${pct(r.e50)}</td><td class="num">${r.adr?.toFixed(1) ?? "–"}</td><td class="num">${r.dvol == null ? "–" : r.dvol.toFixed(0)}</td>`, UI.setups.msort || (UI.setups.msort = ["n", 1])));
+    <td class="num">${pct(r.off_hi)}</td><td class="num">${pct(r.e50)}</td><td class="num">${r.adr?.toFixed(1) ?? "–"}</td><td class="num">${r.dvol == null ? "–" : r.dvol.toFixed(0)}</td>${mega ? `<td class="num">${r.cap == null ? "–" : r.cap.toLocaleString()}</td>` : ""}`, UI.setups.msort || (UI.setups.msort = ["n", 1])));
+  if (mega) { sec.append($(`<div class="note">Every US stock worth $200B+ (Google market cap at the last close, ${(T.lists.counts || {}).mega ?? L.length} today), scored the same way as "Any theme": 60% RS Rating + 40% closeness to the 52-week high, but with <b>no RS 90 cutoff</b>, so you see every giant ranked from strongest to weakest. Foreign stocks that only trade here as ADRs (e.g. TSMC) aren't in the dashboard's universe. A strength ranking, not a buy list: check "vs 50 EMA" for extension.</div>`)); return sec; }
   sec.append($(`<div class="note">Every US stock $10+ trading $20M+ a day with RS Rating 90+ (${(T.lists.counts || {}).strongest ?? L.length} today), scored 60% RS Rating + 40% closeness to the 52-week high — no theme weighting, so lone runners like a biotech on its own news show up here even when their group is weak. Showing the top 25. Names not in a theme don't get live prices or the Trade Setups lists.</div>`));
   return sec;
 }
 function leadersCard(T) {
-  if (UI.setups.lead === "mkt") return marketLeadersCard(T);
+  if (UI.setups.lead === "mkt" || UI.setups.lead === "mega") return marketLeadersCard(T);
   const U = UI.setups, all = leadersJS(T, 400), seen = new Set();
   const rows = (U.lead === "div" ? all.filter(r => { const g = r.sub || r.theme; if (seen.has(g)) return false; seen.add(g); return true; }) : all).slice(0, 10)
     .map((r, i) => ({ ...r, n: i + 1 }));
   const live = !!LIVE_T;
   const sec = $(`<section class="card tcard leaders"><div class="head"><h2>Leaders <span class="meta">· the 10 strongest stocks by the dashboard's own measures${live ? ", live" : ", " + longDate(T.date) + " close"}</span></h2></div></section>`);
   const bar = $('<div class="filters" style="padding:0 16px 8px"></div>');
-  bar.append(chips("Show", [["top", "Top 10"], ["div", "1 per group"], ...((T.lists || {}).strongest ? [["mkt", "Any theme"]] : [])], U, "lead", rerenderPanel));
+  bar.append(chips("Show", leadChips(T), U, "lead", rerenderPanel));
   sec.append(bar);
   const cols = [{ k: "n", h: "#", asc: true }, { k: "t", h: "Ticker", l: true, asc: true }, { k: "score", h: "Score<small>0–100</small>" },
     { k: "today", h: `Today<small>${live ? "live" : "last close"}</small>` }, { k: "d5", h: "5 days" }, { k: "d20", h: "20 days" }, { k: "d60", h: "60 days" },

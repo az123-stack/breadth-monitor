@@ -43,6 +43,7 @@ KEEP_TRADING_DAYS = 500    # ~2 years (the free plan reaches back ~2 years): 1-y
 MIN_PRICE = 3.0              # close must be at least this
 MIN_VOLUME = 100_000         # for 4% breakout/breakdown days
 MIN_AVG_VOLUME = 100_000     # 20-day avg volume, for T2108 and 25%/quarter etc.
+MEGA_CAP = 200e9             # Leaders "Mega caps" view: Google market cap from data/close_snapshot.csv
 
 # ---- Metric definitions ----------------------------------------------------
 PCT_MOVE = 0.04              # 4% breakout / breakdown

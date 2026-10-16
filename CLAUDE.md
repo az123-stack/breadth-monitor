@@ -98,6 +98,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   with vs without on past setup signals (actionable trading); t ≥ 2 → green outline "adds edge", t ≤ −2 → red. As of Oct 11 none ≥ 2.
 - Whole-market leaders (`lists.strongest`, Setups tab Leaders → "Any theme"): all US stocks $10+, $20M+/day, RS ≥ 90,
   60% RS + 40% closeness to high, no theme weighting (catches lone runners like MRNA).
+  "Mega caps" chip (Oct 15, `lists.mega`): every universe stock with Google market cap ≥ `config.MEGA_CAP` ($200B, from
+  `data/close_snapshot.csv` via `strength.mega_caps`), same score, no RS floor, all shown (~60), Mkt cap column. ADRs (TSM) not in universe.
 - `levels.py` all-time highs and old monthly peaks from Yahoo (free; Massive free plan only reaches ~2 years), cached in
   `data/levels.json`, fetched in the daily run for new/stale tickers (`config.LEVELS_ENABLED`; tests switch it off)
 - `kq.py` KQ breakout screen → `DATA.kq` (Basing / Extended / Not this setup or failing a rule); "⬇ KQ list" button exports it to TradingView

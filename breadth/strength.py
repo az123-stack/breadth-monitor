@@ -217,6 +217,16 @@ def strength_scores(inp):
 # ---------------------------------------------------------------------------
 # Everything v2 for the dashboard payload
 # ---------------------------------------------------------------------------
+def mega_caps():
+    """Google market caps (S&P 500 + Nasdaq-100 rows) from the close snapshot; {} if the file is missing."""
+    try:
+        from . import story
+        rows, _ = story.read_csv_rows((config.DATA_DIR / "close_snapshot.csv").read_text())
+    except Exception:
+        return {}
+    return {k: r["marketcap"] for k, r in rows.items() if r.get("marketcap")}
+
+
 def _r(v, nd=4):
     try:
         v = float(v)
@@ -362,6 +372,22 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
                                  "star": bool(nh.iloc[last][tk]) if nh is not None and not pd.isna(nh.iloc[last][tk]) else False}))
     sl.sort(key=lambda r: (-r["score"], -(r["d60"] or 0)))
 
+    # mega caps ($200B+ Google market cap from the close snapshot), same score, no RS floor
+    ml = []
+    caps = mega_caps()
+    for tk in c.columns:
+        cap = caps.get(tk.replace("-", ".")) or caps.get(tk)
+        if not cap or cap < config.MEGA_CAP or not bool(liquid.iloc[last].get(tk, False)) or pd.isna(rl.get(tk)):
+            continue
+        offh = t["off_high"].iloc[last][tk]
+        sc = 0.6 * float(rl[tk]) + 0.4 * _LD.high_score(None if pd.isna(offh) else float(offh))
+        ml.append(row(tk, last, {"score": round(sc, 1), "cap": round(cap / 1e9), "d60": _r(t["d60"].iloc[last][tk]),
+                                 "d5": _r(c.iloc[last][tk] / c.iloc[last - 5][tk] - 1),
+                                 "d20": _r(c.iloc[last][tk] / c.iloc[last - 20][tk] - 1),
+                                 "e50": _r(c.iloc[last][tk] / ema50.iloc[last][tk] - 1),
+                                 "star": bool(nh.iloc[last][tk]) if nh is not None and not pd.isna(nh.iloc[last][tk]) else False}))
+    ml.sort(key=lambda r: (-r["score"], -(r["d60"] or 0)))
+
     # historical results of each list by breadth regime (how these trades did)
     stats = None
     try:
@@ -422,5 +448,5 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
     px_dates = [d.strftime("%Y-%m-%d") for d in dates[-PAIR_DAYS:]]
     return {"hve": hve_out, "timeline_dates": tl_dates, "px_dates": px_dates, "tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt, "vcp": vcp_live,
             "rs_bp": [_r(x, 5) for x in (bps.get(last) if bps.get(last) is not None else [])],
-            "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60], "strongest": sl[:40],
-                      "counts": {"bursts": len(bl), "anticipation": len(al), "eps": len(el), "strongest": len(sl)}}}
+            "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60], "strongest": sl[:40], "mega": ml,
+                      "counts": {"bursts": len(bl), "anticipation": len(al), "eps": len(el), "strongest": len(sl), "mega": len(ml)}}}
