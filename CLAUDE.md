@@ -189,6 +189,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Two-step layout (Oct 14): Step 1 verdict from the whole-market share in falling stocks (≥ 60% "money is leaving", ≤ 40% "coming in",
   else "mixed: rotating") with net $ today and 5 sessions (`dollar.last` third field = net $B); Step 2 always shows both tables, "Money coming in"
   then "Money going out" (Adam prefers both visible); on leaving days the inflow table is labeled as relative strength, not new money.
+  Window chips (Oct 16): Today (live, above) / 3 / 5 / 15 / 30 / 90 days (`MT.win`, remembered in localStorage "moneyWin"; `moneyWindowBody`):
+  official closes from `rotation.mhist` (`money_hist`: per sub-theme and theme with 3+ stocks, last 90 sessions of net $ flow $M, total $
+  volume $M, equal-weight return bp; plus SPY bp; ETFs excluded) → change, vs SPY, stocks up over the window (stock d3/d5/d15/d30/d90), up
+  days, $ volume vs 50-day avg × N, net $ flow, flow × avg day, tier, read; whole-market share/net from breadth rows dv_up/dv_dn.
   Oct 14 read: out of AI infra (Neoclouds −11.6% on 2.4× volume, custom silicon, AI servers, optical, hyperscalers, memory, quantum,
   BTC miners, SMR) into large-cap pharma, defense primes, biotech, managed care, oil majors, utilities; 16 of 102 groups up.
 - Rotation tab (browser-only rendering): ideas card · pair chart (`pairCard`: two groups' equal-weight index, ratio and

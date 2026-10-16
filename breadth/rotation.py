@@ -253,6 +253,47 @@ def flow_build(close, vol, members, F, regimes, subs, stocks):
             "stock_group": {t: g for t, g in stock_tier.items() if t in (stocks or {})}}
 
 
+MHIST_DAYS = 90   # sessions of per-group money history for the Rotation tab's "Where's the money going" windows
+
+
+def money_hist(adjusted, groups, stocks, n=MHIST_DAYS):
+    """Per group and session: net dollar flow (dollar volume counted + when the stock rose, - when it fell, $M), total dollar
+    volume ($M) and the equal-weight average return (basis points), last `n` sessions, for the multi-day windows of the
+    "Where's the money going" card. groups = {"sub": {name: members}, "theme": {...}}; ETFs are left out like the live card."""
+    tick = sorted({t for lv in groups.values() for m in lv.values() for t in m if (stocks.get(t) or {}).get("is_stock")} | {"SPY"})
+    close, _, vol = _wide(adjusted, tick)
+    if "SPY" not in close.columns or len(close) < 60:
+        return None
+    ch = close / close.shift(1) - 1
+    dv = (close * vol).fillna(0.0)
+    sg = np.sign(ch).fillna(0.0)
+    ret = ch.clip(-0.6, 3.0)
+    k = min(n, len(close) - 1)
+    out = {"dates": [d.strftime("%Y-%m-%d") for d in close.index[-k:]],
+           "spy": [int(round(float(v) * 1e4)) for v in ch["SPY"].iloc[-k:].fillna(0.0)]}
+    for lv, gm in groups.items():
+        L = {}
+        for g, mem in gm.items():
+            t = [x for x in mem if x in close.columns and x != "SPY" and (stocks.get(x) or {}).get("is_stock")]
+            if len(t) < 3:
+                continue
+            f = (dv[t] * sg[t]).sum(axis=1).iloc[-k:] / 1e6
+            d = dv[t].sum(axis=1).iloc[-k:] / 1e6
+            r = ret[t].mean(axis=1, skipna=True).iloc[-k:].fillna(0.0) * 1e4
+            L[g] = [[int(round(float(v))) for v in f], [int(round(float(v))) for v in d], [int(round(float(v))) for v in r]]
+        out[lv] = L
+    return out
+
+
+def money_hist_safe(*a):
+    try:
+        return money_hist(*a)
+    except Exception as e:  # never lose the rotation tab over this panel
+        import logging
+        logging.getLogger("breadth").exception("money history failed: %s", e)
+        return None
+
+
 def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub_members=None):
     T = theme_data or {}
     subs = {r["theme"]: r for r in T.get("subthemes") or []}
@@ -361,6 +402,7 @@ def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub
             "turning": [{**brief(g), "days": int(len(F["cross"][g]) - 1 - np.flatnonzero(F["cross"][g].to_numpy())[-1])} for g in turning],
             "bt": ev, "spark_dates": [d.strftime("%Y-%m-%d") for d in dates[-60:]],
             "flow": flow_safe(close, vol, sub_members, F, regimes, subs, stocks),
+            "mhist": money_hist_safe(adjusted, {"sub": sub_members, "theme": {r["theme"]: r.get("members") or [] for r in T.get("themes") or []}}, stocks),
             "ignition": ignition_safe(close, sub_members, F, flow_frames(close, vol, sub_members, F), history, subs, stocks, in_setups, drives, vol)}
 
 

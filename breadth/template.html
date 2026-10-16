@@ -1095,14 +1095,18 @@ function moneyFlowCard() {
 /* ---------- Where's the money going (Rotation + Intraday): live group moves weighted by dollar volume ----------
    Net $ flow = Σ over a group's stocks of (dollar volume today × +1 if up, −1 if down): up-volume minus down-volume dollars.
    Trend into today = the group's money-flow tier at the last close (rotation.flow), so a leader being sold stands out. */
-const MT = { lvl: "sub" };
+const MT = { lvl: "sub", win: (() => { try { return localStorage.getItem("moneyWin") || "1"; } catch (e) { return "1"; } })() };
+const MT_WINS = [["1", "Today"], ["3", "3 days"], ["5", "5 days"], ["15", "15 days"], ["30", "30 days"], ["90", "90 days"]];
 const fmtB = (x) => x >= 1e9 ? "$" + (x / 1e9).toFixed(1) + "B" : "$" + Math.round(x / 1e6) + "M";
 const TIER_LABEL = { confirmed: "Confirmed inflow", steady: "Steady inflow", new: "New inflow", fading: "Fading", bouncing: "Bouncing", outflow: "Outflow" };
 function moneyTodayCard() {
   const T = DATA.themes, I = DATA.intraday || {}, pc = pcI, cls = clsI;
-  const sec = $(`<section class="icard card regcard"><div class="kicker">Where's the money going · today</div><div class="ibtns"></div><div class="ibody"></div></section>`);
+  const N = +MT.win || 1;
+  const sec = $(`<section class="icard card regcard"><div class="kicker">Where's the money going · ${N === 1 ? "today" : `last ${N} sessions`}</div><div class="ibtns"></div><div class="ibody"></div></section>`);
+  sec.querySelector(".ibtns").append(chips("Window", MT_WINS, MT, "win", () => { try { localStorage.setItem("moneyWin", MT.win); } catch (e) {} rerenderPanel(); }));
   sec.querySelector(".ibtns").append(chips("Level", [["sub", "Sub-themes"], ["theme", "Themes"]], MT, "lvl", rerenderPanel));
   const body = sec.querySelector(".ibody");
+  if (N > 1) { body.append(moneyWindowBody(N)); return sec; }
   if (!LIVE || !LIVE.rows || !Object.values(LIVE.rows).some(r => r.closeyest != null)) { body.append($('<p class="meta">Needs live prices from your Google Sheet; loading…</p>')); return sec; }
   const clk = nyClock(), pace = clk.mins <= 0 ? 1 : volPace(clk.mins);
   const sameDay = LIVE.spyDate && T.date && LIVE.spyDate === T.date;
@@ -1178,6 +1182,54 @@ function moneyTodayCard() {
     <h3 class="ih">Money going out <small class="meta">groups down on the day, biggest net dollar outflow first</small></h3>${tbl(outs.slice(0, 12))}
     <div class="note" style="padding:8px 0 0">Every share sold has a buyer, so "money leaving" really means sellers were in control and accepted lower prices; the whole-market line measures how lopsided that was. Net $ flow adds up each stock's dollar volume today, counted as positive when the stock is up and negative when it's down, so big, heavily traded names carry the most weight (that's where the real money is). Flow × avg day divides it by the group's normal daily dollar volume, which puts small and large groups on the same scale. Rel. volume = dollar volume so far vs the 50-day average, paced for the time of day; bold at 1.2× or more. "Trend into today" is the group's money-flow tier at the last close (Rotation tab → money flow card), so "leader being sold" flags groups that had been in inflow and are now being hit. Uses your theme and sub-theme stocks with Google's live prices (up to ~20 min behind). Click any header to sort.</div></div>`));
   return sec;
+}
+// Multi-day windows of "Where's the money going" (rotation.mhist): the same measures summed over the last N official sessions.
+function moneyWindowBody(N) {
+  const T = DATA.themes, H = (T.rotation || {}).mhist, pc = pcI, cls = clsI;
+  if (!H || !H.dates) return $('<p class="meta">The multi-day history appears after the next overnight update.</p>');
+  const L = H[MT.lvl === "theme" ? "theme" : "sub"] || {}, len = H.dates.length, n = Math.min(N, len), i0 = len - n;
+  const M = stockMap(), dk = { 3: "d3", 5: "d5", 15: "d15", 30: "d30", 90: "d90" }[N];
+  const comp = (a) => a.slice(i0).reduce((x, v) => x * (1 + v / 1e4), 1) - 1, sum = (a, k) => a.slice(k).reduce((x, v) => x + v, 0);
+  const spyN = comp(H.spy);
+  const tierOf = Object.fromEntries((((T.rotation || {}).flow || {}).rows || []).map(r => [r.g, r]));
+  const meta = Object.fromEntries(((MT.lvl === "theme" ? T.themes : T.subthemes) || []).map(g => [g.theme, g]));
+  const rows = Object.entries(L).map(([name, [f, d, r]]) => {
+    const g = meta[name] || {}, flow = sum(f, i0), dv = sum(d, i0), avg = comp(r);
+    const a50 = d.slice(-50), av = a50.length ? a50.reduce((x, v) => x + v, 0) / a50.length : 0;
+    const mem = (g.members || []).map(t => M[t]).filter(s => s && s.is_stock && s[dk] != null);
+    const tier = (tierOf[name] || {}).tier || null, inflowTier = ["confirmed", "steady", "new"].includes(tier);
+    const read = avg > 0 ? (flow > 0 ? (inflowTier ? "Being bought, trend intact" : "Being bought") : "Up on light money") : (flow < 0 ? (inflowTier ? "Leader being sold" : "Being sold") : "Down, money holding");
+    return { name, n: mem.length, avg, rel: avg - spyN, upS: mem.filter(s => s[dk] > 0).length, upD: r.slice(i0).filter(v => v > 0).length,
+      rv: av ? dv / (av * n) : null, flow, flowDay: av ? flow / av : null, tier, read, strength: g.strength };
+  });
+  const ins = rows.filter(x => x.flow > 0).sort((a, b) => b.flow - a.flow), outs = rows.filter(x => x.flow < 0).sort((a, b) => a.flow - b.flow);
+  // whole market over the window: official breadth rows (dollar volume in rising vs falling universe stocks)
+  const br = DATA.rows.filter(r => r.dv_up != null).slice(-n), up$ = br.reduce((a, r) => a + r.dv_up, 0), dn$ = br.reduce((a, r) => a + r.dv_dn, 0);
+  const share = up$ + dn$ ? dn$ / (up$ + dn$) : null, net = up$ - dn$, heavyDays = br.filter(r => roDs(r.dn_share) >= 0.6).length, lightDays = br.filter(r => roDs(r.dn_share) <= 0.4).length;
+  const state = share == null ? "mixed" : share >= 0.55 ? "out" : share <= 0.45 ? "in" : "mixed";
+  const head = state === "out" ? ["dn", "Money has been leaving"] : state === "in" ? ["up", "Money has been coming in"] : ["", "Mixed: money has been rotating"];
+  const fmtM = (v) => `${v > 0 ? "+" : v < 0 ? "−" : ""}$${Math.abs(v) >= 1000 ? (Math.abs(v) / 1000).toFixed(1) + "B" : Math.round(Math.abs(v)) + "M"}`;
+  const pts = (v) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(1)} pts`;
+  const nm = (x) => `${esc(x.name.replace(/^[A-Z &]+ - /, ""))} ${pc(x.avg, 1)} (${fmtM(x.flow)})`;
+  const from = H.dates[i0], to = H.dates[len - 1];
+  const tbl = (rs) => `<div class="scroll"><table class="grid"><thead><tr><th class="l">Group</th><th>Change<small>${n} sessions</small></th><th>vs SPY</th><th>Stocks up<small>over ${n} sessions</small></th><th>Up days<small>of ${n}</small></th><th>$ volume<small>vs normal</small></th><th>Net $ flow<small>up − down $ volume</small></th><th>Flow<small>× avg day</small></th><th class="l">Trend<small>money-flow tier, last close</small></th><th class="l">Read</th><th>Strength</th></tr></thead><tbody>
+    ${rs.map(x => `<tr><td class="l">${esc(x.name)}</td><td class="num ${cls(x.avg)}">${pc(x.avg)}</td><td class="num ${cls(x.rel)}">${pts(x.rel)}</td><td class="num">${x.n ? `${x.upS}/${x.n}` : "–"}</td><td class="num">${x.upD}/${n}</td>
+      <td class="num">${x.rv == null ? "–" : (x.rv >= 1.2 ? "<b>" : "") + x.rv.toFixed(2) + "×" + (x.rv >= 1.2 ? "</b>" : "")}</td><td class="num ${cls(x.flow)}" data-v="${x.flow}">${fmtM(x.flow)}</td>
+      <td class="num ${cls(x.flowDay)}">${x.flowDay == null ? "–" : (x.flowDay > 0 ? "+" : "") + x.flowDay.toFixed(2)}</td>
+      <td class="l">${x.tier ? esc(TIER_LABEL[x.tier] || x.tier) : '<span class="meta">–</span>'}</td><td class="l ${x.read === "Leader being sold" ? "dn" : x.read.startsWith("Being bought") ? "up" : ""}">${x.read}</td>
+      <td class="num">${x.strength == null ? "–" : Math.round(x.strength)}</td></tr>`).join("") || '<tr><td class="l meta" colspan="11">None.</td></tr>'}</tbody></table></div>`;
+  return $(`<div>
+    <p class="meta" style="margin:6px 0">${n} official sessions, ${shortDate(from)} – ${shortDate(to)} close. Today's live flows are on the "Today" window.</p>
+    ${share != null ? `<div class="kicker" style="margin:4px 0 0">Step 1 · Is money coming in or going out? · whole market</div>
+    <div class="mtv ${head[0]}">${head[1]}</div>
+    <p style="margin:2px 0 4px">${Math.round(share * 100)}% of dollar volume over these ${n} sessions traded in falling stocks: net <b class="${net >= 0 ? "up" : "dn"}">${net >= 0 ? "+" : "−"}$${Math.abs(net).toFixed(0)}B</b>. ${heavyDays} session${heavyDays === 1 ? "" : "s"} at 60%+ (money leaving), ${lightDays} at 40% or less (money coming in). SPY ${pc(spyN, 1)}.</p>` : ""}
+    <ul style="margin:8px 0 0;padding-left:18px;line-height:1.55">${[
+      outs.length ? `<b>Biggest net outflow:</b> ${outs.slice(0, 4).map(nm).join(", ")}.` : "",
+      ins.length ? `<b>Biggest net inflow:</b> ${ins.slice(0, 4).map(nm).join(", ")}.` : "",
+      `${rows.filter(x => x.avg > 0).length} of ${rows.length} groups up over the window; ${rows.filter(x => x.rel > 0).length} beat SPY.`].filter(Boolean).map(b => `<li>${b}</li>`).join("")}</ul>
+    <h3 class="ih">Money coming in <small class="meta">biggest net dollar inflow over ${n} sessions</small></h3>${tbl(ins.slice(0, 12))}
+    <h3 class="ih">Money going out <small class="meta">biggest net dollar outflow over ${n} sessions</small></h3>${tbl(outs.slice(0, 12))}
+    <div class="note" style="padding:8px 0 0">Same measures as the Today view, added up over the window from official closes: net $ flow = each stock's daily dollar volume counted + on up days and − on down days, summed over the sessions. Flow × avg day divides it by the group's normal daily dollar volume (50-day), so a +3.0 means three average days of net buying. $ volume vs normal = the window's dollar volume vs 50-day average × ${n}. Change = the group's equal-weight return; Stocks up = members higher over the window; Up days = sessions the group rose. The whole-market line uses every US stock $3+. Click any header to sort.</div></div>`);
 }
 /* ---------- Group ignition (rotation.ignition_build; study in tools/ignition_study) ---------- */
 // Today's ignition checks from live Google prices: mirrors rotation.ignition_frames for one more session on top of
