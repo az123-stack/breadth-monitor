@@ -5,11 +5,12 @@ name: Story chapter
 on:
   workflow_dispatch:
     inputs:
-      slot: { description: "am or pm", required: true }
+      slot: { description: "am, data or pm", required: true }
       date: { description: "YYYY-MM-DD", required: true }
       branch: { description: "A, B, W or none", required: true }
       title: { description: "Chapter title", required: true }
       md_b64: { description: "Chapter markdown, base64", required: true }
+      events_b64: { description: "Today's market-moving events, JSON list base64 (optional)", required: false, default: "" }
 
 permissions:
   contents: write
@@ -34,7 +35,8 @@ jobs:
           BRANCH: ${{ inputs.branch }}
           TITLE: ${{ inputs.title }}
           MD: ${{ inputs.md_b64 }}
-        run: python -m breadth.story publish --slot "$SLOT" --date "$CDATE" --branch "$BRANCH" --title "$TITLE" --md-b64 "$MD"
+          EV: ${{ inputs.events_b64 }}
+        run: python -m breadth.story publish --slot "$SLOT" --date "$CDATE" --branch "$BRANCH" --title "$TITLE" --md-b64 "$MD" ${EV:+--events-b64 "$EV"}
       - name: Commit
         run: |
           git config user.name "breadth-bot"

@@ -256,6 +256,8 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .rocols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-top: 6px; }
 .rocol { border: 1px solid var(--border, rgba(127,127,127,.25)); border-radius: 10px; padding: 8px 10px; }
 .rosched { flex-wrap: wrap; } .rosched details ul { margin: 4px 0; }
+.databar { margin-bottom: 10px; padding: 10px 14px; border: 1px solid var(--warning); background: color-mix(in srgb, var(--warning) 10%, var(--surface-1)); }
+.datacard { border-left: 3px solid var(--warning); padding: 12px 16px; }
 .stcard { margin-bottom: 12px; } .stcols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
 @media (max-width: 760px) { .stcols { grid-template-columns: 1fr; } }
 .stcol { border: 1px solid var(--border, rgba(127,127,127,.25)); border-radius: 10px; padding: 10px 12px; opacity: .85; }
@@ -2983,7 +2985,7 @@ function storyCard() {
     `<b>History says:</b> once a calm "money is back" day prints, the bounce in sold groups has usually run (≈ flat after); the groups that held up beat SPY by +1.7% over 10 sessions and 60-day leaders +3.1% over 20.`,
     B.held.length ? `<b>Where to look:</b> ${gl(B.held, 6)}.` : "",
     `Trade Day-1 follow-throughs and ignitions with leaders; if a breadth thrust prints, switch to the post-thrust playbook and press.`])}`;
-  const ch = (STORYJ && STORYJ.chapters) || [], cur = ch[ch.length - 1];
+  const ch = ((STORYJ && STORYJ.chapters) || []).filter(c => c.slot !== "data"), cur = ch[ch.length - 1];
   const chap = cur ? `<div class="stchap"><div class="kicker" style="margin:0">Latest chapter · ${longDate(cur.date)} ${cur.slot === "am" ? "morning" : "after the close"}${cur.written ? ` · written ${cur.written.slice(11, 16)} ET` : ""}</div>
       <h3 style="margin:4px 0 6px">${esc(cur.title)}</h3>${mdLite(cur.md)}
       ${ch.length > 1 ? `<details class="kqsec"><summary><b>Earlier chapters</b> <span class="meta">${ch.length - 1}</span></summary>${ch.slice(0, -1).reverse().map(c => `<details class="kqsec" style="margin-left:8px"><summary>${longDate(c.date)} ${c.slot === "am" ? "AM" : "PM"} · ${esc(c.title)} <span class="meta">branch ${esc(c.branch || "")}</span></summary>${mdLite(c.md)}</details>`).join("")}</details>` : ""}</div>`
@@ -2995,6 +2997,30 @@ function storyCard() {
     <div class="stcols">${card("A", "Scenario A · money keeps leaving", playA)}${card("B", "Scenario B · money comes back", playB)}</div>
     ${chap}
     <div class="note" style="padding:8px 0 0">The tracker updates with every price refresh: A when 60%+ of dollar volume is in falling stocks, B when it drops to 40% or less after a run of selling, "paused" in between. Baskets: the fifth of sub-themes that fell most / held up best vs SPY over the last 5 sessions (last close); "60-day leaders" = top fifth by Strength 10 sessions ago. Evidence from ${"Feb 2025–Oct 2026"}: small samples (9–18 episodes), context not a signal. Chapters are written by Claude from the dashboard's own numbers each morning and after the close.</div></section>`);
+}
+/* ---------- Data days: banner with today's market-moving events (from the morning chapter) + the 8:44 data card ---------- */
+function todayData() {
+  const ch = (STORYJ && STORYJ.chapters) || [], d = etToday(), td = ch.filter(c => c.date === d);
+  const card = td.find(c => c.slot === "data") || null, ev = (td.find(c => (c.events || []).length) || {}).events || [];
+  return { card, ev };
+}
+function dataBanner() {
+  const { card, ev } = todayData();
+  if (!ev.length && !card) return null;
+  const toMin = (t) => { const m = /(\d{1,2}):(\d{2})\s*(AM|PM)?/i.exec(t || ""); if (!m) return null; let h = +m[1] % 12; if ((m[3] || "").toUpperCase() === "PM") h += 12; return h * 60 + +m[2] - 570; };
+  const now = nyClock().mins;
+  const items = ev.map(e => { const mm = toMin(e.time), done = mm != null && mm <= now;
+    return `<li${done ? ' class="meta"' : ""}><b>${esc(e.time || "")}</b> ${esc(e.name || "")}${e.why ? ` <span class="meta">· ${esc(e.why)}</span>` : ""}${done ? " · out" : ""}</li>`; }).join("");
+  const has830 = ev.some(e => { const mm = toMin(e.time); return mm != null && mm < 0; });
+  const tail = card ? `The <b>data card</b> below has the numbers and the market's reaction.` : has830 ? `The <b>data card</b> with the numbers and the market's reaction lands about 8:45 AM ET.` : "";
+  return $(`<div class="card databar"><div class="kicker" style="margin:0 0 4px">📅 Market-moving data today</div>${ev.length ? `<ul class="rol" style="margin:0">${items}</ul>` : ""}${tail ? `<p style="margin:6px 0 0">${tail}</p>` : ""}</div>`);
+}
+function dataCard() {
+  const { card } = todayData();
+  if (!card) return null;
+  return $(`<section class="card stcard datacard"><div class="kicker">Data card · ${longDate(card.date)}${card.written ? ` · written ${card.written.slice(11, 16)} ET` : ""}</div>
+    <h3 style="margin:4px 0 6px">${esc(card.title)}</h3>${mdLite(card.md)}
+    <div class="note" style="padding:6px 0 0">Written by Claude a few minutes after the 8:30 AM ET release from news searches and the dashboard's pre-market quotes (Yahoo, refreshed every ~10 min). Moves "since before 8:30" compare with the last snapshot before the release.</div></section>`);
 }
 /* ---------- Read-out: who drove the S&P 500, by sub-theme, across periods; and when each update lands ---------- */
 function roContrib(phase) {
@@ -3018,7 +3044,8 @@ function roContrib(phase) {
 const RO_SCHED = [
   [-555, "~12:15–1:00 AM", "Official numbers for the last session (Massive): Breadth tab, setups, top picks"],
   [-210, "~6:00 AM–9:30", "Pre-market quotes, every 10 min"],
-  [-90, "~8:00 AM", "Morning story chapter (written 7:52; 8:30 AM economic data comes after it)"],
+  [-90, "~8:00 AM", "Morning story chapter (written 7:52; lists any market-moving data due today)"],
+  [-45, "~8:45 AM", "Data card on days with an 8:30 release (written 8:44): the numbers and how futures, yields and the dollar reacted"],
   [0, "9:30 AM–4:00 PM", "Live prices from your Google Sheet, every 3 min (~20 min behind)"],
   [390, "4:00 PM", "Post-market read-out from Google's closing prices"],
   [445, "~5:00 PM", "After-the-close story chapter (written 4:50)"],
@@ -3029,7 +3056,7 @@ function roSchedule() {
   let nxt = wk ? RO_SCHED.find(e => e[0] > m) : null;
   const when = nxt ? nxt[1] : p.weekday === "Fri" || !wk ? "Monday ~6:00 AM" : "tomorrow ~12:15 AM";
   const what = nxt ? nxt[2] : !wk || p.weekday === "Fri" ? "Pre-market quotes (Friday's official numbers land Saturday ~12:15 AM)" : "Official numbers for today's session";
-  const ch = (STORYJ && STORYJ.chapters) || [], last = ch[ch.length - 1];
+  const ch = ((STORYJ && STORYJ.chapters) || []).filter(c => c.slot !== "data"), last = ch[ch.length - 1];
   return $(`<div class="livebar rosched"><span class="dot on"></span><span><b>Next:</b> ${esc(what)} · <b>${esc(when)} ET</b>${last ? ` <span class="meta">· last chapter ${shortDate(last.date)} ${last.slot === "am" ? "morning" : "after the close"}</span>` : ""}</span>
     <details class="kqsec" style="margin-left:auto"><summary>Daily schedule</summary><ul class="rol">${RO_SCHED.map(e => `<li${nxt === e ? ' style="font-weight:600"' : ""}><b>${e[1]}</b> ${esc(e[2])}</li>`).join("")}</ul></details></div>`);
 }
@@ -3090,7 +3117,10 @@ function renderReadout(app) {
     live: roCard("live", phase, "📈 During the market", "9:30 AM–4:00 PM ET · live Google prices", liveV, liveBody),
     post: roCard("post", phase, "🌙 Post-market", "from the 4:00 PM close · Google closing prices", postV, postBody) };
   const order = [phase, ...["pre", "live", "post"].filter(k => k !== phase)];
+  const dB = dataBanner(), dC = dataCard();
+  if (dB) app.append(dB);
   app.append(roSchedule());
+  if (dC) app.append(dC);
   app.append(storyCard());
   const wrap = $(`<div class="ro">${order.map(k => cards[k]).join("")}
     <div class="note" style="padding:8px 0 0">Each card opens on its own part of the day (Eastern time). Pre-market uses the official overnight numbers plus Yahoo pre-market quotes; during the market and at the close it uses your Google Sheet's live prices; the overnight update replaces the close estimates with official numbers. Links jump to the tab with the full detail.</div></div>`);

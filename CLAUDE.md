@@ -236,6 +236,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   the task dispatches that workflow if the snapshot is stale). Each run: clone, `python3 -m breadth.story facts --slot X` (stdlib only),
   write per `story_guide.md` (incl. "Why it's moving": WebSearch the catalyst for each group on the fact sheet's WHY research list, classify catalyst / rotation / sympathy / unexplained, inline source links rendered by `mdLite`; plus a "How markets work" teaching point tied to the day, a new pattern each chapter), `python3 -m breadth.story publish --slot X --title ... --branch ... --file ch.md --push` (commits only
   docs/story.json via `gh api` PUT). First chapter (Oct 14 pm, "The AI money is leaving") written by hand.
+  Data days (Oct 16): the morning task checks the economic calendar; market-moving releases (CPI, PPI, PCE, payrolls, retail sales, GDP,
+  ISM, JOLTS, FOMC, Fed Chair) open the chapter with a "**Data today:**" line and are saved on the chapter as `events` [{time, name, why}]
+  (`publish --events-file`, workflow input `events_b64`). Read-out shows them in a banner on top (`dataBanner`). A third scheduled task
+  "Market Monitor · data card" (8:44 AM ET Mon–Fri) writes slot `data` only when an 8:30 release came out: `facts --slot data` = today's
+  events + futures/yields/dollar/ETF moves vs last close and vs the last pre-market snapshot before 8:30 (`_pm_before`, from the commit
+  history of docs/premarket.json via gh REST). `dataCard` renders it above the story card; data cards are kept out of the chapter list.
+  Chapter order within a day: am, data, pm (`SLOT_ORDER`).
   Comeback study (`tools/ignition_study/comeback.py`, Feb 2025–Oct 2026): heavy-selling day in an outflow streak (n 18) → SPY median +1.7%
   next 10 sessions, sold-hardest sub-themes +4.3% vs SPY (median +3.2%, 78%) vs held-up +0.5%; ex Mar–Apr 2025 +3.9%; any 70%+ day (n 24)
   sold +1.9% / held +1.0%. First calm comeback day (n 9) → SPY median −1.2% next 10, held-up +1.7%, middle +1.5%, sold −0.1%; 60-day

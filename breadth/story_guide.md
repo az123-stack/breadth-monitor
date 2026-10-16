@@ -45,8 +45,37 @@ story he can absorb in two minutes, and it must CONTINUE the story from the prev
   check the previous chapters in the fact sheet and don't repeat one unless today adds something new.
 
 ## Slots
-- am (about 8:40 AM ET): official close of the last session + pre-market. Frame today's open against the story.
-- pm (about 4:50 PM ET): today's close from Google prices (estimates; official numbers land overnight). Say how today moved the story.
+- am (written 7:52 AM ET, posted ~8:00): official close of the last session + pre-market. Frame today's open against the story.
+- data (written 8:44 AM ET, only on days with an 8:30 AM release): the data card. See "Data days" below.
+- pm (written 4:50 PM ET): today's close from Google prices (estimates; official numbers land overnight). Say how today moved the story.
+
+## Data days (morning chapter)
+Before writing the am chapter, WebSearch today's US economic calendar ("economic calendar today <date>", "CPI release date
+<month year>", "Fed speakers today", "FOMC <month year>"). Count only MARKET-MOVING items: CPI, PPI, core PCE / personal income,
+nonfarm payrolls, retail sales, GDP, ISM manufacturing / services, JOLTS, FOMC decision days (2:00 PM statement, 2:30 press
+conference), FOMC minutes, Fed Chair testimony or major speeches, Treasury refunding, a government shutdown / debt-ceiling deadline.
+Skip routine items (weekly jobless claims unless a big surprise is expected, regional Fed surveys, small auctions, minor speakers).
+- If there are any: open the chapter with one line, before "Where we are": **Data today:** e.g. "8:30 AM CPI (September),
+  10:00 AM consumer sentiment. This chapter is written before the release; the data card at ~8:45 covers the reaction." Add
+  one sentence on why it matters for the story (rate-cut odds, growth vs defensives, small caps). Then pass the events to publish
+  with `--events-file events.json`, a JSON list like
+  `[{"time": "8:30 AM", "name": "CPI (September)", "why": "first inflation read since the selloff; hot = pressure on growth"}]`
+  (time as "H:MM AM/PM" ET, name short, why one short clause). The Read-out tab shows them in a banner at the top.
+- If there are none: no line, no events file.
+
+## Data card (slot data, 8:44 AM ET)
+Run `python3 -m breadth.story facts --slot data`. It lists today's events (from the morning chapter) and the pre-market reaction:
+latest snapshot vs last close and vs the last snapshot before 8:30. Only write a card if an 8:30 AM release came out today;
+otherwise stop. 120–250 words, these lead-ins:
+**The numbers:** each release: actual vs consensus vs prior (headline and core where relevant), with a source link from WebSearch.
+  Say hot / cool / in line in plain words.
+**How the market took it:** futures, 10y yield / note futures, dollar, and the rate-sensitive ETFs, using only the fact sheet's
+  moves since before 8:30. Say if the reaction is big or small (S&P futures moves under ~0.3% are small).
+**What it means today:** 2–3 sentences: rate-cut odds direction (only if a source says so), which kinds of stocks it helps or
+  hurts (growth / small caps / banks / homebuilders vs defensives), and how it fits the story's current scenario.
+**Watch at the open:** 1–2 bullets: concrete things to check in the first 30 minutes (does the futures move hold, group or level).
+Title under 60 characters, e.g. "CPI runs hot; yields jump, Nasdaq futures slip". Publish with
+`python3 -m breadth.story publish --slot data --title "..." --branch <same as this morning's chapter> --file card.md --push`.
 
 ## Branch
 Pass --branch with the scenario engine's branch (A / B / W / none) unless the facts clearly contradict it; if you override, say why in the text.

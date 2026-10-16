@@ -9,6 +9,10 @@ Pieces:
 - `publish`: appends a chapter to docs/story.json (the page fetches it from GitHub Pages). With --push it dispatches
   .github/workflows/story.yml with the chapter as inputs and that workflow commits it (Claude sessions may not write repo files
   through the contents API, but they can dispatch workflows).
+- `facts --slot data` / `publish --slot data` (Oct 16): the 8:44 AM ET "data card" on days with an 8:30 release: market reaction from
+  the pre-market snapshots (latest vs the last one before 8:30, read from the commit history of docs/premarket.json) plus today's
+  scheduled events. The morning chapter stores the day's market-moving events (`--events-b64`, a JSON list of {time, name, why}) on
+  its chapter; the Read-out tab shows them in a banner and the data card on top of the story.
 - `snapshot`: fetches the live Google Sheet CSV into data/close_snapshot.csv (run by .github/workflows/close.yml after the close).
 
 Comeback study (Oct 15, 2026; tools/ignition_study/comeback.py; Feb 2025–Oct 2026, small samples):
@@ -147,7 +151,84 @@ def chg(r):
 
 
 # ---------------------------------------------------------------- fact sheet
+SLOT_ORDER = {"am": 0, "data": 1, "pm": 2}
+
+
+def _pm_before(cut="08:30", day=None):
+    """The last pre-market snapshot committed before `cut` ET today, from the commit history of docs/premarket.json (gh REST)."""
+    day = day or datetime.now(ET).date().isoformat()
+    try:
+        r = subprocess.run(["gh", "api", f"repos/{REPO}/commits?path=docs/premarket.json&per_page=40", "--jq",
+                            '.[]|"\\(.sha) \\(.commit.message)"'], capture_output=True, text=True, timeout=60)
+        for line in r.stdout.splitlines():   # newest first; messages read "Pre-market HH:MM ET"
+            sha, _, msg = line.partition(" ")
+            hm = msg.replace("Pre-market", "").replace("ET", "").strip()[:5]
+            if len(hm) == 5 and hm < cut:
+                raw = subprocess.run(["gh", "api", "-H", "Accept: application/vnd.github.raw", f"repos/{REPO}/contents/docs/premarket.json?ref={sha}"],
+                                     capture_output=True, text=True, timeout=60).stdout
+                J = json.loads(raw)
+                return J if J.get("date") == day else None
+    except Exception:
+        return None
+    return None
+
+
+def today_events(S=None):
+    """Today's market-moving events saved on today's morning chapter (or the data card)."""
+    try:
+        S = S or json.loads(STORY.read_text())
+    except Exception:
+        return []
+    day = datetime.now(ET).date().isoformat()
+    for c in sorted(S.get("chapters", []), key=lambda c: SLOT_ORDER.get(c["slot"], 3)):
+        if c["date"] == day and c.get("events"):
+            return c["events"]
+    return []
+
+
+def facts_data():
+    out = []
+    P = lambda s="": out.append(s)
+    now = datetime.now(ET)
+    P(f"# Fact sheet · DATA · generated {now:%Y-%m-%d %H:%M} ET")
+    ev = today_events()
+    P("\n## Today's market-moving events (from the morning chapter)")
+    P("\n".join(f"- {e.get('time', '')} {e.get('name', '')}: {e.get('why', '')}" for e in ev) if ev else "(none saved: check the calendar yourself)")
+    try:
+        NOW = json.loads((config.DOCS_DIR / "premarket.json").read_text())
+    except Exception:
+        NOW = None
+    if not NOW or NOW.get("date") != now.date().isoformat():
+        P("\n(No pre-market snapshot for today yet.)")
+        return "\n".join(out)
+    B = _pm_before("08:30", now.date().isoformat())
+    P(f"\n## Market reaction (Yahoo pre-market; latest {NOW.get('asof', '')[11:16]} ET" + (f" vs before the release {B.get('asof', '')[11:16]} ET)" if B else "; no pre-8:30 snapshot found)"))
+    F, FB = NOW.get("futures", {}), (B or {}).get("futures", {})
+    for k, lab in NOW.get("futures_labels", {}).items():
+        f, b = F.get(k), FB.get(k)
+        if not (f and f[0] and f[1]):
+            continue
+        if k == "^TNX":
+            P(f"- {lab}: {f[0]:.2f}% ({(f[0] - f[1]) * 100:+.0f} bp vs last close" + (f", {(f[0] - b[0]) * 100:+.0f} bp since before 8:30)" if b and b[0] else ")"))
+        else:
+            P(f"- {lab}: {pct(f[0] / f[1] - 1, 2)} vs last close" + (f", {pct(f[0] / b[0] - 1, 2)} since before 8:30" if b and b[0] else ""))
+    R, RB = NOW.get("rows", {}), (B or {}).get("rows", {})
+    etfs = ["SPY", "QQQ", "IWM", "RSP", "TLT", "XLF", "KRE", "XHB", "XLK", "SMH", "XLY", "XLU", "XLV", "XLE", "GLD", "UUP"]
+    ln = []
+    for t in etfs:
+        r, b = R.get(t), RB.get(t)
+        if r and r[0] and r[1]:
+            ln.append(f"{t} {pct(r[0] / r[1] - 1, 2)}" + (f" ({pct(r[0] / b[0] - 1, 2)} since)" if b and b[0] else ""))
+    if ln:
+        P("- ETFs pre-market vs last close (since before 8:30): " + ", ".join(ln))
+    P("\nRate-sensitive tells: 10y note futures (ZN) UP = yields DOWN; the dollar index; IWM, KRE, XHB (small caps, regional banks, homebuilders)"
+      " react most to rates; QQQ / SMH for long-duration growth.")
+    return "\n".join(out)
+
+
 def facts(slot):
+    if slot == "data":
+        return facts_data()
     D = load_data()
     T, rows = D["themes"], D["rows"]
     last = rows[-1]
@@ -343,22 +424,26 @@ def facts(slot):
 
 
 # ---------------------------------------------------------------- publish / snapshot
-def publish(slot, title, branch, md, date=None, push=False):
+def publish(slot, title, branch, md, date=None, push=False, events=None):
     date = date or datetime.now(ET).date().isoformat()
     try:
         S = json.loads(STORY.read_text())
     except Exception:
         S = {"chapters": []}
     S["chapters"] = [c for c in S["chapters"] if not (c["date"] == date and c["slot"] == slot)]
-    S["chapters"].append({"date": date, "slot": slot, "title": title.strip(), "branch": branch, "md": md.strip(),
-                          "written": datetime.now(ET).strftime("%Y-%m-%dT%H:%M")})
-    S["chapters"] = sorted(S["chapters"], key=lambda c: (c["date"], c["slot"] == "pm"))[-80:]
+    ch = {"date": date, "slot": slot, "title": title.strip(), "branch": branch, "md": md.strip(),
+          "written": datetime.now(ET).strftime("%Y-%m-%dT%H:%M")}
+    if events:
+        ch["events"] = [{k: str(e.get(k, "")).strip() for k in ("time", "name", "why")} for e in events if e.get("name")]
+    S["chapters"].append(ch)
+    S["chapters"] = sorted(S["chapters"], key=lambda c: (c["date"], SLOT_ORDER.get(c["slot"], 3)))[-80:]
     text = json.dumps(S, indent=1, ensure_ascii=False)
     STORY.write_text(text)
     if push:   # Claude sessions can't write repo files through the API, but they can dispatch workflows: story.yml saves it
         r = subprocess.run(["gh", "api", "-X", "POST", f"repos/{REPO}/actions/workflows/story.yml/dispatches", "-f", "ref=main",
                             "-f", f"inputs[slot]={slot}", "-f", f"inputs[date]={date}", "-f", f"inputs[branch]={branch}",
-                            "-f", f"inputs[title]={title.strip()}", "-f", f"inputs[md_b64]={base64.b64encode(md.strip().encode()).decode()}"],
+                            "-f", f"inputs[title]={title.strip()}", "-f", f"inputs[md_b64]={base64.b64encode(md.strip().encode()).decode()}",
+                            "-f", f"inputs[events_b64]={base64.b64encode(json.dumps(ch.get('events', [])).encode()).decode()}"],
                            capture_output=True, text=True)
         if r.returncode:
             sys.exit("dispatch failed: " + (r.stderr or r.stdout)[:400])
@@ -379,10 +464,11 @@ def snapshot():
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
-    f = sub.add_parser("facts"); f.add_argument("--slot", choices=["am", "pm"], required=True)
-    p = sub.add_parser("publish"); p.add_argument("--slot", choices=["am", "pm"], required=True); p.add_argument("--title", required=True)
+    f = sub.add_parser("facts"); f.add_argument("--slot", choices=["am", "pm", "data"], required=True)
+    p = sub.add_parser("publish"); p.add_argument("--slot", choices=["am", "pm", "data"], required=True); p.add_argument("--title", required=True)
     p.add_argument("--branch", choices=["A", "B", "W", "none"], required=True); p.add_argument("--file"); p.add_argument("--md-b64")
     p.add_argument("--date"); p.add_argument("--push", action="store_true")
+    p.add_argument("--events-file", help="JSON list of today's market-moving events [{time, name, why}]"); p.add_argument("--events-b64")
     sub.add_parser("snapshot")
     sub.add_parser("guide")
     a = ap.parse_args()
@@ -390,7 +476,8 @@ if __name__ == "__main__":
         print(facts(a.slot))
     elif a.cmd == "publish":
         md = base64.b64decode(a.md_b64).decode() if a.md_b64 else open(a.file).read()
-        publish(a.slot, a.title, a.branch, md, a.date, a.push)
+        ev = json.loads(base64.b64decode(a.events_b64).decode() or "[]") if a.events_b64 else json.load(open(a.events_file)) if a.events_file else None
+        publish(a.slot, a.title, a.branch, md, a.date, a.push, ev)
         print("chapter saved")
     elif a.cmd == "snapshot":
         snapshot()
