@@ -86,6 +86,9 @@ h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
 .chart .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin: 4px 0 6px; }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 .legend i.line { height: 2px; border-radius: 1px; vertical-align: 3px; width: 14px; }
+.legend .lgtoggle { font: inherit; color: inherit; background: none; border: 1px solid var(--border); border-radius: 999px; padding: 1px 9px; cursor: pointer; }
+.legend .lgtoggle:hover { color: var(--text-primary); }
+.legend .lgtoggle.off { opacity: .45; text-decoration: line-through; }
 .chart .plot { display: flex; align-items: flex-start; }
 .chart .scroller { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: var(--border) transparent; padding-bottom: 4px; }
 .chart .scroller { cursor: grab; scrollbar-color: var(--text-muted) var(--grid); }
@@ -1744,10 +1747,15 @@ function chartHighsLows(rows) {
   hover(c, rows, x, [["New highs", r => fmt(r.nh)], ["New lows", r => fmt(r.nl)], ["Highs − lows", r => r.nhnl == null ? "–" : (r.nhnl > 0 ? "+" : "") + fmt(r.nhnl)], ["Highs − lows, 10-day avg", r => r.nh10 == null ? "–" : ((r.nh10 - r.nl10) > 0 ? "+" : "") + fmt(r.nh10 - r.nl10)], ["10-day avg highs / lows", r => r.nh10 == null ? "–" : fmt(r.nh10) + " / " + fmt(r.nl10)]]);
   return c.el;
 }
+// Money chart average lines: on/off per viewer (clicking a legend item), remembered in this browser
+const MONEY_LINES = (() => { const d = { m10: true, m20: true }; try { return { ...d, ...JSON.parse(localStorage.getItem("moneyLines") || "{}") }; } catch (e) { return d; } })();
 function chartMoney(rows) {
+  const tg = (k, color, dash, label) => `<button type="button" class="lgtoggle${MONEY_LINES[k] ? "" : " off"}" data-ml="${k}" aria-pressed="${MONEY_LINES[k]}" title="Show / hide"><i class="line" style="background:${dash ? `repeating-linear-gradient(90deg, ${color} 0 5px, transparent 5px 8px)` : color};height:3px"></i>${label}</button>`;
   const c = frame("Money in or out: dollar volume in rising minus falling stocks ($B)",
-    '<span><i style="background:var(--up)"></i>More $ in rising stocks</span><span><i style="background:var(--down)"></i>More $ in falling stocks</span><span><i class="line" style="background:var(--s2);height:3px"></i>10-day average</span>');
-  const net10 = rows.map((r, i) => { const w = rows.slice(Math.max(0, i - 9), i + 1).map(q => q.dv_net).filter(v => v != null); return { v: w.length === 10 ? w.reduce((a, b) => a + b, 0) / 10 : null }; });
+    '<span><i style="background:var(--up)"></i>More $ in rising stocks</span><span><i style="background:var(--down)"></i>More $ in falling stocks</span>' +
+    tg("m10", "var(--s2)", false, "10-day average") + tg("m20", "var(--text-primary)", true, "20-day average"));
+  const avgN = (n) => rows.map((r, i) => { const w = rows.slice(Math.max(0, i - n + 1), i + 1).map(q => q.dv_net).filter(v => v != null); return { v: w.length === n ? w.reduce((a, b) => a + b, 0) / n : null }; });
+  const net10 = avgN(10), net20 = avgN(20);
   const vals = rows.map(r => Math.abs(r.dv_net || 0)).sort((a, b) => a - b);
   const mx = niceMax((vals[Math.floor(vals.length * 0.97)] || 10) * 1.05);
   const mid = M.t + (c.h - M.t - M.b) / 2, half = (c.h - M.t - M.b) / 2;
@@ -1759,11 +1767,20 @@ function chartMoney(rows) {
     S("rect", { x: x(i) - w / 2, y: Math.min(y0, mid), width: w, height: Math.abs(y0 - mid), rx: Math.min(2, w / 3), fill: r.dv_net >= 0 ? "var(--up)" : "var(--down)" }, c.svg); });
   S("line", { x1: M.l, x2: W - M.r, y1: mid, y2: mid, stroke: "var(--text-muted)", "stroke-width": 1 }, c.svg);
   eventLines(c, x, false);
-  S("path", { d: path(net10, x, yv, "v"), fill: "none", stroke: "var(--surface-1)", "stroke-width": 5, "stroke-linejoin": "round" }, c.svg);
-  S("path", { d: path(net10, x, yv, "v"), fill: "none", stroke: "var(--s2)", "stroke-width": 2.5, "stroke-linejoin": "round" }, c.svg);
+  const lines = {};
+  [["m20", net20, "var(--text-primary)", "6 4"], ["m10", net10, "var(--s2)", null]].forEach(([k, data, color, dash]) => {
+    const g = lines[k] = S("g", { style: MONEY_LINES[k] ? "" : "display:none" }, c.svg);
+    S("path", { d: path(data, x, yv, "v"), fill: "none", stroke: "var(--surface-1)", "stroke-width": 5, "stroke-linejoin": "round" }, g);
+    S("path", { d: path(data, x, yv, "v"), fill: "none", stroke: color, "stroke-width": k === "m20" ? 2 : 2.5, "stroke-linejoin": "round", ...(dash ? { "stroke-dasharray": dash } : {}) }, g);
+  });
+  c.el.querySelectorAll("[data-ml]").forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.ml; MONEY_LINES[k] = !MONEY_LINES[k];
+    try { localStorage.setItem("moneyLines", JSON.stringify(MONEY_LINES)); } catch (e) {}
+    lines[k].style.display = MONEY_LINES[k] ? "" : "none"; b.classList.toggle("off", !MONEY_LINES[k]); b.setAttribute("aria-pressed", MONEY_LINES[k]);
+  }));
   const B = (v) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + "$" + fmt(Math.abs(v), 0) + "B";
   hover(c, rows, x, [["Net (rising − falling)", r => B(r.dv_net)], ["In rising / falling stocks", r => r.dv_up == null ? "–" : "$" + fmt(r.dv_up, 0) + "B / $" + fmt(r.dv_dn, 0) + "B"],
-    ["Share in falling stocks", r => r.dn_share == null ? "–" : fmt(r.dn_share, 0) + "%"], ["5-day net", r => B(r.dv_net5)], ["Total $ volume vs 50-day avg", r => r.dv_rel == null ? "–" : fmt(r.dv_rel, 2) + "×"]]);
+    ["Share in falling stocks", r => r.dn_share == null ? "–" : fmt(r.dn_share, 0) + "%"], ["5-day net", r => B(r.dv_net5)], ["10-day / 20-day avg", (r, i) => { const k = rows.indexOf(r); return B(net10[k]?.v) + " / " + B(net20[k]?.v); }], ["Total $ volume vs 50-day avg", r => r.dv_rel == null ? "–" : fmt(r.dv_rel, 2) + "×"]]);
   return c.el;
 }
 function chartNearHigh(rows) {

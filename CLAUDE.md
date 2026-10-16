@@ -54,7 +54,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   "highs_lead" (nh10 > nl10 for 3 days after nl10 led 15 of 20).
   Dollar flow (Oct 14): `dv_up` / `dv_dn` ($B of close × volume in rising / falling universe stocks $3+), `dv_net`, `dv_net5`, `dn_share`
   (% in falling), `dn_share10`, `dv_rel` (total $ vol ÷ prior 50-day avg); full ~2-year history from stored bars (median dn_share 47%);
-  Breadth tab "Money in or out" tile row (≥ 60% leaving / ≤ 40% coming in), "Money in or out" chart (net $ bars + 10-day avg), table
+  Breadth tab "Money in or out" tile row (≥ 60% leaving / ≤ 40% coming in), "Money in or out" chart (net $ bars + 10-day avg + dashed 20-day avg;
+  legend buttons toggle each line, `MONEY_LINES`, remembered in localStorage "moneyLines"), table
   columns "$ in falling" and "Net $". Breadth tab: 4 tiles, two charts (highs/lows chart has an
   orange net line = nh10 − nl10 on the same mirrored scale), table columns.
   First look (Nov 2025–Sep 2026, ~210 days): high pct_near was followed by weaker SPY 20-day returns (corr −0.39, top quartile
