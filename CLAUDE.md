@@ -219,7 +219,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   stocks (Leaders score, one per sub-theme), strongest anywhere (`lists.strongest`), new top-10 stocks (live) / RS jumpers (official).
   `dn_share` in breadth rows is in percent (`roDs` converts). Links (`data-go`) switch tabs.
   Oct 15: schedule strip on top (`roSchedule`, `RO_SCHED`: official data ~12:15–1 AM, pre-market quotes ~6–9:30, morning chapter
-  ~8:50, live 9:30–4, post read-out 4:00, after-close chapter ~5:00; "Next:" line + last chapter). "What's driving the S&P 500" by
+  ~8:00, live 9:30–4, post read-out 4:00, after-close chapter ~5:00; "Next:" line + last chapter). "What's driving the S&P 500" by
   sub-theme in every card (`roContrib`): columns last close (`intraday.prev_contrib` from data/close_snapshot.csv, used when its date =
   the official date) · pre-market (today's premarket.json via `pmRows`) · now / today's close (live), top 4 up / down in bp, plus a
   one-line "leadership changed / still" read. Pre-market + Intraday "who's moving the index" cards: Group by Sector / Sub-theme chips
@@ -231,7 +231,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   `storyBaskets`: bottom / top 20% of sub-themes by `vs_d5` = sold hardest / held up; 60-day-leader proxy = top 20% Strength 10 sessions
   ago). Signals chips, "where it's going today" (sold vs held basket live), playbooks per branch with the comeback-study evidence.
   Chapters in `docs/story.json` (page fetches from Pages every 10 min; `mdLite` renders **bold** / bullets), written by two Claude
-  scheduled tasks: "Market Monitor story · morning" (8:40 AM ET Mon–Fri, `--slot am`: official close + pre-market) and "· after the close"
+  scheduled tasks: "Market Monitor story · morning" (7:52 AM ET Mon–Fri since Oct 16 so it lands by 8:00 ET / 5:00 PT, before 8:30 data releases; `--slot am`: official close + pre-market) and "· after the close"
   (4:50 PM ET Mon–Fri, `--slot pm`: `data/close_snapshot.csv` saved by `.github/workflows/close.yml` at 4:25 PM ET from the Google Sheet;
   the task dispatches that workflow if the snapshot is stale). Each run: clone, `python3 -m breadth.story facts --slot X` (stdlib only),
   write per `story_guide.md` (incl. "Why it's moving": WebSearch the catalyst for each group on the fact sheet's WHY research list, classify catalyst / rotation / sympathy / unexplained, inline source links rendered by `mdLite`; plus a "How markets work" teaching point tied to the day, a new pattern each chapter), `python3 -m breadth.story publish --slot X --title ... --branch ... --file ch.md --push` (commits only

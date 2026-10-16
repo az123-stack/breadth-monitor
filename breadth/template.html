@@ -2987,7 +2987,7 @@ function storyCard() {
   const chap = cur ? `<div class="stchap"><div class="kicker" style="margin:0">Latest chapter · ${longDate(cur.date)} ${cur.slot === "am" ? "morning" : "after the close"}${cur.written ? ` · written ${cur.written.slice(11, 16)} ET` : ""}</div>
       <h3 style="margin:4px 0 6px">${esc(cur.title)}</h3>${mdLite(cur.md)}
       ${ch.length > 1 ? `<details class="kqsec"><summary><b>Earlier chapters</b> <span class="meta">${ch.length - 1}</span></summary>${ch.slice(0, -1).reverse().map(c => `<details class="kqsec" style="margin-left:8px"><summary>${longDate(c.date)} ${c.slot === "am" ? "AM" : "PM"} · ${esc(c.title)} <span class="meta">branch ${esc(c.branch || "")}</span></summary>${mdLite(c.md)}</details>`).join("")}</details>` : ""}</div>`
-    : `<p class="meta">${STORY_ERR && STORY_ERR !== "no chapters yet" ? `Couldn't load the chapters (${esc(STORY_ERR)}).` : "The first chapter arrives with the next scheduled write-up (about 8:40 AM and 4:50 PM ET on trading days)."}</p>`;
+    : `<p class="meta">${STORY_ERR && STORY_ERR !== "no chapters yet" ? `Couldn't load the chapters (${esc(STORY_ERR)}).` : "The first chapter arrives with the next scheduled write-up (about 8:00 AM and 5:00 PM ET on trading days)."}</p>`;
   return $(`<section class="card stcard"><div class="kicker">The story · money in or out of the market</div>
     <div class="dfwrap"><div><div class="mtv ${sc.branch === "A" ? "dn" : sc.branch === "B" ? "up" : ""}">${sc.branch === "A" ? "A · " : sc.branch === "B" ? "B · " : ""}${esc(sc.label)}</div>
       <p style="margin:2px 0 4px">${live ? "Today so far" : "Last session"}: ${Math.round(sc.latest)}% of dollar volume in falling stocks; ${sc.left5} of the last 5 sessions at 60%+; 5-day average ${Math.round(sc.avg5)}%.${where ? ` Today: sold-hardest groups ${pc(aS, 1)} vs held-up groups ${pc(aH, 1)} → <b class="${where[0]}">${where[1]}</b>.` : ""}</p></div>
@@ -3018,7 +3018,7 @@ function roContrib(phase) {
 const RO_SCHED = [
   [-555, "~12:15–1:00 AM", "Official numbers for the last session (Massive): Breadth tab, setups, top picks"],
   [-210, "~6:00 AM–9:30", "Pre-market quotes, every 10 min"],
-  [-40, "~8:50 AM", "Morning story chapter (written 8:40)"],
+  [-90, "~8:00 AM", "Morning story chapter (written 7:52; 8:30 AM economic data comes after it)"],
   [0, "9:30 AM–4:00 PM", "Live prices from your Google Sheet, every 3 min (~20 min behind)"],
   [390, "4:00 PM", "Post-market read-out from Google's closing prices"],
   [445, "~5:00 PM", "After-the-close story chapter (written 4:50)"],
