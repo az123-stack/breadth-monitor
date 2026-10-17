@@ -104,6 +104,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - `levels.py` all-time highs and old monthly peaks from Yahoo (free; Massive free plan only reaches ~2 years), cached in
   `data/levels.json`, fetched in the daily run for new/stale tickers (`config.LEVELS_ENABLED`; tests switch it off)
 - `kq.py` KQ breakout screen → `DATA.kq` (Basing / Extended / Not this setup or failing a rule); "⬇ KQ list" button exports it to TradingView
+- `washout.py` (Oct 16) Washout thrust card on the Breadth tab → `DATA.themes.washout`. Classifies each dashboard thrust
+  (metrics.events kind "thrust") as deep (SPY ≥ 8% below its 60-day high within 15 sessions AND T2108 ≤ 25 within 10) or shallow;
+  for ~21 sessions after a deep one it lists the 30 RS ≥ 80 stocks ($5+, $20M+/day) with the highest 60-day beta to SPY and tracks
+  them from the next open. Settings `WASHOUT_*` in config.py. Evidence (connector study): deep Apr 9 2025 +26%, Mar 31 2026 +34%
+  vs all stocks +9%/+8%; four shallow thrusts +3.5% avg vs +2.1%. No group/hub led rebounds (lead-lag ≈ 0); plain RS lagged in
+  thrust windows. Only 2 deep events: experimental.
 - `intraday.py` Intraday tab config → `DATA.intraday` (index members + sectors from `data/index_members.csv`, pulse symbols,
   sector ETFs, the tracker's volume curve, day-type thresholds). The tab itself is browser-only (`renderIntraday`):
   market pulse (indexes, RSP−SPY, IWM−SPY, VIX, bonds, dollar, gold, oil, BTC, sector ETFs) · who's moving the index

@@ -162,6 +162,8 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .regcard .kicker { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
 .regcard .regnow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 6px 0 4px; }
 .regcard p { margin: 6px 0 10px; font-size: 14px; }
+.wocard.act { border-left: 4px solid var(--good); }
+.wocard.watch { border-left: 4px solid var(--warning); }
 .revflag { background: color-mix(in srgb, var(--warning) 30%, transparent) !important; border-color: color-mix(in srgb, var(--warning) 60%, transparent) !important; font-weight: 700; }
 .revn { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 4px; border-radius: 999px; background: var(--warning); color: #1a1a1a; font-size: 11px; text-align: center; }
 .revcard.on { border-color: color-mix(in srgb, var(--warning) 60%, transparent); background: color-mix(in srgb, var(--warning) 10%, var(--card-bg, transparent)); }
@@ -1426,6 +1428,7 @@ function renderBreadth(app) {
   const prevWk = (() => { const d = new Date(etToday() + "T12:00:00"); do d.setDate(d.getDate() - 1); while ([0, 6].includes(d.getDay())); return d.toISOString().slice(0, 10); })();
   if (last && last.date < prevWk) app.append($(`<div class="r2kwarn" style="margin:0 0 12px">⚠ <b>Breadth data runs through ${longDate(last.date)}.</b> ${longDate(prevWk)}'s numbers haven't loaded yet (unless the market was closed that day). Massive's free plan releases each day just after midnight ET, so the update runs at 12:17–12:25 AM with morning backups; if this is still here after 7 AM, ask Claude to check the update.</div>`));
   if (DATA.macro && DATA.macro.length) app.append(macroStrip(true));
+  if (DATA.themes && DATA.themes.washout) app.append(washoutCard(DATA.themes.washout));
   const pct = (k) => P[k] != null ? `${ord(P[k])} percentile of your history` : "building history";
   const tiles = [
     ["Up 4%+ today", fmt(last.up4), last.up4_avg40 != null ? `40-day avg ${fmt(last.up4_avg40)}` : pct("up4")],
@@ -1499,6 +1502,40 @@ function renderBreadth(app) {
     Money in or out: each stock's dollar volume (close × volume, $3+ stocks) counted toward rising or falling stocks; "$ in falling" = the falling side's share, net $ = rising − falling. Every share sold has a buyer, so this shows which side was in control, not cash literally leaving. 60%+ in falling stocks = money leaving, 40% or less = coming in.
     Regime thresholds are starter values; calibrate them in <code>breadth/config.py</code>.
     · <a href="breadth.csv">Download full history (CSV)</a></footer>`));
+}
+
+/* ---------- Washout thrust: a breadth thrust out of a deep washout, and the high-beta leaders list ---------- */
+function washoutCard(X) {
+  const R = X.rules, cur = X.current, pc = (v, d = 0) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v * 100).toFixed(d) + "%";
+  const cond = (pull, tlo) => `SPY pullback ${pc(pull, 1)} (needs ${pc(-R.pullback)} or deeper) · T2108 low ${tlo ?? "–"} (needs ≤ ${R.t2108})`;
+  const rule = `${R.top} stocks with RS ≥ ${R.min_rs} and the highest 60-day beta to SPY ($5+, $${R.dvol / 1e6}M+/day), bought the next open, held ~${R.window} sessions`;
+  const fin = X.events.filter(e => e.done), dp = fin.filter(e => e.deep), sh = fin.filter(e => !e.deep);
+  const avg = (L, k) => L.length ? L.reduce((a, e) => a + (e[k] || 0), 0) / L.length : null;
+  let head, body = "", cls = "";
+  if (X.state === "washout") {
+    cls = "act";
+    head = `<b>⚡ Washout thrust · day ${cur.sessions + 1} of ${R.window}.</b> The ${longDate(cur.date)} thrust came out of a deep washout (${cond(cur.pullback, cur.t2108_low)}). After the ${X.deep_n} past ones, the most market-sensitive leaders ran hardest (${pc(avg(dp, "basket"), 0)} avg in a month vs ${pc(avg(dp, "all"), 0)} for all stocks): lean into the list below, small size per name, hard stops.`;
+    const P = cur.picks || [];
+    body = `<p class="meta" style="margin:6px 0">${rule}. ${cur.basket == null ? "" : `So far: list ${pc(cur.basket, 1)} (median ${pc(cur.basket_med, 1)}) vs all stocks ${pc(cur.all, 1)}, SPY ${pc(cur.spy, 1)}.`}</p>
+      <div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>RS<small>thrust day</small></th><th>Beta<small>to SPY, 60d</small></th><th>Since entry</th></tr></thead><tbody>
+      ${P.map(p => `<tr><td class="l tname">${p.t}<small>${esc((p.name || "").slice(0, 26))}</small></td><td class="num ${rsTint(p.rs)}">${p.rs ?? "–"}</td><td class="num">${p.beta.toFixed(1)}</td><td class="num">${pc(p.ret, 1)}</td></tr>`).join("")}</tbody></table></div>`;
+  } else if (X.state === "shallow") {
+    cls = "watch";
+    head = `<b>Thrust, but not a washout thrust.</b> The ${longDate(cur.date)} thrust came after a shallow dip (${cond(cur.pullback, cur.t2108_low)}). After the ${X.shallow_n} shallow thrusts on file, the high-beta leaders list averaged ${pc(avg(sh, "basket"), 1)} in a month vs ${pc(avg(sh, "all"), 1)} for all stocks (no real edge, for far more risk): don't chase the most volatile names on this one; your normal setups and the post-thrust playbook still apply.`;
+  } else {
+    head = `No washout thrust in the last ${R.window} sessions. Setup today: ${cond(X.now.pullback, X.now.t2108_low)}. A thrust only counts here if it comes out of a washout that deep.`;
+  }
+  const ev = X.events.slice().reverse().map(e => `<tr><td class="l">${longDate(e.date)}</td><td class="num">${pc(e.pullback, 1)}</td><td class="num">${e.t2108_low ?? "–"}</td>
+    <td class="l">${e.deep ? '<span class="tg ppull">washout</span>' : '<span class="tg pother">shallow</span>'}</td>
+    <td class="num">${e.basket == null ? "–" : pc(e.basket, 1)}${e.done || e.basket == null ? "" : `<small>${e.held} sess.</small>`}</td><td class="num">${pc(e.all, 1)}</td><td class="num">${pc(e.spy, 1)}</td></tr>`).join("");
+  const now = (X.now.list || []).map(p => p.t).join(", ");
+  return $(`<section class="card regcard wocard ${cls}"><div class="kicker">Washout thrust · experimental</div>
+    <p style="margin:8px 0 6px">${head}</p>${body}
+    <details class="kqsec" style="margin-top:8px"><summary><b>Track record and how it works</b></summary>
+      <p class="meta" style="margin:6px 0">Study (Oct 2026, ~2 years of data): no group or "hub" moves before the others (they all bottom with SPY), and plain RS leaders lagged right after thrusts, the momentum-crash pattern where the most market-sensitive stocks lead the rebound. What paid was this list — ${rule} — but only when the thrust came out of a deep washout. Only ${X.deep_n} such events so far, so treat this as a strong hint, not a proven rule; names in the list have dropped as much as 79–90% in a month.</p>
+      <div class="scroll"><table class="grid"><thead><tr><th class="l">Thrust</th><th>SPY pullback<small>vs 60-day high</small></th><th>T2108 low<small>10 sessions</small></th><th class="l">Type</th><th>High-beta list<small>${R.window} sessions</small></th><th>All stocks</th><th>SPY</th></tr></thead><tbody>${ev}</tbody></table></div>
+      ${now ? `<p class="meta" style="margin:8px 0 0">Most market-sensitive strong stocks right now (RS ≥ ${R.min_rs}, by beta): ${esc(now)}. This is what the list would start from if a washout thrust prints.</p>` : ""}
+    </details></section>`);
 }
 
 /* ---------- signal events ---------- */

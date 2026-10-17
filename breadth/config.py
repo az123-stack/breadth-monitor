@@ -75,6 +75,14 @@ DASHBOARD_DAYS = 760         # max days on the charts (~3 years); they scroll
 LEVELS_ENABLED = True
 MACRO_RANGE = "2y"     # Yahoo history for macro series; 2 years matches the stored bars (macro fit layer needs it)
 
-# NYSE full-day closures (for counting sessions to earnings / events on the Decision Cards). Extend each December.
-MARKET_HOLIDAYS = ["2026-11-26", "2026-12-25", "2027-01-01", "2027-01-18", "2027-02-15", "2027-03-26", "2027-05-31",
-                   "2027-06-18", "2027-07-05", "2027-09-06", "2027-11-25", "2027-12-24"]
+# ---- Washout thrust (connector study, Oct 16 2026; see breadth/washout.py) --
+# A breadth thrust that follows a deep washout: SPY at least WASHOUT_PULLBACK below its 60-day high
+# within the 15 sessions up to the thrust, and T2108 at or below WASHOUT_T2108 within 10 sessions.
+# After those (Apr 2025, Mar 2026) the most market-sensitive leaders ran +26% / +33% in a month;
+# after shallow thrusts the same list made -26% to +9%. Only 2 qualifying events: experimental.
+WASHOUT_PULLBACK = 0.08
+WASHOUT_T2108 = 25
+WASHOUT_WINDOW = 21          # sessions the flag stays on after the thrust (~1 month)
+WASHOUT_MIN_RS = 80          # list: RS Rating at least this ...
+WASHOUT_TOP = 30             # ... top N by 60-day beta to SPY ...
+WASHOUT_MIN_DVOL = 20e6      # ... among stocks >= $5 with 50-day avg $ volume >= this
