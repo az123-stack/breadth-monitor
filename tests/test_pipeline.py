@@ -825,6 +825,30 @@ def test_decision_log_evidence():
             config.DATA_DIR = old
 
 
+def test_box_range_and_trap():
+    """A level touched 3 times over months is found when the close breaks it, and a slide 1.5+ ADR back
+    inside before any bounce marks the breakout failed (the HPE case)."""
+    import numpy as np
+    from breadth import boxes as BX
+    n = 220
+    rng = np.random.default_rng(3)
+    c = 50 + rng.normal(0, 0.4, n).cumsum() * 0.2
+    c = np.clip(c, 44, 58)
+    for p in (40, 90, 140):                       # three touches of $60
+        c[p - 3:p + 4] = [57, 58.5, 59.5, 60, 59.5, 58.5, 57]
+    c[200:] = np.linspace(61.5, 66, 20)             # break above, run
+    h, l = c * 1.01, c * 0.99
+    v = np.full(n, 1e6)
+    adr = np.full(n, 2.0)
+    prev10 = pd.Series(h).rolling(10).max().shift(1).to_numpy()
+    ev = BX._range_breakouts(h, l, c, v, adr, 60, n - 1, prev10)
+    assert ev and abs(ev[0][1]["top"] - 60.6) < 1.0 and ev[0][1]["touches"] >= 3, ev[:1]
+    bi, b = ev[0]
+    c2 = np.r_[c[:bi + 6], np.linspace(c[bi + 5], 55, 6)]   # fall straight back through the line
+    w = BX.retest_walk(c2 * 1.01, c2 * 0.99, c2, b, bi, len(c2) - 1, 2.0)
+    assert w["state"] == "failed" and w.get("bounce") is None, w
+
+
 def test_washout_thrust():
     """A thrust after an 8%+ SPY pullback with T2108 <= 25 is 'deep'; a shallow one is not."""
     from breadth import washout

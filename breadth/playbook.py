@@ -68,8 +68,8 @@ def rank(theme_data, state):
     rows = []
     for key, name, src, where in TYPES:
         if src == "box":   # own research (breadth/boxes.py): RS 80+ bounces, same 5-session yardstick as the others
-            bs = ((theme_data.get("boxes") or {}).get("rt_study") or {}).get("by_state") or {}
-            st = {k: bs.get(k + "_rs") or {} for k in ("all", "thrust", "strong", "mixed", "weak")}
+            bs = (theme_data.get("boxes") or {}).get("pb") or {}
+            st = {k: bs.get(k) or {} for k in ("all", "thrust", "strong", "mixed", "weak")}
         else:
             st = ((B.get("setups") or {}).get(key) if src == "trade" else S.get(key)) or {}
         o = st.get(state) or {}
@@ -96,11 +96,9 @@ def rank(theme_data, state):
                 " — improving lately" if r is not None and r < 0 and rec["avg_r"] > 0.1 else "")
             bits.append(f"last 30 sessions {rec['avg_r']:+.2f}R (n {rec['n']}){cool}")
         if src == "box":
-            g = [g for g in (((theme_data.get("boxes") or {}).get("rt_study") or {}).get("groups") or []) if g["rows"]]
-            best = next((r for gg in g for r in gg["rows"] if r["name"] == "After a thrust + RS 80+"), None)
-            if best and best.get("R", {}).get("ret") is not None:
-                bits.append(f"held 20 sessions instead, post-thrust RS 80+ bounces made {best['R']['ret']:+.2f}R (n {best['R']['n']}): "
-                            "it pays over weeks, not days")
+            r20 = ((theme_data.get("boxes") or {}).get("pb") or {}).get("thrust_R20") or {}
+            if r20.get("avg_r") is not None:
+                bits.append(f"held 20 sessions instead, post-thrust bounces in strong groups made {r20['avg_r']:+.2f}R (n {r20['n']})")
         t = today.get(key)
         bits.append("none qualify today" if not t else f"{t} qualify today")
         rows.append({"key": key, "name": name, "where": where, "verdict": verdict, "avg_r": r, "n": n,

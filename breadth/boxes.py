@@ -28,7 +28,7 @@ THE TRADE (Adam, Oct 16 2026): breakout -> sharp pullback to the old box top (no
                when the close is under the top. Dead if it closes under the box middle.
   bounced      first close above the prior day's high AND above the box top after the touch,
                in the last 2 sessions. Stop = lowest low since the touch.
-`retest_events` + `retest_study` test the bounce entry (buy the bounce close) by market type.
+Research, wide ranges, failed breaks and confluence live in breadth/boxstudy.py.
 
 Backtest (`evidence`): every first close above a qualifying box over our ~2 years vs a
 baseline of every first close at a new 20-day high (same liquidity), next 5/10/20
@@ -222,22 +222,13 @@ def build(adjusted, universe, stocks=None, names=None, breadth=None, evidence=Tr
         out["now"] = {"thrust": bool(tw[-1]), "regime": reg, "since": None if not np.isfinite(since) else int(since)}
     except Exception:
         out["now"] = {"thrust": False, "regime": None}
-    out["rt"] = retest_today(H, Lo, C, V, ADR, liq, rs, h52, dates, cols, info, names, "long")
-    out["rt_short"] = retest_today(H, Lo, C, V, ADR, liq, rs, h52, dates, cols, info, names, "short")
-    out["rt_cfg"] = RT
+    try:   # research + today's tags (both sides, tight boxes + wide ranges, retests + failed breaks, confluence)
+        from . import boxstudy
+        out.update(boxstudy.run(adjusted, universe, stocks, names, breadth))
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).exception("box study failed: %s", e)
     if evidence:
-        first = CFG["pole_days"] + CFG["min_len"] + 2
-        split = dates[first + (N - first) // 2].strftime("%Y-%m-%d")
-        spy = w["c"][config.BENCHMARK].to_numpy()
-        for side, key in (("long", "rt_study"), ("short", "rt_study_short")):
-            try:
-                ev = retest_events(H, Lo, C, V, ADR, liq, rs, dates, spy, breadth, side=side)
-                out[key] = retest_study(ev, split, side)
-                out[key]["from"], out[key]["to"] = dates[first].strftime("%Y-%m-%d"), dates[-1].strftime("%Y-%m-%d")
-            except Exception as e:
-                import logging
-                logging.getLogger(__name__).exception("retest study (%s) failed: %s", side, e)
-                out[key] = None
         try:
             out["evidence"] = backtest(H, Lo, C, V, ADR, liq, rs, dates, w["c"].get(config.BENCHMARK), breadth)
         except Exception as e:   # evidence is optional
@@ -345,7 +336,7 @@ def retest_walk(h, l, c, b, bi, end, adrp):
     State at `end`: coming / support / bounced / failed / extended / expired / waiting / after."""
     T, B = b["top"], b["bot"]
     a = T * adrp / 100
-    mid = T - RT["fail_frac"] * (T - B)
+    mid = b.get("fail", T - RT["fail_frac"] * (T - B))      # wide ranges: 1.5 ADR back inside the line
     ph, phi, touch, bounce = h[bi], bi, None, None
     state = "waiting"
     for i in range(bi + 1, end + 1):
@@ -399,70 +390,6 @@ def _real_box(b, side):
     return top, bot, bot, top
 
 
-def retest_today(H, Lo, C, V, ADR, liq, rs, h52, dates, cols, info, names, side="long"):
-    N = len(dates)
-    last = N - 1
-    d = 1 if side == "long" else -1
-    SH, SL, SC = _space(H, Lo, C, side)
-    prev10 = pd.DataFrame(SH).rolling(10).max().shift(1).to_numpy()
-    TAG = {"coming": "coming", "support": "at", "bounced": "go"}
-    rows = []
-    for j, t in enumerate(cols):
-        if not liq[-1, j]:
-            continue
-        h, l, c, v, adr = SH[:, j], SL[:, j], SC[:, j], V[:, j], ADR[:, j]
-        best = None
-        for bi, b in reversed(_breakouts(h, l, c, v, adr, last - RT["window"], last, prev10[:, j], strict=(side == "long"))):
-            w = retest_walk(h, l, c, b, bi, last, adr[bi])
-            if w["state"] == "bounced" and last - w["bounce"] >= RT["fresh"]:
-                continue
-            if w["state"] in TAG:
-                best = (bi, b, w)
-                break
-        if not best:
-            continue
-        bi, b, w = best
-        top, bot, lvl, far = _real_box(b, side)
-        rc, rh, rl = C[:, j], H[:, j], Lo[:, j]
-        price = rc[last]
-        a = lvl * adr[bi] / 100
-        ext = w["ph"] if side == "long" else 1 / w["ph"]      # furthest point past the line since the break
-        tag = TAG[w["state"]]
-        if tag == "at" and d * (price - lvl) < 0:
-            tag = "inside"
-        stop = None
-        if w.get("touch") is not None:
-            stop = float(np.nanmin(rl[w["touch"]:last + 1])) if side == "long" else float(np.nanmax(rh[w["touch"]:last + 1]))
-        midp = (top + bot) / 2
-        target = top + (top - bot) if side == "long" else bot - (top - bot)
-        s = info.get(t, {})
-        rsv = s.get("rsr") if s.get("rsr") is not None else _r(rs[-1, j], 0)
-        rsv = rsv if rsv is not None else 50
-        good = rsv >= RT["rs_long"] if side == "long" else rsv <= RT["rs_short"]
-        rows.append({
-            "t": t, "name": s.get("name") or names.get(t, ""), "price": _r(price), "side": side, "tag": tag,
-            "win": b["win"], "len": b["len"], "wks": round(b["len"] / 5, 1), "start": dates[b["s"]].strftime("%Y-%m-%d"),
-            "bo_date": dates[bi].strftime("%Y-%m-%d"), "bo_ago": last - bi,
-            "bvx": _r(v[bi] / b["bvol"], 2) if b["bvol"] else None,
-            "top": _r(top), "bot": _r(bot), "lvl": _r(lvl), "mid": _r(midp), "height": _r(top / bot - 1, 4),
-            "ph": _r(ext), "ext_adr": _r(d * (ext - lvl) / a, 1), "vs_lvl_adr": _r(d * (price - lvl) / a, 1),
-            "vs_lvl": _r(d * (price / lvl - 1), 4),
-            "touch_ago": None if w.get("touch") is None else last - w["touch"],
-            "bounce_ago": None if w.get("bounce") is None else last - w["bounce"],
-            "stop": _r(stop if stop is not None else midp), "stop_kind": "retest" if stop is not None else "box middle",
-            "target": _r(target), "tgt_pct": _r(target / price - 1, 4),
-            "adr": _r(adr[last], 1), "rsr": rsv,
-            "off_hi": _r(price / h52[-1, j] - 1, 4) if np.isfinite(h52[-1, j]) else None,
-            "dvol": _r(np.nanmean(C[-20:, j] * V[-20:, j]) / 1e6, 0),
-            "theme": (s.get("themes") or [None])[0], "sub": s.get("sub"), "d60": s.get("d60"),
-            "grade": ("A" if b["win"] == "w2" else "B") if good else "C",
-            "px": [_r(x) for x in rc[b["s"] - 10:]], "bs": 10, "be": 10 + b["len"] - 1, "bo": 10 + (bi - b["s"]),
-        })
-    order = {"go": 0, "at": 1, "inside": 2, "coming": 3}
-    rows.sort(key=lambda r: (order[r["tag"]], r["grade"], r["bounce_ago"] or 0, -d * (r["rsr"] or 0)))
-    return rows
-
-
 def market_arrays(breadth, dates):
     N = len(dates)
     if breadth is None:
@@ -494,172 +421,12 @@ def market_arrays(breadth, dates):
             "nhnl": (col("nh10") - col("nl10"))}
 
 
-def retest_events(H, Lo, C, V, ADR, liq, rs, dates, spy, breadth=None, side="long", hold=20):
-    """Every bounce (long) / rejection (short) off a retested box edge in history, with conditions."""
-    N, M = C.shape
-    d = 1 if side == "long" else -1
-    first = CFG["pole_days"] + CFG["min_len"] + 2
-    SH, SL, SC = _space(H, Lo, C, side)
-    prev10 = pd.DataFrame(SH).rolling(10).max().shift(1).to_numpy()
-    h52 = pd.DataFrame(H).rolling(252, min_periods=60).max().to_numpy()
-    spy = np.asarray(spy, dtype=float)
-    s50 = pd.Series(spy).rolling(50).mean().to_numpy()
-    s200 = pd.Series(spy).rolling(200, min_periods=120).mean().to_numpy()
-    mk = market_arrays(breadth, dates)
-    ev = []
-
-    def trade(i, entry, stop, risk, end, j):
-        rh, rl, rc = H[:, j], Lo[:, j], C[:, j]
-        xi, xp = end, rc[end]
-        for k in range(i + 1, end + 1):
-            if (rl[k] <= stop) if d > 0 else (rh[k] >= stop):
-                xi, xp = k, stop
-                break
-        return float(np.clip(d * (xp - entry) / risk, -3, 10)), xi
-
-    for j in range(M):
-        if not liq[:, j].any():
-            continue
-        h, l, c, v, adr = SH[:, j], SL[:, j], SC[:, j], V[:, j], ADR[:, j]
-        rh, rl, rc = H[:, j], Lo[:, j], C[:, j]
-        for bi, b in _breakouts(h, l, c, v, adr, first, N - 3, prev10[:, j], strict=(side == "long")):
-            if not liq[bi, j]:
-                continue
-            w = retest_walk(h, l, c, b, bi, min(N - 1, bi + 2 * RT["expire"] + 5), adr[bi])
-            if w.get("bounce") is None:
-                ev.append({"kind": "nobounce", "i": bi, "touch": w.get("touch") is not None, "state": w["state"]})
-                continue
-            i = w["bounce"]
-            top, bot, lvl, far = _real_box(b, side)
-            entry = rc[i]
-            stop = float(np.nanmin(rl[w["touch"]:i + 1])) if d > 0 else float(np.nanmax(rh[w["touch"]:i + 1]))
-            risk = max(d * (entry - stop), 0.3 * entry * adr[i] / 100)
-            o = {"kind": "bounce", "i": i, "date": dates[i].strftime("%Y-%m-%d"), "j": j}
-            for k in (5, 10, 20):
-                if i + k < N and np.isfinite(rc[i + k]):
-                    o[f"d{k}"] = float(np.clip(d * ((rc[i + k] / entry - 1) - (spy[i + k] / spy[i] - 1)), -0.5, 0.5))
-            if i + 5 < N:
-                o["R5"], _ = trade(i, entry, stop, risk, i + 5, j)
-            if i + 5 < N:
-                midp = (top + bot) / 2       # wider stop variant: the middle of the box
-                rk = max(d * (entry - midp), 0.3 * entry * adr[i] / 100)
-                o["Rm"], _ = trade(i, entry, midp, rk, min(N - 1, i + hold), j)
-                end = min(N - 1, i + hold)
-                o["R"], xi = trade(i, entry, stop, risk, end, j)
-                target = top + (top - bot) if d > 0 else bot - (top - bot)
-                seg = rh[i + 1:xi + 1] if d > 0 else rl[i + 1:xi + 1]
-                o["tgt"] = bool(len(seg) and ((np.nanmax(seg) >= target) if d > 0 else (np.nanmin(seg) <= target)))
-                o["stopped"] = xi < end
-            s0 = b["s"]
-            prior = rc[s0 - 1] / rc[s0 - 41] - 1 if s0 >= 41 and np.isfinite(rc[s0 - 41]) else np.nan
-            o.update({
-                "regime": str(mk["regime"][i]), "thrust": bool(mk["tw"][i]), "since": mk["since"][i],
-                "state": "thrust" if mk["tw"][i] else str(mk["regime"][i]),
-                "spy50": bool(spy[i] > s50[i]) if np.isfinite(s50[i]) else None,
-                "spy200": bool(spy[i] > s200[i]) if np.isfinite(s200[i]) else None,
-                "spy50up": bool(s50[i] > s50[i - 10]) if i >= 10 and np.isfinite(s50[i - 10]) else None,
-                "t2108": mk["t2108"][i], "dn10": mk["dn10"][i], "nhnl": mk["nhnl"][i],
-                "rs": rs[i, j], "win": b["win"], "len": b["len"], "bvx": v[bi] / b["bvol"] if b["bvol"] else np.nan,
-                "inside": bool(d * (stop - lvl) < 0), "ext": (w["ph"] - b["top"]) / (b["top"] * adr[bi] / 100),
-                "days_touch": w["touch"] - bi, "pbv": np.nanmean(v[w["phi"] + 1:w["touch"] + 1]) / v[bi] if w["touch"] > w["phi"] and v[bi] else np.nan,
-                "adr": adr[i], "off": rc[i] / h52[i, j] - 1 if np.isfinite(h52[i, j]) else np.nan,
-                "prior": prior,
-            })
-            ev.append(o)
-    return ev
-
-
-def _st(x):
-    x = np.asarray([v for v in x if v is not None and np.isfinite(v)], dtype=float)
-    if len(x) < 8:
-        return {"n": int(len(x))}
-    sd = x.std(ddof=1)
-    return {"n": int(len(x)), "ret": round(float(x.mean()), 4), "median": round(float(np.median(x)), 4),
-            "win": round(float((x > 0).mean()), 3), "t": round(float(x.mean() / (sd / np.sqrt(len(x)))), 2) if sd > 0 else None}
-
-
-def retest_study(ev, split, side="long"):
-    """Results by condition (R over 20 sessions with the retest stop; R5 = 5-session version), with halves."""
-    B = [e for e in ev if e["kind"] == "bounce"]
-    nb = [e for e in ev if e["kind"] == "nobounce"]
-    ok = lambda v: v is not None and not (isinstance(v, float) and np.isnan(v))
-
-    def blk(sub):
-        d = {"d10": _st([e.get("d10") for e in sub]), "R": _st([e.get("R") for e in sub]), "R5": _st([e.get("R5") for e in sub]),
-             "Rm": _st([e.get("Rm") for e in sub])}
-        tg = [e["tgt"] for e in sub if "tgt" in e]
-        if tg:
-            d["tgt"], d["stop"] = round(float(np.mean(tg)), 3), round(float(np.mean([e["stopped"] for e in sub if "stopped" in e])), 3)
-        d["h1R"] = _st([e.get("R") for e in sub if e["date"] < split]).get("ret")
-        d["h2R"] = _st([e.get("R") for e in sub if e["date"] >= split]).get("ret")
-        return d
-
-    def f(k, test):
-        return [e for e in B if ok(e.get(k)) and test(e[k])]
-
-    rsk, rsn = ("rs", RT["rs_long"]) if side == "long" else ("rs", RT["rs_short"])
-    good = (lambda x: x >= rsn) if side == "long" else (lambda x: x <= rsn)
-    rsname = f"RS {rsn}+" if side == "long" else f"RS {rsn} or lower"
-    th = [e for e in B if e["thrust"]]
-    gs = [e for e in B if ok(e["rs"]) and good(e["rs"])]
-    groups = [
-        ("Best combinations" if side == "long" else "Key combinations", [
-            (f"After a thrust + {rsname}", [e for e in th if e in gs]),
-            (f"After a thrust + {rsname} + 2-4 week box", [e for e in th if e in gs and e["win"] == "w2"]),
-            ("After a thrust + 2-4 week box", [e for e in th if e["win"] == "w2"]),
-            ("No thrust in the last 25 sessions", [e for e in B if not e["thrust"]]),
-            (f"No thrust + {rsname}", [e for e in B if not e["thrust"] and e in gs]),
-            ("Strong breadth but no thrust", [e for e in B if e["regime"] == "strong" and not e["thrust"]]),
-            ("Weak breadth, no thrust", [e for e in B if e["regime"] == "weak" and not e["thrust"]])]),
-        ("Market", [("Strong breadth", [e for e in B if e["regime"] == "strong"]),
-                    ("Mixed breadth", [e for e in B if e["regime"] == "mixed"]),
-                    ("Weak breadth", [e for e in B if e["regime"] == "weak"]),
-                    ("Within 25 sessions of a breadth thrust", th),
-                    ("Thrust day to 5 sessions after", f("since", lambda x: 0 <= x <= 5)),
-                    ("6-25 sessions after a thrust", f("since", lambda x: 6 <= x <= 25)),
-                    ("SPY above its 50-day, 50-day rising", [e for e in B if e["spy50"] and e["spy50up"]]),
-                    ("SPY below its 50-day", [e for e in B if e["spy50"] is False]),
-                    ("SPY below its 200-day", [e for e in B if e["spy200"] is False]),
-                    ("T2108 under 40 (washed out)", f("t2108", lambda x: x < 40)),
-                    ("T2108 over 70 (stretched)", f("t2108", lambda x: x > 70)),
-                    ("New highs beating new lows (10-day)", f("nhnl", lambda x: x > 0)),
-                    ("New lows beating new highs", f("nhnl", lambda x: x <= 0)),
-                    ("Money leaving (10-day share in falling stocks ≥ 52%)", f("dn10", lambda x: x >= 52)),
-                    ("Money coming in (≤ 45%)", f("dn10", lambda x: x <= 45))]),
-        ("Stock", [("RS 80+", f("rs", lambda x: x >= 80)), ("RS 90+", f("rs", lambda x: x >= 90)),
-                   ("RS 30 or lower", f("rs", lambda x: x <= 30)), ("RS 31-79", f("rs", lambda x: 30 < x < 80)),
-                   ("Within 5% of 52-week high", f("off", lambda x: x >= -0.05)), ("30%+ below 52-week high", f("off", lambda x: x <= -0.30)),
-                   ("ADR 4%+", f("adr", lambda x: x >= 4)), ("ADR under 2.5%", f("adr", lambda x: x < 2.5))]),
-        ("Pattern", [*[(f"{n} box", [e for e in B if e["win"] == k]) for k, n, *_ in WINDOWS],
-                     ("Box after a 10%+ advance", f("prior", lambda x: x >= 0.10)),
-                     ("Box after a 10%+ decline", f("prior", lambda x: x <= -0.10)),
-                     ("Break on volume 1.3×+ box avg", f("bvx", lambda x: x >= 1.3)), ("Break on light volume", f("bvx", lambda x: x < 1.3)),
-                     ("Retest stayed outside the box", [e for e in B if not e["inside"]]),
-                     ("Retest went back inside the box", [e for e in B if e["inside"]]),
-                     ("Fast retest (within 5 sessions)", f("days_touch", lambda x: x <= 5)),
-                     ("Slow retest (6+ sessions)", f("days_touch", lambda x: x > 5)),
-                     ("Quiet retest (vol ≤ 0.6× break day)", f("pbv", lambda x: x <= 0.6)),
-                     ("Heavy retest (vol > 0.6×)", f("pbv", lambda x: x > 0.6))]),
-    ]
-    by_state = {}
-    for k in ("all", "thrust", "strong", "mixed", "weak"):
-        sub = B if k == "all" else [e for e in B if e["state"] == k]
-        r5 = [e["R5"] for e in sub if ok(e.get("R5"))]
-        by_state[k] = {"n": len(r5), "avg_r": round(float(np.mean(r5)), 3) if r5 else None,
-                       "win": round(float(np.mean(np.array(r5) > 0)), 3) if r5 else None}
-        sg = [e["R5"] for e in sub if ok(e.get("R5")) and e in gs]
-        by_state[k + "_rs"] = {"n": len(sg), "avg_r": round(float(np.mean(sg)), 3) if sg else None,
-                               "win": round(float(np.mean(np.array(sg) > 0)), 3) if sg else None}
-    return {"side": side, "all": blk(B), "groups": [{"name": g, "rows": [{"name": n, **blk(s)} for n, s in rows]} for g, rows in groups],
-            "funnel": {"breakouts": len(B) + len(nb), "touched": len(B) + sum(e["touch"] for e in nb), "bounced": len(B),
-                       "failed": sum(e["state"] == "failed" for e in nb)}, "split": split, "by_state": by_state}
-
-
 # ---------------------------------------------------------------------------
 # Playbook hook: the long retest joins the Trade Setups as "Box Retest"
 # ---------------------------------------------------------------------------
-BOX_SETUP = ("box", "Box Retest", "Broke out of a flat box, snapped back to the old top and just bounced off it (RS 80+). "
-             "Buy, stop under the retest low, target = box height above the top. Paid best in the weeks after a breadth thrust.")
+BOX_SETUP = ("box", "Box Retest", "Broke out of a box or a multi-touch range, snapped back to the old top and just bounced off it, in a "
+             "strong group (sub-theme above its 50-day or top-20% sub-theme/theme). Buy, stop under the retest low, target = box height "
+             "above the top. Paid best right after a breadth thrust.")
 
 
 def attach(theme_data, top=5):
@@ -671,8 +438,8 @@ def attach(theme_data, top=5):
     stocks = {s["t"]: s for s in theme_data.get("stocks") or []}
     ts = {r["theme"]: r.get("strength") for r in theme_data.get("themes") or []}
     ss = {r["theme"]: r.get("strength") for r in theme_data.get("subthemes") or []}
-    cand = [r for r in Bx.get("rt") or [] if r["tag"] == "go" and (r["rsr"] or 0) >= RT["rs_long"] and r["t"] in stocks]
-    cand.sort(key=lambda r: (r["grade"], r["bounce_ago"] or 0, -(r["rsr"] or 0)))
+    cand = [r for r in Bx.get("live") or [] if r["type"] == "retest_long" and r["tag"] == "go" and r.get("group_ok") and r["t"] in stocks]
+    cand.sort(key=lambda r: (-r["score"], r["bounce_ago"] or 0, -(r["rsr"] or 0)))
     keys = []
     for r in cand:
         s = stocks[r["t"]]
@@ -691,7 +458,84 @@ def attach(theme_data, top=5):
         row["angles"] = sorted(set(row.get("angles", [])) | {"box"})
         row["hits"] = len(row["angles"])
         row.update({"box_stop": r["stop"], "box_lvl": r["lvl"], "box_target": r["target"], "box_grade": r["grade"],
-                    "box_wks": r["wks"], "box_bounce_ago": r["bounce_ago"]})
+                    "box_wks": r["wks"], "box_bounce_ago": r["bounce_ago"], "box_kind": r["kind"]})
         keys.append(r["t"])
     X["setups"] = [S for S in X["setups"] if S["key"] != "box"] + [
         {"key": BOX_SETUP[0], "name": BOX_SETUP[1], "desc": BOX_SETUP[2], "count": len(keys), "top": keys[:top]}]
+
+
+# ---------------------------------------------------------------------------
+# Wide ranges (Oct 17, 2026; Adam's HPE / CRWV charts): a horizontal level touched 3+ times over months, with
+# the price living below it (resistance) the whole time. Same breakout-space trick as the tight boxes, so a
+# support line (CRWV ~$66) is a "resistance" in 1/price. Box height is free (up to 150%).
+# ---------------------------------------------------------------------------
+RG = {"k": 5, "look": 480, "min_span": 40, "min_touch": 3, "touch_gap": 8, "tol_adr": 1.0, "tol_min": 0.02,
+      "hold_frac": 0.5, "max_run": 3, "max_over": 0.04, "max_height": 1.5, "fail_adr": 1.5, "bot_q": 0.10}
+
+
+def swing_highs(h, k=RG["k"]):
+    """Indexes p where h[p] is the highest of p-k..p+k (known at bar p+k)."""
+    n = len(h)
+    if n < 2 * k + 1:
+        return np.array([], dtype=int)
+    hh = np.where(np.isfinite(h), h, -np.inf)
+    win = np.lib.stride_tricks.sliding_window_view(hh, 2 * k + 1)
+    mid = np.arange(k, n - k)
+    ok = (win.argmax(axis=1) == k) & np.isfinite(h[mid])
+    return mid[ok]
+
+
+def _range_breakouts(h, l, c, v, adr, lo, hi, prev10):
+    """[(bi, box)] first closes above a multi-touch level (breakout space), bi in [lo, hi]."""
+    P = RG
+    piv = swing_highs(h)
+    if not len(piv):
+        return []
+    out, last_b = [], -99
+    for bi in range(max(lo, P["look"] // 10), hi + 1):
+        if not (np.isfinite(c[bi]) and np.isfinite(prev10[bi]) and c[bi] > prev10[bi]) or bi - last_b < 10:
+            continue
+        a = adr[bi - 1]
+        if not np.isfinite(a) or a <= 0:
+            continue
+        tol = max(P["tol_adr"] * a / 100, P["tol_min"])
+        cand = piv[(piv + P["k"] <= bi - 1) & (piv >= bi - P["look"])]
+        if len(cand) < P["min_touch"]:
+            continue
+        pv = h[cand]
+        best = None
+        # anchors: pivots whose level the close just crossed
+        for q in np.flatnonzero((pv <= c[bi] * (1 + tol)) & (pv >= c[bi - 1] / (1 + 2 * tol))):
+            mem = cand[np.abs(pv / pv[q] - 1) <= tol]
+            L = float(np.median(h[mem]))
+            if not (c[bi] > L * (1 + P["hold_frac"] * tol) >= c[bi - 1]):
+                continue
+            touches = 1 + int(np.sum(np.diff(np.sort(mem)) > P["touch_gap"]))
+            if touches < P["min_touch"]:
+                continue
+            s = int(mem.min())
+            if bi - s < P["min_span"]:
+                continue
+            over = c[s:bi] > L * (1 + P["hold_frac"] * tol)          # closes through the level before today
+            if over.any():                                            # brief shakeouts are allowed (Wyckoff spring /
+                runs = np.diff(np.r_[0, over.astype(int), 0])          # upthrust), a real break is not
+                longest = int((np.flatnonzero(runs == -1) - np.flatnonzero(runs == 1)).max())
+                if longest > P["max_run"] or over.sum() > max(P["max_run"], P["max_over"] * (bi - s)):
+                    continue
+            bot = float(np.nanquantile(l[s:bi], P["bot_q"]))
+            if not (bot > 0 and L / bot - 1 <= P["max_height"]):
+                continue
+            if best is None or touches > best[0]:
+                best = (touches, s, L, bot)
+        if best is None:
+            continue
+        touches, s, L, bot = best
+        n = bi - s
+        bv = np.nanmean(v[s:bi])
+        b = {"s": s, "e": bi - 1, "len": n, "win": "range", "kind": "range", "top": L, "bot": bot, "height": L / bot - 1,
+             "h_adr": (L / bot - 1) * 100 / a, "pole": np.nan, "pole_days": 0, "dry": np.nan, "fade": np.nan,
+             "bvol": bv, "pole_vol": np.nan, "touches": touches,
+             "fail": L * (1 - P["fail_adr"] * a / 100)}
+        out.append((bi, b))
+        last_b = bi
+    return out

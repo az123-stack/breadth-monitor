@@ -267,28 +267,36 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   next 10 sessions, sold-hardest sub-themes +4.3% vs SPY (median +3.2%, 78%) vs held-up +0.5%; ex Mar–Apr 2025 +3.9%; any 70%+ day (n 24)
   sold +1.9% / held +1.0%. First calm comeback day (n 9) → SPY median −1.2% next 10, held-up +1.7%, middle +1.5%, sold −0.1%; 60-day
   leaders +3.1% over 20. Read: snapbacks start around the heavy-selling days; after a calm comeback day follow what held up.
-- `boxes.py` **Box retest, long + short** (Oct 16–17, 2026; Adam's chart: Loew's 1936 rectangle, Edwards & Magee) → `DATA.themes.boxes`,
-  card `boxCard` on Trade Setups (after the setup cards). Box = longest 10–130-session range ≤ 3/4/5/6 ADRs (windows 2–4 wk, 4–8 wk,
-  2–3 mo, 3–6 mo; max 25%, min max(3%, 1 ADR) so pinned buyout names drop), 2+ touches of top and bottom, flat (fit ≤ ½ height); LONG
-  boxes also need a 15%+ / 4+ ADR advance in the prior 40 sessions and box volume ≤ 0.9× the advance (`find_box(strict=True)`).
-  LONG = breakout → pullback to the old top → bounce; SHORT = breakdown → rally back to the old bottom → rejection. The short side runs
-  the same `retest_walk` / `_breakouts` on reciprocal prices (1/low, 1/high, 1/close; `_space`), outcomes on real prices.
-  Tags (`rt`, `rt_short`; `tag`): `coming` (ran 1+ ADR past the line, now 1+ ADR back, within 3 ADRs), `at` / `inside` (within 0.5 ADR
-  of the line / back inside the box, no reaction yet), `go` (close past the prior day's extreme and back past the line after the
-  touch, last 2 sessions). Dead on a close past the box middle; 25 sessions to touch / react. Stop = retest extreme; target = height
-  from the line. Grade A = RS 80+ (long) / RS ≤ 30 (short) & 2–4 wk box, B = RS rule only. `now.since` = sessions since the
-  latest major thrust (`market_arrays`). Banners per side pick the research bucket matching today (thrust day–5 / 6–25 / no thrust).
-  PLAYBOOK (Oct 17): `boxes.attach` adds setup "box" (Box Retest) to `trade_setups` = today's fresh LONG `go` names with RS 80+ in the
-  theme universe (rows carry `box_stop/lvl/target/grade/wks`); `playbook.TYPES` source "box" ranks it by `rt_study.by_state[state+"_rs"]`
-  (5-session R, same yardstick as the other setups); plan buy open, stop retest low (ledger uses `vcp_stop` column for it), risk10k from it.
-  Shorts are NOT in the playbook / picks (no short side in the ledger).
-  Research (Jan 2025–Oct 2026; buy/short the signal close, stop past the retest extreme, else 20 sessions; `R5` = 5-session, `Rm` = box-
-  middle stop): LONG 4,061 breakouts → 2,339 bounces, all +0.11R; thrust + RS 80+ +0.51R (t 3.9, halves +0.66/+0.46); thrust day to 5
-  sessions after +0.46R (t 3.5, 44% win, both halves); 6–25 after +0.13R; no thrust +0.02R (2nd half −0.19); strong breadth w/o thrust
-  −0.07R; weak −0.08R. At 5 sessions post-thrust RS 80+ only +0.10R → playbook says Selective; the edge builds over ~4 weeks.
-  SHORT 9,092 breakdowns → 5,093 rejections, all −0.05R; thrust day to 5 sessions after −0.42R (t −5.9, 19% win, both halves): worst
-  cell; strong breadth w/o thrust +0.16R (t 2.1, 2nd half ≈ 0); weak breadth −0.10R; SPY under its 200-day −0.79R (one V-rebound
-  episode, Apr 2025). Shorts look worse than reality: survivorship (delisted losers missing), mostly-bull window, no borrow costs.
+- `boxes.py` + `boxstudy.py` **Box trades** (Oct 16–17, 2026; Adam's charts: Loew's 1936 rectangle, HPE failed breakout, CRWV
+  breakdown retest) → `DATA.themes.boxes`, card `boxCard` on Trade Setups (4 trade tiles with today's verdict, tags per trade, research).
+  LINES: tight box (`find_box`, 10–130 sessions ≤ 3/4/5/6 ADRs, min max(3%, 1 ADR), 2+ touches each side, flat; LONG side also needs a
+  15%+ advance + volume dry-up, `strict`) and WIDE RANGE (`_range_breakouts`, `RG`: swing highs k=5 within 480 sessions clustered within
+  max(1 ADR, 2%), line = cluster median, 3+ separate touches, span ≥ 40, level held — brief shakeouts ≤ 3 closes / 4% of span allowed,
+  far side = 10th pct of lows, height ≤ 150%, fail line = 1.5 ADR back inside; tight boxes fail at the middle). Support lines run the same
+  code on 1/price (`_space`). HPE: range line $63.44 (Adam drew $63.42), broke Oct 2, failed Oct 15–16. CRWV: support $68.51, broke Oct 14.
+  TRADES (`boxstudy.TYPES`): retest_long / retest_short (break → back to the line → bounce / rejection, tags go/at/inside/coming via
+  `boxes.retest_walk`), trap_short / trap_long (break → closes past the fail line before any bounce → trade toward the far side; tags
+  failed (entry, stop 0.5 ADR back over the line, target far side) / far (close through the far side within 40 sessions, stop 5-day
+  extreme) / falling (in between); dead if the line is reclaimed). Research: `collect` (every event, signal close → NEXT OPEN entry, skip
+  gap-through-stop, 20-session exit or stop, R floored 0.3 ADR, x21/x63 vs SPY, `R5` = 5-session), `features` (market state thr05 /
+  thr625 / none, regime, SPY 50/200, dn10, nh−nl; sub-theme + theme 20/60-day return rank, above 50-day, % above 21 EMA from
+  `group_frames`; siblings = same group + trade within 10 sessions; RS, RS line near 1-yr high/low, 200-day, 50-day slope, signal volume,
+  52-wk distance, beta quartile; box kind/length/break volume/extension/days to fail), `study` (per condition: stats + `edge_vs_rest`
+  = R with minus without, Welch t, per half; `proven` = edge t ≥ 2, n ≥ 30, same sign both halves), pairs (exploratory, t ≥ 2.5, both
+  halves), `episodes` (thr05 signals per independent thrust, follow-throughs merged within 14 days). Live rows (`live`) carry `conf`
+  (proven helps/hurts present), `score`, grade A ≥ +2 / B +1 / C, `group_ok`. ~85 s per build.
+  PLAYBOOK: `boxes.attach` → setup "box" (Box Retest) = today's retest_long `go` names with group confluence (sub-theme above 50-day or
+  top-20% sub-theme/theme, `GROUP_OK`); ranked by `boxes.pb` (5-session R by state). Shorts / traps not in the playbook or picks.
+  FINDINGS (Jan 2025–Oct 2026, next-open entry): retest_long all +0.04R; thr05 +0.45R (t 4.4, halves +0.41/+0.47, positive after 5 of 6
+  thrusts; Feb 2026 −0.43); no thrust −0.05R; weak breadth −0.19R; group confluence proven: sub-theme top 20% 20d +0.24R (edge +0.22, t 2.4),
+  60d +0.25R, above 50-day +0.16R (edge t 3.3), breadth 70%+ +0.16R, theme top 20% +0.25R; not in any sub-theme −0.04R (hurts); RS 80+
+  alone no edge. Independent recompute (median-member groups, raw bars): thr05 +1.49% vs SPY 21d vs none −0.95%; top-20% group +1.87% vs
+  −0.09%. retest_short all −0.12R (t −5.4); thr05 −0.43R (lost after 4 of 6 thrusts); weak-group shorts WORSE (sub-theme weak / low
+  breadth / siblings breaking down: edge −0.1 to −0.36R) — sold-out groups snap back; helped: strong breadth (+0.12R), RS ≤ 30, stocks
+  outside themes; lead pair 6–25 sessions after a thrust + RS ≤ 30 +0.28R. trap_short (HPE) −0.07R, no positive condition; far_short
+  −0.04R. trap_long (spring) +0.07R; thr05 +0.46R (t 6.6, 5 of 6 thrusts), SPY under 50-day +0.24R, nh<nl +0.33R, money leaving +0.21R,
+  theme top 20% +0.59R, ADR 4%+ +0.20R. far_long thr05 +0.33R, strong breadth +0.17R, group strength +0.3R, weak breadth −0.25R.
+  Baseline any liquid stock 21d vs SPY −0.65% (shorts get that tailwind). Limits: survivorship (shorts look worse), bull-heavy 2 yrs.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
