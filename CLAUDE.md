@@ -26,6 +26,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - Workflow commits data + rebuilt `docs/index.html`; push step retries with
   `git pull --rebase -X theirs`. When pushing manually, pull with rebase first
   (the bot commits daily) and rebuild generated files if they conflict.
+  Manual code pushes: plain `git pull --rebase` (no `-X theirs`) — other Claude sessions also commit code, and `-X theirs`
+  silently drops their edits in shared files (Oct 16: it removed `MARKET_HOLIDAYS`; check `git diff <their commit> HEAD` shows only your additions).
 - Intraday: page fetches a published Google Sheet CSV of GOOGLEFINANCE prices
   ("Breadth Monitor – Live Prices", id `1_R08vZphNLMB4MUJSl_bNPx5DjVVy29tMV8WFaOQkSs`,
   URL in `config.LIVE_CSV_URL`) and recomputes themes/stocks in the browser.
