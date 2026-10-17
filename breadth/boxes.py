@@ -469,7 +469,7 @@ def attach(theme_data, top=5):
 # the price living below it (resistance) the whole time. Same breakout-space trick as the tight boxes, so a
 # support line (CRWV ~$66) is a "resistance" in 1/price. Box height is free (up to 150%).
 # ---------------------------------------------------------------------------
-RG = {"k": 5, "look": 480, "min_span": 40, "min_touch": 3, "touch_gap": 8, "tol_adr": 1.0, "tol_min": 0.02,
+RG = {"k": 5, "look": 480, "min_span": 40, "min_touch": 3, "touch_gap": 8, "tol_adr": 1.0, "tol_min": 0.01,
       "hold_frac": 0.5, "max_run": 3, "max_over": 0.04, "max_height": 1.5, "fail_adr": 1.5, "bot_q": 0.10}
 
 
@@ -483,6 +483,22 @@ def swing_highs(h, k=RG["k"]):
     mid = np.arange(k, n - k)
     ok = (win.argmax(axis=1) == k) & np.isfinite(h[mid])
     return mid[ok]
+
+
+def _floor(h, l, s, bi, L, tol):
+    """Far side of a wide range: the most-touched swing-low zone (2+ separate touches) inside the span and clearly
+    below the line; falls back to the 10th percentile of lows. Works in breakout space (so it is a ceiling for supports)."""
+    seg = l[s:bi]
+    lows = s + swing_highs(-seg)
+    lows = lows[(lows >= s) & (lows < bi) & (l[lows] < L * (1 - 3 * tol))] if len(lows) else lows
+    best = None
+    for p in lows:
+        mem = lows[np.abs(l[lows] / l[p] - 1) <= tol]
+        k = 1 + int(np.sum(np.diff(np.sort(mem)) > RG["touch_gap"]))
+        lvl = float(np.median(l[mem]))
+        if k >= 2 and (best is None or k > best[0] or (k == best[0] and lvl > best[1])):
+            best = (k, lvl)
+    return best[1] if best else float(np.nanquantile(seg, RG["bot_q"]))
 
 
 def _range_breakouts(h, l, c, v, adr, lo, hi, prev10):
@@ -522,7 +538,7 @@ def _range_breakouts(h, l, c, v, adr, lo, hi, prev10):
                 longest = int((np.flatnonzero(runs == -1) - np.flatnonzero(runs == 1)).max())
                 if longest > P["max_run"] or over.sum() > max(P["max_run"], P["max_over"] * (bi - s)):
                     continue
-            bot = float(np.nanquantile(l[s:bi], P["bot_q"]))
+            bot = _floor(h, l, s, bi, L, tol)
             if not (bot > 0 and L / bot - 1 <= P["max_height"]):
                 continue
             if best is None or touches > best[0]:

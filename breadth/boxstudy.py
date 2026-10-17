@@ -46,6 +46,7 @@ def group_frames(c, members, spy):
         return None
     I = pd.DataFrame(idx)
     return {"r20": (I / I.shift(20) - 1).rank(axis=1, pct=True), "r60": (I / I.shift(60) - 1).rank(axis=1, pct=True),
+            "r120": (I / I.shift(120) - 1).rank(axis=1, pct=True),
             "a50": (I > I.rolling(50).mean()).astype(float).where(I.rolling(50).mean().notna()),
             "br": pd.DataFrame(br)}
 
@@ -60,7 +61,7 @@ def market_frame(dates, breadth, spy):
 
 
 # ----------------------------------------------------------------------------- events
-def _trade(O, H, L, C, i, dd, stop, adr, n):
+def _trade(O, H, L, C, i, dd, stop, adr, n, target=None):
     """Enter next open; returns dict or None. dd = +1 long / -1 short; stop in real price."""
     e_i = i + 1
     if e_i >= n or not np.isfinite(O[e_i]) or not np.isfinite(stop):
@@ -80,6 +81,16 @@ def _trade(O, H, L, C, i, dd, stop, adr, n):
     if done:
         o["R"] = float(np.clip(dd * (xp - e) / risk, -3, 10))
         o["stopped"] = xi < end
+        if target is not None and np.isfinite(target) and dd * (target - e) > 0:     # cover / sell at the target
+            ti, tp = end, C[end]
+            for k in range(e_i, end + 1):
+                if (L[k] <= stop) if dd > 0 else (H[k] >= stop):
+                    ti, tp = k, (min(stop, O[k]) if dd > 0 else max(stop, O[k])) if k > e_i else stop
+                    break
+                if (H[k] >= target) if dd > 0 else (L[k] <= target):
+                    ti, tp = k, (max(target, O[k]) if dd > 0 else min(target, O[k])) if k > e_i else target
+                    break
+            o["Rt"] = float(np.clip(dd * (tp - e) / risk, -3, 10))
         e5 = min(n - 1, e_i + 4)
         x5 = xp if xi <= e5 and xi < end else C[e5]
         o["R5"] = float(np.clip(dd * (x5 - e) / risk, -3, 10))
@@ -115,10 +126,10 @@ def collect(w, cols, liq, rs, ADR, spy, spyo, lo=None):
                         "touches": b.get("touches"), "lvl": lvl, "far": far, "h_adr": b["h_adr"],
                         "bvx": V[bi] / b["bvol"] if b["bvol"] else np.nan, "ext": (w_["ph"] - T) / (T * a / 100)}
 
-                def add(typ, i, dd, stop, extra=None):
+                def add(typ, i, dd, stop, extra=None, target=None):
                     if i is None or i >= N - 1 or not liq[i, j] or i - last.get(typ, -99) < 10:
                         return
-                    tr = _trade(O, H, L, C, i, dd, stop, ADR[i, j], N)
+                    tr = _trade(O, H, L, C, i, dd, stop, ADR[i, j], N, target)
                     if tr is None:
                         return
                     last[typ] = i
@@ -134,14 +145,18 @@ def collect(w, cols, liq, rs, ADR, spy, spyo, lo=None):
                 if w_.get("bounce") is not None:
                     i = w_["bounce"]
                     st = float(np.nanmin(L[w_["touch"]:i + 1])) if d > 0 else float(np.nanmax(H[w_["touch"]:i + 1]))
-                    add("retest_" + side, i, d, st, {"days_touch": w_["touch"] - bi, "inside": bool(d * (st - lvl) < 0)})
+                    add("retest_" + side, i, d, st, {"days_touch": w_["touch"] - bi, "inside": bool(d * (st - lvl) < 0)},
+                        target=(top + (top - bot)) if d > 0 else (bot - (top - bot)))
                 # failed break -> trap, then far side
                 if w_["state"] == "failed" and w_.get("bounce") is None and w_["i"] - bi <= FAR_DAYS:
                     f = w_["i"]
                     trap = "trap_" + ("short" if side == "long" else "long")
                     st_b = T * (1 + 0.5 * a / 100)                    # breakout space: back over the line
                     st = st_b if side == "long" else 1 / st_b
-                    add(trap, f, -d, st, {"days_fail": f - bi})
+                    seg_l, seg_c = l[f + 1:min(N, f + 21)], c[f + 1:min(N, f + 21)]
+                    tk = np.flatnonzero(seg_l <= b["bot"]); rk = np.flatnonzero(seg_c > T)
+                    touch20 = (bool(len(tk)) and (not len(rk) or tk[0] < rk[0])) if f + 20 < N else None
+                    add(trap, f, -d, st, {"days_fail": f - bi, "touch20": touch20}, target=far)
                     Bb = b["bot"]
                     for k in range(f + 1, min(N - 1, f + FAR_DAYS) + 1):
                         if c[k] > T:                                  # reclaimed the line: thesis gone
@@ -149,7 +164,8 @@ def collect(w, cols, liq, rs, ADR, spy, spyo, lo=None):
                         if c[k] < Bb <= c[k - 1]:
                             hi5 = np.nanmax(h[k - 4:k + 1])
                             st = hi5 if side == "long" else 1 / hi5
-                            add("far_" + ("short" if side == "long" else "long"), k, -d, st, {"days_fail": f - bi, "days_far": k - f})
+                            add("far_" + ("short" if side == "long" else "long"), k, -d, st, {"days_fail": f - bi, "days_far": k - f},
+                                target=(bot - (top - bot)) if side == "long" else (top + (top - bot)))
                             break
     return ev
 
@@ -169,7 +185,10 @@ def features(ev, w, cols, rs, ADR, spy, mk, grp, sub_of, theme_of, thm):
     sr = pd.Series(spy, index=c.index).pct_change()
     beta = (r.rolling(60).cov(sr) / sr.rolling(60).var()).to_numpy()
     bq = pd.DataFrame(beta).rank(axis=1, pct=True).to_numpy()
-    di = {d: k for k, d in enumerate(c.index)}
+    r126 = c / c.shift(126) - 1
+    r126q = r126.rank(axis=1, pct=True).to_numpy()
+    r20q = (c / c.shift(20) - 1).rank(axis=1, pct=True).to_numpy()
+    r126 = r126.to_numpy()
     for e in ev:
         i, j = e["i"], e["j"]
         e["date"] = c.index[i].strftime("%Y-%m-%d")
@@ -182,6 +201,7 @@ def features(ev, w, cols, rs, ADR, spy, mk, grp, sub_of, theme_of, thm):
         e["off"] = C[i, j] / h52[i, j] - 1 if np.isfinite(h52[i, j]) else np.nan
         e["adr"] = ADR[i, j]
         e["betaq"] = bq[i, j]
+        e["s_r126q"], e["s_r126"], e["s_r20q"] = r126q[i, j], r126[i, j], r20q[i, j]
         for name, G, of in (("g", grp, sub_of), ("th", thm, theme_of)):
             g = of.get(e["t"])
             if G is None or g is None or g not in G["r20"].columns:
@@ -190,6 +210,7 @@ def features(ev, w, cols, rs, ADR, spy, mk, grp, sub_of, theme_of, thm):
             e[name] = g
             e[name + "_r20"] = G["r20"].iat[i, G["r20"].columns.get_loc(g)]
             e[name + "_r60"] = G["r60"].iat[i, G["r60"].columns.get_loc(g)]
+            e[name + "_r120"] = G["r120"].iat[i, G["r120"].columns.get_loc(g)]
             e[name + "_a50"] = G["a50"].iat[i, G["a50"].columns.get_loc(g)]
             e[name + "_br"] = G["br"].iat[i, G["br"].columns.get_loc(g)]
     # siblings: same group, same trade, within the prior 10 sessions (incl. the same day)
@@ -236,6 +257,15 @@ def conditions(dd):
         ("Theme / group", "Theme bottom 20% on 20-day return", f("th_r20", lambda x: x <= 0.2)),
         ("Theme / group", "A sibling did the same trade in the last 10 sessions", f("sib", lambda x: x >= 1)),
         ("Theme / group", "Not in any sub-theme", lambda e: not e.get("g")),
+        ("In vogue", "In-vogue stock (top 10% on 6-month return)", f("s_r126q", lambda x: x >= 0.9)),
+        ("In vogue", "In-vogue stock now fading (6-month top 10%, 20-day bottom half)", lambda e: _ok(e.get("s_r126q")) and _ok(e.get("s_r20q")) and e["s_r126q"] >= 0.9 and e["s_r20q"] <= 0.5),
+        ("In vogue", "Stock up 50%+ in 6 months", f("s_r126", lambda x: x >= 0.5)),
+        ("In vogue", "Stock down 30%+ in 6 months", f("s_r126", lambda x: x <= -0.3)),
+        ("In vogue", "In-vogue sub-theme (top 20% on 6-month return)", f("g_r120", lambda x: x >= 0.8)),
+        ("In vogue", "In-vogue sub-theme now fading (6-month top 20%, 20-day bottom half)", lambda e: _ok(e.get("g_r120")) and _ok(e.get("g_r20")) and e["g_r120"] >= 0.8 and e["g_r20"] <= 0.5),
+        ("In vogue", "In-vogue theme (top 20% on 6-month return)", f("th_r120", lambda x: x >= 0.8)),
+        ("In vogue", "In-vogue theme now fading (6-month top 20%, 20-day bottom half)", lambda e: _ok(e.get("th_r120")) and _ok(e.get("th_r20")) and e["th_r120"] >= 0.8 and e["th_r20"] <= 0.5),
+        ("In vogue", "Out-of-favor sub-theme (bottom 20% on 6-month return)", f("g_r120", lambda x: x <= 0.2)),
         ("Stock", "RS 80+", f("rs", lambda x: x >= 80)),
         ("Stock", "RS 30 or lower", f("rs", lambda x: x <= 30)),
         ("Stock", "RS line within 3% of its 1-year high", f("rl_hi", lambda x: x)),
@@ -270,6 +300,16 @@ def stats(sub, split):
         for k, cond in (("h1", lambda e: e["date"] < split), ("h2", lambda e: e["date"] >= split)):
             x = [e["R"] for e in sub if _ok(e.get("R")) and cond(e)]
             out[k] = round(float(np.mean(x)), 3) if len(x) >= 5 else None
+    rt = np.array([e["Rt"] for e in sub if _ok(e.get("Rt"))])
+    if len(rt) >= 8:
+        out["Rt"] = round(float(rt.mean()), 3)
+        out["Rt_t"] = round(float(rt.mean() / (rt.std(ddof=1) / np.sqrt(len(rt)))), 2) if rt.std(ddof=1) > 0 else None
+        for k, cond in (("Rt1", lambda e: e["date"] < split), ("Rt2", lambda e: e["date"] >= split)):
+            x = [e["Rt"] for e in sub if _ok(e.get("Rt")) and cond(e)]
+            out[k] = round(float(np.mean(x)), 3) if len(x) >= 5 else None
+    tt = [e["touch20"] for e in sub if e.get("touch20") is not None]
+    if len(tt) >= 8:
+        out["touch20"] = round(float(np.mean(tt)), 3)
     for k in ("x21", "x63"):
         x = np.array([e[k] for e in sub if _ok(e.get(k))])
         if len(x) >= 8:
@@ -368,6 +408,7 @@ def episodes(ev, breadth, typ):
 # ----------------------------------------------------------------------------- live tags
 TAGS = {"retest_long": ["go", "at", "inside", "coming"], "retest_short": ["go", "at", "inside", "coming"],
         "trap_short": ["failed", "far", "falling"], "trap_long": ["failed", "far", "falling"]}
+INDEX = ["QQQ", "SPY", "IWM", "SMH", "DIA"]
 GROUP_OK = ("Sub-theme above its 50-day", "Sub-theme top 20% on 20-day return", "Theme top 20% on 20-day return")
 
 
@@ -455,26 +496,62 @@ def live(w, cols, liq, rs, ADR, h52, dates, info, names, window=60):
     return rows
 
 
-def confluence(rows, R, w, cols, rs, ADR, spy, mk, grp, sub_of, theme_of, thm):
-    """Tag each live row with the proven confluences of its trade (helps / hurts) and grade it."""
+def expected(e, typ, state, hist, R, conds):
+    """Average result of past trades like this one: same trade, same market state, same proven confluences
+    (helps and hurts). Weakest confluences are dropped until 30+ past trades match."""
+    X = (R or {}).get(typ) or {}
+    edge = {x["name"]: abs(x.get("edge") or 0) for x in X.get("rows", []) if proven(x)}
+    fn = {nm: f for g, nm, f in conds}
+    flags = sorted([nm for nm in edge if g_of(conds, nm) != "Market" and fn[nm](e)], key=lambda nm: -edge[nm])
+    pool = [h for h in hist if h["state"] == state]
+    if len(pool) < 30:
+        pool = hist
+    used = list(flags)
+    while True:
+        m = [h for h in pool if all(fn[nm](h) for nm in used)]
+        if len(m) >= 30 or not used:
+            break
+        used.pop()
+    if len(m) < 8:
+        return None
+    r = [h["R"] for h in m]
+    tt = [h["touch20"] for h in m if h.get("touch20") is not None]
+    return {"exp": round(float(np.mean(r)), 3), "exp_win": round(float(np.mean(np.array(r) > 0)), 3), "exp_n": len(m),
+            "exp_used": used, "exp_touch": round(float(np.mean(tt)), 3) if len(tt) >= 8 else None}
+
+
+def g_of(conds, nm):
+    return next((g for g, n, f in conds if n == nm), None)
+
+
+def confluence(rows, R, w, cols, rs, ADR, spy, mk, grp, sub_of, theme_of, thm, ev=None):
+    """Tag each live row with the proven confluences of its trade (helps / hurts), the average result of similar past
+    trades (`exp`, in R) and a grade from it: A >= +0.40R, B >= +0.15R, C below."""
     evs = features([r["_ev"] for r in rows], w, cols, rs, ADR, spy, mk, grp, sub_of, theme_of, thm)
+    hist = {}
+    for h in ev or []:
+        if not h.get("gap") and _ok(h.get("R")):
+            hist.setdefault(h["type"], []).append(h)
+    state = str(mk["state"][-1])
     for r, e in zip(rows, evs):
         X = (R or {}).get(r["type"]) or {}
         prov = {x["name"]: proven(x) for x in X.get("rows", [])}
         dd = 1 if r["side"] == "long" else -1
+        conds = conditions(dd)
         flags = []
-        for g, nm, fn in conditions(dd):
+        for g, nm, fn in conds:
             if g == "Market" or not prov.get(nm):
                 continue
             if fn(e):
                 flags.append({"name": nm, "eff": prov[nm]})
-        sc = sum(f["eff"] for f in flags)
-        r["conf"], r["score"] = flags, sc
-        r["grade"] = "A" if sc >= 2 else "B" if sc == 1 else "C"
-        r["group_ok"] = any(fn(e) for g, nm, fn in conditions(dd) if nm in GROUP_OK)
-        r["g_r20"] = BX._r(e.get("g_r20"), 2) if _ok(e.get("g_r20")) else None
-        r["th_r20"] = BX._r(e.get("th_r20"), 2) if _ok(e.get("th_r20")) else None
-        r["g_br"] = BX._r(e.get("g_br"), 2) if _ok(e.get("g_br")) else None
+        r["conf"], r["score"] = flags, sum(f["eff"] for f in flags)
+        x = expected(e, r["type"], state, hist.get(r["type"], []), R, conds) or {}
+        r.update(x)
+        ex = x.get("exp")
+        r["grade"] = "C" if ex is None else "A" if ex >= 0.40 else "B" if ex >= 0.15 else "C"
+        r["group_ok"] = any(fn(e) for g, nm, fn in conds if nm in GROUP_OK)
+        for k in ("g_r20", "th_r20", "g_br", "g_r120", "th_r120", "s_r126q"):
+            r[k] = BX._r(e.get(k), 2) if _ok(e.get(k)) else None
         r.pop("_ev", None); r.pop("_j", None)
     return rows
 
@@ -521,11 +598,32 @@ def run(adjusted, universe, stocks, names, breadth):
     for typ in R:
         R[typ]["episodes"] = episodes(ev, breadth, typ) if breadth is not None else []
     info = {s["t"]: s for s in stocks or []}
-    rows = confluence(live(w, cols, liq, rs, ADR, h52, dates, info, names or {}), R, w, cols, rs, ADR, spy, mk, grp, sub_of, theme_of, thm)
+    rows = confluence(live(w, cols, liq, rs, ADR, h52, dates, info, names or {}), R, w, cols, rs, ADR, spy, mk, grp, sub_of, theme_of, thm, ev)
     order = {"go": 0, "failed": 0, "far": 0, "at": 1, "inside": 2, "falling": 2, "coming": 3}
-    rows.sort(key=lambda r: (order.get(r["tag"], 9), -r["score"], -(r["rsr"] or 0) * (1 if r["side"] == "long" else -1)))
+    rows.sort(key=lambda r: (order.get(r["tag"], 9), -(r.get("exp") if r.get("exp") is not None else -9)))
+    # index ETFs (not in the stock universe): same tags, so the big picture sits on top of the card
+    ix = [t for t in INDEX if t in w["c"].columns]
+    idx_rows = []
+    if ix:
+        Ci, Hi, Li = (w[k][ix].to_numpy() for k in ("c", "h", "l"))
+        ADRi = (pd.DataFrame(Hi / Li).rolling(20, min_periods=15).mean().to_numpy() - 1) * 100
+        h52i = pd.DataFrame(Hi).rolling(252, min_periods=60).max().to_numpy()
+        ones = np.ones_like(Ci, dtype=bool)
+        idx_rows = live(w, ix, ones, np.full(Ci.shape, np.nan), ADRi, h52i, dates, {}, {t: t for t in ix}, window=60)
+        hist = [h for h in ev if not h.get("gap") and _ok(h.get("R"))]
+        for r in idx_rows:
+            r.pop("_ev", None); r.pop("_j", None)
+            m = [h for h in hist if h["type"] == r["type"] and h["kind"] == r["kind"]]
+            ms = [h for h in m if h["state"] == str(mk["state"][-1])]
+            tt = [h["touch20"] for h in m if h.get("touch20") is not None]
+            r.update({"hist_n": len(m), "hist_R": round(float(np.mean([h["R"] for h in m])), 3) if m else None,
+                      "hist_R_state": round(float(np.mean([h["R"] for h in ms])), 3) if len(ms) >= 8 else None, "hist_n_state": len(ms),
+                      "hist_touch": round(float(np.mean(tt)), 3) if len(tt) >= 8 else None})
+        idx_status = {t: next(({"type": r["type"], "tag": r["tag"]} for r in idx_rows if r["t"] == t), None) for t in ix}
+    else:
+        idx_status = {}
     now = {"state": str(mk["state"][-1]), "regime": str(mk["regime"][-1])}
-    return {"live": rows, "study": R, "split": split, "now_state": now, "pb": playbook_states(ev),
+    return {"live": rows, "idx": idx_rows, "idx_status": idx_status, "study": R, "split": split, "now_state": now, "pb": playbook_states(ev),
             "from": dates[first].strftime("%Y-%m-%d"), "to": dates[-1].strftime("%Y-%m-%d"),
             "baseline": baseline(w, cols, liq, spy, spyo, first)}
 

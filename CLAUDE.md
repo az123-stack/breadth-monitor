@@ -308,6 +308,18 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   −0.04R. trap_long (spring) +0.07R; thr05 +0.46R (t 6.6, 5 of 6 thrusts), SPY under 50-day +0.24R, nh<nl +0.33R, money leaving +0.21R,
   theme top 20% +0.59R, ADR 4%+ +0.20R. far_long thr05 +0.33R, strong breadth +0.17R, group strength +0.3R, weak breadth −0.25R.
   Baseline any liquid stock 21d vs SPY −0.65% (shorts get that tailwind). Limits: survivorship (shorts look worse), bull-heavy 2 yrs.
+  Oct 17 (2nd pass): range far side = most-touched swing-low zone inside the span (`_floor`; QQQ $702.7, Adam ~$703), tol floor 1%
+  (was 2%: low-ADR ETFs like QQQ never "broke"). `INDEX` QQQ/SPY/IWM/SMH/DIA → `idx` rows + `idx_status` (strip on top of the card;
+  QQQ Oct 16: failed breakout of range line $748.35, falling, far side $702.7). Target-exit variant `Rt` (retests: measured move; traps:
+  far side; far breaks: measured move) and `touch20` (trap reached the far side within 20 sessions before reclaiming the line).
+  SELECTION: `expected()` = avg R of past trades with the same type, market state and proven confluences (weakest dropped until n ≥ 30)
+  → `exp`, `exp_win`, `exp_n`, `exp_used`, `exp_touch`; grade A ≥ +0.40R / B ≥ +0.15R / C; default view Grade A–B ("boxScope").
+  IN VOGUE (6-month leaders, conditions group "In vogue"): shorting stocks in a 6-month top-20% theme / sub-theme (incl. "now fading" on
+  20 days) much worse (retest_short edge −0.35 to −0.45R, trap_short −0.25 to −0.30R, both halves); helps longs (retest_long sub-theme
+  +0.22R, spring theme +0.45R). Stock's own 6-month run: no reliable effect. Far-side reach after failure: tight 66%, range 39% (20d);
+  target exit doesn't rescue trap_short (Rt −0.05R). Fib levels (0.382/0.5/0.618) inside the box held no better than neighbours (40% vs
+  39%; middle 0.5 slightly better 44%). FOMC-day swing lows NOT more likely revisited/taken (68% vs 73% once within 1 ADR; per meeting
+  44–100%); slightly more sweep-and-reverse (72% vs 67%). Any swing low is taken ~70% of the time once price is within 1 ADR.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
