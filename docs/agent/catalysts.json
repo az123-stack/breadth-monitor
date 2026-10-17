@@ -1,6 +1,6 @@
 {
  "for_date": "2026-10-15",
- "written": "2026-10-17T02:17Z",
+ "written": "2026-10-17T02:18Z",
  "stocks": {
   "OSCR": {
    "why": "Still re-rating on Q2 beat (net income $362M vs a loss a year ago) and 2026 operating-earnings guidance raised to $500-700M, followed by price-target hikes; no fresh company news this week beyond scheduling Q3 results.",
@@ -18,7 +18,7 @@
    ]
   },
   "SN": {
-   "why": "Near 52-week highs on analyst target raises and positioning into Q3 results, which include an expected ~$247M cost-of-sales benefit from tariff refund claims; no fresh hard news.",
+   "why": "Near 52-week highs on analyst target raises and positioning into Q3 results, which include an expected ~$247M cost-of-sales benefit tied to refund claims; no fresh hard news.",
    "direction": "positive",
    "quality": "real",
    "earnings_date": null,
