@@ -248,6 +248,17 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["scoreboard"] = ledger.summary(adjusted, history=history)
         except Exception as e:
             log.exception("pick scoreboard failed: %s", e)
+        try:   # Decision Cards: every layer per trade idea (information only; see DECISIONS.md) + daily layer log
+            from . import decision, macrofit, macro as MAC
+            cands = [t for t, _ in decision.candidates(theme_data)]
+            mfit = macrofit.build(adjusted, MAC.load(), cands)
+            dec = decision.build(theme_data, history, mfit, metrics.classify(history).get("label"))
+            if dec:
+                decision.record(dec)
+                decision.settle(adjusted)
+                theme_data["decision"] = decision.strip_private(dec)
+        except Exception as e:
+            log.exception("decision cards failed: %s", e)
         try:
             from . import review
             theme_data["setup_review"] = review.evaluate(theme_data, history)

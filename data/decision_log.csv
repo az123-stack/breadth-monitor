@@ -1,0 +1,26 @@
+date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_tier,ignited,tail5,tail20,macro_words,earn_date,earn_days,event_risk,catalyst,cat_dir,cat_quality,red_flags,brief_risk,support,warn,entry,exit,fwd5,spy5,status
+2026-10-15,A,cand,vcp,thrust,Breadth thrust,Focus,0.289,87.0,Life Science Tools,91.8,confirmed,,0.0,0.0,,,,,,,,,,2,0,,,,,pending
+2026-10-15,ABNB,cand,vcp,thrust,Breadth thrust,Focus,0.289,84.0,Travel & Gig Platforms,44.4,bouncing,,2.22,-2.22,+10bp 10-yr yield → -1.6%,,,,,,,,,1,0,,,,,pending
+2026-10-15,ADM,cand,vcp,thrust,Breadth thrust,Focus,0.289,73.0,Farm Equipment & Ag Processing,52.5,outflow,,1.55,-0.77,+1% oil → +0.2%,,,,,,,,,1,1,,,,,pending
+2026-10-15,ATKR,cand,vcp,thrust,Breadth thrust,Focus,0.289,88.0,Gas Turbines & Grid Equipment,37.7,outflow,,-0.34,4.47,+1% dollar → +2.5%,,,,,,,,,1,1,,,,,pending
+2026-10-15,ATRC,cand,rotation,thrust,Breadth thrust,Focus,0.372,95.0,Medical Devices,70.7,bouncing,warming,0.0,0.0,,,,,,,,,,2,0,,,,,pending
+2026-10-15,CLMT,cand,ath,thrust,Breadth thrust,Focus,0.24,98.0,Refiners,97.4,confirmed,,2.45,-1.22,+1% oil → +0.4%,,,,,,,,,3,0,,,,,pending
+2026-10-15,CON,cand,round,thrust,Breadth thrust,Focus,0.285,94.0,Healthcare Providers,93.3,new,warming,0.0,0.0,,,,,,,,,,3,0,,,,,pending
+2026-10-15,CRM,cand,rotation,thrust,Breadth thrust,Focus,0.372,83.0,Enterprise SaaS,93.4,new,warming,0.0,0.0,,,,,,,,,,2,0,,,,,pending
+2026-10-15,DK,cand,pullback,thrust,Breadth thrust,Focus,0.298,97.0,Refiners,97.4,confirmed,,2.6,-1.29,+1% oil → +0.4%,,,,,,,,,3,0,,,,,pending
+2026-10-15,FTNT,cand,pullback,thrust,Breadth thrust,Focus,0.298,97.0,Cybersecurity Platforms,84.2,fading,,0.0,0.0,,,,,,,,,,2,0,,,,,pending
+2026-10-15,LFST,cand,pullback,thrust,Breadth thrust,Focus,0.298,94.0,Healthcare Providers,93.3,new,warming,0.0,0.0,,,,,,,,,,3,0,,,,,pending
+2026-10-15,MATX,cand,ath,thrust,Breadth thrust,Focus,0.24,93.0,Tankers & Shipping,85.4,neutral,,0.0,0.0,,,,,,,,,,3,0,,,,,pending
+2026-10-15,MPC,cand,round,thrust,Breadth thrust,Focus,0.285,98.0,Refiners,97.4,confirmed,,2.44,-1.21,+1% oil → +0.4%,,,,,,,,,3,0,,,,,pending
+2026-10-15,PACS,cand,round,thrust,Breadth thrust,Focus,0.285,95.0,Healthcare Providers,93.3,new,warming,0.0,0.0,,,,,,,,,,3,0,,,,,pending
+2026-10-15,PSX,cand,round,thrust,Breadth thrust,Focus,0.285,96.0,Refiners,97.4,confirmed,,2.05,-1.02,+1% oil → +0.3%,,,,,,,,,3,0,,,,,pending
+2026-10-15,QLYS,cand,pullback,thrust,Breadth thrust,Focus,0.298,92.0,Identity & Security Tools,88.7,fading,ignition,0.0,0.0,,,,,,,,,,2,0,,,,,pending
+2026-10-15,SLDE,cand,ath,thrust,Breadth thrust,Focus,0.24,91.0,P&C Insurers,72.3,new,warming,2.7,-2.7,+10bp 10-yr yield → -1.9%,,,,,,,,,2,0,,,,,pending
+2026-10-15,TRV,cand,rotation,thrust,Breadth thrust,Focus,0.372,81.0,P&C Insurers,72.3,new,warming,1.65,-1.65,+10bp 10-yr yield → -1.2%,,,,,,,,,1,0,,,,,pending
+2026-10-15,ZETA,cand,rotation,thrust,Breadth thrust,Focus,0.372,95.0,Social & Ad Platforms,77.1,confirmed,warming,0.0,0.0,,,,,,,,,,3,0,,,,,pending
+2026-10-15,ZIM,cand,pullback,thrust,Breadth thrust,Focus,0.298,89.0,Tankers & Shipping,85.4,neutral,,0.0,0.0,,,,,,,,,,2,0,,,,,pending
+2026-10-15,OSCR,pick1,rotation,thrust,Breadth thrust,Focus,0.372,94.0,Managed Care,86.8,new,ignition,0.0,0.0,,,,,,,,,,3,0,,,,,pending
+2026-10-15,SN,pick2,round,thrust,Breadth thrust,Focus,0.285,93.0,Consumer Brands,86.3,confirmed,ignition,1.03,-1.62,+10bp 10-yr yield → -1.6%; +1% oil → -0.2%,,,,,,,,,3,0,,,,,pending
+2026-10-15,IBRX,watch,kq,thrust,Breadth thrust,Focus,0.212,98.0,Oncology Biotech,77.7,fading,,0.0,0.0,,,,,,,,,,2,0,,,,,pending
+2026-10-15,PBF,watch,vcp,thrust,Breadth thrust,Focus,0.289,98.0,Refiners,97.4,confirmed,,2.77,-1.38,+1% oil → +0.4%,,,,,,,,,3,0,,,,,pending
+2026-10-15,TENB,watch,vcp,thrust,Breadth thrust,Focus,0.289,90.0,Identity & Security Tools,88.7,fading,ignition,0.0,0.0,,,,,,,,,,2,0,,,,,pending

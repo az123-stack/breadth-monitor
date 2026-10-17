@@ -1,0 +1,76 @@
+{
+ "macro_fit": {
+  "asof": "2026-10-16",
+  "signals": 6258,
+  "from": "2025-03-28",
+  "to": "2026-10-07",
+  "rule": "tailwind = macro moves of the last 5 sessions imply > +0.25% for the stock (real sensitivities only); headwind < -0.25%; result = actionable 5-session return of each Trade Setups signal",
+  "tail5": {
+   "n_good": 1013,
+   "n_bad": 798,
+   "avg_good": 0.00249,
+   "avg_bad": 0.01997,
+   "dates": 243,
+   "diff": -0.01748,
+   "t": -1.52,
+   "halves": [
+    -0.02159,
+    -0.01401
+   ],
+   "passed": false
+  },
+  "tail20": {
+   "n_good": 1089,
+   "n_bad": 819,
+   "avg_good": 0.01009,
+   "avg_bad": 0.01006,
+   "dates": 253,
+   "diff": 3e-05,
+   "t": -0.41,
+   "halves": [
+    -0.01482,
+    0.01285
+   ],
+   "passed": false
+  },
+  "passed": false,
+  "by_setup": {
+   "ath": {
+    "n_good": 215,
+    "n_bad": 144,
+    "diff": -0.00575,
+    "t": -1.23
+   },
+   "kq": {
+    "n_good": 11,
+    "n_bad": 7,
+    "diff": -0.0619,
+    "t": null
+   },
+   "pullback": {
+    "n_good": 191,
+    "n_bad": 208,
+    "diff": -0.01184,
+    "t": -0.81
+   },
+   "rotation": {
+    "n_good": 214,
+    "n_bad": 191,
+    "diff": -0.02597,
+    "t": -1.5
+   },
+   "round": {
+    "n_good": 317,
+    "n_bad": 188,
+    "diff": -0.02289,
+    "t": -2.27
+   },
+   "vcp": {
+    "n_good": 65,
+    "n_bad": 60,
+    "diff": -0.02049,
+    "t": -0.41
+   }
+  }
+ }
+}

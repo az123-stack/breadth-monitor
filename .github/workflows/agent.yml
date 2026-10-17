@@ -1,0 +1,47 @@
+name: Agent input
+
+# Saves a Catalyst / Macro agent answer to docs/agent/<kind>.json and rebuilds the page so the Decision Cards (and
+# data/decision_log.csv) include it. Dispatched by `python -m breadth.agentfiles publish --push` from the Claude
+# scheduled tasks (they can dispatch workflows but not write repo files). The JSON arrives base64-encoded and is
+# validated again here; an invalid file is never written.
+on:
+  workflow_dispatch:
+    inputs:
+      kind: { description: "catalysts or macro_brief", required: true }
+      b64: { description: "Agent JSON, base64", required: true }
+
+permissions:
+  contents: write
+
+concurrency:
+  group: breadth-update          # same queue as the daily update, so the two never race
+  cancel-in-progress: false
+
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q -r requirements.txt
+      - name: Validate and save
+        env:
+          KIND: ${{ inputs.kind }}
+          B64: ${{ inputs.b64 }}
+        run: python -m breadth.agentfiles save --kind "$KIND" --b64 "$B64"
+      - name: Rebuild the page with it
+        run: python -m breadth.update --rebuild-only
+      - name: Commit
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          git add docs data
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -qm "Agent input: ${{ inputs.kind }}"
+          for i in 1 2 3; do
+            git push -q && break
+            git pull -q --rebase -X theirs || { git rebase --abort; break; }
+          done

@@ -664,6 +664,107 @@ def test_russell_holdings():
             intraday.set_bars(None)
 
 
+def test_macrofit():
+    """A stock built to fall 2% per +10bp in yields gets a real (t >= 2) rate sensitivity; noise gets none;
+    the tailwind has the right sign; nothing uses data after the measured day."""
+    from breadth import macrofit as MF
+    rng = np.random.default_rng(7)
+    n = 200
+    dates = pd.bdate_range("2026-01-01", periods=n)
+    spy = rng.normal(0, 0.01, n); dy = rng.normal(0, 0.05, n); oil = rng.normal(0, 0.02, n)
+    rate_stock = 1.0 * spy - 0.20 * dy + rng.normal(0, 0.005, n)          # -0.2 per 1pt = -2% per 10bp
+    noise = rng.normal(0, 0.02, n)
+    px = lambda r: 100 * np.cumprod(1 + r)
+    rows = []
+    for t, r in (("SPY", spy), ("RATE", rate_stock), ("NOIS", noise)):
+        rows += [{"date": d, "ticker": t, "c": v} for d, v in zip(dates, px(r))]
+    bars = pd.DataFrame(rows)
+    tnx = 4 + np.cumsum(dy); crude = 80 * np.cumprod(1 + oil); dxy = np.full(n, 100.0)
+    mc = {k: {"rows": [[d.strftime("%Y-%m-%d"), float(v)] for d, v in zip(dates, s_)]}
+          for k, s_ in (("tnx", tnx), ("crude", crude), ("dxy", dxy))}
+    out = MF.build(bars, mc, ["RATE", "NOIS"])
+    r, z = out["stocks"]["RATE"], out["stocks"]["NOIS"]
+    assert r["t"]["tnx"] <= -2 and -2.4 < r["sens"]["tnx"] < -1.6, r
+    assert not z["words"] or all("10-yr" not in w for w in z["words"])
+    moved = tnx[-1] - tnx[-6]
+    assert (r["tail5"] > 0) == (moved < 0)                                  # falling yields help a rate-sensitive stock
+    # no look-ahead: research() at day i must equal build() on data cut at day i
+    i = 150
+    sig = pd.DataFrame({"date": [dates[i]], "t": ["RATE"], "fwd_next": [0.0]})
+    a = MF.research(sig, bars, mc)["tail5"].iloc[0]
+    cut = bars[bars["date"] <= dates[i]]
+    mc_cut = {k: {"rows": [x for x in v["rows"] if x[0] <= dates[i].strftime("%Y-%m-%d")]} for k, v in mc.items()}
+    b = MF.build(cut, mc_cut, ["RATE"])["stocks"]["RATE"]["tail5"]
+    assert abs(a - b) < 0.02, (a, b)
+
+
+def test_decision_cards(tmp_path=None):
+    """Cards carry every layer; unproven layers never change the Top 2; stale agent files are ignored;
+    agent JSON is validated; the log settles next-open to 5-sessions-later close."""
+    import tempfile, json as _json
+    from breadth import decision as DC, agentfiles as AF
+    assert DC.sessions_until("2026-10-15", "2026-10-19") == 2 and DC.sessions_until("2026-10-15", "2026-10-12") == -3
+    old_d, old_docs = config.DATA_DIR, config.DOCS_DIR
+    with tempfile.TemporaryDirectory() as d:
+        config.DATA_DIR = Path(d); config.DOCS_DIR = Path(d) / "docs"
+        try:
+            (config.DOCS_DIR / "agent").mkdir(parents=True)
+            T = {"date": "2026-10-15",
+                 "playbook": {"state": "thrust", "label": "Post-thrust",
+                              "rows": [{"key": "rotation", "name": "Rotation Rookie", "verdict": "Focus", "avg_r": 0.3, "n": 400}],
+                              "picks": [{"t": "AAA", "setup": "rotation", "rsr": 95, "sub": "G1", "plan": {"entry": "x"}},
+                                        {"t": "BBB", "setup": "rotation", "rsr": 91, "sub": "G2"}],
+                              "pick_watch": [], "pick_cands": ["AAA", "BBB", "CCC"]},
+                 "trade_setups": {"rows": {"AAA": {"setups": ["rotation"], "rsr": 95, "sub": "G1", "sub_str": 90, "off_hi": -0.02, "adr": 4},
+                                           "CCC": {"setups": [], "rsr": 60, "sub": "G3", "sub_str": 30}}},
+                 "stocks": [], "rotation": {"flow": {"stock_group": {}, "rows": [{"g": "G3", "tier": "outflow"}]}, "ignition": {"rows": []}}}
+            before = _json.dumps(T["playbook"], sort_keys=True)
+            # stale catalysts (older date) must be ignored; fresh macro brief used
+            (config.DOCS_DIR / "agent" / "catalysts.json").write_text(_json.dumps({"for_date": "2026-10-14", "stocks": {"AAA": {"why": "old", "direction": "positive", "quality": "strong", "sources": ["https://x.y"]}}}))
+            (config.DOCS_DIR / "agent" / "macro_brief.json").write_text(_json.dumps({"for_date": "2026-10-15", "headline": "h", "risk": "high",
+                "events": [{"date": "2026-10-19", "name": "CPI", "impact": "high"}], "sources": ["https://x.y"]}))
+            dec = DC.build(T, None, {}, "Breadth thrust")
+            assert _json.dumps(T["playbook"], sort_keys=True) == before          # information only: nothing re-ranked
+            roles = [c["role"] for c in dec["cards"]]
+            assert roles[:2] == ["pick1", "pick2"] and len(dec["cards"]) == 3   # de-duplicated
+            a = dec["cards"][0]
+            names = [l["name"] for l in a["layers"]]
+            assert names == ["Market", "Group", "Setup", "Macro fit", "Calendar", "Catalyst", "Macro brief"]
+            L = {l["name"]: l for l in a["layers"]}
+            assert L["Catalyst"]["state"] == "unknown"                          # stale file ignored
+            assert "CPI" in L["Calendar"]["text"] and L["Macro brief"]["state"] == "bad"
+            assert L["Macro fit"]["proven"] is False and L["Market"]["proven"] is True
+            c = {l["name"]: l for l in dec["cards"][2]["layers"]}
+            assert c["Group"]["state"] == "bad" and c["Setup"]["state"] == "bad"
+            # validation
+            good = {"for_date": "2026-10-15", "stocks": {"aaa": {"why": "beat", "direction": "positive", "quality": "strong",
+                    "earnings_date": "2026-10-20", "sources": ["https://news.example/a"]}, "BBB": {"why": "no source"}}}
+            v = AF.validate("catalysts", good)
+            assert list(v["stocks"]) == ["AAA"]                                # no source -> dropped
+            for bad in ({"stocks": {}}, {"for_date": "2026-10-15", "stocks": {"A": {"sources": []}}}):
+                try:
+                    AF.validate("catalysts", bad); assert False
+                except ValueError:
+                    pass
+            try:
+                AF.validate("macro_brief", {"for_date": "2026-10-15", "headline": "h", "risk": "extreme", "sources": ["https://a.b"]}); assert False
+            except ValueError:
+                pass
+            # log + settle: entry next open, exit 5th close after
+            DC.record(dec)
+            dates = pd.bdate_range("2026-10-13", periods=12)
+            rows = []
+            for k, dd in enumerate(dates):
+                for t, base in (("AAA", 10.0), ("BBB", 20.0), ("CCC", 5.0), ("SPY", 100.0)):
+                    rows.append({"date": dd, "ticker": t, "o": base + k, "c": base + k + 0.5})
+            df = DC.settle(pd.DataFrame(rows))
+            r = df[df["t"] == "AAA"].iloc[0]
+            # card date 10-15 (k=2) -> entry open 10-16 (k=3) = 13; exit close k=7 = 17.5
+            assert r["status"] == "closed" and abs(r["entry"] - 13) < 1e-9 and abs(r["exit"] - 17.5) < 1e-9
+        finally:
+            config.DATA_DIR, config.DOCS_DIR = old_d, old_docs
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

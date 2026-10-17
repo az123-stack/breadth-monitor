@@ -187,6 +187,14 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .pbv.selective { background: color-mix(in srgb, var(--warning) 30%, transparent); }
 .pbv.avoid { background: color-mix(in srgb, var(--critical) 28%, transparent); }
 .pbv.unproven { background: var(--grid); color: var(--text-secondary); }
+.dlay { display: grid; grid-template-columns: 14px 84px minmax(0, 1fr); gap: 0 6px; padding: 4px 0; border-top: 1px solid var(--grid); font-size: 13px; align-items: baseline; }
+.dlay > span:nth-child(2) { color: var(--text-muted); font-weight: 600; }
+.dlay > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.ddot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted); }
+.ddot.good { background: var(--good); } .ddot.bad { background: var(--critical); } .ddot.neutral { background: var(--neutral-mid); border: 1px solid var(--text-muted); }
+.ddot.info { background: var(--s1); } .ddot.unknown { background: transparent; border: 1px dashed var(--text-muted); }
+.dtag { font-size: 10px; padding: 1px 5px; border-radius: 6px; background: var(--grid); color: var(--text-secondary); margin-left: 4px; white-space: nowrap; }
+.dsum { font-size: 12px; margin: 4px 0 6px; }
 .pbtab td.pbwhy { white-space: normal; min-width: 280px; font-size: 12.5px; color: var(--text-secondary); }
 .pbtab tr.pbdim td { opacity: .7; }
 .tg { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 1px 6px; border-radius: 999px; margin: 1px 2px 1px 0; white-space: nowrap;
@@ -3609,6 +3617,7 @@ function renderTrades(app) {
       : $(`<div class="note revcard" style="padding:0 2px 10px">✓ Setups still fit the market. Last reviewed ${b.date ? longDate(b.date) : "–"} in ${b.regime || "–"} breadth; checked daily for a breadth-regime change (${RV.checks.regime_days}+ sessions), a setup going dry (${RV.checks.dry_days} sessions with no names) or slumping (≤ ${RV.checks.slump_r}R over its last 30 sessions), 3+ new top-5 themes, or ${RV.checks.stale_days}+ days since review — and the same morning a major breadth thrust fires.</div>`));
   }
   if (T.playbook && (T.playbook.picks || []).length) app.append(picksCard(T.playbook, T));
+  if (T.decision && (T.decision.cards || []).length) app.append(decisionCard(T.decision));
   if (T.playbook) app.append(playbookCard(T.playbook));
   head.querySelector(".tsall").addEventListener("click", () => document.querySelector(".tsopen").click());
   app.append(head);
@@ -3653,6 +3662,28 @@ function renderTrades(app) {
   app.append(tagStatsCard((T.trade_bt || {}).tag_stats));
   app.append(hveCard(T));
   app.append(tsBacktest(T.trade_bt, (T.playbook && T.playbook.state) || now));
+}
+function decisionCard(D) {
+  const ROLE = { pick1: "Top pick #1", pick2: "Top pick #2", watch: "Watch (trigger not close yet)", cand: "Candidate" };
+  const SET = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Q-Flag", vcp: "VCP", round: "Round Number" };
+  const lay = (l) => `<div class="dlay"><span><i class="ddot ${l.state}" title="${l.state}"></i></span><span>${esc(l.name)}</span><span>${esc(l.text)}${l.proven ? "" : ' <span class="dtag" title="Shown for information: not backtested yet, or failed its backtest. It does not change rankings.">unproven</span>'}</span></div>`;
+  const sum = (c) => `<div class="dsum meta">${c.support} layer${c.support === 1 ? "" : "s"} support · ${c.warn} warning${c.warn === 1 ? "" : "s"}${c.layers.some(l => l.state === "unknown") ? " · some not checked yet" : ""}</div>`;
+  const big = D.cards.filter(c => c.role !== "cand"), rest = D.cards.filter(c => c.role === "cand");
+  const M = D.macro, A = D.agents || {}, B = A.brief;
+  const mline = M ? `Macro backdrop (official close ${M.date}): 10-yr ${M.tnx.toFixed(2)}% (${M.tnx_d5 >= 0 ? "+" : ""}${M.tnx_d5}bp in 5 days) · WTI $${M.oil.toFixed(2)} (${M.oil_d5 >= 0 ? "+" : ""}${M.oil_d5}%) · dollar ${M.usd.toFixed(1)} (${M.usd_d5 >= 0 ? "+" : ""}${M.usd_d5}%)` : "";
+  const bline = B ? `<div style="margin:6px 0"><b>Macro brief</b> <span class="pbv ${B.risk === "high" ? "avoid" : B.risk === "low" ? "focus" : "selective"}">${esc(B.risk || "?")} risk</span> ${esc(B.headline || "")}
+    ${(B.events || []).length ? `<div class="meta" style="font-size:12px;margin-top:3px">Coming up: ${B.events.slice(0, 6).map(e => `${esc(e.date)} ${esc(e.time || "")} <b>${esc(e.name)}</b>${e.impact === "high" ? " ⚠" : ""}`).join(" · ")}</div>` : ""}</div>` : `<div class="meta" style="margin:6px 0">Macro brief, earnings dates and catalysts: not checked yet (the agents run around 7:00 AM ET on weekdays).</div>`;
+  const E = (D.evidence || {}).macro_fit;
+  const ev = E ? `Macro fit backtest (${E.signals.toLocaleString()} past setup trades, ${E.from} to ${E.to}): a recent macro tailwind made ${pct(E.tail5.avg_good)} vs ${pct(E.tail5.avg_bad)} with a headwind (t ${E.tail5.t}) — ${E.passed ? "passed" : "not proven, so it's shown for information only"}.` : "";
+  const el = $(`<section class="card regcard"><div class="kicker">Decision cards · every layer behind today's ideas</div>
+    <div class="meta" style="font-size:12px;margin-top:4px">${mline}</div>${bline}
+    <div class="picks">${big.map(c => `<div class="pick"><div class="phead"><span class="pt">${c.t}</span><span class="pbv unproven">${esc(ROLE[c.role] || c.role)}</span>${c.setup ? `<span class="pbv focus">${esc(c.setup_name || SET[c.setup] || c.setup)}</span>` : ""}</div>
+      <div class="meta" style="font-size:12px">${esc((c.name || "").slice(0, 40))}${c.price ? ` · last close $${c.price.toFixed(2)}` : ""}</div>${sum(c)}${c.layers.map(lay).join("")}</div>`).join("")}</div>
+    ${rest.length ? `<details class="kqsec" style="margin-top:10px"><summary><b>Other candidates</b> · ${rest.length} more, same layers</summary>
+      <div class="scroll"><table class="grid"><thead><tr><th class="l">Ticker</th><th class="l">Setup</th>${rest[0].layers.map(l => `<th>${esc(l.name)}</th>`).join("")}<th>Support</th><th>Warnings</th></tr></thead><tbody>
+      ${rest.map(c => `<tr><td class="l"><b>${c.t}</b></td><td class="l">${esc(SET[c.setup] || c.setup || "–")}</td>${c.layers.map(l => `<td title="${esc(l.text)}" style="text-align:center"><i class="ddot ${l.state}"></i></td>`).join("")}<td class="num">${c.support}</td><td class="num">${c.warn}</td></tr>`).join("")}</tbody></table></div></details>` : ""}
+    <div class="note" style="padding:8px 0 0">Dots: <i class="ddot good"></i> supports the trade · <i class="ddot bad"></i> warning · <i class="ddot neutral"></i> neutral · <i class="ddot info"></i> information only · <i class="ddot unknown"></i> not checked. Market, group and setup are the dashboard's backtested measures; macro fit, calendar, catalyst and the macro brief are <b>unproven</b> and never change the Top 2 ranking. Every layer is logged each day (data/decision_log.csv) and the weekly review tests which ones actually separate winners from losers. ${ev}</div></section>`);
+  return el;
 }
 function picksCard(P, T) {
   const R = (T.trade_bt || {}).pick_replay;
