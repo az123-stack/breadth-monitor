@@ -1,0 +1,37 @@
+name: Macro history
+
+# On-demand refresh of data/macro.json (Yahoo futures / yields / dollar, 2 years). The daily update also refreshes
+# it; this exists so a session can get fresh macro history without running the whole update.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: macro-history
+  cancel-in-progress: false
+
+jobs:
+  macro:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q -r requirements.txt
+      - name: Fetch macro series
+        run: python -m breadth.macro refresh
+      - name: Commit
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          git add data/macro.json
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -qm "Macro history $(TZ=America/New_York date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git push -q && break
+            git pull -q --rebase -X theirs || { git rebase --abort; break; }
+          done

@@ -84,7 +84,7 @@ def refresh(session=None):
         if not sym:
             continue
         try:
-            r = session.get(URL.format(t=sym), params={"range": "1y", "interval": "1d"},
+            r = session.get(URL.format(t=sym), params={"range": config.MACRO_RANGE, "interval": "1d"},
                             headers={"User-Agent": "Mozilla/5.0 (breadth-monitor)"}, timeout=20)
             if r.status_code != 200:
                 raise RuntimeError(r.status_code)
@@ -164,3 +164,10 @@ def build(adjusted, cache=None):
         if it:
             out.append(it)
     return out
+
+
+if __name__ == "__main__":      # python -m breadth.macro refresh  (used by .github/workflows/macro.yml)
+    import sys
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
+    if sys.argv[1:] == ["refresh"]:
+        refresh()

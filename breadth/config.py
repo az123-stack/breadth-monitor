@@ -73,3 +73,4 @@ DASHBOARD_DAYS = 760         # max days on the charts (~3 years); they scroll
 
 # Long-history levels (old highs) for Trade Setups, from Yahoo monthly data; tests switch this off.
 LEVELS_ENABLED = True
+MACRO_RANGE = "2y"     # Yahoo history for macro series; 2 years matches the stored bars (macro fit layer needs it)
