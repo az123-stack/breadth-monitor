@@ -31,7 +31,7 @@ SCHEMA = {
         "for_date": "YYYY-MM-DD — copy `for_date` from the worklist",
         "stocks": {"TICKER": {
             "why": "one or two plain sentences: what is actually driving the stock now (or 'no clear catalyst found')",
-            "direction": "positive | negative | mixed | none",
+            "direction": "positive | negative | mixed | none — what the news means for a LONG swing trade over the next 1-2 weeks (a pending cash takeover = negative: the upside is capped)",
             "quality": "strong (fresh hard news: earnings beat/raise, FDA, contract, M&A) | real (genuine but older or softer) | weak (rumour, sympathy only) | none | unknown",
             "earnings_date": "YYYY-MM-DD of the NEXT earnings report if found, else null",
             "red_flags": ["short list: offering/dilution, downgrade, lawsuit, guidance cut, short report, insider selling... [] if none"],

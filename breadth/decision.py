@@ -190,20 +190,25 @@ def card(t, role, theme_data, history, mfit, cat, brief, regime_label, card_date
         if ed and edays is not None:
             parts.append(f"earnings {ed} ({'in ' + str(edays) + ' sessions' if edays >= 0 else 'reported'})")
         elif cat:
-            parts.append("no earnings found in the next weeks" if c else "earnings not checked")
+            parts.append("next earnings date not confirmed" if c else "earnings not checked")
         if ev_risk:
             parts.append(f"market event inside the hold: {ev_risk}")
         bad = edays is not None and 0 <= edays <= HOLD
         add("calendar", "Calendar", "bad" if bad else "neutral" if ev_risk else "good" if c else "unknown",
             " · ".join(parts) or "no events", proven=False)
-    # 6 catalyst
+    # 6 catalyst: positive real/strong news supports; negative news warns; red flags show and soften a "support"
     if c:
         q = c.get("quality") or "unknown"
         txt = f"{c.get('why') or 'no clear catalyst found'}"
         if c.get("red_flags"):
             txt += " · ⚠ " + "; ".join(c["red_flags"][:2])
-        add("catalyst", "Catalyst", "bad" if c.get("red_flags") or c.get("direction") == "negative" else
-            "good" if q in ("strong", "real") and c.get("direction") == "positive" else "neutral", txt, proven=False)
+        if c.get("direction") == "negative":
+            cstate = "bad"
+        elif c.get("direction") == "positive" and q in ("strong", "real"):
+            cstate = "neutral" if c.get("red_flags") else "good"
+        else:
+            cstate = "neutral"
+        add("catalyst", "Catalyst", cstate, txt, proven=False)
     else:
         add("catalyst", "Catalyst", "unknown", "not checked yet", proven=False)
     # 7 macro brief (market-wide)
