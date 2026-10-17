@@ -892,6 +892,11 @@ def test_volume_tilt():
     dn = metrics.compute(make_bars(closes, vols(-1)))
     assert up["vtilt10"].iloc[-1] > 30 and dn["vtilt10"].iloc[-1] < -30, (up["vtilt10"].iloc[-1], dn["vtilt10"].iloc[-1])
     assert up["vtilt10"].iloc[:59].isna().all()
+    # who won the close: closing at the high everywhere -> +1; falling stocks at the high count as absorbed
+    hb = make_bars(closes, vols(1)); hb["h"] = hb["c"]; hb["l"] = hb["c"] * 0.97
+    m = metrics.compute(hb)
+    assert abs(m["clv_all"].iloc[-1] - 1) < 1e-9 and m["fade"].iloc[-1] == 0, m[["clv_all", "absorb", "fade"]].tail(2)
+    assert m["absorb"].dropna().iloc[-1] == 100
     spy = make_bars({"SPY": list(np.linspace(100, 120, n))}, {"SPY": [1e6] * n})
     out = vtilt.build(dn, spy)
     assert out["tier"] == "low" and out["pct"] <= 10 and set(out["bt"]) == {"post", "other", "all"}, out

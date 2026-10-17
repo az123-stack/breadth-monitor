@@ -66,13 +66,23 @@ def build(history, spy_bars):
             since = int(len(h.loc[pd.Timestamp(thrust_date):]) - 1)
     except Exception:
         pass
+    # EXPERIMENTAL (Oct 17, 2 events): a thrust whose next 1-2 sessions put >= TILT_UNCONFIRM_SHARE% of dollar volume
+    # in falling stocks is "unconfirmed" on this tile (Apr 9 2025 -> 91% next day, still worked; Oct 15 2026 -> 71%).
+    # Only the tile's wording changes; the playbook's post-thrust window is untouched.
+    unconfirmed, next_share = False, None
+    if thrust_date is not None and "dn_share" in h:
+        nxt = h.loc[pd.Timestamp(thrust_date):, "dn_share"].iloc[1:3].dropna()
+        if len(nxt):
+            next_share = _f(nxt.max(), 0)
+            unconfirmed = bool(nxt.max() >= C.TILT_UNCONFIRM_SHARE)
     row = h.loc[last_d]
     return {
         "date": last_d.strftime("%Y-%m-%d"),
         "v": _f(last.v), "up": _f(row.get("vt_up")), "dn": _f(row.get("vt_dn")),
         "pct": int(round(100 * (s < last.v).mean())),
         "tier": last.tier, "post": bool(last.post),
-        "since": since, "thrust_date": thrust_date,
+        "since": since, "thrust_date": thrust_date, "unconfirmed": unconfirmed and bool(last.post),
+        "next_share": next_share, "unconfirm_share": C.TILT_UNCONFIRM_SHARE,
         "lo": _f(lo), "hi": _f(hi), "window": C.TILT_WINDOW, "horizon": n,
         "bt": bt, "from": df.index[0].strftime("%Y-%m-%d"),
         "post_dates": [d.strftime("%Y-%m-%d") for d in df.index[df.post]],

@@ -14,7 +14,7 @@ METRIC_COLS = [
     "up13_34", "dn13_34", "t2108", "universe",
     "nh", "nl", "nhnl", "nh10", "nl10", "near_hi", "pct_near", "pct_near10", "spy_off_hi",
     "dv_up", "dv_dn", "dv_net", "dv_net5", "dn_share", "dn_share10", "dv_rel",
-    "vt_up", "vt_dn", "vtilt10",
+    "vt_up", "vt_dn", "vtilt10", "clv_all", "absorb", "fade",
 ]
 HI_DAYS = 252        # 52-week window for new highs / lows
 NEAR_HI = 0.97       # "near a high" = close within 3% of the 52-week high
@@ -111,6 +111,15 @@ def compute(bars, bench=None):
     out["vt_up"], out["vt_dn"] = vt_up, vt_dn
     # x100 so the 2-decimal rounding on the page keeps the detail (−4.4 = up-movers' volume ~4% lighter than down-movers')
     out["vtilt10"] = 100 * np.log(vt_up / vt_dn).rolling(10).mean()
+    # ---- Who won the close (Oct 17): where stocks closed inside their day's range (+1 = at the high, -1 = at the low).
+    # Describes the day only: on its own it did not predict SPY's next 5-21 sessions (IC ~0, both halves).
+    rng = high - low
+    clv = ((2 * close - high - low) / rng).where(tilt_ok & (rng > 0) & chg.notna())
+    wdv = (close * vol).where(clv.notna())
+    out["clv_all"] = (clv * wdv).sum(axis=1) / wdv.sum(axis=1).replace(0, np.nan)
+    dn_m, up_m = clv.notna() & (chg < -0.01), clv.notna() & (chg > 0.01)
+    out["absorb"] = 100 * ((clv > 0) & dn_m).sum(axis=1) / dn_m.sum(axis=1).replace(0, np.nan)
+    out["fade"] = 100 * ((clv < 0) & up_m).sum(axis=1) / up_m.sum(axis=1).replace(0, np.nan)
     out.index.name = "date"
     out["complete"] = np.arange(len(out)) >= LOOKBACK_NEEDED
     # Blank out metrics whose own lookback isn't filled yet.
@@ -123,7 +132,8 @@ def compute(bars, bench=None):
                       ("nh", HI_DAYS), ("nl", HI_DAYS), ("nhnl", HI_DAYS), ("near_hi", HI_DAYS),
                       ("pct_near", HI_DAYS), ("nh10", HI_DAYS + 9), ("nl10", HI_DAYS + 9), ("pct_near10", HI_DAYS + 9),
                       ("dv_up", 1), ("dv_dn", 1), ("dv_net", 1), ("dn_share", 1), ("dv_net5", 5), ("dn_share10", 10), ("dv_rel", 41),
-                      ("vt_up", 51), ("vt_dn", 51), ("vtilt10", 60)]:
+                      ("vt_up", 51), ("vt_dn", 51), ("vtilt10", 60),
+                      ("clv_all", 21), ("absorb", 21), ("fade", 21)]:
         out.loc[n < need, col] = np.nan
     return out
 

@@ -98,6 +98,7 @@ TILT_MIN_DOLLARS = 5_000_000
 TILT_MOVE_SIGMA = 0.5
 TILT_WINDOW = 25        # sessions after a major thrust that count as "post-thrust" (same as metrics.THRUST_WINDOW)
 TILT_HORIZON = 21       # evidence: SPY from the next open to the close this many sessions later
+TILT_UNCONFIRM_SHARE = 70   # experimental: thrust "unconfirmed" if a next-1-2-session day has this % of $ volume in falling stocks
 
 # Unproven layers (macro_fit, ...) that Adam has approved to color the Decision Cards after passing their backtest.
 # Passing a backtest alone never changes anything; see DECISIONS.md.

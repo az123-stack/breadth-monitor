@@ -1479,6 +1479,7 @@ function renderBreadth(app) {
   }
   const VT = DATA.themes && DATA.themes.vtilt;
   if (VT && VT.v != null) app.append(tiltTiles(VT));
+  if (last.clv_all != null) app.append(closeTiles(rows, last));
   IDX = Object.fromEntries(rows.map((r, i) => [r.date, i]));
   EVBY = {}; (DATA.events || []).forEach(e => { (EVBY[e.date] = EVBY[e.date] || []).push(e); });
   app.append(signalsCard());
@@ -1512,6 +1513,7 @@ function renderBreadth(app) {
     New 52-week highs / lows: liquid stocks with a year of history whose high (low) beat every day of the prior year; "near a high" = close within 3% of the 52-week high.
     Leadership narrowing: SPY within 1% of its 52-week high while the 10-day average of stocks near their highs is 40%+ below its 60-day peak. New highs take over: the 10-day average of new highs moves above new lows for 3 days after weeks of lows leading. Table shading compares each value with your own history (darker = beyond the 10th/90th percentile).
     Money in or out: each stock's dollar volume (close × volume, $3+ stocks) counted toward rising or falling stocks; "$ in falling" = the falling side's share, net $ = rising − falling. Every share sold has a buyer, so this shows which side was in control, not cash literally leaving. 60%+ in falling stocks = money leaving, 40% or less = coming in.
+    Who won the close: for $3+ stocks trading $5M+/day, where each closed in its day's high–low range (−1 low, +1 high), weighted by dollar volume; "bought back" = share of stocks down 1%+ that still closed in the top half, "sold into" = share of stocks up 1%+ that closed in the bottom half. Percentiles vs the chart window. Tested Oct 2024–Oct 2026: it describes the day but did not predict SPY over the next 5–21 sessions, so read it as today's scoreboard, not a signal.
     Volume tilt: among $3+ stocks trading $5M+/day, the ones that moved more than half their usual daily range up vs down; for each side the median volume vs that stock's own 50-day average; tilt = log of up-side ÷ down-side × 100, averaged over 10 days. Low = bottom 20% of our history, high = top 20%. "After a thrust" = within 25 sessions of a major Breadth thrust / Follow-through. Evidence = SPY from the next open to the close 21 sessions later, recomputed every morning.
     Regime thresholds are starter values; calibrate them in <code>breadth/config.py</code>.
     · <a href="breadth.csv">Download full history (CSV)</a></footer>`));
@@ -1906,6 +1908,7 @@ function chartMoney(rows) {
 function tiltRead(VT) {
   const B = VT.bt, cell = (side, t) => B[side][t];
   if (VT.tier === "high") return { cls: "up", label: "Buyers pressing", why: "Stocks going up are trading on heavier volume than stocks going down.", ev: cell(VT.post ? "post" : "other", "high"), evl: "High tilt" + (VT.post ? " after a thrust" : "") };
+  if (VT.tier === "low" && VT.post && VT.unconfirmed) return { cls: "", label: "Unclear: thrust not confirmed", why: `Up moves on lighter volume than down moves. A thrust printed ${shortDate(VT.thrust_date)}, but the next session put ${fmt(VT.next_share, 0)}% of dollar volume in falling stocks, so don't lean on "sellers gone" yet.`, ev: cell("post", "low"), evl: "Low tilt after a thrust (incl. confirmed ones)" };
   if (VT.tier === "low" && VT.post) return { cls: "", label: "Sellers gone", why: "Up moves on lighter volume than down moves, but within a few weeks of a thrust that usually means sellers are already gone (no supply). Not a warning here.", ev: cell("post", "low"), evl: "Low tilt after a thrust" };
   if (VT.tier === "low") return { cls: "dn", label: "Buyers tiring", why: "The selling has the volume; up moves come on light volume with no recent thrust behind them (no demand).", ev: cell("other", "low"), evl: "Low tilt, no recent thrust" };
   return { cls: "", label: "Balanced", why: "Up and down moves trading on similar volume.", ev: cell(VT.post ? "post" : "other", "mid"), evl: "Middle readings" + (VT.post ? " after a thrust" : "") };
@@ -1919,11 +1922,31 @@ function tiltTiles(VT) {
   const t = [
     ["Volume tilt · " + shortDate(VT.date), `<span class="${R.cls}">${R.label}</span>`, R.why],
     ["Tilt, 10-day", sg(VT.v), `lower than ${VT.pct}% of days · low ≤ ${sg(VT.lo)}, high ≥ ${sg(VT.hi)} · today up-movers ${fmt(VT.up, 2)}× vs down-movers ${fmt(VT.dn, 2)}× their normal volume`],
-    ["Thrust context", VT.post ? '<span class="up">Post-thrust</span>' : "None recent", ctx + " · decides what a low reading means"],
+    ["Thrust context", VT.post ? (VT.unconfirmed ? '<span class="dn">Unconfirmed</span>' : '<span class="up">Post-thrust</span>') : "None recent",
+      ctx + (VT.unconfirmed ? ` · next session ${fmt(VT.next_share, 0)}% of $ volume in falling stocks (experimental flag, ≥ ${VT.unconfirm_share}%; only 1 earlier case: Apr 2025, which still worked)` : " · decides what a low reading means")],
     ["What happened next", ev, `${R.evl}: SPY next ${VT.horizon} sessions, up ${R.ev ? fmt(R.ev.up, 0) : "–"}% of the time (n ${R.ev ? R.ev.n : 0}) · all days ${al.spy > 0 ? "+" : ""}${fmt(al.spy, 1)}%, ${fmt(al.up, 0)}%`],
   ];
   const tl = $('<section class="tiles tiles4"></section>');
   t.forEach(([k, v, sub]) => tl.append($(`<div class="card tile"><div class="k">${k}</div><div class="v num">${v}</div><div class="s">${sub}</div></div>`)));
+  return tl;
+}
+function closeTiles(rows, last) {
+  const pctOf = (k) => { const h = rows.map(r => r[k]).filter(v => v != null); return h.length ? Math.round(h.filter(v => v < last[k]).length / h.length * 100) : null; };
+  const pc = pctOf("clv_all"), pa = pctOf("absorb"), pf = pctOf("fade");
+  const ord = (p) => p == null ? "–" : p + (p % 10 === 1 && p !== 11 ? "st" : p % 10 === 2 && p !== 12 ? "nd" : p % 10 === 3 && p !== 13 ? "rd" : "th") + " pct";
+  const v = pc >= 80 ? ["up", "Buyers won the close"] : pc <= 20 ? ["dn", "Sellers won the close"] : ["", "Split close"];
+  const why = pc >= 80 ? "Stocks finished near the top of their day's range: dips were bought into the bell."
+    : pc <= 20 ? "Stocks finished near the bottom of their day's range: nobody stepped in before the bell."
+    : "Stocks finished mid-range: neither side controlled the last part of the day.";
+  const sgn = (x) => x == null ? "–" : (x > 0 ? "+" : x < 0 ? "−" : "") + fmt(Math.abs(x), 2);
+  const t = [
+    ["Who won the close · " + shortDate(last.date), `<span class="${v[0]}">${v[1]}</span>`, why],
+    ["Close position", sgn(last.clv_all), `$-weighted, −1 = at the day's low, +1 = at the high · ${ord(pc)} of days`],
+    ["Falling stocks bought back", fmt(last.absorb, 0) + "%", `of stocks down 1%+ closed in the top half of their range (buyers absorbing) · ${ord(pa)} · typical ~10%`],
+    ["Rising stocks sold into", fmt(last.fade, 0) + "%", `of stocks up 1%+ closed in the bottom half (sellers hitting the rally) · ${ord(pf)} · describes today only, no forward edge found`],
+  ];
+  const tl = $('<section class="tiles tiles4"></section>');
+  t.forEach(([k, val, sub]) => tl.append($(`<div class="card tile"><div class="k">${k}</div><div class="v num">${val}</div><div class="s">${sub}</div></div>`)));
   return tl;
 }
 function chartTilt(rows, VT) {

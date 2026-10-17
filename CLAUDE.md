@@ -70,6 +70,17 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Study (Oct 2024–Oct 2026): up-volume % = dn_share (dropped); 90% days 4 in 2 yrs; "ease" (square-root impact) and dollar-weighted
   close-in-range: no edge. Tilt: low outside thrust windows SPY −4.2% next 21, up 14% (n 29); low post-thrust +2.4%, 73% (n 51);
   high +2.2–2.5% (68–88%); all days +1.3%, 68%. Extra info beyond ratio10/dn_share10/T2108 (residual IC ≈ 0.2–0.3). ~4 episodes per side.
+  Thrust "unconfirmed" (Oct 17, EXPERIMENTAL, tile wording only; `vtilt.unconfirmed`, `TILT_UNCONFIRM_SHARE` 70): latest thrust's next 1–2
+  sessions put ≥ 70% of $ volume in falling stocks → tilt verdict "Unclear: thrust not confirmed", context tile "Unconfirmed". Only 2 cases
+  (Apr 9 2025 → 91% next day, still worked; Oct 15 2026 → 71%). Playbook / thrust_window unchanged.
+  Who won the close (Oct 17): `clv_all` ($-weighted close location in the day's range, same stock filter as tilt), `absorb` (% of stocks
+  down 1%+ closing in the top half), `fade` (% of stocks up 1%+ closing in the bottom half); Breadth tab `closeTiles` (verdict by clv_all
+  percentile ≥ 80 buyers / ≤ 20 sellers / split). Test (Oct 2024–Oct 2026, SPY next open → 5/10/21): IC ≈ 0 for clv, absorb, fade, both
+  halves; 5-day absorb +0.12 (2nd half −0.02); heavy days (dn_share ≥ 65) absorb ≥ 20% +2.1% SPY10 (n 12) vs < 8% +1.1% (n 38), all +0.5%.
+  Descriptive only — labeled "no forward edge found". Oct 16, 2026: clv −0.41 (6th pct), absorb 1.8% (2nd pct); Oct 15 absorb 47% (98th).
+  Free daily order-flow proxies considered (Oct 17): FINRA daily short sale volume (cdn.finra.org/equity/regsho/daily/CNMSshvolYYYYMMDD.txt,
+  free, from Aug 2018, posted by 6 PM ET; blocked in Claude's sandbox, reachable from GitHub Actions) = raw input of SqueezeMetrics' DIX.
+  Not built/tested yet.
 - `themes.py` sheet port: theme Score /8, rotation, setup score, long/short pulse, ranks, payload
 - `strength.py` v2: RS Rating, RS-line ★/⚑ flags, tightness, Theme Strength
 - `setups.py` momentum bursts (2LYNCH), anticipation, episodic pivots, regime trade stats
