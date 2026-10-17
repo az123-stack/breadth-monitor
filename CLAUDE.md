@@ -62,6 +62,14 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   orange net line = nh10 − nl10 on the same mirrored scale), table columns.
   First look (Nov 2025–Sep 2026, ~210 days): high pct_near was followed by weaker SPY 20-day returns (corr −0.39, top quartile
   −0.4% vs bottom +3.3%); SPY-near-high divergence days −0.4% vs +1.2% (n 12). Context, not a timing signal.
+  Volume tilt (Oct 17, `vtilt.py`, imbalance study): `vt_up` / `vt_dn` = median volume ÷ own 50-day avg of universe stocks ($3+, 100k avg
+  vol, $5M+/day) that moved > 0.5σ (own 20-day vol) up / down; `vtilt10` = 100 × 10-day avg of log(vt_up ÷ vt_dn). `DATA.themes.vtilt`
+  (date, v, pct, tier low ≤ 20th pct / high ≥ 80th, post = within `TILT_WINDOW` 25 sessions of a major thrust/follow-through, since,
+  bt = SPY next open → 21 sessions by post/other × tier, recomputed each build, `post_dates`); Breadth tab tile row (`tiltTiles`,
+  verdict Buyers pressing / Sellers gone (low, post-thrust) / Buyers tiring (low, no thrust) / Balanced) + chart (`chartTilt`).
+  Study (Oct 2024–Oct 2026): up-volume % = dn_share (dropped); 90% days 4 in 2 yrs; "ease" (square-root impact) and dollar-weighted
+  close-in-range: no edge. Tilt: low outside thrust windows SPY −4.2% next 21, up 14% (n 29); low post-thrust +2.4%, 73% (n 51);
+  high +2.2–2.5% (68–88%); all days +1.3%, 68%. Extra info beyond ratio10/dn_share10/T2108 (residual IC ≈ 0.2–0.3). ~4 episodes per side.
 - `themes.py` sheet port: theme Score /8, rotation, setup score, long/short pulse, ranks, payload
 - `strength.py` v2: RS Rating, RS-line ★/⚑ flags, tightness, Theme Strength
 - `setups.py` momentum bursts (2LYNCH), anticipation, episodic pivots, regime trade stats

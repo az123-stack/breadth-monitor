@@ -240,6 +240,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["washout"] = washout.build(adjusted, history, universe, names=store.load_names())
         except Exception as e:  # optional panel; never block the page
             log.exception("washout thrust failed: %s", e)
+        try:   # volume tilt: up moves on heavier or lighter volume than down moves (imbalance study, Oct 2026)
+            from . import vtilt
+            theme_data["vtilt"] = vtilt.build(history, adjusted[adjusted["ticker"] == config.BENCHMARK])
+        except Exception as e:  # optional panel; never block the page
+            log.exception("volume tilt failed: %s", e)
         try:
             from . import rotation
             theme_data["rotation"] = rotation.build(adjusted, theme_data, kq_data, macro_data, history)

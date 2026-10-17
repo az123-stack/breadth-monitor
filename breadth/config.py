@@ -90,3 +90,10 @@ WASHOUT_WINDOW = 21          # sessions the flag stays on after the thrust (~1 m
 WASHOUT_MIN_RS = 80          # list: RS Rating at least this ...
 WASHOUT_TOP = 30             # ... top N by 60-day beta to SPY ...
 WASHOUT_MIN_DVOL = 20e6      # ... among stocks >= $5 with 50-day avg $ volume >= this
+
+# Volume tilt (breadth tab; vtilt.py): stocks with 20-day avg dollar volume of at least TILT_MIN_DOLLARS whose
+# move was more than TILT_MOVE_SIGMA of their own 20-day volatility count as "movers".
+TILT_MIN_DOLLARS = 5_000_000
+TILT_MOVE_SIGMA = 0.5
+TILT_WINDOW = 25        # sessions after a major thrust that count as "post-thrust" (same as metrics.THRUST_WINDOW)
+TILT_HORIZON = 21       # evidence: SPY from the next open to the close this many sessions later

@@ -14,6 +14,7 @@ METRIC_COLS = [
     "up13_34", "dn13_34", "t2108", "universe",
     "nh", "nl", "nhnl", "nh10", "nl10", "near_hi", "pct_near", "pct_near10", "spy_off_hi",
     "dv_up", "dv_dn", "dv_net", "dv_net5", "dn_share", "dn_share10", "dv_rel",
+    "vt_up", "vt_dn", "vtilt10",
 ]
 HI_DAYS = 252        # 52-week window for new highs / lows
 NEAR_HI = 0.97       # "near a high" = close within 3% of the 52-week high
@@ -99,6 +100,17 @@ def compute(bars, bench=None):
     out["dn_share"] = 100 * d_dn / (d_up + d_dn).replace(0, np.nan)
     out["dn_share10"] = out["dn_share"].rolling(10).mean()
     out["dv_rel"] = tot / tot.rolling(50, min_periods=40).mean().shift(1)
+    # ---- Volume tilt (Oct 17 imbalance study, see vtilt.py): do the stocks that moved up meaningfully trade on
+    # heavier or lighter volume (vs their own 50-day average) than the stocks that moved down?
+    sig = chg.rolling(20, min_periods=15).std().shift(1)
+    rv = vol / vol.rolling(50, min_periods=40).mean().shift(1)
+    tilt_ok = liquid & (close * avg_vol >= C.TILT_MIN_DOLLARS) & (sig > 0) & (rv > 0)
+    z = chg / sig
+    vt_up = rv.where(tilt_ok & (z > C.TILT_MOVE_SIGMA)).median(axis=1)
+    vt_dn = rv.where(tilt_ok & (z < -C.TILT_MOVE_SIGMA)).median(axis=1)
+    out["vt_up"], out["vt_dn"] = vt_up, vt_dn
+    # x100 so the 2-decimal rounding on the page keeps the detail (−4.4 = up-movers' volume ~4% lighter than down-movers')
+    out["vtilt10"] = 100 * np.log(vt_up / vt_dn).rolling(10).mean()
     out.index.name = "date"
     out["complete"] = np.arange(len(out)) >= LOOKBACK_NEEDED
     # Blank out metrics whose own lookback isn't filled yet.
@@ -110,7 +122,8 @@ def compute(bars, bench=None):
                       ("t2108", C.MA_DAYS + 20), ("up4", 1), ("dn4", 1),
                       ("nh", HI_DAYS), ("nl", HI_DAYS), ("nhnl", HI_DAYS), ("near_hi", HI_DAYS),
                       ("pct_near", HI_DAYS), ("nh10", HI_DAYS + 9), ("nl10", HI_DAYS + 9), ("pct_near10", HI_DAYS + 9),
-                      ("dv_up", 1), ("dv_dn", 1), ("dv_net", 1), ("dn_share", 1), ("dv_net5", 5), ("dn_share10", 10), ("dv_rel", 41)]:
+                      ("dv_up", 1), ("dv_dn", 1), ("dv_net", 1), ("dn_share", 1), ("dv_net5", 5), ("dn_share10", 10), ("dv_rel", 41),
+                      ("vt_up", 51), ("vt_dn", 51), ("vtilt10", 60)]:
         out.loc[n < need, col] = np.nan
     return out
 

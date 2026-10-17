@@ -847,6 +847,32 @@ def test_washout_thrust():
     assert [t for t, _ in b] == ["HI", "MID"] and abs(b[0][1] - 3) < 1e-6, b
 
 
+def test_volume_tilt():
+    """Up-movers on heavier relative volume than down-movers -> positive tilt; the reverse -> negative."""
+    from breadth import vtilt
+    n, k = 140, 40
+    rng = np.random.default_rng(1)
+    rets = rng.normal(0, 0.02, (n, k))
+    closes = {f"S{j}": list(50 * np.cumprod(1 + rets[:, j])) for j in range(k)}
+
+    def vols(sign):   # last 15 days: stocks moving with `sign` trade 2x normal volume
+        out = {}
+        for j in range(k):
+            v = [300000.0] * n
+            for i in range(n - 15, n):
+                if np.sign(rets[i, j]) == sign:
+                    v[i] = 600000.0
+            out[f"S{j}"] = v
+        return out
+    up = metrics.compute(make_bars(closes, vols(1)))
+    dn = metrics.compute(make_bars(closes, vols(-1)))
+    assert up["vtilt10"].iloc[-1] > 30 and dn["vtilt10"].iloc[-1] < -30, (up["vtilt10"].iloc[-1], dn["vtilt10"].iloc[-1])
+    assert up["vtilt10"].iloc[:59].isna().all()
+    spy = make_bars({"SPY": list(np.linspace(100, 120, n))}, {"SPY": [1e6] * n})
+    out = vtilt.build(dn, spy)
+    assert out["tier"] == "low" and out["pct"] <= 10 and set(out["bt"]) == {"post", "other", "all"}, out
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
