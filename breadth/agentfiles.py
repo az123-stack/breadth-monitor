@@ -187,6 +187,10 @@ def validate(kind, js, allowed=None):
                 continue
             v = str(it.get("verdict", "")).lower()
             pr = it.get("priority")
+            if isinstance(pr, str) and pr.strip().isdigit():
+                pr = int(pr.strip())                  # agents often write "1"
+            if isinstance(pr, float) and pr.is_integer():
+                pr = int(pr)
             items.append({"title": _s(it.get("title"), 120), "verdict": v if v in V else "watch",
                           "cards": [_s(c, 60) for c in _list(it.get("cards")) if isinstance(c, str)][:8],
                           **{k: _s(it.get(k), 600) for k in ("where", "how", "test", "kill")},

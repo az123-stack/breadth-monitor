@@ -1086,6 +1086,8 @@ def test_research_ledger():
     assert meta["layers"] == ["a", "b"] and research.validate_card(meta) == []
     assert research.validate_card({**meta, "status": "great"})
     assert "Layer registry" in digest and "R-2026-10-16-macro-fit" in digest
+    assert AF.validate("plan", {"for_date": "2026-10-17", "summary": "s",
+                                "items": [{"title": "Q", "priority": "3"}]})["items"][0]["priority"] == 3
     plan = {"for_date": "2026-10-17", "summary": "s", "items": [{"title": "A", "verdict": "build", "priority": 2},
             {"title": "B", "verdict": "nonsense", "priority": 1, "cards": "R-x"}, "junk"],
             "new_agents": [{"name": "Earnings reaction agent", "job": "j"}, {"job": "no name"}]}
