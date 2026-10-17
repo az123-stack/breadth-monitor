@@ -505,6 +505,13 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .tg.pspike { background: color-mix(in srgb, var(--critical) 18%, transparent); color: var(--text-primary); }
 .tg.ppull { background: color-mix(in srgb, var(--good) 20%, transparent); color: var(--text-primary); }
 .tg.pother { background: var(--neutral-mid); color: var(--text-secondary); }
+.boxcard .rbanner { margin: 8px 0 4px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; border-left: 4px solid; }
+.boxcard .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.boxcard svg.boxspark { display: block; }
+.tg.bst-today { background: color-mix(in srgb, var(--good) 28%, transparent); color: var(--text-primary); }
+.tg.bst-recent { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--text-primary); }
+.tg.bst-near { background: color-mix(in srgb, var(--warning) 25%, transparent); color: var(--text-primary); }
+.tg.bst-inside { background: var(--neutral-mid); color: var(--text-secondary); }
 .tg.pliq { background: var(--neutral-mid); color: var(--text-secondary); } .tg.pliq.mid { background: color-mix(in srgb, var(--warning) 25%, transparent); color: var(--text-primary); }
 table.grid.hvetab td.pcell { min-width: 170px; } table.grid.hvetab td.pcell small { max-width: 230px; }
 
@@ -3596,6 +3603,141 @@ function hveCard(T) {
   return card;
 }
 
+/* ---------- Box breakouts (Edwards & Magee rectangle / Darvas box): breadth/boxes.py ---------- */
+function boxSpark(r) {
+  const px = r.px || [], n = px.length; if (n < 2) return "";
+  const W = 150, Ht = 40, vals = px.filter(v => v != null), lo = Math.min(...vals, r.bot), hi = Math.max(...vals, r.top);
+  const x = (i) => (i / (n - 1) * (W - 2) + 1).toFixed(1), y = (v) => (Ht - 3 - (v - lo) / ((hi - lo) || 1) * (Ht - 6)).toFixed(1);
+  const pts = px.map((v, i) => v == null ? null : `${x(i)},${y(v)}`).filter(Boolean).join(" ");
+  const x0 = x(r.bs), x1 = x(r.be);
+  return `<svg class="boxspark" width="${W}" height="${Ht}" viewBox="0 0 ${W} ${Ht}" aria-label="Price with the box marked">
+    <rect x="${x0}" y="${y(r.top)}" width="${(x1 - x0).toFixed(1)}" height="${(y(r.bot) - y(r.top)).toFixed(1)}" fill="var(--neutral-mid)" opacity=".7"/>
+    <line x1="${x0}" x2="${W - 1}" y1="${y(r.top)}" y2="${y(r.top)}" stroke="var(--good)" stroke-dasharray="3 2" stroke-width="1"/>
+    <line x1="${x0}" x2="${x1}" y1="${y(r.bot)}" y2="${y(r.bot)}" stroke="var(--critical)" stroke-dasharray="3 2" stroke-width="1"/>
+    <polyline points="${pts}" fill="none" stroke="var(--text-primary)" stroke-width="1.3"/>${r.bo != null && px[r.bo] != null ? `<circle cx="${x(r.bo)}" cy="${y(px[r.bo])}" r="2.5" fill="var(--good)"/>` : ""}</svg>`;
+}
+function boxCard(T) {
+  const X = T.boxes;
+  if (!X) return $('<div></div>');
+  const ls = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+  UI.box = UI.box || { win: ls("boxWin", "all"), st: ls("boxSt", "brk"), scope: "all", sort: ["_st", 1], rs: { bounced: ["grade", 1], support: ["grade", 1], coming: ["grade", 1] } };
+  const U = UI.box, E = X.evidence || {}, R = X.rt_study || null, NOW = X.now || {};
+  const WN = Object.fromEntries((X.windows || []).map(w => [w.key, w]));
+  const inWin = (r) => U.win === "all" || r.win === U.win;
+  const inScope = (r) => U.scope === "all" || (U.scope === "themes" ? (r.theme || r.sub) : (r.rsr || 0) >= 80);
+  const Rx = (o) => !o || o.ret == null ? "–" : `${o.ret >= 0 ? "+" : ""}${o.ret.toFixed(2)}R`;
+  const comb = R && R.groups ? Object.fromEntries(R.groups.flatMap(g => g.rows.map(r => [r.name, r]))) : {};
+  const best = comb["After a thrust + RS 80+"], noth = comb["No thrust in the last 25 sessions"], allR = R && R.all;
+  const card = $(`<section class="card regcard boxcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2>Box breakout retest <span class="meta">· break out of the box → snap back to the old top → buy the bounce</span></h2>
+      <div class="tsbtns"><button class="boxdl" title="Download all three retest lists (shown filters) as a TradingView watchlist">⬇ TradingView</button></div></div>
+    <p class="note" style="padding:4px 0 0">The Loew's 1936 shape: an advance, weeks of sideways trading in a flat box while volume dries up, a close above the top, then a quick pullback to the old top, which should now act as support. We tag each breakout three ways as it comes back. <b>Stop</b> = lowest low of the retest; <b>dead</b> if it closes under the middle of the box. <b>Target</b> = box height added to the top. Grade <b>A</b> = RS 80+ and a 2–4 week box, <b>B</b> = RS 80+, <b>C</b> = the rest.</p>
+    ${R ? `<div class="rbanner ${NOW.thrust ? "act" : "watch"}">${NOW.thrust
+      ? `<b>Act: we're inside a breadth-thrust window.</b> That's where this trade has paid: after a thrust, RS 80+ bounces made ${Rx(best && best.R)} a trade (${best && best.R.win != null ? Math.round(best.R.win * 100) + "% winners" : ""}, n ${best ? best.R.n : "–"}, both halves positive). Favor grade A and B.`
+      : `<b>Watch: no breadth thrust in the last 25 sessions.</b> Outside thrust windows this trade has been about break-even (${Rx(noth && noth.R)} a trade, n ${noth ? noth.R.n : "–"}), and lately negative. After a thrust, RS 80+ bounces made ${Rx(best && best.R)} (n ${best ? best.R.n : "–"}). Build the list now; size up when a thrust prints.`}
+      Breadth today: ${esc(NOW.regime || "–")}.</div>` : ""}
+    <div class="filters" style="margin:8px 0 4px"></div><div class="rtbody"></div>
+    <details class="kqsec" style="margin-top:10px"><summary><b>Pipeline</b> · fresh breakouts and boxes still forming (where the next retests come from)</summary><div class="pfil filters" style="margin:6px 0 4px"></div><div class="boxbody"></div></details>
+    <details class="kqsec" style="margin-top:8px"><summary><b>Research: when does the retest bounce work?</b> ${R ? `· ${esc(R.from)} to ${esc(R.to)}, ${R.funnel.bounced.toLocaleString()} bounces` : ""}</summary><div class="rtev"></div></details>
+    <details class="kqsec" style="margin-top:4px"><summary>Buying the breakout itself (no retest), for comparison</summary><div class="boxev"></div></details></section>`);
+  const fl = card.querySelector(".filters");
+  /* ---- the three retest tags ---- */
+  const TAGS = [
+    ["bounced", "🟢 Just bounced off the old top", "Entry signal: after touching the old box top it closed above the prior day's high and back above the top, in the last 2 sessions. Buy, stop under the retest low.", r => r.tag === "bounced"],
+    ["support", "🟡 At support / back under the top", "It came back to the old top (or slipped back inside the box). Wait for the bounce: a close above the day's high and above the top.", r => r.tag === "support" || r.tag === "inside"],
+    ["coming", "🔵 Coming back to the box", "Broke out, ran 1+ ADR, and has pulled back 1+ ADR toward the old top. Set an alert at the top.", r => r.tag === "coming"]];
+  const body = card.querySelector(".rtbody");
+  const spark = (r) => boxSpark({ ...r, bs: r.bs, be: r.be });
+  const rtCols = (key) => [{ k: "t", h: "Stock", l: true, asc: true }, { k: "grade", h: "Grade", asc: true }, { k: null, h: "Chart<small>box · breakout · now</small>" },
+    { k: "len", h: "Box<small>length</small>" }, { k: "bo_ago", h: "Breakout<small>when · volume</small>", asc: true }, { k: "top", h: "Old top<small>now support</small>" },
+    { k: "ext_adr", h: "Ran<small>past the top</small>" }, { k: "vs_top_adr", h: "Now vs top<small>in ADRs</small>", asc: true },
+    ...(key === "coming" ? [] : [{ k: "touch_ago", h: "Touched", asc: true }]), { k: "stop", h: "Stop<small>% away</small>" }, { k: "tgt_pct", h: "Target" },
+    { k: "rsr", h: "RS" }, { k: "adr", h: "ADR %" }];
+  let shownRT = {};
+  TAGS.forEach(([key, title, help]) => {
+    const sec = $(`<div class="rtsec" style="margin-top:10px"><h3 style="margin:4px 0 2px">${title} <span class="meta rtn"></span></h3><p class="meta" style="margin:0 0 4px">${help}</p>
+      <div class="scroll"><table class="grid"><thead><tr>${rtCols(key).map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta rtempty" style="display:none">None right now.</p></div>`);
+    body.append(sec);
+  });
+  const rtFill = (key, rows, sec) => {
+    shownRT[key] = rows;
+    sec.querySelector(".rtempty").style.display = rows.length ? "none" : "";
+    sec.querySelector(".rtn").textContent = `· ${rows.length}`;
+    sec.querySelector("tbody").innerHTML = rows.map(r => { r.tgt_pct = r.target / r.price - 1; return `<tr>${nameCell(r)}
+      <td class="num"><b>${r.grade}</b></td><td>${spark(r)}</td>
+      <td class="num" data-v="${r.len}">${r.wks} wks<small class="meta" style="display:block">${esc((WN[r.win] || {}).name || "")}</small></td>
+      <td class="num" data-v="${r.bo_ago}">${shortDate(r.bo_date)}<small class="meta" style="display:block">${r.bo_ago} sessions ago${r.bvx != null ? " · " + r.bvx.toFixed(1) + "× vol" : ""}</small></td>
+      <td class="num">$${r.top}<small class="meta" style="display:block">box $${r.bot}–$${r.top}</small></td>
+      <td class="num">+${r.ext_adr} ADR<small class="meta" style="display:block">high $${r.ph}</small></td>
+      <td class="num">${r.vs_top_adr > 0 ? "+" : ""}${r.vs_top_adr}<small class="meta" style="display:block">${pct(r.vs_top)}${r.tag === "inside" ? " · <b>back inside</b>" : ""}</small></td>
+      ${key === "coming" ? "" : `<td class="num">${r.touch_ago == null ? "–" : r.touch_ago === 0 ? "today" : r.touch_ago + "d ago"}${r.bounce_ago != null ? `<small class="meta" style="display:block">bounced ${r.bounce_ago === 0 ? "today" : r.bounce_ago + "d ago"}</small>` : ""}</td>`}
+      <td class="num">$${r.stop}<small class="meta" style="display:block">${pct(r.stop / r.price - 1)}${r.tag === "coming" ? " (box middle)" : ""}</small></td>
+      <td class="num">$${r.target}<small class="meta" style="display:block">${pct(r.tgt_pct)}</small></td>
+      <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.adr ?? "–"}</td></tr>`; }).join("");
+  };
+  const rtDraws = TAGS.map(([key, , , f], i) => {
+    const sec = body.querySelectorAll(".rtsec")[i];
+    const get = () => (X.rt || []).filter(r => f(r) && inWin(r) && inScope(r));
+    const cur = sortable(sec.querySelector("table"), rtCols(key), get, rows => rtFill(key, rows, sec), U.rs[key]);
+    return () => rtFill(key, cur(), sec);
+  });
+  /* ---- pipeline (the plain box scan) ---- */
+  const STL = { today: "Breakout today", recent: "Recent breakout", near: "Near the top", inside: "In the box" };
+  const pb = card.querySelector(".boxbody");
+  X.rows.forEach(r => { r._st = { today: 0, recent: 1, near: 2, inside: 3 }[r.state] * 10 + (r.ago || 0); });
+  const pRows = () => X.rows.filter(r => inWin(r) && inScope(r) && (U.st === "all" || (U.st === "brk" ? (r.state === "today" || r.state === "recent") : r.state === U.st)));
+  const cols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "_st", h: "Status", l: true, asc: true }, { k: null, h: "Chart<small>advance · box · now</small>" },
+    { k: "len", h: "Box<small>length</small>" }, { k: "top", h: "Top / bottom" }, { k: "height", h: "Height<small>% · ADRs</small>" },
+    { k: "pole", h: "Advance<small>into the box</small>" }, { k: "dry", h: "Vol dry-up<small>box ÷ advance</small>", asc: true },
+    { k: "bvx", h: "Breakout vol<small>× box avg</small>" }, { k: "vs_top", h: "vs top" }, { k: "tgt_pct", h: "Target<small>top + height</small>" },
+    { k: "rsr", h: "RS" }, { k: "adr", h: "ADR %" }];
+  pb.innerHTML = `<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta boxempty" style="display:none">No stocks match these filters.</p>`;
+  const tb = pb.querySelector("tbody");
+  const pFill = (rows) => {
+    pb.querySelector(".boxempty").style.display = rows.length ? "none" : "";
+    tb.innerHTML = rows.map(r => `<tr>${nameCell(r)}
+      <td class="l"><span class="tg bst-${r.state}">${STL[r.state]}</span><small class="meta" style="display:block">${r.state === "recent" ? r.ago + " session" + (r.ago === 1 ? "" : "s") + " ago, holding above" : r.state === "today" ? (r.bchg != null ? "closed " + pct(r.bchg) : "") : r.state === "near" ? "within 1 ADR of the top" : ""}</small></td>
+      <td>${boxSpark(r)}</td>
+      <td class="num" data-v="${r.len}">${r.wks} wks<small class="meta" style="display:block">${esc((WN[r.win] || {}).name || "")} · since ${shortDate(r.start)}</small></td>
+      <td class="num">$${r.top}<small class="meta" style="display:block">$${r.bot}</small></td>
+      <td class="num">${pct(r.height)}<small class="meta" style="display:block">${r.h_adr} ADR</small></td>
+      <td class="num">${pct(r.pole, 0)}</td>
+      <td class="num">${r.dry?.toFixed(2) ?? "–"}<small class="meta" style="display:block">${r.fade != null ? (r.fade <= 0.8 ? "still fading" : r.fade >= 1.2 ? "picking up" : "flat") : ""}</small></td>
+      <td class="num">${r.bvx == null ? "–" : r.bvx.toFixed(1) + "×"}</td>
+      <td class="num">${pct(r.vs_top)}</td>
+      <td class="num">$${r.target}<small class="meta" style="display:block">${pct(r.tgt_pct)} · stop $${r.stop}</small></td>
+      <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.adr ?? "–"}</td></tr>`).join("");
+  };
+  const pCur = sortable(pb.querySelector("table"), cols, pRows, pFill, U.sort);
+  const draw = () => { try { localStorage.setItem("boxWin", U.win); localStorage.setItem("boxSt", U.st); } catch (e) {} rtDraws.forEach(f => f()); pFill(pCur()); };
+  const cnt = (f) => (X.rt || []).filter(f).length + X.rows.filter(f).length;
+  fl.append(chips("Box length", [["all", "Any length"], ...(X.windows || []).map(w => [w.key, `${w.name} (${cnt(r => r.win === w.key)})`])], U, "win", draw));
+  fl.append(chips("Scope", [["all", "All stocks"], ["themes", "In my themes"], ["rs80", "RS 80+"]], U, "scope", draw));
+  card.querySelector(".pfil").append(chips("Status", [["brk", `Breakouts (${X.rows.filter(r => r.state === "today" || r.state === "recent").length})`], ["today", `Today (${X.counts.today})`], ["near", `Near the top (${X.counts.near})`], ["inside", `In the box (${X.counts.inside})`], ["all", "All"]], U, "st", draw));
+  card.querySelector(".boxdl").addEventListener("click", () => tsDownload("box-retest", TAGS.map(([k, title]) => ({ name: "Box retest - " + title.replace(/^\S+\s/, ""), ticks: (shownRT[k] || []).map(r => r.t) }))));
+  /* ---- research table ---- */
+  if (R) {
+    const rr = (o) => !o || !o.R ? "" : `<tr><td class="l">${esc(o.name)}</td><td class="num"><b>${Rx(o.R)}</b></td><td class="num">${o.R.t ?? "–"}</td><td class="num">${o.R.win != null ? Math.round(o.R.win * 100) + "%" : "–"}</td>
+      <td class="num">${o.h1R == null ? "–" : (o.h1R >= 0 ? "+" : "") + o.h1R.toFixed(2)} / ${o.h2R == null ? "–" : (o.h2R >= 0 ? "+" : "") + o.h2R.toFixed(2)}</td>
+      ${o.d10 && o.d10.ret != null ? retCell(o.d10.ret, "d15") : '<td class="num meta">–</td>'}<td class="num">${o.tgt != null ? Math.round(o.tgt * 100) + "%" : "–"}</td><td class="num">${(o.R.n || 0).toLocaleString()}</td></tr>`;
+    const F = R.funnel;
+    card.querySelector(".rtev").innerHTML = `<p class="meta" style="margin:6px 0">Of ${F.breakouts.toLocaleString()} box breakouts, ${F.touched.toLocaleString()} came back to the old top and ${F.bounced.toLocaleString()} bounced (our entry); ${F.failed.toLocaleString()} closed under the box middle first. Trade tested: buy the bounce close, stop under the retest low (risk at least 0.3 ADR), else sell the close 20 sessions later. Results in R (gain ÷ risk); most trades are small stop-outs, the winners run.</p>
+      <div class="scroll"><table class="grid"><thead><tr><th class="l">Bounce off the retest, when…</th><th>Avg R</th><th>t</th><th>Winners</th><th>1st / 2nd half<small>avg R, split ${shortDate(R.split)}</small></th><th>10 sessions<small>vs SPY</small></th><th>Hit target</th><th>Trades</th></tr></thead><tbody>
+      ${rr({ name: "Every bounce", ...R.all })}
+      ${R.groups.map(g => `<tr><td class="l" colspan="8"><b>${esc(g.name)}</b></td></tr>${g.rows.map(rr).join("")}`).join("")}</tbody></table></div>
+      <p class="meta" style="margin:6px 0 0"><b>Read (Oct 16, 2026):</b> the edge lives in breadth-thrust windows (the 25 sessions after a major Breadth thrust or Follow-through). After a thrust, RS 80+ bounces made about +0.5R a trade, and +0.7R from 2–4 week boxes, positive in both halves of the data. Without a thrust it's about zero, and strong breadth alone (no thrust) was slightly negative. Weak breadth and SPY under its 50-day lost money. Breakout volume, pullback volume and whether the retest held above the top or dipped inside made little consistent difference. Limits: one 2-year window, survivorship in the stock list, no costs, daily bars only (the stop is checked on the daily low).</p>`;
+  }
+  /* ---- plain breakout evidence ---- */
+  const row = (n, o) => !o || !o.d10 ? "" : `<tr><td class="l">${n}</td>${["d5", "d10", "d20"].map(k => o[k] && o[k].ret != null ? retCell(o[k].ret, "d15") : '<td class="num meta">–</td>').join("")}<td class="num">${o.d10.win != null ? Math.round(o.d10.win * 100) + "%" : "–"}</td><td class="num">${o.d10.t ?? "–"}</td><td class="num">${o.tgt != null ? Math.round(o.tgt * 100) + "%" : "–"}</td><td class="num">${o.fail != null ? Math.round(o.fail * 100) + "%" : "–"}</td><td class="num">${(o.d10.n || 0).toLocaleString()}</td></tr>`;
+  if (E.all) card.querySelector(".boxev").innerHTML = `<div class="scroll"><table class="grid" style="margin-top:6px"><thead><tr><th class="l">Buying the breakout close…</th><th>5 sessions<small>vs SPY</small></th><th>10 sessions</th><th>20 sessions</th><th>Beat SPY<small>10 sessions</small></th><th>t</th><th>Hit target<small>${E.hold} sessions</small></th><th>Failed<small>closed below box</small></th><th>Cases</th></tr></thead><tbody>
+      ${row("All box breakouts", E.all)}${(X.windows || []).map(w => row("…" + w.name + " box", (E.win || {})[w.key])).join("")}
+      ${row("…breakout volume 1.3×+ box avg", E.vol)}${row("…RS 80+", E.rs80)}
+      ${row("…strong breadth", (E.regime || {}).strong)}${row("…mixed breadth", (E.regime || {}).mixed)}${row("…weak breadth", (E.regime || {}).weak)}
+      ${row("Baseline: any close at a fresh 20-day high", E.base)}</tbody></table></div>
+    <p class="meta" style="margin:6px 0 0">Chasing the breakout itself lagged SPY (most stocks did over this stretch), only slightly better than any 20-day-high break. That's why the trade waits for the retest. Box rules: 10–130 sessions, no taller than 3 / 4 / 5 / 6 ADRs for the four lengths (max 25%), 2+ touches of top and bottom, flat, after a 15%+ advance, box volume ≤ 0.9× the advance.</p>`;
+  draw();
+  return card;
+}
 function renderTrades(app) {
   const T = DATA.themes, X = T && T.trade_setups;
   if (!X) { app.append($('<div class="card empty">Trade setups appear after the next data run.</div>')); return; }
@@ -3658,6 +3800,7 @@ function renderTrades(app) {
     if (S.key === "kq" && (X.kq_ondeck || []).length) sec.append($(`<div class="note">On deck — extended, wait for a flag to form: ${X.kq_ondeck.map(r => `<b>${r.t}</b> <span class="meta">(+${r.leg}% leg, ${r.ext} ATR above the 20-day)</span>`).join(", ")}</div>`));
     app.append(sec);
   });
+  app.append(boxCard(T));
   app.append(scoreboardCard(T.scoreboard));
   app.append(tagStatsCard((T.trade_bt || {}).tag_stats));
   app.append(hveCard(T));

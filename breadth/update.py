@@ -224,6 +224,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["playbook"] = playbook.build(theme_data, history)
         except Exception as e:
             log.exception("playbook failed: %s", e)
+        try:   # Box breakouts (Edwards & Magee rectangle / Darvas box), with its own backtest
+            from . import boxes
+            theme_data["boxes"] = boxes.build(adjusted, universe, theme_data.get("stocks"), store.load_names(), history)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("box scan failed: %s", e)
         intraday.set_bars(adjusted)      # Russell 2000 weights follow prices since the holdings file date
         try:
             theme_data["thrust_watch"] = intraday.thrust_watch(adjusted, history, universe)
