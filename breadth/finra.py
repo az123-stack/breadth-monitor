@@ -117,12 +117,22 @@ def update(recent=None, bars=None):
         new.append(f)
         if i % 25 == 0:
             log.info("FINRA %s: %d tickers (%d/%d)", d.date(), len(f), i + 1, len(days))
-    if new:
-        months = {d.strftime("%Y-%m") for d in pd.to_datetime([n["date"].iloc[0] for n in new])}
-        allf = pd.concat([have] + new, ignore_index=True).drop_duplicates(["date", "ticker"], keep="last")
-        save(allf[allf["date"].dt.strftime("%Y-%m").isin(months)])
+        if len(new) % 50 == 0:      # keep progress if a later download fails
+            have = _merge_save(have, new[-50:])
+    rest = len(new) % 50
+    if rest:
+        _merge_save(have, new[-rest:])
     log.info("FINRA: %d new days", len(new))
     return len(new)
+
+
+def _merge_save(have, chunk):
+    months = {pd.Timestamp(n["date"].iloc[0]).strftime("%Y-%m") for n in chunk}
+    allf = pd.concat([x for x in [have] + chunk if len(x)], ignore_index=True)
+    allf["date"] = pd.to_datetime(allf["date"])
+    allf = allf.drop_duplicates(["date", "ticker"], keep="last")
+    save(allf[allf["date"].dt.strftime("%Y-%m").isin(months)])
+    return allf
 
 
 def aggregate(bars=None, fin=None):
