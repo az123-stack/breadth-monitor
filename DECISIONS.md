@@ -38,3 +38,27 @@ the log has ~2–3 months of settled rows; the Reviewer then proposes promotion 
 7. Unproven layers do not change live pick ranking (verified by test).
 8. Existing + new tests pass; `--rebuild-only` works offline; page checked in a headless browser.
 9. Costs and run times documented; CLAUDE.md and the project context updated.
+
+## How it runs (built Oct 16–17, 2026)
+| When (ET) | What | Writes |
+|---|---|---|
+| ~12:25 AM Tue–Sat | Daily update (existing): official data, all layers in code, cards for the new date, settles 5-session-old log rows, forward evidence (`layers.study_log`) | `docs/index.html`, `data/decision_log.csv`, `data/layer_evidence.json` |
+| 7:02 AM Mon–Fri | **Macro agent** (Claude scheduled task) → `agentfiles publish --kind macro_brief --push` | `docs/agent/macro_brief.json` + rebuild |
+| 7:12 AM Mon–Fri | **Catalyst agent** → up to 15 carded tickers: why it's moving, direction, quality, next earnings date, red flags, sources | `docs/agent/catalysts.json` + rebuild |
+| 9:07 AM Sat | **Weekly Reviewer** → refreshes macro backtest + log evidence, writes a plain-English review with proposals (applies nothing) | `docs/agent/review.json` + evidence + rebuild; push notification |
+
+`.github/workflows/agent.yml`: job `save` (validate + commit the JSON; never queued, so it can't be cancelled) then job
+`rebuild` (queued behind the daily update in group `breadth-update`; checks out `main`, so a cancelled pending rebuild is
+harmless). Staleness: catalysts count only for their exact card date; the macro brief for up to 4 days; the review 10.
+
+## Costs and run times
+- GitHub Actions: free (public repo). agent.yml ≈ 4–5 min per run (2 a weekday) + ≈ 9 min weekly (evidence refresh).
+- Claude scheduled tasks: 2 runs each weekday (macro ≈ 3–6 min, ~8 searches; catalysts ≈ 6–12 min, ~20–40 searches) and
+  1 weekly (≈ 10 min). These count toward Adam's Claude plan usage like any session.
+- Daily build: cards + log add ~2 s; the 2-year macro history adds ~10 s to the Yahoo fetch.
+
+## Evidence so far
+- Macro fit (backtest, 6,258 Trade Setups signals Mar 2025–Oct 2026, actionable 5-session result): 5-day macro tailwind
+  +0.25% vs headwind +2.00% (t −1.52; both halves negative: −2.2%, −1.4%). **Not proven → information only.** If anything,
+  a recent macro headwind came before better results (mean reversion), but not significantly. 20-day version: no difference.
+- Agent layers: forward log started Oct 15, 2026. Earliest meaningful test ≈ 60+ settled ideas over 20+ dates (~5–6 weeks).

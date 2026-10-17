@@ -378,3 +378,16 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - Start every answer with a TL;DR, then detail.
 - Ship working changes; verify with `--rebuild-only`, the tests, and a headless browser check before pushing.
 - Don't run long blocking polling loops.
+
+## Decision Cards + agents (Oct 16–17, 2026) — read DECISIONS.md
+- Principle: code measures, agents read, only proven layers move the score. Nothing here re-ranks the Top 2 picks.
+- `macrofit.py` rate/oil/dollar sensitivity (market-neutral OLS, 120 sessions, |t| ≥ 2 only) + 5/20-day tailwind; `macro.json`
+  now holds 2 years (`config.MACRO_RANGE`; `.github/workflows/macro.yml` refreshes it on demand).
+- `decision.py` 7-layer cards (Market, Group, Setup, Macro fit, Calendar, Catalyst, Macro brief) for picks / watch / ~20
+  candidates → `DATA.themes.decision`, Trade Setups tab `decisionCard`; every layer logged to `data/decision_log.csv`,
+  settled next open → close 5 sessions later vs SPY.
+- `layers.py` evidence → `data/layer_evidence.json` (`macro` backtest via in-memory signal capture, `log` forward test,
+  `report`). Pass rule: t ≥ 2 over ≥ 20 dates and same sign in both halves.
+- `agentfiles.py` worklist / schema / publish (validates, dispatches `agent.yml`) / save. Agents never write code or weights.
+- Scheduled tasks: "Market Monitor · macro brief agent" 7:02 AM, "· catalyst agent" 7:12 AM (Mon–Fri), "· weekly layer
+  review" Sat 9:07 AM (push notification).
