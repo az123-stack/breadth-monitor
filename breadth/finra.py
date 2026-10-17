@@ -58,10 +58,16 @@ def fetch(day, tries=3):
             if e.code in (403, 404):
                 return None
             log.warning("FINRA %s HTTP %s", day, e.code)
-        except Exception as e:  # network hiccup
+        except Exception as e:  # network hiccup / unreachable
             log.warning("FINRA %s: %s", day, e)
+            msg = str(e).lower()
+            if any(w in msg for w in ("tunnel", "name or service", "unreachable", "403 forbidden")):
+                return UNREACHABLE
         time.sleep(2 * (k + 1))
     return None
+
+
+UNREACHABLE = object()
 
 
 def _liquid(bars):
@@ -107,6 +113,9 @@ def update(recent=None, bars=None):
     new = []
     for i, d in enumerate(days):
         txt = fetch(d)
+        if txt is UNREACHABLE:
+            log.warning("FINRA unreachable from here; skipping downloads")
+            break
         if txt is None:
             log.info("FINRA %s: not available", d.date())
             continue
@@ -173,6 +182,47 @@ def aggregate(bars=None, fin=None):
     out = out.round(4)
     out.to_csv(DAILY)
     return out
+
+
+def build(spy_bars, daily=None):
+    """Breadth-tab payload (EXPERIMENTAL, Oct 17 study): S&P 500 off-exchange short share, 5-day avg, vs its own 120-day
+    normal ("dev", in points). High dev = more buying than usual hidden in off-exchange trades (DIX idea).
+    Evidence recomputed each build: SPY next open -> 21 sessions by dev quintile."""
+    if daily is None and not DAILY.exists():
+        return None
+    d = (pd.read_csv(DAILY, parse_dates=["date"]).set_index("date") if daily is None else daily).copy()
+    d = d[d["n"] > 1000]
+    if len(d) < 140:
+        return None
+    d["s5"] = d["sr_spx"].rolling(5).mean()
+    d["dev"] = 100 * (d["s5"] - d["sr_spx"].rolling(120, min_periods=60).mean())
+    d["m5"] = d["srm_all"].rolling(5).mean()
+    spy = spy_bars.drop_duplicates("date").set_index("date").sort_index()
+    o, c = spy["o"].astype(float).reindex(d.index), spy["c"].astype(float).reindex(d.index)
+    d["fwd"] = 100 * (c.shift(-21) / o.shift(-1) - 1)
+    x = d.dropna(subset=["dev"])
+    if len(x) < 60:
+        return None
+    lo, hi = float(x["dev"].quantile(0.2)), float(x["dev"].quantile(0.8))
+    tier = np.where(x["dev"] <= lo, "low", np.where(x["dev"] >= hi, "high", "mid"))
+    bt = {}
+    for t in ("low", "mid", "high"):
+        y = x["fwd"][(tier == t)].dropna()
+        bt[t] = {"n": int(len(y)), "spy": round(float(y.mean()), 1) if len(y) else None,
+                 "up": round(float(100 * (y > 0).mean())) if len(y) else None}
+    a = x["fwd"].dropna()
+    bt["all"] = {"n": int(len(a)), "spy": round(float(a.mean()), 1), "up": round(float(100 * (a > 0).mean()))}
+    last = x.iloc[-1]
+    pct = lambda col, v: int(round(100 * (x[col].dropna() < v).mean()))
+    return {
+        "date": x.index[-1].strftime("%Y-%m-%d"), "s1": round(100 * float(last["sr_spx"]), 1),
+        "s5": round(100 * float(last["s5"]), 1), "norm": round(100 * float(last["s5"]) - float(last["dev"]), 1),
+        "dev": round(float(last["dev"]), 2), "dev_pct": pct("dev", last["dev"]), "tier": str(tier[-1]),
+        "lo": round(lo, 2), "hi": round(hi, 2),
+        "m5": round(100 * float(last["m5"]), 1), "m5_pct": pct("m5", last["m5"]),
+        "s5_pct": pct("s5", last["s5"]), "bt": bt, "from": x.index[0].strftime("%Y-%m-%d"),
+        "hist": [[i.strftime("%Y-%m-%d"), round(float(v), 2)] for i, v in x["dev"].tail(250).items()],
+    }
 
 
 def main(argv=None):

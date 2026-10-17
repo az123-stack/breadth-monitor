@@ -245,6 +245,14 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["vtilt"] = vtilt.build(history, adjusted[adjusted["ticker"] == config.BENCHMARK])
         except Exception as e:  # optional panel; never block the page
             log.exception("volume tilt failed: %s", e)
+        try:   # FINRA off-exchange short share (free daily; experimental "hidden buying" read, Oct 17 study)
+            from . import finra
+            if config.LEVELS_ENABLED:
+                finra.update(recent=7, bars=adjusted)
+                finra.aggregate(bars=adjusted)
+            theme_data["dix"] = finra.build(adjusted[adjusted["ticker"] == config.BENCHMARK])
+        except Exception as e:  # optional panel; never block the page
+            log.exception("FINRA short share failed: %s", e)
         try:
             from . import rotation
             theme_data["rotation"] = rotation.build(adjusted, theme_data, kq_data, macro_data, history)

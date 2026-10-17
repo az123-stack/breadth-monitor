@@ -1481,6 +1481,8 @@ function renderBreadth(app) {
   const VT = DATA.themes && DATA.themes.vtilt;
   if (VT && VT.v != null) app.append(tiltTiles(VT));
   if (last.clv_all != null) app.append(closeTiles(rows, last));
+  const DX = DATA.themes && DATA.themes.dix;
+  if (DX && DX.dev != null) app.append(dixTiles(DX));
   IDX = Object.fromEntries(rows.map((r, i) => [r.date, i]));
   EVBY = {}; (DATA.events || []).forEach(e => { (EVBY[e.date] = EVBY[e.date] || []).push(e); });
   app.append(signalsCard());
@@ -1514,6 +1516,7 @@ function renderBreadth(app) {
     New 52-week highs / lows: liquid stocks with a year of history whose high (low) beat every day of the prior year; "near a high" = close within 3% of the 52-week high.
     Leadership narrowing: SPY within 1% of its 52-week high while the 10-day average of stocks near their highs is 40%+ below its 60-day peak. New highs take over: the 10-day average of new highs moves above new lows for 3 days after weeks of lows leading. Table shading compares each value with your own history (darker = beyond the 10th/90th percentile).
     Money in or out: each stock's dollar volume (close × volume, $3+ stocks) counted toward rising or falling stocks; "$ in falling" = the falling side's share, net $ = rising − falling. Every share sold has a buyer, so this shows which side was in control, not cash literally leaving. 60%+ in falling stocks = money leaving, 40% or less = coming in.
+    Hidden buying (FINRA, experimental): FINRA's free daily short sale volume files cover trades reported off-exchange (dark pools, wholesalers). Most of that "short" volume is market makers selling to buyers, so the share = a rough buying-pressure read (SqueezeMetrics' DIX idea). We use S&P 500 members, dollar-weighted, 5-day average, compared with its own 120-day average; low / high = bottom / top 20% of that gap. Tested Oct 2024–Oct 2026: higher readings were followed by better SPY 21-session returns in both halves (rank correlation ≈ 0.26), also after the other breadth measures; ~2 years only, so it's a watch item.
     Who won the close: for $3+ stocks trading $5M+/day, where each closed in its day's high–low range (−1 low, +1 high), weighted by dollar volume; "bought back" = share of stocks down 1%+ that still closed in the top half, "sold into" = share of stocks up 1%+ that closed in the bottom half. Percentiles vs the chart window. Tested Oct 2024–Oct 2026: it describes the day but did not predict SPY over the next 5–21 sessions, so read it as today's scoreboard, not a signal.
     Volume tilt: among $3+ stocks trading $5M+/day, the ones that moved more than half their usual daily range up vs down; for each side the median volume vs that stock's own 50-day average; tilt = log of up-side ÷ down-side × 100, averaged over 10 days. Low = bottom 20% of our history, high = top 20%. "After a thrust" = within 25 sessions of a major Breadth thrust / Follow-through. Evidence = SPY from the next open to the close 21 sessions later, recomputed every morning.
     Regime thresholds are starter values; calibrate them in <code>breadth/config.py</code>.
@@ -1929,6 +1932,24 @@ function tiltTiles(VT) {
   ];
   const tl = $('<section class="tiles tiles4"></section>');
   t.forEach(([k, v, sub]) => tl.append($(`<div class="card tile"><div class="k">${k}</div><div class="v num">${v}</div><div class="s">${sub}</div></div>`)));
+  return tl;
+}
+function dixTiles(X) {
+  const sg = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + fmt(Math.abs(v), d);
+  const R = X.tier === "high" ? ["up", "More hidden buying than usual", "high"]
+    : X.tier === "low" ? ["dn", "Less hidden buying than usual", "low"] : ["", "Normal hidden buying", "mid"];
+  const ev = X.bt[R[2]], al = X.bt.all;
+  const div = X.m5_pct >= 70 && X.s5_pct <= 30 ? " · the typical stock is being bought more than the big S&P names"
+    : X.m5_pct <= 30 && X.s5_pct >= 70 ? " · the big S&P names are being bought more than the typical stock" : "";
+  const t = [
+    ["Hidden buying (FINRA) · " + shortDate(X.date) + ' · experimental', `<span class="${R[0]}">${R[1]}</span>`,
+      "Off-exchange \"short\" volume is mostly market makers selling to buyers, so a higher share = more buying behind the scenes (the idea behind SqueezeMetrics' DIX)."],
+    ["S&P 500 short share, 5-day", fmt(X.s5, 1) + "%", `vs its own 4-month normal ${fmt(X.norm, 1)}% → ${sg(X.dev, 2)} pts (${X.dev_pct}th pct) · today ${fmt(X.s1, 1)}%`],
+    ["Typical stock, 5-day", fmt(X.m5, 1) + "%", `median stock's short share · ${X.m5_pct}th pct of 2 yrs${div}`],
+    ["What happened next", ev && ev.n ? sg(ev.spy) + "%" : "–", `SPY next 21 sessions when this reading was ${R[2]} (n ${ev ? ev.n : 0}, up ${ev ? ev.up : "–"}%) · all days ${sg(al.spy)}%, ${al.up}% · WATCH: held in both halves of 2 yrs, not proven`],
+  ];
+  const tl = $('<section class="tiles tiles4"></section>');
+  t.forEach(([k, val, sub]) => tl.append($(`<div class="card tile"><div class="k">${k}</div><div class="v num">${val}</div><div class="s">${sub}</div></div>`)));
   return tl;
 }
 function closeTiles(rows, last) {

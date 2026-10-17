@@ -82,7 +82,8 @@
    "what": "relvol of up movers vs down movers, 10-day; low outside thrust windows -> SPY -4% next 21",
    "affects_picks": false,
    "evidence": [
-    "R-2026-10-16-imbalance-volume-tilt"
+    "R-2026-10-16-imbalance-volume-tilt",
+    "R-2026-10-17-thrust-unconfirmed"
    ],
    "notes": ""
   },
@@ -311,6 +312,34 @@
     "R-2026-10-16-three-month-picks"
    ],
    "notes": ""
+  },
+  {
+   "id": "hidden_buying",
+   "name": "Hidden buying (FINRA short share)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "finra.py, Breadth tab dixTiles",
+   "what": "S&P 500 off-exchange short share 5-day vs 120-day normal; top fifth -> SPY +3.1% next 21 (experimental)",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-17-order-flow-proxies"
+   ],
+   "notes": "WATCH: both halves positive, ~2 years"
+  },
+  {
+   "id": "who_won_close",
+   "name": "Who won the close",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "metrics clv_all/absorb/fade, Breadth tab closeTiles",
+   "what": "descriptive: where stocks closed in their range; no forward edge",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-17-who-won-the-close"
+   ],
+   "notes": "scoreboard only"
   }
  ]
 }

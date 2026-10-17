@@ -78,9 +78,17 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   percentile ≥ 80 buyers / ≤ 20 sellers / split). Test (Oct 2024–Oct 2026, SPY next open → 5/10/21): IC ≈ 0 for clv, absorb, fade, both
   halves; 5-day absorb +0.12 (2nd half −0.02); heavy days (dn_share ≥ 65) absorb ≥ 20% +2.1% SPY10 (n 12) vs < 8% +1.1% (n 38), all +0.5%.
   Descriptive only — labeled "no forward edge found". Oct 16, 2026: clv −0.41 (6th pct), absorb 1.8% (2nd pct); Oct 15 absorb 47% (98th).
-  Free daily order-flow proxies considered (Oct 17): FINRA daily short sale volume (cdn.finra.org/equity/regsho/daily/CNMSshvolYYYYMMDD.txt,
-  free, from Aug 2018, posted by 6 PM ET; blocked in Claude's sandbox, reachable from GitHub Actions) = raw input of SqueezeMetrics' DIX.
-  Not built/tested yet.
+  Hidden buying (FINRA, Oct 17, EXPERIMENTAL; `finra.py`, card R-2026-10-17-order-flow-proxies): free FINRA daily short sale volume
+  (cdn.finra.org/equity/regsho/daily/CNMSshvolYYYYMMDD.txt, off-exchange trades, from Aug 2018, posted ~6 PM ET; Claude's sandbox can't
+  reach it — `fetch` returns UNREACHABLE and the loop stops; GitHub Actions can) = raw input of SqueezeMetrics' DIX. Per ticker (liquid
+  universe + SPY/QQQ/IWM) in `data/finra/YYYY-MM.parquet` (~19 MB / 2 yrs); `aggregate` → `data/finra_daily.csv` (sr_all, sr_spx, sr_ndx =
+  $-weighted short share; srm_all median stock; offx_all off-exchange share of volume; sr_SPY/QQQ/IWM). Backfill: `.github/workflows/finra.yml`
+  (input recent 0 = all missing days). update.py tops up the last 7 days (`LEVELS_ENABLED`) and `finra.build` → `DATA.themes.dix`
+  (s5 = S&P 500 5-day share, norm = 120-day avg, dev = s5 − norm in pts, tier low/high = bottom/top 20% of dev, m5 median stock, bt = SPY
+  next open → 21 by tier) → Breadth tab `dixTiles` (verdict, S&P share vs normal, typical stock + divergence note, what happened next).
+  Test (486 days): detrended S&P 5-day IC +0.26 vs SPY 21d (halves +0.34/+0.19), residual vs ratio10/dn_share/T2108/vtilt +0.25; top
+  fifth +3.1% (88% up) vs bottom +0.7%, all +1.4%; raw levels drift (2nd half +0.08); 60-day z weak; same-day link to SPY ≈ 0;
+  offx and ETF shares noise. WATCH. Oct 16, 2026: S&P 44.2% vs normal 45.2% (35th pct), median stock 82nd pct.
 - `themes.py` sheet port: theme Score /8, rotation, setup score, long/short pulse, ranks, payload
 - `strength.py` v2: RS Rating, RS-line ★/⚑ flags, tightness, Theme Strength
 - `setups.py` momentum bursts (2LYNCH), anticipation, episodic pivots, regime trade stats

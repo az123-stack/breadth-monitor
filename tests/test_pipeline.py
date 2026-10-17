@@ -1110,6 +1110,21 @@ def test_research_ledger():
             config.DOCS_DIR = old
 
 
+def test_finra_short_share():
+    """FINRA pipe file parses (trailer dropped, zero-volume rows dropped); build() tiers the 5-day vs 120-day gap."""
+    from breadth import finra
+    txt = "Date|Symbol|ShortVolume|ShortExemptVolume|TotalVolume|Market\n20261016|AAPL|600|0|1000|Q\n20261016|ZZZ|0|0|0|N\n1234\n"
+    p = finra.parse(txt)
+    assert list(p.ticker) == ["AAPL"] and p.short.iloc[0] == 600 and p.total.iloc[0] == 1000, p
+    n = 200
+    idx = pd.bdate_range("2025-01-02", periods=n)
+    sr = np.r_[np.full(n - 5, 0.45), np.full(5, 0.50)]
+    daily = pd.DataFrame({"sr_spx": sr, "srm_all": 0.5, "n": 2000}, index=idx)
+    spy = pd.DataFrame({"date": idx, "o": np.linspace(100, 120, n), "c": np.linspace(100, 120, n)})
+    out = finra.build(spy, daily)
+    assert out["tier"] == "high" and out["dev"] > 4 and out["s5"] == 50.0, out
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

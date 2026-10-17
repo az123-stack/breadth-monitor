@@ -63,10 +63,6 @@ jobs:
             python -m breadth.update
           fi
 
-      - name: FINRA short volume (free, off-exchange; research data)
-        continue-on-error: true
-        run: python -m breadth.finra --recent 7
-
       - name: Commit results
         if: always()   # keep partial backfill progress even if a later step failed
         run: |
