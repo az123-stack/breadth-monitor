@@ -1,0 +1,47 @@
+{
+ "for_date": "2026-10-15",
+ "written": "2026-10-17T01:06Z",
+ "headline": "AI debt fears hit tech as the 10-year holds near 5.1% after a hot CPI, while Brent tests $110 on Middle East supply risk.",
+ "risk": "high",
+ "rates": "10-year about 5.08% and up roughly 8% over 60 days; 2-year near 4.71%, so the curve steepened Friday; a hot CPI has a rate hike being debated.",
+ "fed": "No FOMC meeting or major Fed speaker on next week's calendar; hike talk after CPI is the live theme.",
+ "oil": "Brent tested $110 and WTI about $101 midday Friday on supply risk; the IEA is speeding up emergency stock releases and the US may ease some tanker sanctions.",
+ "geo": "Iran tensions remain the oil wildcard (talk of new strikes on nuclear sites).",
+ "events": [
+  {
+   "date": "2026-10-20",
+   "time": "8:30 AM ET",
+   "name": "Housing starts / permits",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-10-20",
+   "time": "After close",
+   "name": "Netflix earnings",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-10-21",
+   "time": "After close",
+   "name": "Meta, Tesla, IBM, TXN earnings",
+   "impact": "high"
+  },
+  {
+   "date": "2026-10-22",
+   "time": "After close",
+   "name": "Western Digital earnings",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-10-23",
+   "time": "9:45 AM ET",
+   "name": "Flash PMIs (S&P Global)",
+   "impact": "medium"
+  }
+ ],
+ "sources": [
+  "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-16-2026",
+  "https://www.gurufocus.com/news/9128361/us-treasury-bonds-mixed-as-oil-prices-surge-yield-curves-steepen",
+  "https://investrade.com/weekly-event-calendar-10-19-2026-10-23-2026/"
+ ]
+}
