@@ -21,7 +21,8 @@ from datetime import datetime, timezone
 from . import config
 
 REPO = "az123-stack/breadth-monitor"
-KINDS = ("catalysts", "macro_brief", "review")
+KINDS = ("catalysts", "macro_brief", "review", "plan")
+WEEKLY = ("review", "plan")      # weekly agents: not tied to a card date / entry cutoff
 FULL_RESEARCH = 15        # first N carded tickers get full catalyst research; the rest get an earnings-date check only
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 URL = re.compile(r"^https?://\S+$")
@@ -37,6 +38,27 @@ SCHEMA = {
             "red_flags": ["short list: offering/dilution, downgrade, lawsuit, guidance cut, short report, insider selling... [] if none"],
             "depth": "full | earnings_only — copy from the worklist",
             "sources": ["https://... at least one URL you actually used"]}},
+    },
+    "plan": {
+        "for_date": "YYYY-MM-DD — today's date",
+        "summary": "2-4 plain sentences for Adam: what's new in the research and the single most valuable next step",
+        "items": [{
+            "title": "short name of the proposal",
+            "cards": ["R-... ids of the finding cards it builds on"],
+            "verdict": "build (ready: evidence passed) | test_first (promising, needs the test below) | watch (needs more data) "
+                       "| duplicate (already covered by a layer: say which) | reject (evidence says no)",
+            "where": "where it plugs in: which layer id / tab / card / setup / exit rule / sizing / new layer",
+            "how": "2-4 sentences: what exactly would be built, in plain words",
+            "test": "the test that would prove it (data, entry/exit, both halves, t >= 2) — or the evidence that already did",
+            "kill": "the result that would make us drop it",
+            "effort": "S | M | L",
+            "priority": "1 = do first"}],
+        "new_agents": [{"name": "...", "job": "what it does each run", "schedule": "when (ET)", "inputs": "what it reads",
+                        "outputs": "what it writes (file / schema)", "cost": "rough runs x minutes / searches",
+                        "why": "which layer or card needs it", "kill": "when to retire it"}],
+        "retire": [{"target": "layer id or agent name", "why": "evidence"}],
+        "registry_updates": [{"layer": "id", "to": "proposed status on the ladder", "why": "evidence"}],
+        "card_updates": [{"card": "R-...", "integrated": "yes | partly | no | rejected", "why": "..."}],
     },
     "review": {
         "for_date": "YYYY-MM-DD — the latest official date (worklist for_date)",
@@ -154,6 +176,33 @@ def validate(kind, js, allowed=None):
         if not clean:
             raise ValueError("no valid tickers (each needs a source URL)")
         out["stocks"] = clean
+    elif kind == "plan":
+        out["summary"] = _s(js.get("summary"), 800)
+        if not out["summary"]:
+            raise ValueError("summary is required")
+        V = ("build", "test_first", "watch", "duplicate", "reject")
+        items = []
+        for it in _list(js.get("items"))[:12]:
+            if not isinstance(it, dict) or not _s(it.get("title")):
+                continue
+            v = str(it.get("verdict", "")).lower()
+            pr = it.get("priority")
+            items.append({"title": _s(it.get("title"), 120), "verdict": v if v in V else "watch",
+                          "cards": [_s(c, 60) for c in _list(it.get("cards")) if isinstance(c, str)][:8],
+                          **{k: _s(it.get(k), 600) for k in ("where", "how", "test", "kill")},
+                          "effort": it.get("effort") if it.get("effort") in ("S", "M", "L") else None,
+                          "priority": pr if isinstance(pr, int) and 0 < pr < 100 else None})
+        out["items"] = sorted(items, key=lambda x: x["priority"] or 99)
+        out["new_agents"] = [{k: _s(a.get(k), 400) for k in ("name", "job", "schedule", "inputs", "outputs", "cost", "why", "kill")}
+                             for a in _list(js.get("new_agents"))[:4] if isinstance(a, dict) and _s(a.get("name"))]
+        out["retire"] = [{k: _s(a.get(k), 300) for k in ("target", "why")}
+                         for a in _list(js.get("retire"))[:6] if isinstance(a, dict) and _s(a.get("target"))]
+        out["registry_updates"] = [{k: _s(a.get(k), 300) for k in ("layer", "to", "why")}
+                                   for a in _list(js.get("registry_updates"))[:20] if isinstance(a, dict) and _s(a.get("layer"))]
+        out["card_updates"] = [{k: _s(a.get(k), 300) for k in ("card", "integrated", "why")}
+                               for a in _list(js.get("card_updates"))[:40] if isinstance(a, dict) and _s(a.get("card"))]
+        if not items:
+            raise ValueError("at least one item is required (use verdict 'watch' if nothing is ready)")
     elif kind == "review":
         out["summary"] = _s(js.get("summary"), 700)
         out["findings"] = [_s(x, 300) for x in _list(js.get("findings")) if isinstance(x, str) and _s(x)][:10]
@@ -190,7 +239,7 @@ def save(kind, js):
     clean = validate(kind, js, allowed)
     try:
         cur = worklist().get("for_date")
-        if kind != "review" and cur and clean["for_date"] != cur:
+        if kind not in WEEKLY and cur and clean["for_date"] != cur:
             print(f"WARNING: for_date {clean['for_date']} is not the current card date {cur}; the cards will ignore it")
     except Exception:
         pass
@@ -201,10 +250,10 @@ def save(kind, js):
 def publish(kind, path, push=False):
     js = json.loads(open(path).read())
     wl = worklist()
-    if kind != "review" and js.get("for_date") != wl.get("for_date"):
+    if kind not in WEEKLY and js.get("for_date") != wl.get("for_date"):
         sys.exit(f"for_date {js.get('for_date')} != current card date {wl.get('for_date')}: new data arrived, "
                  "re-run the worklist and research again")
-    if kind != "review" and wl.get("past_cutoff"):
+    if kind not in WEEKLY and wl.get("past_cutoff"):
         sys.exit(f"too late: ideas for {wl['for_date']} were bought at {wl['entry_cutoff']}; research done now can't be "
                  "logged as known beforehand. Not publishing (the overnight data is probably late; report it).")
     clean = validate(kind, js, {x["t"] for x in wl["tickers"]} or None)   # same check the save job runs

@@ -18,6 +18,7 @@ from . import config, nyse
 log = logging.getLogger(__name__)
 MAX_CARDS = 25
 HOLD = 5                         # sessions, same as the pick scoreboard
+EXIT_SESSIONS = HOLD + 1         # an idea carded on day D is held from the open of D+1 to the close of D+1+HOLD
 STALE_DAYS = 4                   # agent file older than this vs the card date -> treated as missing
 
 SETUP_NAMES = {"ath": "ATH Magnet", "pullback": "Leader Pullback", "rotation": "Rotation Rookie", "kq": "Qullamaggie Flag",
@@ -68,10 +69,25 @@ def _clean_agent(name, js):
         js["sources"] = [str(x) for x in _as_list(js.get("sources")) if isinstance(x, str)]
         for k in ("headline", "risk", "rates", "fed", "oil", "geo"):
             js[k] = _txt(js.get(k))
+        if (js.get("risk") or "").lower() not in ("low", "medium", "high"):
+            return {}                                   # no usable risk level = no brief
+    if name == "plan":
+        js["summary"] = _txt(js.get("summary"))
+        if not js["summary"]:
+            return {}
+        js["items"] = [{k: (_txt(v) if k not in ("cards", "priority") else v) for k, v in it.items()}
+                       for it in _as_list(js.get("items")) if isinstance(it, dict)]
+        for k in ("new_agents", "retire", "registry_updates", "card_updates"):
+            js[k] = [{kk: _txt(vv) for kk, vv in a.items()} for a in _as_list(js.get(k)) if isinstance(a, dict)]
+        for it in js["items"]:
+            it["cards"] = [c for c in _as_list(it.get("cards")) if isinstance(c, str)]
+            it["priority"] = it.get("priority") if isinstance(it.get("priority"), int) else None
     if name == "review":
         for k in ("findings", "proposals"):
             js[k] = [str(x) for x in _as_list(js.get(k)) if isinstance(x, str)]
         js["summary"] = _txt(js.get("summary"))
+        if not js["summary"]:
+            return {}
     return js
 
 
@@ -103,7 +119,8 @@ def load_agent(name, card_date=None, max_age=None):
         return {}
     if card_date:
         age = (pd.Timestamp(card_date) - pd.Timestamp(js["for_date"])).days
-        if age > (STALE_DAYS if max_age is None else max_age) or age < 0:
+        weekly = name in ("review", "plan")             # written on weekends, after the last card date: fine
+        if age > (STALE_DAYS if max_age is None else max_age) or (age < 0 and not weekly):
             return {}
     return _clean_agent(name, js)
 
@@ -245,7 +262,7 @@ def card(t, role, theme_data, history, mfit, cat, brief, regime_label, card_date
             dd = sessions_until(card_date, e.get("date"))
         except Exception:
             continue
-        if 1 <= dd <= HOLD and str(e.get("impact", "")).lower() == "high":
+        if 1 <= dd <= EXIT_SESSIONS and str(e.get("impact", "")).lower() == "high":
             ev_risk = f"{e.get('name')} {e.get('date')}"
             break
     if not cat and not brief:
@@ -258,7 +275,7 @@ def card(t, role, theme_data, history, mfit, cat, brief, regime_label, card_date
             parts.append("next earnings date not confirmed" if c else "earnings not checked")
         if ev_risk:
             parts.append(f"market event inside the hold: {ev_risk}")
-        bad = edays is not None and 0 <= edays <= HOLD
+        bad = edays is not None and 0 <= edays <= EXIT_SESSIONS   # through the exit day
         clear = edays is not None and not bad            # a confirmed earnings date outside the hold
         add("calendar", "Calendar", "bad" if bad else "neutral" if ev_risk else "good" if clear else "unknown",
             " · ".join(parts) or "no events", proven=False)
@@ -316,7 +333,9 @@ def build(theme_data, history, mfit, regime_label=None):
                 log.warning("decision card %s failed: %s", t, e)
         ev = load_evidence()
         review = load_agent("review", day, max_age=10)
-        return {"review": {k: review.get(k) for k in ("for_date", "summary", "findings", "proposals")} if review else None,"date": day, "cards": cards, "macro": (mfit or {}).get("ctx"), "evidence": ev,
+        plan = load_agent("plan", day, max_age=10)
+        return {"plan": plan or None,
+                "review": {k: review.get(k) for k in ("for_date", "summary", "findings", "proposals")} if review else None,"date": day, "cards": cards, "macro": (mfit or {}).get("ctx"), "evidence": ev,
                 "written": {"catalysts": cat.get("written"), "macro_brief": brief.get("written")},
                 "agents": {"catalysts": cat.get("for_date"), "macro_brief": brief.get("for_date"),
                            "brief": {k: brief.get(k) for k in ("headline", "risk", "rates", "oil", "fed", "geo", "events", "sources")} if brief else None}}
@@ -333,7 +352,12 @@ def load_log():
     p = _path()
     if not p.exists():
         return pd.DataFrame(columns=LOG_COLS)
-    df = pd.read_csv(p, dtype={"date": str, "t": str})
+    try:
+        df = pd.read_csv(p, dtype={"date": str, "t": str})
+    except Exception as e:                       # corrupt / empty file: keep a copy, start a fresh log
+        log.error("decision log unreadable (%s); moved to %s", e, p.name + ".bad")
+        p.replace(p.with_name(p.name + ".bad"))
+        return pd.DataFrame(columns=LOG_COLS)
     for c in LOG_COLS:
         if c not in df.columns:
             df[c] = np.nan

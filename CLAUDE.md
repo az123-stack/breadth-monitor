@@ -461,5 +461,9 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - Forward log has no look-ahead: `decision.record` freezes a date's rows at `nyse.entry_cutoff` (9:30 ET next session)
   and drops agent files written after it; `agentfiles publish` refuses after it. Holidays: `breadth/nyse.py` (by rule).
   Layers only color cards after a passed backtest AND `config.APPROVED_LAYERS`. `tools/check_info_only.py` = e2e proof.
+- **Research ledger + registry + Integrator** (Oct 17): `research/R-*.md` finding cards (`breadth/research.py`: check / digest / new),
+  `data/layers.json` registry (ladder idea→tested→info→proven→approved→live, retired), "Market Monitor · Integrator" Sat 10:07 AM ET
+  → `docs/agent/plan.json` (kind `plan`). **Every research chat ends by filing a card** (`python -m breadth.research new ...`),
+  updating `integrated` on cards and `status` in the registry when something is built. "build #N" = build Integrator plan item N.
 - Scheduled tasks: "Market Monitor · macro brief agent" 7:02 AM, "· catalyst agent" 7:12 AM (Mon–Fri), "· weekly layer
   review" Sat 9:07 AM (push notification).

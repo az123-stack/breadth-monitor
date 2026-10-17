@@ -53,13 +53,43 @@ def compare(df, good, bad, ret="fwd_next", date_col="date"):
     out["dates"] = int(len(d))
     out["diff"] = None if (a.empty or b.empty) else round(out["avg_good"] - out["avg_bad"], 5)
     out["t"] = round(float(d.mean() / d.std() * np.sqrt(len(d))), 2) if len(d) >= 3 and d.std() > 0 else None
-    mid = df["_d"].sort_values().iloc[len(df) // 2] if len(df) else None
+    # halves: the same date-paired differences, split at the median paired date (dates weigh equally, like the t)
     halves = []
-    for part in (df["_d"] < mid, df["_d"] >= mid) if mid is not None else ():
-        pa, pb = df[good & part], df[bad & part]
-        halves.append(None if pa.empty or pb.empty else round(float(pa[ret].mean() - pb[ret].mean()), 5))
+    if len(d) >= 2:
+        mid = d.index.sort_values()[len(d) // 2]
+        for part in (d[d.index < mid], d[d.index >= mid]):
+            halves.append(round(float(part.mean()), 5) if len(part) else None)
     out["halves"] = halves
     out["passed"] = bool(out["t"] is not None and out["t"] >= T_PASS and out["dates"] >= MIN_DATES
+                         and len(halves) == 2 and all(h is not None and h > 0 for h in halves))
+    return out
+
+
+def compare_dates(df, good, bad, ret="ex", date_col="date"):
+    """For market-wide layers (one value per date, e.g. the macro brief's risk): average each date's ideas, then compare
+    good dates vs bad dates with Welch's t (a date-paired test is impossible: no date is both). Same pass rule."""
+    df = df.assign(_d=pd.to_datetime(df[date_col]))
+    ga = df[good].groupby("_d")[ret].mean()
+    gb = df[bad].groupby("_d")[ret].mean()
+    out = {"n_good": int(good.sum()), "n_bad": int(bad.sum()), "dates": int(len(ga) + len(gb)),
+           "avg_good": None if ga.empty else round(float(ga.mean()), 5),
+           "avg_bad": None if gb.empty else round(float(gb.mean()), 5), "test": "welch over dates"}
+    out["diff"] = None if ga.empty or gb.empty else round(out["avg_good"] - out["avg_bad"], 5)
+    t = None
+    if len(ga) >= 3 and len(gb) >= 3:
+        se = np.sqrt(ga.var() / len(ga) + gb.var() / len(gb))
+        t = round(float((ga.mean() - gb.mean()) / se), 2) if se > 0 else None
+    out["t"] = t
+    halves = []
+    allds = pd.Series(sorted(set(ga.index) | set(gb.index)))
+    if len(allds) >= 2:
+        mid = allds.iloc[len(allds) // 2]
+        for lo, hi in ((None, mid), (mid, None)):
+            a = ga[(ga.index < hi) if hi is not None else (ga.index >= lo)]
+            b = gb[(gb.index < hi) if hi is not None else (gb.index >= lo)]
+            halves.append(None if a.empty or b.empty else round(float(a.mean() - b.mean()), 5))
+    out["halves"] = halves
+    out["passed"] = bool(t is not None and t >= T_PASS and out["dates"] >= MIN_DATES
                          and len(halves) == 2 and all(h is not None and h > 0 for h in halves))
     return out
 
@@ -130,15 +160,17 @@ def study_log():
     tests = {   # each test only uses rows where that layer was actually checked ("not checked" is never the good group)
         "catalyst_positive": (checked & (df["cat_dir"] == "positive"), checked & df["cat_dir"].isin(["negative", "none"])),
         "red_flags": (checked & (df["red_flags"].fillna("") == ""), checked & (df["red_flags"].fillna("") != "")),
-        "earnings_in_hold": (has_earn & ~df["earn_days"].astype(float).between(0, decision.HOLD),
-                             has_earn & df["earn_days"].astype(float).between(0, decision.HOLD)),
-        "brief_low_risk": (df["brief_risk"] == "low", df["brief_risk"] == "high"),
+        "earnings_in_hold": (has_earn & ~df["earn_days"].astype(float).between(0, decision.EXIT_SESSIONS),
+                             has_earn & df["earn_days"].astype(float).between(0, decision.EXIT_SESSIONS)),
         "macro_tailwind": (df["tail5"].astype(float) > 0.25, df["tail5"].astype(float) < -0.25),
         "more_support": (df["support"].astype(float) >= 4, df["support"].astype(float) <= 2),
         "no_warnings": (df["warn"].astype(float) == 0, df["warn"].astype(float) >= 2),
     }
     for k, (g, b) in tests.items():
         out[k] = compare(df, g.fillna(False), b.fillna(False), ret="ex")
+    # market-wide layer: one value per date -> compare dates, not ideas within a date
+    out["brief_low_risk"] = compare_dates(df, (df["brief_risk"] == "low").fillna(False),
+                                          (df["brief_risk"] == "high").fillna(False), ret="ex")
     return out
 
 

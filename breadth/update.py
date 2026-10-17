@@ -270,8 +270,11 @@ def recompute_and_publish(bars, splits, universe, state):
             mfit = macrofit.build(adjusted, MAC.load(), cands)
             dec = decision.build(theme_data, history, mfit, metrics.classify(history).get("label"))
             if dec:
-                decision.record(dec)
-                theme_data["decision"] = decision.strip_private(dec)
+                theme_data["decision"] = decision.strip_private(dec)     # the page gets the cards even if logging fails
+                try:
+                    decision.record(dec)
+                except Exception as e:
+                    log.exception("decision log record failed: %s", e)
         except Exception as e:
             log.exception("decision cards failed: %s", e)
         try:   # settle earlier ideas and refresh forward evidence even if today's cards failed
@@ -279,7 +282,7 @@ def recompute_and_publish(bars, splits, universe, state):
             decision.settle(adjusted)
             ev = layers.load(); ev["log"] = layers.study_log(); layers.save(ev)
             if theme_data.get("decision"):
-                theme_data["decision"]["evidence"] = ev
+                theme_data["decision"]["evidence"] = decision.load_evidence()   # cleaned, never raw
         except Exception as e:
             log.exception("decision log settle failed: %s", e)
         try:

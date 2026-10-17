@@ -1,0 +1,314 @@
+{
+ "about": "Layer registry: every input the dashboard uses or has tried. Ladder: idea -> tested -> info -> proven -> approved -> live (retired). Only approved/live layers may affect the picks. See breadth/research.py and DECISIONS.md.",
+ "layers": [
+  {
+   "id": "breadth_regime",
+   "name": "Breadth regime",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "live",
+   "where": "metrics.classify",
+   "what": "Stockbee-style 4% up/down ratios, T2108 -> strong / mixed / weak / thrust",
+   "affects_picks": true,
+   "evidence": [
+    "R-2026-10-11-setups-by-breadth"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "playbook_state",
+   "name": "Playbook state + setup verdicts",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "live",
+   "where": "playbook.build",
+   "what": "post-thrust or breadth regime; each setup Focus / Selective / Avoid by backtested R in that state",
+   "affects_picks": true,
+   "evidence": [
+    "R-2026-10-11-setups-by-breadth",
+    "R-2026-10-14-round-number"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "thrust_watch",
+   "name": "Thrust watch (live)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "live",
+   "where": "intraday.thrust_watch",
+   "what": "live 4% up count vs 40-day avg; thrust pace >= 2.5x",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-13-thrust-watch"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "washout_thrust",
+   "name": "Washout thrust card",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "washout.py",
+   "what": "thrusts after SPY -8% and T2108 <= 25 -> high-beta RS 80+ leaders for ~1 month",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-16-connector-beta"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "money_flow_share",
+   "name": "Money in or out (dollar share)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "metrics dv_*, dn_share",
+   "what": "share of $ volume in falling stocks; >= 70% days followed by SPY +1.3% next 5",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-14-dollar-flow"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "volume_tilt",
+   "name": "Volume tilt",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "vtilt.py",
+   "what": "relvol of up movers vs down movers, 10-day; low outside thrust windows -> SPY -4% next 21",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-16-imbalance-volume-tilt"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "near_highs_context",
+   "name": "Narrowing / highs context",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "metrics pct_near",
+   "what": "many stocks near highs followed by weaker SPY 20d (context)",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-12-near-highs"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "theme_strength",
+   "name": "Theme / sub-theme Strength",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "live",
+   "where": "strength.py",
+   "what": "relative perf + EMA breadth + median RS, 0-100",
+   "affects_picks": true,
+   "evidence": [
+    "R-2026-10-11-theme-strength"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "rotation_tier",
+   "name": "Rotation: leading & accelerating",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "live",
+   "where": "rotation.build",
+   "what": "group line above rising 20-day, near 60-day high, top 20% 20d -> ideas",
+   "affects_picks": true,
+   "evidence": [
+    "R-2026-10-14-rotation-ideas",
+    "R-2026-10-16-three-month-picks"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "money_flow_tiers",
+   "name": "Money flow tiers (RRG)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "rotation.flow",
+   "what": "confirmed / steady / new / fading / outflow per sub-theme",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-14-money-flow-tiers"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "group_ignition",
+   "name": "Group ignition + Day 1",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "live",
+   "where": "rotation.ignition_build",
+   "what": "4-check ignition; Day 1 breakout needs 3-day follow-through",
+   "affects_picks": true,
+   "evidence": [
+    "R-2026-10-14-group-ignition",
+    "R-2026-10-14-day1-breakout"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "pick_context",
+   "name": "Pick context re-rank",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "live",
+   "where": "playbook.rerank",
+   "what": "+1 ignited sub-theme; in outflow episodes +1 sold-hardest / -1 held-up group",
+   "affects_picks": true,
+   "evidence": [
+    "R-2026-10-15-pick-context"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "rs_rating",
+   "name": "RS Rating + leaders score",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "live",
+   "where": "strength.py, leaders.py",
+   "what": "RS 1-99; leaders = 60% RS + 40% closeness to high",
+   "affects_picks": true,
+   "evidence": [
+    "R-2026-10-16-three-month-picks"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "trade_setups",
+   "name": "Trade setups (ATH, pullback, rotation, Q-flag, VCP, round number, box retest)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "live",
+   "where": "tradesetups.py, boxes.py",
+   "what": "setup masks + backtest by state",
+   "affects_picks": true,
+   "evidence": [
+    "R-2026-10-14-trade-setups",
+    "R-2026-10-14-round-number",
+    "R-2026-10-17-box-trades"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "conviction_tags",
+   "name": "Conviction tags",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "tradesetups.TAGS",
+   "what": "RS high/ahead, burst, coil, top theme...; none adds edge at t >= 2",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-11-conviction-tags"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "record_volume",
+   "name": "Record volume warning",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "hve.py",
+   "what": "up days on record volume lagged SPY ~-5% over 10 sessions",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-12-record-volume"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "macro_fit",
+   "name": "Macro fit (rates / oil / dollar)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "macrofit.py",
+   "what": "market-neutral sensitivities + 5-day tailwind; failed its backtest",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-16-macro-fit"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "calendar",
+   "name": "Calendar (earnings + events)",
+   "kind": "agent",
+   "owner": "catalyst + macro brief agents",
+   "status": "tested",
+   "where": "decision.py",
+   "what": "earnings inside the hold, high-impact events; forward-logged",
+   "affects_picks": false,
+   "evidence": [],
+   "notes": ""
+  },
+  {
+   "id": "catalyst",
+   "name": "Catalyst (why it's moving)",
+   "kind": "agent",
+   "owner": "catalyst agent",
+   "status": "tested",
+   "where": "decision.py",
+   "what": "direction / quality / red flags with sources; forward-logged",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-11-setups-by-breadth"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "macro_brief",
+   "name": "Macro brief",
+   "kind": "agent",
+   "owner": "macro brief agent",
+   "status": "tested",
+   "where": "decision.py",
+   "what": "rates, Fed, oil, geopolitics, event risk; forward-logged",
+   "affects_picks": false,
+   "evidence": [],
+   "notes": ""
+  },
+  {
+   "id": "position_exits",
+   "name": "Position-trade exits",
+   "kind": "code",
+   "owner": "(not built)",
+   "status": "tested",
+   "where": "-",
+   "what": "3-month holds: hold or 50-EMA trail beat 10/21-EMA trails",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-16-position-exits"
+   ],
+   "notes": ""
+  },
+  {
+   "id": "position_sizing",
+   "name": "Sizing high-ADR leaders",
+   "kind": "code",
+   "owner": "(not built)",
+   "status": "idea",
+   "where": "-",
+   "what": "size so a ~30% drawdown is ~1% of account instead of adding names",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-16-three-month-picks"
+   ],
+   "notes": ""
+  }
+ ]
+}

@@ -971,8 +971,8 @@ def test_decision_robustness():
                  "pick_watch": [], "pick_cands": []}, "trade_setups": {"rows": {}}, "stocks": [],
                  "rotation": {"flow": {}, "ignition": {}}}
             dd = DC.build(T, None, {"stocks": {"AAA": {"words": [], "tail5": 1.0}}}, "x")
-            assert dd and dd["review"]["summary"] is None and dd["review"]["findings"] == ["x"]
-            assert dd["agents"]["brief"]["headline"] is None and dd["agents"]["brief"]["events"][0]["name"] is None
+            assert dd and dd["review"] is None                    # no usable summary = no review (round 3)
+            assert dd["agents"]["brief"] is None                  # no usable risk level = no brief (round 3)
             assert dd["evidence"] == {}                                     # malformed evidence ignored
             L = {l["k"]: l for l in dd["cards"][0]["layers"]}
             assert L["calendar"]["state"] == "unknown"                      # earnings date not confirmed
@@ -1020,6 +1020,92 @@ def test_agent_tools_stdlib_only():
     code = f"import sys; sys.path.insert(0, {str(root)!r}); import breadth.agentfiles, breadth.nyse; print('ok')"
     r = subprocess.run([sys.executable, "-I", "-S", "-c", code], capture_output=True, text=True, cwd="/")
     assert r.stdout.strip() == "ok", r.stderr[-500:]
+
+
+
+def test_round3_fixes():
+    """Corrupt log -> fresh log (backup kept); exit-day earnings flagged; market-wide brief tested over dates;
+    halves weigh dates equally; an unusable brief / review counts as missing."""
+    import tempfile, json as _json
+    from breadth import decision as DC, layers
+    old_d, old_docs = config.DATA_DIR, config.DOCS_DIR
+    with tempfile.TemporaryDirectory() as d:
+        config.DATA_DIR = Path(d); config.DOCS_DIR = Path(d) / "docs"
+        try:
+            (Path(d) / "decision_log.csv").write_text("")
+            assert DC.load_log().empty and (Path(d) / "decision_log.csv.bad").exists()
+            ag = config.DOCS_DIR / "agent"; ag.mkdir(parents=True)
+            (ag / "macro_brief.json").write_text(_json.dumps({"for_date": "2026-10-16", "headline": "h", "risk": None}))
+            (ag / "review.json").write_text(_json.dumps({"for_date": "2026-10-16", "summary": None}))
+            assert DC.load_agent("macro_brief", "2026-10-16") == {} and DC.load_agent("review", "2026-10-16") == {}
+            # card Fri Oct 16: entry Mon 19, exit close Mon 26 = 6 sessions later -> earnings on the 26th is inside
+            (ag / "catalysts.json").write_text(_json.dumps({"for_date": "2026-10-16", "stocks": {"AAA": {
+                "why": "x", "direction": "positive", "quality": "real", "earnings_date": "2026-10-26", "sources": ["https://a.b"]}}}))
+            T = {"date": "2026-10-16", "playbook": {"rows": [], "picks": [{"t": "AAA"}], "pick_watch": [], "pick_cands": []},
+                 "trade_setups": {"rows": {}}, "stocks": [], "rotation": {"flow": {}, "ignition": {}}}
+            L = {l["k"]: l for l in DC.build(T, None, {}, "x")["cards"][0]["layers"]}
+            assert L["calendar"]["state"] == "bad", L["calendar"]
+            # market-wide brief test: different dates, Welch over dates (the paired test would always be empty)
+            rows = []
+            for k, day in enumerate(pd.bdate_range("2026-06-01", periods=40)):
+                risk = "low" if k % 2 else "high"
+                for t in ("A", "B"):
+                    rows.append({"date": day.strftime("%Y-%m-%d"), "t": t, "brief_risk": risk, "status": "closed",
+                                 "fwd5": (0.02 if risk == "low" else -0.01) + (0.001 * (k % 5)), "spy5": 0.0, "support": 3, "warn": 0})
+            pd.DataFrame(rows).reindex(columns=DC.LOG_COLS).to_csv(Path(d) / "decision_log.csv", index=False)
+            b = layers.study_log()["brief_low_risk"]
+            assert b["test"] == "welch over dates" and b["t"] and b["t"] > 2 and b["passed"] and len(b["halves"]) == 2
+            # halves weigh dates equally: one date with 100 good rows can't dominate its half
+            df = pd.DataFrame({"date": ["2026-01-0%d" % i for i in (1, 1, 2, 2, 3, 3, 4, 4)], "g": [1, 0] * 4,
+                               "r": [0.01, 0.0] * 4})
+            c = layers.compare(df, df["g"] == 1, df["g"] == 0, ret="r")
+            assert c["halves"] == [0.01, 0.01] and c["dates"] == 4
+        finally:
+            config.DATA_DIR, config.DOCS_DIR = old_d, old_docs
+
+
+
+def test_research_ledger():
+    """Every finding card and the layer registry validate; only approved/live layers may affect picks;
+    the Integrator's plan validates and loads; the digest is stdlib-only."""
+    import json as _json, tempfile
+    from breadth import research, agentfiles as AF, decision as DC
+    saved = config.DATA_DIR
+    config.DATA_DIR = config.ROOT / "data"          # the real ledger + registry (earlier tests repoint DATA_DIR)
+    try:
+        assert research.check() == [], research.check()
+        reg = research.load_registry()
+        digest = research.digest()
+    finally:
+        config.DATA_DIR = saved
+    assert any(L["id"] == "macro_fit" and L["status"] == "info" for L in reg["layers"])
+    bad = {"layers": [{"id": "x", "status": "info", "kind": "code", "affects_picks": True}]}
+    assert any("only approved/live" in e for e in research.validate_registry(bad))
+    meta, _ = research.parse("---\nid: R-2026-10-20-x\ntitle: t\ndate: 2026-10-20\nstatus: works\nkind: setup\n"
+                             "result: r\nintegrated: no\nlayers: [a, b]\n---\nbody")
+    assert meta["layers"] == ["a", "b"] and research.validate_card(meta) == []
+    assert research.validate_card({**meta, "status": "great"})
+    assert "Layer registry" in digest and "R-2026-10-16-macro-fit" in digest
+    plan = {"for_date": "2026-10-17", "summary": "s", "items": [{"title": "A", "verdict": "build", "priority": 2},
+            {"title": "B", "verdict": "nonsense", "priority": 1, "cards": "R-x"}, "junk"],
+            "new_agents": [{"name": "Earnings reaction agent", "job": "j"}, {"job": "no name"}]}
+    v = AF.validate("plan", plan)
+    assert [i["title"] for i in v["items"]] == ["B", "A"] and v["items"][0]["verdict"] == "watch"
+    assert v["items"][0]["cards"] == ["R-x"] and len(v["new_agents"]) == 1
+    try:
+        AF.validate("plan", {"for_date": "2026-10-17", "summary": "s", "items": []}); assert False
+    except ValueError:
+        pass
+    old = config.DOCS_DIR
+    with tempfile.TemporaryDirectory() as d:
+        config.DOCS_DIR = Path(d)
+        try:
+            (Path(d) / "agent").mkdir()
+            (Path(d) / "agent" / "plan.json").write_text(_json.dumps({**v, "items": v["items"] + [7]}))
+            p = DC.load_agent("plan", "2026-10-16", max_age=10)
+            assert p["summary"] == "s" and len(p["items"]) == 2
+        finally:
+            config.DOCS_DIR = old
 
 
 if __name__ == "__main__":

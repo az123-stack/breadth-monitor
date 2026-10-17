@@ -40,12 +40,26 @@ the log has ~2–3 months of settled rows; the Reviewer then proposes promotion 
 9. Costs and run times documented; CLAUDE.md and the project context updated.
 10. No look-ahead in the forward log: nothing learned after an idea's entry (next session's open) is logged for it.
 
+## Research → dashboard loop (the Integrator, Oct 17, 2026)
+- **Research ledger** `research/R-*.md`: one finding card per study (works / doesnt / mixed / untested / process), with
+  the numbers, both halves, the registry layers it is evidence for, and whether it is integrated. Every research chat
+  ends by filing one — failed ideas too, so they aren't re-tested. 24 cards backfilled Oct 17.
+- **Layer registry** `data/layers.json`: every input on the ladder idea → tested → info → proven → approved → live
+  (retired); only approved/live layers may affect the picks (validated by `python -m breadth.research check` and tests).
+- **Integrator** (Claude scheduled task, Saturday 10:07 AM ET, after the Reviewer): reads the digest
+  (`python -m breadth.research digest`), the review, the evidence and last week's plan; proposes where each finding plugs
+  in, the test that proves it, the result that kills it, effort, priority, new agents (job description) and retirements →
+  `docs/agent/plan.json` → "🧠 Integrator plan" on the Decision Cards + push notification. **Proposes only.**
+- Building: Adam says "build #N" in the project; a Claude session builds it with tests, `tools/check_info_only.py` and an
+  independent grader, updates the card (integrated) and the registry (status), and creates any approved new agent.
+
 ## How it runs (built Oct 16–17, 2026)
 | When (ET) | What | Writes |
 |---|---|---|
 | ~12:25 AM Tue–Sat | Daily update (existing): official data, all layers in code, cards for the new date, settles 5-session-old log rows, forward evidence (`layers.study_log`) | `docs/index.html`, `data/decision_log.csv`, `data/layer_evidence.json` |
 | 7:02 AM Mon–Fri | **Macro agent** (Claude scheduled task) → `agentfiles publish --kind macro_brief --push` | `docs/agent/macro_brief.json` + rebuild |
 | 7:12 AM Mon–Fri | **Catalyst agent** → every carded ticker: the first 15 get full research (why it's moving, direction for a long swing, quality, red flags), the rest an earnings-date check; all with sources. Waits up to 30 min if the overnight data is late | `docs/agent/catalysts.json` + rebuild |
+| 10:07 AM Sat | **Integrator** → research cards + registry + evidence → ranked plan, new-agent proposals (applies nothing) | `docs/agent/plan.json` + rebuild; push notification |
 | 9:07 AM Sat | **Weekly Reviewer** → refreshes macro backtest + log evidence, writes a plain-English review with proposals (applies nothing) | `docs/agent/review.json` + evidence + rebuild; push notification |
 
 `.github/workflows/agent.yml`: job `save` (validate + commit the JSON; never queued, so it can't be cancelled; fails red if
@@ -54,8 +68,7 @@ running daily update, rebuilds on the latest `main`, and starts over if `main` m
 save with `python -m breadth.agentfiles status`. Staleness: catalysts count only for their exact card date; the macro brief
 for up to 4 days; the review 10. Malformed or wrongly-shaped agent files are ignored field by field (never break the cards);
 every "<" in the embedded page data is escaped, so agent text can't break the page.
-Known gap: if a daily update's push races an agent rebuild, the daily update's (newer) page wins and that day's agent
-data shows after the next rebuild.
+If agent input lands while a daily update runs, the daily update's last step rebuilds again on the newest main.
 
 ## Costs and run times
 - GitHub Actions: free (public repo). agent.yml ≈ 4–5 min per run (2 a weekday) + ≈ 9 min weekly (evidence refresh).
@@ -80,5 +93,10 @@ data shows after the next rebuild.
   update rebuilds again if agent input arrived during it; NYSE holidays computed by rule (`breadth/nyse.py`);
   clean truncation; `tools/check_info_only.py` (two full rebuilds, hostile agent files) proves picks and pick_ledger.csv
   are byte-identical. Tests: 31.
+- Grading round 3 (Oct 17): 72% — critical: `nyse.py` imported dateutil, which the agent save job doesn't install (no
+  agent output could be saved; caught before any scheduled run). Fixed: stdlib-only (test runs the agent tools with no
+  packages), live save verified; plus corrupt-log recovery, cleaned evidence on the page, hold window through the exit
+  day (`EXIT_SESSIONS` = 6 sessions after the card date), market-wide brief tested over dates (Welch), halves weigh dates
+  equally, unusable brief/review = missing.
 - Agent layers: forward log started Oct 15, 2026 (Oct 15 rows have no agent data; first full agent day: Oct 16 cards,
   researched Mon Oct 19 before the open). Earliest meaningful test ≈ 60+ settled ideas over 20+ dates (~5–6 weeks).

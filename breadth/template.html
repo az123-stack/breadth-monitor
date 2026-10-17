@@ -3965,6 +3965,7 @@ function renderTrades(app) {
   app.append(hveCard(T));
   app.append(tsBacktest(T.trade_bt, (T.playbook && T.playbook.state) || now));
 }
+const isNum = (x) => typeof x === "number" && isFinite(x);
 function decisionCard(D) {
   const ROLE = { pick1: "Top pick #1", pick2: "Top pick #2", watch: "Watch (trigger not close yet)", cand: "Candidate" };
   const SET = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Q-Flag", vcp: "VCP", round: "Round Number", box: "Box Retest" };
@@ -3980,12 +3981,22 @@ function decisionCard(D) {
   const rline = RV ? `<details class="kqsec" style="margin-top:8px"><summary><b>Weekly review</b> (${esc(RV.for_date || "")}) · ${esc(String(RV.summary || "").slice(0, 140))}${String(RV.summary || "").length > 140 ? "…" : ""}</summary>
     <p style="margin:6px 0">${esc(RV.summary || "")}</p>${(RV.findings || []).length ? `<div class="meta" style="font-size:12px"><b>Findings</b><ul style="margin:4px 0 6px 18px;padding:0">${RV.findings.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
     ${(RV.proposals || []).length ? `<div style="font-size:13px"><b>Proposals</b> (nothing changes until you approve)<ul style="margin:4px 0 6px 18px;padding:0">${RV.proposals.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}</details>` : "";
-  const lline = LG.closed ? ` Forward log so far: ${LG.closed} settled ideas over ${LG.dates} days.` : " The forward log has no settled ideas yet (each idea is scored 5 sessions after its card).";
+  const PL = D.plan, VERD = { build: ["focus", "Ready to build"], test_first: ["selective", "Test first"], watch: ["unproven", "Watch"], duplicate: ["unproven", "Duplicate"], reject: ["avoid", "Reject"] };
+  const pline = PL ? `<details class="kqsec" style="margin-top:8px"><summary><b>🧠 Integrator plan</b> (${esc(PL.for_date || "")}) · ${esc(String(PL.summary || "").slice(0, 150))}${String(PL.summary || "").length > 150 ? "…" : ""}</summary>
+    <p style="margin:6px 0">${esc(PL.summary || "")}</p>
+    ${(PL.items || []).map((it, i) => { const v = VERD[it.verdict] || VERD.watch; return `<div class="dlay" style="grid-template-columns:22px minmax(0,1fr)"><span class="meta">${it.priority || i + 1}.</span><span><b>${esc(it.title || "")}</b> <span class="pbv ${v[0]}">${v[1]}</span>${it.effort ? ` <span class="dtag">effort ${esc(it.effort)}</span>` : ""}
+      ${it.where ? `<div class="meta" style="font-size:12px">Where: ${esc(it.where)}</div>` : ""}${it.how ? `<div style="font-size:12.5px">${esc(it.how)}</div>` : ""}
+      ${it.test ? `<div class="meta" style="font-size:12px">Test: ${esc(it.test)}</div>` : ""}${it.kill ? `<div class="meta" style="font-size:12px">Drop it if: ${esc(it.kill)}</div>` : ""}
+      ${(it.cards || []).length ? `<div class="meta" style="font-size:11.5px">Research: ${it.cards.map(esc).join(", ")}</div>` : ""}</span></div>`; }).join("")}
+    ${(PL.new_agents || []).length ? `<div style="margin-top:8px;font-size:13px"><b>Proposed new agents</b>${PL.new_agents.map(a => `<div class="dlay" style="grid-template-columns:minmax(0,1fr)"><span><b>${esc(a.name || "")}</b> — ${esc(a.job || "")}<div class="meta" style="font-size:12px">${[a.schedule && "When: " + a.schedule, a.cost && "Cost: " + a.cost, a.why && "Why: " + a.why, a.kill && "Retire if: " + a.kill].filter(Boolean).map(esc).join(" · ")}</div></span></div>`).join("")}</div>` : ""}
+    ${(PL.retire || []).length ? `<div class="meta" style="margin-top:6px;font-size:12px"><b>Proposed to retire:</b> ${PL.retire.map(r => `${esc(r.target || "")} (${esc(r.why || "")})`).join(" · ")}</div>` : ""}
+    <div class="note" style="padding:6px 0 0">Proposals only. Nothing is built, changed or switched on until you say "build #N" in the project chat; each build goes through tests, the information-only check and an independent grader.</div></details>` : "";
+  const lline = isNum(LG.closed) && LG.closed ? ` Forward log so far: ${LG.closed} settled ideas over ${LG.dates} days.` : " The forward log has no settled ideas yet (each idea is scored 5 sessions after its card).";
   const E = (D.evidence || {}).macro_fit;
-  const ev = E && E.tail5 && typeof E.signals === "number" ? `Macro fit backtest (${E.signals.toLocaleString()} past setup trades, ${E.from} to ${E.to}): a recent macro tailwind made ${pct(E.tail5.avg_good)} vs ${pct(E.tail5.avg_bad)} with a headwind (t ${E.tail5.t}) — ${E.passed ? "passed" : "not proven, so it's shown for information only"}.` : "";
+  const ev = E && E.tail5 && isNum(E.signals) && isNum(E.tail5.avg_good) && isNum(E.tail5.avg_bad) && isNum(E.tail5.t) ? `Macro fit backtest (${E.signals.toLocaleString()} past setup trades, ${E.from} to ${E.to}): a recent macro tailwind made ${pct(E.tail5.avg_good)} vs ${pct(E.tail5.avg_bad)} with a headwind (t ${E.tail5.t}) — ${E.passed ? "passed" : "not proven, so it's shown for information only"}.` : "";
   const el = $(`<section class="card regcard"><div class="kicker">Decision cards · every layer behind today's ideas</div>
     <div class="meta" style="font-size:12px;margin-top:4px">${mline}</div>${bline}
-    ${rline}<div class="picks">${big.map(c => `<div class="pick"><div class="phead"><span class="pt">${c.t}</span><span class="pbv unproven">${esc(ROLE[c.role] || c.role)}</span>${c.setup ? `<span class="pbv focus">${esc(c.setup_name || SET[c.setup] || c.setup)}</span>` : ""}</div>
+    ${rline}${pline}<div class="picks">${big.map(c => `<div class="pick"><div class="phead"><span class="pt">${c.t}</span><span class="pbv unproven">${esc(ROLE[c.role] || c.role)}</span>${c.setup ? `<span class="pbv focus">${esc(c.setup_name || SET[c.setup] || c.setup)}</span>` : ""}</div>
       <div class="meta" style="font-size:12px">${esc((c.name || "").slice(0, 40))}${c.price ? ` · last close $${c.price.toFixed(2)}` : ""}</div>${sum(c)}${c.layers.map(lay).join("")}</div>`).join("")}</div>
     ${rest.length ? `<details class="kqsec" style="margin-top:10px"><summary><b>Other candidates</b> · ${rest.length} more, same layers</summary>
       <div class="scroll"><table class="grid"><thead><tr><th class="l">Ticker</th><th class="l">Setup</th>${rest[0].layers.map(l => `<th>${esc(l.name)}</th>`).join("")}<th>Support</th><th>Warnings</th></tr></thead><tbody>
