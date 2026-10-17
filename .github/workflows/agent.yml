@@ -1,9 +1,14 @@
 name: Agent input
 
-# Saves a Catalyst / Macro agent answer to docs/agent/<kind>.json and rebuilds the page so the Decision Cards (and
-# data/decision_log.csv) include it. Dispatched by `python -m breadth.agentfiles publish --push` from the Claude
+# Saves a Catalyst / Macro / Review agent answer to docs/agent/<kind>.json, then rebuilds the page so the Decision Cards
+# (and data/decision_log.csv) include it. Dispatched by `python -m breadth.agentfiles publish --push` from the Claude
 # scheduled tasks (they can dispatch workflows but not write repo files). The JSON arrives base64-encoded and is
 # validated again here; an invalid file is never written.
+#
+# Two jobs on purpose: GitHub keeps only the NEWEST pending run in a concurrency queue and cancels older pending ones.
+# The save job is not queued (it can't be cancelled, so no agent answer is ever lost); only the rebuild is queued
+# behind the daily update, and a cancelled rebuild is harmless because the newer one checks out main and includes
+# every saved file.
 on:
   workflow_dispatch:
     inputs:
@@ -13,29 +18,52 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: breadth-update          # same queue as the daily update, so the two never race
-  cancel-in-progress: false
-
 jobs:
   save:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with: { ref: main }
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -q -r requirements.txt
       - name: Validate and save
         env:
           KIND: ${{ inputs.kind }}
           B64: ${{ inputs.b64 }}
         run: python -m breadth.agentfiles save --kind "$KIND" --b64 "$B64"
-      - name: Refresh layer evidence (weekly review only, ~3 min)
+      - name: Commit the agent file
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          git add docs/agent
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -qm "Agent input: ${{ inputs.kind }}"
+          for i in 1 2 3 4 5; do
+            git push -q && break
+            sleep $((i * 3))
+            git pull -q --rebase -X theirs || { git rebase --abort; break; }
+          done
+
+  rebuild:
+    needs: save
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: breadth-update          # same queue as the daily update, so the two never race
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main }
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q -r requirements.txt
+      - name: Refresh layer evidence (weekly review only, ~4 min)
         if: ${{ inputs.kind == 'review' }}
         run: python -m breadth.layers macro && python -m breadth.layers log
-      - name: Rebuild the page with it
+      - name: Rebuild the page with every saved agent file
         run: python -m breadth.update --rebuild-only
       - name: Commit
         run: |
@@ -43,7 +71,7 @@ jobs:
           git config user.email "breadth-bot@users.noreply.github.com"
           git add docs data
           if git diff --cached --quiet; then echo "no change"; exit 0; fi
-          git commit -qm "Agent input: ${{ inputs.kind }}"
+          git commit -qm "Rebuild with agent input (${{ inputs.kind }})"
           for i in 1 2 3; do
             git push -q && break
             git pull -q --rebase -X theirs || { git rebase --abort; break; }
