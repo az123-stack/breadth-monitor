@@ -75,8 +75,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   **When Adam says "review my trade setups"**: read the reasons in `setup_review`, the backtest by regime (`trade_bt`),
   propose adds/drops/retunes, build them, then run `python -m breadth.review --mark-reviewed --note "..."` and rebuild.
 - `playbook.py` "Today's playbook" card at the top of Trade Setups → `DATA.themes.playbook`: state = post-thrust (25 sessions
-  after a major Breadth thrust / Follow-through, `metrics.thrust_window`) else breadth regime; ranks all 7 setup types
-  (4 Trade Setups + bursts, anticipation, EPs) by backtested avg R in that state: Focus ≥ +0.15R, Selective ≥ 0, Avoid < 0,
+  after a major Breadth thrust / Follow-through, `metrics.thrust_window`) else breadth regime; ranks all setup types
+  (Trade Setups incl. Box Retest + bursts, anticipation, EPs) by backtested avg R in that state: Focus ≥ +0.15R, Selective ≥ 0, Avoid < 0,
   Unproven n < 15; shows the "if a thrust comes" ranking too. Setup cards follow the playbook order.
   The review flag also fires (⚡) the morning a major thrust prints, with the post-thrust playbook in the reason.
 - Top 2 trades (`playbook.picks`, card at the top of Trade Setups): top 5 of each Focus setup (+ Selective if < 2
@@ -259,21 +259,28 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   next 10 sessions, sold-hardest sub-themes +4.3% vs SPY (median +3.2%, 78%) vs held-up +0.5%; ex Mar–Apr 2025 +3.9%; any 70%+ day (n 24)
   sold +1.9% / held +1.0%. First calm comeback day (n 9) → SPY median −1.2% next 10, held-up +1.7%, middle +1.5%, sold −0.1%; 60-day
   leaders +3.1% over 20. Read: snapbacks start around the heavy-selling days; after a calm comeback day follow what held up.
-- `boxes.py` **Box breakout retest** (Oct 16, 2026; Adam's chart: Loew's 1936 rectangle from Edwards & Magee) → `DATA.themes.boxes`,
-  card `boxCard` on Trade Setups (after the six setup cards). Box = longest 10–130-session range ≤ 3/4/5/6 ADRs (windows 2–4 wk,
-  4–8 wk, 2–3 mo, 3–6 mo; max 25%), 2+ touches of top and bottom, flat (fit ≤ ½ height), after a 15%+ / 4+ ADR advance in the prior
-  40 sessions, box volume ≤ 0.9× the advance. THE TRADE = breakout → pullback to the old top → bounce (`RT`, `retest_walk`): tags
-  🔵 coming back (ran 1+ ADR past the top, now 1+ ADR off the high, within 3 ADRs), 🟡 at support / back inside (low within 0.5 ADR
-  of the top, no bounce yet), 🟢 bounced (close > prior high and > top after the touch, last 2 sessions). Dead on a close under the box
-  middle; 25 sessions to touch / bounce. Stop = retest low; target = top + height. Grade A = RS 80+ & 2–4 wk box, B = RS 80+.
-  `rows` = plain box scan (pipeline: breakout today / recent / near top / in box); `rt` = retest tags; `rt_study` = research, `now`.
-  Chips: box length + scope (remembered "boxWin"); ⬇ exports the three lists. Adds ~70 s to the build.
-  Research (Jan 2025–Oct 2026, 4,083 breakouts → 2,942 touched → 2,353 bounces; buy bounce close, stop retest low, else 20 sessions):
-  all +0.09R (35% win, t 2.3; halves +0.19 / 0.00). After a major thrust (25 sessions) +0.22R (t 3.3, both halves); thrust + RS 80+
-  +0.50R (t 3.8, 42% win, halves +0.60/+0.47, n 271); + 2–4 wk box +0.68R (n 146). No thrust ≈ 0 (+0.01R; RS 80+ −0.08R, 2nd half −0.48);
-  strong breadth without a thrust −0.09R; weak breadth −0.08R. Breakout volume, pullback volume, held-above vs dipped-inside: no
-  consistent difference. Buying the breakout itself lagged SPY (−0.4% 10d vs −0.6% for any 20-day-high break). Banner = Act inside a
-  thrust window, else Watch. Monthly R was negative Jul–Oct 2026 (no thrust). Not in the playbook / Top 2 picks yet.
+- `boxes.py` **Box retest, long + short** (Oct 16–17, 2026; Adam's chart: Loew's 1936 rectangle, Edwards & Magee) → `DATA.themes.boxes`,
+  card `boxCard` on Trade Setups (after the setup cards). Box = longest 10–130-session range ≤ 3/4/5/6 ADRs (windows 2–4 wk, 4–8 wk,
+  2–3 mo, 3–6 mo; max 25%, min max(3%, 1 ADR) so pinned buyout names drop), 2+ touches of top and bottom, flat (fit ≤ ½ height); LONG
+  boxes also need a 15%+ / 4+ ADR advance in the prior 40 sessions and box volume ≤ 0.9× the advance (`find_box(strict=True)`).
+  LONG = breakout → pullback to the old top → bounce; SHORT = breakdown → rally back to the old bottom → rejection. The short side runs
+  the same `retest_walk` / `_breakouts` on reciprocal prices (1/low, 1/high, 1/close; `_space`), outcomes on real prices.
+  Tags (`rt`, `rt_short`; `tag`): `coming` (ran 1+ ADR past the line, now 1+ ADR back, within 3 ADRs), `at` / `inside` (within 0.5 ADR
+  of the line / back inside the box, no reaction yet), `go` (close past the prior day's extreme and back past the line after the
+  touch, last 2 sessions). Dead on a close past the box middle; 25 sessions to touch / react. Stop = retest extreme; target = height
+  from the line. Grade A = RS 80+ (long) / RS ≤ 30 (short) & 2–4 wk box, B = RS rule only. `now.since` = sessions since the
+  latest major thrust (`market_arrays`). Banners per side pick the research bucket matching today (thrust day–5 / 6–25 / no thrust).
+  PLAYBOOK (Oct 17): `boxes.attach` adds setup "box" (Box Retest) to `trade_setups` = today's fresh LONG `go` names with RS 80+ in the
+  theme universe (rows carry `box_stop/lvl/target/grade/wks`); `playbook.TYPES` source "box" ranks it by `rt_study.by_state[state+"_rs"]`
+  (5-session R, same yardstick as the other setups); plan buy open, stop retest low (ledger uses `vcp_stop` column for it), risk10k from it.
+  Shorts are NOT in the playbook / picks (no short side in the ledger).
+  Research (Jan 2025–Oct 2026; buy/short the signal close, stop past the retest extreme, else 20 sessions; `R5` = 5-session, `Rm` = box-
+  middle stop): LONG 4,061 breakouts → 2,339 bounces, all +0.11R; thrust + RS 80+ +0.51R (t 3.9, halves +0.66/+0.46); thrust day to 5
+  sessions after +0.46R (t 3.5, 44% win, both halves); 6–25 after +0.13R; no thrust +0.02R (2nd half −0.19); strong breadth w/o thrust
+  −0.07R; weak −0.08R. At 5 sessions post-thrust RS 80+ only +0.10R → playbook says Selective; the edge builds over ~4 weeks.
+  SHORT 9,092 breakdowns → 5,093 rejections, all −0.05R; thrust day to 5 sessions after −0.42R (t −5.9, 19% win, both halves): worst
+  cell; strong breadth w/o thrust +0.16R (t 2.1, 2nd half ≈ 0); weak breadth −0.10R; SPY under its 200-day −0.79R (one V-rebound
+  episode, Apr 2025). Shorts look worse than reality: survivorship (delisted losers missing), mostly-bull window, no borrow costs.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

@@ -30,6 +30,7 @@ TYPES = [  # key, name, source, where to find the names
     ("round", "Round Number Magnet", "trade", "Trade Setups"),
     ("kq", "Qullamaggie Flag", "trade", "Trade Setups"),
     ("vcp", "Minervini VCP", "trade", "Trade Setups"),
+    ("box", "Box Retest", "box", "Trade Setups"),
     ("bursts", "Momentum bursts (2LYNCH 5+)", "lists", "Setups tab"),
     ("anticipation", "Anticipation coils", "lists", "Setups tab"),
     ("eps", "Episodic pivots", "lists", "Setups tab"),
@@ -66,7 +67,11 @@ def rank(theme_data, state):
     label = STATE[state][0].lower()
     rows = []
     for key, name, src, where in TYPES:
-        st = ((B.get("setups") or {}).get(key) if src == "trade" else S.get(key)) or {}
+        if src == "box":   # own research (breadth/boxes.py): RS 80+ bounces, same 5-session yardstick as the others
+            bs = ((theme_data.get("boxes") or {}).get("rt_study") or {}).get("by_state") or {}
+            st = {k: bs.get(k + "_rs") or {} for k in ("all", "thrust", "strong", "mixed", "weak")}
+        else:
+            st = ((B.get("setups") or {}).get(key) if src == "trade" else S.get(key)) or {}
         o = st.get(state) or {}
         allo = st.get("all") or {}
         rec = (B.get("recent") or {}).get(key) if src == "trade" else None
@@ -90,6 +95,12 @@ def rank(theme_data, state):
             cool = " — cooling lately" if r is not None and r > 0 and rec["avg_r"] < 0 else (
                 " — improving lately" if r is not None and r < 0 and rec["avg_r"] > 0.1 else "")
             bits.append(f"last 30 sessions {rec['avg_r']:+.2f}R (n {rec['n']}){cool}")
+        if src == "box":
+            g = [g for g in (((theme_data.get("boxes") or {}).get("rt_study") or {}).get("groups") or []) if g["rows"]]
+            best = next((r for gg in g for r in gg["rows"] if r["name"] == "After a thrust + RS 80+"), None)
+            if best and best.get("R", {}).get("ret") is not None:
+                bits.append(f"held 20 sessions instead, post-thrust RS 80+ bounces made {best['R']['ret']:+.2f}R (n {best['R']['n']}): "
+                            "it pays over weeks, not days")
         t = today.get(key)
         bits.append("none qualify today" if not t else f"{t} qualify today")
         rows.append({"key": key, "name": name, "where": where, "verdict": verdict, "avg_r": r, "n": n,
@@ -182,7 +193,7 @@ def picks(theme_data, pb, n=2, ctx=None):
         r = c.pop("row")
         cs, cnotes = ctx(r) if ctx else (0, [])
         c.update({"ctx": cs, "ctx_notes": cnotes, "rsr": r["rsr"], "d60": r.get("d60"), "name": r.get("name", ""), "sub": g, "price": r.get("price"),
-                  "adr": r.get("adr"), "tags": r.get("tags") or [], "vcp_stop": r.get("vcp_stop") if c["setup"] == "vcp" else None,
+                  "adr": r.get("adr"), "tags": r.get("tags") or [], "vcp_stop": r.get("vcp_stop") if c["setup"] == "vcp" else r.get("box_stop") if c["setup"] == "box" else None,
                   "entry_type": "trigger" if c["trigger"] else "open",
                   "plan": plan(c["setup"], r), "why": why(c, pb, r), "risk10k": risk10k(c["setup"], r)})
         out.append(c)
@@ -238,7 +249,9 @@ def rerank(theme_data, history):
 
 
 def risk10k(key, r):
-    """Dollars lost on a $10k position if the stop is hit (1 ADR, or the VCP stop)."""
+    """Dollars lost on a $10k position if the stop is hit (1 ADR, or the VCP / box stop)."""
+    if key == "box" and r.get("box_stop") and r.get("price"):
+        return round(10000 * max(1 - r["box_stop"] / r["price"], 0))
     if key == "vcp" and r.get("vcp_pivot") and r.get("vcp_stop"):
         return round(10000 * (1 - r["vcp_stop"] / r["vcp_pivot"]))
     return round(100 * (r.get("adr") or 0) * 1)   # 1 ADR as a % of $10k
@@ -264,6 +277,10 @@ def plan(key, r):
                 "target": tgt}
     if key == "rotation":
         return {"entry": f"Buy at the open (last close {_p(price)})", "stop": "1 ADR below your fill" + f" (~{_p(stop1)})", "target": tgt}
+    if key == "box" and r.get("box_stop"):
+        return {"entry": f"Buy at the open (last close {_p(price)}): it just bounced off the old box top {_p(r['box_lvl'])}",
+                "stop": f"{_p(r['box_stop'])}, under the retest low ({(r['box_stop'] / price - 1) * 100:+.1f}%)",
+                "target": f"{_p(r['box_target'])} (box height above the top, {(r['box_target'] / price - 1) * 100:+.1f}%); tested hold ~20 sessions"}
     if key == "kq":
         return {"entry": (f"Buy the break of the flag above {_p(r['kq_pivot'])} ({(r['kq_pivot'] / price - 1) * 100:+.1f}% from here)"
                           if r.get("kq_pivot") else "Buy the flag break"),
