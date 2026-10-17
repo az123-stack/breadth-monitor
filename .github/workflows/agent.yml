@@ -7,7 +7,7 @@ name: Agent input
 on:
   workflow_dispatch:
     inputs:
-      kind: { description: "catalysts or macro_brief", required: true }
+      kind: { description: "catalysts, macro_brief or review", required: true }
       b64: { description: "Agent JSON, base64", required: true }
 
 permissions:
@@ -32,6 +32,9 @@ jobs:
           KIND: ${{ inputs.kind }}
           B64: ${{ inputs.b64 }}
         run: python -m breadth.agentfiles save --kind "$KIND" --b64 "$B64"
+      - name: Refresh layer evidence (weekly review only, ~3 min)
+        if: ${{ inputs.kind == 'review' }}
+        run: python -m breadth.layers macro && python -m breadth.layers log
       - name: Rebuild the page with it
         run: python -m breadth.update --rebuild-only
       - name: Commit
