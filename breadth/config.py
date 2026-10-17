@@ -74,3 +74,7 @@ DASHBOARD_DAYS = 760         # max days on the charts (~3 years); they scroll
 # Long-history levels (old highs) for Trade Setups, from Yahoo monthly data; tests switch this off.
 LEVELS_ENABLED = True
 MACRO_RANGE = "2y"     # Yahoo history for macro series; 2 years matches the stored bars (macro fit layer needs it)
+
+# NYSE full-day closures (for counting sessions to earnings / events on the Decision Cards). Extend each December.
+MARKET_HOLIDAYS = ["2026-11-26", "2026-12-25", "2027-01-01", "2027-01-18", "2027-02-15", "2027-03-26", "2027-05-31",
+                   "2027-06-18", "2027-07-05", "2027-09-06", "2027-11-25", "2027-12-24"]

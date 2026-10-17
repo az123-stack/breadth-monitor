@@ -3666,7 +3666,8 @@ function renderTrades(app) {
 function decisionCard(D) {
   const ROLE = { pick1: "Top pick #1", pick2: "Top pick #2", watch: "Watch (trigger not close yet)", cand: "Candidate" };
   const SET = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Q-Flag", vcp: "VCP", round: "Round Number" };
-  const lay = (l) => `<div class="dlay"><span><i class="ddot ${l.state}" title="${l.state}"></i></span><span>${esc(l.name)}</span><span>${esc(l.text)}${l.proven ? "" : ' <span class="dtag" title="Shown for information: not backtested yet, or failed its backtest. It does not change rankings.">unproven</span>'}</span></div>`;
+  const src = (l) => (l.links || []).filter(u => /^https?:\/\//.test(u)).map((u, i) => ` <a href="${esc(u)}" target="_blank" rel="noopener noreferrer" class="meta" title="${esc(u)}">[${i + 1}]</a>`).join("");
+  const lay = (l) => `<div class="dlay"><span><i class="ddot ${l.state}" title="${l.state}"></i></span><span>${esc(l.name)}</span><span>${esc(l.text)}${src(l)}${l.proven ? "" : ' <span class="dtag" title="Shown for information: not backtested yet, or failed its backtest. It does not change rankings.">unproven</span>'}</span></div>`;
   const sum = (c) => `<div class="dsum meta">${c.support} layer${c.support === 1 ? "" : "s"} support · ${c.warn} warning${c.warn === 1 ? "" : "s"}${c.layers.some(l => l.state === "unknown") ? " · some not checked yet" : ""}</div>`;
   const big = D.cards.filter(c => c.role !== "cand"), rest = D.cards.filter(c => c.role === "cand");
   const M = D.macro, A = D.agents || {}, B = A.brief;

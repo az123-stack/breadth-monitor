@@ -22,7 +22,7 @@ from . import config
 
 REPO = "az123-stack/breadth-monitor"
 KINDS = ("catalysts", "macro_brief", "review")
-MAX_TICKERS = 15
+FULL_RESEARCH = 15        # first N carded tickers get full catalyst research; the rest get an earnings-date check only
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 URL = re.compile(r"^https?://\S+$")
 
@@ -67,25 +67,44 @@ def worklist():
     dec = (D.get("themes") or {}).get("decision") or {}
     cards = dec.get("cards") or []
     stocks = [{"t": c["t"], "role": c["role"], "name": c.get("name"), "setup": c.get("setup_name") or c.get("setup"),
-               "price": c.get("price")} for c in cards[:MAX_TICKERS]]
+               "price": c.get("price"), "depth": "full" if k < FULL_RESEARCH else "earnings_only"}
+              for k, c in enumerate(cards)]
     return {"for_date": dec.get("date"), "tickers": stocks,
-            "note": "for_date is the last official close; research news up to now. Keep the order: picks first."}
+            "note": "for_date is the last official close; research news up to now. Keep the order: picks first. "
+                    "depth=full: full catalyst research; depth=earnings_only: find the next earnings date only "
+                    "(why='earnings date check only', direction none, quality unknown)."}
+
+
+def _date_ok(v):
+    try:
+        from datetime import date as _d
+        _d.fromisoformat(str(v))
+        return bool(DATE.match(str(v)))
+    except (TypeError, ValueError):
+        return False
+
+
+def _list(v):
+    """A string becomes a one-item list (never one item per character); non-lists become []."""
+    if isinstance(v, str):
+        return [v]
+    return v if isinstance(v, list) else []
 
 
 def _s(v, n=400):
-    return re.sub(r"\s+", " ", str(v)).strip()[:n] if v is not None else None
+    return re.sub(r"\s+", " ", re.sub(r"[<>]", "", str(v))).strip()[:n] if v is not None else None
 
 
 def _urls(v):
-    return [u for u in (v or []) if isinstance(u, str) and URL.match(u.strip())][:6]
+    return [u.strip() for u in _list(v) if isinstance(u, str) and URL.match(u.strip())][:6]
 
 
 def validate(kind, js, allowed=None):
     """Return a clean dict or raise ValueError."""
     if kind not in KINDS:
         raise ValueError(f"unknown kind {kind}")
-    if not isinstance(js, dict) or not DATE.match(str(js.get("for_date", ""))):
-        raise ValueError("for_date (YYYY-MM-DD) missing")
+    if not isinstance(js, dict) or not _date_ok(js.get("for_date")):
+        raise ValueError("for_date (YYYY-MM-DD, a real date) missing")
     out = {"for_date": js["for_date"], "written": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ")}
     if kind == "catalysts":
         st = js.get("stocks")
@@ -107,16 +126,16 @@ def validate(kind, js, allowed=None):
             clean[t] = {"why": _s(c.get("why"), 300) or "no clear catalyst found",
                         "direction": d if d in ("positive", "negative", "mixed", "none") else "none",
                         "quality": q if q in ("strong", "real", "weak", "none", "unknown") else "unknown",
-                        "earnings_date": ed if isinstance(ed, str) and DATE.match(ed) else None,
-                        "red_flags": [_s(x, 120) for x in (c.get("red_flags") or []) if _s(x)][:4],
+                        "earnings_date": ed if isinstance(ed, str) and _date_ok(ed) else None,
+                        "red_flags": [_s(x, 120) for x in _list(c.get("red_flags")) if isinstance(x, str) and _s(x)][:4],
                         "sources": src}
         if not clean:
             raise ValueError("no valid tickers (each needs a source URL)")
         out["stocks"] = clean
     elif kind == "review":
         out["summary"] = _s(js.get("summary"), 700)
-        out["findings"] = [_s(x, 240) for x in (js.get("findings") or []) if _s(x)][:10]
-        out["proposals"] = [_s(x, 240) for x in (js.get("proposals") or []) if _s(x)][:6]
+        out["findings"] = [_s(x, 240) for x in _list(js.get("findings")) if isinstance(x, str) and _s(x)][:10]
+        out["proposals"] = [_s(x, 240) for x in _list(js.get("proposals")) if isinstance(x, str) and _s(x)][:6]
         if not out["summary"]:
             raise ValueError("summary is required")
     else:
@@ -126,8 +145,8 @@ def validate(kind, js, allowed=None):
         out.update({"headline": _s(js.get("headline"), 240), "risk": r,
                     **{k: _s(js.get(k), 300) for k in ("rates", "fed", "oil", "geo")}})
         ev = []
-        for e in js.get("events") or []:
-            if isinstance(e, dict) and DATE.match(str(e.get("date", ""))) and _s(e.get("name")):
+        for e in _list(js.get("events")):
+            if isinstance(e, dict) and _date_ok(e.get("date")) and _s(e.get("name")):
                 imp = str(e.get("impact", "")).lower()
                 ev.append({"date": e["date"], "time": _s(e.get("time"), 20), "name": _s(e.get("name"), 80),
                            "impact": imp if imp in ("high", "medium") else "medium"})
@@ -147,13 +166,23 @@ def save(kind, js):
     except Exception:
         pass
     clean = validate(kind, js, allowed)
+    try:
+        cur = worklist().get("for_date")
+        if kind != "review" and cur and clean["for_date"] != cur:
+            print(f"WARNING: for_date {clean['for_date']} is not the current card date {cur}; the cards will ignore it")
+    except Exception:
+        pass
     (agent_dir / f"{kind}.json").write_text(json.dumps(clean, indent=1))
     return clean
 
 
 def publish(kind, path, push=False):
     js = json.loads(open(path).read())
-    clean = validate(kind, js)                    # fail fast before dispatching
+    wl = worklist()
+    if kind != "review" and js.get("for_date") != wl.get("for_date"):
+        sys.exit(f"for_date {js.get('for_date')} != current card date {wl.get('for_date')}: new data arrived, "
+                 "re-run the worklist and research again")
+    clean = validate(kind, js, {x["t"] for x in wl["tickers"]} or None)   # same check the save job runs
     if not push:
         print(json.dumps(clean, indent=1))
         return
@@ -167,9 +196,21 @@ def publish(kind, path, push=False):
     print(f"dispatched agent.yml ({kind}, {len(clean.get('stocks', {})) or 'brief'}): saved and the page rebuilt in ~4 minutes")
 
 
+def status():
+    """Latest Agent input run and its jobs (agents run this ~2 minutes after --push to confirm the save worked)."""
+    r = subprocess.run(["gh", "api", f"repos/{REPO}/actions/workflows/agent.yml/runs?per_page=1", "--jq",
+                        '.workflow_runs[0]|"\\(.id) \\(.status) \\(.conclusion) \\(.created_at)"'], capture_output=True, text=True)
+    print(r.stdout.strip() or r.stderr.strip())
+    rid = (r.stdout.split() or [""])[0]
+    if rid.isdigit():
+        j = subprocess.run(["gh", "api", f"repos/{REPO}/actions/runs/{rid}/jobs", "--jq",
+                            '.jobs[]|"  \\(.name): \\(.status) \\(.conclusion)"'], capture_output=True, text=True)
+        print(j.stdout.strip())
+
+
 def main(argv=None):
     p = argparse.ArgumentParser()
-    p.add_argument("cmd", choices=["worklist", "schema", "publish", "save"])
+    p.add_argument("cmd", choices=["worklist", "schema", "publish", "save", "status"])
     p.add_argument("kind", nargs="?")
     p.add_argument("--kind", dest="kind2")
     p.add_argument("--file")
@@ -183,6 +224,8 @@ def main(argv=None):
         print(json.dumps(SCHEMA[kind], indent=1))
     elif a.cmd == "publish":
         publish(kind, a.file, a.push)
+    elif a.cmd == "status":
+        status()
     elif a.cmd == "save":
         clean = save(kind, json.loads(base64.b64decode(a.b64)))
         print(f"saved docs/agent/{kind}.json for {clean['for_date']}")

@@ -255,13 +255,17 @@ def recompute_and_publish(bars, splits, universe, state):
             dec = decision.build(theme_data, history, mfit, metrics.classify(history).get("label"))
             if dec:
                 decision.record(dec)
-                decision.settle(adjusted)
-                from . import layers
-                ev = layers.load(); ev["log"] = layers.study_log(); layers.save(ev)    # forward evidence, seconds
-                dec["evidence"] = ev
                 theme_data["decision"] = decision.strip_private(dec)
         except Exception as e:
             log.exception("decision cards failed: %s", e)
+        try:   # settle earlier ideas and refresh forward evidence even if today's cards failed
+            from . import decision, layers
+            decision.settle(adjusted)
+            ev = layers.load(); ev["log"] = layers.study_log(); layers.save(ev)
+            if theme_data.get("decision"):
+                theme_data["decision"]["evidence"] = ev
+        except Exception as e:
+            log.exception("decision log settle failed: %s", e)
         try:
             from . import review
             theme_data["setup_review"] = review.evaluate(theme_data, history)

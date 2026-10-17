@@ -759,10 +759,70 @@ def test_decision_cards(tmp_path=None):
                     rows.append({"date": dd, "ticker": t, "o": base + k, "c": base + k + 0.5})
             df = DC.settle(pd.DataFrame(rows))
             r = df[df["t"] == "AAA"].iloc[0]
-            # card date 10-15 (k=2) -> entry open 10-16 (k=3) = 13; exit close k=7 = 17.5
-            assert r["status"] == "closed" and abs(r["entry"] - 13) < 1e-9 and abs(r["exit"] - 17.5) < 1e-9
+            # card date 10-15 (k=2) -> entry open 10-16 (k=3) = 13; exit close 5 sessions after entry (k=8) = 18.5,
+            # the same window as the pick ledger and the backtest
+            assert r["status"] == "closed" and abs(r["entry"] - 13) < 1e-9 and abs(r["exit"] - 18.5) < 1e-9
+            # malformed agent files never break the cards (each case must still give 3 full cards)
+            bad_files = [[], None, "x", {"for_date": "2026-10-15", "stocks": ["AAA"]},
+                         {"for_date": "2026-10-15", "stocks": {"AAA": "beat", "BBB": None}},
+                         {"for_date": "2026-99-99", "stocks": {"AAA": {"why": "x"}}},
+                         {"for_date": "2026-10-15", "stocks": {"AAA": {"why": "x", "red_flags": "dilution", "earnings_date": "soon"}}}]
+            for bf in bad_files:
+                (config.DOCS_DIR / "agent" / "catalysts.json").write_text(_json.dumps(bf))
+                (config.DOCS_DIR / "agent" / "macro_brief.json").write_text(_json.dumps({"for_date": "2026-10-15", "events": "CPI", "headline": "h"}))
+                dd = DC.build(T, None, {}, "x")
+                assert dd and len(dd["cards"]) == 3 and all(len(c["layers"]) == 7 for c in dd["cards"]), bf
+            (config.DOCS_DIR / "agent" / "catalysts.json").write_text("{not json")
+            assert len(DC.build(T, None, {}, "x")["cards"]) == 3
+            # a string red flag is one flag, not one per character; impossible dates are rejected
+            v = AF.validate("catalysts", {"for_date": "2026-10-15", "stocks": {"AAA": {"why": "x", "red_flags": "dilution",
+                            "earnings_date": "2026-02-30", "sources": "https://a.b/c"}}})
+            assert v["stocks"]["AAA"]["red_flags"] == ["dilution"] and v["stocks"]["AAA"]["earnings_date"] is None
+            assert v["stocks"]["AAA"]["sources"] == ["https://a.b/c"]
+            for bad_date in ("2026-99-99", "2026-02-30", "soon"):
+                try:
+                    AF.validate("catalysts", {"for_date": bad_date, "stocks": {"AAA": {"sources": ["https://a.b"]}}}); assert False
+                except ValueError:
+                    pass
+            v = AF.validate("catalysts", {"for_date": "2026-10-15", "stocks": {"AAA": {"why": "<!--<script>x", "sources": ["https://a.b"]}}})
+            assert "<" not in v["stocks"]["AAA"]["why"]
+            # holidays: Thanksgiving is not a session
+            assert DC.sessions_until("2026-11-25", "2026-11-27") == 1
         finally:
             config.DATA_DIR, config.DOCS_DIR = old_d, old_docs
+
+
+def test_page_blob_escaping():
+    """Text containing <!-- or </script> can't break the page script: every '<' is escaped in the embedded JSON,
+    and the browser's JSON/JS parser still reads back the exact text."""
+    import json as _json
+    from breadth import site
+    data = {"themes": {"note": "<!--<script>alert(1)</script> a<b"}}
+    blob = site.embed(data)
+    assert "<" not in blob
+    assert _json.loads(blob) == data
+
+
+def test_decision_log_evidence():
+    """Forward tests only compare rows where the layer was actually checked."""
+    import tempfile
+    from breadth import layers, decision as DC
+    old = config.DATA_DIR
+    with tempfile.TemporaryDirectory() as d:
+        config.DATA_DIR = Path(d)
+        try:
+            rows = []
+            for k, day in enumerate(pd.bdate_range("2026-08-03", periods=30)):
+                for t, cd, fl, r in (("A", "positive", "", 0.03), ("B", "negative", "x", -0.02), ("C", None, None, 0.5)):
+                    rows.append({"date": day.strftime("%Y-%m-%d"), "t": t, "cat_dir": cd, "red_flags": fl, "fwd5": r,
+                                 "spy5": 0.0, "status": "closed", "support": 3, "warn": 0})
+            pd.DataFrame(rows).reindex(columns=DC.LOG_COLS).to_csv(Path(d) / "decision_log.csv", index=False)
+            ev = layers.study_log()
+            c = ev["catalyst_positive"]
+            assert c["n_good"] == 30 and c["n_bad"] == 30 and abs(c["avg_good"] - 0.03) < 1e-9   # C (unchecked, +50%) excluded
+            assert ev["red_flags"]["n_good"] == 30 and ev["earnings_in_hold"]["n_good"] == 0
+        finally:
+            config.DATA_DIR = old
 
 
 if __name__ == "__main__":

@@ -71,10 +71,16 @@ def _intraday():
         return None
 
 
+def embed(data):
+    """JSON for the inline <script>: every "<" becomes \\u003c (JSON only has "<" inside strings, so this is exact),
+    so no text (e.g. from an agent) containing "<!--" or "</script" can break out of the script block."""
+    return json.dumps(data, separators=(",", ":")).replace("<", "\\u003c")
+
+
 def build(history, theme_data=None, kq_data=None, macro_data=None):
     config.DOCS_DIR.mkdir(parents=True, exist_ok=True)
     data = payload(history, theme_data, kq_data, macro_data)
-    blob = json.dumps(data, separators=(",", ":")).replace("</", "<\\/")
+    blob = embed(data)
     html = TEMPLATE.read_text().replace("/*__DATA__*/null", blob)
     (config.DOCS_DIR / "index.html").write_text(html)
     (config.DOCS_DIR / "data.json").write_text(json.dumps(data, separators=(",", ":")))

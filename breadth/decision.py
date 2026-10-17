@@ -37,9 +37,48 @@ def _f(v):
         return None
 
 
+def _as_list(v):
+    if v is None:
+        return []
+    if isinstance(v, str):
+        return [v] if v.strip() else []
+    return [x for x in v if isinstance(x, (str, dict))] if isinstance(v, list) else []
+
+
+def _clean_agent(name, js):
+    """Coerce an agent file to the shapes the cards expect; anything unusable becomes empty."""
+    if not isinstance(js, dict):
+        return {}
+    if name == "catalysts":
+        st = js.get("stocks")
+        st = {str(t).upper(): c for t, c in st.items() if isinstance(c, dict)} if isinstance(st, dict) else {}
+        for c in st.values():
+            c["red_flags"] = [str(x) for x in _as_list(c.get("red_flags")) if isinstance(x, str)]
+            c["sources"] = [str(x) for x in _as_list(c.get("sources")) if isinstance(x, str)]
+            if not (isinstance(c.get("earnings_date"), str) and _valid_date(c["earnings_date"])):
+                c["earnings_date"] = None
+        js["stocks"] = st
+    if name == "macro_brief":
+        js["events"] = [e for e in _as_list(js.get("events")) if isinstance(e, dict) and _valid_date(e.get("date"))]
+        js["sources"] = [str(x) for x in _as_list(js.get("sources")) if isinstance(x, str)]
+    if name == "review":
+        for k in ("findings", "proposals"):
+            js[k] = [str(x) for x in _as_list(js.get(k)) if isinstance(x, str)]
+    return js
+
+
+def _valid_date(s):
+    try:
+        _date.fromisoformat(str(s))
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
 def load_agent(name, card_date=None, max_age=None):
-    """docs/agent/<name>.json, or {} when missing, unreadable or stale (written for an older card date).
-    Catalysts are ticker-specific, so they must be for this exact card date; the macro brief may be a few days old."""
+    """docs/agent/<name>.json, or {} when missing, unreadable, malformed or stale (written for another card date).
+    Catalysts are ticker-specific, so they must be for this exact card date; the macro brief may be a few days old.
+    A missing or impossible for_date counts as stale."""
     p = config.DOCS_DIR / "agent" / f"{name}.json"
     if not p.exists():
         return {}
@@ -47,14 +86,13 @@ def load_agent(name, card_date=None, max_age=None):
         js = json.loads(p.read_text())
     except Exception:
         return {}
-    if card_date and js.get("for_date"):
-        try:
-            age = (pd.Timestamp(card_date) - pd.Timestamp(js["for_date"])).days
-        except Exception:
-            age = 0
+    if not isinstance(js, dict) or not _valid_date(js.get("for_date")):
+        return {}
+    if card_date:
+        age = (pd.Timestamp(card_date) - pd.Timestamp(js["for_date"])).days
         if age > (STALE_DAYS if max_age is None else max_age) or age < 0:
             return {}
-    return js
+    return _clean_agent(name, js)
 
 
 def load_evidence():
@@ -65,14 +103,15 @@ def load_evidence():
 
 
 def sessions_until(day_from, day_to):
-    """Weekday sessions after day_from up to and including day_to (0 = same day; negative = already past).
-    Holidays are ignored, so it can be off by one around them."""
+    """Trading sessions after day_from up to and including day_to (0 = same day; negative = already past).
+    Uses config.MARKET_HOLIDAYS (NYSE closures)."""
     a = pd.Timestamp(day_from).normalize().date()
     b = pd.Timestamp(day_to).normalize().date()
     one = pd.Timedelta(days=1)
+    hol = config.MARKET_HOLIDAYS
     if b >= a:                                   # sessions in (a, b]
-        return int(np.busday_count(a + one, b + one))
-    return -int(np.busday_count(b + one, a + one))
+        return int(np.busday_count(a + one, b + one, holidays=hol))
+    return -int(np.busday_count(b + one, a + one, holidays=hol))
 
 
 # ----------------------------------------------------------------- candidates
@@ -165,7 +204,7 @@ def card(t, role, theme_data, history, mfit, cat, brief, regime_label, card_date
         add("macro", "Macro fit", ("good" if (tw or 0) > 0.25 else "bad" if (tw or 0) < -0.25 else "neutral") if proven else "info",
             mtxt, proven=proven)
     else:
-        add("macro", "Macro fit", "info", "not enough history", proven=proven)
+        add("macro", "Macro fit", "info", "macro data unavailable or not enough history", proven=proven)
     # 5 calendar: earnings (Catalyst agent) + market events (Macro agent)
     c = (cat.get("stocks") or {}).get(t) or {}
     ed, edays = c.get("earnings_date"), None
@@ -209,6 +248,7 @@ def card(t, role, theme_data, history, mfit, cat, brief, regime_label, card_date
         else:
             cstate = "neutral"
         add("catalyst", "Catalyst", cstate, txt, proven=False)
+        layers[-1]["links"] = (c.get("sources") or [])[:3]
     else:
         add("catalyst", "Catalyst", "unknown", "not checked yet", proven=False)
     # 7 macro brief (market-wide)
@@ -240,8 +280,12 @@ def build(theme_data, history, mfit, regime_label=None):
         day = theme_data.get("date")
         cat = load_agent("catalysts", day, max_age=0)
         brief = load_agent("macro_brief", day, max_age=STALE_DAYS)
-        cards = [card(t, role, theme_data, history, mfit or {}, cat, brief, regime_label, day)
-                 for t, role in candidates(theme_data)]
+        cards = []
+        for t, role in candidates(theme_data):
+            try:                 # one bad input never costs the other cards
+                cards.append(card(t, role, theme_data, history, mfit or {}, cat, brief, regime_label, day))
+            except Exception as e:
+                log.warning("decision card %s failed: %s", t, e)
         ev = load_evidence()
         review = load_agent("review", day, max_age=10)
         return {"review": {k: review.get(k) for k in ("for_date", "summary", "findings", "proposals")} if review else None,"date": day, "cards": cards, "macro": (mfit or {}).get("ctx"), "evidence": ev,
@@ -284,7 +328,8 @@ def record(dec):
 
 
 def settle(adjusted, bench="SPY"):
-    """Fill outcomes: buy the next session's open, exit at the close HOLD sessions after entry; SPY the same way."""
+    """Fill outcomes: buy the next session's open, exit at the close HOLD sessions after the entry day (same as the
+    pick ledger and the Trade Setups backtest); SPY the same way."""
     df = load_log()
     if df.empty:
         return df
@@ -294,13 +339,13 @@ def settle(adjusted, bench="SPY"):
     for i in df.index[df["status"].astype(str) != "closed"]:
         d, t = pd.Timestamp(df.at[i, "date"]), df.at[i, "t"]
         k = dates.searchsorted(d, side="right")           # next session after the card date
-        if k + HOLD - 1 >= len(dates) or t not in c.columns:
+        if k + HOLD >= len(dates) or t not in c.columns:
             continue
-        e, x = o[t].iloc[k], c[t].iloc[k + HOLD - 1]
+        e, x = o[t].iloc[k], c[t].iloc[k + HOLD]
         if not (np.isfinite(e) and np.isfinite(x)) or e <= 0:
             df.at[i, "status"] = "no data"
             continue
-        se, sx = o[bench].iloc[k], c[bench].iloc[k + HOLD - 1]
+        se, sx = o[bench].iloc[k], c[bench].iloc[k + HOLD]
         df.at[i, "entry"], df.at[i, "exit"] = round(float(e), 4), round(float(x), 4)
         df.at[i, "fwd5"] = round(float(x / e - 1), 5)
         df.at[i, "spy5"] = round(float(sx / se - 1), 5) if se > 0 else np.nan

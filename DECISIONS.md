@@ -44,12 +44,17 @@ the log has ~2–3 months of settled rows; the Reviewer then proposes promotion 
 |---|---|---|
 | ~12:25 AM Tue–Sat | Daily update (existing): official data, all layers in code, cards for the new date, settles 5-session-old log rows, forward evidence (`layers.study_log`) | `docs/index.html`, `data/decision_log.csv`, `data/layer_evidence.json` |
 | 7:02 AM Mon–Fri | **Macro agent** (Claude scheduled task) → `agentfiles publish --kind macro_brief --push` | `docs/agent/macro_brief.json` + rebuild |
-| 7:12 AM Mon–Fri | **Catalyst agent** → up to 15 carded tickers: why it's moving, direction, quality, next earnings date, red flags, sources | `docs/agent/catalysts.json` + rebuild |
+| 7:12 AM Mon–Fri | **Catalyst agent** → every carded ticker: the first 15 get full research (why it's moving, direction for a long swing, quality, red flags), the rest an earnings-date check; all with sources. Waits up to 30 min if the overnight data is late | `docs/agent/catalysts.json` + rebuild |
 | 9:07 AM Sat | **Weekly Reviewer** → refreshes macro backtest + log evidence, writes a plain-English review with proposals (applies nothing) | `docs/agent/review.json` + evidence + rebuild; push notification |
 
-`.github/workflows/agent.yml`: job `save` (validate + commit the JSON; never queued, so it can't be cancelled) then job
-`rebuild` (queued behind the daily update in group `breadth-update`; checks out `main`, so a cancelled pending rebuild is
-harmless). Staleness: catalysts count only for their exact card date; the macro brief for up to 4 days; the review 10.
+`.github/workflows/agent.yml`: job `save` (validate + commit the JSON; never queued, so it can't be cancelled; fails red if
+it can't push) then job `rebuild` (own queue `agent-rebuild`, so it can never cancel a waiting daily update; waits for any
+running daily update, rebuilds on the latest `main`, and starts over if `main` moved before its push). Agents confirm the
+save with `python -m breadth.agentfiles status`. Staleness: catalysts count only for their exact card date; the macro brief
+for up to 4 days; the review 10. Malformed or wrongly-shaped agent files are ignored field by field (never break the cards);
+every "<" in the embedded page data is escaped, so agent text can't break the page.
+Known gap: if a daily update's push races an agent rebuild, the daily update's (newer) page wins and that day's agent
+data shows after the next rebuild.
 
 ## Costs and run times
 - GitHub Actions: free (public repo). agent.yml ≈ 4–5 min per run (2 a weekday) + ≈ 9 min weekly (evidence refresh).
@@ -61,4 +66,8 @@ harmless). Staleness: catalysts count only for their exact card date; the macro 
 - Macro fit (backtest, 6,258 Trade Setups signals Mar 2025–Oct 2026, actionable 5-session result): 5-day macro tailwind
   +0.25% vs headwind +2.00% (t −1.52; both halves negative: −2.2%, −1.4%). **Not proven → information only.** If anything,
   a recent macro headwind came before better results (mean reversion), but not significantly. 20-day version: no difference.
+- Grading round 1 (independent reviewer, Oct 17): 72% (0 fail, 9 partial). All 10 defects fixed the same night:
+  per-field agent-file cleaning, per-card isolation, settle window = pick ledger (+5 sessions after entry), page-data
+  escaping, red push failures, own rebuild queue, real-date validation, "not checked" excluded from forward tests,
+  earnings check for every card, NYSE holidays in session counts, sources shown on cards.
 - Agent layers: forward log started Oct 15, 2026. Earliest meaningful test ≈ 60+ settled ideas over 20+ dates (~5–6 weeks).

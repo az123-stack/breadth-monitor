@@ -123,10 +123,13 @@ def study_log():
         out["note"] = "no settled rows yet"
         return out
     df["ex"] = df["fwd5"].astype(float) - df["spy5"].astype(float)
-    tests = {
-        "catalyst_positive": (df["cat_dir"] == "positive", df["cat_dir"].isin(["negative", "none"])),
-        "red_flags": (df["red_flags"].fillna("") == "", df["red_flags"].fillna("") != ""),
-        "earnings_in_hold": (~df["earn_days"].between(0, decision.HOLD), df["earn_days"].between(0, decision.HOLD)),
+    checked = df["cat_dir"].notna()                       # the Catalyst agent looked at this idea
+    has_earn = df["earn_date"].notna() & (df["earn_date"].astype(str) != "")
+    tests = {   # each test only uses rows where that layer was actually checked ("not checked" is never the good group)
+        "catalyst_positive": (checked & (df["cat_dir"] == "positive"), checked & df["cat_dir"].isin(["negative", "none"])),
+        "red_flags": (checked & (df["red_flags"].fillna("") == ""), checked & (df["red_flags"].fillna("") != "")),
+        "earnings_in_hold": (has_earn & ~df["earn_days"].astype(float).between(0, decision.HOLD),
+                             has_earn & df["earn_days"].astype(float).between(0, decision.HOLD)),
         "brief_low_risk": (df["brief_risk"] == "low", df["brief_risk"] == "high"),
         "macro_tailwind": (df["tail5"].astype(float) > 0.25, df["tail5"].astype(float) < -0.25),
         "more_support": (df["support"].astype(float) >= 4, df["support"].astype(float) <= 2),

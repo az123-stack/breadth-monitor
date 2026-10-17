@@ -6,9 +6,11 @@ name: Agent input
 # validated again here; an invalid file is never written.
 #
 # Two jobs on purpose: GitHub keeps only the NEWEST pending run in a concurrency queue and cancels older pending ones.
-# The save job is not queued (it can't be cancelled, so no agent answer is ever lost); only the rebuild is queued
-# behind the daily update, and a cancelled rebuild is harmless because the newer one checks out main and includes
-# every saved file.
+# The save job is not queued (it can't be cancelled, so no agent answer is ever lost). Rebuilds queue in their OWN group
+# (so they can never cancel a waiting daily update); a cancelled pending rebuild is harmless because the newer one
+# includes every saved file. The rebuild waits for any running daily update, then rebuilds on the latest main and, if the
+# push races another commit, starts over from the new main (it never overwrites newer generated files).
+# Both jobs fail loudly (red run) if they can't push.
 on:
   workflow_dispatch:
     inputs:
@@ -17,6 +19,7 @@ on:
 
 permissions:
   contents: write
+  actions: read          # to see whether a daily update is running
 
 jobs:
   save:
@@ -41,38 +44,49 @@ jobs:
           if git diff --cached --quiet; then echo "no change"; exit 0; fi
           git commit -qm "Agent input: ${{ inputs.kind }}"
           for i in 1 2 3 4 5; do
-            git push -q && break
+            if git push -q; then exit 0; fi
             sleep $((i * 3))
-            git pull -q --rebase -X theirs || { git rebase --abort; break; }
+            git pull -q --rebase || { echo "rebase failed"; exit 1; }
           done
+          echo "could not push the agent file"; exit 1
 
   rebuild:
     needs: save
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     concurrency:
-      group: breadth-update          # same queue as the daily update, so the two never race
+      group: agent-rebuild
       cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
-        with: { ref: main }
+        with: { ref: main, fetch-depth: 0 }
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: pip install -q -r requirements.txt
-      - name: Refresh layer evidence (weekly review only, ~4 min)
-        if: ${{ inputs.kind == 'review' }}
-        run: python -m breadth.layers macro && python -m breadth.layers log
-      - name: Rebuild the page with every saved agent file
-        run: python -m breadth.update --rebuild-only
-      - name: Commit
+      - name: Wait for any running daily update (up to 20 min)
+        run: |
+          for i in $(seq 1 40); do
+            n=$(gh api "repos/${{ github.repository }}/actions/workflows/daily.yml/runs?per_page=5" --jq '[.workflow_runs[]|select(.status=="in_progress" or .status=="queued")]|length')
+            [ "$n" = "0" ] && exit 0
+            echo "daily update running ($n); waiting"; sleep 30
+          done
+      - name: Rebuild on the latest main and push (start over if main moved)
+        env:
+          KIND: ${{ inputs.kind }}
         run: |
           git config user.name "breadth-bot"
           git config user.email "breadth-bot@users.noreply.github.com"
-          git add docs data
-          if git diff --cached --quiet; then echo "no change"; exit 0; fi
-          git commit -qm "Rebuild with agent input (${{ inputs.kind }})"
           for i in 1 2 3; do
-            git push -q && break
-            git pull -q --rebase -X theirs || { git rebase --abort; break; }
+            git fetch -q origin main && git reset -q --hard origin/main
+            if [ "$KIND" = "review" ]; then python -m breadth.layers macro && python -m breadth.layers log; fi
+            python -m breadth.update --rebuild-only
+            git add docs data
+            if git diff --cached --quiet; then echo "no change"; exit 0; fi
+            git commit -qm "Rebuild with agent input ($KIND)"
+            if git push -q; then exit 0; fi
+            echo "main moved; rebuilding again"
           done
+          echo "could not push the rebuild"; exit 1
