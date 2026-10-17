@@ -37,12 +37,14 @@ jobs:
           B64: ${{ inputs.b64 }}
         run: python -m breadth.agentfiles save --kind "$KIND" --b64 "$B64"
       - name: Commit the agent file
+        env:
+          KIND: ${{ inputs.kind }}
         run: |
           git config user.name "breadth-bot"
           git config user.email "breadth-bot@users.noreply.github.com"
           git add docs/agent
           if git diff --cached --quiet; then echo "no change"; exit 0; fi
-          git commit -qm "Agent input: ${{ inputs.kind }}"
+          git commit -qm "Agent input: $KIND"
           for i in 1 2 3 4 5; do
             if git push -q; then exit 0; fi
             sleep $((i * 3))
@@ -73,6 +75,7 @@ jobs:
             [ "$n" = "0" ] && exit 0
             echo "daily update running ($n); waiting"; sleep 30
           done
+          echo "::warning::daily update still running after 20 minutes; rebuilding anyway (the push step retries on the newest main)"
       - name: Rebuild on the latest main and push (start over if main moved)
         env:
           KIND: ${{ inputs.kind }}

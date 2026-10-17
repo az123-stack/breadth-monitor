@@ -435,5 +435,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - `layers.py` evidence → `data/layer_evidence.json` (`macro` backtest via in-memory signal capture, `log` forward test,
   `report`). Pass rule: t ≥ 2 over ≥ 20 dates and same sign in both halves.
 - `agentfiles.py` worklist / schema / publish (validates, dispatches `agent.yml`) / save. Agents never write code or weights.
+- Forward log has no look-ahead: `decision.record` freezes a date's rows at `nyse.entry_cutoff` (9:30 ET next session)
+  and drops agent files written after it; `agentfiles publish` refuses after it. Holidays: `breadth/nyse.py` (by rule).
+  Layers only color cards after a passed backtest AND `config.APPROVED_LAYERS`. `tools/check_info_only.py` = e2e proof.
 - Scheduled tasks: "Market Monitor · macro brief agent" 7:02 AM, "· catalyst agent" 7:12 AM (Mon–Fri), "· weekly layer
   review" Sat 9:07 AM (push notification).

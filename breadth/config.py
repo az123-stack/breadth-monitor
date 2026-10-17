@@ -75,9 +75,10 @@ DASHBOARD_DAYS = 760         # max days on the charts (~3 years); they scroll
 LEVELS_ENABLED = True
 MACRO_RANGE = "2y"     # Yahoo history for macro series; 2 years matches the stored bars (macro fit layer needs it)
 
-# NYSE full-day closures (for counting sessions to earnings / events on the Decision Cards). Extend each December.
-MARKET_HOLIDAYS = ["2026-11-26", "2026-12-25", "2027-01-01", "2027-01-18", "2027-02-15", "2027-03-26", "2027-05-31",
-                   "2027-06-18", "2027-07-05", "2027-09-06", "2027-11-25", "2027-12-24"]
+# NYSE full-day closures (session counts on the Decision Cards, entry cutoffs), computed from the exchange's rules
+# in breadth/nyse.py, so the list never runs out. One-off closures go in nyse.EXTRA.
+from .nyse import holidays as _nyse_holidays  # noqa: E402
+MARKET_HOLIDAYS = _nyse_holidays(2024, 2040)
 
 # ---- Washout thrust (connector study, Oct 16 2026; see breadth/washout.py) --
 # A breadth thrust that follows a deep washout: SPY at least WASHOUT_PULLBACK below its 60-day high
@@ -97,3 +98,7 @@ TILT_MIN_DOLLARS = 5_000_000
 TILT_MOVE_SIGMA = 0.5
 TILT_WINDOW = 25        # sessions after a major thrust that count as "post-thrust" (same as metrics.THRUST_WINDOW)
 TILT_HORIZON = 21       # evidence: SPY from the next open to the close this many sessions later
+
+# Unproven layers (macro_fit, ...) that Adam has approved to color the Decision Cards after passing their backtest.
+# Passing a backtest alone never changes anything; see DECISIONS.md.
+APPROVED_LAYERS = ()

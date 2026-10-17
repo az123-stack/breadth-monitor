@@ -897,6 +897,115 @@ def test_volume_tilt():
     assert out["tier"] == "low" and out["pct"] <= 10 and set(out["bt"]) == {"post", "other", "all"}, out
 
 
+def test_nyse_calendar():
+    """Holidays come from the exchange's rules (never run out) and match the published NYSE calendar."""
+    from breadth import nyse
+    from datetime import date as _d
+    assert nyse.holidays(2025, 2025) == ["2025-01-01", "2025-01-09", "2025-01-20", "2025-02-17", "2025-04-18", "2025-05-26",
+                                         "2025-06-19", "2025-07-04", "2025-09-01", "2025-11-27", "2025-12-25"]
+    assert nyse.holidays(2027, 2027)[-1] == "2027-12-24" and "2027-06-18" in nyse.holidays(2027, 2027)   # Sat -> Fri
+    assert "2027-12-31" not in nyse.holidays(2027, 2028)          # New Year on a Saturday: no Friday holiday
+    assert max(config.MARKET_HOLIDAYS) >= str(_d.today().year + 5)
+    assert str(nyse.entry_cutoff("2026-10-16")) == "2026-10-19 09:30:00-04:00"        # Fri card -> Mon open
+    assert str(nyse.entry_cutoff("2026-11-25")) == "2026-11-27 09:30:00-05:00"        # skips Thanksgiving
+
+
+def test_decision_log_no_lookahead():
+    """Rows freeze at the entry cutoff (next session's 9:30 ET open); agent data written after it is never logged."""
+    import tempfile
+    from datetime import datetime, timezone
+    from breadth import decision as DC
+    old = config.DATA_DIR
+    with tempfile.TemporaryDirectory() as d:
+        config.DATA_DIR = Path(d)
+        try:
+            lay = [{"k": "market", "state": "good"}, {"k": "catalyst", "state": "good"}, {"k": "brief", "state": "bad"}]
+            def dec(why, written):
+                return {"date": "2026-10-16", "written": {"catalysts": written, "macro_brief": written},
+                        "cards": [{"layers": lay, "_log": {"date": "2026-10-16", "t": "AAA", "role": "pick1", "catalyst": why,
+                                   "cat_dir": "positive", "brief_risk": "high", "support": 2, "warn": 1}}]}
+            before = datetime(2026, 10, 19, 11, 0, tzinfo=timezone.utc)     # Mon 7:00 AM ET, before the open
+            after = datetime(2026, 10, 19, 14, 0, tzinfo=timezone.utc)      # Mon 10:00 AM ET
+            DC.record(dec("first", "2026-10-19T11:05Z"), now=before)
+            r = DC.load_log().iloc[0]
+            assert r["catalyst"] == "first" and r["support"] == 2
+            DC.record(dec("second", "2026-10-19T11:20Z"), now=before)       # still before the open: replaced
+            assert DC.load_log().iloc[0]["catalyst"] == "second"
+            DC.record(dec("late", "2026-10-19T14:00Z"), now=after)          # after the open: frozen
+            assert DC.load_log().iloc[0]["catalyst"] == "second" and len(DC.load_log()) == 1
+            # first logged after the cutoff (late update): agent columns blank, agent layers not counted
+            (Path(d) / "decision_log.csv").unlink()
+            DC.record(dec("late", "2026-10-19T14:00Z"), now=after)
+            r = DC.load_log().iloc[0]
+            assert pd.isna(r["catalyst"]) and pd.isna(r["brief_risk"]) and r["support"] == 1 and r["warn"] == 0
+            # agent file written after the cutoff but logged "before" (clock skew / rerun): still dropped
+            (Path(d) / "decision_log.csv").unlink()
+            DC.record(dec("late", "2026-10-19T14:00Z"), now=before)
+            assert pd.isna(DC.load_log().iloc[0]["catalyst"])
+        finally:
+            config.DATA_DIR = old
+
+
+def test_decision_robustness():
+    """Odd agent fields can't break the cards or the page; unconfirmed earnings never count as support; a passed
+    backtest still needs approval; earnings-only checks don't count as researched; evidence file errors are ignored."""
+    import tempfile, json as _json
+    from breadth import decision as DC, agentfiles as AF, layers
+    old_d, old_docs = config.DATA_DIR, config.DOCS_DIR
+    with tempfile.TemporaryDirectory() as d:
+        config.DATA_DIR = Path(d); config.DOCS_DIR = Path(d) / "docs"
+        try:
+            ag = config.DOCS_DIR / "agent"; ag.mkdir(parents=True)
+            (ag / "review.json").write_text(_json.dumps({"for_date": "2026-10-15", "summary": 123, "findings": "x"}))
+            (ag / "macro_brief.json").write_text(_json.dumps({"for_date": "2026-10-15", "headline": ["a"], "risk": 5,
+                "events": [{"date": "2026-10-16", "name": {"x": 1}}]}))
+            (ag / "catalysts.json").write_text(_json.dumps({"for_date": "2026-10-15", "stocks": {"AAA": {"why": 7,
+                "direction": "positive", "quality": "real", "sources": ["https://a.b"]}}}))
+            (Path(d) / "layer_evidence.json").write_text(_json.dumps({"macro_fit": {"passed": True, "tail5": "bad"}}))
+            T = {"date": "2026-10-15", "playbook": {"state": "x", "rows": [], "picks": [{"t": "AAA", "setup": "rotation"}],
+                 "pick_watch": [], "pick_cands": []}, "trade_setups": {"rows": {}}, "stocks": [],
+                 "rotation": {"flow": {}, "ignition": {}}}
+            dd = DC.build(T, None, {"stocks": {"AAA": {"words": [], "tail5": 1.0}}}, "x")
+            assert dd and dd["review"]["summary"] is None and dd["review"]["findings"] == ["x"]
+            assert dd["agents"]["brief"]["headline"] is None and dd["agents"]["brief"]["events"][0]["name"] is None
+            assert dd["evidence"] == {}                                     # malformed evidence ignored
+            L = {l["k"]: l for l in dd["cards"][0]["layers"]}
+            assert L["calendar"]["state"] == "unknown"                      # earnings date not confirmed
+            assert L["catalyst"]["text"] == "no clear catalyst found"
+            # approval gate: a passed backtest alone doesn't color the macro layer
+            (Path(d) / "layer_evidence.json").write_text(_json.dumps({"macro_fit": {"passed": True, "signals": 10,
+                "tail5": {"t": 3}}}))
+            L = {l["k"]: l for l in DC.build(T, None, {"stocks": {"AAA": {"words": [], "tail5": 1.0}}}, "x")["cards"][0]["layers"]}
+            assert L["macro"]["state"] == "info" and L["macro"]["proven"] is False and "approval" in L["macro"]["text"]
+            # text cleaning
+            assert AF._s("w " * 400, 300).endswith("…") and len(AF._s("w " * 400, 300)) <= 300
+            # earnings-only rows don't count as researched in the forward news tests
+            rows = []
+            for day in pd.bdate_range("2026-08-03", periods=25):
+                for t, dep, cd, r in (("A", "full", "positive", 0.02), ("B", "full", "none", -0.01), ("C", "earnings_only", "none", 0.9)):
+                    rows.append({"date": day.strftime("%Y-%m-%d"), "t": t, "cat_depth": dep, "cat_dir": cd, "red_flags": "",
+                                 "fwd5": r, "spy5": 0.0, "status": "closed", "support": 3, "warn": 0})
+            pd.DataFrame(rows).reindex(columns=DC.LOG_COLS).to_csv(Path(d) / "decision_log.csv", index=False)
+            ev = layers.study_log()
+            assert ev["catalyst_positive"]["n_bad"] == 25 and ev["red_flags"]["n_good"] == 50
+        finally:
+            config.DATA_DIR, config.DOCS_DIR = old_d, old_docs
+
+
+def test_unproven_layers_cannot_reach_picks():
+    """Static guarantee: the modules that choose, rank and log the Top 2 picks never read agent files, layer evidence
+    or the decision cards (so no unproven layer can change them). tools/check_info_only.py tests it end to end."""
+    import re as _re
+    root = Path(__file__).resolve().parent.parent / "breadth"
+    for mod in ("playbook.py", "ledger.py", "tradesetups.py", "leaders.py", "themes.py", "strength.py", "rotation.py"):
+        src = (root / mod).read_text()
+        for bad in ("docs/agent", "layer_evidence", "agentfiles", "macrofit", "decision_log", "from . import decision",
+                    "import decision", '"agent"'):
+            assert bad not in src, (mod, bad)
+    upd = (root / "update.py").read_text()
+    assert upd.index("ledger.record(") < upd.index("decision.build(")   # picks are logged before cards are built
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

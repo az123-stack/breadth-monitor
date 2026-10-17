@@ -35,13 +35,14 @@ SCHEMA = {
             "quality": "strong (fresh hard news: earnings beat/raise, FDA, contract, M&A) | real (genuine but older or softer) | weak (rumour, sympathy only) | none | unknown",
             "earnings_date": "YYYY-MM-DD of the NEXT earnings report if found, else null",
             "red_flags": ["short list: offering/dilution, downgrade, lawsuit, guidance cut, short report, insider selling... [] if none"],
+            "depth": "full | earnings_only — copy from the worklist",
             "sources": ["https://... at least one URL you actually used"]}},
     },
     "review": {
         "for_date": "YYYY-MM-DD — the latest official date (worklist for_date)",
         "summary": "2-4 plain sentences for Adam: what the evidence says this week",
-        "findings": ["one line each: a layer and what its evidence shows (numbers from `python -m breadth.layers report`)"],
-        "proposals": ["one line each: a concrete change to consider, and the evidence; or 'no changes yet: not enough data'"],
+        "findings": ["one line each (max 300 characters): a layer and what its evidence shows (numbers from `python -m breadth.layers report`)"],
+        "proposals": ["one line each (max 300 characters): a concrete change to consider, and the evidence; or 'no changes yet: not enough data'"],
         "sources": ["data/layer_evidence.json", "data/decision_log.csv"],
     },
     "macro_brief": {
@@ -69,10 +70,22 @@ def worklist():
     stocks = [{"t": c["t"], "role": c["role"], "name": c.get("name"), "setup": c.get("setup_name") or c.get("setup"),
                "price": c.get("price"), "depth": "full" if k < FULL_RESEARCH else "earnings_only"}
               for k, c in enumerate(cards)]
-    return {"for_date": dec.get("date"), "tickers": stocks,
+    from datetime import datetime, timezone
+    from . import nyse
+    fd = dec.get("date")
+    today = datetime.now(nyse.ET).date()
+    expected = nyse.prev_session(today)              # last completed session before today
+    cutoff = nyse.entry_cutoff(fd) if fd else None
+    return {"for_date": fd, "expected_date": expected.isoformat(), "fresh": fd == expected.isoformat(),
+            "market_open_today": nyse.is_session(today),
+            "entry_cutoff": cutoff.isoformat() if cutoff else None,
+            "past_cutoff": bool(cutoff and datetime.now(timezone.utc) >= cutoff),
+            "tickers": stocks,
             "note": "for_date is the last official close; research news up to now. Keep the order: picks first. "
                     "depth=full: full catalyst research; depth=earnings_only: find the next earnings date only "
-                    "(why='earnings date check only', direction none, quality unknown)."}
+                    "(why='earnings date check only', direction none, quality unknown). fresh=false means the overnight data is "
+                    "late. past_cutoff=true means ideas for for_date have already been bought at the open: research for them "
+                    "can no longer be logged, so publish refuses it."}
 
 
 def _date_ok(v):
@@ -92,7 +105,14 @@ def _list(v):
 
 
 def _s(v, n=400):
-    return re.sub(r"\s+", " ", re.sub(r"[<>]", "", str(v))).strip()[:n] if v is not None else None
+    """Clean one-line text: no < or >, single spaces, cut at a word boundary with "…" if longer than n."""
+    if v is None:
+        return None
+    t = re.sub(r"\s+", " ", re.sub(r"[<>]", "", str(v))).strip()
+    if len(t) <= n:
+        return t
+    cut = t[:n - 1]
+    return (cut.rsplit(" ", 1)[0] if " " in cut[n // 2:] else cut).rstrip(" ,;:") + "…"
 
 
 def _urls(v):
@@ -126,6 +146,8 @@ def validate(kind, js, allowed=None):
             clean[t] = {"why": _s(c.get("why"), 300) or "no clear catalyst found",
                         "direction": d if d in ("positive", "negative", "mixed", "none") else "none",
                         "quality": q if q in ("strong", "real", "weak", "none", "unknown") else "unknown",
+                        "depth": c.get("depth") if c.get("depth") in ("full", "earnings_only") else (
+                            "earnings_only" if str(c.get("why") or "").lower().startswith("earnings date check only") else "full"),
                         "earnings_date": ed if isinstance(ed, str) and _date_ok(ed) else None,
                         "red_flags": [_s(x, 120) for x in _list(c.get("red_flags")) if isinstance(x, str) and _s(x)][:4],
                         "sources": src}
@@ -134,8 +156,8 @@ def validate(kind, js, allowed=None):
         out["stocks"] = clean
     elif kind == "review":
         out["summary"] = _s(js.get("summary"), 700)
-        out["findings"] = [_s(x, 240) for x in _list(js.get("findings")) if isinstance(x, str) and _s(x)][:10]
-        out["proposals"] = [_s(x, 240) for x in _list(js.get("proposals")) if isinstance(x, str) and _s(x)][:6]
+        out["findings"] = [_s(x, 300) for x in _list(js.get("findings")) if isinstance(x, str) and _s(x)][:10]
+        out["proposals"] = [_s(x, 300) for x in _list(js.get("proposals")) if isinstance(x, str) and _s(x)][:6]
         if not out["summary"]:
             raise ValueError("summary is required")
     else:
@@ -182,6 +204,9 @@ def publish(kind, path, push=False):
     if kind != "review" and js.get("for_date") != wl.get("for_date"):
         sys.exit(f"for_date {js.get('for_date')} != current card date {wl.get('for_date')}: new data arrived, "
                  "re-run the worklist and research again")
+    if kind != "review" and wl.get("past_cutoff"):
+        sys.exit(f"too late: ideas for {wl['for_date']} were bought at {wl['entry_cutoff']}; research done now can't be "
+                 "logged as known beforehand. Not publishing (the overnight data is probably late; report it).")
     clean = validate(kind, js, {x["t"] for x in wl["tickers"]} or None)   # same check the save job runs
     if not push:
         print(json.dumps(clean, indent=1))

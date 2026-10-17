@@ -123,7 +123,9 @@ def study_log():
         out["note"] = "no settled rows yet"
         return out
     df["ex"] = df["fwd5"].astype(float) - df["spy5"].astype(float)
-    checked = df["cat_dir"].notna()                       # the Catalyst agent looked at this idea
+    # the Catalyst agent actually researched this idea (earnings-date-only checks don't count for the news tests)
+    depth = df["cat_depth"] if "cat_depth" in df else pd.Series(index=df.index, dtype=object)
+    checked = df["cat_dir"].notna() & (depth.fillna("full") == "full")
     has_earn = df["earn_date"].notna() & (df["earn_date"].astype(str) != "")
     tests = {   # each test only uses rows where that layer was actually checked ("not checked" is never the good group)
         "catalyst_positive": (checked & (df["cat_dir"] == "positive"), checked & df["cat_dir"].isin(["negative", "none"])),

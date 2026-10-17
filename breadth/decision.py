@@ -8,12 +8,12 @@ value goes to data/decision_log.csv so the weekly Reviewer can test, from real f
 """
 import json
 import logging
-from datetime import date as _date
+from datetime import date as _date, datetime, timezone
 
 import numpy as np
 import pandas as pd
 
-from . import config
+from . import config, nyse
 
 log = logging.getLogger(__name__)
 MAX_CARDS = 25
@@ -24,7 +24,7 @@ SETUP_NAMES = {"ath": "ATH Magnet", "pullback": "Leader Pullback", "rotation": "
                "vcp": "Minervini VCP", "round": "Round Number Magnet", "box": "Box Retest"}
 LOG_COLS = ["date", "t", "role", "setup", "state", "regime", "setup_verdict", "setup_avg_r", "rsr", "sub", "grp_str",
             "flow_tier", "ignited", "tail5", "tail20", "macro_words", "earn_date", "earn_days", "event_risk",
-            "catalyst", "cat_dir", "cat_quality", "red_flags", "brief_risk", "support", "warn",
+            "catalyst", "cat_depth", "cat_dir", "cat_quality", "red_flags", "brief_risk", "support", "warn",
             "entry", "exit", "fwd5", "spy5", "status"]
 
 
@@ -58,13 +58,26 @@ def _clean_agent(name, js):
             if not (isinstance(c.get("earnings_date"), str) and _valid_date(c["earnings_date"])):
                 c["earnings_date"] = None
         js["stocks"] = st
+    if name == "catalysts":
+        for c in js["stocks"].values():
+            for k in ("why", "direction", "quality", "depth"):
+                c[k] = _txt(c.get(k))
     if name == "macro_brief":
-        js["events"] = [e for e in _as_list(js.get("events")) if isinstance(e, dict) and _valid_date(e.get("date"))]
+        js["events"] = [{k: _txt(e.get(k)) for k in ("date", "time", "name", "impact")}
+                        for e in _as_list(js.get("events")) if isinstance(e, dict) and _valid_date(e.get("date"))]
         js["sources"] = [str(x) for x in _as_list(js.get("sources")) if isinstance(x, str)]
+        for k in ("headline", "risk", "rates", "fed", "oil", "geo"):
+            js[k] = _txt(js.get(k))
     if name == "review":
         for k in ("findings", "proposals"):
             js[k] = [str(x) for x in _as_list(js.get(k)) if isinstance(x, str)]
+        js["summary"] = _txt(js.get("summary"))
     return js
+
+
+def _txt(v):
+    """Text the page can safely call string methods on: strings stay, anything else becomes None."""
+    return v if isinstance(v, str) else None
 
 
 def _valid_date(s):
@@ -96,10 +109,20 @@ def load_agent(name, card_date=None, max_age=None):
 
 
 def load_evidence():
+    """data/layer_evidence.json with only well-formed sections kept (a bad file never costs the cards)."""
     try:
-        return json.loads((config.DATA_DIR / "layer_evidence.json").read_text())
+        ev = json.loads((config.DATA_DIR / "layer_evidence.json").read_text())
     except Exception:
         return {}
+    if not isinstance(ev, dict):
+        return {}
+    out = {}
+    m = ev.get("macro_fit")
+    if isinstance(m, dict) and isinstance(m.get("tail5"), dict) and isinstance(m.get("signals"), int):
+        out["macro_fit"] = m
+    if isinstance(ev.get("log"), dict):
+        out["log"] = ev["log"]
+    return out
 
 
 def sessions_until(day_from, day_to):
@@ -195,12 +218,15 @@ def card(t, role, theme_data, history, mfit, cat, brief, regime_label, card_date
     # 4 macro fit (information only until proven)
     m = (mfit.get("stocks") or {}).get(t)
     ev = (load_evidence().get("macro_fit") or {})
-    proven = bool(ev.get("passed"))
+    passed = bool(ev.get("passed"))
+    proven = passed and "macro_fit" in getattr(config, "APPROVED_LAYERS", ())
     if m:
         tw = m.get("tail5")
         mtxt = ("; ".join(m["words"]) if m["words"] else "no clear link to rates, oil or the dollar")
         if tw:
             mtxt += f" · last 5 days of macro moves {'help' if tw > 0 else 'hurt'} it by about {abs(tw):.1f}%"
+        if passed and not proven:
+            mtxt += " · backtest passed, waiting for your approval"
         add("macro", "Macro fit", ("good" if (tw or 0) > 0.25 else "bad" if (tw or 0) < -0.25 else "neutral") if proven else "info",
             mtxt, proven=proven)
     else:
@@ -233,7 +259,8 @@ def card(t, role, theme_data, history, mfit, cat, brief, regime_label, card_date
         if ev_risk:
             parts.append(f"market event inside the hold: {ev_risk}")
         bad = edays is not None and 0 <= edays <= HOLD
-        add("calendar", "Calendar", "bad" if bad else "neutral" if ev_risk else "good" if c else "unknown",
+        clear = edays is not None and not bad            # a confirmed earnings date outside the hold
+        add("calendar", "Calendar", "bad" if bad else "neutral" if ev_risk else "good" if clear else "unknown",
             " · ".join(parts) or "no events", proven=False)
     # 6 catalyst: positive real/strong news supports; negative news warns; red flags show and soften a "support"
     if c:
@@ -268,6 +295,7 @@ def card(t, role, theme_data, history, mfit, cat, brief, regime_label, card_date
                      "grp_str": grp, "flow_tier": tier, "ignited": ign, "tail5": (m or {}).get("tail5"),
                      "tail20": (m or {}).get("tail20"), "macro_words": "; ".join((m or {}).get("words") or []),
                      "earn_date": ed, "earn_days": edays, "event_risk": ev_risk, "catalyst": c.get("why"),
+                     "cat_depth": (c.get("depth") or ("earnings_only" if str(c.get("why") or "").lower().startswith("earnings date check only") else "full")) if c else None,
                      "cat_dir": c.get("direction"), "cat_quality": c.get("quality"),
                      "red_flags": "; ".join(c.get("red_flags") or []), "brief_risk": brief.get("risk"),
                      "support": support, "warn": warn}}
@@ -289,6 +317,7 @@ def build(theme_data, history, mfit, regime_label=None):
         ev = load_evidence()
         review = load_agent("review", day, max_age=10)
         return {"review": {k: review.get(k) for k in ("for_date", "summary", "findings", "proposals")} if review else None,"date": day, "cards": cards, "macro": (mfit or {}).get("ctx"), "evidence": ev,
+                "written": {"catalysts": cat.get("written"), "macro_brief": brief.get("written")},
                 "agents": {"catalysts": cat.get("for_date"), "macro_brief": brief.get("for_date"),
                            "brief": {k: brief.get(k) for k in ("headline", "risk", "rates", "oil", "fed", "geo", "events", "sources")} if brief else None}}
     except Exception as e:
@@ -311,15 +340,49 @@ def load_log():
     return df[LOG_COLS]
 
 
-def record(dec):
-    """Replace today's rows in data/decision_log.csv with the current cards (keeps outcome columns of settled rows)."""
+AGENT_COLS = {"catalysts": ["catalyst", "cat_depth", "cat_dir", "cat_quality", "red_flags", "earn_date", "earn_days"],
+              "macro_brief": ["brief_risk", "event_risk"]}
+AGENT_LAYERS = {"catalysts": ("calendar", "catalyst"), "macro_brief": ("brief",)}
+
+
+def _utc(s):
+    """'2026-10-17T02:17Z' -> aware datetime, or None."""
+    try:
+        return datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return None
+
+
+def record(dec, now=None):
+    """Write today's cards to data/decision_log.csv without letting anything learned after the entry leak in.
+
+    An idea carded on day D is bought at 9:30 AM ET on the next session (the entry cutoff). Rules:
+      * before the cutoff, today's rows are (re)written with the current cards;
+      * after the cutoff, rows already logged for D are frozen (a later rebuild can't change them);
+      * if D is first logged after the cutoff (late update), or an agent file was written after the cutoff, that
+        agent's columns are left blank and its layers are not counted in support / warnings.
+    """
     if not dec or not dec.get("cards"):
         return
-    df = load_log()
+    now = now or datetime.now(timezone.utc)
     day = dec["date"]
+    cutoff = nyse.entry_cutoff(day)
+    df = load_log()
+    if now >= cutoff and (df["date"] == day).any():
+        return                                                     # frozen
+    late = {k for k in AGENT_COLS
+            if now >= cutoff or ((w := _utc((dec.get("written") or {}).get(k))) is not None and w >= cutoff)}
+    skip = {lk for k in late for lk in AGENT_LAYERS[k]}
     rows = []
     for cd in dec["cards"]:
         r = dict(cd["_log"])
+        for k in late:
+            for col in AGENT_COLS[k]:
+                r[col] = None
+        if skip:
+            kept = [l for l in cd["layers"] if l["k"] not in skip]
+            r["support"] = sum(l["state"] == "good" for l in kept)
+            r["warn"] = sum(l["state"] == "bad" for l in kept)
         r.update({"entry": None, "exit": None, "fwd5": None, "spy5": None, "status": "pending"})
         rows.append(r)
     new = pd.DataFrame(rows, columns=LOG_COLS)

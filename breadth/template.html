@@ -3876,7 +3876,10 @@ function renderTrades(app) {
       : $(`<div class="note revcard" style="padding:0 2px 10px">✓ Setups still fit the market. Last reviewed ${b.date ? longDate(b.date) : "–"} in ${b.regime || "–"} breadth; checked daily for a breadth-regime change (${RV.checks.regime_days}+ sessions), a setup going dry (${RV.checks.dry_days} sessions with no names) or slumping (≤ ${RV.checks.slump_r}R over its last 30 sessions), 3+ new top-5 themes, or ${RV.checks.stale_days}+ days since review — and the same morning a major breadth thrust fires.</div>`));
   }
   if (T.playbook && (T.playbook.picks || []).length) app.append(picksCard(T.playbook, T));
-  if (T.decision && (T.decision.cards || []).length) app.append(decisionCard(T.decision));
+  if (T.decision && (T.decision.cards || []).length) {
+    try { app.append(decisionCard(T.decision)); }      // a bad agent field can only cost this card, never the tab
+    catch (e) { console.error("decision cards", e); app.append($('<section class="card regcard"><div class="kicker">Decision cards</div><p class="meta">Couldn\'t show the decision cards today (bad input data). Everything else on this tab is unaffected.</p></section>')); }
+  }
   if (T.playbook) app.append(playbookCard(T.playbook));
   head.querySelector(".tsall").addEventListener("click", () => document.querySelector(".tsopen").click());
   app.append(head);
@@ -3938,12 +3941,12 @@ function decisionCard(D) {
   const bline = B ? `<div style="margin:6px 0"><b>Macro brief</b> <span class="pbv ${B.risk === "high" ? "avoid" : B.risk === "low" ? "focus" : "selective"}">${esc(B.risk || "?")} risk</span> ${esc(B.headline || "")}
     ${(B.events || []).length ? `<div class="meta" style="font-size:12px;margin-top:3px">Coming up: ${B.events.slice(0, 6).map(e => `${esc(e.date)} ${esc(e.time || "")} <b>${esc(e.name)}</b>${e.impact === "high" ? " ⚠" : ""}`).join(" · ")}</div>` : ""}</div>` : `<div class="meta" style="margin:6px 0">Macro brief, earnings dates and catalysts: not checked yet (the agents run around 7:00 AM ET on weekdays).</div>`;
   const RV = D.review, LG = (D.evidence || {}).log || {};
-  const rline = RV ? `<details class="kqsec" style="margin-top:8px"><summary><b>Weekly review</b> (${esc(RV.for_date || "")}) · ${esc((RV.summary || "").slice(0, 140))}${(RV.summary || "").length > 140 ? "…" : ""}</summary>
+  const rline = RV ? `<details class="kqsec" style="margin-top:8px"><summary><b>Weekly review</b> (${esc(RV.for_date || "")}) · ${esc(String(RV.summary || "").slice(0, 140))}${String(RV.summary || "").length > 140 ? "…" : ""}</summary>
     <p style="margin:6px 0">${esc(RV.summary || "")}</p>${(RV.findings || []).length ? `<div class="meta" style="font-size:12px"><b>Findings</b><ul style="margin:4px 0 6px 18px;padding:0">${RV.findings.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
     ${(RV.proposals || []).length ? `<div style="font-size:13px"><b>Proposals</b> (nothing changes until you approve)<ul style="margin:4px 0 6px 18px;padding:0">${RV.proposals.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}</details>` : "";
   const lline = LG.closed ? ` Forward log so far: ${LG.closed} settled ideas over ${LG.dates} days.` : " The forward log has no settled ideas yet (each idea is scored 5 sessions after its card).";
   const E = (D.evidence || {}).macro_fit;
-  const ev = E ? `Macro fit backtest (${E.signals.toLocaleString()} past setup trades, ${E.from} to ${E.to}): a recent macro tailwind made ${pct(E.tail5.avg_good)} vs ${pct(E.tail5.avg_bad)} with a headwind (t ${E.tail5.t}) — ${E.passed ? "passed" : "not proven, so it's shown for information only"}.` : "";
+  const ev = E && E.tail5 && typeof E.signals === "number" ? `Macro fit backtest (${E.signals.toLocaleString()} past setup trades, ${E.from} to ${E.to}): a recent macro tailwind made ${pct(E.tail5.avg_good)} vs ${pct(E.tail5.avg_bad)} with a headwind (t ${E.tail5.t}) — ${E.passed ? "passed" : "not proven, so it's shown for information only"}.` : "";
   const el = $(`<section class="card regcard"><div class="kicker">Decision cards · every layer behind today's ideas</div>
     <div class="meta" style="font-size:12px;margin-top:4px">${mline}</div>${bline}
     ${rline}<div class="picks">${big.map(c => `<div class="pick"><div class="phead"><span class="pt">${c.t}</span><span class="pbv unproven">${esc(ROLE[c.role] || c.role)}</span>${c.setup ? `<span class="pbv focus">${esc(c.setup_name || SET[c.setup] || c.setup)}</span>` : ""}</div>

@@ -38,6 +38,7 @@ the log has ~2–3 months of settled rows; the Reviewer then proposes promotion 
 7. Unproven layers do not change live pick ranking (verified by test).
 8. Existing + new tests pass; `--rebuild-only` works offline; page checked in a headless browser.
 9. Costs and run times documented; CLAUDE.md and the project context updated.
+10. No look-ahead in the forward log: nothing learned after an idea's entry (next session's open) is logged for it.
 
 ## How it runs (built Oct 16–17, 2026)
 | When (ET) | What | Writes |
@@ -70,4 +71,14 @@ data shows after the next rebuild.
   per-field agent-file cleaning, per-card isolation, settle window = pick ledger (+5 sessions after entry), page-data
   escaping, red push failures, own rebuild queue, real-date validation, "not checked" excluded from forward tests,
   earnings check for every card, NYSE holidays in session counts, sources shown on cards.
-- Agent layers: forward log started Oct 15, 2026. Earliest meaningful test ≈ 60+ settled ideas over 20+ dates (~5–6 weeks).
+- Grading round 2 (fresh independent reviewer, Oct 17): 82% (0 fail). 12 defects, all fixed:
+  **no look-ahead in the forward log** — rows freeze at the entry cutoff (9:30 ET on the next session, `nyse.entry_cutoff`);
+  agent files written after it are never logged and their layers don't count; `publish` refuses research after the cutoff;
+  the Oct 15 agent columns (researched Oct 17) were blanked. Every agent text field type-checked; decision card wrapped
+  so it can't take down the tab; malformed evidence ignored; unconfirmed earnings = unknown (not support); a passed
+  backtest still needs `config.APPROVED_LAYERS`; earnings-only checks excluded from news tests (`cat_depth`); daily
+  update rebuilds again if agent input arrived during it; NYSE holidays computed by rule (`breadth/nyse.py`);
+  clean truncation; `tools/check_info_only.py` (two full rebuilds, hostile agent files) proves picks and pick_ledger.csv
+  are byte-identical. Tests: 31.
+- Agent layers: forward log started Oct 15, 2026 (Oct 15 rows have no agent data; first full agent day: Oct 16 cards,
+  researched Mon Oct 19 before the open). Earliest meaningful test ≈ 60+ settled ideas over 20+ dates (~5–6 weeks).
