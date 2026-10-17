@@ -188,7 +188,7 @@
   },
   {
    "id": "trade_setups",
-   "name": "Trade setups (ATH, pullback, rotation, Q-flag, VCP, round number, box retest)",
+   "name": "Trade setups (ATH, pullback, rotation, Q-flag, VCP, round number, box retest, box spring)",
    "kind": "code",
    "owner": "daily update",
    "status": "live",
@@ -198,7 +198,9 @@
    "evidence": [
     "R-2026-10-14-trade-setups",
     "R-2026-10-14-round-number",
-    "R-2026-10-17-box-trades"
+    "R-2026-10-17-box-trades",
+    "R-2026-10-17-box-spring",
+    "R-2026-10-17-in-vogue"
    ],
    "notes": ""
   },

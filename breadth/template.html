@@ -1397,7 +1397,7 @@ function renderRotation(app) {
 }
 
 /* ---------- Pick scorecard (by setup / regime) ---------- */
-const SETUP_NAME = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP", round: "Round Number Magnet", box: "Box Retest" };
+const SETUP_NAME = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP", round: "Round Number Magnet", box: "Box Retest", spring: "Box Spring" };
 const REG_NAME = { thrust: "After a thrust", strong: "Strong breadth", mixed: "Mixed breadth", weak: "Weak breadth", unknown: "Unknown" };
 function scorecardHTML(B) {
   const C = B && B.card, R = ((DATA.themes || {}).trade_bt || {}).pick_replay;
@@ -3627,8 +3627,8 @@ function tagStatsCard(S) {
 }
 
 /* ---------- Trade Setups tab (breadth/tradesetups.py) ---------- */
-const ANG_LABEL = { box: "Box", ath: "ATH", round: "Round #", pullback: "Pullback", rotation: "Rotation", kq: "Q-Flag", vcp: "VCP", burst: "Burst", antic: "Coil" };
-const ANG_TITLE = { box: "Box Retest (bounce off the old box top)", ath: "ATH Magnet", round: "Round Number Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP",
+const ANG_LABEL = { box: "Box", spring: "Spring", ath: "ATH", round: "Round #", pullback: "Pullback", rotation: "Rotation", kq: "Q-Flag", vcp: "VCP", burst: "Burst", antic: "Coil" };
+const ANG_TITLE = { box: "Box Retest (bounce off the old box top)", spring: "Box Spring (failed breakdown, back inside the box)", ath: "ATH Magnet", round: "Round Number Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP",
   burst: "2LYNCH 5+ momentum burst today", antic: "Anticipation list (tight, quiet coil)" };
 function tsDownload(name, sections) {
   const T = DATA.themes, tv = T.tv || {};
@@ -3926,7 +3926,7 @@ function renderTrades(app) {
   };
   const athCell = (r) => `<td class="num magcell">${r.ath.toFixed(2)}<small>${r.ath_ok ? "all-time" : "52-wk (ATH unverified)"} · ${pct(r.ath_pct)}${r.ath_adr != null ? ` · ${r.ath_adr} ADR` : ""}</small></td>`;
   const grpCell = (r) => `<td class="num">${Math.round(r.grp)}<small class="meta" style="display:block;font-size:11px">${r.rising ? "rising: " + esc(r.rising.replace(/^[A-Z &]+ - /, "")) : r.theme_str != null && r.theme_str >= r.sub_str ? "theme" : "sub-theme"}</small></td>`;
-  const angles = (r) => `<td class="l">${["ath", "round", "pullback", "rotation", "kq", "vcp", "box", "burst", "antic"].filter(k => r.angles.includes(k)).map(k => `<span class="ang on" title="${ANG_TITLE[k]}">${ANG_LABEL[k]}</span>`).join("")}${(r.tags || []).length ? `<div>${tagBadges(r.tags, ["burst", "antic"])}</div>` : ""}<small class="meta" style="display:block">${r.hits} angle${r.hits > 1 ? "s" : ""} · ${convCount(r.tags)} tag${convCount(r.tags) === 1 ? "" : "s"}${r.leader ? " · Leaders top 10" : ""}</small></td>`;
+  const angles = (r) => `<td class="l">${["ath", "round", "pullback", "rotation", "kq", "vcp", "box", "spring", "burst", "antic"].filter(k => r.angles.includes(k)).map(k => `<span class="ang on" title="${ANG_TITLE[k]}">${ANG_LABEL[k]}</span>`).join("")}${(r.tags || []).length ? `<div>${tagBadges(r.tags, ["burst", "antic"])}</div>` : ""}<small class="meta" style="display:block">${r.hits} angle${r.hits > 1 ? "s" : ""} · ${convCount(r.tags)} tag${convCount(r.tags) === 1 ? "" : "s"}${r.leader ? " · Leaders top 10" : ""}</small></td>`;
   const COLS = {
     ath: [["mag", "ATH<small>distance</small>", athCell]],
     round: [["round_adr", "Round level<small>distance</small>", r => `<td class="num magcell">$${r.round_lvl?.toLocaleString() ?? "–"}<small>${pct(r.round_pct)} · ${r.round_adr ?? "–"} ADR${r.round_fresh ? ' · <b>fresh</b>' : ""}${r.round_century ? " · century" : ""}</small></td>`]],
@@ -3938,6 +3938,9 @@ function renderTrades(app) {
     box: [["box_lvl", "Old top<small>now support</small>", r => `<td class="num">$${r.box_lvl ?? "–"}<small class="meta" style="display:block;font-size:11px">${r.box_wks ?? "–"} wk box · grade ${r.box_grade ?? "–"}</small></td>`],
           ["box_stop", "Stop<small>retest low</small>", r => `<td class="num">$${r.box_stop ?? "–"}<small class="meta" style="display:block;font-size:11px">${r.box_stop ? pct(r.box_stop / r.price - 1) : ""}</small></td>`],
           ["box_target", "Target<small>box height</small>", r => `<td class="num">$${r.box_target ?? "–"}<small class="meta" style="display:block;font-size:11px">${r.box_target ? pct(r.box_target / r.price - 1) : ""}</small></td>`]],
+    spring: [["spring_lvl", "Old bottom<small>reclaimed</small>", r => `<td class="num">$${r.spring_lvl ?? "–"}<small class="meta" style="display:block;font-size:11px">${r.spring_kind === "range" ? "range" : (r.spring_wks ?? "–") + " wk box"} · grade ${r.spring_grade ?? "–"}${r.spring_exp != null ? " · past " + (r.spring_exp >= 0 ? "+" : "") + r.spring_exp.toFixed(2) + "R" : ""}</small></td>`],
+          ["spring_stop", "Stop<small>under the old bottom</small>", r => `<td class="num">$${r.spring_stop ?? "–"}<small class="meta" style="display:block;font-size:11px">${r.spring_stop ? pct(r.spring_stop / r.price - 1) : ""}</small></td>`],
+          ["spring_target", "Target<small>box top</small>", r => `<td class="num">$${r.spring_target ?? "–"}<small class="meta" style="display:block;font-size:11px">${r.spring_target ? pct(r.spring_target / r.price - 1) : ""}</small></td>`]],
     vcp: [["vcp_r10", "Contraction<small>10d / 20d / 40d range</small>", r => `<td class="num">${[r.vcp_r10, r.vcp_r20, r.vcp_r40].map(x => x == null ? "–" : Math.round(x * 100) + "%").join(" / ")}</td>`],
           ["vdry", "Vol dry<small>5d ÷ 50d</small>", r => `<td class="num">${r.vdry?.toFixed(2) ?? "–"}</td>`],
           ["vcp_pivot", "Pivot<small>10-day high</small>", r => `<td class="num">${r.vcp_pivot?.toFixed(2) ?? "–"}<small class="meta" style="display:block;font-size:11px">stop ${r.vcp_stop?.toFixed(2) ?? "–"} (${r.vcp_pivot ? pct(r.vcp_stop / r.vcp_pivot - 1) : "–"})</small></td>`]],
@@ -3968,7 +3971,7 @@ function renderTrades(app) {
 const isNum = (x) => typeof x === "number" && isFinite(x);
 function decisionCard(D) {
   const ROLE = { pick1: "Top pick #1", pick2: "Top pick #2", watch: "Watch (trigger not close yet)", cand: "Candidate" };
-  const SET = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Q-Flag", vcp: "VCP", round: "Round Number", box: "Box Retest" };
+  const SET = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Q-Flag", vcp: "VCP", round: "Round Number", box: "Box Retest", spring: "Box Spring" };
   const src = (l) => (l.links || []).filter(u => /^https?:\/\//.test(u)).map((u, i) => ` <a href="${esc(u)}" target="_blank" rel="noopener noreferrer" class="meta" title="${esc(u)}">[${i + 1}]</a>`).join("");
   const lay = (l) => `<div class="dlay"><span><i class="ddot ${l.state}" title="${l.state}"></i></span><span>${esc(l.name)}</span><span>${esc(l.text)}${src(l)}${l.proven ? "" : ' <span class="dtag" title="Shown for information: not backtested yet, or failed its backtest. It does not change rankings.">unproven</span>'}</span></div>`;
   const sum = (c) => `<div class="dsum meta">${c.support} layer${c.support === 1 ? "" : "s"} support · ${c.warn} warning${c.warn === 1 ? "" : "s"}${c.layers.some(l => l.state === "unknown") ? " · some not checked yet" : ""}</div>`;
@@ -4023,7 +4026,7 @@ function picksCard(P, T) {
 function scoreboardCard(B) {
   if (!B) return $('<div></div>');
   const fmtd = (d) => d ? d.slice(5) : "–";
-  const NAME = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP", round: "Round Number Magnet", box: "Box Retest" };
+  const NAME = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP", round: "Round Number Magnet", box: "Box Retest", spring: "Box Spring" };
   const sum = B.n ? `${B.n} closed picks · average ${pct(B.avg_ret)} a trade with stops (${B.pnl10k >= 0 ? "+" : "−"}$${Math.abs(B.pnl10k).toLocaleString()} total on $10k each) · ${Math.round(B.win * 100)}% winners · stop hit on ${Math.round((B.stops || 0) * 100)}% · held 5 days without the stop ${pct(B.avg_nostop)} vs ${pct(B.avg_cand)} for the average candidate (beat it ${B.beat == null ? "–" : Math.round(B.beat * 100) + "% of the time"})${B.no_fill ? ` · ${B.no_fill} trigger pick${B.no_fill > 1 ? "s" : ""} never filled` : ""}`
     : `No closed picks yet: each pick enters the next session and is scored 5 sessions later.${B.no_fill ? ` ${B.no_fill} trigger pick${B.no_fill > 1 ? "s" : ""} didn't fill.` : ""}`;
   const rows = [...(B.open || []), ...(B.closed || [])];

@@ -12,4 +12,4 @@ layers: [trade_setups]
 integrated: yes
 source: boxes.py + boxstudy.py
 ---
-**Used.** Box Retest setup in the playbook; shorts/traps shown but not in picks. Swing lows get taken ~70% once within 1 ADR; Fib levels no better.
+**Used.** Box Retest and (Oct 17) Box Spring setups in the playbook; shorts/traps shown but not in picks. Swing lows get taken ~70% once within 1 ADR; Fib levels no better.

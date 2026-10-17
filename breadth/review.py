@@ -27,7 +27,7 @@ DRY_DAYS = 3
 SLUMP_R, SLUMP_N = -0.15, 10
 LEADER_CHANGES = 3
 STALE_DAYS = 30
-NAMES = {"round": "Round Number Magnet", "ath": "ATH Magnet", "pullback": "Leader Pullback", "rotation": "Rotation Rookie", "kq": "Qullamaggie Flag", "vcp": "Minervini VCP", "box": "Box Retest"}
+NAMES = {"round": "Round Number Magnet", "ath": "ATH Magnet", "pullback": "Leader Pullback", "rotation": "Rotation Rookie", "kq": "Qullamaggie Flag", "vcp": "Minervini VCP", "box": "Box Retest", "spring": "Box Spring"}
 REG = {"strong": "Strong", "mixed": "Mixed", "weak": "Weak"}
 
 

@@ -373,7 +373,7 @@ def test_playbook():
     rows = PB.rank(td, "mixed")
     v = {r["key"]: r["verdict"] for r in rows}
     assert [r["key"] for r in rows][:3] == ["pullback", "bursts", "ath"], rows
-    assert v == {"pullback": "Focus", "bursts": "Focus", "ath": "Selective", "kq": "Unproven", "vcp": "Unproven", "round": "Unproven", "box": "Unproven",
+    assert v == {"pullback": "Focus", "bursts": "Focus", "ath": "Selective", "kq": "Unproven", "vcp": "Unproven", "round": "Unproven", "box": "Unproven", "spring": "Unproven",
                  "rotation": "Avoid", "anticipation": "Avoid", "eps": "Avoid"}
     p = next(r for r in rows if r["key"] == "pullback")
     assert "cooling lately" in p["why"] and "none qualify today" in p["why"]

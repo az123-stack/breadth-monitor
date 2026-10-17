@@ -99,7 +99,7 @@ def settle(adjusted, df=None):
         df.at[k, "entry"] = round(float(e), 4)
         if df.at[k, "setup"] == "kq":
             stop = float(L[t].iloc[e_i])
-        elif df.at[k, "setup"] in ("vcp", "box") and df.at[k, "vcp_stop"] == df.at[k, "vcp_stop"]:   # box: retest low
+        elif df.at[k, "setup"] in ("vcp", "box", "spring") and df.at[k, "vcp_stop"] == df.at[k, "vcp_stop"]:   # box: retest low
             stop = float(df.at[k, "vcp_stop"])
         else:
             stop = e * (1 - float(df.at[k, "stop_pct"] or 0))

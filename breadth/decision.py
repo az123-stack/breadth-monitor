@@ -22,7 +22,7 @@ EXIT_SESSIONS = HOLD + 1         # an idea carded on day D is held from the open
 STALE_DAYS = 4                   # agent file older than this vs the card date -> treated as missing
 
 SETUP_NAMES = {"ath": "ATH Magnet", "pullback": "Leader Pullback", "rotation": "Rotation Rookie", "kq": "Qullamaggie Flag",
-               "vcp": "Minervini VCP", "round": "Round Number Magnet", "box": "Box Retest"}
+               "vcp": "Minervini VCP", "round": "Round Number Magnet", "box": "Box Retest", "spring": "Box Spring"}
 LOG_COLS = ["date", "t", "role", "setup", "state", "regime", "setup_verdict", "setup_avg_r", "rsr", "sub", "grp_str",
             "flow_tier", "ignited", "tail5", "tail20", "macro_words", "earn_date", "earn_days", "event_risk",
             "catalyst", "cat_depth", "cat_dir", "cat_quality", "red_flags", "brief_risk", "support", "warn",

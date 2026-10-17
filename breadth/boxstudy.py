@@ -556,10 +556,11 @@ def confluence(rows, R, w, cols, rs, ADR, spy, mk, grp, sub_of, theme_of, thm, e
     return rows
 
 
-def playbook_states(ev):
-    """Box Retest (long, with group confluence) by playbook state, 5-session R (same yardstick as other setups)."""
+def playbook_states(ev, typ="retest_long"):
+    """A box trade (with group confluence) by playbook state, 5-session R (same yardstick as the other setups).
+    retest_long = Box Retest, trap_long = Box Spring."""
     conds = {nm: fn for g, nm, fn in conditions(1)}
-    sub = [e for e in ev if e["type"] == "retest_long" and _ok(e.get("R5")) and any(conds[n](e) for n in GROUP_OK)]
+    sub = [e for e in ev if e["type"] == typ and _ok(e.get("R5")) and any(conds[n](e) for n in GROUP_OK)]
     out = {}
     for k in ("all", "thrust", "strong", "mixed", "weak"):
         s = sub if k == "all" else [e for e in sub if (e["state"] != "none" if k == "thrust" else e["state"] == "none" and e["regime"] == k)]
@@ -623,7 +624,7 @@ def run(adjusted, universe, stocks, names, breadth):
     else:
         idx_status = {}
     now = {"state": str(mk["state"][-1]), "regime": str(mk["regime"][-1])}
-    return {"live": rows, "idx": idx_rows, "idx_status": idx_status, "study": R, "split": split, "now_state": now, "pb": playbook_states(ev),
+    return {"live": rows, "idx": idx_rows, "idx_status": idx_status, "study": R, "split": split, "now_state": now, "pb": playbook_states(ev), "pb_spring": playbook_states(ev, "trap_long"),
             "from": dates[first].strftime("%Y-%m-%d"), "to": dates[-1].strftime("%Y-%m-%d"),
             "baseline": baseline(w, cols, liq, spy, spyo, first)}
 

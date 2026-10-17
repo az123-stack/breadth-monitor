@@ -296,8 +296,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   = R with minus without, Welch t, per half; `proven` = edge t ≥ 2, n ≥ 30, same sign both halves), pairs (exploratory, t ≥ 2.5, both
   halves), `episodes` (thr05 signals per independent thrust, follow-throughs merged within 14 days). Live rows (`live`) carry `conf`
   (proven helps/hurts present), `score`, grade A ≥ +2 / B +1 / C, `group_ok`. ~85 s per build.
-  PLAYBOOK: `boxes.attach` → setup "box" (Box Retest) = today's retest_long `go` names with group confluence (sub-theme above 50-day or
-  top-20% sub-theme/theme, `GROUP_OK`); ranked by `boxes.pb` (5-session R by state). Shorts / traps not in the playbook or picks.
+  PLAYBOOK: `boxes.attach` (`BOX_SETUPS`) → setup "box" (Box Retest) = today's retest_long `go` names, and (Oct 17, Adam approved)
+  setup "spring" (Box Spring) = trap_long `failed` names (closed back inside the box in the last 2 sessions), both only with group
+  confluence (sub-theme above 50-day or top-20% sub-theme/theme, `GROUP_OK`), best `exp` first; rows carry `box_*` / `spring_*`
+  (stop, lvl, target, grade, wks, ago, kind, exp). Ranked by `boxes.pb` / `boxes.pb_spring` (`boxstudy.playbook_states`, 5-session R by
+  state; spring post-thrust +0.14R n 372, 20-session +0.53R). Spring plan: buy open, stop 0.5 ADR under the old bottom, target box top;
+  ledger stop from `vcp_stop` column. Shorts / failed breakouts not in the playbook or picks.
   FINDINGS (Jan 2025–Oct 2026, next-open entry): retest_long all +0.04R; thr05 +0.45R (t 4.4, halves +0.41/+0.47, positive after 5 of 6
   thrusts; Feb 2026 −0.43); no thrust −0.05R; weak breadth −0.19R; group confluence proven: sub-theme top 20% 20d +0.24R (edge +0.22, t 2.4),
   60d +0.25R, above 50-day +0.16R (edge t 3.3), breadth 70%+ +0.16R, theme top 20% +0.25R; not in any sub-theme −0.04R (hurts); RS 80+

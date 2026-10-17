@@ -424,13 +424,22 @@ def market_arrays(breadth, dates):
 # ---------------------------------------------------------------------------
 # Playbook hook: the long retest joins the Trade Setups as "Box Retest"
 # ---------------------------------------------------------------------------
-BOX_SETUP = ("box", "Box Retest", "Broke out of a box or a multi-touch range, snapped back to the old top and just bounced off it, in a "
-             "strong group (sub-theme above its 50-day or top-20% sub-theme/theme). Buy, stop under the retest low, target = box height "
-             "above the top. Paid best right after a breadth thrust.")
+BOX_SETUPS = {   # key: (trade, entry tag, name, desc, playbook stats key, row field prefix, "when" field)
+    "box": ("retest_long", "go", "Box Retest",
+            "Broke out of a box or a multi-touch range, snapped back to the old top and just bounced off it, in a strong group "
+            "(sub-theme above its 50-day or top-20% sub-theme/theme). Buy, stop under the retest low, target = box height above the top. "
+            "Paid best right after a breadth thrust.", "pb", "box", "bounce_ago"),
+    "spring": ("trap_long", "failed", "Box Spring",
+               "Broke below a box or a multi-touch support, failed, and just closed back inside the box (a spring / bear trap), in a "
+               "strong group. Buy, stop 0.5 ADR under the old bottom, target the top of the box. Paid best right after a breadth thrust "
+               "and in washed-out tapes; in-vogue themes add more.", "pb_spring", "spring", "fail_ago"),
+}
+BOX_SETUP = ("box",) + BOX_SETUPS["box"][2:4]     # kept for older imports
 
 
 def attach(theme_data, top=5):
-    """Add today's fresh RS 80+ bounces (theme universe) to trade_setups as setup 'box' so the playbook can rank it."""
+    """Add today's box trades (Box Retest, Box Spring) to trade_setups so the playbook can rank them: fresh entry tags
+    in strong groups (group confluence), best similar-past-trades result first."""
     from . import leaders as LD
     X, Bx = theme_data.get("trade_setups"), theme_data.get("boxes")
     if not X or not Bx:
@@ -438,30 +447,32 @@ def attach(theme_data, top=5):
     stocks = {s["t"]: s for s in theme_data.get("stocks") or []}
     ts = {r["theme"]: r.get("strength") for r in theme_data.get("themes") or []}
     ss = {r["theme"]: r.get("strength") for r in theme_data.get("subthemes") or []}
-    cand = [r for r in Bx.get("live") or [] if r["type"] == "retest_long" and r["tag"] == "go" and r.get("group_ok") and r["t"] in stocks]
-    cand.sort(key=lambda r: (-r["score"], r["bounce_ago"] or 0, -(r["rsr"] or 0)))
-    keys = []
-    for r in cand:
-        s = stocks[r["t"]]
-        row = X["rows"].get(r["t"])
-        if row is None:
-            if not LD.eligible(s):
-                continue
-            score, bt, bstr, sub = LD.score_one(s, ts, ss)
-            row = {"t": s["t"], "name": s.get("name", ""), "price": s["price"], "score": score, "rsr": s["rsr"], "rsr5": s.get("rsr5"),
-                   "theme": bt, "theme_str": bstr, "sub": s.get("sub"), "sub_str": sub,
-                   "grp": max(bstr or 0, ss.get(s.get("sub")) or 0), "off_hi": s.get("off_hi"), "e21": s.get("e21"), "e50": s.get("e50"),
-                   "adr": s.get("adr"), "vdry": s.get("vdry"), "tight": s.get("tight"), "d60": s.get("d60"), "tier": s.get("tier"),
-                   "star": bool(s.get("rs_nh")), "leader": False, "rising": None, "setups": [], "angles": [], "hits": 0, "tags": []}
-            X["rows"][r["t"]] = row
-        row["setups"] = sorted(set(row.get("setups", [])) | {"box"})
-        row["angles"] = sorted(set(row.get("angles", [])) | {"box"})
-        row["hits"] = len(row["angles"])
-        row.update({"box_stop": r["stop"], "box_lvl": r["lvl"], "box_target": r["target"], "box_grade": r["grade"],
-                    "box_wks": r["wks"], "box_bounce_ago": r["bounce_ago"], "box_kind": r["kind"]})
-        keys.append(r["t"])
-    X["setups"] = [S for S in X["setups"] if S["key"] != "box"] + [
-        {"key": BOX_SETUP[0], "name": BOX_SETUP[1], "desc": BOX_SETUP[2], "count": len(keys), "top": keys[:top]}]
+    new = []
+    for key, (typ, tag, name, desc, _pb, px, when) in BOX_SETUPS.items():
+        cand = [r for r in Bx.get("live") or [] if r["type"] == typ and r["tag"] == tag and r.get("group_ok") and r["t"] in stocks]
+        cand.sort(key=lambda r: (-(r.get("exp") if r.get("exp") is not None else -9), r.get(when) or 0, -(r["rsr"] or 0)))
+        keys = []
+        for r in cand:
+            s = stocks[r["t"]]
+            row = X["rows"].get(r["t"])
+            if row is None:
+                if not LD.eligible(s):
+                    continue
+                score, bt, bstr, sub = LD.score_one(s, ts, ss)
+                row = {"t": s["t"], "name": s.get("name", ""), "price": s["price"], "score": score, "rsr": s["rsr"], "rsr5": s.get("rsr5"),
+                       "theme": bt, "theme_str": bstr, "sub": s.get("sub"), "sub_str": sub,
+                       "grp": max(bstr or 0, ss.get(s.get("sub")) or 0), "off_hi": s.get("off_hi"), "e21": s.get("e21"), "e50": s.get("e50"),
+                       "adr": s.get("adr"), "vdry": s.get("vdry"), "tight": s.get("tight"), "d60": s.get("d60"), "tier": s.get("tier"),
+                       "star": bool(s.get("rs_nh")), "leader": False, "rising": None, "setups": [], "angles": [], "hits": 0, "tags": []}
+                X["rows"][r["t"]] = row
+            row["setups"] = sorted(set(row.get("setups", [])) | {key})
+            row["angles"] = sorted(set(row.get("angles", [])) | {key})
+            row["hits"] = len(row["angles"])
+            row.update({px + "_stop": r["stop"], px + "_lvl": r["lvl"], px + "_target": r["target"], px + "_grade": r["grade"],
+                        px + "_wks": r["wks"], px + "_ago": r.get(when), px + "_kind": r["kind"], px + "_exp": r.get("exp")})
+            keys.append(r["t"])
+        new.append({"key": key, "name": name, "desc": desc, "count": len(keys), "top": keys[:top]})
+    X["setups"] = [S for S in X["setups"] if S["key"] not in BOX_SETUPS] + new
 
 
 # ---------------------------------------------------------------------------
