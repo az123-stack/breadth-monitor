@@ -238,7 +238,8 @@ def build(theme_data, history, mfit, regime_label=None):
         cards = [card(t, role, theme_data, history, mfit or {}, cat, brief, regime_label, day)
                  for t, role in candidates(theme_data)]
         ev = load_evidence()
-        return {"date": day, "cards": cards, "macro": (mfit or {}).get("ctx"), "evidence": ev,
+        review = load_agent("review", day, max_age=10)
+        return {"review": {k: review.get(k) for k in ("for_date", "summary", "findings", "proposals")} if review else None,"date": day, "cards": cards, "macro": (mfit or {}).get("ctx"), "evidence": ev,
                 "agents": {"catalysts": cat.get("for_date"), "macro_brief": brief.get("for_date"),
                            "brief": {k: brief.get(k) for k in ("headline", "risk", "rates", "oil", "fed", "geo", "events", "sources")} if brief else None}}
     except Exception as e:

@@ -72,5 +72,11 @@
     "t": -0.41
    }
   }
+ },
+ "log": {
+  "asof": "2026-10-16",
+  "closed": 0,
+  "dates": 0,
+  "note": "no settled rows yet"
  }
 }

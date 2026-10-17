@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from . import config
 
 REPO = "az123-stack/breadth-monitor"
-KINDS = ("catalysts", "macro_brief")
+KINDS = ("catalysts", "macro_brief", "review")
 MAX_TICKERS = 15
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 URL = re.compile(r"^https?://\S+$")
@@ -36,6 +36,13 @@ SCHEMA = {
             "earnings_date": "YYYY-MM-DD of the NEXT earnings report if found, else null",
             "red_flags": ["short list: offering/dilution, downgrade, lawsuit, guidance cut, short report, insider selling... [] if none"],
             "sources": ["https://... at least one URL you actually used"]}},
+    },
+    "review": {
+        "for_date": "YYYY-MM-DD — the latest official date (worklist for_date)",
+        "summary": "2-4 plain sentences for Adam: what the evidence says this week",
+        "findings": ["one line each: a layer and what its evidence shows (numbers from `python -m breadth.layers report`)"],
+        "proposals": ["one line each: a concrete change to consider, and the evidence; or 'no changes yet: not enough data'"],
+        "sources": ["data/layer_evidence.json", "data/decision_log.csv"],
     },
     "macro_brief": {
         "for_date": "YYYY-MM-DD — copy `for_date` from the worklist",
@@ -106,6 +113,12 @@ def validate(kind, js, allowed=None):
         if not clean:
             raise ValueError("no valid tickers (each needs a source URL)")
         out["stocks"] = clean
+    elif kind == "review":
+        out["summary"] = _s(js.get("summary"), 700)
+        out["findings"] = [_s(x, 240) for x in (js.get("findings") or []) if _s(x)][:10]
+        out["proposals"] = [_s(x, 240) for x in (js.get("proposals") or []) if _s(x)][:6]
+        if not out["summary"]:
+            raise ValueError("summary is required")
     else:
         r = str(js.get("risk", "")).lower()
         if r not in ("low", "medium", "high"):

@@ -256,6 +256,9 @@ def recompute_and_publish(bars, splits, universe, state):
             if dec:
                 decision.record(dec)
                 decision.settle(adjusted)
+                from . import layers
+                ev = layers.load(); ev["log"] = layers.study_log(); layers.save(ev)    # forward evidence, seconds
+                dec["evidence"] = ev
                 theme_data["decision"] = decision.strip_private(dec)
         except Exception as e:
             log.exception("decision cards failed: %s", e)
