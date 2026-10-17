@@ -1011,6 +1011,17 @@ def test_unproven_layers_cannot_reach_picks():
     assert upd.index("ledger.record(") < upd.index("decision.build(")   # picks are logged before cards are built
 
 
+
+def test_agent_tools_stdlib_only():
+    """The agents' tools (worklist / schema / publish / status / save) must run with NO installed packages:
+    the scheduled tasks and the agent.yml save job don't install anything first."""
+    import subprocess
+    root = Path(__file__).resolve().parent.parent
+    code = f"import sys; sys.path.insert(0, {str(root)!r}); import breadth.agentfiles, breadth.nyse; print('ok')"
+    r = subprocess.run([sys.executable, "-I", "-S", "-c", code], capture_output=True, text=True, cwd="/")
+    assert r.stdout.strip() == "ok", r.stderr[-500:]
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

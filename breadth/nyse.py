@@ -9,10 +9,24 @@ Special one-off closures (e.g. a national day of mourning) are not predictable; 
 from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
-from dateutil.easter import easter
 
 ET = ZoneInfo("America/New_York")
 EXTRA = ["2025-01-09"]          # ad-hoc closures, "YYYY-MM-DD" (Jan 9 2025: national day of mourning, President Carter)
+
+
+def easter(year):
+    """Easter Sunday (Gregorian), anonymous Gregorian algorithm — stdlib only, so the agent tools need no installs."""
+    a, b, c = year % 19, year // 100, year % 100
+    d, e = b // 4, b % 4
+    f = (b + 8) // 25
+    g = (b - f + 1) // 3
+    h = (19 * a + b - d - g + 15) % 30
+    i, k = c // 4, c % 4
+    l = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * l) // 451
+    month = (h + l - 7 * m + 114) // 31
+    day = (h + l - 7 * m + 114) % 31 + 1
+    return date(year, month, day)
 
 
 def _nth(year, month, weekday, n):
