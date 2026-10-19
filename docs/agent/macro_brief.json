@@ -1,17 +1,17 @@
 {
  "for_date": "2026-10-16",
- "written": "2026-10-17T19:11Z",
- "headline": "AI debt fears hit tech as the 10-year holds near 5.1% after a hot CPI, while Brent tests $110 on Middle East supply risk.",
- "risk": "high",
- "rates": "10-year about 5.08% and up roughly 8% over 60 days; 2-year near 4.71%, so the curve steepened Friday; a hot CPI has a rate hike being debated.",
- "fed": "No FOMC meeting or major Fed speaker on next week's calendar; hike talk after CPI is the live theme.",
- "oil": "Brent tested $110 and WTI about $101 midday Friday on supply risk; the IEA is speeding up emergency stock releases and the US may ease some tanker sanctions.",
- "geo": "Iran tensions remain the oil wildcard (talk of new strikes on nuclear sites).",
+ "written": "2026-10-19T11:05Z",
+ "headline": "Oil eases from five-month highs after Trump waives some Russia sanctions, pulling the 10-year yield to about 5.09% and lifting Nasdaq futures ~1% ahead of Meta and Tesla earnings Wednesday.",
+ "risk": "medium",
+ "rates": "The 10-year Treasury yield slipped to about 5.085% early Monday as oil fell, but yields remain high and have pressured tech.",
+ "fed": "The Fed is in its blackout period with no speakers this week; markets price about 88% hold / 12% hike for the Oct 27-28 FOMC and roughly 75-80% odds of a hike by December.",
+ "oil": "Brent fell about 2% to ~$107.6 and WTI to ~$99.5 after Trump's Oct 16 order waived some Russia sanctions, but Hormuz tanker attacks and mines keep Gulf exports near 8.5M bpd vs 20M+ before, holding crude near $100+.",
+ "geo": "Iran-linked attacks on shipping in the Strait of Hormuz continue (another tanker hit a mine), while the US Russia-sanctions waiver is under a review of up to 60 days.",
  "events": [
   {
    "date": "2026-10-20",
    "time": "8:30 AM ET",
-   "name": "Housing starts / permits",
+   "name": "Housing starts & building permits",
    "impact": "medium"
   },
   {
@@ -23,25 +23,39 @@
   {
    "date": "2026-10-21",
    "time": "After close",
-   "name": "Meta, Tesla, IBM, TXN earnings",
+   "name": "Meta Platforms earnings",
    "impact": "high"
   },
   {
-   "date": "2026-10-22",
+   "date": "2026-10-21",
    "time": "After close",
-   "name": "Western Digital earnings",
+   "name": "Tesla earnings",
+   "impact": "high"
+  },
+  {
+   "date": "2026-10-21",
+   "time": "After close",
+   "name": "Lam Research & Texas Instruments earnings",
    "impact": "medium"
   },
   {
    "date": "2026-10-23",
    "time": "9:45 AM ET",
-   "name": "Flash PMIs (S&P Global)",
+   "name": "S&P Global flash PMIs (manufacturing, services)",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-10-23",
+   "time": "10:00 AM ET",
+   "name": "UMich consumer sentiment & inflation expectations (final)",
    "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-16-2026",
-  "https://www.gurufocus.com/news/9128361/us-treasury-bonds-mixed-as-oil-prices-surge-yield-curves-steepen",
-  "https://investrade.com/weekly-event-calendar-10-19-2026-10-23-2026/"
+  "https://www.marketscreener.com/news/wall-st-futures-climb-as-ai-stocks-rebound-oil-yields-fall-ce785cdbd889f325",
+  "https://grafa.com/en/news/united-states/oil-prices-fall-trump-russia-sanctions-waiver-october-2026",
+  "https://defirate.com/odds/fed-decision/",
+  "https://www.heygotrade.com/en/news/weekly-economic-outlook-2026-10-19/",
+  "https://www.fxempire.com/forecasts/article/the-week-ahead-meta-tesla-and-chip-earnings-put-ai-trade-to-the-test-1638768"
  ]
 }
