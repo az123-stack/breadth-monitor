@@ -1,183 +1,289 @@
 {
- "for_date": "2026-10-15",
- "written": "2026-10-17T02:18Z",
+ "for_date": "2026-10-16",
+ "written": "2026-10-19T11:23Z",
  "stocks": {
-  "OSCR": {
-   "why": "Still re-rating on Q2 beat (net income $362M vs a loss a year ago) and 2026 operating-earnings guidance raised to $500-700M, followed by price-target hikes; no fresh company news this week beyond scheduling Q3 results.",
+  "PBF": {
+   "why": "No fresh company news found; the stock is riding the refiner rally on strong refining margins and tight fuel inventories (a move that started in July). Q3 results come Oct 29.",
    "direction": "positive",
-   "quality": "real",
-   "earnings_date": "2026-11-05",
+   "quality": "weak",
+   "depth": "full",
+   "earnings_date": "2026-10-29",
    "red_flags": [
-    "heavy insider selling (CEO sold ~$71M over 6 months)",
-    "ACA subsidy/policy risk"
+    "Quiver data lists large-holder share sales over the past 6 months (unverified)"
    ],
    "sources": [
-    "https://www.benzinga.com/trading-ideas/movers/26/09/61849460/oscar-health-stock-rises-following-raised-2026-guidance-and-wall-street-price-target-hikes",
-    "https://www.quiverquant.com/news/Oscar+Health+rises+as+investors+continue+to+reward+stronger+profitability+and+higher+2026+targets",
-    "https://finviz.com/news/401202/oscar-health-inc-2026-third-quarter-earnings-conference-call"
+    "https://finviz.com/news/396193/pbf-energy-to-release-third-quarter-2026-earnings-results",
+    "https://www.quiverquant.com/news/PBF+Energy+Jumps+as+Refining-Margin+Tailwinds+Lift+Refiner+Shares"
    ]
   },
-  "SN": {
-   "why": "Near 52-week highs on analyst target raises and positioning into Q3 results, which include an expected ~$247M cost-of-sales benefit tied to refund claims; no fresh hard news.",
+  "HAE": {
+   "why": "On Oct 8 Haemonetics said CSL Plasma will move all its US plasma centers to NexSys devices by end-2027 (a bigger, dated deal); the stock jumped ~14-16% and BTIG raised its target to $130.",
    "direction": "positive",
-   "quality": "real",
-   "earnings_date": null,
+   "quality": "strong",
+   "depth": "full",
+   "earnings_date": "2026-11-05",
    "red_flags": [
-    "heavy insider selling (CEO ~$141M, director ~$401M over 6 months)"
+    "CSL deal is non-exclusive with no minimum volumes; FY27 guidance not raised yet"
    ],
    "sources": [
-    "https://www.quiverquant.com/news/SharkNinja+Gains+as+Investors+Eye+Earnings+Setup+and+Stronger+Street+Targets"
+    "https://www.tikr.com/zh/blog/haemonetics-soars-12-on-csl-update-plasma-giant-to-roll-out-nexsys-across-u-s-centers",
+    "https://blockonomi.com/haemonetics-hae-stock-breaks-higher-with-november-test-looming/",
+    "https://finviz.com/news/397285/haemonetics-sets-date-for-publishing-second-quarter-fiscal-year-2027-results-november-5-2026"
+   ]
+  },
+  "NTSK": {
+   "why": "Momentum after a Sept 2 beat (record ARR, revenue +29%); up ~38% in the month to Oct 7. No fresh hard news; Amerx started coverage at Hold on Oct 8.",
+   "direction": "mixed",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [
+    "price above the consensus target",
+    "more Hold ratings lately"
+   ],
+   "sources": [
+    "https://nasdaq.com/articles/amerx-initiates-coverage-netskope-hold",
+    "https://www.tipranks.com/stocks/NTSK/earnings"
    ]
   },
   "TENB": {
-   "why": "No company-specific catalyst found beyond scheduling Q3 results and a board addition/AI security launch; moving with the strong cybersecurity group.",
-   "direction": "none",
-   "quality": "weak",
+   "why": "Still running on the July beat-and-raise (record Tenable One mix, net expansion up); no fresh October news found. Q3 report Oct 28 after the close.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
    "earnings_date": "2026-10-28",
-   "red_flags": [],
-   "sources": [
-    "https://www.marketscreener.com/news/tenable-to-announce-fiscal-third-quarter-2026-earnings-results-ce785dd2df8afe2d",
-    "https://finance.yahoo.com/markets/stocks/articles/tenable-holdings-tenb-fully-valued-031702608.html"
-   ]
-  },
-  "PBF": {
-   "why": "Riding the refining-sector rally on record/near-record crack spreads and tight fuel supply; Q3 results due Oct 29.",
-   "direction": "positive",
-   "quality": "real",
-   "earnings_date": "2026-10-29",
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/396193/pbf-energy-to-release-third-quarter-2026-earnings-results",
-    "https://seekingalpha.com/news/4652678-pbf-energy-climbs-7-percent-amid-broad-refining-sector-rally",
-    "https://www.marketbeat.com/articles/3-refiners-benefiting-from-oil-volatility-and-tight-fuel-supply/"
-   ]
-  },
-  "IBRX": {
-   "why": "FDA expanded the Anktiva label on Oct 14 to BCG-unresponsive high-grade papillary-only bladder cancer, widening the addressable market; stock up on ~2x volume.",
-   "direction": "positive",
-   "quality": "strong",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.benzinga.com/news/fda/26/10/62365146/why-is-immunitybio-stock-gaining-wednesday",
-    "https://www.tradingkey.com/news/market-movers/262209087-market-movers-ibrx-20261009"
-   ]
-  },
-  "A": {
-   "why": "Older fundamentals: fiscal Q3 beat and raised 2026 guidance; TD Cowen lifted its target to $196 on Oct 13. Near its 52-week high.",
-   "direction": "positive",
-   "quality": "real",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.ad-hoc-news.de/boerse/news/nebenwerte/td-cowen-lifts-agilent-technologies-stock-target-to-usd-196-00/70332145",
-    "https://www.ad-hoc-news.de/boerse/news/corporate-news/agilent-technologies-stock-reflects-raised-2026-guidance/70221476"
-   ]
-  },
-  "ABNB": {
-   "why": "No fresh hard news; analyst notes (Bernstein reiterates $217 target, Wells Fargo cut to $185) ahead of Q3 results Nov 5.",
-   "direction": "mixed",
-   "quality": "weak",
-   "earnings_date": "2026-11-05",
    "red_flags": [
-    "price target cut (Wells Fargo)"
+    "short-seller report (The Bear Cave, Aug 7)",
+    "analyst ratings drifting to Hold/Sell",
+    "director share sales in August"
    ],
    "sources": [
-    "https://www.ad-hoc-news.de/boerse/news/corporate-news/airbnb-stock-trades-at-eur-147-87-before-results-on-november-5/70322115",
-    "https://www.ad-hoc-news.de/boerse/news/corporate-news/wells-fargo-cuts-airbnb-stock-target-to-usd-185-00/70256107"
+    "https://www.tikr.com/blog/tenable-is-up-90-off-its-low-heres-where-the-stock-could-go",
+    "https://www.nextearningsdate.com/tenable-holdings.html"
+   ]
+  },
+  "HNGE": {
+   "why": "Older news: Aug 4 Q2 beat with raised guidance, a $550M buyback and the Cylinder Health deal; several target raises. No fresh October catalyst found.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": "2026-11-02",
+   "red_flags": [],
+   "sources": [
+    "https://www.webull.ca/news-detail/15350699273249792",
+    "https://scanx.trade/stock-market-news/companies/hinge-health-report-q3-2026-financial-results-november-2/52762744"
+   ]
+  },
+  "AMPL": {
+   "why": "Older news: Aug 5 raised 2026 revenue outlook on AI demand (stock up ~27%) and target raises. No fresh October catalyst found.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": "2026-11-04",
+   "red_flags": [],
+   "sources": [
+    "https://simplywall.st/stocks/us/software/nasdaq-ampl/amplitude/news/amplitude-ampl-is-up-268-after-raising-2026-revenue-outlook",
+    "https://amplitude.com/press/amplitude-hosts-third-quarter-2026-earnings-webcast"
    ]
   },
   "ADM": {
-   "why": "Rallied Oct 13 on heavy call buying into Q3 results, after a Q2 beat and raised 2026 EPS guidance; no fresh company news.",
-   "direction": "positive",
-   "quality": "real",
+   "why": "No clear stock-specific catalyst found in October; Q3 results are set for Nov 3.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
    "earnings_date": "2026-11-03",
-   "red_flags": [
-    "JPMorgan Underweight, target cut to $75"
-   ],
+   "red_flags": [],
    "sources": [
-    "https://www.investing.com/news/stock-market-news/why-is-archerdanielsmidland-stock-rallying-today-93CH-4947314",
-    "https://www.ad-hoc-news.de/boerse/news/nebenwerte/archer-daniels-midland-schedules-november-3-results-for-archer-daniels-midland-stock/70331561"
+    "https://finviz.com/news/399205/adm-to-release-third-quarter-financial-results-on-november-3-2026"
    ]
   },
-  "ATKR": {
-   "why": "Being acquired by Prysmian for $95.00 cash per share (holders approved Oct 7); price is pinned just under the deal price, so this is merger arbitrage, not a breakout.",
-   "direction": "none",
-   "quality": "strong",
+  "APA": {
+   "why": "No company-specific news found; moving with oil producers (up 4% on Oct 16). One analyst downgrade in the past month. Q3 call Nov 5.",
+   "direction": "mixed",
+   "quality": "weak",
+   "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "pending cash takeover at $95 - upside capped"
+    "analyst downgrade in the past month"
    ],
    "sources": [
-    "https://www.stocktitan.net/sec-filings/ATKR/defm14a-atkore-inc-merger-proxy-statement-3a6dc65b11ec.html",
-    "https://www.prysmian.com/en/media/press-releases/atkore-stockholders-approve-acquisition-by-prysmian"
+    "https://www.aaii.com/investingideas/article/550985-why-apa-corporation8217s-apa-stock-is-up-523",
+    "https://finviz.com/news/400071/apa-corporation-provides-third-quarter-2026-supplemental-information-and-schedules-results-conference-call-for-nov-5-at-10-am-central-time"
    ]
   },
   "ATRC": {
-   "why": "No clear catalyst found; Oct 9 +5.6% move had no news attached.",
+   "why": "No clear catalyst found; last news was the July 23 Q2 report and an August target raise. Fell 6% on Oct 1 without news.",
    "direction": "none",
    "quality": "none",
+   "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "insider selling (~$4.4M over 12 months)"
+    "insider selling (~$3.3M in 90 days)",
+    "Zacks downgrade to Hold (Aug 24)"
    ],
    "sources": [
-    "https://www.gurufocus.com/news/9118145/atricure-inc-atrc-stock-up-56-but-gf-value-says-overvalued-gf-score-77100"
+    "https://www.marketbeat.com/instant-alerts/price-atricure-nasdaq-atrc-stock-falls-62-time-to-sell-2026-10-01/"
    ]
   },
-  "CLMT": {
-   "why": "Refining-sector strength on wide crack spreads plus balance-sheet repair ($150M 9.75% notes being redeemed Oct 25); Q3 results Nov 6.",
-   "direction": "positive",
-   "quality": "real",
-   "earnings_date": "2026-11-06",
+  "CGAU": {
+   "why": "No company-specific news found; likely moving with gold miners. Q3 results Oct 29 after the close.",
+   "direction": "none",
+   "quality": "weak",
+   "depth": "full",
+   "earnings_date": "2026-10-29",
    "red_flags": [],
    "sources": [
-    "https://finance.yahoo.com/markets/stocks/articles/calumet-inc-release-third-quarter-110000381.html",
-    "https://www.stocktitan.net/news/CLMT/calumet-issues-redemption-notice-for-150-million-of-9-75-senior-auxzhp6b5rfx.html"
+    "https://finviz.com/news/396949/centerra-gold-provides-notice-of-third-quarter-2026-results-and-conference-call"
    ]
   },
   "CON": {
-   "why": "Hitting all-time highs on older news: Q2 growth, raised full-year outlook and an S&P credit upgrade to BB; nothing fresh this week.",
+   "why": "Older news: Aug Q2 beat with raised 2026 outlook and buyback; CEO transition Nov 1. No fresh October catalyst found.",
    "direction": "positive",
    "quality": "real",
-   "earnings_date": null,
-   "red_flags": [],
+   "depth": "full",
+   "earnings_date": "2026-11-05",
+   "red_flags": [
+    "high leverage",
+    "CEO change effective Nov 1"
+   ],
    "sources": [
-    "https://www.investing.com/news/company-news/concentra-group-holdings-stock-hits-alltime-high-at-3808-usd-93CH-4949725"
-   ]
-  },
-  "CRM": {
-   "why": "BofA double-upgraded Salesforce on Oct 12 (Underperform to Buy, target $285), saying AI deepens enterprise reliance on its platform; Agentforce ARR $1.5B.",
-   "direction": "positive",
-   "quality": "strong",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.benzinga.com/markets/tech/26/10/62303548/salesforce-double-upgrade-bank-of-america"
+    "https://www.webull.ca/news-detail/15372184564818944",
+    "https://finviz.com/news/400679/concentra-to-announce-third-quarter-2026-results-on-thursday-november-5-2026"
    ]
   },
   "DK": {
-   "why": "Refining-sector rally on wide crack spreads; Goldman and Wells Fargo (target $95) raised targets this week.",
-   "direction": "positive",
-   "quality": "real",
-   "earnings_date": null,
-   "red_flags": [
-    "$400M convertible notes issued early Oct (potential dilution)"
-   ],
-   "sources": [
-    "https://www.marketbeat.com/instant-alerts/analyst-delek-us-nyse-dk-stock-price-expected-to-rise-the-goldman-sachs-group-analyst-says-2026-10-15/",
-    "https://finance.yahoo.com/markets/stocks/articles/delek-us-holdings-dk-could-190552181.html"
-   ]
-  },
-  "FTNT": {
-   "why": "No fresh company news; Barclays raised its target to $210 and the cybersecurity group is strong ahead of Q3 results (date not yet confirmed).",
+   "why": "No company-specific news found; moving with the refiner group on strong margins. Q3 results Nov 6 before the open.",
    "direction": "positive",
    "quality": "weak",
+   "depth": "full",
+   "earnings_date": "2026-11-06",
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/403670/delek-us-holdings-to-host-third-quarter-2026-conference-call-on-november-6-2026"
+   ]
+  },
+  "DXCM": {
+   "why": "No clear fresh catalyst found; last hard news was the Q2 2026 beat. Q3 report Oct 29 after the close.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": "2026-10-29",
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/399830/dexcom-schedules-third-quarter-2026-earnings-release-and-conference-call-for-october-29-2026-at-4-30-pm-eastern-time",
+    "https://www.drugdeliverybusiness.com/dexcom-q2-2026-beats-sales-outlook/"
+   ]
+  },
+  "FRSH": {
+   "why": "Older news: Q1 beat, 11% headcount cut, CEO share purchase and $400M buyback; record Q2 results in August. No fresh October catalyst found.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": "2026-11-03",
+   "red_flags": [],
+   "sources": [
+    "https://www.tikr.com/blog/freshworks-stock-is-down-46-over-the-past-year-heres-whats-driving-the-move?",
+    "https://www.freshworks.com/pressrelease/freshworks-to-announce-third-quarter-2026-financial-results-on-november-3-2026/"
+   ]
+  },
+  "MATX": {
+   "why": "Older news: August Q2 beat with raised Q3 and full-year operating income outlook plus buybacks. No fresh October catalyst found.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.ad-hoc-news.de/boerse/news/corporate-news/barclays-raises-target-for-fortinet-stock-from-usd-190-to-usd-210/70313310",
-    "https://www.marketbeat.com/earnings/reports/2026-10-28-fortinet-inc-stock/"
+    "https://www.webull.com/news/15407062883255296",
+    "https://www.earningswhispers.com/stocks/matx"
+   ]
+  },
+  "MPC": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": "2026-11-03",
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/393371/marathon-petroleum-corp-to-report-third-quarter-financial-results-on-november-3-2026"
+   ]
+  },
+  "PR": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/PR"
+   ]
+  },
+  "PSX": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": "2026-10-28",
+   "red_flags": [],
+   "sources": [
+    "https://scanx.trade/stock-market-news/companies/phillips-66-announce-q3fy26-results-october-28/51136462"
+   ]
+  },
+  "RVTY": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": "2026-11-03",
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/398253/revvity-to-hold-earnings-call-on-november-3-2026"
+   ]
+  },
+  "SLDE": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": "2026-10-27",
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/398043/slide-to-report-2026-third-quarter-earnings-results-on-october-27-2026"
+   ]
+  },
+  "TTE": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": "2026-10-29",
+   "red_flags": [],
+   "sources": [
+    "https://ae.marketscreener.com/quote/stock/TOTALENERGIES-SE-4717/calendar/"
+   ]
+  },
+  "VLO": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": "2026-10-22",
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/389791/valero-energy-corporation-to-announce-third-quarter-2026-earnings-results-on-october-22-2026"
+   ]
+  },
+  "ZIM": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.ajot.com/news/zim-reports-strong-q2-2026-results-driven-by-transpacific-position-and-cost-efficiency"
    ]
   }
  }
