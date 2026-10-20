@@ -47,26 +47,26 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-10-16,HNGE,watch,pullback,thrust,Washed out,Focus,0.289,97.0,Consumer Apps,58.8,,,0.0,0.0,,2026-11-02,11.0,Meta Platforms earnings 2026-10-21,"Older news: Aug 4 Q2 beat with raised guidance, a $550M buyback and the Cylinder Health deal; several target raises. No fresh October catalyst found.",full,positive,real,,medium,3,0,,,,,pending
 2026-10-16,NTSK,watch,round,thrust,Washed out,Focus,0.286,89.0,Cybersecurity Platforms,79.1,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,"Momentum after a Sept 2 beat (record ARR, revenue +29%); up ~38% in the month to Oct 7. No fresh hard news; Amerx started coverage at Hold on Oct 8.",full,mixed,real,price above the consensus target; more Hold ratings lately,medium,1,0,,,,,pending
 2026-10-16,TENB,watch,kq,thrust,Washed out,Focus,0.212,89.0,Identity & Security Tools,84.6,fading,,0.0,0.0,,2026-10-28,8.0,Meta Platforms earnings 2026-10-21,"Still running on the July beat-and-raise (record Tenable One mix, net expansion up); no fresh October news found. Q3 report Oct 28 after the close.",full,positive,real,"short-seller report (The Bear Cave, Aug 7); analyst ratings drifting to Hold/Sell; director share sales in August",medium,1,0,,,,,pending
-2026-10-19,AMGN,cand,rotation,thrust,Washed out,Focus,0.342,83.0,Large-cap Pharma,74.1,new,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,,,,,pending
-2026-10-19,APA,cand,round,thrust,Washed out,Focus,0.286,96.0,Shale E&P,90.5,confirmed,warming,5.58,4.58,+1% oil → +0.5%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-19,CRL,cand,rotation,thrust,Washed out,Focus,0.342,93.0,CROs,85.9,confirmed,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-19,DK,cand,pullback,thrust,Washed out,Focus,0.293,98.0,Refiners,95.4,neutral,,3.73,3.06,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-19,GILD,cand,rotation,thrust,Washed out,Focus,0.342,80.0,Large-cap Pharma,74.1,new,,1.15,-1.91,+10bp 10-yr yield → -1.1%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,,,,,pending
-2026-10-19,HAE,cand,rotation,thrust,Washed out,Focus,0.342,97.0,Medical Devices,66.7,bouncing,,2.22,-3.7,+10bp 10-yr yield → -2.1%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-19,HNGE,cand,vcp,thrust,Washed out,Focus,0.286,98.0,Consumer Apps,60.0,,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-19,LLY,cand,rotation,thrust,Washed out,Focus,0.342,82.0,Large-cap Pharma,74.1,new,,1.27,-2.1,+10bp 10-yr yield → -1.2%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,,,,,pending
-2026-10-19,MPC,cand,round,thrust,Washed out,Focus,0.286,98.0,Refiners,95.4,neutral,,3.5,2.88,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-19,NTRA,cand,pullback,thrust,Washed out,Focus,0.293,97.0,Genomics & Diagnostics,87.3,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-19,PR,cand,round,thrust,Washed out,Focus,0.286,93.0,Shale E&P,90.5,confirmed,warming,4.26,3.5,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-19,PSX,cand,round,thrust,Washed out,Focus,0.286,97.0,Refiners,95.4,neutral,,3.02,2.48,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-19,RELY,cand,round,thrust,Washed out,Focus,0.286,88.0,Payments & Networks,69.1,bouncing,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,,,,,pending
-2026-10-19,RVTY,cand,pullback,thrust,Washed out,Focus,0.293,92.0,Life Science Tools,90.1,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
+2026-10-19,AMGN,cand,rotation,thrust,Washed out,Focus,0.345,83.0,Large-cap Pharma,74.1,new,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,,,,,pending
+2026-10-19,APA,cand,round,thrust,Washed out,Focus,0.283,96.0,Shale E&P,90.5,confirmed,warming,5.58,4.58,+1% oil → +0.5%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
+2026-10-19,CRL,cand,rotation,thrust,Washed out,Focus,0.345,93.0,CROs,85.9,confirmed,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
+2026-10-19,DK,cand,pullback,thrust,Washed out,Focus,0.292,98.0,Refiners,95.4,neutral,,3.73,3.06,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
+2026-10-19,GILD,cand,rotation,thrust,Washed out,Focus,0.345,80.0,Large-cap Pharma,74.1,new,,1.15,-1.91,+10bp 10-yr yield → -1.1%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,,,,,pending
+2026-10-19,HAE,cand,rotation,thrust,Washed out,Focus,0.345,97.0,Medical Devices,66.7,bouncing,,2.22,-3.7,+10bp 10-yr yield → -2.1%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
+2026-10-19,HNGE,cand,vcp,thrust,Washed out,Focus,0.283,98.0,Consumer Apps,60.0,,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
+2026-10-19,LLY,cand,rotation,thrust,Washed out,Focus,0.345,82.0,Large-cap Pharma,74.1,new,,1.27,-2.1,+10bp 10-yr yield → -1.2%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,,,,,pending
+2026-10-19,MPC,cand,round,thrust,Washed out,Focus,0.283,98.0,Refiners,95.4,neutral,,3.5,2.88,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
+2026-10-19,NTRA,cand,pullback,thrust,Washed out,Focus,0.292,97.0,Genomics & Diagnostics,87.3,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
+2026-10-19,PR,cand,round,thrust,Washed out,Focus,0.283,93.0,Shale E&P,90.5,confirmed,warming,4.26,3.5,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
+2026-10-19,PSX,cand,round,thrust,Washed out,Focus,0.283,97.0,Refiners,95.4,neutral,,3.02,2.48,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
+2026-10-19,RELY,cand,round,thrust,Washed out,Focus,0.283,88.0,Payments & Networks,69.1,bouncing,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,,,,,pending
+2026-10-19,RVTY,cand,pullback,thrust,Washed out,Focus,0.292,92.0,Life Science Tools,90.1,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
 2026-10-19,SLDE,cand,ath,thrust,Washed out,Focus,0.237,94.0,P&C Insurers,77.1,new,warming,2.01,-3.35,+10bp 10-yr yield → -1.9%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-19,VLO,cand,pullback,thrust,Washed out,Focus,0.293,98.0,Refiners,95.4,neutral,,3.35,2.76,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-19,ZIM,pick1,pullback,thrust,Washed out,Focus,0.293,90.0,Tankers & Shipping,82.4,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-19,MRNA,pick2,round,thrust,Washed out,Focus,0.286,99.0,Mid-cap Biotech,58.9,fading,,8.08,-21.34,+1% dollar → -13.8%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-19,AMPL,watch,vcp,thrust,Washed out,Focus,0.286,96.0,Data & Observability,88.1,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-19,CVI,watch,vcp,thrust,Washed out,Focus,0.286,98.0,Refiners,95.4,neutral,,4.58,3.77,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-19,NTSK,watch,round,thrust,Washed out,Focus,0.286,91.0,Cybersecurity Platforms,82.0,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
+2026-10-19,VLO,cand,pullback,thrust,Washed out,Focus,0.292,98.0,Refiners,95.4,neutral,,3.35,2.76,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
+2026-10-19,ZIM,pick1,pullback,thrust,Washed out,Focus,0.292,90.0,Tankers & Shipping,82.4,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
+2026-10-19,MRNA,pick2,round,thrust,Washed out,Focus,0.283,99.0,Mid-cap Biotech,58.9,fading,,8.08,-21.34,+1% dollar → -13.8%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
+2026-10-19,AMPL,watch,vcp,thrust,Washed out,Focus,0.283,96.0,Data & Observability,88.1,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
+2026-10-19,CVI,watch,vcp,thrust,Washed out,Focus,0.283,98.0,Refiners,95.4,neutral,,4.58,3.77,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
+2026-10-19,NTSK,watch,round,thrust,Washed out,Focus,0.283,91.0,Cybersecurity Platforms,82.0,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
 2026-10-19,PBF,watch,kq,thrust,Washed out,Focus,0.212,98.0,Refiners,95.4,neutral,,3.92,3.22,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-19,TENB,watch,round,thrust,Washed out,Focus,0.286,93.0,Identity & Security Tools,87.3,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
+2026-10-19,TENB,watch,round,thrust,Washed out,Focus,0.283,93.0,Identity & Security Tools,87.3,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
