@@ -509,6 +509,9 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .tg.pother { background: var(--neutral-mid); color: var(--text-secondary); }
 .boxcard .rbanner { margin: 8px 0 4px; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; border-left: 4px solid; }
 .boxcard .btiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin: 10px 0 4px; }
+.sowcard .sowspark { display: block; }
+.tg.sow-breakout { background: color-mix(in srgb, var(--good) 35%, transparent); } .tg.sow-pop { background: color-mix(in srgb, var(--good) 22%, transparent); }
+.tg.sow-nuzzle { background: color-mix(in srgb, var(--s1) 25%, transparent); } .tg.sow-riding { background: var(--grid); } .tg.sow-extended { background: color-mix(in srgb, var(--warning) 28%, transparent); }
 .boxcard .btile { text-align: left; border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 8px; padding: 8px 10px; background: none; cursor: pointer; font: inherit; color: var(--text-primary); display: flex; flex-direction: column; gap: 2px; }
 .boxcard .btile.act { border-left-color: var(--good); } .boxcard .btile.avoid { border-left-color: var(--critical); } .boxcard .btile.watch { border-left-color: var(--warning); }
 .boxcard .btile.on { background: var(--neutral-mid); box-shadow: inset 0 0 0 1px var(--text-secondary); }
@@ -584,7 +587,8 @@ function render() {
       ...(DATA.themes.hve ? [{ name: "Record volume - up days (warning list)", ticks: DATA.themes.hve.rows.filter(r => r.chg > 0).map(r => r.t) },
         { name: "Record volume - down days", ticks: DATA.themes.hve.rows.filter(r => r.chg < 0).map(r => r.t) },
         { name: "Record volume - short watch (turn triggered)", ticks: DATA.themes.hve.rows.filter(r => r.short && r.short.state === "triggered").map(r => r.t) },
-        { name: "Record volume - short watch (spike, waiting)", ticks: DATA.themes.hve.rows.filter(r => r.profile === "spike" && !(r.short && r.short.state === "triggered")).map(r => r.t) }] : [])]);
+        { name: "Record volume - short watch (spike, waiting)", ticks: DATA.themes.hve.rows.filter(r => r.profile === "spike" && !(r.short && r.short.state === "triggered")).map(r => r.t) }] : []),
+      ...(DATA.themes.sow ? ["breakout", "pop", "nuzzle"].map(k => ({ name: "Strength on Weakness - " + (DATA.themes.sow.states.find(x => x.key === k) || {}).name, ticks: DATA.themes.sow.rows.filter(r => r.state === k).map(r => r.t) })) : [])]);
   });
   const rf = app.querySelector(".revflag"); if (rf) rf.addEventListener("click", () => {
     const b = app.querySelector('nav.tabs button[data-tab="trades"]'); if (b) b.click();
@@ -3984,10 +3988,106 @@ function renderTrades(app) {
     app.append(sec);
   });
   app.append(boxCard(T));
+  app.append(sowCard(T));
   app.append(scoreboardCard(T.scoreboard));
   app.append(tagStatsCard((T.trade_bt || {}).tag_stats));
   app.append(hveCard(T));
   app.append(tsBacktest(T.trade_bt, (T.playbook && T.playbook.state) || now));
+}
+/* ---------- Strength on Weakness: weekly position trades out of a stage-1 base (breadth/sow.py) ---------- */
+function sowSpark(r) {
+  const px = r.wk || [], n = px.length; if (n < 2) return '<span class="meta">–</span>';
+  const all = [...px, ...(r.w9 || []), ...(r.w21 || []), ...(r.w50 || [])].filter(v => v != null);
+  const W = 170, Ht = 46, lo = Math.min(...all), hi = Math.max(...all);
+  const x = (i) => (i / (n - 1) * (W - 2) + 1).toFixed(1), y = (v) => (Ht - 3 - (v - lo) / ((hi - lo) || 1) * (Ht - 6)).toFixed(1);
+  const line = (a, st, wd, dash) => `<polyline points="${(a || []).map((v, i) => v == null ? null : `${x(i)},${y(v)}`).filter(Boolean).join(" ")}" fill="none" stroke="${st}" stroke-width="${wd}"${dash ? ` stroke-dasharray="${dash}"` : ""}/>`;
+  const box = r.box_hi && r.box_lo ? `<rect x="${x(Math.max(0, n - 11))}" y="${y(r.box_hi)}" width="${(x(n - 2) - x(Math.max(0, n - 11))).toFixed(1)}" height="${(y(r.box_lo) - y(r.box_hi)).toFixed(1)}" fill="none" stroke="var(--text-secondary)" stroke-width="1"/>` : "";
+  return `<svg class="sowspark" width="${W}" height="${Ht}" viewBox="0 0 ${W} ${Ht}" aria-label="Weekly closes with the 9, 21 and 50-week EMAs; box = the last 10 weeks">${box}
+    ${line(r.w50, "var(--text-muted)", 1.2, "3 2")}${line(r.w21, "var(--s2)", 1.2)}${line(r.w9, "var(--s1)", 1.2)}${line(px, "var(--text-primary)", 1.4)}</svg>`;
+}
+const SOW_TOP = 25;
+function sowCard(T) {
+  const X = T.sow;
+  if (!X) return $('<div></div>');
+  const ls = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+  const ss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storage off */ } };
+  UI.sow = UI.sow || { st: ls("sowState", "act"), scope: "all", sort: ["_o", 1], more: false };
+  const U = UI.sow, E = X.evidence || {}, C = X.cfg || {};
+  const NAME = Object.fromEntries(X.states.map(s => [s.key, s.name]));
+  const DESC = Object.fromEntries(X.states.map(s => [s.key, s.desc]));
+  const ACT = ["breakout", "pop", "nuzzle"];
+  const pp = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const evRow = (nm, o, vsStrong) => {
+    if (!o || o.ex == null) return `<tr><td class="l">${nm}</td><td colspan="6" class="meta">not enough signals yet</td></tr>`;
+    const s = vsStrong ? (o.vs_strong || {}) : o;
+    return `<tr><td class="l">${nm}</td>${retCell(o.ret, "d60")}${retCell(o.ex, "d15")}${retCell(s.ex, "d15")}<td class="num">${s.t ?? "–"}</td><td class="num">${pp(s.h1)} / ${pp(s.h2)}</td><td class="num">${o.n.toLocaleString()} · ${o.dates} wks</td></tr>`;
+  };
+  const p26 = ((E.pop || {}).w26 || {}), p26s = p26.vs_strong || {};
+  const card = $(`<section class="card regcard sowcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv unproven" title="Information only: it has not beaten other strong stocks in a backtest yet, so it never changes the Top 2 picks">Unproven</span> Strength on Weakness <span class="meta">· weekly position trades out of a long base</span></h2>
+      <div class="tsbtns"><button class="sowdl" title="Download the stocks shown, in this order, as a TradingView watchlist">⬇ TradingView</button></div></div>
+    <p class="note" style="padding:4px 0 0"><b>The setup</b> (your write-up, weekly chart): a 6–24+ month base with a flat or rising <b>50-week EMA</b> and 2–3 pumps up through it → the first thrust → instead of selling off, it rests on the rising <b>9 / 21-week EMAs</b> (the black box) → it breaks the box on volume with price &gt; 9 &gt; 21 &gt; 50. <b>Your entry:</b> once it rides the 9/21 up, buy when it nuzzles back into them and take the next pop. Hold for months; the exit is a weekly close under the 21.
+      <br><b>Week of ${shortDate(X.week)}:</b> ${X.week_done ? "complete." : `<b>not finished</b> (${X.week_days} session${X.week_days === 1 ? "" : "s"} in, through ${shortDate(X.date)}). This week's states use prices so far and volume paced to a full week; they're final at Friday's close.`}</p>
+    <div class="rbanner watch" style="margin-top:8px"><b>How it has done</b> (${esc(p26.from || "")} to ${esc(p26.to || "")}, bought at the next open): a <b>pop</b> held 26 weeks returned ${pp(p26.ret)} on average, ${pp(p26.ex)} more than the average stock bought the same week, but only ${pp(p26s.ex)} more than <b>other RS 70+ stocks</b> (t ${p26s.t ?? "–"}). So the list finds strong stocks well; the pattern itself hasn't proven extra edge yet. Only ~1 year of signals is testable (the 50-week EMA needs a year of our 2-year history), so treat it as a watchlist for your own chart read.</div>
+    <div class="filters" style="margin:8px 0 4px"></div><div class="sowbody"></div>
+    <details class="kqsec" style="margin-top:8px"><summary><b>The rules in code</b></summary><ul class="meta" style="margin:6px 0 0 18px;padding:0;font-size:12.5px">
+      <li><b>Liquid & strong:</b> $${C.min_price}+, $${Math.round((C.min_dvol || 0) / 1e6)}M+ a day, RS Rating ${C.min_rs}+.</li>
+      <li><b>Stack:</b> 9 &gt; 21 &gt; 50-week EMA, 21 rising over ${C.curl} weeks, 9 flat or rising; 50-week EMA at least ${Math.round((C.flat || 0) * 100)}% of its level ${C.flat_wk} weeks ago.</li>
+      <li><b>Base:</b> ${C.pumps}+ weekly closes crossing up through the 50-week EMA in the last ${C.pump_wk} weeks (the pumps) and ${C.below_wk}+ weekly closes under it (it really based).</li>
+      <li><b>Black box:</b> last ${C.box_wk} weeks no taller than ${C.tight_atr} weekly ATRs, a low within ${Math.round((C.anchor_touch || 0) * 100)}% of the 21-week EMA and no close more than ${Math.round((1 - (C.anchor_hold || 0)) * 100)}% under it.</li>
+      <li><b>Breakout:</b> weekly close above the prior ${C.box_wk}-week high on ${C.vol_x}× the ${C.vol_wk}-week average volume. <b>Nuzzle:</b> the week's low within ${Math.round((C.nuzzle || 0) * 100)}% of the 9-week EMA while the close holds ${Math.round((C.hold21 || 0) * 100)}% of the 21. <b>Pop:</b> the next week closes above the nuzzle week's high.</li>
+      <li>Riding / extended / nuzzle need a ${C.box_wk}-week-high close in the last ${C.thrust_wk} weeks (the first thrust). Extended = more than ${C.ext_atr} weekly ATRs above the 9.</li></ul></details>
+    <details class="kqsec" style="margin-top:4px"><summary><b>The evidence</b> · signals ${esc(p26.from || "")} on, entry next open</summary>
+      <div class="scroll"><table class="grid" style="margin-top:6px"><thead><tr><th class="l">Signal · hold</th><th>Avg return</th><th>vs avg stock<small>same week</small></th><th>vs RS 70+ stocks<small>same week</small></th><th>t<small>vs RS 70+, by week</small></th><th>Halves<small>vs RS 70+</small></th><th>Trades · weeks</th></tr></thead><tbody>
+      ${["pop", "breakout"].map(k => (E.holds || [13, 26]).map(h => evRow(`${NAME[k]} · ${h} weeks`, (E[k] || {})["w" + h], true)).join("")).join("")}
+      ${["pop", "breakout"].map(k => (E.holds || [13, 26]).map(h => { const o = ((E.any_rs || {})[k] || {})["w" + h]; return !o || o.ex == null ? "" : `<tr><td class="l meta">${NAME[k]} · ${h} weeks, any RS (no RS 70 floor)</td>${retCell(o.ret, "d60")}${retCell(o.ex, "d15")}<td class="num meta">–</td><td class="num">${o.t ?? "–"}</td><td class="num">${pp(o.h1)} / ${pp(o.h2)}<small class="meta" style="display:block">vs avg stock</small></td><td class="num">${o.n.toLocaleString()} · ${o.dates} wks</td></tr>`; }).join("")).join("")}</tbody></table></div>
+      <p class="meta" style="margin:6px 0 0">Each signal week is averaged first, so busy weeks don't dominate; t and halves use those weekly averages. Holding windows overlap (a 26-week hold from consecutive weeks shares most of its path), so the real sample is about one market cycle, mostly a bull market, with today's survivors only (delisted losers are missing). The RS 70 floor explains most of the gain over the average stock. No costs. To test properly it needs more history (Massive Starter reaches 5 years).</p></details></section>`);
+  const fl = card.querySelector(".filters"), body = card.querySelector(".sowbody");
+  const ORD = Object.fromEntries(X.states.map((s, i) => [s.key, i]));
+  X.rows.forEach(r => { r._o = ORD[r.state] * 10 + (r.ago || 0); });
+  const filtered = () => X.rows.filter(r => (U.st === "all" || (U.st === "act" ? ACT.includes(r.state) : r.state === U.st)) && (U.scope === "all" || r.theme || r.sub));
+  const plan = (r) => {
+    const risk = r.risk != null ? ` (${pct(-r.risk)})` : "";
+    if (r.state === "breakout") return `Buy next open · stop under the box $${r.stop}${risk}`;
+    if (r.state === "pop") return `Buy next open · stop under the nuzzle-week low $${r.stop}${risk}`;
+    if (r.state === "nuzzle") return `Buy a pop over <b>$${r.trig}</b> · stop $${r.stop}${risk}`;
+    return `Wait for a nuzzle into the 9 ($${r.e9}) / 21 ($${r.e21})`;
+  };
+  const cols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "_o", h: "State", l: true, asc: true }, { k: null, h: "Weekly chart<small>price · 9 · 21 · 50 WEMA · box</small>" },
+    { k: "vs9", h: "vs 9 / 21 WEMA" }, { k: "pumps", h: "Pumps<small>crosses up the 50 WEMA</small>" }, { k: "below", h: "Base<small>weeks under the 50</small>" },
+    { k: "box_atr", h: "Black box<small>10-wk high / low · ATRs</small>" }, { k: "volx", h: "Volume<small>× 20-wk avg</small>" },
+    { k: "risk", h: "Plan<small>stop · risk</small>", l: true, asc: true }, { k: "rsr", h: "RS" }, { k: "off_hi52", h: "Off high<small>52-week</small>" }, { k: "dvol", h: "$ / day" }];
+  body.innerHTML = `<div class="scroll"><table class="grid sowtab"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta sowempty" style="display:none">No stocks in this state today.</p><button class="xopen sowmore" style="margin-top:6px"></button>`;
+  const tb = body.querySelector("tbody");
+  let shown = [];
+  const fill = (all) => {
+    const rows = U.more ? all : all.slice(0, SOW_TOP);
+    shown = rows;
+    body.querySelector(".sowempty").style.display = rows.length ? "none" : "";
+    const mb = body.querySelector(".sowmore");
+    mb.style.display = all.length > SOW_TOP ? "" : "none";
+    mb.textContent = U.more ? `Show the top ${SOW_TOP} only` : `Show all ${all.length}`;
+    tb.innerHTML = rows.map(r => `<tr>${nameCell(r)}
+      <td class="l"><span class="tg sow-${r.state}" title="${esc(DESC[r.state] || "")}">${esc(NAME[r.state] || r.state)}</span><small class="meta" style="display:block">${r.ago ? "last week" : X.week_done ? "this week" : "this week so far"}</small></td>
+      <td>${r.wk ? sowSpark(r) : '<span class="meta" title="Charts are drawn for the first 25 names of each state">–</span>'}</td>
+      <td class="num">${pct(r.vs9)} / ${pct(r.vs21)}<small class="meta" style="display:block">$${r.e9} / $${r.e21}</small></td>
+      <td class="num">${r.pumps ?? "–"}</td><td class="num">${r.below ?? "–"}</td>
+      <td class="num">$${r.box_hi ?? "–"} / $${r.box_lo ?? "–"}<small class="meta" style="display:block" title="Height of the last 10 weeks in weekly ATRs (weekly ATR ${r.atr ?? "–"}%)">${r.box_atr ?? "–"} ATRs tall</small></td>
+      <td class="num">${r.volx == null ? "–" : r.volx.toFixed(2) + "×"}</td>
+      <td class="l" style="min-width:170px">${plan(r)}</td>
+      <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${pct(r.off_hi52)}</td><td class="num">$${r.dvol >= 1000 ? (r.dvol / 1000).toFixed(1) + "B" : Math.round(r.dvol || 0) + "M"}</td></tr>`).join("");
+  };
+  const current = sortable(body.querySelector("table"), cols, filtered, fill, U.sort);
+  const draw = () => fill(current());
+  body.querySelector(".sowmore").addEventListener("click", () => { U.more = !U.more; draw(); });
+  const cnt = Object.fromEntries(X.states.map(s => [s.key, s.n]));
+  const nAct = ACT.reduce((a, k) => a + (cnt[k] || 0), 0);
+  fl.append(chips("State", [["act", `Actionable (${nAct})`], ...X.states.map(s => [s.key, `${s.name} (${s.n})`]), ["all", `All (${X.rows.length})`]], U, "st", () => { ss("sowState", U.st); U.more = false; draw(); }));
+  fl.append(chips("Scope", [["all", "All stocks"], ["themes", "In my themes"]], U, "scope", draw));
+  const dl = card.querySelector(".sowdl");
+  dl.addEventListener("click", () => tsDownload("strength-on-weakness", [{ name: `Strength on Weakness ${U.st === "act" ? "actionable" : U.st}`, ticks: shown.map(r => r.t) }]));
+  draw();
+  return card;
 }
 const isNum = (x) => typeof x === "number" && isFinite(x);
 function decisionCard(D) {

@@ -332,6 +332,18 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   target exit doesn't rescue trap_short (Rt −0.05R). Fib levels (0.382/0.5/0.618) inside the box held no better than neighbours (40% vs
   39%; middle 0.5 slightly better 44%). FOMC-day swing lows NOT more likely revisited/taken (68% vs 73% once within 1 ADR; per meeting
   44–100%); slightly more sweep-and-reverse (72% vs 67%). Any swing low is taken ~70% of the time once price is within 1 ADR.
+- `sow.py` **Strength on Weakness** (Oct 21, 2026; Adam's weekly position setup, charts NRIX/APPN/AMPL/MTCH; card R-2026-10-21-strength-on-weakness,
+  layer `sow`, status info) → `DATA.themes.sow`, card `sowCard` on Trade Setups (after Box trades; "Unproven" tag, never touches picks). Weekly bars from
+  daily (`weekly`, week labelled by its last session; current week counts as it stands, volume paced to 5 sessions, `week_done` via `nyse.next_session`).
+  Rules (`CFG`): $5+, $10M+/day, RS 70+; stack 9 > 21 > 50 WEMA, 21 rising 4 wks, 9 ≥ 99% of 4 wks ago; 50 WEMA ≥ 99% of 13 wks ago; base = 2+ closes
+  crossing up the 50 WEMA and 10+ closes under it in 78 wks; black box = prior 10-wk range ≤ 3 weekly ATRs, a low within 3% of the 21 WEMA, no close
+  5%+ under it; breakout = close > prior 10-wk high on 1.2× 20-wk avg volume; nuzzle = low ≤ 9 WEMA × 1.02 and close ≥ 21 WEMA × 0.98; pop = next week
+  closes over the nuzzle week's high. States: breakout / pop (this or last week) > nuzzle (buy over this week's high, stop its low) > riding > extended
+  (> 1.5 weekly ATRs over the 9); riding/nuzzle/extended need a 10-wk-high close in 26 wks. Rows carry weekly closes + EMAs (`wk`, `w9`, `w21`, `w50`)
+  for the first 25 per state; card shows the top 25 (Show all), chips by state / scope, ⬇ TradingView; header ⬇ Trade Setups adds breakout/pop/nuzzle.
+  Evidence (`backtest`, ~40 s per build): signals after 52 wks warm-up, complete weeks, next open → close 13/26 wks later vs avg liquid stock and vs
+  avg RS 70+ stock (per signal week). Oct 21: pop 26w +14.8%, +6.6% vs avg stock (t 3.3) but +1.6% vs RS 70+ (t 1.0); breakout ≈ RS 70+;
+  without the RS floor ≈ avg stock. Only ~1 year testable; needs longer history (Massive Starter) for a real test.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

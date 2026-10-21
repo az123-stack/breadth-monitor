@@ -340,6 +340,20 @@
     "R-2026-10-17-who-won-the-close"
    ],
    "notes": "scoreboard only"
+  },
+  {
+   "id": "sow",
+   "name": "Strength on Weakness (weekly position setup)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "breadth/sow.py → DATA.themes.sow, Trade Setups tab sowCard",
+   "what": "weekly stage-1 base + 9/21 WEMA re-anchor; breakout / nuzzle / pop states for multi-month holds",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-21-strength-on-weakness"
+   ],
+   "notes": "beats the average stock but not other RS 70+ stocks yet; only ~1 year testable"
   }
  ]
 }

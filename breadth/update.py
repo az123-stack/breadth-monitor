@@ -225,6 +225,11 @@ def recompute_and_publish(bars, splits, universe, state):
             boxes.attach(theme_data)          # long retest joins the Trade Setups so the playbook ranks it
         except Exception as e:  # optional panel; never block the page
             log.exception("box scan failed: %s", e)
+        try:   # Strength on Weakness: weekly position trades out of a stage-1 base (Adam, Oct 21 2026; info only)
+            from . import sow
+            theme_data["sow"] = sow.build(adjusted, universe, theme_data.get("stocks"), store.load_names())
+        except Exception as e:  # optional panel; never block the page
+            log.exception("strength-on-weakness scan failed: %s", e)
         try:
             from . import playbook
             theme_data["playbook"] = playbook.build(theme_data, history)

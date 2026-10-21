@@ -1125,6 +1125,48 @@ def test_finra_short_share():
     assert out["tier"] == "high" and out["dev"] > 4 and out["s5"] == 50.0, out
 
 
+def test_strength_on_weakness():
+    """Weekly screen: a stock that based around its 50-week EMA (2+ pumps), thrust, rested on the 9/21 and
+    broke the box on volume fires a breakout; a nuzzle into the 9 then a close over that week's high is a pop;
+    a stock that never based (straight uptrend) never qualifies; weekly bars come out of daily bars correctly."""
+    from breadth import sow
+    n = 110
+    idx = pd.date_range("2024-10-25", periods=n, freq="W-FRI")
+    base = list(20 + 2.5 * np.sin(np.arange(84) / 2.0))                      # ~60 weeks around 20: crosses the 50 WEMA
+    thrust = list(np.linspace(21, 27, 8))
+    rest = [26.6, 26.9, 26.5, 26.8, 27.0, 26.7, 26.9, 27.1, 26.8, 27.0, 26.7, 26.9, 27.0, 26.8]      # black box right above the rising EMAs
+    a = np.array(base + thrust + rest, float)
+    a = np.r_[a, np.linspace(a[-1], 27.2, n - len(a) - 1), 29.5]            # last week: break out of the box
+    trend = np.linspace(10, 40, n)                                           # never under its 50 WEMA
+    c = pd.DataFrame({"AAA": a, "UP": trend}, index=idx)
+    h, l = c * 1.01, c * 0.99
+    v = pd.DataFrame(1e6, index=idx, columns=c.columns); v.iloc[-1] = 3e6
+    W = {"o": c, "h": h, "l": l, "c": c, "v": v}
+    dvol = pd.DataFrame(50e6, index=idx, columns=c.columns)
+    rs = pd.DataFrame(90.0, index=idx, columns=c.columns)
+    F = sow.features(W, dvol, None, rs)
+    assert bool(F["base"]["AAA"].iloc[-1]) and F["pumps"]["AAA"].iloc[-1] >= 2, (F["pumps"]["AAA"].iloc[-1], F["below"]["AAA"].iloc[-1])
+    assert bool(F["breakout"]["AAA"].iloc[-1]), {k: bool(F[k]["AAA"].iloc[-1]) for k in ("stack", "flat50", "anchor", "tight", "brk", "volx")}
+    assert not F["qual"]["UP"].any(), "a stock that never based is not this setup"
+    # nuzzle week then a pop over its high
+    a2 = a.copy(); a2[-2] = 26.6; a2[-1] = 28.0
+    c2 = pd.DataFrame({"AAA": a2}, index=idx)
+    l2 = c2 * 0.99; l2.iloc[-2] = 26.0
+    F2 = sow.features({"o": c2, "h": c2 * 1.01, "l": l2, "c": c2, "v": v[["AAA"]]}, dvol[["AAA"]], None, rs[["AAA"]])
+    assert bool(F2["nuz"]["AAA"].iloc[-2]) and bool(F2["pop"]["AAA"].iloc[-1]), (F2["e9"]["AAA"].iloc[-2], F2["e21"]["AAA"].iloc[-2])
+    # the RS floor gates it
+    F3 = sow.features(W, dvol, None, rs * 0 + 50)
+    assert not F3["breakout"]["AAA"].any()
+    # daily -> weekly: Mon..Wed partial week keeps its own row, labelled by its last session
+    days = pd.bdate_range("2026-10-05", "2026-10-14")
+    dc = pd.DataFrame({"X": np.arange(len(days), dtype=float) + 1}, index=days)
+    wd = {"o": dc, "h": dc + 0.5, "l": dc - 0.5, "c": dc, "v": dc * 0 + 10}
+    Wk, nd = sow.weekly(wd, ["X"])
+    assert list(Wk["c"].index.strftime("%Y-%m-%d")) == ["2026-10-09", "2026-10-14"] and list(nd) == [5, 3]
+    assert Wk["h"]["X"].iloc[0] == 5.5 and Wk["l"]["X"].iloc[1] == 5.5 and Wk["v"]["X"].iloc[0] == 50
+    assert not sow.complete_weeks(nd, days[-1])[-1]
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
