@@ -38,3 +38,16 @@ bases (Adam's 2021–2026 examples) can't be seen in 2 years of data — the bas
 **How it could be used.** Built Oct 21 as an information-only card on Trade Setups ("Strength on Weakness", unproven tag;
 never touches the Top 2 picks). Re-test when more history exists (Massive Starter 5-year backfill would make this a real
 test), and try: group strength / sub-theme leading as confluence, breadth regime at the pop, and a nuzzle depth filter.
+
+**Prime positioned (added Oct 21, Adam's follow-up with PEB / ABCL / CNK charts).** Adam wants the names while they're still
+IN the box, before the stage-2 leg: after 2+ pumps through the 50 WEMA, now holding above it. Rule (`features` → `prime`):
+liquid, RS line (price ÷ SPY) above its 21-week EMA and above 13 weeks ago (his box names had RS Ratings 26–67 in the box, so no
+RS 70 floor), 50 WEMA flat/rising, base (2+ pumps, 10+ weeks under in 78), 3–30 consecutive weekly closes over the 50 WEMA,
+9 > 21 with the 21 rising, close within 2.5 weekly ATRs of the 50. Matches PEB Dec 2025–May 2026, ABCL May–Aug 2026, MTCH
+May–Oct 2026. Backtest (first prime week, next open; vs any liquid stock over its 50 WEMA with an improving RS line):
+13w +3.0% (+0.1% vs avg stock; −0.1% vs similar, t −0.1), 26w +12.3% (+2.5% vs avg, t 1.7; −1.2% vs similar, t −0.85, halves
+−4.2/+1.6). Volume rising (10-wk avg ≥ 1.1× the prior 26) did NOT help (26w −1.3% vs similar vs −0.2% without). RS line at a
+1-yr high +3.2% vs similar (n 48–64, not significant). Verdict: the box stage is found reliably but has no tested edge over any
+stock holding its 50 WEMA yet. Pops (same build, RS ranked among $10M+ stocks): 13w +2.7% vs RS 70+ (t 2.0, halves +0.6/+4.9),
+26w +2.8% (t 2.0, halves +2.7/+2.9) — closest to passing, but overlapping windows over ~1 year; still info only.
+Oct 20, 2026: 172 prime (87 new in 4 weeks), e.g. BBY, CVLT, KDP, NWSA (RS line at 1-yr high), ABSI, PENG, PANW, FROG.

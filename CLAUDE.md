@@ -344,6 +344,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Evidence (`backtest`, ~40 s per build): signals after 52 wks warm-up, complete weeks, next open → close 13/26 wks later vs avg liquid stock and vs
   avg RS 70+ stock (per signal week). Oct 21: pop 26w +14.8%, +6.6% vs avg stock (t 3.3) but +1.6% vs RS 70+ (t 1.0); breakout ≈ RS 70+;
   without the RS floor ≈ avg stock. Only ~1 year testable; needs longer history (Massive Starter) for a real test.
+  ⭐ PRIME POSITIONED (Oct 21, Adam: "too late in the stage-2 break, show them in the box"; PEB/ABCL boxes): `prime` = liquid, RS line
+  (price ÷ SPY, `spy` arg) above its 21-wk EMA and 13 wks ago (`rs_up`; no RS-rating floor), flat50, base, 3–30 consecutive closes over the 50 WEMA
+  (`run`), 9 > 21 and 21 rising, close ≤ 50 WEMA × (1 + 2.5 weekly ATR); `vr` volume trend (10 vs prior 26 wks), `rsl_hi` RS line within 2% of its
+  1-yr high. Rows carry `prime`, `prime_new` (entered in the last 4 wks), `run50`, `ext50`, `vr`, `rsl_hi`; prime rows with no later state get state
+  "box" (In the box). Page: "⭐ Prime positioned" chip is the default (localStorage `sowState2`), sorted RS-line-high first then RS; ⭐ Prime / RS
+  line high tags. Evidence `prime`, `prime_vol`, `prime_novol`, `prime_rshi` vs `vs_above` (any liquid stock over its 50 WEMA with rs_up):
+  26w +12.3%, +2.5% vs avg stock, −1.2% vs similar; volume rising didn't help. Pops 13/26w +2.7/+2.8% vs RS 70+ (t 2.0, both halves) — info only.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

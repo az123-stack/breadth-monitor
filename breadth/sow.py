@@ -37,12 +37,16 @@ import pandas as pd
 CFG = {"min_price": 5.0, "min_dvol": 10e6, "e_fast": 9, "e_mid": 21, "e_slow": 50, "curl": 4, "flat_wk": 13, "flat": 0.99,
        "pump_wk": 78, "pumps": 2, "below_wk": 10, "min_rs": 70, "anchor_wk": 10, "anchor_touch": 0.03, "anchor_hold": 0.95,
        "box_wk": 10, "tight_atr": 3.0, "atr_wk": 10, "vol_wk": 20, "vol_x": 1.2, "nuzzle": 0.02, "hold21": 0.98,
-       "thrust_wk": 26, "ext_atr": 1.5, "warm": 52, "holds": (13, 26), "spark": 78, "spark_rows": 25}
+       "thrust_wk": 26, "ext_atr": 1.5, "prime_hold": 3, "prime_run": 30, "prime_ext": 2.5, "vr_wk": 10, "vr_base": 26, "vr_up": 1.1,
+       "warm": 52, "holds": (13, 26), "spark": 78, "spark_rows": 25}
 STATES = [("breakout", "Breakout", "Closed above the black box (prior 10-week high) on 1.2× normal volume, stacked 9 > 21 > 50."),
           ("pop", "Pop", "Nuzzled into the 9/21 WEMA last week and popped back over that week's high: Adam's entry."),
           ("nuzzle", "Nuzzling (buy zone)", "Pulled into the 9 WEMA this week, holding the 21. Buy a pop over this week's high; stop under this week's low."),
           ("riding", "Riding the 9/21", "Stacked and rising, close to the EMAs. Wait for it to nuzzle in."),
-          ("extended", "Extended", "More than 1.5 weekly ATRs above the 9 WEMA. Don't chase; wait for the nuzzle.")]
+          ("extended", "Extended", "More than 1.5 weekly ATRs above the 9 WEMA. Don't chase; wait for the nuzzle."),
+          ("box", "In the box", "Prime positioned and not in a later state yet: holding over the 50 WEMA after the pumps, 9 curling over a rising 21.")]
+PRIME = ("Prime positioned", "Still in the box: after 2+ pumps through the 50-week EMA it has held above it for 3-30 weeks, the 9 has "
+         "curled over a rising 21, the RS line is improving, and price is within 2.5 weekly ATRs of the 50 (before the stage-2 leg).")
 
 
 def _r(x, n=2):
@@ -75,7 +79,7 @@ def complete_weeks(days_per_week, last_date):
     return done
 
 
-def features(W, dvol, nday=None, rs=None):
+def features(W, dvol, nday=None, rs=None, spy=None):
     """Every rule as a weeks x stocks boolean / float frame. `nday` = sessions in each week (volume pace)."""
     P = CFG
     c, h, l, v = W["c"], W["h"], W["l"], W["v"]
@@ -105,10 +109,26 @@ def features(W, dvol, nday=None, rs=None):
     nuz = (l <= e9 * (1 + P["nuzzle"])) & (c >= e21 * P["hold21"])
     thrust = brk.astype(float).rolling(P["thrust_wk"], min_periods=1).max() > 0
     sig_brk = qual & anchor & tight & brk & volx
+    # PRIME POSITIONED (Adam, Oct 21): still in the box. After 2+ pumps through the 50 WEMA it now HOLDS above it
+    # (3+ weekly closes in a row, not 30+ yet), the 9 has curled over a rising 21, and price is still within
+    # 2.5 weekly ATRs of the 50 (before the stage-2 leg). Volume rising = last 10 weeks vs the 26 before.
+    ab = (c > e50).astype(int)
+    cs = ab.cumsum()
+    run = cs - cs.where(ab == 0).ffill().fillna(0)
+    vr = v.rolling(P["vr_wk"], min_periods=6).mean() / v.shift(P["vr_wk"]).rolling(P["vr_base"], min_periods=13).mean()
+    if spy is not None:                                   # RS line (price / SPY) improving: above its 21-week EMA and 13 weeks ago
+        rsl = c.div(spy.reindex(c.index), axis=0)
+        rs_up = (rsl > rsl.ewm(span=P["e_mid"], adjust=False, min_periods=1).mean()) & (rsl > rsl.shift(P["flat_wk"]))
+        rsl_hi = rsl >= rsl.rolling(52, min_periods=26).max() * 0.98   # RS line within 2% of its 1-year high
+    else:
+        rs_up = rsl_hi = pd.DataFrame(True, index=c.index, columns=c.columns)
+    prime = liq & rs_up & flat50 & base & (run >= P["prime_hold"]) & (run <= P["prime_run"]) & \
+        (c <= e50 * (1 + P["prime_ext"] * atr)) & (e9 > e21) & (e21 > e21.shift(P["curl"]))
+    prime_new = prime & ~(prime.shift(1, fill_value=False) | prime.shift(2, fill_value=False) | prime.shift(3, fill_value=False) | prime.shift(4, fill_value=False))
     sig_pop = (qual & thrust & nuz).shift(1, fill_value=False) & (c > h.shift()) & qual
     return {"e9": e9, "e21": e21, "e50": e50, "atr": atr, "v20": v20, "vpace": vpace, "hi10": hi10, "lo10": lo10, "pumps": pumps,
             "below": below, "liq": liq, "strong": strong, "stack": stack, "flat50": flat50, "base": base, "anchor": anchor, "tight": tight, "brk": brk,
-            "volx": volx, "qual": qual, "nuz": nuz, "thrust": thrust, "breakout": sig_brk, "pop": sig_pop}
+            "volx": volx, "qual": qual, "run": run, "vr": vr, "prime": prime, "prime_new": prime_new, "rs_up": rs_up, "rsl_hi": rsl_hi, "nuz": nuz, "thrust": thrust, "breakout": sig_brk, "pop": sig_pop}
 
 
 def _state(F, j, wi):
@@ -144,11 +164,14 @@ def build(adjusted, universe, stocks=None, names=None, evidence=True):
     W, nday = weekly(w, cols)
     done = complete_weeks(nday, w["c"].index[-1])
     raw = strength.rs_raw(w["c"][cols])
-    liqd = (w["c"][cols] >= 5) & (dvol >= 20e6)
+    liqd = (w["c"][cols] >= CFG["min_price"]) & (dvol >= CFG["min_dvol"])   # rank among the same liquid stocks as the screen
     rsd = (raw.where(liqd).rank(axis=1, pct=True) * 99).clip(1, 99)
     rs_w = rsd.reindex(W["c"].index)                      # RS Rating at each week's last session
     rs = rsd.iloc[-1]
-    F = features(W, dvol, nday, rs_w)
+    spy_w = w["c"][config.BENCHMARK].groupby(w["c"].index.to_period("W-FRI")).last() if config.BENCHMARK in w["c"] else None
+    if spy_w is not None:
+        spy_w.index = W["c"].index
+    F = features(W, dvol, nday, rs_w, spy_w)
     F["_c"] = W["c"]
     wi = len(W["c"].index) - 1
     rows = []
@@ -156,8 +179,11 @@ def build(adjusted, universe, stocks=None, names=None, evidence=True):
         if not bool(F["liq"].iat[wi, j]):
             continue
         st, ago = _state(F, j, wi)
-        if not st:
+        prime = bool(F["prime"].iat[wi, j])
+        if not st and not prime:
             continue
+        if not st:
+            st, ago = "box", 0
         k = wi - (ago or 0)
         c, h, l = (W[x].iat[wi, j] for x in ("c", "h", "l"))
         e9, e21, e50, atr = (F[x].iat[wi, j] for x in ("e9", "e21", "e50", "atr"))
@@ -185,20 +211,27 @@ def build(adjusted, universe, stocks=None, names=None, evidence=True):
             "lo52": _r(lo52), "hi52": _r(hi52), "off_hi52": _r(c / hi52 - 1, 4),
             "rsr": s.get("rsr") if s.get("rsr") is not None else _r(rs.get(t), 0),
             "dvol": _r(dvol[t].iloc[-1] / 1e6, 0), "theme": (s.get("themes") or [None])[0], "sub": s.get("sub"),
+            "prime": prime, "prime_new": prime and any(bool(F["prime_new"].iat[wi - a, j]) for a in range(0, 4) if wi - a >= 0),
+            "prime_wks": int(F["prime"].iloc[:wi + 1, j][::-1].cumprod().sum()) if prime else 0,
+            "run50": int(F["run"].iat[wi, j]), "vr": _r(F["vr"].iat[wi, j], 2), "rsl_hi": bool(F["rsl_hi"].iat[wi, j]),
+            "rs_up": bool(F["rs_up"].iat[wi, j]), "ext50": _r((c / e50 - 1) / atr, 1) if np.isfinite(atr) and atr > 0 else None,
             "wk": [_r(x) for x in W["c"].iloc[n0:, j]], "w9": [_r(x) for x in F["e9"].iloc[n0:, j]],
             "w21": [_r(x) for x in F["e21"].iloc[n0:, j]], "w50": [_r(x) for x in F["e50"].iloc[n0:, j]],
         })
     order = {k: i for i, (k, _, _) in enumerate(STATES)}
     rows.sort(key=lambda r: (order[r["state"]], r["ago"] or 0, -(r["rsr"] or 0)))
     seen = {}
-    for r in rows:                                        # weekly mini chart only for the first rows of each state (page size)
+    pr = sorted((r for r in rows if r["prime"]), key=lambda r: (not r["rsl_hi"], -(r["rsr"] or 0)))   # same order as the page
+    keep = {r["t"] for r in pr[:CFG["spark_rows"]]}
+    for r in rows:                                        # weekly mini chart only for the first rows of each state + top prime (page size)
         seen[r["state"]] = seen.get(r["state"], 0) + 1
-        if seen[r["state"]] > CFG["spark_rows"]:
+        if seen[r["state"]] > CFG["spark_rows"] and r["t"] not in keep:
             for k in ("wk", "w9", "w21", "w50"):
                 r.pop(k)
     out = {"date": w["c"].index[-1].strftime("%Y-%m-%d"), "week": W["c"].index[-1].strftime("%Y-%m-%d"),
            "week_done": bool(done[-1]), "week_days": int(nday.iloc[-1]), "rows": rows,
-           "states": [{"key": k, "name": n, "desc": d, "n": sum(r["state"] == k for r in rows)} for k, n, d in STATES], "cfg": CFG}
+           "states": [{"key": k, "name": n, "desc": d, "n": sum(r["state"] == k for r in rows)} for k, n, d in STATES], "cfg": CFG,
+           "prime": {"name": PRIME[0], "desc": PRIME[1], "n": sum(r["prime"] for r in rows), "new": sum(r["prime_new"] for r in rows)}}
     if evidence:
         try:
             ev = backtest(W, F, w, cols, done, config.BENCHMARK)
@@ -241,11 +274,18 @@ def backtest(W, F, w, cols, done, bench="SPY"):
         spy_wc = w["c"][bench].groupby(days.to_period("W-FRI")).last().to_numpy()   # same week order as W
     liq = F["liq"].to_numpy()
     strong = (F["liq"] & F["strong"]).to_numpy()
+    above = (F["liq"] & (W["c"] > F["e50"]) & F["rs_up"]).to_numpy()     # any stock over its 50 WEMA with an improving RS line
     nW = len(wd)
     ent_i = days.searchsorted(wd, side="right")          # next session after each week's close
     out = {"holds": list(P["holds"]), "warm": P["warm"]}
-    for key in ("breakout", "pop"):
-        S = F[key].to_numpy().copy()
+    vr = F["vr"].to_numpy()
+    rshi = F["rsl_hi"].to_numpy()
+    pn = F["prime_new"].to_numpy()
+    sigs = {"breakout": (F["breakout"].to_numpy(), strong, "vs_strong"), "pop": (F["pop"].to_numpy(), strong, "vs_strong"),
+            "prime": (pn, above, "vs_above"), "prime_vol": (pn & (vr >= P["vr_up"]), above, "vs_above"),
+            "prime_novol": (pn & ~(vr >= P["vr_up"]), above, "vs_above"), "prime_rshi": (pn & rshi, above, "vs_above")}
+    for key, (S0, ref, refname) in sigs.items():
+        S = S0.copy()
         S[:P["warm"]] = False
         S[~done] = False
         res = {}
@@ -263,7 +303,7 @@ def backtest(W, F, w, cols, done, bench="SPY"):
                 if m.sum() < 50:
                     continue
                 base = float(np.mean(np.clip(fwd[m], -0.95, 5)))
-                ms = strong[i] & np.isfinite(fwd)
+                ms = ref[i] & np.isfinite(fwd)
                 base_s = float(np.mean(np.clip(fwd[ms], -0.95, 5))) if ms.sum() >= 20 else np.nan
                 s_ret = (spy_wc[i + n] / spy_o[ent_i[i]] - 1) if spy_o is not None and spy_wc is not None else np.nan
                 for j in js:
@@ -272,6 +312,6 @@ def backtest(W, F, w, cols, done, bench="SPY"):
                         ex.append(r - base); dt.append(wd[i]); raw.append(r); sp.append(r - s_ret); exs.append(r - base_s)
             res[f"w{n}"] = _stats(ex, dt, raw, sp)
             ok = np.isfinite(exs)
-            res[f"w{n}"]["vs_strong"] = _stats(list(np.asarray(exs)[ok]), list(np.asarray(dt, dtype=object)[ok]))
+            res[f"w{n}"][refname] = _stats(list(np.asarray(exs)[ok]), list(np.asarray(dt, dtype=object)[ok]))
         out[key] = res
     return out

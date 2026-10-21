@@ -1165,6 +1165,19 @@ def test_strength_on_weakness():
     assert list(Wk["c"].index.strftime("%Y-%m-%d")) == ["2026-10-09", "2026-10-14"] and list(nd) == [5, 3]
     assert Wk["h"]["X"].iloc[0] == 5.5 and Wk["l"]["X"].iloc[1] == 5.5 and Wk["v"]["X"].iloc[0] == 50
     assert not sow.complete_weeks(nd, days[-1])[-1]
+    # PRIME POSITIONED: after the pumps it holds over the 50 WEMA, 9 over a rising 21, still close to the 50
+    b = list(20 + 2.5 * np.sin(np.arange(98) / 2.0))
+    hold = list(np.linspace(21.0, 22.6, 12))
+    p = np.array(b + hold, float)
+    cp = pd.DataFrame({"P": p, "X": p.copy()}, index=idx)
+    cp.iloc[-3:, 1] = [30.0, 33.0, 36.0]                                     # same base, but the leg already ran
+    spy = pd.Series(100.0, index=idx)
+    Wp = {"o": cp, "h": cp * 1.02, "l": cp * 0.98, "c": cp, "v": pd.DataFrame(1e6, index=idx, columns=cp.columns)}
+    Fp = sow.features(Wp, pd.DataFrame(50e6, index=idx, columns=cp.columns), None, None, spy)
+    assert bool(Fp["prime"]["P"].iloc[-1]), {k: Fp[k]["P"].iloc[-1] for k in ("run", "rs_up", "flat50", "base", "e9", "e21", "e50", "atr")}
+    assert not bool(Fp["prime"]["X"].iloc[-1]), "too far above the 50 WEMA: the stage-2 leg already ran"
+    Fn = sow.features(Wp, pd.DataFrame(50e6, index=idx, columns=cp.columns), None, None, spy * np.r_[np.ones(n - 13), np.linspace(1, 1.6, 13)])
+    assert not bool(Fn["prime"]["P"].iloc[-1]), "RS line falling (SPY doubling) is not prime"
 
 
 if __name__ == "__main__":
