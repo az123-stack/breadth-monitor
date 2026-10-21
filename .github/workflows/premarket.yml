@@ -1,13 +1,15 @@
 name: Pre-market quotes
 
 # Fetches Yahoo pre-market prices every 10 minutes until 9:31 AM ET and commits docs/premarket.json
-# (the dashboard's Pre-market tab reads it). Cron is UTC: 09:52 = 5:52 AM EDT (summer), 10:52 = 5:52 AM EST
-# (winter); the other one queues behind and exits at the open. A Claude scheduled task also dispatches it
-# at 5:48 AM ET, because GitHub's scheduler skipped runs on this repo in its first days.
+# (the dashboard's Pre-market tab reads it). GitHub fires scheduled runs on this repo hours late
+# (Oct 2026: the 09:52/10:52 UTC crons started at 14:31/15:24 UTC, after the open), so there is one cron
+# every hour 07:07–13:07 UTC: whichever starts first before the open does the work; later ones queue
+# (concurrency) and exit at the open. A run that starts before 4:00 AM ET waits until then, and each run
+# stops after 5 h so it never hits GitHub's 6-hour job limit (the next queued run carries on).
+# A Claude scheduled task also dispatches it at 5:48 AM ET as a backup.
 on:
   schedule:
-    - cron: "52 9 * * 1-5"
-    - cron: "52 10 * * 1-5"
+    - cron: "7 7-13 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -20,7 +22,7 @@ concurrency:
 jobs:
   quotes:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -33,6 +35,11 @@ jobs:
           git config user.name "breadth-bot"
           git config user.email "breadth-bot@users.noreply.github.com"
           end=$(TZ=America/New_York date -d "09:31" +%s)
+          cap=$(( $(date +%s) + 300*60 ))
+          [ "$cap" -lt "$end" ] && end=$cap
+          start=$(TZ=America/New_York date -d "04:00" +%s)
+          now=$(date +%s)
+          if [ "$now" -lt "$start" ] && [ "$start" -lt "$end" ]; then sleep $(( start - now )); fi
           while [ "$(date +%s)" -lt "$end" ]; do
             python -m breadth.premarket || echo "fetch failed, retrying next round"
             git add docs/premarket.json

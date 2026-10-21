@@ -168,7 +168,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   the page also cross-checks against Google (pre-open Google price = last close) and prefers it when they differ > 0.3%.
   User-Agent must be the plain "Mozilla/5.0 (breadth-monitor)" — a browser-looking UA gets 429
   on every call from GitHub runners. 4-min budget, `diag` in the JSON records HTTP statuses. Workflow loops every 10 min until 9:31
-  ET, committing each snapshot (crons 09:52 + 10:52 UTC Mon–Fri, plus the 5:48 AM Claude task dispatches it). Page reads
+  ET, committing each snapshot (hourly crons 07:07–13:07 UTC Mon–Fri because GitHub fires them hours late — Oct 2026 they started after the open; waits until 4 AM ET, 5 h cap per run; the 5:48 AM Claude task dispatches it as backup). Page reads
   `premarket.json` from Pages every 2 min; `pmRows()` turns it into live-sheet-shaped rows (market cap = Google shares × pre price,
   ^SPX/^NDX = ES/NQ futures) and sets `ROWS_OVERRIDE` so the shared cards (`indexMoversCard`, `themeHeatCard`, `yourTradesCard`, also
   used by Intraday) read pre-market prices through `liveRow`. Cards: morning read (plain-English bullets), futures/macro/ETFs/sectors,
