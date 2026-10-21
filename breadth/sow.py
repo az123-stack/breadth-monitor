@@ -37,7 +37,7 @@ import pandas as pd
 CFG = {"min_price": 5.0, "min_dvol": 10e6, "e_fast": 9, "e_mid": 21, "e_slow": 50, "curl": 4, "flat_wk": 13, "flat": 0.99,
        "pump_wk": 78, "pumps": 2, "below_wk": 10, "min_rs": 70, "anchor_wk": 10, "anchor_touch": 0.03, "anchor_hold": 0.95,
        "box_wk": 10, "tight_atr": 3.0, "atr_wk": 10, "vol_wk": 20, "vol_x": 1.2, "nuzzle": 0.02, "hold21": 0.98,
-       "thrust_wk": 26, "ext_atr": 1.5, "prime_hold": 3, "prime_run": 30, "prime_ext": 2.5, "vr_wk": 10, "vr_base": 26, "vr_up": 1.1,
+       "thrust_wk": 26, "ext_atr": 1.5, "prime_hold": 3, "prime_run": 30, "prime_ext": 2.5, "prime_below": 30, "prime_slope": 0.20, "nuz_dd_atr": 2.0, "nuz_dd": 0.25, "vr_wk": 10, "vr_base": 26, "vr_up": 1.1,
        "warm": 52, "holds": (13, 26), "spark": 78, "spark_rows": 25}
 STATES = [("breakout", "Breakout", "Closed above the black box (prior 10-week high) on 1.2× normal volume, stacked 9 > 21 > 50."),
           ("pop", "Pop", "Nuzzled into the 9/21 WEMA last week and popped back over that week's high: Adam's entry."),
@@ -45,8 +45,9 @@ STATES = [("breakout", "Breakout", "Closed above the black box (prior 10-week hi
           ("riding", "Riding the 9/21", "Stacked and rising, close to the EMAs. Wait for it to nuzzle in."),
           ("extended", "Extended", "More than 1.5 weekly ATRs above the 9 WEMA. Don't chase; wait for the nuzzle."),
           ("box", "In the box", "Prime positioned and not in a later state yet: holding over the 50 WEMA after the pumps, 9 curling over a rising 21.")]
-PRIME = ("Prime positioned", "Still in the box: after 2+ pumps through the 50-week EMA it has held above it for 3-30 weeks, the 9 has "
-         "curled over a rising 21, the RS line is improving, and price is within 2.5 weekly ATRs of the 50 (before the stage-2 leg).")
+PRIME = ("Prime positioned", "Still in the box: a real base (2+ pumps through the 50-week EMA and 30+ weekly closes under it in "
+         "78 weeks), now holding above it for 3-30 weeks with the 50 WEMA still flat (up 20% or less in 26 weeks, so the stage-2 leg "
+         "hasn't run), the 9 curled over a rising 21, an improving RS line, and price within 2.5 weekly ATRs of the 50.")
 
 
 def _r(x, n=2):
@@ -106,7 +107,8 @@ def features(W, dvol, nday=None, rs=None, spy=None):
     volx = vpace >= P["vol_x"] * v20
     strong = (rs >= P["min_rs"]) if rs is not None else pd.DataFrame(True, index=c.index, columns=c.columns)
     qual = liq & stack & flat50 & base & strong
-    nuz = (l <= e9 * (1 + P["nuzzle"])) & (c >= e21 * P["hold21"])
+    dd10 = h.rolling(P["box_wk"], min_periods=5).max() / l - 1   # drop from the 10-week high to this week's low
+    nuz = (l <= e9 * (1 + P["nuzzle"])) & (c >= e21 * P["hold21"]) & (dd10 <= np.minimum(P["nuz_dd_atr"] * atr, P["nuz_dd"]))
     thrust = brk.astype(float).rolling(P["thrust_wk"], min_periods=1).max() > 0
     sig_brk = qual & anchor & tight & brk & volx
     # PRIME POSITIONED (Adam, Oct 21): still in the box. After 2+ pumps through the 50 WEMA it now HOLDS above it
@@ -122,13 +124,14 @@ def features(W, dvol, nday=None, rs=None, spy=None):
         rsl_hi = rsl >= rsl.rolling(52, min_periods=26).max() * 0.98   # RS line within 2% of its 1-year high
     else:
         rs_up = rsl_hi = pd.DataFrame(True, index=c.index, columns=c.columns)
-    prime = liq & rs_up & flat50 & base & (run >= P["prime_hold"]) & (run <= P["prime_run"]) & \
+    slope26 = e50 / e50.shift(26) - 1                      # a 50 WEMA already climbing hard = the stage-2 leg already ran (FROG, PANW, PENG)
+    prime = liq & rs_up & flat50 & base & (below >= P["prime_below"]) & (slope26 <= P["prime_slope"]) & (run >= P["prime_hold"]) & (run <= P["prime_run"]) & \
         (c <= e50 * (1 + P["prime_ext"] * atr)) & (e9 > e21) & (e21 > e21.shift(P["curl"]))
     prime_new = prime & ~(prime.shift(1, fill_value=False) | prime.shift(2, fill_value=False) | prime.shift(3, fill_value=False) | prime.shift(4, fill_value=False))
     sig_pop = (qual & thrust & nuz).shift(1, fill_value=False) & (c > h.shift()) & qual
     return {"e9": e9, "e21": e21, "e50": e50, "atr": atr, "v20": v20, "vpace": vpace, "hi10": hi10, "lo10": lo10, "pumps": pumps,
             "below": below, "liq": liq, "strong": strong, "stack": stack, "flat50": flat50, "base": base, "anchor": anchor, "tight": tight, "brk": brk,
-            "volx": volx, "qual": qual, "run": run, "vr": vr, "prime": prime, "prime_new": prime_new, "rs_up": rs_up, "rsl_hi": rsl_hi, "nuz": nuz, "thrust": thrust, "breakout": sig_brk, "pop": sig_pop}
+            "volx": volx, "qual": qual, "run": run, "vr": vr, "prime": prime, "prime_new": prime_new, "rs_up": rs_up, "rsl_hi": rsl_hi, "slope26": slope26, "dd10": dd10, "nuz": nuz, "thrust": thrust, "breakout": sig_brk, "pop": sig_pop}
 
 
 def _state(F, j, wi):

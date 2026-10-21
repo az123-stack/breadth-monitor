@@ -350,7 +350,9 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   1-yr high. Rows carry `prime`, `prime_new` (entered in the last 4 wks), `run50`, `ext50`, `vr`, `rsl_hi`; prime rows with no later state get state
   "box" (In the box). Page: "⭐ Prime positioned" chip is the default (localStorage `sowState2`), sorted RS-line-high first then RS; ⭐ Prime / RS
   line high tags. Evidence `prime`, `prime_vol`, `prime_novol`, `prime_rshi` vs `vs_above` (any liquid stock over its 50 WEMA with rs_up):
-  26w +12.3%, +2.5% vs avg stock, −1.2% vs similar; volume rising didn't help. Pops 13/26w +2.7/+2.8% vs RS 70+ (t 2.0, both halves) — info only.
+  Oct 21 evening (Adam: BBY/CVLT/KDP/NWSA right; FROG late, PANW base too short, PENG crash not a nuzzle): prime also needs `slope26`
+  (50 WEMA vs 26 wks ago) ≤ +20% (`prime_slope`) and 30+ closes under the 50 in 78 wks (`prime_below`); nuzzle needs `dd10` (10-wk high →
+  week's low) ≤ min(2 weekly ATRs, 25%). Prime 172 → 110. Evidence after: prime 26w +11.5%, −2.4% vs similar (t −1.5); pop vs RS 70+ +1.2/+1.9%.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

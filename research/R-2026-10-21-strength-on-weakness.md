@@ -51,3 +51,11 @@ May–Oct 2026. Backtest (first prime week, next open; vs any liquid stock over 
 stock holding its 50 WEMA yet. Pops (same build, RS ranked among $10M+ stocks): 13w +2.7% vs RS 70+ (t 2.0, halves +0.6/+4.9),
 26w +2.8% (t 2.0, halves +2.7/+2.9) — closest to passing, but overlapping windows over ~1 year; still info only.
 Oct 20, 2026: 172 prime (87 new in 4 weeks), e.g. BBY, CVLT, KDP, NWSA (RS line at 1-yr high), ABSI, PENG, PANW, FROG.
+
+**Prime tightened (Oct 21 evening, Adam: BBY/CVLT/KDP/NWSA good; FROG late, PANW base too short, PENG not a nuzzle).** Separators
+measured Oct 20: 50 WEMA 26-week rise — good +5% to +12% (and his box examples PEB +1–4%, MTCH +1%, AMPL −4%, APPN −7%) vs
+FROG +55%, PANW +56%, PENG +114%; weekly closes under the 50 in 78 weeks — good 33–58 vs FROG 10, PENG 17, PANW 26. New rules:
+prime needs slope26 ≤ +20% and 30+ closes under the 50 in 78 weeks; nuzzle needs an orderly dip (10-week high → week's low ≤
+min(2 weekly ATRs, 25%); PENG dropped 50%). Result: prime 172 → 110, BBY/CVLT/KDP/NWSA on top, FROG/PANW/PENG out, PEB/MTCH/
+AMPL/APPN box weeks still flagged. Backtest after the change: prime 26w +11.5% (+1.2% vs avg stock, −2.4% vs similar, t −1.5);
+13w +3.2% (+0.4% vs similar). Pop (stricter nuzzle) 13w +1.2% / 26w +1.9% vs RS 70+ (t 1.2) — weaker than before. Still info only.

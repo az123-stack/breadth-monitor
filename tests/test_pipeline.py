@@ -1152,7 +1152,8 @@ def test_strength_on_weakness():
     a2 = a.copy(); a2[-2] = 26.6; a2[-1] = 28.0
     c2 = pd.DataFrame({"AAA": a2}, index=idx)
     l2 = c2 * 0.99; l2.iloc[-2] = 26.0
-    F2 = sow.features({"o": c2, "h": c2 * 1.01, "l": l2, "c": c2, "v": v[["AAA"]]}, dvol[["AAA"]], None, rs[["AAA"]])
+    l2 = c2 * 0.98; l2.iloc[-2] = 26.0                                       # a shallow, orderly dip into the 9 (not a crash)
+    F2 = sow.features({"o": c2, "h": c2 * 1.02, "l": l2, "c": c2, "v": v[["AAA"]]}, dvol[["AAA"]], None, rs[["AAA"]])
     assert bool(F2["nuz"]["AAA"].iloc[-2]) and bool(F2["pop"]["AAA"].iloc[-1]), (F2["e9"]["AAA"].iloc[-2], F2["e21"]["AAA"].iloc[-2])
     # the RS floor gates it
     F3 = sow.features(W, dvol, None, rs * 0 + 50)
