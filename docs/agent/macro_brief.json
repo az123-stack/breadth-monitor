@@ -1,61 +1,55 @@
 {
- "for_date": "2026-10-16",
- "written": "2026-10-19T11:05Z",
- "headline": "Oil eases from five-month highs after Trump waives some Russia sanctions, pulling the 10-year yield to about 5.09% and lifting Nasdaq futures ~1% ahead of Meta and Tesla earnings Wednesday.",
- "risk": "medium",
- "rates": "The 10-year Treasury yield slipped to about 5.085% early Monday as oil fell, but yields remain high and have pressured tech.",
- "fed": "The Fed is in its blackout period with no speakers this week; markets price about 88% hold / 12% hike for the Oct 27-28 FOMC and roughly 75-80% odds of a hike by December.",
- "oil": "Brent fell about 2% to ~$107.6 and WTI to ~$99.5 after Trump's Oct 16 order waived some Russia sanctions, but Hormuz tanker attacks and mines keep Gulf exports near 8.5M bpd vs 20M+ before, holding crude near $100+.",
- "geo": "Iran-linked attacks on shipping in the Strait of Hormuz continue (another tanker hit a mine), while the US Russia-sanctions waiver is under a review of up to 60 days.",
+ "for_date": "2026-10-21",
+ "written": "2026-10-22T11:05Z",
+ "headline": "Brent is back near $110 on Gulf/Hormuz attack risk while the 10-year sits around 5.1%, with the FOMC, GDP/PCE and Microsoft/Alphabet/Amazon earnings all landing next week.",
+ "risk": "high",
+ "rates": "The 10-year Treasury yield was about 5.08% on Oct 22, down roughly 5 bp from the prior session after a recent selloff took yields to multi-decade highs.",
+ "fed": "The FOMC meets Oct 27-28 with the decision on Oct 28 at 2:00 PM ET; I could not confirm Fed speakers for this week.",
+ "oil": "Brent is about $110 (settled $108.82 on Oct 21) as attacks on shipping near Hormuz and Houthi strikes on Saudi targets raise supply-disruption fears.",
+ "geo": "The US ordered some diplomats out of Saudi Arabia after Houthi attacks, Iran-related shipping attacks continue in the Gulf, and Iran says it will not talk while being blockaded.",
  "events": [
   {
-   "date": "2026-10-20",
+   "date": "2026-10-28",
+   "time": "2:00 PM ET",
+   "name": "FOMC rate decision",
+   "impact": "high"
+  },
+  {
+   "date": "2026-10-28",
+   "time": "After close",
+   "name": "Microsoft and Alphabet earnings",
+   "impact": "high"
+  },
+  {
+   "date": "2026-10-29",
    "time": "8:30 AM ET",
-   "name": "Housing starts & building permits",
+   "name": "Q3 GDP advance estimate",
    "impact": "medium"
   },
   {
-   "date": "2026-10-20",
-   "time": "After close",
-   "name": "Netflix earnings",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-10-21",
-   "time": "After close",
-   "name": "Meta Platforms earnings",
+   "date": "2026-10-29",
+   "time": "8:30 AM ET",
+   "name": "PCE inflation (September)",
    "impact": "high"
   },
   {
-   "date": "2026-10-21",
+   "date": "2026-10-29",
    "time": "After close",
-   "name": "Tesla earnings",
+   "name": "Amazon earnings",
    "impact": "high"
   },
   {
-   "date": "2026-10-21",
+   "date": "2026-11-02",
    "time": "After close",
-   "name": "Lam Research & Texas Instruments earnings",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-10-23",
-   "time": "9:45 AM ET",
-   "name": "S&P Global flash PMIs (manufacturing, services)",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-10-23",
-   "time": "10:00 AM ET",
-   "name": "UMich consumer sentiment & inflation expectations (final)",
-   "impact": "medium"
+   "name": "Apple earnings",
+   "impact": "high"
   }
  ],
  "sources": [
-  "https://www.marketscreener.com/news/wall-st-futures-climb-as-ai-stocks-rebound-oil-yields-fall-ce785cdbd889f325",
-  "https://grafa.com/en/news/united-states/oil-prices-fall-trump-russia-sanctions-waiver-october-2026",
-  "https://defirate.com/odds/fed-decision/",
-  "https://www.heygotrade.com/en/news/weekly-economic-outlook-2026-10-19/",
-  "https://www.fxempire.com/forecasts/article/the-week-ahead-meta-tesla-and-chip-earnings-put-ai-trade-to-the-test-1638768"
+  "https://nationthailand.com/news/world/40072588",
+  "https://tradingeconomics.com/united-states/government-bond-yield",
+  "https://fedratecalc.com/us-economic-calendar/october-2026/",
+  "https://blofin.com/en/academy/education/tradfi/earnings-season-october-2026",
+  "https://thriveinmarkets.com/calendar/2026-10-26/"
  ]
 }
