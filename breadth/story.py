@@ -387,6 +387,24 @@ def facts(slot):
             big = sorted(((R[t][0] / R[t][1] - 1, t) for t in R if R[t][0] and R[t][1] and (R[t][4] or 0) >= 6 and R[t][0] >= 5), reverse=True)
             P("- Biggest steady gappers up: " + ", ".join(f"{t} {pct(v, 0)}" for v, t in big[:8] if v >= 0.04))
             P("- Biggest steady gappers down: " + ", ".join(f"{t} {pct(v, 0)}" for v, t in big[::-1][:8] if v <= -0.04))
+            try:
+                cat = json.loads((config.DOCS_DIR / "agent" / "catalysts.json").read_text())
+            except Exception:
+                cat = None
+            IP = in_play(T, PM, cat)
+            P("\n## IN PLAY candidates (for the **In play today:** section; code measured these, YOU find the why)")
+            P("Stocks (score = number of independent reasons; warnings subtract):")
+            for r in IP["stocks"]:
+                P(f"- {r['t']} {pct(r['gap'])} pre-market, ${r['price']}, RS {f"{r['rsr']:.0f}" if r['rsr'] is not None else '–'}, {r['sub'] or 'no sub-theme'} · "
+                  f"score {r['score']:g}: {'; '.join(r['why'])}" + (f" · WARN: {'; '.join(r['warn'])}" if r["warn"] else ""))
+            if not IP["stocks"]:
+                P("- (no stock is gapping 4%+ on steady pre-market trading)")
+            P("Groups moving together pre-market:")
+            for r in IP["groups"]:
+                P(f"- {r['g']}: {'; '.join(r['why'])} · names {', '.join(r['names'])}")
+            if not IP["groups"]:
+                P("- (no sub-theme is gapping 1%+ with breadth)")
+            P("Your names in pre-market (picks, setups, Strength on Weakness): " + (", ".join(f"{r['t']} {pct(r['gap'])}" for r in IP["mine"]) or "none moving"))
         else:
             P(f"\n(No pre-market snapshot for {today} yet.)")
     # groups whose moves the chapter should explain: the writer searches the news for each
@@ -421,6 +439,112 @@ def facts(slot):
     if not S.get("chapters"):
         P("(none yet: this is the first chapter)")
     return "\n".join(x for x in out if x is not None)
+
+
+# ---------------------------------------------------------------- in play (morning chapter)
+INPLAY = {"gap": 0.04, "gap_adr": 1.5, "ep": 0.08, "min_px": 5.0, "min_dv": 20e6, "bars": 6, "grp_gap": 0.01, "grp_up": 0.6, "n": 12}
+
+
+def in_play(T, PM, cat=None):
+    """Candidates for "In play today" from the pre-market snapshot + the dashboard's own lists. Code measures, the writer
+    explains: each candidate carries the measurable reasons; the morning chapter searches the news for the WHY.
+    Returns {"stocks": [...], "groups": [...], "mine": [...]} sorted by score (count of independent reasons)."""
+    I = INPLAY
+    R = (PM or {}).get("rows", {}) or {}
+    stocks = {x["t"]: x for x in T.get("stocks", []) if x.get("is_stock")}
+    gap = lambda t: (R[t][0] / R[t][1] - 1) if t in R and R[t][0] and R[t][1] else None
+    steady = lambda t: t in R and (R[t][4] or 0) >= I["bars"]
+    cat = cat if (cat or {}).get("for_date") == T.get("date") else {}
+    C = (cat or {}).get("stocks", {}) or {}
+    PB = T.get("playbook") or {}
+    mine = {}
+    for i, c in enumerate(PB.get("picks", [])):
+        mine.setdefault(c["t"], []).append(f"Top pick #{i + 1} ({c.get('setup_name')})")
+    for c in PB.get("pick_watch", []):
+        mine.setdefault(c["t"], []).append(f"pick watch ({c.get('setup_name')}, trigger {c.get('trigger')})")
+    for S in (T.get("trade_setups") or {}).get("setups", []):
+        for t in S.get("top", []):
+            mine.setdefault(t, []).append(S["name"])
+    SW = T.get("sow") or {}
+    for r in SW.get("rows", []):
+        if r.get("prime") or r.get("state") in ("breakout", "pop", "nuzzle"):
+            mine.setdefault(r["t"], []).append("SoW " + ("⭐ Prime" if r.get("prime") else r["state"]))
+    hve = {r["t"] for r in (T.get("hve") or {}).get("rows", []) if (r.get("chg") or 0) > 0}
+    # group gaps
+    grp = {}
+    for g in T.get("subthemes", []):
+        cs = [gap(t) for t in g.get("members", []) if t in stocks and gap(t) is not None]
+        if len(cs) >= 3:
+            grp[g["theme"]] = (sum(cs) / len(cs), sum(c > 0 for c in cs) / len(cs), len(cs), g.get("strength"), g.get("s_rank"))
+    X = (T.get("rotation") or {}).get("ignition") or {}
+    fresh = {r["g"]: "ignition" for r in X.get("rows", []) if r.get("status") == "ignition" and r.get("ago", 9) <= 5}
+    fresh.update({r["g"]: "Day 1" for r in (X.get("day1") or {}).get("rows", []) if r.get("ago", 9) <= 3})
+    groups = []
+    for g, (a, up, n, st, rk) in grp.items():
+        why = []
+        if a >= I["grp_gap"] and up >= I["grp_up"]:
+            why.append(f"gapping {pct(a)} with {up:.0%} of {n} members up")
+        elif a <= -I["grp_gap"] and up <= 1 - I["grp_up"]:
+            why.append(f"gapping {pct(a)} with {1 - up:.0%} of {n} members down")
+        if not why:
+            continue
+        if g in fresh:
+            why.append(f"fresh {fresh[g]}")
+        if rk and rk <= 10:
+            why.append(f"top-10 group (#{rk}, Strength {st})")
+        lead = sorted((stocks[t] for t in next((x.get("members", []) for x in T.get("subthemes", []) if x["theme"] == g), []) if t in stocks),
+                      key=lambda x: -(x.get("rsr") or 0))[:4]
+        groups.append({"g": g, "gap": round(a, 4), "breadth": round(up, 2), "n": n, "score": len(why), "why": why,
+                       "names": [f"{x['t']} {pct(gap(x['t']))}" for x in lead if gap(x["t"]) is not None]})
+    groups.sort(key=lambda r: (-r["score"], -abs(r["gap"])))
+    out = []
+    for t in R:
+        s = stocks.get(t)
+        g = gap(t)
+        if g is None or not steady(t) or R[t][0] < I["min_px"]:
+            continue
+        adr = (s or {}).get("adr")
+        g_adr = g / (adr / 100) if adr else None
+        big = abs(g) >= I["gap"] and (g_adr is None or abs(g_adr) >= I["gap_adr"])
+        c = C.get(t) or {}
+        earn = c.get("earnings_date")
+        if not big and t not in mine:
+            continue
+        if not big and abs(g) < 0.02:           # one of your names, but not moving yet
+            continue
+        dv = (s or {}).get("v50", 0) * (s or {}).get("price", 0) if s else None
+        if dv is not None and dv < I["min_dv"] and t not in mine:
+            continue
+        why, warn = [], []
+        if big:
+            why.append(f"gap {pct(g)}" + (f" ({g_adr:+.1f} ADR)" if g_adr is not None else ""))
+        if g >= I["ep"] and (dv or 0) >= I["min_dv"]:
+            why.append("possible EP (8%+ gap, liquid): needs a real catalyst")
+        if s and (s.get("rsr") or 0) >= 85:
+            why.append(f"leader RS {s['rsr']:.0f}")
+        sub = (s or {}).get("sub")
+        if sub in grp and grp[sub][0] * g > 0 and abs(grp[sub][0]) >= I["grp_gap"]:
+            why.append(f"group moving with it ({sub} {pct(grp[sub][0])})")
+        if t in mine:
+            why.append("on your lists: " + "; ".join(dict.fromkeys(mine[t]))[:120])
+        if earn and earn <= (PM or {}).get("date", "9999") and earn >= T.get("date", ""):
+            why.append(f"earnings {earn}")
+        if c.get("quality") in ("strong", "real") and c.get("direction") in ("positive", "negative"):
+            why.append(f"catalyst agent: {c['quality']} {c['direction']} — {str(c.get('why', ''))[:120]}")
+        for f in c.get("red_flags") or []:
+            warn.append(f"red flag: {f}")
+        if t in hve:
+            warn.append("record-volume up day in the last 5 sessions (has tended to lag SPY)")
+        if s and (s.get("off_hi") or 0) <= -0.3 and g > 0:
+            warn.append("30%+ below its 52-wk high (gap into overhead supply)")
+        out.append({"t": t, "gap": round(g, 4), "g_adr": None if g_adr is None else round(g_adr, 1), "rsr": (s or {}).get("rsr"),
+                    "sub": sub, "price": R[t][0], "score": len(why) - 0.5 * len(warn), "why": why, "warn": warn, "mine": t in mine})
+    out.sort(key=lambda r: (-r["score"], -abs(r["gap"])))
+    up = [r for r in out if r["gap"] > 0][:I["n"]]
+    dn = [r for r in out if r["gap"] < 0][:max(4, I["n"] // 3)]
+    mine_rows = [{"t": t, "why": list(dict.fromkeys(v))[:2], "gap": gap(t)} for t, v in mine.items() if gap(t) is not None]
+    mine_rows.sort(key=lambda r: -abs(r["gap"]))
+    return {"stocks": up + dn, "groups": groups[:8], "mine": mine_rows[:10]}
 
 
 # ---------------------------------------------------------------- publish / snapshot

@@ -23,10 +23,12 @@ story he can absorb in two minutes, and it must CONTINUE the story from the prev
 - Evidence lines (historical tendencies) are context, never promises. Say "has tended to", "historically", give n when small.
 - Name groups and stocks specifically. Every "trade" line should point at concrete groups/stocks from the fact sheet
   (ignitions, Day 1s, leaders, held-up / sold-hardest baskets, picks). No position sizing advice beyond "small / normal / press".
-- 400–650 words. Markdown: short paragraphs, **bold** lead-ins, "- " bullets. No headings deeper than "**Bold:**" lead-ins.
+- 400–650 words (am chapter: up to 750 with the In play section). Markdown: short paragraphs, **bold** lead-ins, "- " bullets. No headings deeper than "**Bold:**" lead-ins.
 
 ## Structure (keep these lead-ins so chapters read the same every day)
 **Where we are:** 2–4 sentences: the story so far + today's update (money in/out, how much, where it went, breadth, indexes).
+**In play today:** (am chapter only, right after "Where we are") where the extra edge is today, so Adam knows where to focus.
+  See "In play (morning chapter)" below. 3–6 bullets, best edge first, then one "Skip:" line.
 **Why it's moving:** 3–6 bullets, one per key group: the driver in one line with the key number, its type (catalyst /
   rotation / sympathy / unexplained), and the source link. Lead with the groups that matter most to the story and the trades.
 **What it means:** 2–3 sentences tying it together (rotation vs leaving, leadership, thrust setup, regime), using the why.
@@ -48,6 +50,27 @@ story he can absorb in two minutes, and it must CONTINUE the story from the prev
 - am (written 7:52 AM ET, posted ~8:00): official close of the last session + pre-market. Frame today's open against the story.
 - data (written 8:44 AM ET, only on days with an 8:30 AM release): the data card. See "Data days" below.
 - pm (written 4:50 PM ET): today's close from Google prices (estimates; official numbers land overnight). Say how today moved the story.
+
+## In play (morning chapter)
+The fact sheet's "IN PLAY candidates" block lists what code measured before the open: stocks gapping 4%+ (and 1.5+ ADRs) on
+steady pre-market trading, with the reasons stacked (possible EP, leader RS 85+, its group gapping with it, on Adam's lists,
+earnings, catalyst-agent read) and warnings (red flags, record-volume up day, gap into overhead supply); sub-themes gapping 1%+
+with breadth (60%+ of members the same way), fresh ignitions / Day 1s, top-10 groups; and Adam's own names moving pre-market.
+Your job is the WHY and the judgment:
+1. WebSearch "stocks moving premarket today <date>", "earnings before the open <date>" and "after hours earnings <yesterday>"
+   to catch reports and news the code can't see, then WebSearch each candidate you consider using ("<TICKER> stock premarket",
+   "<TICKER> earnings"). Find the hard reason: earnings beat/raise with the key number, guidance, FDA, contract, M&A, upgrade,
+   sector news, or a peer's news (sympathy). A gap with no news you can find is "no clear catalyst": say so.
+2. Pick 3–6 with the MOST edge. Edge = a real catalyst AND something structural: leader (RS 85+) in a strong / igniting group,
+   an EP (8%+ gap on real news, ideally a first gap out of a base), a whole group gapping together (the money is going there),
+   or one of Adam's setups reaching its trigger. Prefer liquid names. Long-side first; a big gap-down in a leader or a whole
+   group gapping down is in play as a "stay away / exit" note, not a short idea.
+3. Each bullet: **TICKER or group** — gap and the one-line why with a source link — the edge (why it can keep going) — the plan in
+   one clause for a Qullamaggie-style trader (e.g. "opening-range high after the first 5–30 min, stop the day's low; skip if it
+   gives back half the gap" for EPs; "wait for the first pullback to hold the gap" for extended names; "your trigger $X" for picks).
+4. End with one **Skip:** line: big movers with no catalyst, news that caps the upside (a cash takeover), red flags, gaps into
+   overhead supply (30%+ below the high), record-volume climaxes. Never invent a catalyst; never present a candidate as a
+   guaranteed trade. The pre-market gap is a snapshot (written ~7:50 AM ET); say gaps can change by the open.
 
 ## Data days (morning chapter)
 Before writing the am chapter, WebSearch today's US economic calendar ("economic calendar today <date>", "CPI release date

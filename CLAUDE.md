@@ -282,6 +282,14 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   events + futures/yields/dollar/ETF moves vs last close and vs the last pre-market snapshot before 8:30 (`_pm_before`, from the commit
   history of docs/premarket.json via gh REST). `dataCard` renders it above the story card; data cards are kept out of the chapter list.
   Chapter order within a day: am, data, pm (`SLOT_ORDER`).
+  IN PLAY (Oct 22, Adam: "tell me where the extra edge is today"): `story.in_play(T, PM, catalysts)` (stdlib) → am fact sheet block "IN PLAY
+  candidates": stocks gapping ≥ 4% and ≥ 1.5 ADR on steady pre-market trading (6+ active bars, $5+, $20M+/day when known) or Adam's names
+  moving 2%+, scored by stacked reasons (gap, possible EP ≥ 8% liquid, RS 85+, its sub-theme gapping the same way ≥ 1%, on picks / pick
+  watch / Trade Setups top 5 / SoW prime-breakout-pop-nuzzle, earnings date from catalysts.json for the card date, catalyst-agent strong/real
+  read) minus warnings (red flags, record-volume up day, 30%+ below the 52-wk high); groups gapping ≥ 1% with ≥ 60% of members the same
+  way (+ fresh ignition / Day 1, top-10 Strength); Adam's names in pre-market. `INPLAY` settings. story_guide.md "In play (morning
+  chapter)": the writer searches premarket movers / earnings before the open / after-hours reports, picks 3–6 with catalyst + structure,
+  each with source, edge and a one-clause plan, then a "Skip:" line; chapter lead-in **In play today:** right after Where we are.
   Comeback study (`tools/ignition_study/comeback.py`, Feb 2025–Oct 2026): heavy-selling day in an outflow streak (n 18) → SPY median +1.7%
   next 10 sessions, sold-hardest sub-themes +4.3% vs SPY (median +3.2%, 78%) vs held-up +0.5%; ex Mar–Apr 2025 +3.9%; any 70%+ day (n 24)
   sold +1.9% / held +1.0%. First calm comeback day (n 9) → SPY median −1.2% next 10, held-up +1.7%, middle +1.5%, sold −0.1%; 60-day

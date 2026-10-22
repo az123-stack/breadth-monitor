@@ -1181,6 +1181,29 @@ def test_strength_on_weakness():
     assert not bool(Fn["prime"]["P"].iloc[-1]), "RS line falling (SPY doubling) is not prime"
 
 
+def test_in_play_candidates():
+    """Pre-market in-play list: a liquid leader gapping 8%+ with its group is a high-score EP candidate; a thin
+    unknown name without steady trading is dropped; a group gapping together with breadth is listed; your pick shows."""
+    from breadth import story
+    T = {"date": "2026-10-20", "stocks": [
+            {"t": "LEAD", "is_stock": True, "adr": 4.0, "v50": 2e6, "price": 50, "rsr": 95, "sub": "G", "off_hi": -0.05},
+            {"t": "PEER", "is_stock": True, "adr": 4.0, "v50": 2e6, "price": 30, "rsr": 70, "sub": "G", "off_hi": -0.1},
+            {"t": "PEER2", "is_stock": True, "adr": 4.0, "v50": 2e6, "price": 30, "rsr": 60, "sub": "G", "off_hi": -0.1},
+            {"t": "MINE", "is_stock": True, "adr": 3.0, "v50": 1e6, "price": 40, "rsr": 90, "sub": "H", "off_hi": -0.02}],
+         "subthemes": [{"theme": "G", "members": ["LEAD", "PEER", "PEER2"], "strength": 80, "s_rank": 3}],
+         "playbook": {"picks": [{"t": "MINE", "setup_name": "Q-Flag"}], "pick_watch": []}}
+    PM = {"date": "2026-10-21", "rows": {"LEAD": [55, 50, 0, "09:00", 20], "PEER": [31.5, 30, 0, "09:00", 10],
+                                          "PEER2": [31, 30, 0, "09:00", 10], "MINE": [41, 40, 0, "09:00", 12], "THIN": [9, 8, 0, "07:00", 1]}}
+    cat = {"for_date": "2026-10-20", "stocks": {"LEAD": {"quality": "strong", "direction": "positive", "why": "beat and raise", "earnings_date": "2026-10-20", "red_flags": []}}}
+    IP = story.in_play(T, PM, cat)
+    ts = [r["t"] for r in IP["stocks"]]
+    assert ts[0] == "LEAD" and "THIN" not in ts, IP["stocks"]
+    w = " ".join(IP["stocks"][0]["why"])
+    assert "possible EP" in w and "leader RS 95" in w and "group moving" in w and "catalyst agent: strong positive" in w and "earnings 2026-10-20" in w, w
+    assert IP["groups"] and IP["groups"][0]["g"] == "G", IP["groups"]
+    assert [r["t"] for r in IP["mine"]] == ["MINE"]
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
