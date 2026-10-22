@@ -95,21 +95,21 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-10-21,CON,cand,round,thrust,Choppy / mixed,Focus,0.284,94.0,Healthcare Providers,85.5,neutral,warming,0.0,0.0,,,,,,,,,,,3,0,,,,,pending
 2026-10-21,CVI,cand,vcp,thrust,Choppy / mixed,Focus,0.288,97.0,Refiners,93.8,fading,,1.05,2.56,+1% oil → +0.4%,,,,,,,,,,2,0,,,,,pending
 2026-10-21,DINO,cand,vcp,thrust,Choppy / mixed,Focus,0.288,98.0,Refiners,93.8,fading,,0.61,1.49,+1% oil → +0.3%,,,,,,,,,,2,0,,,,,pending
-2026-10-21,HTFL,cand,ath,thrust,Choppy / mixed,Focus,0.236,97.0,Genomics & Diagnostics,89.8,fading,,0.0,0.0,,,,,,,,,,,2,0,,,,,pending
+2026-10-21,HTFL,cand,ath,thrust,Choppy / mixed,Focus,0.239,97.0,Genomics & Diagnostics,89.8,fading,,0.0,0.0,,,,,,,,,,,2,0,,,,,pending
 2026-10-21,ITGR,cand,vcp,thrust,Choppy / mixed,Focus,0.288,87.0,Medical Devices,65.1,new,warming,0.0,0.0,,,,,,,,,,,1,0,,,,,pending
-2026-10-21,LFST,cand,pullback,thrust,Choppy / mixed,Focus,0.289,95.0,Healthcare Providers,85.5,neutral,warming,0.0,0.0,,,,,,,,,,,3,0,,,,,pending
-2026-10-21,MATX,cand,ath,thrust,Choppy / mixed,Focus,0.236,92.0,Tankers & Shipping,82.9,fading,,0.0,0.0,,,,,,,,,,,2,0,,,,,pending
+2026-10-21,LFST,cand,pullback,thrust,Choppy / mixed,Focus,0.292,95.0,Healthcare Providers,85.5,neutral,warming,0.0,0.0,,,,,,,,,,,3,0,,,,,pending
+2026-10-21,MATX,cand,ath,thrust,Choppy / mixed,Focus,0.239,92.0,Tankers & Shipping,82.9,fading,,0.0,0.0,,,,,,,,,,,2,0,,,,,pending
 2026-10-21,OKE,cand,vcp,thrust,Choppy / mixed,Focus,0.288,70.0,LNG & Midstream,57.9,bouncing,,0.57,1.39,+1% oil → +0.2%,,,,,,,,,,1,0,,,,,pending
-2026-10-21,PARR,cand,pullback,thrust,Choppy / mixed,Focus,0.289,94.0,Refiners,93.8,fading,,0.89,2.17,+1% oil → +0.4%,,,,,,,,,,2,0,,,,,pending
+2026-10-21,PARR,cand,pullback,thrust,Choppy / mixed,Focus,0.292,94.0,Refiners,93.8,fading,,0.89,2.17,+1% oil → +0.4%,,,,,,,,,,2,0,,,,,pending
 2026-10-21,RVTY,cand,vcp,thrust,Choppy / mixed,Focus,0.288,91.0,Life Science Tools,89.5,new,warming,0.0,0.0,,,,,,,,,,,3,0,,,,,pending
-2026-10-21,SAIC,cand,rotation,thrust,Choppy / mixed,Focus,0.357,84.0,Defense IT & Services,67.9,bouncing,warming,0.0,0.0,,,,,,,,,,,1,0,,,,,pending
-2026-10-21,SLDE,cand,ath,thrust,Choppy / mixed,Focus,0.236,93.0,P&C Insurers,75.4,confirmed,ignition,0.86,-0.63,+10bp 10-yr yield → -2.0%,,,,,,,,,,3,0,,,,,pending
-2026-10-21,THC,cand,pullback,thrust,Choppy / mixed,Focus,0.289,88.0,Healthcare Providers,85.5,neutral,warming,-0.78,-1.9,+1% oil → -0.3%,,,,,,,,,,2,0,,,,,pending
+2026-10-21,SAIC,cand,rotation,thrust,Choppy / mixed,Focus,0.36,84.0,Defense IT & Services,67.9,bouncing,warming,0.0,0.0,,,,,,,,,,,1,0,,,,,pending
+2026-10-21,SLDE,cand,ath,thrust,Choppy / mixed,Focus,0.239,93.0,P&C Insurers,75.4,confirmed,ignition,0.86,-0.63,+10bp 10-yr yield → -2.0%,,,,,,,,,,3,0,,,,,pending
+2026-10-21,THC,cand,pullback,thrust,Choppy / mixed,Focus,0.292,88.0,Healthcare Providers,85.5,neutral,warming,-0.78,-1.9,+1% oil → -0.3%,,,,,,,,,,2,0,,,,,pending
 2026-10-21,TLN,cand,kq,thrust,Choppy / mixed,Focus,0.215,40.0,Independent Power Producers,50.2,steady,,0.0,0.0,,,,,,,,,,,2,1,,,,,pending
 2026-10-21,ZBRA,cand,round,thrust,Choppy / mixed,Focus,0.284,93.0,Industrial & Surgical Robots,38.8,outflow,,0.0,0.0,,,,,,,,,,,2,1,,,,,pending
-2026-10-21,ZIM,cand,pullback,thrust,Choppy / mixed,Focus,0.289,88.0,Tankers & Shipping,82.9,fading,,0.0,0.0,,,,,,,,,,,1,0,,,,,pending
+2026-10-21,ZIM,cand,pullback,thrust,Choppy / mixed,Focus,0.292,88.0,Tankers & Shipping,82.9,fading,,0.0,0.0,,,,,,,,,,,1,0,,,,,pending
 2026-10-21,APPN,pick1,round,thrust,Choppy / mixed,Focus,0.284,98.0,Enterprise SaaS,95.0,confirmed,ignition,1.14,-0.83,+10bp 10-yr yield → -2.6%,,,,,,,,,,3,0,,,,,pending
-2026-10-21,SN,pick2,ath,thrust,Choppy / mixed,Focus,0.236,95.0,Consumer Brands,86.1,confirmed,ignition,0.29,-1.48,+10bp 10-yr yield → -1.6%; +1% oil → -0.2%,,,,,,,,,,3,0,,,,,pending
-2026-10-21,PBF,watch,pullback,thrust,Choppy / mixed,Focus,0.289,98.0,Refiners,93.8,fading,,0.92,2.24,+1% oil → +0.4%,,,,,,,,,,2,0,,,,,pending
+2026-10-21,SN,pick2,ath,thrust,Choppy / mixed,Focus,0.239,95.0,Consumer Brands,86.1,confirmed,ignition,0.29,-1.48,+10bp 10-yr yield → -1.6%; +1% oil → -0.2%,,,,,,,,,,3,0,,,,,pending
+2026-10-21,PBF,watch,pullback,thrust,Choppy / mixed,Focus,0.292,98.0,Refiners,93.8,fading,,0.92,2.24,+1% oil → +0.4%,,,,,,,,,,2,0,,,,,pending
 2026-10-21,PSX,watch,vcp,thrust,Choppy / mixed,Focus,0.288,96.0,Refiners,93.8,fading,,0.67,1.63,+1% oil → +0.3%,,,,,,,,,,2,0,,,,,pending
 2026-10-21,VLO,watch,vcp,thrust,Choppy / mixed,Focus,0.288,98.0,Refiners,93.8,fading,,0.74,1.81,+1% oil → +0.3%,,,,,,,,,,2,0,,,,,pending
