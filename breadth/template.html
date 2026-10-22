@@ -3413,6 +3413,52 @@ function renderReadout(app) {
   wrap.querySelectorAll("details.rocard").forEach(el => el.addEventListener("toggle", () => { UIRO.open[el.dataset.k] = el.open; }));
   app.append(wrap);
 }
+/* ---------- 3-2-1 crack spread (refiner margin) from WTI, RBOB gasoline and heating oil futures ----------
+   crack $/bbl = (2 × gasoline $/gal × 42 + 1 × diesel $/gal × 42 − 3 × WTI $/bbl) ÷ 3, same formula as breadth/macro.py.
+   get(k) returns [price, prev settle, ...] for "CL=F", "RB=F", "HO=F". */
+function crackCalc(get) {
+  const c = get("CL=F"), r = get("RB=F"), h = get("HO=F");
+  if (!c || !r || !h || [c[0], c[1], r[0], r[1], h[0], h[1]].some(v => v == null)) return null;
+  const f = (i) => (2 * r[i] * 42 + h[i] * 42 - 3 * c[i]) / 3, now = f(0), prev = f(1);
+  return { now, prev, d: now - prev, pct: prev ? now / prev - 1 : null, oil: c[0] / c[1] - 1, gas: r[0] / r[1] - 1, dsl: h[0] / h[1] - 1 };
+}
+function crackTile(K) {
+  if (!K) return "";
+  const c = K.d > 0 ? "up" : K.d < 0 ? "dn" : "";
+  return `<div class="itile" title="3-2-1 crack spread: what a refiner earns turning 3 barrels of crude into 2 of gasoline + 1 of diesel. Up = fatter refining margins."><small>3-2-1 crack (refiner margin)</small><b class="${c}">$${K.now.toFixed(2)}</b><span class="meta">${K.d >= 0 ? "+" : "−"}$${Math.abs(K.d).toFixed(2)} (${K.pct >= 0 ? "+" : ""}${(K.pct * 100).toFixed(1)}%) vs last settle · gasoline ${K.gas >= 0 ? "+" : ""}${(K.gas * 100).toFixed(1)}%, diesel ${K.dsl >= 0 ? "+" : ""}${(K.dsl * 100).toFixed(1)}%</span></div>`;
+}
+// Tested Oct 22, 2026 on our 2 years (same-day result vs SPY): oil +1.5% & crack +3% (31 days): refiners +3.1% (90% beat SPY),
+// shale +2.5% (87%), airlines −1.0%; oil +1.5% & crack −2% (30 days): shale +1.5% (77%), refiners +0.4% (57%), airlines −0.4%.
+function crackRead(K) {
+  if (!K) return "";
+  const o = K.oil, k = K.pct, p = (v) => (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const head = `Oil ${p(o)}, crack ${p(k)}: `;
+  if (o >= 0.01 && k >= 0.02) return head + "<b>refiners favored</b>. On days like this refiners beat SPY by ~3.1% (90% of 31 days), shale producers by ~2.5%; airlines lagged.";
+  if (o >= 0.01 && k <= -0.02) return head + "<b>producers favored over refiners</b>: rising crude squeezes the refining margin. Shale beat SPY by ~1.5% (77% of 30 days); refiners only ~0.4%.";
+  if (o <= -0.015) return head + "crude falling: a headwind for producers; refiners hold up better if the crack holds (not separately tested).";
+  if (k >= 0.03) return head + "margins widening with crude flat: a refiner tailwind (not separately tested).";
+  return head + "no strong oil signal today.";
+}
+let FUT = null, FUT_BUSY = false;
+async function fetchFut() {
+  if (FUT_BUSY) return; FUT_BUSY = true;
+  try { const r = await fetch("futures.json?cb=" + Date.now(), { cache: "no-store" }); if (r.ok) FUT = await r.json(); } catch (e) { /* optional */ }
+  FUT_BUSY = false;
+  if (TAB === "intraday") rerenderPanel();
+}
+setInterval(() => { if (document.visibilityState === "visible" && TAB === "intraday") fetchFut(); }, 3 * 60 * 1000);
+function oilCard() {
+  if (!FUT && !FUT_BUSY) fetchFut();
+  const F = (FUT && FUT.futures) || {}, L = (FUT && FUT.labels) || {};
+  const today = FUT && FUT.date === etToday();
+  const K = today ? crackCalc(k => F[k]) : null;
+  const tile = (k) => { const f = F[k]; if (!f) return ""; const v = f[0] / f[1] - 1;
+    return `<div class="itile"><small>${esc(L[k] || k)}</small><b class="${v > 0 ? "up" : v < 0 ? "dn" : ""}">${(v >= 0 ? "+" : "") + (v * 100).toFixed(2)}%</b><span class="meta">${f[0] < 10 ? f[0].toFixed(3) : f[0].toFixed(2)}${f[2] ? " · " + f[2] : ""}</span></div>`; };
+  const body = !FUT ? `<p class="meta" style="margin:6px 0 0">Loading energy futures…</p>`
+    : !today ? `<p class="meta" style="margin:6px 0 0">No futures snapshot for today yet (last ${esc(FUT.asof || "–")} ET). The feed runs every 10 minutes from 9:25 AM to 4:15 PM ET on weekdays.</p>`
+    : `<div class="igrid">${crackTile(K)}${["CL=F", "BZ=F", "RB=F", "HO=F", "NG=F"].map(tile).join("")}</div><div class="note" style="padding:8px 0 0">${crackRead(K)} <span class="meta">Futures snapshot ${esc(FUT.asof.slice(11, 16))} ET (Yahoo, every 10 min), vs yesterday's settle.</span></div>`;
+  return $(`<section class="icard card regcard"><div class="kicker">Oil & refining margins</div>${body}</section>`);
+}
 /* =================== Pre-market tab (breadth/premarket.py -> docs/premarket.json) =================== */
 let PM = null, PM_ERR = null, PM_BUSY = false;
 async function fetchPM() {
@@ -3494,6 +3540,7 @@ function renderPremarketCards(app, I, T, R) {
   const mine = pool.filter(x => picks.has(x.t) || X[x.t]).sort((a, b) => Math.abs(b.r.chg) - Math.abs(a.r.chg));
   const eps = pool.filter(x => liquid(x) && x.r.chg >= 0.08 && real(x)).sort((a, b) => b.r.chg - a.r.chg);
   const VX = (PM.rows || {})["^VIX"], vixNow = VX && VX[0] && VX[1] ? VX : null;
+  const PK = crackCalc(k => F[k]);
   const vixTxt = vixNow ? `VIX ${vixNow[0].toFixed(1)} (${vixNow[0] >= vixNow[1] ? "+" : ""}${(vixNow[0] - vixNow[1]).toFixed(1)})` : "";
   const vixTile = () => { if (!vixNow) return ""; const d = vixNow[0] - vixNow[1], c = d > 0 ? "dn" : d < 0 ? "up" : "";
     const lvl = vixNow[0] >= 30 ? "fear" : vixNow[0] >= 20 ? "elevated" : vixNow[0] >= 15 ? "normal" : "calm";
@@ -3501,6 +3548,7 @@ function renderPremarketCards(app, I, T, R) {
   const fut = [["ES=F", "S&P"], ["NQ=F", "Nasdaq"], ["RTY=F", "Russell"]].map(([k, l]) => fchg(k) == null ? "" : `${l} ${pc(fchg(k))}`).filter(Boolean).concat(vixTxt ? [vixTxt] : []).join(" · ");
   const bullets = [
     fut ? `<b>Futures:</b> ${fut}.` : "",
+    PK ? `<b>Oil:</b> ${crackRead(PK)}` : "",
     `<b>Breadth of the gaps:</b> ${up} of your ${ours.length} theme stocks indicated up, ${dn} down; ${g4u} gapping up 4%+ and ${g4d} down 4%+ with steady pre-market trading.`,
     MV.rows.length ? `<b>S&P 500 indicated ${pc(MV.ret)}</b> (equal-weight ${pc(MV.eq)}), Nasdaq-100 ${pc(MN.ret)}. Biggest drivers: ${top3}. Shape so far: <b>${MV.type}</b>${MV.t10share != null ? ` (top 10 names = ${Math.round(Math.abs(MV.t10share) * 100)}% of the move)` : ""}.` : "",
     subs.length ? `<b>Money is gapping into</b> ${subs.slice(0, 3).map(g => `${esc(g.name)} ${pc(g.avg, 1)}`).join(", ")}; <b>out of</b> ${subs.slice(-3).reverse().map(g => `${esc(g.name)} ${pc(g.avg, 1)}`).join(", ")}.` : "",
@@ -3515,7 +3563,7 @@ function renderPremarketCards(app, I, T, R) {
   const spread = (a, b, label, note) => { const x = liveRow(a), y = liveRow(b); const v = x && y ? x.chg - y.chg : null;
     return v == null ? "" : `<div class="itile"><small>${esc(label)}</small><b class="${cls(v)}">${(v > 0 ? "+" : "") + (v * 100).toFixed(2) + " pts"}</b><span class="meta">${esc(note)}</span></div>`; };
   app.append($(`<section class="icard card regcard"><div class="kicker">Futures, macro & ETFs</div>
-    <div class="igrid">${vixTile()}${Object.keys(FL).map(ftile).join("")}</div>
+    <div class="igrid">${vixTile()}${crackTile(PK)}${Object.keys(FL).map(ftile).join("")}</div>${PK ? `<div class="note" style="padding:6px 0 0">${crackRead(PK)}</div>` : ""}
     <div class="igrid" style="margin-top:8px">${[["SPY", "SPY"], ["QQQ", "QQQ"], ["IWM", "IWM"], ["DIA", "DIA"], ["RSP", "RSP (equal weight)"], ["TLT", "TLT"], ["GLD", "GLD"], ["USO", "USO"]].map(([k, l]) => tile(k, l)).join("")}
       ${spread("RSP", "SPY", "Equal weight vs cap weight", "RSP minus SPY: positive = broad")}${spread("IWM", "SPY", "Small vs large caps", "IWM minus SPY")}</div>
     <div class="ibars" style="margin-top:10px">${Object.entries(I.sector_etfs).map(([k, l]) => ({ k, l, r: liveRow(k) })).filter(x => x.r).sort((a, b) => b.r.chg - a.r.chg)
@@ -3638,7 +3686,7 @@ function renderIntraday(app) {
     : !hasCols ? "The live sheet only has prices so far: the full Intraday view needs its extra columns." 
     : `<b>${clk.open ? "Session open" : "Market closed"}</b> · ${clk.label} · Google prices fetched ${LIVE.fetched.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} (Google runs up to ~20 min behind) · refreshes every 3 min`}</span><button>Refresh</button></div>`));
   app.querySelector(".livebar:last-child button").addEventListener("click", () => fetchLive());
-  if (!hasCols) return;
+  if (!hasCols) { app.append(oilCard()); return; }   // the futures feed doesn't need the Google sheet
   const pc = (v, d = 2) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
   const cls = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "dn" : "";
   // 0. Thrust watch
@@ -3652,6 +3700,7 @@ function renderIntraday(app) {
     <div class="igrid" style="margin-top:8px">${spread("RSP", "SPY", "Equal weight vs cap weight", "RSP minus SPY: positive = broad")}${spread("QQEW", "QQQ", "Nasdaq equal vs cap", "QQEW minus QQQ")}${spread("IWM", "SPY", "Small vs large caps", "IWM minus SPY")}</div>
     <div class="ibars" style="margin-top:10px">${Object.entries(I.sector_etfs).map(([k, l]) => ({ k, l, r: liveRow(k) })).filter(x => x.r).sort((a, b) => b.r.chg - a.r.chg)
       .map(x => `<div class="ibar"><span>${esc(x.l)} <small class="meta">${x.k}</small></span><i class="${cls(x.r.chg)}" style="width:${Math.min(100, Math.abs(x.r.chg) * 2500)}%"></i><b class="${cls(x.r.chg)}">${pc(x.r.chg)}</b></div>`).join("")}</div></section>`));
+  app.append(oilCard());
   // 2. Who's moving the index
   app.append(indexMoversCard({ kicker: "Who's moving the index", volHead: "Rel. volume<small>paced</small>", vol: (r) => r.volume && r.vavg && pace ? (r.volume / (r.vavg * pace)).toFixed(1) + "×" : "–" }));
   // 3. Live breadth on our stocks (vs the same stocks' last full session)

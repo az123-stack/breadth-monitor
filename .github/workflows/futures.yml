@@ -1,0 +1,54 @@
+name: Intraday futures
+
+# Energy futures for the Intraday tab (WTI, Brent, gasoline, diesel, natural gas -> 3-2-1 crack spread), every 10
+# minutes from the open to 4:15 PM ET. GOOGLEFINANCE has no futures, so Yahoo via `python -m breadth.premarket --futures`
+# writes docs/futures.json. GitHub fires scheduled runs late on this repo, so there's one cron an hour 13–19 UTC:
+# the first to start loops until 4:15 PM ET (5 h cap per run, under GitHub's 6-hour limit); later ones queue and
+# carry on or exit.
+on:
+  schedule:
+    - cron: "11 13-19 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: futures
+  cancel-in-progress: false
+
+jobs:
+  futures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 310
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Fetch energy futures until 4:15 PM ET
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          end=$(TZ=America/New_York date -d "16:15" +%s)
+          cap=$(( $(date +%s) + 300*60 ))
+          [ "$cap" -lt "$end" ] && end=$cap
+          start=$(TZ=America/New_York date -d "09:25" +%s)
+          now=$(date +%s)
+          if [ "$now" -lt "$start" ] && [ "$start" -lt "$end" ]; then sleep $(( start - now )); fi
+          while [ "$(date +%s)" -lt "$end" ]; do
+            python -m breadth.premarket --futures || echo "fetch failed, retrying next round"
+            git add docs/futures.json
+            if ! git diff --cached --quiet; then
+              git commit -qm "Futures $(TZ=America/New_York date +%H:%M) ET"
+              for i in 1 2 3; do
+                git push -q && break
+                git pull -q --rebase -X theirs || { git rebase --abort; break; }
+              done
+            fi
+            left=$(( end - $(date +%s) ))
+            [ "$left" -le 0 ] && break
+            sleep $(( left < 600 ? left : 600 ))
+          done

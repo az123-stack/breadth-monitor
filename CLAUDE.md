@@ -373,6 +373,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   IC + halves, `edges` for today's fifth) recomputed each build; ~40 s. Finding: no forward edge (|IC| ≤ 0.2, halves disagree) over 410 days.
   Pre-market tab (Oct 22): VIX tile first in "Futures, macro & ETFs" (from premarket.json rows `^VIX`: level, pts, %, calm < 15 / normal /
   elevated ≥ 20 / fear ≥ 30) and VIX in the morning-read futures line.
+  3-2-1 CRACK (Oct 22, Adam): premarket.py FUTURES adds RB=F (gasoline) and HO=F (diesel); `crackCalc` in the page = (2·RB·42 + HO·42 −
+  3·CL)/3 $/bbl (same as macro.py) → `crackTile` next to VIX on the Pre-market tab + `crackRead` line (morning read too). Intraday tab: new
+  `.github/workflows/futures.yml` (hourly crons 13:11–19:11 UTC, loops every 10 min 9:25 AM–4:15 PM ET, concurrency `futures`) runs
+  `python -m breadth.premarket --futures` (`run_futures`, `parse_live`: latest bar any session vs previous settle; FUT_LIVE CL, BZ, RB, HO, NG)
+  → docs/futures.json → `oilCard` ("Oil & refining margins", after Market pulse; shown even without the Google sheet; fetched every 3 min).
+  `crackRead` uses the Oct 22 study (same-day vs SPY, 2 yrs): oil ≥ +1.5% & crack ≥ +3% (31 days) refiners +3.1% (90% beat), shale +2.5%,
+  airlines −1.0%; oil ≥ +1.5% & crack ≤ −2% (30 days) shale +1.5% (77%), refiners +0.4% (57%). Read thresholds: oil ≥ 1% with crack ≥ ±2%.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

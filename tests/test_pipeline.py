@@ -1234,6 +1234,17 @@ def test_market_health():
     assert E["n"] > 0                                                # (no ImportError = the guard)
 
 
+def test_futures_feed_parse():
+    """Intraday futures: latest bar of any session vs the previous settle; the 3-2-1 crack uses gasoline + diesel."""
+    from breadth import premarket as PMK
+    res = {"meta": {"chartPreviousClose": 100.0, "regularMarketPrice": 101.0, "regularMarketTime": 1792675800},
+           "timestamp": [1792670000, 1792675800], "indicators": {"quote": [{"close": [100.5, 102.3]}]}}
+    v = PMK.parse_live(res, "2026-10-22")
+    assert v[0] == 102.3 and v[1] == 100.0 and v[2]
+    assert "RB=F" in PMK.FUTURES and "HO=F" in PMK.FUTURES and set(PMK.FUT_LIVE) >= {"CL=F", "RB=F", "HO=F"}
+    assert PMK.parse_live({"meta": {}, "timestamp": [], "indicators": {"quote": [{}]}}, "2026-10-22") is None
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

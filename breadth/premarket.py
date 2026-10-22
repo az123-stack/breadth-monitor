@@ -38,7 +38,7 @@ CHART = "https://query1.finance.yahoo.com/v8/finance/chart/{s}"
 # Futures and macro that trade overnight: key -> (Yahoo symbol, label)
 FUTURES = {
     "ES=F": "S&P 500 futures", "NQ=F": "Nasdaq-100 futures", "RTY=F": "Russell 2000 futures", "YM=F": "Dow futures",
-    "CL=F": "Crude oil", "NG=F": "Natural gas", "GC=F": "Gold", "SI=F": "Silver", "HG=F": "Copper",
+    "CL=F": "Crude oil", "RB=F": "Gasoline (RBOB)", "HO=F": "Diesel (heating oil)", "NG=F": "Natural gas", "GC=F": "Gold", "SI=F": "Silver", "HG=F": "Copper",
     "ZN=F": "10y Treasury note", "^TNX": "10y yield", "DX-Y.NYB": "US dollar index", "BTC-USD": "Bitcoin", "ETH-USD": "Ether",
 }
 # Our sheet keys that Yahoo spells differently
@@ -184,7 +184,65 @@ def run():
     return out
 
 
+# Intraday energy futures (Google's GOOGLEFINANCE has no futures): the `futures.yml` workflow runs
+# `python -m breadth.premarket --futures` every 10 minutes during the session -> docs/futures.json, which the
+# Intraday tab reads for WTI, Brent, gasoline, diesel and the 3-2-1 crack spread.
+FUT_LIVE = {"CL=F": "WTI crude", "BZ=F": "Brent crude", "RB=F": "Gasoline (RBOB)", "HO=F": "Diesel (heating oil)", "NG=F": "Natural gas"}
+FUT_OUT = config.ROOT / "docs" / "futures.json"
+
+
+def parse_live(res, today):
+    """Latest trade (any session) and the previous settlement -> [price, prev_close, "HH:MM"] or None."""
+    meta = res.get("meta") or {}
+    ts = res.get("timestamp") or []
+    closes = (((res.get("indicators") or {}).get("quote") or [{}])[0].get("close")) or []
+    prev = meta.get("chartPreviousClose") or meta.get("previousClose")
+    last_p = last_t = None
+    for i, t in enumerate(ts):
+        c = closes[i] if i < len(closes) else None
+        if c is not None:
+            last_p, last_t = c, datetime.fromtimestamp(t, ET).strftime("%H:%M")
+    if last_p is None:
+        last_p = meta.get("regularMarketPrice")
+        rt = meta.get("regularMarketTime")
+        last_t = datetime.fromtimestamp(rt, ET).strftime("%H:%M") if rt else None
+    if last_p is None or not prev:
+        return None
+    return [round(last_p, 4), round(prev, 4), last_t]
+
+
+def run_futures():
+    now = datetime.now(ET)
+    session = requests.Session()
+    out = {}
+    try:
+        r = session.get(SPARK, params={"symbols": ",".join(FUT_LIVE), "range": "1d", "interval": "5m"}, headers=UA, timeout=15)
+        r.raise_for_status()
+        for item in (r.json().get("spark") or {}).get("result") or []:
+            resp = (item.get("response") or [None])[0]
+            v = parse_live(resp, now.date().isoformat()) if resp else None
+            if v:
+                out[item["symbol"]] = v
+    except Exception as e:   # fall back to one chart call per symbol
+        log.warning("futures spark failed (%s); trying chart", e)
+        for sym in FUT_LIVE:
+            try:
+                r = session.get(CHART.format(s=sym), params={"range": "1d", "interval": "5m"}, headers=UA, timeout=10)
+                res = ((r.json().get("chart") or {}).get("result") or [None])[0] if r.status_code == 200 else None
+                v = parse_live(res, now.date().isoformat()) if res else None
+                if v:
+                    out[sym] = v
+            except Exception:
+                continue
+    doc = {"asof": now.strftime("%Y-%m-%dT%H:%M"), "date": now.date().isoformat(), "futures": out, "labels": FUT_LIVE}
+    FUT_OUT.write_text(json.dumps(doc, separators=(",", ":")))
+    log.info("futures: %s", {k: v[0] for k, v in out.items()})
+    return doc
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
-    argparse.ArgumentParser().parse_args()
-    run()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--futures", action="store_true", help="only the intraday energy futures -> docs/futures.json")
+    a = ap.parse_args()
+    run_futures() if a.futures else run()
