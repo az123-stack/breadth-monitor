@@ -104,7 +104,7 @@ def evidence(D, warm=70):
             continue
         q = pd.qcut(x[k].rank(method="first"), 5, labels=False)
         h = len(x) // 2
-        ic = lambda z: _r(z[k].corr(z["rest_fwd"], method="spearman"), 2)
+        ic = lambda z: _r(z[k].rank().corr(z["rest_fwd"].rank()), 2)   # Spearman without scipy (not installed in CI)
         out["rows"][k] = {"q": [_r(x[k][q == i].mean(), 1) for i in range(5)],
                           "rest": [_r(x["rest_fwd"][q == i].mean(), 4) for i in range(5)],
                           "spy": [_r(x["spy_fwd"][q == i].mean(), 4) for i in range(5)] if "spy_fwd" in x else None,

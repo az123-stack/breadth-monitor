@@ -1224,8 +1224,14 @@ def test_market_health():
     assert {"S0", "S1", "S2", "S3"} <= Ls and len(Ls) <= 5, Ls          # top 10% of 40 (percentile >= 0.9)
     assert D["bo"].iloc[-1] >= 1 and D["bd"].iloc[-1] >= 1, (D["bo"].iloc[-1], D["bd"].iloc[-1])
     assert 0 <= D["basket"].iloc[-1] <= 100 and D["a50"].iloc[-1] >= 75
-    E = LD.evidence(D, warm=20)
-    assert E["n"] > 0
+    import sys as _sys
+    saved = {k: _sys.modules.pop(k) for k in list(_sys.modules) if k == "scipy" or k.startswith("scipy.")}
+    _sys.modules["scipy"] = None                                     # GitHub Actions has no scipy: evidence must not need it
+    try:
+        E = LD.evidence(D, warm=20)
+    finally:
+        del _sys.modules["scipy"]; _sys.modules.update(saved)
+    assert E["n"] > 0                                                # (no ImportError = the guard)
 
 
 if __name__ == "__main__":
