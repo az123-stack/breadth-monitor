@@ -4113,7 +4113,7 @@ function sowCard(T) {
       Only ~1 year of signals is testable (the 50-week EMA needs a year of our 2-year history) and the holds overlap, so nothing here is proven: use it as a watchlist for your own chart read.</div>
     <div class="filters" style="margin:8px 0 4px"></div><div class="sowbody"></div>
     <details class="kqsec" style="margin-top:8px"><summary><b>The rules in code</b></summary><ul class="meta" style="margin:6px 0 0 18px;padding:0;font-size:12.5px">
-      <li><b>Liquid & strong:</b> $${C.min_price}+, $${Math.round((C.min_dvol || 0) / 1e6)}M+ a day, RS Rating ${C.min_rs}+.</li>
+      <li><b>Liquid & strong:</b> $${C.min_price}+, $${Math.round((C.min_dvol || 0) / 1e6)}M+ a day, ${C.min_vol30 ? ((C.min_vol30 / 1e6) + "M+ shares a day (30-day average), ") : ""}RS Rating ${C.min_rs}+ (Prime uses an improving RS line instead).</li>
       <li><b>Stack:</b> 9 &gt; 21 &gt; 50-week EMA, 21 rising over ${C.curl} weeks, 9 flat or rising; 50-week EMA at least ${Math.round((C.flat || 0) * 100)}% of its level ${C.flat_wk} weeks ago.</li>
       <li><b>Base:</b> ${C.pumps}+ weekly closes crossing up through the 50-week EMA in the last ${C.pump_wk} weeks (the pumps) and ${C.below_wk}+ weekly closes under it (it really based).</li>
       <li><b>Black box:</b> last ${C.box_wk} weeks no taller than ${C.tight_atr} weekly ATRs, a low within ${Math.round((C.anchor_touch || 0) * 100)}% of the 21-week EMA and no close more than ${Math.round((1 - (C.anchor_hold || 0)) * 100)}% under it.</li>

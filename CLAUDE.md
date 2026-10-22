@@ -360,7 +360,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   line high tags. Evidence `prime`, `prime_vol`, `prime_novol`, `prime_rshi` vs `vs_above` (any liquid stock over its 50 WEMA with rs_up):
   Oct 21 evening (Adam: BBY/CVLT/KDP/NWSA right; FROG late, PANW base too short, PENG crash not a nuzzle): prime also needs `slope26`
   (50 WEMA vs 26 wks ago) ≤ +20% (`prime_slope`) and 30+ closes under the 50 in 78 wks (`prime_below`); nuzzle needs `dd10` (10-wk high →
-  week's low) ≤ min(2 weekly ATRs, 25%). Prime 172 → 110. Evidence after: prime 26w +11.5%, −2.4% vs similar (t −1.5); pop vs RS 70+ +1.2/+1.9%.
+  week's low) ≤ min(2 weekly ATRs, 25%). Prime 172 → 110. Oct 22 (Adam): every SoW row also needs a 30-day avg volume ≥ 1M shares
+  (`min_vol30`, `vol30` arg into `features`, applies to the backtest too); prime 103 → 73 (CVLT, APPN dropped). Evidence after: prime 26w +11.5%, −2.4% vs similar (t −1.5); pop vs RS 70+ +1.2/+1.9%.
 - `leadership.py` **Market health** (Oct 22, 2026; Adam: "do leaders tell on the market?" + "count breakouts vs breakdowns"; card
   R-2026-10-22-leaders-and-breakouts, layer `market_health`, info) → `DATA.themes.leadership`, `healthCard` near the top of the Breadth tab
   (after the washout card). Leaders = top 10% RS of $5+/$10M+ stocks as of the previous session. `frames`: up10/dn10 (% of leader-days at a

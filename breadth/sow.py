@@ -34,7 +34,7 @@ Our bars reach ~2 years (Massive free plan), so only ~1 year of signals is testa
 import numpy as np
 import pandas as pd
 
-CFG = {"min_price": 5.0, "min_dvol": 10e6, "e_fast": 9, "e_mid": 21, "e_slow": 50, "curl": 4, "flat_wk": 13, "flat": 0.99,
+CFG = {"min_price": 5.0, "min_dvol": 10e6, "min_vol30": 1e6, "e_fast": 9, "e_mid": 21, "e_slow": 50, "curl": 4, "flat_wk": 13, "flat": 0.99,
        "pump_wk": 78, "pumps": 2, "below_wk": 10, "min_rs": 70, "anchor_wk": 10, "anchor_touch": 0.03, "anchor_hold": 0.95,
        "box_wk": 10, "tight_atr": 3.0, "atr_wk": 10, "vol_wk": 20, "vol_x": 1.2, "nuzzle": 0.02, "hold21": 0.98,
        "thrust_wk": 26, "ext_atr": 1.5, "prime_hold": 3, "prime_run": 30, "prime_ext": 2.5, "prime_below": 30, "prime_slope": 0.20, "nuz_dd_atr": 2.0, "nuz_dd": 0.25, "vr_wk": 10, "vr_base": 26, "vr_up": 1.1,
@@ -80,7 +80,7 @@ def complete_weeks(days_per_week, last_date):
     return done
 
 
-def features(W, dvol, nday=None, rs=None, spy=None):
+def features(W, dvol, nday=None, rs=None, spy=None, vol30=None):
     """Every rule as a weeks x stocks boolean / float frame. `nday` = sessions in each week (volume pace)."""
     P = CFG
     c, h, l, v = W["c"], W["h"], W["l"], W["v"]
@@ -97,6 +97,8 @@ def features(W, dvol, nday=None, rs=None, spy=None):
     pumps = up50.rolling(P["pump_wk"], min_periods=26).sum()
     below = (c < e50).astype(float).rolling(P["pump_wk"], min_periods=26).sum()
     liq = (c >= P["min_price"]) & (dvol.reindex(c.index, method="ffill")[c.columns] >= P["min_dvol"])
+    if vol30 is not None:                                   # Adam, Oct 22: 30-day average volume of 1M+ shares
+        liq &= vol30.reindex(c.index, method="ffill")[c.columns] >= P["min_vol30"]
     stack = (e9 > e21) & (e21 > e50) & (e9 >= e9.shift(P["curl"]) * P["flat"]) & (e21 > e21.shift(P["curl"]))
     flat50 = e50 >= e50.shift(P["flat_wk"]) * P["flat"]
     base = (pumps >= P["pumps"]) & (below >= P["below_wk"])
@@ -174,7 +176,8 @@ def build(adjusted, universe, stocks=None, names=None, evidence=True):
     spy_w = w["c"][config.BENCHMARK].groupby(w["c"].index.to_period("W-FRI")).last() if config.BENCHMARK in w["c"] else None
     if spy_w is not None:
         spy_w.index = W["c"].index
-    F = features(W, dvol, nday, rs_w, spy_w)
+    vol30 = w["v"][cols].rolling(30, min_periods=20).mean()
+    F = features(W, dvol, nday, rs_w, spy_w, vol30)
     F["_c"] = W["c"]
     wi = len(W["c"].index) - 1
     rows = []
@@ -238,7 +241,7 @@ def build(adjusted, universe, stocks=None, names=None, evidence=True):
     if evidence:
         try:
             ev = backtest(W, F, w, cols, done, config.BENCHMARK)
-            ev["any_rs"] = {k: v for k, v in backtest(W, features(W, dvol, nday), w, cols, done, config.BENCHMARK).items()
+            ev["any_rs"] = {k: v for k, v in backtest(W, features(W, dvol, nday, vol30=vol30), w, cols, done, config.BENCHMARK).items()
                             if k in ("breakout", "pop")}  # same rules without the RS 70 floor
             out["evidence"] = ev
         except Exception as e:   # evidence is optional
