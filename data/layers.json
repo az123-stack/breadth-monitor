@@ -354,6 +354,20 @@
     "R-2026-10-21-strength-on-weakness"
    ],
    "notes": "beats the average stock but not other RS 70+ stocks yet; only ~1 year testable"
+  },
+  {
+   "id": "market_health",
+   "name": "Market health (leaders + breakouts working)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "breadth/leadership.py → DATA.themes.leadership, Breadth tab healthCard",
+   "what": "leaders' breakouts/breakdowns, 50-day recovery check, universe base breakouts vs breakdowns and follow-through",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-22-leaders-and-breakouts"
+   ],
+   "notes": "no forward edge in 410 days; untested in a bear market"
   }
  ]
 }

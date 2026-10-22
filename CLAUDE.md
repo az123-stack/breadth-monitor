@@ -361,6 +361,17 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Oct 21 evening (Adam: BBY/CVLT/KDP/NWSA right; FROG late, PANW base too short, PENG crash not a nuzzle): prime also needs `slope26`
   (50 WEMA vs 26 wks ago) ≤ +20% (`prime_slope`) and 30+ closes under the 50 in 78 wks (`prime_below`); nuzzle needs `dd10` (10-wk high →
   week's low) ≤ min(2 weekly ATRs, 25%). Prime 172 → 110. Evidence after: prime 26w +11.5%, −2.4% vs similar (t −1.5); pop vs RS 70+ +1.2/+1.9%.
+- `leadership.py` **Market health** (Oct 22, 2026; Adam: "do leaders tell on the market?" + "count breakouts vs breakdowns"; card
+  R-2026-10-22-leaders-and-breakouts, layer `market_health`, info) → `DATA.themes.leadership`, `healthCard` near the top of the Breadth tab
+  (after the washout card). Leaders = top 10% RS of $5+/$10M+ stocks as of the previous session. `frames`: up10/dn10 (% of leader-days at a
+  20-day high/low, 10 sessions), net, a21/a50, off (median off 63-day high), basket (leaders of 20 sessions ago now under the 50-day EMA),
+  bo/bd (universe closes beyond the 20-day high/low out of a ≤ 6-ADR base on 1.3× 50-day volume), ratio10, work/wret/wn (breakouts 5–25
+  sessions ago still above their level, return from next open). Verdicts: leaders breaking out (net ≥ 5) / cracking (≤ −5) / stalling;
+  "not recovering" when basket ≥ 50%; breakouts working (≥ 55% holding and avg > 0) / failing (≤ 40%) / mixed. Lists (leaders as of 5
+  sessions ago): crack / under50 / breakout / holding, top 20 shown. `evidence` (fifths vs next 20 sessions of the avg non-leader stock,
+  IC + halves, `edges` for today's fifth) recomputed each build; ~40 s. Finding: no forward edge (|IC| ≤ 0.2, halves disagree) over 410 days.
+  Pre-market tab (Oct 22): VIX tile first in "Futures, macro & ETFs" (from premarket.json rows `^VIX`: level, pts, %, calm < 15 / normal /
+  elevated ≥ 20 / fear ≥ 30) and VIX in the morning-read futures line.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

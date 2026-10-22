@@ -1204,6 +1204,30 @@ def test_in_play_candidates():
     assert [r["t"] for r in IP["mine"]] == ["MINE"]
 
 
+def test_market_health():
+    """Leaders = top 10% by RS as of the previous session; a base breakout on volume is counted; a loud close under
+    the 20-day low is a breakdown; the 4-weeks-ago leader basket under its 50-day EMA is measured."""
+    from breadth import leadership as LD
+    n, m = 140, 40
+    idx = pd.bdate_range("2026-01-02", periods=n)
+    rng = np.random.default_rng(1)
+    base = 20 * np.exp(np.cumsum(rng.normal(0, 0.003, (n, m)), axis=0))
+    base[:, :4] *= np.linspace(1, 3, n)[:, None]                      # 4 clear leaders (10%)
+    c = pd.DataFrame(base, index=idx, columns=[f"S{i}" for i in range(m)])
+    c.iloc[-1, 10] = c.iloc[-2, 10] * 1.08                            # S10 breaks out of its flat base on volume
+    c.iloc[-1, 11] = c.iloc[-2, 11] * 0.92                            # S11 breaks down on volume
+    v = pd.DataFrame(1e6, index=idx, columns=c.columns); v.iloc[-1, 10:12] = 3e6
+    c["SPY"] = 500.0; v["SPY"] = 1e8
+    w = {"o": c, "h": c * 1.005, "l": c * 0.995, "c": c, "v": v}
+    D, F = LD.frames(w, [x for x in c.columns if x != "SPY"])
+    Ls = set(F["L"].iloc[-1][F["L"].iloc[-1]].index)
+    assert {"S0", "S1", "S2", "S3"} <= Ls and len(Ls) <= 5, Ls          # top 10% of 40 (percentile >= 0.9)
+    assert D["bo"].iloc[-1] >= 1 and D["bd"].iloc[-1] >= 1, (D["bo"].iloc[-1], D["bd"].iloc[-1])
+    assert 0 <= D["basket"].iloc[-1] <= 100 and D["a50"].iloc[-1] >= 75
+    E = LD.evidence(D, warm=20)
+    assert E["n"] > 0
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
