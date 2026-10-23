@@ -1,232 +1,196 @@
 {
- "for_date": "2026-10-21",
- "written": "2026-10-22T11:25Z",
+ "for_date": "2026-10-22",
+ "written": "2026-10-23T11:24Z",
  "stocks": {
-  "APPN": {
-   "why": "Hit a new 52-week high of $46.72 on Oct 21 with no company-specific news found; the run looks like momentum plus a software-sector bid on top of the Aug 6 revenue beat (+19% y/y) and raised FY guide.",
-   "direction": "mixed",
-   "quality": "weak",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [
-    "CEO Calkins sold 45,000 shares Oct 7 under a 10b5-1 plan (about $1.7M)",
-    "Barclays underweight (PT $30, Oct 13); consensus PT about $32, far below the price",
-    "Zacks cut to hold Oct 6"
-   ],
-   "sources": [
-    "https://www.marketbeat.com/instant-alerts/price-appian-nasdaq-appn-reaches-new-1-year-high-heres-why-2026-10-21/",
-    "https://www.marketbeat.com/instant-alerts/price-appian-nasdaq-appn-stock-price-up-64-whats-next-2026-10-01/"
-   ]
-  },
   "SN": {
-   "why": "At all-time highs (about $194.69 around Oct 15) on steady growth (Q2 revenue +22%, 13 new products) and analyst target raises (UBS $219, Canaccord $210); no single fresh trigger found. Q3 report Nov 4, outside the next 5 sessions.",
+   "why": "Hit new 52-week high Oct 13 with no fresh company news found; backdrop is the Aug 5 beat (rev +22%) with analyst PT raises. Q3 report Nov 4.",
    "direction": "positive",
    "quality": "real",
    "depth": "full",
    "earnings_date": "2026-11-04",
-   "red_flags": [
-    "Q2 adjusted EPS $0.92 missed the $1.20 consensus (older)",
-    "Seen as overvalued vs fair value after a 100%+ 1-year run"
-   ],
-   "sources": [
-    "https://finviz.com/news/402373/sharkninja-announces-third-quarter-2026-earnings-release-and-conference-call-date",
-    "https://in.investing.com/news/stock-market-news/sharkninja-stock-hits-alltime-high-at-19469-usd-93CH-5635881"
-   ]
-  },
-  "VLO": {
-   "why": "Reported Q3 2026 results this morning (Oct 22): adjusted EPS $23.90 vs $3.66 a year ago, refining operating income $8.8B, record ethanol output, cash $9.8B. Part of a strong refiner rally on tight diesel and record crack spreads.",
-   "direction": "positive",
-   "quality": "strong",
-   "depth": "full",
-   "earnings_date": "2026-10-22",
-   "red_flags": [
-    "Mizuho (Oct 8): refiners largely priced in, valuation near 8.5x forward EV/EBITDA vs 6.7x history",
-    "Sector up about 150% YTD, so stretched; reaction to the print is unknown"
-   ],
-   "sources": [
-    "https://www.financialcontent.com/article/bizwire-2026-10-22-valero-energy-reports-third-quarter-2026-results",
-    "https://in.investing.com/news/stock-market-news/mizuho-cuts-phillips-66-delek-par-pacific-as-refiner-rally-prices-in-gains-5624012"
-   ]
-  },
-  "PBF": {
-   "why": "Rides the refiner rally on tight fuel inventories and record US utilization (96.3% in Q3). Earnings Oct 29 (inside 5 sessions), and Valero's blowout print today is a read-through.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": "2026-10-29",
-   "red_flags": [
-    "Earnings inside the next 5 sessions",
-    "Mizuho neutral, PT $89: group seen as priced in"
-   ],
-   "sources": [
-    "https://finviz.com/news/396193/pbf-energy-to-release-third-quarter-2026-earnings-results",
-    "https://in.investing.com/news/stock-market-news/mizuho-cuts-phillips-66-delek-par-pacific-as-refiner-rally-prices-in-gains-5624012"
-   ]
-  },
-  "PSX": {
-   "why": "Refiner sector strength; Valero's strong Q3 is a read-through. Reports Oct 28 before the open (inside 5 sessions).",
-   "direction": "mixed",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": "2026-10-28",
-   "red_flags": [
-    "Mizuho downgraded to neutral Oct 8 (PT $300): gains priced in",
-    "Earnings inside the next 5 sessions"
-   ],
-   "sources": [
-    "https://unusualwhales.com/stock/PSX/earnings",
-    "https://in.investing.com/news/stock-market-news/mizuho-cuts-phillips-66-delek-par-pacific-as-refiner-rally-prices-in-gains-5624012"
-   ]
-  },
-  "CDNA": {
-   "why": "No fresh company news found beyond earlier FY26 revenue guidance raise; reports Q3 on Oct 29.",
-   "direction": "none",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": "2026-10-29",
-   "red_flags": [
-    "Earnings inside the next 5 sessions"
-   ],
-   "sources": [
-    "https://finviz.com/news/403261/caredx-to-report-third-quarter-2026-financial-results-on-october-29-2026",
-    "https://www.itiger.com/news/2656937253"
-   ]
-  },
-  "CON": {
-   "why": "No clear catalyst found; Q3 results due Nov 5.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": "2026-11-05",
    "red_flags": [],
    "sources": [
-    "https://finviz.com/news/400679/concentra-to-announce-third-quarter-2026-results-on-thursday-november-5-2026"
+    "https://finviz.com/news/402373/sharkninja-announces-third-quarter-2026-earnings-release-and-conference-call-date",
+    "https://www.marketbeat.com/instant-alerts/price-sharkninja-nyse-sn-sets-new-52-week-high-heres-why-2026-10-13/"
    ]
   },
-  "CVI": {
-   "why": "Refiner sector sympathy with Valero's strong Q3; no company news found. Reports Nov 3.",
+  "VEEV": {
+   "why": "Drifting higher since the Aug 26 beat-and-raise (+17% post-earnings drift); no fresh Oct catalyst found. Next report expected Nov 30 (unconfirmed by company).",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/veev"
+   ]
+  },
+  "MPC": {
+   "why": "Refiners strong on wide refining margins; no stock-specific fresh news found. Q3 report expected ~Nov 3 (unconfirmed).",
    "direction": "positive",
    "quality": "weak",
    "depth": "full",
-   "earnings_date": "2026-11-03",
-   "red_flags": [
-    "Mizuho underperform, PT $52, below the share price (Oct 8)"
-   ],
+   "earnings_date": null,
+   "red_flags": [],
    "sources": [
-    "https://unusualwhales.com/stock/CVI/earnings",
-    "https://in.investing.com/news/stock-market-news/mizuho-cuts-phillips-66-delek-par-pacific-as-refiner-rally-prices-in-gains-5624012"
+    "https://unusualwhales.com/stock/MPC/earnings"
    ]
   },
   "DINO": {
-   "why": "Refiner sector sympathy with Valero's strong Q3; reports Oct 28 before the open (inside 5 sessions).",
-   "direction": "positive",
+   "why": "Refiner sympathy with margins; no stock-specific news found. Q3 report expected Oct 28 premarket (unconfirmed, inside 5 sessions).",
+   "direction": "mixed",
    "quality": "weak",
-   "depth": "full",
-   "earnings_date": "2026-10-28",
-   "red_flags": [
-    "Earnings inside the next 5 sessions",
-    "Mizuho neutral, PT $119"
-   ],
-   "sources": [
-    "https://s29.q4cdn.com/382181944/files/doc_news/HF-Sinclair-Corporation-Third-Quarter-2026-Earnings-Release-and-Conference-Webcast-2026.pdf",
-    "https://in.investing.com/news/stock-market-news/mizuho-cuts-phillips-66-delek-par-pacific-as-refiner-rally-prices-in-gains-5624012"
-   ]
-  },
-  "HTFL": {
-   "why": "Rose about 6.9% around Oct 19 after earlier Q1/Q2 beats and raised revenue outlook ($228-232M) plus broader insurance coverage; no confirmed Q3 date (about Nov 12 is an estimate).",
-   "direction": "positive",
-   "quality": "real",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.marketbeat.com/instant-alerts/price-heartflow-nasdaq-htfl-shares-climb-69-whats-next-2026-10-19/",
-    "https://www.tipranks.com/news/catalyst/why-heartflow-stock-is-suddenly-surging-higher"
+    "https://unusualwhales.com/stock/DINO/earnings"
    ]
   },
-  "ITGR": {
-   "why": "No clear catalyst found. Earnings date not confirmed (an estimate says Oct 28, which would be inside 5 sessions).",
-   "direction": "none",
-   "quality": "none",
+  "PBF": {
+   "why": "Refiner sympathy; no fresh stock-specific news found. Q3 results confirmed Oct 29, inside 5 sessions.",
+   "direction": "mixed",
+   "quality": "weak",
+   "depth": "full",
+   "earnings_date": "2026-10-29",
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/396193/pbf-energy-to-release-third-quarter-2026-earnings-results"
+   ]
+  },
+  "CVI": {
+   "why": "Barchart piece flags a refining-margin collapse testing the balance-sheet recovery; no other fresh news found. Q3 report expected ~Nov 3 (unconfirmed).",
+   "direction": "mixed",
+   "quality": "weak",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "Possible earnings inside 5 sessions (unconfirmed)"
+    "refining margin pressure noted by Barchart"
    ],
    "sources": [
-    "https://beta.earningswhispers.com/go/w/ITGR"
+    "https://www.barchart.com/story/news/3511424/cvr-energy-s-refining-margin-collapse-tests-whether-the-balance-sheet-recovery-still-matters",
+    "https://unusualwhales.com/stock/CVI/earnings"
    ]
   },
-  "LFST": {
-   "why": "No fresh news found; last events were the Q2 beat and raised full-year guidance. Q3 on Nov 5.",
+  "PSX": {
+   "why": "Refiner sympathy; no stock-specific news found. Q3 report expected Oct 28 premarket (unconfirmed, inside 5 sessions).",
+   "direction": "mixed",
+   "quality": "weak",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://unusualwhales.com/stock/PSX/earnings"
+   ]
+  },
+  "ABNB": {
+   "why": "no clear catalyst found; limited news retrieved. Q3 report confirmed Nov 5 after close.",
    "direction": "none",
-   "quality": "real",
+   "quality": "none",
    "depth": "full",
    "earnings_date": "2026-11-05",
    "red_flags": [],
    "sources": [
-    "https://finviz.com/news/403302/lifestance-to-host-third-quarter-2026-earnings-conference-call-on-november-5-2026",
-    "https://www.chartmill.com/news/LFST/Chartmill-53064-LifeStance-Health-Group-NASDAQLFST-Beats-Q2-Estimates-and-Raises-Full-Year-Guidance"
+    "https://finviz.com/news/397976/airbnb-to-announce-third-quarter-2026-results"
    ]
   },
-  "MATX": {
-   "why": "No fresh news found; last catalyst was the Q2 beat with raised 2026 outlook and buybacks. Q3 date not confirmed.",
+  "CDNA": {
+   "why": "no clear catalyst found; limited news retrieved. Q3 report confirmed Oct 29, inside 5 sessions.",
    "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": "2026-10-29",
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/403261/caredx-to-report-third-quarter-2026-financial-results-on-october-29-2026"
+   ]
+  },
+  "FTRE": {
+   "why": "no clear catalyst found; limited news retrieved. Q3 report confirmed Oct 29 premarket, inside 5 sessions.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": "2026-10-29",
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/398507/fortrea-announces-date-for-third-quarter-2026-financial-results-and-conference-call"
+   ]
+  },
+  "IOVA": {
+   "why": "no clear catalyst found; limited news retrieved; next earnings date not confirmed.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://therighttrader.com/earnings-calendar/iova"
+   ]
+  },
+  "KNSA": {
+   "why": "no clear catalyst found; limited news retrieved; next earnings date not confirmed.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://beta.earningswhispers.com/go/w/KNSA"
+   ]
+  },
+  "NHC": {
+   "why": "no clear catalyst found; limited news retrieved; next earnings date not confirmed (Q2 reported Aug 7).",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://secure.businesswire.com/news/home/20260807142918/en/NHC-Reports-Second-Quarter-2026-Earnings"
+   ]
+  },
+  "PACS": {
+   "why": "no clear catalyst found; limited news retrieved; next earnings date not confirmed.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://beta.earningswhispers.com/go/w/PACS"
+   ]
+  },
+  "QLYS": {
+   "why": "Raised 2026 revenue guidance to $732-738M with Q2 (Aug 4); no fresh Oct news found. Next earnings date not confirmed.",
+   "direction": "positive",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.webull.com/news/15407062883255296"
+    "https://startupmap.iamsterdam.com/news/feed/qualys-raises-2026-revenue-guidance-to-732m--738m-on-11-q2-growth"
    ]
   },
-  "OKE": {
-   "why": "No clear catalyst found. Reports Oct 27 after the close (inside 5 sessions).",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": "2026-10-27",
-   "red_flags": [
-    "Earnings inside the next 5 sessions"
-   ],
-   "sources": [
-    "https://finviz.com/news/398900/oneok-schedules-third-quarter-2026-conference-call-and-webcast"
-   ]
-  },
-  "PARR": {
-   "why": "Refiner sector sympathy; Mizuho downgraded to neutral Oct 8 (PT $91) and flagged Hawaii crude supply risk. Reports Nov 3 after the close.",
-   "direction": "mixed",
-   "quality": "weak",
-   "depth": "full",
-   "earnings_date": "2026-11-03",
-   "red_flags": [
-    "Mizuho downgrade to neutral Oct 8"
-   ],
-   "sources": [
-    "https://finviz.com/news/401419/par-pacific-announces-third-quarter-2026-earnings-release-and-conference-call-schedule",
-    "https://in.investing.com/news/stock-market-news/mizuho-cuts-phillips-66-delek-par-pacific-as-refiner-rally-prices-in-gains-5624012"
-   ]
-  },
-  "RVTY": {
+  "ROIV": {
    "why": "earnings date check only",
    "direction": "none",
    "quality": "unknown",
    "depth": "earnings_only",
-   "earnings_date": "2026-11-03",
+   "earnings_date": "2026-11-09",
    "red_flags": [],
    "sources": [
-    "https://finviz.com/news/398253/revvity-to-hold-earnings-call-on-november-3-2026"
+    "https://www.biopharmawatch.com/news/ROIV/roivant-financial-results-business-update-november-2026"
    ]
   },
   "SAIC": {
-   "why": "earnings date check only",
+   "why": "earnings date check only; next date not found",
    "direction": "none",
    "quality": "unknown",
    "depth": "earnings_only",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.earningswhispers.com/stocks/saic"
+    "https://bullstory.io/en/stocks/saic/earnings/2027-q3"
    ]
   },
   "SLDE": {
@@ -240,48 +204,15 @@
     "https://finviz.com/news/398043/slide-to-report-2026-third-quarter-earnings-results-on-october-27-2026"
    ]
   },
-  "THC": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": "2026-10-29",
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/398248/tenet-to-report-its-third-quarter-2026-results-on-october-29"
-   ]
-  },
-  "TLN": {
-   "why": "earnings date check only",
+  "VLO": {
+   "why": "earnings date check only; Q3 reported Oct 22, next date not found",
    "direction": "none",
    "quality": "unknown",
    "depth": "earnings_only",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://beta.earningswhispers.com/go/w/TLN"
-   ]
-  },
-  "ZBRA": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://beta.earningswhispers.com/go/w/ZBRA"
-   ]
-  },
-  "ZIM": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://s203.q4cdn.com/172866090/files/doc_financials/2026/q2/ZIM-Q2-2026-PR-Eng-19-8-2026-FINAL-new-template.pdf"
+    "https://finviz.com/news/389791/valero-energy-corporation-to-announce-third-quarter-2026-earnings-results-on-october-22-2026"
    ]
   }
  }
