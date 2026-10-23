@@ -390,6 +390,9 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   the sheet is newer). Live tile: winners vs losers basket today. Evidence (410 days): winners +0.9% vs avg group next 10 (t 1.5);
   holds up +1.1% (t 2.0, halves +1.3/+1.1); gives back → losers won 5 of 5 settled episodes (n small). Oct 21: Consumer + Biotech &
   Health over AI Infrastructure, on 13 sessions, corr 0.03, gives back since Oct 16. ~2 s per build.
+  "Why this trade is happening" (Oct 22, Adam: "I want to understand the trade, it gives confidence"): every story chapter writes a
+  **The trade, explained:** section (story_guide.md: What's happening / Why with sources / How it works / Real or seesaw / What
+  confirms it or breaks it, with dated upcoming events); `tradeCard` shows the latest one at the top of the card (`mdLite`).
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

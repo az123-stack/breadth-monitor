@@ -3278,8 +3278,20 @@ function tradeCard(X) {
   const stk = (r, counter) => `<tr>${nameCell(r)}<td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.ext == null ? "–" : (r.ext >= 0 ? "+" : "") + r.ext.toFixed(1)}</td>${retCell(r.d5, "d5")}${retCell(r.off_hi, "d15")}<td class="l">${counter ? (r.reclaim ? '<span class="tg">back over 21 EMA</span>' : '<span class="meta">under 21 EMA</span>') : (r.on || []).map(x => `<span class="tg">${esc(x)}</span>`).join(" ") || '<span class="meta">–</span>'}</td></tr>`;
   const stkTbl = (rows, counter) => rows.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>RS</th><th>ADRs over 21 EMA</th><th>5 days</th><th>Off high</th><th class="l">${counter ? "Reclaim?" : "On your lists"}</th></tr></thead><tbody>${rows.map(r => stk(r, counter)).join("")}</tbody></table></div>` : '<p class="meta">None today.</p>';
   const evRow = (k, nm) => { const r = ER[k]; if (!r) return ""; const c = (x) => `<td class="num">${pp(x.mean)}<small>t ${x.t ?? "–"} · n ${x.n} (${x.days} days) · ${pp(x.h1)} / ${pp(x.h2)}</small></td>`; return `<tr><td class="l">${nm}</td>${c(r.w)}${c(r.l)}</tr>`; };
+  if (!STORYJ && !STORY_ERR && !STORY_BUSY) fetchStory();
+  const chs = ((STORYJ && STORYJ.chapters) || []).filter(c => c.slot !== "data" && /\*\*The trade, explained:\*\*/.test(c.md || ""));
+  const exCh = chs[chs.length - 1];
+  let explained = "";
+  if (exCh) {
+    const m = exCh.md.split(/\*\*The trade, explained:\*\*/)[1] || "";
+    const body = m.split(/\n\s*\n\*\*[A-Z][^*\n]{0,60}:\*\*/)[0].trim();
+    explained = `<div class="tradewhy"><h3 style="margin:10px 0 4px;font-size:14px">Why this trade is happening <span class="meta">· from the ${longDate(exCh.date)} ${exCh.slot === "am" ? "morning" : "after-the-close"} chapter (researched, with sources)</span></h3>${mdLite(body)}</div>`;
+  } else {
+    explained = `<p class="meta" style="margin:8px 0 0">The plain-English "why" behind this trade is written into each story chapter (morning ~8:00, after the close ~5:00 PM) and will show here.</p>`;
+  }
   const card = $(`<section class="card regcard healthcard tradecard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
       <h2><span class="pbv unproven" title="Information only: it names the rotation and never changes the picks">Info only</span> The trade: ${esc(X.name)} <span class="meta">· ${shortDate(X.date)} close</span></h2></div>
+    ${explained}
     <div class="htiles">
       <div class="btile ${st[0]}"><b>Scoreboard</b><span class="bv">${st[1]} · ${X.above ? X.above + " sessions above its 20-day avg" : "under its 20-day avg"}</span>
         <small>${st[2]} Winning basket beat the losing basket by ${pp(X.spread20, 0)} over 20 sessions.</small>

@@ -108,3 +108,15 @@ The fact sheet's "THE TRADE" block names the market's main rotation (winning vs 
 state (on / cooling / fading / over), and whether the winners hold up when the losers bounce (real buying) or give it back
 (a seesaw). Mention it in one line inside **Where we are** ("The trade: Software + Consumer over AI Infrastructure, day 12,
 still on, but a seesaw"). Say plainly when its state changes since the last chapter. Use only the fact sheet's numbers.
+
+Then write a **The trade, explained:** section (place it right after **What it means**). Adam wants to UNDERSTAND the trade,
+not just see which groups lead: it is what gives him the confidence to hold. It is shown on its own at the top of the Read-out
+("The trade" card), so it must stand alone. 5 bullets, each starting with its bold label, plain words, 120–220 words total:
+- **What's happening:** one sentence: money moving from <losing side> to <winning side>, how long, how big (fact sheet).
+- **Why:** the 1–3 real drivers behind the whole rotation (not just today), each with a source link from your research
+  (earnings/guidance, rates, oil, credit, policy). If you can't find a driver, say "no clear driver found" — never invent one.
+- **How it works:** the mechanism in plain words: who is selling and why, why the money lands where it does (e.g. funds cut
+  crowded AI-capex winners and buy earnings that don't depend on AI spending; falling yields help rate-sensitive groups).
+- **Real or seesaw:** the fact sheet's read in plain words and what history says it usually means next.
+- **What confirms it / what breaks it:** specific upcoming events with dates (earnings, data, Fed) that would prove or
+  disprove the "why", plus the code's kill switch (3 closes under the 20-day average) and the comeback trigger.
