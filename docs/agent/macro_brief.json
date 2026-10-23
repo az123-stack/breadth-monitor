@@ -1,17 +1,23 @@
 {
- "for_date": "2026-10-21",
- "written": "2026-10-22T11:05Z",
- "headline": "Brent is back near $110 on Gulf/Hormuz attack risk while the 10-year sits around 5.1%, with the FOMC, GDP/PCE and Microsoft/Alphabet/Amazon earnings all landing next week.",
+ "for_date": "2026-10-22",
+ "written": "2026-10-23T11:06Z",
+ "headline": "Brent above $110 on Gulf and Iran shipping attacks and a 10-year yield near 5.1% keep markets on edge ahead of next week's FOMC, GDP/PCE and mega-cap earnings.",
  "risk": "high",
- "rates": "The 10-year Treasury yield was about 5.08% on Oct 22, down roughly 5 bp from the prior session after a recent selloff took yields to multi-decade highs.",
- "fed": "The FOMC meets Oct 27-28 with the decision on Oct 28 at 2:00 PM ET; I could not confirm Fed speakers for this week.",
- "oil": "Brent is about $110 (settled $108.82 on Oct 21) as attacks on shipping near Hormuz and Houthi strikes on Saudi targets raise supply-disruption fears.",
- "geo": "The US ordered some diplomats out of Saudi Arabia after Houthi attacks, Iran-related shipping attacks continue in the Gulf, and Iran says it will not talk while being blockaded.",
+ "rates": "The 10-year Treasury yield is about 5.1% (peak near 5.3% earlier in October) and the 2-year hit about 4.77% this week, with cuts priced out for 2026.",
+ "fed": "The Fed is in its blackout period before the Oct 28 FOMC (2:00 PM ET), where a hold is expected (about 94% of economists) and a December hike is widely expected.",
+ "oil": "Brent was about $110 and WTI about $98 on Oct 22 after Houthi attacks on Saudi targets, a US diplomatic drawdown in Saudi Arabia and repeated Hormuz shipping attacks.",
+ "geo": "Iran and Gulf escalation risk is active: Hormuz and Gulf of Oman shipping attacks and the US ordering some diplomats out of Saudi Arabia, with possible renewed US/Israel action on Iran reported.",
  "events": [
+  {
+   "date": "2026-10-23",
+   "time": "9:45 AM ET",
+   "name": "US flash PMIs",
+   "impact": "medium"
+  },
   {
    "date": "2026-10-28",
    "time": "2:00 PM ET",
-   "name": "FOMC rate decision",
+   "name": "FOMC decision and press conference",
    "impact": "high"
   },
   {
@@ -23,13 +29,7 @@
   {
    "date": "2026-10-29",
    "time": "8:30 AM ET",
-   "name": "Q3 GDP advance estimate",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-10-29",
-   "time": "8:30 AM ET",
-   "name": "PCE inflation (September)",
+   "name": "Q3 GDP advance and September PCE",
    "impact": "high"
   },
   {
@@ -37,19 +37,12 @@
    "time": "After close",
    "name": "Amazon earnings",
    "impact": "high"
-  },
-  {
-   "date": "2026-11-02",
-   "time": "After close",
-   "name": "Apple earnings",
-   "impact": "high"
   }
  ],
  "sources": [
+  "https://www.mitrade.com/insights/more/Central-Banks/fed-october-hold-december-hike-20261022J1428",
   "https://nationthailand.com/news/world/40072588",
-  "https://tradingeconomics.com/united-states/government-bond-yield",
-  "https://fedratecalc.com/us-economic-calendar/october-2026/",
-  "https://blofin.com/en/academy/education/tradfi/earnings-season-october-2026",
-  "https://thriveinmarkets.com/calendar/2026-10-26/"
+  "https://blofin.com/academy/education/tradfi/earnings-season-october-2026",
+  "https://www.heygotrade.com/en/news/fed-rate-cuts-priced-out-2026-treasury-yields-hammack-jolts/"
  ]
 }
