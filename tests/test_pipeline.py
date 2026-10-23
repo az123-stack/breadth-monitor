@@ -1262,6 +1262,33 @@ def test_the_trade():
     assert nm == "Software" and sec[0]["s"] == "Software"
 
 
+def test_trade_stories():
+    """Trade Stories: validation drops unsourced timeline items and unknown sub-themes, caps open stories, appends a dated
+    history entry; the price check compares favoured vs hurt groups (or SPY) from rotation.mhist; the scorecard settles 5 later."""
+    from breadth import stories as SS
+    dates = [f"2026-09-{d:02d}" for d in range(1, 31)]
+    up, dn = [100] * 30, [-100] * 30                                   # +1% / -1% a day
+    T = {"subthemes": [{"theme": "Up"}, {"theme": "Down"}],
+         "rotation": {"mhist": {"dates": dates, "spy": [0] * 30, "sub": {"Up": [[0] * 30, [0] * 30, up], "Down": [[0] * 30, [0] * 30, dn]}}}}
+    s = {"id": "Test Story", "title": "t", "status": "building", "summary": "x", "thesis": {k: "x" for k in SS.THESIS},
+         "timeline": [{"date": "2026-09-01", "event": "a", "url": "https://x.com"}, {"date": "2026-09-02", "event": "no link"}],
+         "groups": {"long": ["Up", "Nope"], "short": ["Down"]},
+         "history": [{"date": "2026-09-10", "status": "building", "long": ["Up"], "short": ["Down"]}]}
+    S, probs = SS.validate({"stories": [s]}, T=T, today="2026-09-30")
+    st = S["stories"][0]
+    assert st["id"] == "test-story" and len(st["timeline"]) == 1 and st["groups"]["long"] == ["Up"], st
+    assert any("source link" in p for p in probs) and any("unknown sub-themes" in p for p in probs)
+    assert st["history"][-1]["date"] == "2026-09-30" and st["history"][-1]["status"] == "building"
+    pc = SS.price_check(T, st)
+    assert pc["verdict"] == "agrees" and pc["d5"] > 0.09, pc
+    sc = SS.scorecard(T, st)
+    assert len(sc) == 1 and sc[0]["edge"] > 0.09, sc
+    only_short = SS.price_check(T, {"groups": {"long": [], "short": ["Down"]}})
+    assert only_short["verdict"] == "agrees" and "SPY" in only_short["vs"]
+    many = {"stories": [dict(s, id=f"s{i}") for i in range(SS.MAX_OPEN + 1)]}
+    assert any("open stories" in p for p in SS.validate(many, T=T, today="2026-09-30")[1])
+
+
 def test_futures_feed_parse():
     """Intraday futures: latest bar of any session vs the previous settle; the 3-2-1 crack uses gasoline + diesel."""
     from breadth import premarket as PMK

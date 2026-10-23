@@ -120,3 +120,8 @@ not just see which groups lead: it is what gives him the confidence to hold. It 
 - **Real or seesaw:** the fact sheet's read in plain words and what history says it usually means next.
 - **What confirms it / what breaks it:** specific upcoming events with dates (earnings, data, Fed) that would prove or
   disprove the "why", plus the code's kill switch (3 closes under the 20-day average) and the comeback trigger.
+
+## Trade Stories
+The Trade Stories tab (docs/stories.json) holds the running storylines. In the morning chapter, if a story's catalyst lands
+today or overnight news moved one, say so in one line ("Trade story: AI spending repriced: Microsoft reports tonight").
+The after-the-close task updates the stories themselves (stories_guide.md) AFTER publishing the chapter.

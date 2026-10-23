@@ -393,6 +393,17 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   "Why this trade is happening" (Oct 22, Adam: "I want to understand the trade, it gives confidence"): every story chapter writes a
   **The trade, explained:** section (story_guide.md: What's happening / Why with sources / How it works / Real or seesaw / What
   confirms it or breaks it, with dated upcoming events); `tradeCard` shows the latest one at the top of the card (`mdLite`).
+- `stories.py` **Trade Stories tab** (Oct 22, 2026; Adam: "a tab where you put together news and earnings narratives into a cohesive
+  story and recommend how to trade the developing story"; card R-2026-10-22-trade-stories, layer `trade_stories`, info) → docs/stories.json
+  (page fetches it from Pages every 15 min, `renderStories`, tab right after Read-out). Max 6 open storylines, updated (not rewritten) once a
+  day by the "after the close" task (stories_guide.md): id, title, status building / peaking / fading / resolved, started, summary, changed,
+  thesis {what, why, how, real, confirm}, timeline [{date, event, source, url, reaction}] (no url → dropped), groups {long, short} = exact
+  sub-theme names, tickers {long, short, watch}, catalysts [{date, time, name, why}], trade (markdown), related, history (per day: status +
+  groups, appended by `validate`). Code: `price_check` (favoured minus hurt groups, or vs SPY, from rotation.mhist; verdict agrees /
+  wobbling / turning / disagrees) and `scorecard` (each history day, next 5 sessions) — mirrored in the page (`storyPrice`, `storyScore`).
+  `python -m breadth.stories facts | guide | check --file F | publish --file F --push` (gzip+base64 → `.github/workflows/stories.yml`,
+  `save --gz-b64`). Stdlib only. Seeded Oct 22 with 5 sourced stories (AI spending repriced, 10-year near 5%, Gulf oil, IT services
+  re-rating, managed care).
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

@@ -382,6 +382,20 @@
     "R-2026-10-22-the-trade"
    ],
    "notes": "holds-up winners +1.1% vs avg group next 10 (t 2.0, both halves) but basket momentum overall t 1.5; 'gives back' snapback 5 of 5 settled episodes, n small"
+  },
+  {
+   "id": "trade_stories",
+   "name": "Trade Stories (running news/earnings narratives with a price check)",
+   "kind": "agent",
+   "owner": "Market Monitor story · after the close",
+   "status": "info",
+   "where": "breadth/stories.py + stories_guide.md → docs/stories.json, Trade Stories tab (renderStories)",
+   "what": "max 6 open storylines: thesis, sourced timeline, favoured/hurt sub-themes, catalysts, how to trade; code price check + 5-session scorecard per story-day",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-22-trade-stories"
+   ],
+   "notes": "forward-only test from Oct 22, 2026"
   }
  ]
 }

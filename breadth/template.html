@@ -188,6 +188,7 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 .pbv.focus { background: color-mix(in srgb, var(--good) 35%, transparent); }
 .pbv.selective { background: color-mix(in srgb, var(--warning) 30%, transparent); }
 .pbv.avoid { background: color-mix(in srgb, var(--critical) 28%, transparent); }
+.pbv.act { background: color-mix(in srgb, var(--good) 35%, transparent); } .pbv.watch { background: color-mix(in srgb, var(--warning) 30%, transparent); }
 .pbv.unproven { background: var(--grid); color: var(--text-secondary); }
 .dlay { display: grid; grid-template-columns: 14px 84px minmax(0, 1fr); gap: 0 6px; padding: 4px 0; border-top: 1px solid var(--grid); font-size: 13px; align-items: baseline; }
 .dlay > span:nth-child(2) { color: var(--text-muted); font-weight: 600; }
@@ -513,6 +514,15 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .tg.sow-breakout { background: color-mix(in srgb, var(--good) 35%, transparent); } .tg.sow-pop { background: color-mix(in srgb, var(--good) 22%, transparent); }
 .tg.sow-prime { background: color-mix(in srgb, var(--warning) 45%, transparent); font-weight: 700; } .tg.sow-box { background: var(--grid); } .tg.sow-rshi { background: color-mix(in srgb, var(--s1) 18%, transparent); }
 .tg.sow-nuzzle { background: color-mix(in srgb, var(--s1) 25%, transparent); } .tg.sow-riding { background: var(--grid); } .tg.sow-extended { background: color-mix(in srgb, var(--warning) 28%, transparent); }
+.storycard { padding: 10px 14px; } .storycard > summary { cursor: pointer; list-style: none; } .storycard > summary::-webkit-details-marker { display: none; }
+.storycard .sthead { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; } .storycard .sttitle { font-size: 16px; }
+.storycard .stsum { margin: 6px 0 2px; font-weight: 500; } .storycard .stchg { font-size: 12.5px; }
+.storycard .sth { font-size: 14px; margin: 14px 0 4px; } .storycard .stpart { margin: 6px 0; } .storycard .stpart > b { display: block; font-size: 12.5px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .03em; }
+.storycard .stpart p { margin: 2px 0; } .storycard .sttl { margin: 4px 0; padding-left: 18px; } .storycard .sttl li { margin: 3px 0; }
+.storycard .htiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin-top: 8px; }
+.storycard .btile { text-align: left; border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 3px; }
+.storycard .btile.act { border-left-color: var(--good); } .storycard .btile.avoid { border-left-color: var(--critical); } .storycard .btile.watch { border-left-color: var(--warning); }
+.storycard .btile .bv { font-size: 15px; font-weight: 700; } .storycard .btile.act .bv { color: var(--good); } .storycard .btile.avoid .bv { color: var(--critical); }
 .healthcard .htiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin-top: 8px; }
 .healthcard .btile { text-align: left; border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 3px; }
 .healthcard .btile.act { border-left-color: var(--good); } .healthcard .btile.avoid { border-left-color: var(--critical); } .healthcard .btile.watch { border-left-color: var(--warning); }
@@ -566,7 +576,7 @@ const TONES = {
 };
 
 let TAB = "readout";
-try { const h = location.hash.slice(1); if (["readout", "breadth", "premarket", "intraday", "trades", "themes", "rotation", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
+try { const h = location.hash.slice(1); if (["readout", "stories", "breadth", "premarket", "intraday", "trades", "themes", "rotation", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
 
 function render() {
   const app = document.getElementById("app");
@@ -602,6 +612,7 @@ function render() {
   });
   const tabs = $(`<nav class="tabs" role="tablist">
     <button role="tab" data-tab="readout">Read-out</button>
+    <button role="tab" data-tab="stories">Trade Stories</button>
     <button role="tab" data-tab="breadth">Breadth</button>
     <button role="tab" data-tab="premarket">Pre-market</button>
     <button role="tab" data-tab="intraday">Intraday</button>
@@ -625,7 +636,7 @@ function render() {
     else if (TAB === "intraday") renderIntraday(panel);
     else if (TAB === "premarket") renderPremarket(panel);
     else if (TAB === "rotation") renderRotation(panel);
-    else if (TAB === "readout") renderReadout(panel);
+    else if (TAB === "readout") renderReadout(panel); else if (TAB === "stories") renderStories(panel);
     else renderBreadth(panel);
     reapplySorts(panel);
   };
@@ -2348,7 +2359,7 @@ function rerenderPanel() {
   if (TAB === "themes") renderThemes(panel); else if (TAB === "stocks") renderStocks(panel);
   else if (TAB === "browse") renderBrowse(panel); else if (TAB === "setups") renderSetups(panel);
   else if (TAB === "trades") renderTrades(panel);
-  else if (TAB === "intraday") renderIntraday(panel); else if (TAB === "premarket") renderPremarket(panel); else if (TAB === "rotation") renderRotation(panel); else if (TAB === "readout") renderReadout(panel); else renderBreadth(panel);
+  else if (TAB === "intraday") renderIntraday(panel); else if (TAB === "premarket") renderPremarket(panel); else if (TAB === "rotation") renderRotation(panel); else if (TAB === "readout") renderReadout(panel); else if (TAB === "stories") renderStories(panel); else renderBreadth(panel);
   reapplySorts(panel);
   window.scrollTo(0, y);
 }
@@ -3236,6 +3247,104 @@ function mdLite(md) {
   return String(md || "").split(/\n{2,}/).map(block => { const lines = block.split("\n");
     if (lines.every(l => /^\s*[-•] /.test(l))) return `<ul class="rol">${lines.map(l => `<li>${inl(l.replace(/^\s*[-•] /, ""))}</li>`).join("")}</ul>`;
     return lines.map(l => /^\s*[-•] /.test(l) ? `<ul class="rol"><li>${inl(l.replace(/^\s*[-•] /, ""))}</li></ul>` : `<p>${inl(l)}</p>`).join(""); }).join("");
+}
+// ---------------------------------------------------------------- Trade Stories tab (Oct 22): docs/stories.json, written after the close
+let STORIESJ = null, STORIES_ERR = null, STORIES_BUSY = false;
+async function fetchStories() {
+  STORIES_BUSY = true;
+  try { const r = await fetch("stories.json?cb=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw new Error(r.status === 404 ? "no stories yet" : "HTTP " + r.status); STORIESJ = await r.json(); STORIES_ERR = null; }
+  catch (e) { STORIES_ERR = String(e.message || e); }
+  STORIES_BUSY = false; if (TAB === "stories") rerenderPanel();
+}
+setInterval(() => { if (document.visibilityState === "visible" && TAB === "stories") fetchStories(); }, 15 * 60 * 1000);
+// mirrors stories.price_check / scorecard (rotation.mhist: per sub-theme [net $, $ vol, return bp], spy bp)
+function storyMH() { const M = ((DATA.themes || {}).rotation || {}).mhist || {}; return { d: M.dates || [], sub: M.sub || {}, spy: M.spy || [] }; }
+function storyBasket(M, gs, i0, i1) {
+  const v = gs.map(g => { const r = (M.sub[g] || [])[2]; if (!r || i1 >= r.length || i0 < -1) return null; let p = 1; for (let i = i0 + 1; i <= i1; i++) p *= 1 + (r[i] || 0) / 1e4; return p - 1; }).filter(x => x != null);
+  return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
+}
+function storySpy(M, i0, i1) { let p = 1; for (let i = i0 + 1; i <= i1; i++) p *= 1 + (M.spy[i] || 0) / 1e4; return p - 1; }
+function storyPrice(s) {
+  const M = storyMH(), n = M.d.length - 1; if (n < 25) return null;
+  const L = ((s.groups || {}).long || []).filter(g => M.sub[g]), S = ((s.groups || {}).short || []).filter(g => M.sub[g]);
+  if (!L.length && !S.length) return null;
+  const edge = (i0, i1) => { const lo = L.length ? storyBasket(M, L, i0, i1) : storySpy(M, i0, i1), sh = S.length ? storyBasket(M, S, i0, i1) : storySpy(M, i0, i1); return lo == null || sh == null ? null : lo - sh; };
+  const o = { d1: edge(n - 1, n), d5: edge(n - 5, n), d20: edge(n - 20, n), vs: S.length ? (L.length ? "the groups it hurts" : "SPY (these groups should lag)") : "SPY" };
+  o.verdict = o.d5 == null || o.d20 == null ? "unknown" : o.d5 > 0 && o.d20 > 0 ? "agrees" : o.d20 > 0 ? "wobbling" : o.d5 > 0 ? "turning" : "disagrees";
+  const k = Math.min(60, n); o.line = []; for (let i = n - k; i <= n; i++) o.line.push(edge(n - k, i) ?? 0);
+  return o;
+}
+function storyScore(s) {
+  const M = storyMH(), idx = {}; M.d.forEach((d, i) => { idx[d] = i; });
+  return (s.history || []).map(h => { const i = idx[h.date]; if (i == null || i + 5 >= M.d.length || h.status === "resolved") return null;
+    const L = (h.long || []).filter(g => M.sub[g]), S = (h.short || []).filter(g => M.sub[g]); if (!L.length && !S.length) return null;
+    const lo = L.length ? storyBasket(M, L, i, i + 5) : storySpy(M, i, i + 5), sh = S.length ? storyBasket(M, S, i, i + 5) : storySpy(M, i, i + 5);
+    return lo == null || sh == null ? null : { date: h.date, edge: lo - sh }; }).filter(Boolean);
+}
+function storyStocks(groups) {
+  const T = DATA.themes || {}, on = {};
+  ((T.trade_setups || {}).setups || []).forEach(st => (st.top || []).forEach(t => { (on[t] = on[t] || []).push(st.name); }));
+  ((T.playbook || {}).picks || []).forEach((p, i) => { (on[p.t] = on[p.t] || []).unshift("Top pick #" + (i + 1)); });
+  const G = new Set(groups);
+  return (T.stocks || []).filter(s => G.has(s.sub) && (s.rsr || 0) >= 80 && (s.price || 0) >= 10)
+    .map(s => { const ext = s.adr ? (s.e21 || 0) / (s.adr / 100) : null; return Object.assign({}, s, { ext, chase: ext != null && ext > 2, on: on[s.t] || [] }); })
+    .sort((a, b) => (a.chase - b.chase) || (b.on.length - a.on.length) || ((b.rsr || 0) - (a.rsr || 0))).slice(0, 8);
+}
+const STORY_ST = { building: ["act", "Building", "gaining force: new sourced events and price agrees"], peaking: ["watch", "Peaking", "still true but crowded, extended or about to be tested"],
+  fading: ["avoid", "Fading", "price or the key catalyst has turned against it"], resolved: ["", "Resolved", "played out"] };
+const STORY_PV = { agrees: ["act", "Price agrees"], wobbling: ["watch", "Price wobbling (5 days against)"], turning: ["watch", "Price turning its way (5 days for, 20 against)"], disagrees: ["avoid", "Price disagrees"], unknown: ["", "No price check"] };
+function storyCardFull(s, open) {
+  const pp = (v, d = 1) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(d) + "%";
+  const st = STORY_ST[s.status] || STORY_ST.building, days = Math.max(0, Math.round((new Date(etToday() + "T12:00:00") - new Date(s.started + "T12:00:00")) / 864e5));
+  const P = storyPrice(s), pv = STORY_PV[(P || {}).verdict || "unknown"], sc = storyScore(s), hits = sc.filter(r => r.edge > 0).length;
+  const th = s.thesis || {}, parts = [["what", "What's happening"], ["why", "Why"], ["how", "How it works"], ["real", "Real or seesaw"], ["confirm", "What confirms it / what breaks it"]];
+  const stk = storyStocks((s.groups || {}).long || []);
+  const today = etToday(), cats = (s.catalysts || []).filter(c => c.date >= today);
+  const dleft = (d) => { const n = Math.round((new Date(d + "T12:00:00") - new Date(today + "T12:00:00")) / 864e5); return n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`; };
+  const rel = (s.related || []).map(id => { const r = ((STORIESJ || {}).stories || []).find(x => x.id === id); return r ? `<a href="#" class="tg" data-story="${esc(id)}">${esc(r.title)}</a>` : ""; }).join(" ");
+  return `<details class="card storycard" id="story-${esc(s.id)}" ${open ? "open" : ""}><summary>
+      <div class="sthead"><span class="pbv ${st[0] === "act" ? "act" : st[0] === "avoid" ? "avoid" : "watch"}" title="${esc(st[2])}">${st[1]}</span>
+      <b class="sttitle">${esc(s.title)}</b><span class="meta">day ${days} · since ${shortDate(s.started)} · updated ${shortDate(s.updated)}</span>
+      ${P ? `<span class="pbv ${pv[0]}" title="Long groups vs ${esc(P.vs)}: 5 days ${pp(P.d5)}, 20 days ${pp(P.d20)}">${pv[1]}</span>` : ""}</div>
+      <div class="stsum">${esc(s.summary || "")}</div>
+      ${s.changed ? `<div class="meta stchg"><b>Today:</b> ${esc(s.changed)}</div>` : ""}</summary>
+    <div class="stbody">
+      <div class="htiles">
+        <div class="btile ${pv[0] || "watch"}"><b>Price check</b><span class="bv">${pv[1]}</span>
+          ${P ? `<small>The groups this story favours vs ${esc(P.vs)}: today ${pp(P.d1)}, 5 days ${pp(P.d5)}, 20 days ${pp(P.d20)}.</small>
+          <div class="meta" style="font-size:11.5px">Story's edge, last ${P.line.length - 1} sessions (cumulative)</div>${healthLine([{ v: P.line, c: "var(--s1)" }], { zero: 0 })}` : "<small>No groups linked.</small>"}
+          <small>${(s.groups.long || []).length ? "<b>For:</b> " + s.groups.long.map(esc).join(", ") : ""}${(s.groups.short || []).length ? "<br><b>Against:</b> " + s.groups.short.map(esc).join(", ") : ""}</small></div>
+        <div class="btile watch"><b>Scorecard</b><span class="bv">${sc.length ? `${hits} of ${sc.length} days right` : "Too new to score"}</span>
+          <small>${sc.length ? `Each day's call (favoured groups minus ${esc((P || {}).vs || "the other side")}) over the next 5 sessions: average ${pp(sc.reduce((a, r) => a + r.edge, 0) / sc.length)}.` : "Each day the story is open, its call is scored over the next 5 sessions. The first scores land 5 sessions after a story starts being tracked."}</small>
+          ${cats.length ? `<small><b>Next catalysts:</b></small>${cats.slice(0, 4).map(c => `<small>· <b>${shortDate(c.date)}</b> (${dleft(c.date)}) ${esc(c.time || "")} ${esc(c.name)}${c.why ? ` <span class="meta">— ${esc(c.why)}</span>` : ""}</small>`).join("")}` : ""}</div>
+      </div>
+      <h3 class="sth">The story</h3>
+      ${parts.filter(([k]) => th[k]).map(([k, nm]) => `<div class="stpart"><b>${nm}</b>${mdLite(th[k])}</div>`).join("")}
+      <h3 class="sth">How to trade it</h3>
+      ${s.trade ? mdLite(s.trade) : ""}
+      ${stk.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="l">Stocks in the favoured groups (RS 80+)</th><th>RS</th><th>ADRs over 21 EMA</th><th>5 days</th><th>Off high</th><th class="l">On your lists</th></tr></thead><tbody>
+        ${stk.map(r => `<tr>${nameCell(r)}<td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.ext == null ? "–" : (r.ext >= 0 ? "+" : "") + r.ext.toFixed(1)}${r.chase ? ' <span class="tg pspike">don\'t chase</span>' : ""}</td>${retCell(r.d5, "d5")}${retCell(r.off_hi, "d15")}<td class="l">${r.on.map(x => `<span class="tg">${esc(x)}</span>`).join(" ") || '<span class="meta">–</span>'}</td></tr>`).join("")}</tbody></table></div>` : ""}
+      ${(s.tickers || {}).watch && s.tickers.watch.length ? `<p class="meta"><b>Counter-trade watch:</b> ${s.tickers.watch.map(esc).join(", ")}</p>` : ""}
+      <h3 class="sth">Timeline</h3>
+      <ul class="sttl">${(s.timeline || []).slice().reverse().map(e => `<li><b>${shortDate(e.date)}</b> ${esc(e.event)} <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.source || "source")}</a>${e.reaction ? ` <span class="meta">· ${esc(e.reaction)}</span>` : ""}</li>`).join("")}</ul>
+      ${rel ? `<p class="meta"><b>Related stories:</b> ${rel}</p>` : ""}
+    </div></details>`;
+}
+function renderStories(app) {
+  if (!STORIESJ && !STORIES_ERR && !STORIES_BUSY) fetchStories();
+  const all = (STORIESJ || {}).stories || [], open = all.filter(s => s.status !== "resolved"), closed = all.filter(s => s.status === "resolved");
+  const X = (DATA.themes || {}).thetrade;
+  const head = $(`<section class="card regcard"><div class="head"><h2><span class="pbv unproven" title="Information only: stories never change the picks; each is scored against price">Info only</span> Trade Stories <span class="meta">· the storylines moving the market, updated after each close${STORIESJ && STORIESJ.updated ? " · last update " + esc(STORIESJ.updated.replace("T", " ")) + " ET" : ""}</span></h2></div>
+    <p class="meta" style="margin:4px 0 0">Each story pulls the news, earnings and macro behind a move into one case file: what's happening, why, how it works, whether price agrees, how to trade it, and what would prove it wrong. Claude updates them once a day after the close with sources; the price check and scorecard are computed by the dashboard from real group returns, so a story that price stops agreeing with shows it.${X && X.name ? ` The market's main rotation right now: <a href="#" data-go="readout"><b>${esc(X.name)}</b></a> (The trade card on Read-out).` : ""}</p></section>`);
+  app.append(head);
+  if (!STORIESJ) { app.append($(`<div class="card empty">${STORIES_ERR ? "No stories yet (" + esc(STORIES_ERR) + ")." : "Loading stories…"}</div>`)); return; }
+  const wrap = $(`<div>${open.map((s, i) => storyCardFull(s, i === 0)).join("")}
+    ${closed.length ? `<details class="card"><summary><b>Closed stories</b> <span class="meta">${closed.length}</span></summary>${closed.map(s => storyCardFull(s, false)).join("")}</details>` : ""}</div>`);
+  wrap.addEventListener("click", (e) => {
+    const a = e.target.closest("[data-story]"); if (a) { e.preventDefault(); const el = document.getElementById("story-" + a.dataset.story); if (el) { el.open = true; el.scrollIntoView({ behavior: "smooth" }); } return; }
+  });
+  head.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); const b = document.querySelector(`nav.tabs button[data-tab="${a.dataset.go}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
+  app.append(wrap);
 }
 function tradeCard(X) {
   if (!X || !X.winners) return $('<div></div>');

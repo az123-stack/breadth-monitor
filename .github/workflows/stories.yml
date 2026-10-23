@@ -1,0 +1,40 @@
+name: Trade stories
+
+# Saves docs/stories.json. Dispatched by `python -m breadth.stories publish --push` from the Claude "after the close" task
+# (scheduled tasks can dispatch workflows but not write repo files). The file arrives gzipped + base64.
+on:
+  workflow_dispatch:
+    inputs:
+      gz_b64: { description: "stories.json, gzip + base64", required: true }
+
+permissions:
+  contents: write
+
+concurrency:
+  group: story
+  cancel-in-progress: false
+
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Save the stories
+        env:
+          B64: ${{ inputs.gz_b64 }}
+        run: python -m breadth.stories save --gz-b64 "$B64"
+      - name: Commit
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          git add docs/stories.json
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -qm "Trade stories: $(date -u +%F)"
+          for i in 1 2 3; do
+            git push -q && break
+            git pull -q --rebase -X theirs || { git rebase --abort; break; }
+          done
