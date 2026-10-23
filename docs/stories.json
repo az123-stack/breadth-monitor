@@ -1,0 +1,501 @@
+{
+ "updated": "2026-10-22T21:09",
+ "stories": [
+  {
+   "id": "ai-spending-repriced",
+   "title": "AI spending gets repriced",
+   "status": "peaking",
+   "started": "2026-10-02",
+   "updated": "2026-10-22",
+   "summary": "Investors are questioning whether the AI build-out pays for itself at 5% rates, so money is leaving AI hardware for companies whose earnings don't depend on AI capex.",
+   "changed": "Meta's share-funded AI spending, Tesla's capex cut and Lam's soft guide hit chips again on Oct 22: semicap, optical and AI servers fell 10–12% while software and staples rallied.",
+   "thesis": {
+    "what": "Since early October the AI-hardware groups (chip equipment, optical, AI servers, custom chips, memory, neoclouds, data-center power) fell about 18% over 20 sessions while IT services, enterprise software and steady consumer names rose about 10%: a 28-point swing. On Oct 22 the S&P 500 fell 1.2% but the equal-weight S&P rose 0.7%: the money moved, it didn't leave.",
+    "why": "Two worries feed each other. **Cost:** Meta announced non-voting shares to help fund its AI spending and fell 5%; Tesla cut capex; Lam Research guided below consensus ([Korea Times](https://www.koreatimes.co.kr/world/20261023/wall-street-sinks-as-nasdaq-falls-over-2-on-ai-cost-worries), [Investrade](https://investrade.com/market-review-october-22-2026/)). **Financing:** hot CPI pushed the 10-year to 5.26% and CoreWeave's credit spread past 1,000 bp, so borrowing to build data centers got expensive ([TradingKey](https://www.tradingkey.com/analysis/stocks/us-stocks/262218623-us-premarket-tsmc-record-profit-chip-stocks-fall-nvidia-micron-ppi-tradingkey)).",
+    "how": "Funds were crowded in AI hardware after a huge run. When the spending story wobbles they trim those winners first and park the money in businesses that grow without AI capex (software, IT services, staples). The giants' weight drags the S&P down while the average stock holds up.",
+    "real": "A seesaw since Oct 16: the two sides move opposite each other and the winners give back whenever AI bounces (Oct 21 on Super Micro's raised forecast). Price still agrees on 5 and 20 days. In 5 of 5 past seesaw stretches the beaten-down side won the next 10 sessions, so this is mature and snapback-prone.",
+    "confirm": "The verdict comes next week: Fed decision and Microsoft + Alphabet earnings on Oct 28, PCE inflation and Amazon on Oct 29, Apple on Nov 2. Capex still rising AND rewarded → AI hardware snaps back and this fades. Capex cut or punished → the rotation runs on. A day with ≤ 40% of dollars in falling stocks is the code's comeback trigger."
+   },
+   "timeline": [
+    {
+     "date": "2026-10-02",
+     "event": "Accenture's forecast eases AI-disruption fears; battered IT services stocks rally",
+     "url": "https://www.thestar.com.my/tech/tech-news/2026/10/02/accenture039s-forecast-eases-ai-disruption-fears-lifts-battered-it-services-stocks",
+     "source": "The Star",
+     "reaction": "IT services start re-rating"
+    },
+    {
+     "date": "2026-10-14",
+     "event": "Hot CPI (3.7% vs 3.6% expected) revives hike bets; CoreWeave credit spread breaks 1,000 bp",
+     "url": "https://www.tradingkey.com/analysis/stocks/us-stocks/262218623-us-premarket-tsmc-record-profit-chip-stocks-fall-nvidia-micron-ppi-tradingkey",
+     "source": "TradingKey",
+     "reaction": "~72% of dollars in falling stocks; neoclouds −11.6%"
+    },
+    {
+     "date": "2026-10-15",
+     "event": "Money rotates from indebted AI names into enterprise software; SMH falls an 8th straight day",
+     "url": "https://invezz.com/news/2026/10/15/servicenow-stock-rises-6-as-investors-rotate-to-enterprise-software-stocks/",
+     "source": "Invezz",
+     "reaction": "Enterprise SaaS +6.0%"
+    },
+    {
+     "date": "2026-10-16",
+     "event": "Reuters flags credit-funded data-center spending squeezing Alphabet and Meta cash flow; CoreWeave −12%",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-16-2026",
+     "source": "TheStreet",
+     "reaction": "Neoclouds −10.4%, thrust fails its first test"
+    },
+    {
+     "date": "2026-10-21",
+     "event": "Super Micro raises its revenue forecast to $18.5–19.5B; AI hardware bounces",
+     "url": "https://ts2.tech/en/nasdaq-rises-0-6-as-ai-hardware-gains-divide-wall-street/",
+     "source": "ts2",
+     "reaction": "Data-center power +5%, neoclouds +4%: the seesaw"
+    },
+    {
+     "date": "2026-10-22",
+     "event": "Meta funds AI with non-voting shares, Tesla cuts capex, Lam guides below consensus",
+     "url": "https://www.koreatimes.co.kr/world/20261023/wall-street-sinks-as-nasdaq-falls-over-2-on-ai-cost-worries",
+     "source": "Korea Times",
+     "reaction": "Semicap −11.9%, optical −10.7%; Enterprise SaaS +4.1%, IT services +6.1%"
+    }
+   ],
+   "groups": {
+    "long": [
+     "IT Services & Consulting",
+     "Enterprise SaaS",
+     "Business Services & Data",
+     "Household & Personal Care",
+     "Packaged Foods"
+    ],
+    "short": [
+     "Semicap Equipment",
+     "Optical Components & Transceivers",
+     "AI Servers & Integrators",
+     "Custom Silicon & Networking Chips",
+     "Neoclouds & GPU Hosting",
+     "Data Center Power & Cooling",
+     "Memory & Storage Media"
+    ]
+   },
+   "tickers": {
+    "long": [
+     "CRM",
+     "WDAY",
+     "NOW",
+     "FRSH",
+     "APPN",
+     "TEAM"
+    ],
+    "short": [],
+    "watch": [
+     "MU",
+     "LITE",
+     "MRVL",
+     "SNDK",
+     "AXTI"
+    ]
+   },
+   "catalysts": [
+    {
+     "date": "2026-10-28",
+     "time": "2:00 PM ET",
+     "name": "FOMC rate decision",
+     "why": "Rates are half of this story: a hawkish Fed keeps AI financing expensive."
+    },
+    {
+     "date": "2026-10-28",
+     "time": "After close",
+     "name": "Microsoft and Alphabet earnings",
+     "why": "Their capex plans and AI revenue decide whether the spending is paying off."
+    },
+    {
+     "date": "2026-10-29",
+     "time": "8:30 AM ET",
+     "name": "PCE inflation (September)",
+     "why": "Another hot print pushes yields back toward 5.25%."
+    },
+    {
+     "date": "2026-10-29",
+     "time": "After close",
+     "name": "Amazon earnings",
+     "why": "AWS capex and growth: the other big AI spender."
+    },
+    {
+     "date": "2026-11-02",
+     "time": "After close",
+     "name": "Apple earnings",
+     "why": "Mega-cap tone into November."
+    }
+   ],
+   "trade": "- **Expression:** strong software names that aren't stretched (CRM, WDAY, NOW, FRSH); APPN and TEAM are 2.5–3.4 ADRs over their 21 EMA, so wait for a pullback or a flag.\n- **Entry:** pullbacks toward the 10/21 EMA or tight 3–5 day flags; never a +4% day.\n- **Stop:** the entry day's low or 1 ADR.\n- **Into Oct 28–29:** size down or take partials before Microsoft/Alphabet/Amazon: a capex beat can flip the seesaw in a day.\n- **Counter-trade:** MU, LITE, MRVL, SNDK (RS 97–99, all under their 21 EMA) only after the comeback trigger or a reclaim of the 21 EMA, small.",
+   "related": [
+    "rates-near-5",
+    "it-services-rerating",
+    "gulf-oil-shock"
+   ],
+   "history": [
+    {
+     "date": "2026-10-22",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "Enterprise SaaS",
+      "Business Services & Data",
+      "Household & Personal Care",
+      "Packaged Foods"
+     ],
+     "short": [
+      "Semicap Equipment",
+      "Optical Components & Transceivers",
+      "AI Servers & Integrators",
+      "Custom Silicon & Networking Chips",
+      "Neoclouds & GPU Hosting",
+      "Data Center Power & Cooling",
+      "Memory & Storage Media"
+     ],
+     "note": "Meta's share-funded AI spending, Tesla's capex cut and Lam's soft guide hit chips again on Oct 22: semicap, optical and AI servers fell 10–12% while software and staples rallied."
+    }
+   ]
+  },
+  {
+   "id": "rates-near-5",
+   "title": "Hot inflation keeps the 10-year near 5%",
+   "status": "peaking",
+   "started": "2026-10-14",
+   "updated": "2026-10-22",
+   "summary": "Hot CPI and PPI pushed the 10-year Treasury yield to 5.26%, hurting companies whose profits are years away; yields eased on Oct 22, but the Fed and PCE next week decide the next leg.",
+   "changed": "Yields fell back toward 5% on Oct 22 and rate-sensitive groups (homebuilders, utilities, REITs) rallied.",
+   "thesis": {
+    "what": "Since the Oct 14 CPI the groups that need cheap money or are years from profits (small nuclear reactors, quantum, homebuilders, REITs, residential solar) fell about 13% vs SPY over 20 sessions.",
+    "why": "September CPI came in at 3.7% vs 3.6% and PPI was hot the next day, reviving rate-hike bets; the 10-year hit 5.26% ([24/7 Wall St.](https://247wallst.com/investing/2026/10/14/nuscale-power-falls-7-as-10-year-treasury-yield-climbs-to-5-26-energy-fuels-drops-9-oklo-slides-5/)). Oil above $100 feeds inflation worries too (see the Gulf oil story).",
+    "how": "A higher 10-year lowers what future profits are worth today, so the longest-dated stories (SMR, quantum) get hit hardest, and it raises mortgage and financing costs for housing and REITs. When yields ease, the same groups snap back fastest.",
+    "real": "Over 20 days price agrees, but on 5 days the rate-sensitive groups are level with SPY: the pressure has paused with yields off their high.",
+    "confirm": "Confirm: a hawkish Fed on Oct 28 or a hot PCE on Oct 29 sends the 10-year back above 5.25%. Break: a soft PCE and a calm Fed let yields slide and these groups recover."
+   },
+   "timeline": [
+    {
+     "date": "2026-10-14",
+     "event": "CPI 3.7% vs 3.6% expected; 10-year yield climbs to 5.26%",
+     "url": "https://247wallst.com/investing/2026/10/14/nuscale-power-falls-7-as-10-year-treasury-yield-climbs-to-5-26-energy-fuels-drops-9-oklo-slides-5/",
+     "source": "24/7 Wall St.",
+     "reaction": "NuScale −7%, Oklo −5%"
+    },
+    {
+     "date": "2026-10-15",
+     "event": "Hot PPI revives fears that borrowing costs slow AI data-center spending",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/formfactor-teradyne-applied-materials-amd-173627052.html",
+     "source": "Yahoo Finance",
+     "reaction": "Semicap −3.2%"
+    },
+    {
+     "date": "2026-10-22",
+     "event": "10-year yield falls about 19 bp toward 4.95% as money seeks safety",
+     "url": "https://investrade.com/market-review-october-22-2026/",
+     "source": "Investrade",
+     "reaction": "Homebuilders +5.7%, utilities +2.8%, REITs +2.8%"
+    }
+   ],
+   "groups": {
+    "long": [],
+    "short": [
+     "Nuclear Reactors (SMR)",
+     "Quantum Computing",
+     "Homebuilders",
+     "REITs",
+     "Residential Solar & Yieldcos"
+    ]
+   },
+   "tickers": {
+    "long": [],
+    "short": [],
+    "watch": [
+     "OKLO",
+     "SMR",
+     "IONQ"
+    ]
+   },
+   "catalysts": [
+    {
+     "date": "2026-10-28",
+     "time": "2:00 PM ET",
+     "name": "FOMC rate decision",
+     "why": "Tone on hikes decides whether 5%+ holds."
+    },
+    {
+     "date": "2026-10-29",
+     "time": "8:30 AM ET",
+     "name": "PCE inflation (September)",
+     "why": "The Fed's preferred inflation gauge."
+    }
+   ],
+   "trade": "- **Don't fight it with longs** in SMR, quantum or long-duration names while the 10-year is near 5%.\n- **Rate-relief bounce:** homebuilders and utilities lead when yields fall (Oct 22); trade it only after the Fed/PCE if yields break lower.\n- **Into Oct 28–29:** binary for these groups; stay small or flat.",
+   "related": [
+    "ai-spending-repriced",
+    "gulf-oil-shock"
+   ],
+   "history": [
+    {
+     "date": "2026-10-22",
+     "status": "peaking",
+     "long": [],
+     "short": [
+      "Nuclear Reactors (SMR)",
+      "Quantum Computing",
+      "Homebuilders",
+      "REITs",
+      "Residential Solar & Yieldcos"
+     ],
+     "note": "Yields fell back toward 5% on Oct 22 and rate-sensitive groups (homebuilders, utilities, REITs) rallied."
+    }
+   ]
+  },
+  {
+   "id": "gulf-oil-shock",
+   "title": "Gulf attacks keep oil above $100",
+   "status": "building",
+   "started": "2026-10-09",
+   "updated": "2026-10-22",
+   "summary": "Houthi attacks on Saudi sites and Hormuz shipping pushed Brent from about $98 to over $110 in two weeks; refiners and drillers lead, airlines lose.",
+   "changed": "Brent reached about $112–113 on Oct 22 after new Houthi attacks in Saudi Arabia; the crack spread rose ~4%, but refiners slipped on Valero's earnings day.",
+   "thesis": {
+    "what": "Energy groups (refiners, shale, integrated oil, tankers, drillers) are up about 8% over 20 sessions while airlines fell 10%: an 18-point swing, though the last 5 days stalled.",
+    "why": "Houthi attacks on Saudi sites (Oct 9, Oct 12, Oct 22) and reported attacks on ships in the Strait of Hormuz (Oct 14) put supply at risk; Brent went from $97.92 to $111.88 ([Nation Thailand](https://www.nationthailand.com/news/40070809), [Euronews](https://www.euronews.com/2026/10/14/oil-prices-rise-after-reported-attacks-on-ships-in-strait-of-hormuz), [Investrade](https://investrade.com/morning-preview-october-22-2026/)).",
+    "how": "A supply scare lifts crude, and when fuel prices rise faster than crude (crack spread up) refiners earn the most; when crude outruns fuel, producers win. Airlines pay for the fuel. Higher oil also feeds inflation, which ties this story to rates.",
+    "real": "Wobbling: the 20-day call is right but the last 5 days went against it (refiners down on Valero's earnings day despite the crack +4%). That's crowding in a group that roughly doubled since June.",
+    "confirm": "Confirm: more attacks or supply losses keep Brent over $110 and refiners hold their gains through earnings. Break: a ceasefire or diplomatic progress drops Brent back under $100, or refiners keep falling while the crack rises (distribution)."
+   },
+   "timeline": [
+    {
+     "date": "2026-10-09",
+     "event": "Oil hits a six-week high after Houthi attacks on Saudi sites (Brent $97.92)",
+     "url": "https://www.nationthailand.com/news/40070809",
+     "source": "Nation Thailand",
+     "reaction": ""
+    },
+    {
+     "date": "2026-10-12",
+     "event": "Brent +1.8% after more attacks on Saudi Arabia",
+     "url": "https://www.nationthailand.com/news/world/40072180",
+     "source": "Nation Thailand",
+     "reaction": ""
+    },
+    {
+     "date": "2026-10-14",
+     "event": "Reported attacks on ships in the Strait of Hormuz lift crude",
+     "url": "https://www.euronews.com/2026/10/14/oil-prices-rise-after-reported-attacks-on-ships-in-strait-of-hormuz",
+     "source": "Euronews",
+     "reaction": "Integrated oil ignites"
+    },
+    {
+     "date": "2026-10-16",
+     "event": "Brent near $110; energy the best S&P sector",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-16-2026",
+     "source": "TheStreet",
+     "reaction": "Energy +2.5%, USO +2.8%"
+    },
+    {
+     "date": "2026-10-22",
+     "event": "Houthi attacks in Saudi Arabia and a report of US-Israel plans against Iran push Brent to $111.88",
+     "url": "https://investrade.com/morning-preview-october-22-2026/",
+     "source": "Investrade",
+     "reaction": "WTI +2.8%, 3-2-1 crack +4%; refiners −1 to −2% on Valero's earnings day"
+    }
+   ],
+   "groups": {
+    "long": [
+     "Refiners",
+     "Shale E&P",
+     "Integrated & Large-cap Oil",
+     "Tankers & Shipping",
+     "Oil Services & Drillers"
+    ],
+    "short": [
+     "Airlines"
+    ]
+   },
+   "tickers": {
+    "long": [
+     "PBF",
+     "VLO",
+     "PSX",
+     "DINO",
+     "CVI",
+     "MPC"
+    ],
+    "short": [],
+    "watch": []
+   },
+   "catalysts": [],
+   "trade": "- **Expression:** refiners on the dashboard's setups (PBF and PARR Leader Pullbacks, CVI Q-Flag, VLO VCP, DINO ATH Magnet, PSX Round Number Magnet).\n- **Read the crack daily** (Intraday oil card): oil up + crack up = refiners; oil up + crack down = shale.\n- **Warning sign:** refiners red while the crack is up (Oct 22) = distribution; don't add until the group stops falling.\n- **Stop:** setup stops (entry-day low / 1 ADR); this group can drop hard on any ceasefire headline.",
+   "related": [
+    "rates-near-5"
+   ],
+   "history": [
+    {
+     "date": "2026-10-22",
+     "status": "building",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Brent reached about $112–113 on Oct 22 after new Houthi attacks in Saudi Arabia; the crack spread rose ~4%, but refiners slipped on Valero's earnings day."
+    }
+   ]
+  },
+  {
+   "id": "it-services-rerating",
+   "title": "IT services: from AI loser to AI implementer",
+   "status": "building",
+   "started": "2026-10-02",
+   "updated": "2026-10-22",
+   "summary": "After being sold as AI losers, IT services and consulting are being re-rated as the firms that will implement AI, and they're absorbing money leaving AI hardware.",
+   "changed": "Accenture +7.7%, Gartner +6.8%, Cognizant +6.0% on Oct 22 while chips fell 10%+.",
+   "thesis": {
+    "what": "IT Services & Consulting is up about 20% over 20 sessions (+10% in 5) with every member above its 21-day EMA, the strongest dollar flow of any group (+0.76).",
+    "why": "Accenture's outlook on Oct 1–2 eased fears that AI will eat consulting revenue ([The Star](https://www.thestar.com.my/tech/tech-news/2026/10/02/accenture039s-forecast-eases-ai-disruption-fears-lifts-battered-it-services-stocks)); in June the same fear had sent Accenture down 18% ([SentiSense](https://app.sentisense.ai/stories/accenture-shares-plummet-18-percent-it-stocks-crash-amid-weak-guidance-06192026)). Cognizant rose 7% in sympathy ([Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/cognizant-shares-rise-7-2-123306736.html)).",
+    "how": "The group was priced as an AI victim, so a 'not as bad as feared' outlook forces a re-rating, and money leaving AI hardware wants businesses with earnings that don't depend on capex. Adam's hypothesis: companies will pay consultants to implement AI, so this group sees real revenue sooner than software. Not proven yet; earnings will show it.",
+    "real": "Mostly rotation so far: on the days AI hardware jumped 3%+, IT services averaged −1.3%. Strong trend, but it trades as the other side of the AI seesaw.",
+    "confirm": "Confirm: IT services hold up on a day AI hardware rallies, and Cognizant/Accenture talk up AI bookings in their next reports. Break: an AI-hardware snapback after big-tech earnings that drags these back below their 21 EMA."
+   },
+   "timeline": [
+    {
+     "date": "2026-06-19",
+     "event": "Accenture plunges 18% on weak guidance and AI-disruption fears",
+     "url": "https://app.sentisense.ai/stories/accenture-shares-plummet-18-percent-it-stocks-crash-amid-weak-guidance-06192026",
+     "source": "SentiSense",
+     "reaction": "IT services sold as AI losers"
+    },
+    {
+     "date": "2026-10-02",
+     "event": "Accenture's forecast eases AI-disruption fears; IT services rally",
+     "url": "https://www.thestar.com.my/tech/tech-news/2026/10/02/accenture039s-forecast-eases-ai-disruption-fears-lifts-battered-it-services-stocks",
+     "source": "The Star",
+     "reaction": ""
+    },
+    {
+     "date": "2026-10-15",
+     "event": "Cognizant rises 7.2% as the IT services re-rating continues",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/cognizant-shares-rise-7-2-123306736.html",
+     "source": "Yahoo Finance",
+     "reaction": "Group ignition"
+    },
+    {
+     "date": "2026-10-22",
+     "event": "Software and services bought as a haven while chips fall",
+     "url": "https://investrade.com/market-review-october-22-2026/",
+     "source": "Investrade",
+     "reaction": "IT services +6.1% (ACN +7.7%, IT +6.8%, CTSH +6.0%)"
+    }
+   ],
+   "groups": {
+    "long": [
+     "IT Services & Consulting",
+     "India IT Services"
+    ],
+    "short": []
+   },
+   "tickers": {
+    "long": [
+     "ACN",
+     "IT",
+     "CTSH"
+    ],
+    "short": [],
+    "watch": []
+   },
+   "catalysts": [
+    {
+     "date": "2026-10-28",
+     "time": "After close",
+     "name": "Microsoft earnings",
+     "why": "Its commentary on enterprise AI adoption speaks directly to implementation demand."
+    }
+   ],
+   "trade": "- **All three leaders are ~3 ADRs over their 21 EMA after Oct 22:** don't chase. Let them build a 1–2 week base, then buy the flag breakout.\n- **Stop:** the flag low.\n- **Test of the thesis:** watch how the group trades the next day AI hardware rallies hard; holding up = real buying, add on the next base.",
+   "related": [
+    "ai-spending-repriced"
+   ],
+   "history": [
+    {
+     "date": "2026-10-22",
+     "status": "building",
+     "long": [
+      "IT Services & Consulting",
+      "India IT Services"
+     ],
+     "short": [],
+     "note": "Accenture +7.7%, Gartner +6.8%, Cognizant +6.0% on Oct 22 while chips fell 10%+."
+    }
+   ]
+  },
+  {
+   "id": "managed-care-repair",
+   "title": "Managed care repairs on better Medicare ratings",
+   "status": "building",
+   "started": "2026-10-09",
+   "updated": "2026-10-22",
+   "summary": "Better Medicare star ratings and UnitedHealth's beat-and-raise are pulling managed care out of its slump.",
+   "changed": "Cigna +3.8%, Elevance +2.6%, UnitedHealth +1.9% on Oct 22 as money moved to defensives.",
+   "thesis": {
+    "what": "Managed Care is up about 11% over 20 sessions and 2% over 5, beating SPY on both.",
+    "why": "Humana jumped 16% on better Medicare Advantage star ratings ([24/7 Wall St.](https://247wallst.com/investing/2026/10/09/humana-soars-16-on-improved-medicare-advantage-star-ratings-cvs-slides-3-unitedhealth-holds-steady/)), then UnitedHealth beat and raised its full-year outlook ([24/7 Wall St.](https://247wallst.com/investing/2026/10/13/unitedhealth-rises-4-on-earnings-beat-and-raised-full-year-outlook-humana-advances-2/)).",
+    "how": "Star ratings set Medicare bonus payments, so better ratings mean more revenue next year; a beat-and-raise from the biggest name tells investors the cost spike that crushed the group is easing. It's also a defensive group money can hide in.",
+    "real": "Price agrees on 5 and 20 days. The Oct 9 'Day 1' held and the group ignited on Oct 13.",
+    "confirm": "Confirm: the rest of the group's earnings confirm costs are stabilising. Break: a peer reports rising medical costs, or a policy headline on Medicare Advantage payments."
+   },
+   "timeline": [
+    {
+     "date": "2026-10-09",
+     "event": "Humana soars 16% on improved Medicare Advantage star ratings",
+     "url": "https://247wallst.com/investing/2026/10/09/humana-soars-16-on-improved-medicare-advantage-star-ratings-cvs-slides-3-unitedhealth-holds-steady/",
+     "source": "24/7 Wall St.",
+     "reaction": "Day 1 breakout for the group"
+    },
+    {
+     "date": "2026-10-13",
+     "event": "UnitedHealth beats and raises its full-year outlook",
+     "url": "https://247wallst.com/investing/2026/10/13/unitedhealth-rises-4-on-earnings-beat-and-raised-full-year-outlook-humana-advances-2/",
+     "source": "24/7 Wall St.",
+     "reaction": "UNH +4%, group ignition"
+    }
+   ],
+   "groups": {
+    "long": [
+     "Managed Care"
+    ],
+    "short": []
+   },
+   "tickers": {
+    "long": [
+     "HUM",
+     "CNC",
+     "OSCR",
+     "AGL"
+    ],
+    "short": [],
+    "watch": []
+   },
+   "catalysts": [],
+   "trade": "- **Expression:** the group's RS leaders near their 21 EMA (HUM, CNC, OSCR; AGL is RS 99 but 32% off its high).\n- **Entry:** pullbacks or tight flags; these are slower movers, so size by ADR.\n- **Risk:** single-name earnings gaps; check each report date before buying.",
+   "related": [],
+   "history": [
+    {
+     "date": "2026-10-22",
+     "status": "building",
+     "long": [
+      "Managed Care"
+     ],
+     "short": [],
+     "note": "Cigna +3.8%, Elevance +2.6%, UnitedHealth +1.9% on Oct 22 as money moved to defensives."
+    }
+   ]
+  }
+ ]
+}
