@@ -1234,6 +1234,34 @@ def test_market_health():
     assert E["n"] > 0                                                # (no ImportError = the guard)
 
 
+def test_the_trade():
+    """The trade: top / bottom fifth of groups on 20 days; a seesaw (winners fall on the losers' best days) reads as
+    'gives back'; the ratio state turns over after 3 closes under its 20-day average; evidence runs end to end."""
+    from breadth import thetrade as TT
+    n, rng = 160, np.random.default_rng(3)
+    idx = pd.bdate_range("2026-01-02", periods=n)
+    shock = rng.normal(0, 0.02, n)
+    R = {f"G{i}": rng.normal(0, 0.01, n) for i in range(10)}
+    R["G0"] = 0.004 - 0.6 * shock + rng.normal(0, 0.003, n)          # winner that moves against the loser
+    R["G9"] = -0.004 + shock                                         # loser
+    I = pd.DataFrame({k: np.cumprod(1 + v) for k, v in R.items()}, index=idx)
+    W, L, r20 = TT._split(I, n - 1)
+    assert W[0] == "G0" and L[0] == "G9" and 2 <= len(W) <= 3 and 2 <= len(L) <= 3, (W, L)
+    Rr = I.pct_change()
+    w, l = TT._baskets(Rr, ["G0"], ["G9"], n - 60, n)
+    spy = pd.Series(0.0, index=idx)
+    cr, ind, nhot, _, _ = TT._read(w, l, spy)
+    assert cr < 0 and ind < 0 and nhot >= 3, (cr, ind)
+    r = np.r_[np.linspace(1, 1.3, 40), [1.2, 1.15, 1.1]]
+    ma = pd.Series(r).rolling(20).mean().values
+    assert TT._state(r, ma)[0] == "over" and TT._state(r[:-2], ma[:-2])[0] == "fading" and TT._state(r[:40], ma[:40])[0] == "on"
+    D = TT.frames(I, spy)
+    E = TT.evidence(D)
+    assert E and E["rows"]["all"]["w"]["n"] > 0 and set(E["rows"]) >= {"holds", "gives"}
+    nm, sec = TT._side_name(["G0", "G1"], {"G0": "Software", "G1": "Consumer"}, pd.Series({"G0": 0.2, "G1": 0.05}))
+    assert nm == "Software" and sec[0]["s"] == "Software"
+
+
 def test_futures_feed_parse():
     """Intraday futures: latest bar of any session vs the previous settle; the 3-2-1 crack uses gasoline + diesel."""
     from breadth import premarket as PMK

@@ -368,6 +368,20 @@
     "R-2026-10-22-leaders-and-breakouts"
    ],
    "notes": "no forward edge in 410 days; untested in a bear market"
+  },
+  {
+   "id": "the_trade",
+   "name": "The trade (main rotation: winning vs losing groups)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "breadth/thetrade.py → DATA.themes.thetrade, Read-out tradeCard + story fact sheet",
+   "what": "names the top-fifth vs bottom-fifth sub-theme rotation (20 sessions), its state vs the ratio's 20-day avg, and whether the winners hold up on the losers' best days (real buying) or give back (seesaw)",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-22-the-trade"
+   ],
+   "notes": "holds-up winners +1.1% vs avg group next 10 (t 2.0, both halves) but basket momentum overall t 1.5; 'gives back' snapback 5 of 5 settled episodes, n small"
   }
  ]
 }

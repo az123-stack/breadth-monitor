@@ -102,3 +102,9 @@ Title under 60 characters, e.g. "CPI runs hot; yields jump, Nasdaq futures slip"
 
 ## Branch
 Pass --branch with the scenario engine's branch (A / B / W / none) unless the facts clearly contradict it; if you override, say why in the text.
+
+## The trade (every chapter)
+The fact sheet's "THE TRADE" block names the market's main rotation (winning vs losing groups over 20 sessions), its
+state (on / cooling / fading / over), and whether the winners hold up when the losers bounce (real buying) or give it back
+(a seesaw). Mention it in one line inside **Where we are** ("The trade: Software + Consumer over AI Infrastructure, day 12,
+still on, but a seesaw"). Say plainly when its state changes since the last chapter. Use only the fact sheet's numbers.

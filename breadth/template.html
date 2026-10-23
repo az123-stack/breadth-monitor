@@ -3237,6 +3237,75 @@ function mdLite(md) {
     if (lines.every(l => /^\s*[-•] /.test(l))) return `<ul class="rol">${lines.map(l => `<li>${inl(l.replace(/^\s*[-•] /, ""))}</li>`).join("")}</ul>`;
     return lines.map(l => /^\s*[-•] /.test(l) ? `<ul class="rol"><li>${inl(l.replace(/^\s*[-•] /, ""))}</li></ul>` : `<p>${inl(l)}</p>`).join(""); }).join("");
 }
+function tradeCard(X) {
+  if (!X || !X.winners) return $('<div></div>');
+  const E = X.evidence || {}, ER = E.rows || {}, C = X.cfg || {};
+  const pp = (v, d = 1) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(d) + "%";
+  const ST = { on: ["act", "On", "The winners are still pulling away from the losers."],
+    cooling: ["watch", "Cooling", "Still above its 20-day average, but the gap narrowed 2%+ from its 5-day best."],
+    fading: ["watch", "Fading", `Closed under its 20-day average ${X.below} session${X.below === 1 ? "" : "s"}: the lead is slipping. Three closes under = over.`],
+    over: ["avoid", "Over", `${X.below} closes under its 20-day average: the rotation has stalled or reversed. Stop adding to the winners.`] };
+  const st = ST[X.state] || ST.on;
+  const holds = X.ind != null && X.ind >= 0;
+  const cr = X.corr, crTxt = cr == null ? "–" : cr < 0.3 ? "a seesaw" : cr >= 0.5 ? "moving together" : "loosely linked";
+  const seesaw = cr != null && cr < 0.3;
+  const realCls = holds && !seesaw ? "act" : holds || !seesaw ? "watch" : "avoid";
+  const realTxt = holds ? (seesaw ? "Holding up, but it's a seesaw" : "Holding up on its own") : "Gives back when the losers bounce";
+  const eh = (ER.holds || {}).w || {}, eg = ER.gives || {}, snap = E.gives_snap || [0, 0];
+  const evLine = holds
+    ? `Past days like this (winners holding up): the winning groups beat the average group by ${pp(eh.mean)} over the next ${E.hold} sessions (t ${eh.t ?? "–"}; halves ${pp(eh.h1)} / ${pp(eh.h2)}).`
+    : `Past "gives back" stretches: the losing side won the next ${E.hold} sessions in ${snap[0]} of ${snap[1]} episodes (losers ${pp((eg.l || {}).mean)} vs average group, winners ${pp((eg.w || {}).mean)}; small sample).`;
+  // live: today's basket moves from the Google sheet
+  let liveTile = "";
+  if (typeof liveActive === "function" && liveActive() && LIVE && LIVE.rows) {
+    const avg = (gs) => { const v = gs.map(g => { const ch = ((X.members || {})[g.g] || []).map(t => liveRow(t)).filter(r => r && r.chg != null).map(r => r.chg); return ch.length >= 3 ? ch.reduce((a, b) => a + b, 0) / ch.length : null; }).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+    const aw = avg(X.winners), al = avg(X.losers);
+    if (aw != null && al != null) {
+      const d = aw - al, cls = d > 0.005 ? "act" : d < -0.005 ? "avoid" : "watch";
+      liveTile = `<div class="btile ${cls}"><b>Today (live)</b><span class="bv">${d > 0.005 ? "Trade working today" : d < -0.005 ? "Trade reversing today" : "No clear move today"}</span>
+        <small>Winning groups ${pp(aw)} · losing groups ${pp(al)} (equal-weight, Google prices).</small></div>`;
+    }
+  }
+  let liveShare = null;
+  try { if (typeof liveActive === "function" && liveActive()) { const m = roMoney(); if (m && m.share != null) liveShare = m.share * 100; } } catch (e) { /* live optional */ }
+  if (liveShare != null) { X = Object.assign({}, X, { dn_share: liveShare, comeback: liveShare <= C.comeback, dsLive: true }); }
+  const comeback = X.dn_share == null ? "" : X.comeback
+    ? `<b class="up">Comeback trigger met:</b> only ${Math.round(X.dn_share)}% of dollar volume was in falling stocks ${X.dsLive ? "today (live)" : "last session"} (≤ ${C.comeback}%). That's the cue to start looking at the counter-trade below.`
+    : `Comeback trigger not met: ${Math.round(X.dn_share)}% of dollar volume was in falling stocks ${X.dsLive ? "today (live)" : "last session"} (needs ≤ ${C.comeback}%).`;
+  const R = X.ratio || { r: [], ma: [] };
+  const grpRow = (g, side) => `<tr><td class="l tname">${esc(g.g)}<small>${esc(g.sector || "")}</small></td><td class="num ${side ? "up" : "dn"}">${pp(g.r20)}</td><td class="num">${pp(g.r5)}</td><td class="num">${g.strength == null ? "–" : Math.round(g.strength)}</td></tr>`;
+  const grpTbl = (gs, side) => `<div class="scroll"><table class="grid"><thead><tr><th class="l">${side ? "Winning groups" : "Losing groups"}</th><th>20 days</th><th>5 days</th><th>Strength</th></tr></thead><tbody>${gs.slice(0, 8).map(g => grpRow(g, side)).join("")}${gs.length > 8 ? `<tr><td class="l meta" colspan="4">+ ${gs.length - 8} more groups in the basket</td></tr>` : ""}</tbody></table></div>`;
+  const stk = (r, counter) => `<tr>${nameCell(r)}<td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.ext == null ? "–" : (r.ext >= 0 ? "+" : "") + r.ext.toFixed(1)}</td>${retCell(r.d5, "d5")}${retCell(r.off_hi, "d15")}<td class="l">${counter ? (r.reclaim ? '<span class="tg">back over 21 EMA</span>' : '<span class="meta">under 21 EMA</span>') : (r.on || []).map(x => `<span class="tg">${esc(x)}</span>`).join(" ") || '<span class="meta">–</span>'}</td></tr>`;
+  const stkTbl = (rows, counter) => rows.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>RS</th><th>ADRs over 21 EMA</th><th>5 days</th><th>Off high</th><th class="l">${counter ? "Reclaim?" : "On your lists"}</th></tr></thead><tbody>${rows.map(r => stk(r, counter)).join("")}</tbody></table></div>` : '<p class="meta">None today.</p>';
+  const evRow = (k, nm) => { const r = ER[k]; if (!r) return ""; const c = (x) => `<td class="num">${pp(x.mean)}<small>t ${x.t ?? "–"} · n ${x.n} (${x.days} days) · ${pp(x.h1)} / ${pp(x.h2)}</small></td>`; return `<tr><td class="l">${nm}</td>${c(r.w)}${c(r.l)}</tr>`; };
+  const card = $(`<section class="card regcard healthcard tradecard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv unproven" title="Information only: it names the rotation and never changes the picks">Info only</span> The trade: ${esc(X.name)} <span class="meta">· ${shortDate(X.date)} close</span></h2></div>
+    <div class="htiles">
+      <div class="btile ${st[0]}"><b>Scoreboard</b><span class="bv">${st[1]} · ${X.above ? X.above + " sessions above its 20-day avg" : "under its 20-day avg"}</span>
+        <small>${st[2]} Winning basket beat the losing basket by ${pp(X.spread20, 0)} over 20 sessions.</small>
+        <div class="meta" style="font-size:11.5px;margin-top:2px">Winners ÷ losers (today's baskets), ${R.r.length} sessions · dashed = 20-day avg</div>${healthLine([{ v: R.r, c: "var(--s1)" }, { v: R.ma, c: "var(--text-secondary)", dash: true }], {})}</div>
+      <div class="btile ${realCls}"><b>Real buying or a seesaw?</b><span class="bv">${realTxt}</span>
+        <small>The two baskets are ${crTxt} (correlation ${cr == null ? "–" : cr.toFixed(2)}, last ${C.win} sessions). On the losers' best ${X.hot_n} days the winners did ${pp(X.w_hot)} (losers ${pp(X.l_hot)}), ${pp(X.ind)} vs SPY.</small>
+        <small>${evLine}</small></div>
+      ${liveTile}
+      <div class="btile watch"><b>Kill switch &amp; counter-trade</b><span class="bv">${X.state === "over" ? "Trade over" : X.state === "fading" ? "Kill switch arming" : "Not triggered"}</span>
+        <small>The trade is over after 3 closes of the ratio under its 20-day average. ${comeback}</small></div>
+    </div>
+    <div class="hcharts">${grpTbl(X.winners, true)}${grpTbl(X.losers, false)}</div>
+    <h3 style="margin:12px 0 4px;font-size:14px">How to play it · strong stocks in the winning groups</h3>
+    <p class="meta" style="margin:0 0 4px">RS ${80}+, $10+, at most 2 per group, the ones on your setup lists first. Buy pullbacks or tight flags, not extended days; stop at the entry day's low or 1 ADR.</p>
+    ${stkTbl(X.plays || [], false)}
+    ${(X.stretched || []).length ? `<p class="meta" style="margin:6px 0 0"><b>Don't chase (more than ${C.chase_adr} ADRs above the 21 EMA):</b> ${X.stretched.map(r => `${esc(r.t)} <small>(${r.ext.toFixed(1)})</small>`).join(", ")}. Wait for a pullback or a new base.</p>` : ""}
+    <h3 style="margin:12px 0 4px;font-size:14px">Counter-trade watch · still-strong stocks in the losing groups</h3>
+    <p class="meta" style="margin:0 0 4px">RS 85+ names the rotation is hitting. Only for the snapback: wait for the comeback trigger or the stock back over its 21 EMA, small size.</p>
+    ${stkTbl(X.counter || [], true)}
+    <details class="kqsec" style="margin-top:8px"><summary><b>The evidence</b> · ${esc(E.from || "")} to ${esc(E.to || "")}, ${E.n || 0} days, next ${E.hold || 10} sessions vs the average group</summary>
+      <div class="scroll"><table class="grid" style="margin-top:6px"><thead><tr><th class="l">When</th><th>Winning groups<small>mean · t · halves</small></th><th>Losing groups<small>mean · t · halves</small></th></tr></thead><tbody>
+      ${evRow("all", "Every day")}${evRow("holds", "Winners hold up on the losers' best days")}${evRow("gives", "Winners give back (seesaw)")}${evRow("together", "Baskets move together (corr ≥ 0.5)")}${evRow("seesaw", "Baskets move opposite (corr < 0.3)")}</tbody></table></div>
+      ${(E.gives_eps || []).length ? `<p class="meta" style="margin:6px 0 0"><b>"Gives back" episodes:</b> ${E.gives_eps.map(e => `${shortDate(e.start)}–${shortDate(e.end)} (${e.w == null ? "open" : `winners ${pp(e.w)}, losers ${pp(e.l)}`})`).join(" · ")}</p>` : ""}
+      <p class="meta" style="margin:6px 0 0">Baskets: top and bottom fifth of sub-themes (4+ stocks, equal-weight) on their 20-session move, picked each day with data up to that day. Independent samples every ${E.hold || 10} sessions. Passing needs t ≥ 2 and the same sign in both halves; with ~2 years of data this is information only.</p></details></section>`);
+  return card;
+}
 function storyCard() {
   const T = DATA.themes, rows = DATA.rows, last = rows[rows.length - 1], pc = pcI;
   if (!STORYJ && !STORY_ERR && !STORY_BUSY) fetchStory();
@@ -3405,6 +3474,7 @@ function renderReadout(app) {
   if (dB) app.append(dB);
   app.append(roSchedule());
   if (dC) app.append(dC);
+  if (DATA.themes && DATA.themes.thetrade) app.append(tradeCard(DATA.themes.thetrade));
   app.append(storyCard());
   const wrap = $(`<div class="ro">${order.map(k => cards[k]).join("")}
     <div class="note" style="padding:8px 0 0">Each card opens on its own part of the day (Eastern time). Pre-market uses the official overnight numbers plus Yahoo pre-market quotes; during the market and at the close it uses your Google Sheet's live prices; the overnight update replaces the close estimates with official numbers. Links jump to the tab with the full detail.</div></div>`);

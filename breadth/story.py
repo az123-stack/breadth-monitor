@@ -237,6 +237,26 @@ def facts(slot):
     now = datetime.now(ET)
     P(f"# Fact sheet · {slot.upper()} · generated {now:%Y-%m-%d %H:%M} ET")
     P(f"Official data through {T['date']} (Massive). Regime: {D['regime'].get('label')} — {D['regime'].get('advice')}")
+    X = T.get("thetrade") or {}
+    if X.get("winners"):
+        pc = lambda v: "–" if v is None else f"{v * 100:+.1f}%"
+        P(f"\n## THE TRADE (open with one line on it): {X['name']} · state {X.get('state')} · {X.get('above', 0)} sessions above"
+          f" its 20-day avg · 20-day spread {pc(X.get('spread20'))}")
+        P(f"- Winners: " + ", ".join(f"{g['g']} {pc(g['r20'])}" for g in X["winners"][:5]))
+        P(f"- Losers: " + ", ".join(f"{g['g']} {pc(g['r20'])}" for g in X["losers"][:5]))
+        ind = X.get("ind")
+        P(f"- Real or seesaw: correlation {X.get('corr')}; on the losers' best days winners did {pc(X.get('w_hot'))}"
+          f" ({pc(ind)} vs SPY) → {'HOLDS UP on its own' if ind is not None and ind >= 0 else 'GIVES BACK (seesaw)'}")
+        ev = (X.get("evidence") or {})
+        if ev.get("gives_snap"):
+            g = ev["gives_snap"]
+            P(f"- Evidence: in past 'gives back' stretches the losing side won the next 10 sessions in {g[0]} of {g[1]} episodes;"
+              f" when winners hold up they beat the average group by {pc(((ev.get('rows') or {}).get('holds') or {}).get('w', {}).get('mean'))}.")
+        P(f"- Plays (not stretched): " + ", ".join(f"{r['t']} ({r['sub']}, RS {r['rsr']})" for r in (X.get('plays') or [])[:6]))
+        if X.get("stretched"):
+            P("- Don't chase (> 2 ADRs over the 21 EMA): " + ", ".join(r["t"] for r in X["stretched"]))
+        P(f"- Counter-trade watch (RS 85+ in losing groups): " + ", ".join(f"{r['t']}{' (back over 21 EMA)' if r['reclaim'] else ''}" for r in (X.get('counter') or [])[:6])
+          + f" · comeback trigger {'MET' if X.get('comeback') else 'not met'} (last share in falling stocks {X.get('dn_share')}%)")
     PB = T.get("playbook", {})
     P(f"Playbook state: {PB.get('label')}. Focus: {', '.join(r['name'] for r in PB.get('rows', []) if r['verdict'] == 'Focus') or 'none'}. "
       f"Avoid: {', '.join(r['name'] for r in PB.get('rows', []) if r['verdict'] == 'Avoid') or 'none'}.")

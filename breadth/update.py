@@ -273,6 +273,11 @@ def recompute_and_publish(bars, splits, universe, state):
             playbook.rerank(theme_data, history)
         except Exception as e:
             log.exception("pick re-rank failed: %s", e)
+        try:   # The trade: the market's main rotation (winning vs losing groups), info only (Oct 22)
+            from . import thetrade
+            theme_data["thetrade"] = thetrade.build(adjusted, theme_data, history)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("the trade failed: %s", e)
         try:
             from . import ledger
             pb = theme_data.get("playbook") or {}

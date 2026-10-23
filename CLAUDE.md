@@ -380,6 +380,16 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   → docs/futures.json → `oilCard` ("Oil & refining margins", after Market pulse; shown even without the Google sheet; fetched every 3 min).
   `crackRead` uses the Oct 22 study (same-day vs SPY, 2 yrs): oil ≥ +1.5% & crack ≥ +3% (31 days) refiners +3.1% (90% beat), shale +2.5%,
   airlines −1.0%; oil ≥ +1.5% & crack ≤ −2% (30 days) shale +1.5% (77%), refiners +0.4% (57%). Read thresholds: oil ≥ 1% with crack ≥ ±2%.
+- `thetrade.py` **The trade** (Oct 22, 2026; Adam: "how do we handle the trade in play?"; card R-2026-10-22-the-trade, layer `the_trade`, info)
+  → `DATA.themes.thetrade`, `tradeCard` on the Read-out tab (above the story card) + "THE TRADE" block on the story fact sheet (guide: one
+  line in Where we are). Winners / losers = top / bottom fifth of sub-themes (4+ stocks, `rotation.group_frames`) on 20 sessions; name =
+  sectors carrying most of each side's move; ratio (today's baskets) vs its 20-day avg → state on / cooling (2%+ off 5-day best) /
+  fading (1–2 closes under) / over (3+); real or seesaw = 60-session correlation + winners minus SPY on the losers' best 15% of days
+  (`ind` ≥ 0 holds up, < 0 gives back); plays = RS 80+ $10+ in winning groups (2 per group, setup lists first), "don't chase" > 2 ADRs
+  over the 21 EMA; counter watch = RS 85+ in losing groups + comeback trigger (share in falling stocks ≤ 40%, live via `roMoney` when
+  the sheet is newer). Live tile: winners vs losers basket today. Evidence (410 days): winners +0.9% vs avg group next 10 (t 1.5);
+  holds up +1.1% (t 2.0, halves +1.3/+1.1); gives back → losers won 5 of 5 settled episodes (n small). Oct 21: Consumer + Biotech &
+  Health over AI Infrastructure, on 13 sessions, corr 0.03, gives back since Oct 16. ~2 s per build.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
