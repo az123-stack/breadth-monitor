@@ -166,6 +166,7 @@ def build(adjusted, universe, stocks=None, names=None, evidence=True):
     if len(w["c"].index) < 120 or not cols:
         return None
     dvol = (w["c"][cols] * w["v"][cols]).rolling(20, min_periods=15).mean()
+    adr = ((w["h"][cols] / w["l"][cols]) - 1).rolling(20, min_periods=15).mean() * 100   # daily ADR %, same as the rest of the dashboard
     W, nday = weekly(w, cols)
     done = complete_weeks(nday, w["c"].index[-1])
     raw = strength.rs_raw(w["c"][cols])
@@ -216,7 +217,7 @@ def build(adjusted, universe, stocks=None, names=None, evidence=True):
             "trig": _r(trig), "stop": _r(stop), "risk": _r(1 - stop / (trig or c), 4) if stop and np.isfinite(stop) else None,
             "lo52": _r(lo52), "hi52": _r(hi52), "off_hi52": _r(c / hi52 - 1, 4),
             "rsr": s.get("rsr") if s.get("rsr") is not None else _r(rs.get(t), 0),
-            "dvol": _r(dvol[t].iloc[-1] / 1e6, 0), "theme": (s.get("themes") or [None])[0], "sub": s.get("sub"),
+            "dvol": _r(dvol[t].iloc[-1] / 1e6, 0), "adr": _r(adr[t].iloc[-1], 1), "theme": (s.get("themes") or [None])[0], "sub": s.get("sub"),
             "prime": prime, "prime_new": prime and any(bool(F["prime_new"].iat[wi - a, j]) for a in range(0, 4) if wi - a >= 0),
             "prime_wks": int(F["prime"].iloc[:wi + 1, j][::-1].cumprod().sum()) if prime else 0,
             "run50": int(F["run"].iat[wi, j]), "vr": _r(F["vr"].iat[wi, j], 2), "rsl_hi": bool(F["rsl_hi"].iat[wi, j]),

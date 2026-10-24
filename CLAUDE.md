@@ -433,7 +433,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   shorts in ★ groups worse (−0.28R t −3.5). ★ passes the proven rule but is NOT in box grades/playbook (needs Adam's approval).
   Strength on Weakness card (Oct 24, Adam): same `stairBits` tags in the State cell + "Stair steps" chips (BOX_STAIR without "fav",
   localStorage "sowStair"); `stairGroupOf` falls back to DATA.themes.stocks sub / first theme when a row has none. Stair states are DAILY
-  (9/21-day EMAs), SoW states weekly; ★ / nuzzle not backtested on SoW signals.
+  (9/21-day EMAs), SoW states weekly; ★ / nuzzle not backtested on SoW signals. Rows carry `adr` (daily 20-day ADR %, Oct 24) → sortable "ADR %" column.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

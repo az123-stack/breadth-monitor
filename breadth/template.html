@@ -4603,7 +4603,7 @@ function sowCard(T) {
   const cols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "_o", h: "State", l: true, asc: true }, { k: null, h: "Weekly chart<small>price · 9 · 21 · 50 WEMA · box</small>" },
     { k: "vs9", h: "vs 9 / 21 WEMA" }, { k: "pumps", h: "Pumps<small>crosses up the 50 WEMA</small>" }, { k: "below", h: "Base<small>weeks under the 50</small>" },
     { k: "box_atr", h: "Black box<small>10-wk high / low · ATRs</small>" }, { k: "volx", h: "Volume<small>this week × 20-wk avg · trend</small>" },
-    { k: "risk", h: "Plan<small>stop · risk</small>", l: true, asc: true }, { k: "rsr", h: "RS" }, { k: "off_hi52", h: "Off high<small>52-week</small>" }, { k: "dvol", h: "$ / day" }];
+    { k: "risk", h: "Plan<small>stop · risk</small>", l: true, asc: true }, { k: "rsr", h: "RS" }, { k: "adr", h: "ADR %<small>daily, 20-day</small>" }, { k: "off_hi52", h: "Off high<small>52-week</small>" }, { k: "dvol", h: "$ / day" }];
   body.innerHTML = `<div class="scroll"><table class="grid sowtab"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta sowempty" style="display:none">No stocks in this state today.</p><button class="xopen sowmore" style="margin-top:6px"></button>`;
   const tb = body.querySelector("tbody");
   let shown = [];
@@ -4622,7 +4622,7 @@ function sowCard(T) {
       <td class="num">$${r.box_hi ?? "–"} / $${r.box_lo ?? "–"}<small class="meta" style="display:block" title="Height of the last 10 weeks in weekly ATRs (weekly ATR ${r.atr ?? "–"}%)">${r.box_atr ?? "–"} ATRs tall</small></td>
       <td class="num">${r.volx == null ? "–" : r.volx.toFixed(2) + "×"}<small class="meta" style="display:block" title="Average weekly volume, last 10 weeks ÷ the 26 weeks before">${r.vr == null ? "" : "10 vs 26 wk " + r.vr.toFixed(2) + "×"}</small></td>
       <td class="l" style="min-width:170px">${plan(r)}</td>
-      <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${pct(r.off_hi52)}</td><td class="num">$${r.dvol >= 1000 ? (r.dvol / 1000).toFixed(1) + "B" : Math.round(r.dvol || 0) + "M"}</td></tr>`).join("");
+      <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.adr ?? "–"}</td><td class="num">${pct(r.off_hi52)}</td><td class="num">$${r.dvol >= 1000 ? (r.dvol / 1000).toFixed(1) + "B" : Math.round(r.dvol || 0) + "M"}</td></tr>`).join("");
   };
   const current = sortable(body.querySelector("table"), cols, filtered, fill, U.sort);
   const draw = () => fill(current());
