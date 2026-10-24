@@ -1478,6 +1478,7 @@ function boxFavRank(a, b) {
 const BOX_STAIR = [["all", "All"], ["fav", "★ Favorites"], ["lead_active", "★ group setting/stepping"], ["lead_own", "★ group + stock nuzzled/lifting"], ["own", "Stock nuzzled/lifting"], ["lead", "★ Leading group"]];
 function stairBoxPass(r, f) {
   if (!f || f === "all") return true;
+  if (f.includes(",")) return f.split(",").some(x => stairBoxPass(r, x));   // several chips picked: a row passes if it matches any of them
   const g = stairGroupOf(r), o = stairOwn(r.t);
   const lead = !!(g && g.leader), act = !!(g && (g.status === "setting" || g.status === "stepping"));
   const own = !!(o && (o[0] === "nuzzle" || o[0] === "lift"));
@@ -2659,6 +2660,20 @@ function reapplySorts(root) {
   root.querySelectorAll("table").forEach(t => { if (t.dataset.ownSort) return; const s = AUTOSORT[tableKey(t)]; if (s) sortTable(t, s[0], s[1]); });
 }
 // A small segmented control bound to a key on a state object.
+/* Multi-select chips: click several to combine them (a row passes if it matches ANY picked chip); "all" clears the rest.
+   state[key] holds a comma list, e.g. "lead_active,lead_own". */
+function chipsMulti(label, options, state, key, onChange) {
+  const on = () => new Set(String(state[key] || "all").split(","));
+  const el = $(`<div class="chips" role="group" aria-label="${label}" title="Click several to combine them">${options.map(([v, t]) => `<button data-v="${v}" aria-pressed="${on().has(v)}">${t}</button>`).join("")}</div>`);
+  el.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    const v = b.dataset.v, cur = on();
+    if (v === "all") { cur.clear(); cur.add("all"); }
+    else { cur.delete("all"); cur.has(v) ? cur.delete(v) : cur.add(v); if (!cur.size) cur.add("all"); }
+    state[key] = [...cur].join(",");
+    el.querySelectorAll("button").forEach(o => o.setAttribute("aria-pressed", cur.has(o.dataset.v))); onChange();
+  }));
+  return el;
+}
 function chips(label, options, state, key, onChange) {
   const el = $(`<div class="chips" role="group" aria-label="${label}">${options.map(([v, t]) => `<button data-v="${v}" aria-pressed="${state[key] === v}">${t}</button>`).join("")}</div>`);
   el.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
@@ -4450,7 +4465,7 @@ function boxCard(T) {
   };
   const pCur = sortable(pb.querySelector("table"), pcols, pRows, pFill, U.sort);
   const draw = () => { try { localStorage.setItem("boxTrade", U.trade); localStorage.setItem("boxKind", U.kind); localStorage.setItem("boxScope", U.scope); localStorage.setItem("boxStair", U.stair); } catch (e) {} draws.forEach(f => f()); pFill(pCur()); };
-  if ((DATA.themes || {}).stairs) fl.append(chips("Stair steps", BOX_STAIR, U, "stair", draw));
+  if ((DATA.themes || {}).stairs) fl.append(chipsMulti("Stair steps", BOX_STAIR, U, "stair", draw));
   fl.append(chips("Box type", [["all", "Tight boxes + wide ranges"], ["tight", "Tight boxes"], ["range", "Wide ranges"]], U, "kind", draw));
   fl.append(chips("Scope", [["ab", "Grade A–B"], ["themes", "In my themes"], ["all", "All names"]], U, "scope", draw));
   card.querySelector(".pfil").append(chips("Status", [["brk", "Breakouts"], ["today", "Today"], ["near", "Near the top"], ["inside", "In the box"], ["all", "All"]], U, "st", draw));
@@ -4589,7 +4604,7 @@ function dipCard(T, where) {
   const card = $(`<section class="card regcard dipcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
       <h2><span class="pbv unproven" title="Information only: never changes the Top 2 picks">Unproven</span> Dip buys · 9 / 21 EMA <span class="meta">· Box + Strength on Weakness names · ${asof}</span></h2>
       <div class="tsbtns"><button class="dipdl" title="Download the names shown as a TradingView watchlist">⬇ TradingView</button></div></div>
-    <p class="note" style="padding:4px 0 0">Your names from <b>Box trades</b> (long retests + springs) and <b>Strength on Weakness</b>, checked against the <b>daily 9 and 21 EMAs</b>.
+    <p class="note" style="padding:4px 0 0">Your names from <b>Box trades</b> (long retests + springs) and <b>Strength on Weakness</b>, checked against the <b>daily 9 and 21 EMAs</b> (9- and 21-day, not weekly; Strength on Weakness itself uses weekly EMAs).
       <b>Wicked under & back above</b> = today's low went under the 9 or 21 and price is back over it (or it closed under in the last 3 sessions and is back over now).
       <b>Under now</b> = price below the 9 or 21. ${anyLive ? "Live: the EMAs move with the price exactly as today's close will set them." : "As of the last close; turns live once Google has a newer session."}
       ${noLow ? ' <b>Today\'s low isn\'t in the sheet yet</b>, so wicks use the open until column L fills.' : ""}
@@ -4632,7 +4647,7 @@ function dipCard(T, where) {
   fl.append(chips("Show", DIP_F.map(([k, l]) => [k, k === "back" ? `${l} (${nBack})` : k === "under" ? `${l} (${nUnder})` : l]), U, "f", () => { ss("dipF", U.f); U.more = false; draw(); }));
   fl.append(chips("From", DIP_SRC, U, "src", () => { ss("dipSrc", U.src); U.more = false; draw(); }));
   fl.append(chips("Trend", [["up", "9 EMA over 21"], ["all", "Any"]], U, "trend", () => { ss("dipTrend", U.trend); draw(); }));
-  if ((DATA.themes || {}).stairs) fl.append(chips("Stair steps", BOX_STAIR.filter(([k]) => k !== "fav"), U, "stair", () => { ss("dipStair", U.stair); U.more = false; draw(); }));
+  if ((DATA.themes || {}).stairs) fl.append(chipsMulti("Stair steps", BOX_STAIR.filter(([k]) => k !== "fav"), U, "stair", () => { ss("dipStair", U.stair); U.more = false; draw(); }));
   card.querySelector(".dipdl").addEventListener("click", () => tsDownload("dip-buys", [{ name: "Dip buys 9-21 EMA", ticks: shown.map(r => r.t) }]));
   draw();
   return card;
@@ -4723,7 +4738,7 @@ function sowCard(T) {
   const nAct = ACT.reduce((a, k) => a + (cnt[k] || 0), 0);
   fl.append(chips("State", [["prime", `⭐ Prime positioned (${PR.n || 0})`], ["act", `Actionable (${nAct})`], ...X.states.map(s => [s.key, `${s.name} (${s.n})`]), ["all", `All (${X.rows.length})`]], U, "st", () => { ss("sowState2", U.st); U.more = false; U.sort[0] = U.st === "prime" ? "_p" : "_o"; U.sort[1] = 1; draw(); }));
   fl.append(chips("Scope", [["all", "All stocks"], ["themes", "In my themes"]], U, "scope", draw));
-  if ((DATA.themes || {}).stairs) fl.append(chips("Stair steps", BOX_STAIR.filter(([k]) => k !== "fav"), U, "stair", () => { ss("sowStair", U.stair); U.more = false; draw(); }));
+  if ((DATA.themes || {}).stairs) fl.append(chipsMulti("Stair steps", BOX_STAIR.filter(([k]) => k !== "fav"), U, "stair", () => { ss("sowStair", U.stair); U.more = false; draw(); }));
   const dl = card.querySelector(".sowdl");
   dl.addEventListener("click", () => tsDownload("strength-on-weakness", [{ name: `Strength on Weakness ${U.st === "act" ? "actionable" : U.st}`, ticks: shown.map(r => r.t) }]));
   draw();
