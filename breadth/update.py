@@ -240,6 +240,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["stairs"] = stairs.build(adjusted, theme_data.get("stocks"), store.load_names(), store.load_subthemes())
         except Exception as e:  # optional panel; never block the page
             log.exception("stair steps failed: %s", e)
+        try:   # Dip buys: Box + SoW names under / wicking under their 9-21 EMAs (Adam, Oct 24 2026; info only)
+            from . import dips
+            theme_data["dips"] = dips.build(adjusted, theme_data, store.load_names())
+        except Exception as e:  # optional panel; never block the page
+            log.exception("dip buys failed: %s", e)
         try:
             from . import playbook
             theme_data["playbook"] = playbook.build(theme_data, history)
@@ -320,7 +325,8 @@ def recompute_and_publish(bars, splits, universe, state):
             log.exception("setup review failed: %s", e)
     site.build(history, theme_data, kq_data, macro_data)
     try:
-        intraday.write_sheet_csv()
+        from . import dips
+        intraday.write_sheet_csv(dips.tickers((theme_data or {}).get("dips")))
     except Exception as e:  # never block the page on this
         log.warning("live sheet ticker list skipped: %s", e)
     return history

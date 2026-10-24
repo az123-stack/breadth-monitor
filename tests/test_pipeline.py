@@ -1328,6 +1328,34 @@ def test_stair_steps():
     return f"set up day {i_set.min()}, stepping day {i_step.min()}"
 
 
+def test_dip_buys():
+    """Box / SoW names: a wick under the 21 EMA that closes back over is flagged; a close under is 'under'; sheet rows add them."""
+    import numpy as np
+    import pandas as pd
+    from breadth import dips, intraday
+    dates = pd.bdate_range("2026-01-02", periods=60)
+    rows = []
+    for t, last_low, last_close in (("WIK", 0.80, 1.0), ("UND", 0.98, 0.90), ("OK", 0.995, 1.02)):
+        c = np.linspace(80, 120, 60); c[-1] = c[-2] * last_close if t != "OK" else c[-2] * 1.01
+        for i, d in enumerate(dates):
+            lo = c[i] * 0.99 if i < 59 else c[-2] * last_low
+            rows.append({"ticker": t, "date": d, "o": c[i], "h": c[i] * 1.01, "l": min(lo, c[i]), "c": c[i], "v": 1e6})
+    adj = pd.DataFrame(rows)
+    td = {"boxes": {"live": [{"t": "WIK", "side": "long", "type": "retest_long", "tag": "at", "grade": "A", "rsr": 90},
+                             {"t": "ZZZ", "side": "short", "type": "retest_short", "tag": "at"}]},
+          "sow": {"rows": [{"t": "UND", "state": "nuzzle", "prime": False, "rsr": 80}, {"t": "OK", "state": "box", "prime": True}]}}
+    p = dips.build(adj, td)
+    R = {r["t"]: r for r in p["rows"]}
+    assert set(R) == {"WIK", "UND", "OK"}, R.keys()          # the short box row is not a dip buy
+    assert R["WIK"]["wick21"] and not R["WIK"]["under21"], R["WIK"]
+    assert R["UND"]["under9"] and R["UND"]["under21"], R["UND"]
+    assert not (R["OK"]["under9"] or R["OK"]["wick9"] or R["OK"]["wick21"]), R["OK"]
+    assert p["rows"][0]["t"] == "WIK" and R["WIK"]["box"][0]["grade"] == "A" and R["OK"]["sow"]["prime"]
+    sr = intraday.sheet_rows(["WIK"])
+    assert any(r[0] == "WIK" and r[1] in (0, 3) for r in sr)
+    return f"{p['n_wick']} wicked, {p['n_under']} under"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

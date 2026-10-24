@@ -132,8 +132,11 @@ def prev_contrib(m):
     return {"date": date, "ret": round(ret, 5), "subs": subs}
 
 
-def sheet_rows():
-    """[ticker, index_flag, google_symbol] for every row the live sheet should carry."""
+def sheet_rows(extra=None):
+    """[ticker, index_flag, google_symbol] for every row the live sheet should carry.
+    extra = dip-buy names (Box + Strength on Weakness, `dips.tickers`): added if missing; Russell-2000-only ones get
+    flag 3 instead of 2 so the sheet also fetches their open and today's low (column L) for the live dip check."""
+    extra = set(extra or [])
     m = load_members()
     idx = {t for rows in m.values() for t, _ in rows} - DUP_CLASSES
     tick = set(store.theme_tickers()) | {t for rows in m.values() for t, _ in rows} | set(SECTOR_ETFS)
@@ -141,8 +144,10 @@ def sheet_rows():
     for k, (sym, _) in PULSE.items():
         rows.append([k, 0, sym])
         tick.discard(k)
-    for t in sorted(tick):
-        rows.append([t, 1 if t in idx else 0, SYMBOL_OVERRIDE.get(t, t)])
+    r2kset = russell_tickers() if extra else set()
+    for t in sorted(tick | (extra - set(PULSE))):
+        if t in tick or t not in r2kset:
+            rows.append([t, 1 if t in idx else 0, SYMBOL_OVERRIDE.get(t, t)])
     # Russell 2000 members not already listed: flag 2 = price, prior close and volume only (keeps the sheet light)
     have = {r[0] for r in rows}
     r2k, _ = russell_members()
@@ -151,13 +156,20 @@ def sheet_rows():
         if t in have:
             continue
         have.add(t)
-        rows.append([t, 2, SYMBOL_OVERRIDE.get(t, f'{r["exchange"]}:{t}' if r["exchange"] else t)])
+        rows.append([t, 3 if t in extra else 2, SYMBOL_OVERRIDE.get(t, f'{r["exchange"]}:{t}' if r["exchange"] else t)])
     return rows
 
 
-def write_sheet_csv():
+def russell_tickers():
+    try:
+        return {r["ticker"] for r in russell_members()[0]}
+    except Exception:
+        return set()
+
+
+def write_sheet_csv(extra=None):
     with open(config.DATA_DIR / "live_sheet.csv", "w", newline="") as f:
-        csv.writer(f).writerows(sheet_rows())
+        csv.writer(f).writerows(sheet_rows(extra))
 
 
 if __name__ == "__main__":

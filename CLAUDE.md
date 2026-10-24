@@ -434,6 +434,16 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Strength on Weakness card (Oct 24, Adam): same `stairBits` tags in the State cell + "Stair steps" chips (BOX_STAIR without "fav",
   localStorage "sowStair"); `stairGroupOf` falls back to DATA.themes.stocks sub / first theme when a row has none. Stair states are DAILY
   (9/21-day EMAs), SoW states weekly; ★ / nuzzle not backtested on SoW signals. Rows carry `adr` (daily 20-day ADR %, Oct 24) → sortable "ADR %" column.
+- `dips.py` **Dip buys · 9 / 21 EMA** (Oct 24, 2026; Adam: "get in when price is wicking under the 9 or the 21 and coming back up", wants it live;
+  card R-2026-10-24-dip-buys, layer `dips`, info) → `DATA.themes.dips`, `dipCard` at the very top of Trade Setups (after the live bar) and on the
+  Intraday tab (after "Your trades, live"). Names = Box longs (retest_long any tag, trap_long `failed`) + every SoW row. Daily 9/21 EMAs at the last
+  close; flags under9/under21, wick9/wick21 (low under, close at/over), reclaim9/21 (closed under in the prior 3, over now), run9/run21, 10-day strip
+  (0 above / 1 wick / 2 under 9 / 3 under 21). Live (`dipLive`, when `liveActive()`): today's EMA = e + α(price − e), α 2/10 and 2/22; low from sheet
+  column **L "low"** (added Oct 24: `=IF(OR($C4="",$B4=2),"",IFERROR(GOOGLEFINANCE($C4,"low"),""))`, rows 4–3600), falls back to the open. Chips Show
+  (wicked & back / under now / either / all) · From (Box / SoW / ⭐ Prime) · Trend (9 over 21 default) · Stair steps; localStorage dipF / dipSrc /
+  dipTrend / dipStair. Sheet rows: `intraday.sheet_rows(extra=dips.tickers(...))` adds missing names (flag 0) and gives R2K-only dip names **flag 3**
+  (open + low fetched; marketcap/volumeavg still only flag 1). Test (`tools/dip_study/test.py`, all liquid RS 70+ uptrend stocks): wick & back ≈
+  any uptrend day (±0.1 pts vs SPY, t < 1, R +0.05 vs +0.03, halves flip) → entry-location tool, no edge alone.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

@@ -426,6 +426,20 @@
     "R-2026-10-24-stair-steps"
    ],
    "notes": "★ leading group on retest bounces +0.23R vs −0.02R (t 3.2, both halves) — passes the proven rule but NOT wired into box grades/playbook (needs Adam's approval)"
+  },
+  {
+   "id": "dips",
+   "name": "Dip buys: Box + SoW names under / wicking under the daily 9-21 EMAs",
+   "kind": "code",
+   "owner": "daily update + browser (live)",
+   "status": "info",
+   "where": "breadth/dips.py → DATA.themes.dips → dipCard at the top of Trade Setups and on the Intraday tab (live from the Google Sheet price + column L low)",
+   "what": "Box longs (retest_long, trap_long failed) + every SoW row; flags under 9/21, wick under and close back above, reclaim within 3 sessions; live EMA = last EMA + alpha x (price - last EMA)",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-24-dip-buys"
+   ],
+   "notes": "generic test: no edge vs any uptrend day (entry-location tool only)"
   }
  ]
 }
