@@ -41,7 +41,12 @@ SIDE = {1: "long (index broke up)", -1: "short (index broke down)"}
 
 
 def load(bars_path):
-    df = pd.read_parquet(bars_path)
+    import glob
+    import os
+    if os.path.isdir(bars_path):
+        df = pd.concat([pd.read_parquet(f) for f in sorted(glob.glob(os.path.join(bars_path, "*.parquet")))], ignore_index=True)
+    else:
+        df = pd.read_parquet(bars_path)
     df["date"] = pd.to_datetime(df["date"])
     df = df[(df.m % 15 == 0) & (df.m < NB * 15)]
     dates = sorted(df.date.unique())
