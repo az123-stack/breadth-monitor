@@ -419,6 +419,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   theme and sub-theme name; themes use `stairs.themes` (same rules on data/themes.csv members, ETFs out; TECH - Cybersecurity stepping Oct 23).
   "Stair steps" filter chips (`STAIR_FILTERS`, `stairPass`, `UI.themes.stair`): All / ★ + setting/stepping / setting or stepping / stepping /
   setting / ★ leading, with counts for the current view; kept when switching Themes ↔ Sub-themes.
+  Box trades (Oct 24, Adam: "couple this with our box setups"): `stairs.stocks` = every liquid stock nuzzled / lifting / step break
+  → [state, e9, e21]; `stairBits(r)` adds ★ group + "group setting/stepping up · dN" + the stock's own state under each box row's grade
+  (trade sections and the tight-box pipeline); "Stair steps" chips (`BOX_STAIR`, `stairBoxPass`, localStorage "boxStair"): All / ★ group
+  setting/stepping / ★ group + stock nuzzled/lifting / stock nuzzled/lifting / ★ leading group. Group = sub-theme, else theme. Not
+  backtested as a box confluence yet (could add to `boxstudy.features`).
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

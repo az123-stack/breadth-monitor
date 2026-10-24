@@ -124,6 +124,18 @@ def evidence(G, spy, setting, stepping, breaks):
     return out
 
 
+def stock_states(S, d):
+    """Every liquid stock currently ◆ nuzzled / ↗ lifting / ▲ step break -> [state, 9 EMA, 21 EMA].
+    Used to tag other cards (Box trades) with the stock's own stair-step state."""
+    out = {}
+    liq = S["liq"].loc[d]
+    for k, name in (("nuz5", "nuzzle"), ("lift3", "lift"), ("brk3", "break")):   # later wins: break > lift > nuzzle
+        row = S[k].loc[d] & S["up"].loc[d] & liq
+        for t in row.index[row.to_numpy()]:
+            out[t] = [name, round(float(S["e9"].at[d, t]), 2), round(float(S["e21"].at[d, t]), 2)]
+    return out
+
+
 def build(adjusted, stocks=None, names=None, subthemes=None, with_evidence=True):
     """Payload for DATA.themes.stairs."""
     from . import config, store, strength
@@ -247,4 +259,4 @@ def build(adjusted, stocks=None, names=None, subthemes=None, with_evidence=True)
         theme_tags = {}
     return {"date": d.strftime("%Y-%m-%d"), "dates": [x.strftime("%Y-%m-%d") for x in dates[-H:]], "cfg": CFG,
             "n_stepping": sum(r["status"] == "stepping" for r in rows), "n_setting": sum(r["status"] == "setting" for r in rows),
-            "rows": rows, "themes": theme_tags, "evidence": ev}
+            "rows": rows, "themes": theme_tags, "stocks": stock_states(S, d), "evidence": ev}
