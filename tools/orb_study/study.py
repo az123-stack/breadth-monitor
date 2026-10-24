@@ -248,7 +248,16 @@ def run(bars_path):
                     res = {"pick": trades(A, dayC, dayL, dayH, d, j, k, np.array(picks), dd, adr[d]),
                            "basket": trades(A, dayC, dayL, dayH, d, j, k, basket, dd, adr[d]),
                            "anywhere": trades(A, dayC, dayL, dayH, d, j, k, anywhere, dd, adr[d])}
+                    pk = np.array(picks, int)
+                    with np.errstate(all="ignore"):
+                        own = (np.nanmax(A["h"][d, :k, pk], axis=0) if dd > 0 else np.nanmin(A["l"][d, :k, pk], axis=0)) if len(pk) else np.array([])
+                        gap = (A["o"][d, 0, pk] / dayC[d - 1, pk] - 1) if len(pk) else np.array([])
                     row = {**base, "dir": dd, "rank": rk, "bar": j,
+                           # extra context for splits: is the stock itself past its own opening range at entry?
+                           # how big was its gap in the trade direction? did both SPY and QQQ break the same way?
+                           "aligned": float(np.mean(dd * (A["c"][d, j, pk] - own) > 0)) if len(pk) else np.nan,
+                           "gap_dir": float(np.nanmean(dd * gap)) if len(pk) else np.nan,
+                           "both_idx": both_break(A, d, k, ti, dd, j),
                            "groups": " | ".join(g for g, _, _, _ in chosen), "names": " ".join(tks[p] for p in picks),
                            # chosen groups' relative volume and its percentile among all groups that day
                            "grp_rvol": float(np.nanmean([x[3] for x in chosen])),
@@ -261,6 +270,37 @@ def run(bars_path):
                             row[f"{nm}_{ex}_ret"] = np.nanmean(ret) if np.isfinite(ret).any() else np.nan
                     rows.append(row)
     return pd.DataFrame(rows)
+
+
+def both_break(A, d, k, ti, dd, j):
+    """True when SPY and QQQ have both closed beyond their opening range in direction dd by bar j."""
+    ok = []
+    for nm in ("SPY", "QQQ"):
+        x = ti.get(nm)
+        if x is None:
+            return False
+        H, L, C = A["h"][d, :, x], A["l"][d, :, x], A["c"][d, :, x]
+        lvl = H[:k].max() if dd > 0 else L[:k].min()
+        ok.append(bool(np.any(dd * (C[k:j + 1] - lvl) > 0)))
+    return all(ok)
+
+
+def splits(df, ex="close"):
+    """Extra cuts on the plain rankings: stock past its own OR at entry, early vs late break, gap size, both indexes."""
+    t = df[(df.dir != 0) & df["rank"].isin(["prior", "or"])].copy()
+    t["early"] = t.bar <= t.orb // 15 + 1                       # broke on the first bar after the range
+    t["gap_big"] = t.gap_dir >= 0.02
+    cuts = {"own ORB aligned": t.aligned >= 1, "own ORB not aligned": t.aligned < 1, "early break": t.early,
+            "late break": ~t.early, "gapped 2%+ our way": t.gap_big, "small/against gap": ~t.gap_big,
+            "SPY+QQQ both": t.both_idx.astype(bool), "only one index": ~t.both_idx.astype(bool)}
+    out = []
+    for (ix, orb, rk, side), g in t.groupby(["idx", "orb", "rank", "dir"]):
+        for lab, m in cuts.items():
+            s = g[m.loc[g.index]]
+            p, a = s[f"pick_{ex}_R"], s[f"any_{ex}_R"]
+            out.append({"idx": ix, "orb": orb, "rank": rk, "side": SIDE[side], "cut": lab, "n": int(p.notna().sum()),
+                        "pick_R": p.mean(), "edge_R": (p - a).mean(), "edge_t": tstat(p - a)})
+    return pd.DataFrame(out)
 
 
 def tstat(x):
@@ -328,6 +368,7 @@ def main():
     pd.set_option("display.width", 250, "display.max_columns", 40, "display.max_rows", 200)
     print(summarize(df).round(3).to_string())
     print(vol_split(df).round(3).to_string())
+    print(splits(df).round(3).to_string())
 
 
 if __name__ == "__main__":
