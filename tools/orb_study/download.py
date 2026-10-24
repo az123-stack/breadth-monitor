@@ -47,40 +47,52 @@ def fetch(cli, t, start, end):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default="orb15.parquet")
+    ap.add_argument("--outdir", default="orbdata")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--chunk", type=int, default=50)
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     tks, start, end = tickers()
     if a.limit:
         tks = tks[: a.limit]
-    done, frames = set(), []
-    if os.path.exists(a.out):
-        old = pd.read_parquet(a.out)
-        frames.append(old)
-        done = set(old.ticker.unique())
+    os.makedirs(a.outdir, exist_ok=True)
+    done = set()
+    for f in sorted(os.listdir(a.outdir)):          # resume: tickers already in saved parts
+        if f.endswith(".parquet"):
+            done |= set(pd.read_parquet(os.path.join(a.outdir, f), columns=["ticker"]).ticker.unique())
+    done_file = os.path.join(a.outdir, "done.txt")
+    if os.path.exists(done_file):                    # tickers tried before that returned nothing
+        done |= set(open(done_file).read().split())
+    part = len([f for f in os.listdir(a.outdir) if f.endswith(".parquet")])
     cols = ["ticker", "date", "m", "o", "h", "l", "c", "v"]
     cli = MassiveClient()
     todo = [t for t in tks if t not in done]
     log.info("tickers %d, already have %d, to fetch %d, %s..%s", len(tks), len(done), len(todo), start, end)
-    buf, empty = [], []
+    buf, tried, empty = [], [], []
     for i, t in enumerate(todo, 1):
         try:
             rows = fetch(cli, t, start, end)
-        except Exception as e:  # keep going; a failed ticker is just missing
+        except Exception as e:  # keep going; a failed ticker is just missing (not marked done, retried next run)
             log.warning("%s failed: %s", t, e)
-            rows = []
-        if not rows:
-            empty.append(t)
-        buf.extend(rows)
-        if i % 50 == 0 or i == len(todo):
-            frames.append(pd.DataFrame(buf, columns=cols))
-            buf = []
-            df = pd.concat(frames, ignore_index=True)
-            df["date"] = pd.to_datetime(df["date"])
-            df.to_parquet(a.out, index=False)
-            frames = [df]
-            log.info("%d/%d saved, rows %d, empty so far %d", i, len(todo), len(df), len(empty))
+            rows = None
+        if rows is not None:
+            tried.append(t)
+            if not rows:
+                empty.append(t)
+            buf.extend(rows)
+        if i % a.chunk == 0 or i == len(todo):
+            if buf:
+                df = pd.DataFrame(buf, columns=cols)
+                df["date"] = pd.to_datetime(df["date"])
+                for k in "ohlc":
+                    df[k] = df[k].astype("float32")
+                df["m"] = df["m"].astype("int16")
+                df.to_parquet(os.path.join(a.outdir, f"part_{part:03d}.parquet"), index=False)
+                part += 1
+            with open(done_file, "a") as fh:
+                fh.write("\n".join(tried) + "\n")
+            buf, tried = [], []
+            log.info("%d/%d saved (part %d), empty so far %d", i, len(todo), part, len(empty))
     log.info("empty tickers: %s", " ".join(empty))
 
 

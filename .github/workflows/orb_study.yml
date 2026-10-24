@@ -1,7 +1,8 @@
 name: ORB study download (one-off)
 
 # Downloads 15-minute regular-session bars for liquid sub-theme stocks + SPY/QQQ (~3.6 h on the free plan)
-# and keeps them as a workflow artifact (too big for the repo). Run by hand only; don't overlap the daily update.
+# into the separate branch `orb-data` (kept off main: ~100+ MB). Resumes from what that branch already has,
+# so if a run stops early just run it again. Run by hand only; don't overlap the daily update.
 on:
   workflow_dispatch:
     inputs:
@@ -14,10 +15,13 @@ concurrency:
   group: breadth-update
   cancel-in-progress: false
 
+permissions:
+  contents: write
+
 jobs:
   download:
     runs-on: ubuntu-latest
-    timeout-minutes: 345
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,14 +29,29 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
+      - name: Get the data branch (resume)
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          mkdir orbdata && cd orbdata
+          git init -q
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git fetch -q --depth 1 origin orb-data; then git checkout -q -b orb-data FETCH_HEAD; else git checkout -q --orphan orb-data; fi
+          ls | head
       - name: Download 15-minute bars
+        timeout-minutes: 335
         env:
           MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
           LIMIT: ${{ github.event.inputs.limit || '0' }}
-        run: python -m tools.orb_study.download --out orb15.parquet --limit "$LIMIT"
-      - uses: actions/upload-artifact@v4
+        run: python -m tools.orb_study.download --outdir orbdata --limit "$LIMIT"
+      - name: Push the data branch
         if: always()
-        with:
-          name: orb15
-          path: orb15.parquet
-          retention-days: 30
+        run: |
+          cd orbdata
+          git add -A
+          if git diff --cached --quiet; then echo "No new data"; exit 0; fi
+          git commit -qm "ORB study 15-minute bars $(date -u +%Y-%m-%dT%H:%M)"
+          git push -q origin orb-data
+          du -sh .
