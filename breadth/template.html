@@ -1444,7 +1444,12 @@ function stairPass(kind, name, f) {
 }
 /* Box trades (and any stock row with .sub / .theme): the group's stair-step state + the stock's own state. */
 const STAIR_OWN = { nuzzle: ["◆ Nuzzled", "In the 9/21 EMA pick-up zone (pulled in within the last 5 sessions)"], lift: ["↗ Lifting", "Lifting off the 9/21 EMAs (close over the 9 EMA and the prior high)"], break: ["▲ Step break", "Broke its last 15-session step high after pulling in"] };
-function stairGroupOf(r) { return stairOf("sub", r.sub) || stairOf("theme", r.theme) || null; }
+let STAIR_STK = null;
+function stairGroupOf(r) {
+  if (!STAIR_STK) STAIR_STK = Object.fromEntries(((DATA.themes || {}).stocks || []).map(x => [x.t, x]));
+  const k = STAIR_STK[r.t] || {};
+  return stairOf("sub", r.sub || k.sub) || stairOf("theme", r.theme || (k.themes || [])[0]) || null;
+}
 function stairOwn(t) { const X = (DATA.themes || {}).stairs; return X && X.stocks ? X.stocks[t] || null : null; }
 /* ★ Favorites (Oct 24, 2026 test, card R-2026-10-24-box-leaders): long box trades that are actionable now (retest bounce "go"/"at",
    spring "failed"), grade A–B, in a ★ leading group (sub-theme, else theme, top 30% on 60-day return). Ranked: acting now first, then the
@@ -1477,7 +1482,8 @@ function stairBoxPass(r, f) {
 function stairBits(r) {
   const X = (DATA.themes || {}).stairs;
   if (!X) return "";
-  const g = stairGroupOf(r), o = stairOwn(r.t), gn = esc(stairOf("sub", r.sub) ? r.sub : r.theme || "");
+  const g = stairGroupOf(r), o = stairOwn(r.t), k = (STAIR_STK || {})[r.t] || {};
+  const gn = esc(stairOf("sub", r.sub || k.sub) ? (r.sub || k.sub) : (r.theme || (k.themes || [])[0] || ""));
   const bits = [];
   if (g && g.leader) bits.push(`<span class="stairstar" title="${gn}: leading group (top 30% on 60-day return)">★</span>`);
   if (g && g.status === "stepping") bits.push(`<span class="tg st-step" title="${gn} is stepping up together (as of the ${shortDate(X.date)} close)">group stepping up · d${g.since}</span>`);
@@ -4544,7 +4550,7 @@ function sowCard(T) {
   if (!X) return $('<div></div>');
   const ls = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
   const ss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storage off */ } };
-  UI.sow = UI.sow || { st: ls("sowState2", "prime"), scope: "all", sort: ["_o", 1], more: false };
+  UI.sow = UI.sow || { st: ls("sowState2", "prime"), scope: "all", stair: ls("sowStair", "all"), sort: ["_o", 1], more: false };
   const U = UI.sow, E = X.evidence || {}, C = X.cfg || {}, PR = X.prime || {};
   const NAME = Object.fromEntries(X.states.map(s => [s.key, s.name]));
   const DESC = Object.fromEntries(X.states.map(s => [s.key, s.desc]));
@@ -4585,7 +4591,7 @@ function sowCard(T) {
   const ORD = Object.fromEntries(X.states.map((s, i) => [s.key, i]));
   X.rows.forEach(r => { r._o = ORD[r.state] * 10 + (r.ago || 0); r._p = (r.rsl_hi ? 0 : 1000) - (r.rsr || 0); });
   if (U.st === "prime" && U.sort[0] === "_o") U.sort[0] = "_p";
-  const filtered = () => X.rows.filter(r => (U.st === "all" || (U.st === "prime" ? r.prime : U.st === "act" ? ACT.includes(r.state) : r.state === U.st)) && (U.scope === "all" || r.theme || r.sub));
+  const filtered = () => X.rows.filter(r => (U.st === "all" || (U.st === "prime" ? r.prime : U.st === "act" ? ACT.includes(r.state) : r.state === U.st)) && (U.scope === "all" || r.theme || r.sub) && stairBoxPass(r, U.stair));
   const plan = (r) => {
     const risk = r.risk != null ? ` (${pct(-r.risk)})` : "";
     if (r.state === "breakout") return `Buy next open · stop under the box $${r.stop}${risk}`;
@@ -4609,7 +4615,7 @@ function sowCard(T) {
     mb.style.display = all.length > SOW_TOP ? "" : "none";
     mb.textContent = U.more ? `Show the top ${SOW_TOP} only` : `Show all ${all.length}`;
     tb.innerHTML = rows.map(r => `<tr>${nameCell(r)}
-      <td class="l">${r.prime ? `<span class="tg sow-prime" title="${esc(PR.desc || "")}">⭐ Prime${r.prime_new ? " · new" : ""}</span>` : ""}<span class="tg sow-${r.state}" title="${esc(DESC[r.state] || "")}">${esc(NAME[r.state] || r.state)}</span>${r.rsl_hi ? '<span class="tg sow-rshi" title="RS line (price ÷ SPY) within 2% of its 1-year high">RS line high</span>' : ""}<small class="meta" style="display:block">${r.ago ? "last week" : X.week_done ? "this week" : "this week so far"}${r.prime ? ` · ${r.run50} wk${r.run50 === 1 ? "" : "s"} over the 50 · ${r.ext50 ?? "–"} ATRs above it` : ""}</small></td>
+      <td class="l">${r.prime ? `<span class="tg sow-prime" title="${esc(PR.desc || "")}">⭐ Prime${r.prime_new ? " · new" : ""}</span>` : ""}<span class="tg sow-${r.state}" title="${esc(DESC[r.state] || "")}">${esc(NAME[r.state] || r.state)}</span>${r.rsl_hi ? '<span class="tg sow-rshi" title="RS line (price ÷ SPY) within 2% of its 1-year high">RS line high</span>' : ""}<small class="meta" style="display:block">${r.ago ? "last week" : X.week_done ? "this week" : "this week so far"}${r.prime ? ` · ${r.run50} wk${r.run50 === 1 ? "" : "s"} over the 50 · ${r.ext50 ?? "–"} ATRs above it` : ""}</small>${stairBits(r)}</td>
       <td>${r.wk ? sowSpark(r) : '<span class="meta" title="Charts are drawn for the first 25 names of each state">–</span>'}</td>
       <td class="num">${pct(r.vs9)} / ${pct(r.vs21)}<small class="meta" style="display:block">$${r.e9} / $${r.e21}</small></td>
       <td class="num">${r.pumps ?? "–"}</td><td class="num">${r.below ?? "–"}</td>
@@ -4625,6 +4631,7 @@ function sowCard(T) {
   const nAct = ACT.reduce((a, k) => a + (cnt[k] || 0), 0);
   fl.append(chips("State", [["prime", `⭐ Prime positioned (${PR.n || 0})`], ["act", `Actionable (${nAct})`], ...X.states.map(s => [s.key, `${s.name} (${s.n})`]), ["all", `All (${X.rows.length})`]], U, "st", () => { ss("sowState2", U.st); U.more = false; U.sort[0] = U.st === "prime" ? "_p" : "_o"; U.sort[1] = 1; draw(); }));
   fl.append(chips("Scope", [["all", "All stocks"], ["themes", "In my themes"]], U, "scope", draw));
+  if ((DATA.themes || {}).stairs) fl.append(chips("Stair steps", BOX_STAIR.filter(([k]) => k !== "fav"), U, "stair", () => { ss("sowStair", U.stair); U.more = false; draw(); }));
   const dl = card.querySelector(".sowdl");
   dl.addEventListener("click", () => tsDownload("strength-on-weakness", [{ name: `Strength on Weakness ${U.st === "act" ? "actionable" : U.st}`, ticks: shown.map(r => r.t) }]));
   draw();

@@ -431,6 +431,9 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Evidence: retest bounce in ★ group +0.23R vs −0.02R (t 3.2, halves +0.27/+0.25; post-thrust +0.56R; +0.29R even without the sub-theme
   top-20% 60d badge, t 2.7); own nuzzle adds nothing inside ★ (+0.24 vs +0.22R); group setting/stepping nothing; springs ★ +0.22R (t 1.7);
   shorts in ★ groups worse (−0.28R t −3.5). ★ passes the proven rule but is NOT in box grades/playbook (needs Adam's approval).
+  Strength on Weakness card (Oct 24, Adam): same `stairBits` tags in the State cell + "Stair steps" chips (BOX_STAIR without "fav",
+  localStorage "sowStair"); `stairGroupOf` falls back to DATA.themes.stocks sub / first theme when a row has none. Stair states are DAILY
+  (9/21-day EMAs), SoW states weekly; ★ / nuzzle not backtested on SoW signals.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.
