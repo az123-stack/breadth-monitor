@@ -74,9 +74,86 @@
   }
  },
  "log": {
-  "asof": "2026-10-23",
-  "closed": 0,
-  "dates": 0,
-  "note": "no settled rows yet"
+  "asof": "2026-10-24",
+  "closed": 24,
+  "dates": 1,
+  "catalyst_positive": {
+   "n_good": 0,
+   "n_bad": 0,
+   "avg_good": null,
+   "avg_bad": null,
+   "dates": 0,
+   "diff": null,
+   "t": null,
+   "halves": [],
+   "passed": false
+  },
+  "red_flags": {
+   "n_good": 0,
+   "n_bad": 0,
+   "avg_good": null,
+   "avg_bad": null,
+   "dates": 0,
+   "diff": null,
+   "t": null,
+   "halves": [],
+   "passed": false
+  },
+  "earnings_in_hold": {
+   "n_good": 0,
+   "n_bad": 0,
+   "avg_good": null,
+   "avg_bad": null,
+   "dates": 0,
+   "diff": null,
+   "t": null,
+   "halves": [],
+   "passed": false
+  },
+  "macro_tailwind": {
+   "n_good": 10,
+   "n_bad": 0,
+   "avg_good": -0.01268,
+   "avg_bad": null,
+   "dates": 0,
+   "diff": null,
+   "t": null,
+   "halves": [],
+   "passed": false
+  },
+  "more_support": {
+   "n_good": 3,
+   "n_bad": 9,
+   "avg_good": -0.07703,
+   "avg_bad": 0.05485,
+   "dates": 1,
+   "diff": -0.13188,
+   "t": null,
+   "halves": [],
+   "passed": false
+  },
+  "no_warnings": {
+   "n_good": 0,
+   "n_bad": 1,
+   "avg_good": null,
+   "avg_bad": -0.0217,
+   "dates": 0,
+   "diff": null,
+   "t": null,
+   "halves": [],
+   "passed": false
+  },
+  "brief_low_risk": {
+   "n_good": 0,
+   "n_bad": 0,
+   "dates": 0,
+   "avg_good": null,
+   "avg_bad": null,
+   "test": "welch over dates",
+   "diff": null,
+   "t": null,
+   "halves": [],
+   "passed": false
+  }
  }
 }
