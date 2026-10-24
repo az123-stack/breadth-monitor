@@ -4591,7 +4591,7 @@ function dipLive(r0, tf, X) {
     wick9: lo < x9 && !under9, wick21: lo < x21 && !under21,
     reclaim9: !under9 && ((carry && r.under9) || r.reclaim9), reclaim21: !under21 && ((carry && r.under21) || r.reclaim21), noLow: L.low == null };
 }
-const DIP_F = [["back", "Wicked under & back above"], ["under", "Under the 9 / 21 now"], ["any", "Either"], ["all", "All names"]];
+const DIP_F = [["back", "Wicked under & back above"], ["under", "Under the 9 / 21 now"], ["all", "All names"]];   // multi-select: pick both for either
 const DIP_SRC = [["all", "Box + SoW"], ["box", "Box trades"], ["sow", "Strength on Weakness"], ["prime", "⭐ Prime"]];
 function dipCard(T, where) {
   const X = T && T.dips;
@@ -4608,7 +4608,8 @@ function dipCard(T, where) {
     r.dep = A ? (r.lo - Math.min(r.x9, r.x21)) / A : null; r.risk = r.lo && r.p > r.lo ? r.lo / r.p - 1 : null;
     r._o = (r.wick21 ? 0 : r.wick9 ? 1 : (r.reclaim21 || r.reclaim9) ? 2 : under(r) ? 3 : 4) * 1000 - (r.rsr || 0); });
   const srcOk = (r) => U.src === "all" || (U.src === "box" ? !!r.box : U.src === "sow" ? !!r.sow : !!(r.sow && r.sow.prime));
-  const fOk = (r) => U.f === "all" || (U.f === "back" ? back(r) : U.f === "under" ? under(r) : back(r) || under(r));
+  if (U.f === "any") U.f = "back,under";            // old "Either" chip = both picked
+  const fOk = (r) => U.f === "all" || U.f.split(",").some(f => f === "back" ? back(r) : f === "under" ? under(r) : false);
   const filtered = () => rows0.filter(r => fOk(r) && srcOk(r) && (U.trend === "all" || r.x9 > r.x21 || r.up) && stairBoxPass(r, U.stair));
   const nBack = rows0.filter(back).length, nUnder = rows0.filter(under).length;
   const asof = anyLive ? `live · Google prices ${LIVE.fetched ? LIVE.fetched.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }) : ""}` : `${shortDate(X.date)} close`;
@@ -4656,7 +4657,7 @@ function dipCard(T, where) {
   const draw = () => fill(current());
   body.querySelector(".dipmore").addEventListener("click", () => { U.more = !U.more; draw(); });
   fl.append(chips("EMAs", [["d", "Daily 9 / 21"], ["w", "Weekly 9 / 21"]], U, "tf", () => { ss("dipTf", U.tf); U.more = false; const n = dipCard(T, where); card.replaceWith(n); }));
-  fl.append(chips("Show", DIP_F.map(([k, l]) => [k, k === "back" ? `${l} (${nBack})` : k === "under" ? `${l} (${nUnder})` : l]), U, "f", () => { ss("dipF", U.f); U.more = false; draw(); }));
+  fl.append(chipsMulti("Show", DIP_F.map(([k, l]) => [k, k === "back" ? `${l} (${nBack})` : k === "under" ? `${l} (${nUnder})` : l]), U, "f", () => { ss("dipF", U.f); U.more = false; draw(); }));
   fl.append(chips("From", DIP_SRC, U, "src", () => { ss("dipSrc", U.src); U.more = false; draw(); }));
   fl.append(chips("Trend", [["up", "9 EMA over 21"], ["all", "Any"]], U, "trend", () => { ss("dipTrend", U.trend); draw(); }));
   if ((DATA.themes || {}).stairs) fl.append(chipsMulti("Stair steps", BOX_STAIR.filter(([k]) => k !== "fav"), U, "stair", () => { ss("dipStair", U.stair); U.more = false; draw(); }));

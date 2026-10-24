@@ -440,7 +440,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   close; flags under9/under21, wick9/wick21 (low under, close at/over), reclaim9/21 (closed under in the prior 3, over now), run9/run21, 10-day strip
   (0 above / 1 wick / 2 under 9 / 3 under 21). Live (`dipLive`, when `liveActive()`): today's EMA = e + α(price − e), α 2/10 and 2/22; low from sheet
   column **L "low"** (added Oct 24: `=IF(OR($C4="",$B4=2),"",IFERROR(GOOGLEFINANCE($C4,"low"),""))`, rows 4–3600), falls back to the open. Chips Show
-  (wicked & back / under now / either / all) · From (Box / SoW / ⭐ Prime) · Trend (9 over 21 default) · Stair steps (multi-select, `chipsMulti`: picked chips combine with OR, also on Box + SoW cards); localStorage dipF / dipSrc /
+  (wicked & back / under now / all; multi-select, both = either) · From (Box / SoW / ⭐ Prime) · Trend (9 over 21 default) · Stair steps (multi-select, `chipsMulti`: picked chips combine with OR, also on Box + SoW cards); localStorage dipF / dipSrc /
   dipTrend / dipStair. Sheet rows: `intraday.sheet_rows(extra=dips.tickers(...))` adds missing names (flag 0) and gives R2K-only dip names **flag 3**
   (open + low fetched; marketcap/volumeavg still only flag 1). Test (`tools/dip_study/test.py`, all liquid RS 70+ uptrend stocks): wick & back ≈
   any uptrend day (±0.1 pts vs SPY, t < 1, R +0.05 vs +0.03, halves flip) → entry-location tool, no edge alone.
