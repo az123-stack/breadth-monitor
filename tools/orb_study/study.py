@@ -53,9 +53,9 @@ def load(bars_path):
     tks = sorted(df.ticker.unique())
     di = {d: i for i, d in enumerate(dates)}
     ti = {t: i for i, t in enumerate(tks)}
-    A = {k: np.full((len(dates), NB, len(tks)), np.nan) for k in "ohlc"}
+    A = {k: np.full((len(dates), NB, len(tks)), np.nan) for k in "ohlcv"}
     r, b, c = df.date.map(di).to_numpy(), (df.m // 15).to_numpy(), df.ticker.map(ti).to_numpy()
-    for k in "ohlc":
+    for k in "ohlcv":
         A[k][r, b, c] = df[k].to_numpy(float)
     return pd.DatetimeIndex(dates), tks, A
 
@@ -95,22 +95,31 @@ def groups(tks):
     return out
 
 
-def rank_groups(r, ok, G):
-    """r = per-stock move, ok = usable mask. Returns list of (group, score, members) sorted best first."""
+def rank_groups(r, ok, G, rv=None, use_vol=False):
+    """r = per-stock move, ok = usable mask, rv = per-stock relative volume. Returns list of
+    (group, score, members, group rel. volume) sorted best first. use_vol adds rank(group rel. volume) to the
+    score for the top end and is direction-agnostic (heavy volume counts for both the best and the worst groups):
+    score_up = rank(avg) + rank(%up) + rank(rvol); score_dn = rank(avg) + rank(%up) - rank(rvol)."""
     rows = []
     for g, idx in G.items():
         m = idx[ok[idx]]
         if len(m) < 3:
             continue
         x = np.clip(r[m], -0.5, 0.5)
-        rows.append((g, x.mean(), (x > 0).mean(), m))
+        gv = np.nanmedian(rv[m]) if rv is not None and np.isfinite(rv[m]).any() else np.nan
+        rows.append((g, x.mean(), (x > 0).mean(), m, gv))
     if len(rows) < 6:
-        return []
+        return [], []
     avg = pd.Series([x[1] for x in rows]).rank(pct=True).to_numpy()
     up = pd.Series([x[2] for x in rows]).rank(pct=True).to_numpy()
-    sc = avg + up + 1e-9 * np.array([x[1] for x in rows])     # tie-break on avg move
-    order = np.argsort(-sc)
-    return [(rows[i][0], sc[i], rows[i][3]) for i in order]
+    vol = pd.Series([x[4] for x in rows]).rank(pct=True).fillna(0.5).to_numpy()
+    tie = 1e-9 * np.array([x[1] for x in rows])     # tie-break on avg move
+    base = avg + up + tie
+    sc_up = base + (vol if use_vol else 0)
+    sc_dn = base - (vol if use_vol else 0)
+    up_order, dn_order = np.argsort(-sc_up), np.argsort(sc_dn)
+    pack = lambda o: [(rows[i][0], 0.0, rows[i][3], rows[i][4]) for i in o]
+    return pack(up_order), pack(dn_order)
 
 
 def trades(A, dayC, dayL, dayH, d, j, k, s, dd, adr):
@@ -169,6 +178,21 @@ def run(bars_path):
     liquid, adr, reg, since, spy50 = daily_context(dates, tks)
     G = groups(tks)
     ti = {t: i for i, t in enumerate(tks)}
+    # Relative volume per stock, known at decision time.
+    # prior: yesterday's total volume / its average over the 20 sessions before it.
+    # or (k bars): volume in today's first k bars / average volume in the first k bars over the prior 20 sessions.
+    with np.errstate(all="ignore"):
+        V = np.where(np.isfinite(A["v"]), A["v"], 0.0)
+        dayV = np.where(last >= 0, V.sum(axis=1), np.nan)
+        dv = pd.DataFrame(dayV)
+        avgV = dv.shift(1).rolling(20, min_periods=15).mean().to_numpy()   # avg of the 20 sessions before each day
+        rv_prior = np.full_like(dayV, np.nan)
+        rv_prior[1:] = (dayV / avgV)[:-1]                                   # yesterday's rel. volume, used on day d
+        rv_or = {}
+        for k in (1, 2):
+            ov = pd.DataFrame(V[:, :k, :].sum(axis=1))
+            ov[ov == 0] = np.nan
+            rv_or[k] = (ov / ov.shift(1).rolling(20, min_periods=15).mean()).to_numpy()
     rows = []
     for d in range(2, nd):
         for idx_name in ("SPY", "QQQ"):
@@ -200,29 +224,36 @@ def run(bars_path):
                 if len(anym) < 50:
                     continue
                 anyres = trades(A, dayC, dayL, dayH, d, j, k, anym, dd, adr[d])
-                for rk in ("prior", "or"):
+                for rk in ("prior", "or", "prior+vol", "or+vol"):
+                    base_rk, use_vol = rk.split("+")[0], rk.endswith("+vol")
                     with np.errstate(all="ignore"):
-                        r = dayC[d - 1] / dayC[d - 2] - 1 if rk == "prior" else A["c"][d, k - 1] / dayC[d - 1] - 1
+                        r = dayC[d - 1] / dayC[d - 2] - 1 if base_rk == "prior" else A["c"][d, k - 1] / dayC[d - 1] - 1
                     okr = ok & np.isfinite(r)
-                    ranked = rank_groups(r, okr, G)
-                    if not ranked:
+                    rv = rv_prior[d] if base_rk == "prior" else rv_or[k][d]
+                    best_first, worst_first = rank_groups(r, okr, G, rv, use_vol)
+                    if not best_first:
                         continue
-                    chosen = ranked[:2] if dd > 0 else ranked[-2:]
+                    chosen = best_first[:2] if dd > 0 else worst_first[:2]
+                    allrv = [x[3] for x in best_first]
                     picks, used = [], set()
-                    for g, sc, m in chosen:
+                    for g, sc, m, _ in chosen:
                         cand = m[np.argsort(-dd * r[m])]
                         cand = [c for c in cand if c not in used]
                         if cand:
                             picks.append(cand[0])
                             used.add(cand[0])
-                    basket = np.unique(np.concatenate([m for _, _, m in chosen]))
+                    basket = np.unique(np.concatenate([m for _, _, m, _ in chosen]))
                     am = anym[np.isfinite(r[anym])]
                     anywhere = am[np.argsort(-dd * r[am])][:2]
                     res = {"pick": trades(A, dayC, dayL, dayH, d, j, k, np.array(picks), dd, adr[d]),
                            "basket": trades(A, dayC, dayL, dayH, d, j, k, basket, dd, adr[d]),
                            "anywhere": trades(A, dayC, dayL, dayH, d, j, k, anywhere, dd, adr[d])}
                     row = {**base, "dir": dd, "rank": rk, "bar": j,
-                           "groups": " | ".join(g for g, _, _ in chosen), "names": " ".join(tks[p] for p in picks)}
+                           "groups": " | ".join(g for g, _, _, _ in chosen), "names": " ".join(tks[p] for p in picks),
+                           # chosen groups' relative volume and its percentile among all groups that day
+                           "grp_rvol": float(np.nanmean([x[3] for x in chosen])),
+                           "grp_rvol_pct": float(np.nanmean([pd.Series(allrv).rank(pct=True).iloc[[x[0] for x in best_first].index(c[0])]
+                                                              for c in chosen]))}
                     for ex in ("close", "2R", "5d"):
                         for nm, rr in (("pick", res["pick"]), ("basket", res["basket"]), ("anywhere", res["anywhere"]), ("any", anyres)):
                             R, ret = rr[ex]
@@ -272,6 +303,21 @@ def by_state(df, idx="SPY", orb=30, rank="or", ex="close"):
     return pd.DataFrame(out)
 
 
+def vol_split(df, ex="close"):
+    """For the plain rankings: did the chosen groups' relative volume (percentile among groups that day) matter?
+    high = top third of groups by rel. volume, low = bottom third. Edge = pick minus 'any' on the same days."""
+    t = df[(df.dir != 0) & df["rank"].isin(["prior", "or"])]
+    out = []
+    for (ix, orb, rk, side), g in t.groupby(["idx", "orb", "rank", "dir"]):
+        for lab, m in (("high rvol", g.grp_rvol_pct >= 2 / 3), ("mid", (g.grp_rvol_pct > 1 / 3) & (g.grp_rvol_pct < 2 / 3)),
+                       ("low rvol", g.grp_rvol_pct <= 1 / 3)):
+            s = g[m]
+            p, a = s[f"pick_{ex}_R"], s[f"any_{ex}_R"]
+            out.append({"idx": ix, "orb": orb, "rank": rk, "side": SIDE[side], "group vol": lab, "n": int(p.notna().sum()),
+                        "pick_R": p.mean(), "edge_R": (p - a).mean(), "edge_t": tstat(p - a)})
+    return pd.DataFrame(out)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bars", default="orb15.parquet")
@@ -281,6 +327,7 @@ def main():
     df.to_parquet(a.out, index=False)
     pd.set_option("display.width", 250, "display.max_columns", 40, "display.max_rows", 200)
     print(summarize(df).round(3).to_string())
+    print(vol_split(df).round(3).to_string())
 
 
 if __name__ == "__main__":
