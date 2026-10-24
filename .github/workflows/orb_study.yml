@@ -1,0 +1,38 @@
+name: ORB study download (one-off)
+
+# Downloads 15-minute regular-session bars for liquid sub-theme stocks + SPY/QQQ (~3.6 h on the free plan)
+# and keeps them as a workflow artifact (too big for the repo). Run by hand only; don't overlap the daily update.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Only the first N tickers (0 = all; use 3 for a quick check)"
+        required: false
+        default: "0"
+
+concurrency:
+  group: breadth-update
+  cancel-in-progress: false
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Download 15-minute bars
+        env:
+          MASSIVE_API_KEY: ${{ secrets.MASSIVE_API_KEY }}
+          LIMIT: ${{ github.event.inputs.limit || '0' }}
+        run: python -m tools.orb_study.download --out orb15.parquet --limit "$LIMIT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: orb15
+          path: orb15.parquet
+          retention-days: 30
