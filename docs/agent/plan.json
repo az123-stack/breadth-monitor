@@ -1,110 +1,138 @@
 {
- "for_date": "2026-10-17",
- "written": "2026-10-17T19:50Z",
- "summary": "First Integrator plan. Nothing new is proven this week: macro fit still fails, and the forward log for the agent layers has no settled ideas yet (first ones settle around Oct 22-23). The biggest untapped edge is already in the research: the 'spring' (failed breakdown, trap_long) after a breadth thrust made +0.46R (t 6.6, worked after 5 of 6 thrusts) but is not in the playbook, and we are in a post-thrust window right now (Oct 15). Best next step: confirm its halves and per-thrust results, then add it to the post-thrust playbook during this weekend's 'review my trade setups' session.",
+ "for_date": "2026-10-24",
+ "written": "2026-10-24T14:09Z",
+ "summary": "Nothing new is proven this week. Last week's top item (the Spring) is built and in the playbook, and the FINRA hidden-buying gauge is live as information. The forward log has only one settled day, so the news agents can't be judged until late November. The Top 2 picks started weak (9 closed, -1.7% with stops vs -0.7% without), so the single best next step is a cheap test: replay the picks over 18 months with different stops to see whether the 1-ADR stop is costing money.",
  "items": [
   {
-   "title": "Add the Spring (trap_long) to the post-thrust playbook",
+   "title": "Test the Top 2 stop rule on 18 months of replayed picks",
    "verdict": "test_first",
    "cards": [
-    "R-2026-10-17-box-trades",
-    "R-2026-10-11-setups-by-breadth"
+    "R-2026-10-15-pick-context",
+    "R-2026-10-16-position-exits"
    ],
-   "where": "trade_setups / playbook_state: new setup 'Spring' next to Box Retest on the Trade Setups tab (boxCard tiles already list trap_long names)",
-   "how": "boxes.attach already finds trap_long names; feed the 'failed' and 'far' tags into the playbook as a setup ranked by backtested 5-session R in each state, so it shows as Focus only after a thrust (and wherever else its R earns it). Plan from the study: entry next open, stop 0.5 ADR back under the line, target the far side. Do it inside the 'review my trade setups' session the Reviewer already flagged.",
-   "test": "Already: thr05 +0.46R, t 6.6, positive after 5 of 6 thrusts. Still needed: split by halves (same sign), count per independent thrust episode (boxstudy.episodes) so one big thrust isn't the whole result, and 5-session R (playbook uses R5) at next-open entry.",
-   "kill": "Either half negative, or the edge comes from 1-2 thrusts only, or R5 after a thrust below +0.15R (not Focus).",
+   "where": "exit rule for the Top 2 picks: ledger.py stop, trade_bt.pick_replay",
+   "how": "5 of the first 9 live picks were stopped out and the no-stop result beat the stopped one. Replay every #1/#2 pick (with today's context re-rank) under: no stop, 1 ADR (now), 1.5 ADR, entry-day low, and close-only stops. Pick the rule only if it wins clearly; otherwise keep 1 ADR.",
+   "test": "pick_replay from Mar 2025: next-session entry, 5-session exit, result in % and in R. Compare each stop vs the current 1-ADR stop per date, both halves same sign, t = 2 over 20+ dates; also check the worst trade and the max drawdown so a wider stop isn't just hiding risk.",
+   "kill": "No rule beats 1 ADR in both halves, or the gain comes with much bigger worst-case losses.",
    "effort": "S",
-   "priority": null
+   "priority": 1
   },
   {
-   "title": "Setups filtered by volume tilt",
+   "title": "Market filters on setups: volume tilt and hidden buying",
    "verdict": "test_first",
    "cards": [
     "R-2026-10-16-imbalance-volume-tilt",
-    "R-2026-10-15-pick-context"
+    "R-2026-10-17-order-flow-proxies",
+    "R-2026-10-11-setups-by-breadth"
    ],
-   "where": "playbook_state (a tilt modifier on the state) or a Decision-Card Market note; volume_tilt layer",
-   "how": "Tilt already changes SPY's next 21 sessions (low tilt outside thrust windows -4.2%, low post-thrust +2.4%). Test whether the same tiers change the R of our own setups; if so, 'Buyers tiring' days would mark every setup one notch down (Focus to Selective) on the playbook.",
-   "test": "Re-use tools/picks_context/capture.py (signals.pkl, 5,394+ signals): actionable 5-session result by tilt tier (low no-thrust / low post-thrust / balanced / high), cluster by date, both halves, t = 2 on the low-no-thrust vs rest difference over 20+ dates.",
-   "kill": "Difference |t| 2, or halves disagree, or it's explained away by breadth regime (check within mixed breadth only).",
+   "where": "playbook_state modifier (Focus - Selective on bad days); layers volume_tilt, hidden_buying",
+   "how": "Both gauges predict SPY's next month (tilt: low outside thrusts -4.2%; FINRA S&P short share top fifth +3.1% vs +0.7%). Carried over from last week, still untested: do they change the R of OUR setups? One capture run tests both. If yes, the playbook drops every setup a notch on 'Buyers tiring' / low-hidden-buying days.",
+   "test": "tools/picks_context/capture.py signals (5,400+), actionable 5-session result by tilt tier and by FINRA dev fifth, averaged per date, both halves, t = 2 over 20+ dates; repeat inside mixed breadth only so it isn't just the breadth regime again.",
+   "kill": "|t| 2, halves disagree, or the effect disappears inside one breadth regime.",
    "effort": "S",
-   "priority": null
+   "priority": 2
   },
   {
-   "title": "FINRA short-sale volume (DIX-style) market layer",
+   "title": "'The trade' as a pick context: favour names in the winning groups when winners hold up",
    "verdict": "test_first",
    "cards": [
-    "R-2026-10-17-order-flow-proxies"
+    "R-2026-10-22-the-trade",
+    "R-2026-10-17-two-camps",
+    "R-2026-10-15-pick-context"
    ],
-   "where": "new market-context layer (Breadth tab tile) via a fetch step in .github/workflows/daily.yml (the file is blocked in Claude's sandbox but reachable from Actions)",
-   "how": "Fetch FINRA's daily CNMS short volume files (free, from Aug 2018) in a one-off Actions job, build a market-wide short-volume ratio (dollar-weighted on our universe) and store it as a csv. If it passes, add a daily fetch and a tile. Code only, no agent needed.",
-   "test": "Daily ratio and its 10-day avg vs SPY next open to 5/10/21 sessions; must add information beyond ratio10, dn_share10, T2108 and vtilt10 (residual IC, both halves 2018-2022 / 2022-2026, extreme-tier returns with t = 2).",
-   "kill": "Residual IC near 0 or halves disagree: file it as 'doesnt' so it isn't retried.",
+   "where": "pick_context re-rank (playbook.context_fn); layers the_trade, rotation_tier",
+   "how": "The 'holds up' reading is the closest thing to a pass in new research (+1.1% vs avg group, t 2.0, halves +1.3/+1.1) and the two-camps study found the same thing at the stock level (RS 90 in the winning camp +2.7% vs -5.1% when leaders sit there). Test +1 context for candidates in the winning fifth while the trade 'holds up', and -1 for the winning fifth when it 'gives back'. Two-camps is a duplicate of the_trade for building purposes; fold it in here instead of a separate tile.",
+   "test": "Same capture signals: candidates in winning-fifth groups vs others, split by holds-up / gives-back, 5-session actionable result, per date, both halves, t = 2; then the Top 2 replay with vs without the extra context (must beat the current +1.96%/pick).",
+   "kill": "No edge at the setup level, or it only repeats the existing ignition / leading-and-accelerating context.",
    "effort": "M",
-   "priority": null
+   "priority": 3
   },
   {
-   "title": "Position ideas list (3-month holds, 50-EMA exit, size by ADR)",
+   "title": "In-vogue groups as long confluence for all setups",
+   "verdict": "test_first",
+   "cards": [
+    "R-2026-10-17-in-vogue",
+    "R-2026-10-17-box-trades"
+   ],
+   "where": "Decision-Card group layer / conviction tag on Trade Setups rows",
+   "how": "A 6-month top-20% theme helped box longs (retest +0.22R, spring +0.45R) but has only been tested on box trades. Test it on ATH Magnet, Pullback, Rotation Rookie, Round Number, Q-Flag and VCP; if it passes, add an 'in vogue' tag that counts.",
+   "test": "Capture signals, in vogue (6-month top-20% theme or sub-theme, as of the signal date) vs not, per setup and pooled, per date, both halves, t = 2.",
+   "kill": "Pooled edge |t| 2 or halves disagree: keep it on box trades only.",
+   "effort": "S",
+   "priority": 4
+  },
+  {
+   "title": "Position ideas list: leaders in leading groups + SoW prime, 50-EMA exit, size by ADR",
    "verdict": "test_first",
    "cards": [
     "R-2026-10-16-three-month-picks",
-    "R-2026-10-16-position-exits"
+    "R-2026-10-16-position-exits",
+    "R-2026-10-21-strength-on-weakness"
    ],
-   "where": "new list on the Setups tab, separate from the 5-day Top 2; layers rotation_tier, rs_rating, position_exits, position_sizing",
-   "how": "Top 2 by Leaders score in 'leading & accelerating' sub-themes, held up to 3 months with a close-below-50-EMA exit and a size note (so a 30% drawdown costs about 1% of the account). Its own forward log, like the pick ledger.",
-   "test": "Re-run with the dashboard's exact RS / rotation code (the study used approximations), non-overlapping monthly starts, next-open entry, vs SPY, both halves. The card already says the second half was -4% vs SPY for every rule, so this is the key risk.",
-   "kill": "Second half still negative vs SPY with exact code, or 50-EMA exit not better than holding by a clear margin.",
+   "where": "new list on Setups / Trade Setups (separate from the 5-day Top 2); layers position_exits, position_sizing, sow",
+   "how": "Still the biggest unbuilt idea: top 2 by Leaders score in leading-and-accelerating sub-themes, optionally requiring SoW 'prime' or 'pop', held up to 3 months with a close-below-50-EMA exit and a size note. Its own forward log.",
+   "test": "Exact dashboard RS/rotation/SoW code, non-overlapping monthly starts, next-open entry, vs SPY and vs other RS 70+ stocks, both halves. Only ~1 year is testable, so it can at most become information until longer history exists.",
+   "kill": "Second half still negative vs SPY, or no better than any RS 70+ stock (the SoW pop already only beat them by +1.6%, t 1.0).",
    "effort": "M",
-   "priority": null
+   "priority": 5
   },
   {
-   "title": "Agent layers: keep logging, judge in late November",
+   "title": "Agent layers: keep logging, first real read in late November",
    "verdict": "watch",
    "cards": [
-    "R-2026-10-11-setups-by-breadth"
+    "R-2026-10-11-setups-by-breadth",
+    "R-2026-10-22-trade-stories"
    ],
-   "where": "catalyst, calendar, macro_brief (Decision Cards, forward log)",
-   "how": "Nothing to build. The forward log has 48 carded ideas and none settled. Keep the catalyst and macro agents running; the Reviewer tests them once there are ~60 settled ideas over 20+ dates.",
-   "test": "Forward log: ideas with a real catalyst vs none, red flag vs none, earnings inside hold vs not; t = 2 over = 20 dates, same sign in both halves.",
-   "kill": "No layer reaches |t| = 1 by ~100 settled ideas: cut the catalyst agent to earnings checks only (cheaper).",
+   "where": "catalyst, calendar, macro_brief, trade_stories (forward log / story scorecard)",
+   "how": "Nothing to build. Only Oct 15 has settled (before the agents started); the first agent-researched rows settle next week. Trade Stories is scored every day by its own price check.",
+   "test": "Forward log: real catalyst vs none, red flag vs none, earnings in hold vs not, brief risk; t = 2 over 20+ dates, same sign both halves. Stories: favoured minus hurt groups next 5 sessions.",
+   "kill": "No agent layer reaches |t| = 1 by ~100 settled ideas: cut the catalyst agent to earnings checks only.",
    "effort": "S",
-   "priority": null
+   "priority": 6
   },
   {
-   "title": "Thrust 'unconfirmed' and washout-beta: wait for more events",
+   "title": "Thrust follow-ups: Oct 15 shallow thrust + Oct 22 follow-through",
    "verdict": "watch",
    "cards": [
     "R-2026-10-17-thrust-unconfirmed",
     "R-2026-10-16-connector-beta"
    ],
-   "where": "volume_tilt tile wording; washout_thrust card (both info only)",
-   "how": "Both rest on 2 events. Keep them as experimental wording; log the outcome of the Oct 15 thrust (unconfirmed by Oct 16's selloff) as the third case: SPY next 21 sessions and the post-thrust playbook's results.",
-   "test": "Needs 8+ cases before any test; then post-thrust setup R with vs without 'unconfirmed'.",
-   "kill": "If the Oct 15 thrust works like a normal one, drop the 'unconfirmed' wording back to a footnote.",
+   "where": "volume_tilt wording, washout_thrust card (info only)",
+   "how": "Log the outcomes as new cases: the Oct 15 thrust was shallow and 'unconfirmed' (result lands ~Nov 13); record the post-thrust playbook's actual results after the Oct 22 follow-through.",
+   "test": "Needs 8+ cases before any test.",
+   "kill": "If Oct 15 works like a normal thrust, demote the 'unconfirmed' wording to a footnote.",
    "effort": "S",
-   "priority": null
+   "priority": 7
   }
  ],
  "new_agents": [],
  "retire": [
   {
-   "target": "close-location tiles (Breadth tab closeTiles; not in the registry)",
-   "why": "R-2026-10-17-close-location is rejected: IC about 0 for clv, absorb and fade in both halves. The tiles say 'no forward edge found'; removing them reduces clutter. Keep the data columns for research."
+   "target": "who_won_close",
+   "why": "Repeat from last week: close location, absorption and fade have IC near 0 in both halves (two cards, R-2026-10-17-close-location and -who-won-the-close). The tiles take space on the Breadth tab while saying 'no forward edge found'. Keep the data columns for research."
+  },
+  {
+   "target": "market_health",
+   "why": "R-2026-10-22-leaders-and-breakouts: no forward edge (|IC| = 0.2, halves disagree) over 410 days and ~40 s per build. Consider hiding the card or moving it to a collapsed section; re-test in 6 months."
   }
  ],
  "registry_updates": [
   {
    "layer": "macro_fit",
    "to": "info",
-   "why": "Still failed (5-day t -1.65, both halves the wrong way). No change; the mean-reversion hint (Round Number t -2.27) is not tested by halves and stays a note."
+   "why": "Failed again (5-day t -1.67, halves -1.1%/-1.1%, the wrong way). No change."
+  },
+  {
+   "layer": "who_won_close",
+   "to": "retired",
+   "why": "IC about 0 in both halves; descriptive only."
   }
  ],
  "card_updates": [
   {
-   "card": "R-2026-10-17-box-trades",
+   "card": "R-2026-10-17-two-camps",
    "integrated": "partly",
-   "why": "Box Retest is in the playbook, but the Spring (trap_long, +0.46R after thrusts) is shown only on the box card, not in the playbook or picks."
+   "why": "The winning-vs-losing groups idea now lives in the_trade (R-2026-10-22-the-trade), which names the two sides and checks whether winners hold up; the camp-level RS split itself is not built."
   }
  ]
 }
