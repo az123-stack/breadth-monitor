@@ -424,6 +424,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (trade sections and the tight-box pipeline); "Stair steps" chips (`BOX_STAIR`, `stairBoxPass`, localStorage "boxStair"): All / ★ group
   setting/stepping / ★ group + stock nuzzled/lifting / stock nuzzled/lifting / ★ leading group. Group = sub-theme, else theme. Not
   backtested as a box confluence yet (could add to `boxstudy.features`).
+  ★ MY FAVORITES (Oct 24, Adam: "your favorite of these trades"; card R-2026-10-24-box-leaders, layer `box_favorites`, info; test scripts
+  `tools/box_stairs/`): panel at the top of the Box trades card + "★ Favorites" chip. `isBoxFav`: retest_long go/at or trap_long failed,
+  grade A–B, ★ leading group (`stairGroupOf`), `boxRR` (target − last) ÷ (last − stop) ≥ 1.5, "at" rows within 1.5 ADR of the line (ZS
+  Oct 23 touched-and-ripped same day stays tagged "at" by `retest_walk`); `boxFavRank`: acting now, exp, own nuzzle/lift, RS; top 5.
+  Evidence: retest bounce in ★ group +0.23R vs −0.02R (t 3.2, halves +0.27/+0.25; post-thrust +0.56R; +0.29R even without the sub-theme
+  top-20% 60d badge, t 2.7); own nuzzle adds nothing inside ★ (+0.24 vs +0.22R); group setting/stepping nothing; springs ★ +0.22R (t 1.7);
+  shorts in ★ groups worse (−0.28R t −3.5). ★ passes the proven rule but is NOT in box grades/playbook (needs Adam's approval).
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

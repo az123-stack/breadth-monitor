@@ -514,6 +514,8 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .tg.sow-breakout { background: color-mix(in srgb, var(--good) 35%, transparent); } .tg.sow-pop { background: color-mix(in srgb, var(--good) 22%, transparent); }
 .tg.sow-prime { background: color-mix(in srgb, var(--warning) 45%, transparent); font-weight: 700; } .tg.sow-box { background: var(--grid); } .tg.sow-rshi { background: color-mix(in srgb, var(--s1) 18%, transparent); }
 .tg.sow-nuzzle { background: color-mix(in srgb, var(--s1) 25%, transparent); } .tg.sow-riding { background: var(--grid); } .tg.sow-extended { background: color-mix(in srgb, var(--warning) 28%, transparent); }
+.favbox { margin: 10px 0 6px; padding: 10px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent); background: color-mix(in srgb, var(--warning) 7%, transparent); }
+.favrow { padding: 7px 0; border-top: 1px solid var(--grid); font-size: 13.5px; } .favrow:first-of-type { border-top: 0; } .favhead { display: flex; gap: 6px; flex-wrap: wrap; align-items: baseline; }
 .stairbits { margin-top: 3px; } .stairbits .tg { font-size: 10px; }
 .stairstar { color: var(--warning); font-weight: 700; margin: 0 2px 0 4px; cursor: help; }
 .tg.st-step { background: color-mix(in srgb, var(--good) 38%, transparent); font-weight: 700; } .tg.st-set { background: color-mix(in srgb, var(--s1) 28%, transparent); font-weight: 700; }
@@ -1444,12 +1446,32 @@ function stairPass(kind, name, f) {
 const STAIR_OWN = { nuzzle: ["◆ Nuzzled", "In the 9/21 EMA pick-up zone (pulled in within the last 5 sessions)"], lift: ["↗ Lifting", "Lifting off the 9/21 EMAs (close over the 9 EMA and the prior high)"], break: ["▲ Step break", "Broke its last 15-session step high after pulling in"] };
 function stairGroupOf(r) { return stairOf("sub", r.sub) || stairOf("theme", r.theme) || null; }
 function stairOwn(t) { const X = (DATA.themes || {}).stairs; return X && X.stocks ? X.stocks[t] || null : null; }
-const BOX_STAIR = [["all", "All"], ["lead_active", "★ group setting/stepping"], ["lead_own", "★ group + stock nuzzled/lifting"], ["own", "Stock nuzzled/lifting"], ["lead", "★ Leading group"]];
+/* ★ Favorites (Oct 24, 2026 test, card R-2026-10-24-box-leaders): long box trades that are actionable now (retest bounce "go"/"at",
+   spring "failed"), grade A–B, in a ★ leading group (sub-theme, else theme, top 30% on 60-day return). Ranked: acting now first, then the
+   graded expectation, then the stock's own nuzzle/lift (entry location only: it added no R once the group was ★), then RS. */
+function isBoxFav(r) {
+  const ok = (r.type === "retest_long" && (r.tag === "go" || r.tag === "at")) || (r.type === "trap_long" && r.tag === "failed");
+  if (!ok || !(r.grade === "A" || r.grade === "B")) return false;
+  if (!(boxRR(r) >= 1.5)) return false;            // chase guard: still buyable with the stop close enough
+  if (r.tag === "at" && !(r.vs_lvl_adr <= 1.5)) return false;   // "at the line" must really be near it (ZS Oct 23: touched and ripped the same day)
+  const g = stairGroupOf(r);
+  return !!(g && g.leader);
+}
+function boxRR(r) {                                // reward : risk from the last close (target vs stop)
+  if (r.stop == null || r.target == null || !r.price || r.stop >= r.price) return null;
+  return (r.target - r.price) / (r.price - r.stop);
+}
+function boxFavRank(a, b) {
+  const now = (r) => (r.tag === "at" ? 1 : 0), own = (r) => { const o = stairOwn(r.t); return o && (o[0] === "nuzzle" || o[0] === "lift") ? 0 : 1; };
+  return now(a) - now(b) || (b.exp ?? -9) - (a.exp ?? -9) || own(a) - own(b) || (b.rsr || 0) - (a.rsr || 0);
+}
+const BOX_STAIR = [["all", "All"], ["fav", "★ Favorites"], ["lead_active", "★ group setting/stepping"], ["lead_own", "★ group + stock nuzzled/lifting"], ["own", "Stock nuzzled/lifting"], ["lead", "★ Leading group"]];
 function stairBoxPass(r, f) {
   if (!f || f === "all") return true;
   const g = stairGroupOf(r), o = stairOwn(r.t);
   const lead = !!(g && g.leader), act = !!(g && (g.status === "setting" || g.status === "stepping"));
   const own = !!(o && (o[0] === "nuzzle" || o[0] === "lift"));
+  if (f === "fav") return isBoxFav(r);
   return f === "lead" ? lead : f === "lead_active" ? lead && act : f === "own" ? own : f === "lead_own" ? lead && own : true;
 }
 function stairBits(r) {
@@ -4289,6 +4311,7 @@ function boxCard(T) {
     <p class="note" style="padding:4px 0 0">A <b>line</b> is the edge of a tight box (flat 2 weeks–6 months) or a <b>wide range</b> level touched 3+ times over months (HPE's $63 ceiling, CRWV's $68 floor). After price breaks it, two things can happen: it comes back and <b>holds</b> (retest → trade the bounce / rejection) or it <b>fails</b> back into the box (trap → trade toward the other side). Today ${STATE_TXT[NOWS] || "–"}, and that has mattered more than anything else. Tiles = how each trade did in this market state; pick one to see today's names.
       <br><b>Which names show:</b> every $5+, $20M+/day stock with an active box trade (one per stock and side, the latest break). Each is matched to past trades like it (same trade, same market state, same proven confluences, at least 30 matches) and graded by their average result: <b>A</b> ≥ +0.40R, <b>B</b> ≥ +0.15R, <b>C</b> below. The default view shows grades A–B, best first, 10 per list.</p>
     <div class="bidx"></div>
+    <div class="boxfav"></div>
     <div class="btiles">${Object.keys(TR).map(tile).join("")}</div>
     <div class="filters" style="margin:8px 0 4px"></div><div class="rtbody"></div>
     <details class="kqsec" style="margin-top:10px"><summary><b>Research: when does this trade work?</b> · ${esc(X.from || "")} to ${esc(X.to || "")}, entry next open</summary><div class="rtev"></div></details>
@@ -4304,6 +4327,31 @@ function boxCard(T) {
   }).join(" · ")}</div>` : "";
   card.querySelectorAll(".btile").forEach(b => b.addEventListener("click", () => { U.trade = b.dataset.trade; card.querySelectorAll(".btile").forEach(x => x.classList.toggle("on", x === b)); draw(); drawEv(); }));
   const fl = card.querySelector(".filters"), body = card.querySelector(".rtbody");
+  /* ---- ★ My favorites: the rule in isBoxFav, top 5 ---- */
+  if ((DATA.themes || {}).stairs) {
+    const seen = new Set();
+    const favs = (X.live || []).filter(isBoxFav).sort(boxFavRank).filter(r => !seen.has(r.t) && seen.add(r.t));
+    const top = favs.slice(0, 5);
+    const nm = { retest_long: "Retest bounce", trap_long: "Spring (reclaimed the box)" };
+    const act = (r) => r.tag === "at" ? `At the old top: <b>wait for the bounce</b> (a close over the day's high and over $${r.lvl})` : `<b>Buy next open</b>`;
+    const fav = (r, i) => {
+      const g = stairGroupOf(r), o = stairOwn(r.t), gname = stairOf("sub", r.sub) ? r.sub : r.theme;
+      const why = [`grade ${r.grade}: similar past trades ${Rx(r.exp)} avg (${Math.round((r.exp_win || 0) * 100)}% win, n ${r.exp_n})`,
+        `★ ${esc(gname || "")} is a leading group${g.status === "stepping" ? ", stepping up together" : g.status === "setting" ? ", setting up together" : ""}`,
+        ...(r.conf || []).filter(f => f.eff > 0).slice(0, 2).map(f => esc(f.name.toLowerCase())),
+        o ? (o[0] === "nuzzle" ? "the stock is in its 9/21 EMA pick-up zone" : o[0] === "lift" ? "the stock is lifting off its 9/21 EMAs" : "the stock just broke its step") : "",
+        r.rsr != null ? `RS ${r.rsr}` : ""].filter(Boolean);
+      return `<div class="favrow"><div class="favhead"><b>${i + 1}. ${r.t}</b> <span class="meta">${esc((r.name || "").slice(0, 28))}</span> <span class="tg ${r.tag === "at" ? "st-set" : "st-step"}">${nm[r.type]}${r.tag === "at" ? " · at the line" : ""}</span></div>
+        <div class="meta" style="margin:2px 0">${why.join(" · ")}</div>
+        <div>${act(r)} · stop ${r.stop != null ? "$" + r.stop + " (" + pct(r.stop / r.price - 1) + ")" : "–"} · target $${r.target} (${pct(r.target / r.price - 1)}) · <b>${boxRR(r).toFixed(1)} : 1</b> · line $${r.lvl} · last $${r.price}</div></div>`;
+    };
+    card.querySelector(".boxfav").innerHTML = `<div class="favbox"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline">
+        <h3 style="margin:0;font-size:15px">★ My favorites right now <span class="meta">· ${favs.length} qualify, top ${top.length} shown</span></h3>
+        <span class="pbv unproven" title="Information only: never changes the Top 2 picks">Info only</span></div>
+      <p class="meta" style="margin:4px 0 6px">The rule: a <b>long</b> box trade I can act on now (retest bounce, or a spring back into the box), grade A–B, in a <b>★ leading group</b>, and still worth buying from the last close (target at least 1.5× the distance to the stop, and "at the line" names within 1.5 ADR of it, so nothing is chased). Why ★: on 3,784 past retest bounces (Jan 2025–Oct 2026, buy next open) a ★ group made <b>+0.23R vs −0.02R</b> elsewhere (t 3.2, both halves +0.27 / +0.25), still +0.29R outside the box study's own group badges, and +0.56R right after a thrust. Springs in ★ groups +0.22R vs +0.04R (not proven yet). The stock's own nuzzle and the group's setting-up state added nothing on top, so they only break ties. Shorts in ★ groups were much worse (−0.28R, t −3.5): never short a leader's box.</p>
+      ${top.length ? top.map(fav).join("") : '<p class="meta">Nothing qualifies today: no grade A–B long box trade in a leading group. That is an answer too.</p>'}
+      ${favs.length > top.length ? `<p class="meta" style="margin:6px 0 0">The rest: choose “★ Favorites” in the Stair steps filter below (${favs.slice(5).map(r => r.t).join(", ")}).</p>` : ""}</div>`;
+  }
   const inKind = (r) => U.kind === "all" || r.kind === U.kind;
   const inScope = (r) => (U.scope === "all" || (U.scope === "themes" ? (r.theme || r.sub) : r.grade !== "C")) && stairBoxPass(r, U.stair);
   const confCell = (r) => `<td class="l bconf"><b>${r.grade}</b> <span class="meta" title="Average result of ${r.exp_n || "–"} past ${esc((R[r.type] || {}).name || "")} trades in this market state${(r.exp_used || []).length ? " that shared: " + esc(r.exp_used.join("; ")) : ""}">${r.exp != null ? Rx(r.exp) + " · " + Math.round((r.exp_win || 0) * 100) + "% win · n " + r.exp_n : "–"}${r.exp_touch != null ? " · far side " + Math.round(r.exp_touch * 100) + "%" : ""}</span>${(r.conf || []).length ? `<div>${r.conf.map(f => `<span class="tg ${f.eff > 0 ? "tg-help" : "tg-hurt"}" title="${f.eff > 0 ? "Proven to help this trade" : "Proven to hurt this trade"}: beat/trailed the same trade without it, t ≥ 2, both halves">${f.eff > 0 ? "+" : "−"} ${esc(f.name)}</span>`).join("")}</div>` : '<div class="meta">no proven confluence</div>'}${stairBits(r)}</td>`;

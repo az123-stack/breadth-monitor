@@ -407,9 +407,25 @@
    "what": "per stock: nuzzled / lifting / step break vs the 9/21 EMAs and the last 15-session step high; per sub-theme: setting up together (50%+ nuzzled) / stepping up together (40%+ lifting or breaking after nuzzling), 15-session strip",
    "affects_picks": false,
    "evidence": [
-    "R-2026-10-24-stair-steps"
+    "R-2026-10-24-stair-steps",
+    "R-2026-10-24-box-leaders"
    ],
    "notes": "alone ≈ average group; inside top-30% (60d) groups setting up +2.2% vs other leaders over 20 sessions (t 1.9, both halves), stepping up +1.7% (t 2.0); pure step breaks lagged"
+  },
+  {
+   "id": "box_favorites",
+   "name": "Box trades: ★ My favorites (leading-group box longs)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "template.html isBoxFav/boxFavRank → Box trades card (Trade Setups tab), from DATA.themes.boxes + DATA.themes.stairs",
+   "what": "long box trades actionable now (retest go/at, spring failed), grade A–B, in a ★ leading group (top 30% on 60-day), reward:risk ≥ 1.5 from the last close; top 5",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-24-box-leaders",
+    "R-2026-10-24-stair-steps"
+   ],
+   "notes": "★ leading group on retest bounces +0.23R vs −0.02R (t 3.2, both halves) — passes the proven rule but NOT wired into box grades/playbook (needs Adam's approval)"
   }
  ]
 }
