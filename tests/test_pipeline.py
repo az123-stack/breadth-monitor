@@ -1351,6 +1351,7 @@ def test_dip_buys():
     assert R["UND"]["under9"] and R["UND"]["under21"], R["UND"]
     assert not (R["OK"]["under9"] or R["OK"]["wick9"] or R["OK"]["wick21"]), R["OK"]
     assert p["rows"][0]["t"] == "WIK" and R["WIK"]["box"][0]["grade"] == "A" and R["OK"]["sow"]["prime"]
+    assert all("w" in r and {"e9", "p9", "low", "under21", "strip"} <= set(r["w"]) for r in p["rows"]) and "week_done" in p
     sr = intraday.sheet_rows(["WIK"])
     assert any(r[0] == "WIK" and r[1] in (0, 3) for r in sr)
     return f"{p['n_wick']} wicked, {p['n_under']} under"

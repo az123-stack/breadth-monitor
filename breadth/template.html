@@ -4571,15 +4571,25 @@ const SOW_TOP = 25;
    Live from the Google Sheet (price + column L "low"): today's EMA = last EMA + alpha × (price − last EMA), the same number the close will
    print. Info only (card R-2026-10-24-dip-buys): over ~2 years a wick-and-back day in an uptrend was no better than any uptrend day; it's an
    entry spot with a close stop, not an edge by itself. */
-function dipLive(r) {
+function dipLive(r0, tf, X) {
+  // tf "w": same tests on weekly bars + 9/21-week EMAs (this week as it stands; low = the week's low so far)
+  const wk = tf === "w";
+  if (wk && !r0.w) return null;
+  const r = wk ? { ...r0, ...r0.w, price: r0.price, adr: r0.w.atr, box: r0.box, sow: r0.sow } : r0;
   const L = liveActive() && LIVE && LIVE.rows ? LIVE.rows[r.t] : null;
   if (!L || L.price == null || !(L.price > 0)) return { ...r, live: false, p: r.price, lo: r.low, x9: r.e9, x21: r.e21 };
-  const p = L.price, lo = L.low != null && L.low > 0 ? Math.min(L.low, p) : (L.open ? Math.min(L.open, p) : p);
-  const x9 = r.e9 + (p - r.e9) * 0.2, x21 = r.e21 + (p - r.e21) * 2 / 22;
+  const p = L.price, dlo = L.low != null && L.low > 0 ? Math.min(L.low, p) : (L.open ? Math.min(L.open, p) : p);
+  // weekly: a finished week at the last close means today starts a new week (base = that week's EMAs, low = today's);
+  // otherwise today extends the current week (base = last week's EMAs, low = min(week so far, today))
+  const newWk = wk && X && X.week_done;
+  const b9 = wk ? (newWk ? r0.w.e9 : r0.w.p9 ?? r0.w.e9) : r.e9, b21 = wk ? (newWk ? r0.w.e21 : r0.w.p21 ?? r0.w.e21) : r.e21;
+  const lo = wk && !newWk ? Math.min(r0.w.low, dlo) : dlo;
+  const x9 = b9 + (p - b9) * 0.2, x21 = b21 + (p - b21) * 2 / 22;
   const under9 = p < x9, under21 = p < x21;
+  const carry = !wk || newWk;     // last bar is a finished period -> "closed under before, back over now" = reclaim
   return { ...r, live: true, p, lo, x9, x21, chg: L.closeyest ? p / L.closeyest - 1 : null, under9, under21,
     wick9: lo < x9 && !under9, wick21: lo < x21 && !under21,
-    reclaim9: !under9 && (r.under9 || r.reclaim9), reclaim21: !under21 && (r.under21 || r.reclaim21), noLow: L.low == null };
+    reclaim9: !under9 && ((carry && r.under9) || r.reclaim9), reclaim21: !under21 && ((carry && r.under21) || r.reclaim21), noLow: L.low == null };
 }
 const DIP_F = [["back", "Wicked under & back above"], ["under", "Under the 9 / 21 now"], ["any", "Either"], ["all", "All names"]];
 const DIP_SRC = [["all", "Box + SoW"], ["box", "Box trades"], ["sow", "Strength on Weakness"], ["prime", "⭐ Prime"]];
@@ -4588,9 +4598,10 @@ function dipCard(T, where) {
   if (!X || !(X.rows || []).length) return $('<div></div>');
   const ls = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
   const ss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storage off */ } };
-  UI.dip = UI.dip || { f: ls("dipF", "back"), src: ls("dipSrc", "all"), stair: ls("dipStair", "all"), trend: ls("dipTrend", "up"), sort: ["_o", 1], more: false };
+  UI.dip = UI.dip || { tf: ls("dipTf", "d"), f: ls("dipF", "back"), src: ls("dipSrc", "all"), stair: ls("dipStair", "all"), trend: ls("dipTrend", "up"), sort: ["_o", 1], more: false };
   const U = UI.dip;
-  const rows0 = X.rows.map(dipLive), anyLive = rows0.some(r => r.live), noLow = anyLive && rows0.filter(r => r.live).every(r => r.noLow);
+  const WK = U.tf === "w", per = WK ? "week" : "day", pers = WK ? "weeks" : "sessions";
+  const rows0 = X.rows.map(r => dipLive(r, U.tf, X)).filter(Boolean), anyLive = rows0.some(r => r.live), noLow = anyLive && rows0.filter(r => r.live).every(r => r.noLow);
   const back = (r) => r.wick9 || r.wick21 || r.reclaim9 || r.reclaim21, under = (r) => r.under9 || r.under21;
   rows0.forEach(r => { const A = r.adr ? r.adr / 100 * r.p : null;
     r.d9 = A ? (r.p - r.x9) / A : null; r.d21 = A ? (r.p - r.x21) / A : null;
@@ -4602,14 +4613,14 @@ function dipCard(T, where) {
   const nBack = rows0.filter(back).length, nUnder = rows0.filter(under).length;
   const asof = anyLive ? `live · Google prices ${LIVE.fetched ? LIVE.fetched.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }) : ""}` : `${shortDate(X.date)} close`;
   const card = $(`<section class="card regcard dipcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
-      <h2><span class="pbv unproven" title="Information only: never changes the Top 2 picks">Unproven</span> Dip buys · 9 / 21 EMA <span class="meta">· Box + Strength on Weakness names · ${asof}</span></h2>
+      <h2><span class="pbv unproven" title="Information only: never changes the Top 2 picks">Unproven</span> Dip buys · 9 / 21 ${WK ? "week" : "day"} EMA <span class="meta">· Box + Strength on Weakness names · ${asof}${WK ? ` · week of ${shortDate(X.week || X.date)}${X.week_done ? "" : ` (${X.week_days} session${X.week_days === 1 ? "" : "s"} in)`}` : ""}</span></h2>
       <div class="tsbtns"><button class="dipdl" title="Download the names shown as a TradingView watchlist">⬇ TradingView</button></div></div>
-    <p class="note" style="padding:4px 0 0">Your names from <b>Box trades</b> (long retests + springs) and <b>Strength on Weakness</b>, checked against the <b>daily 9 and 21 EMAs</b> (9- and 21-day, not weekly; Strength on Weakness itself uses weekly EMAs).
-      <b>Wicked under & back above</b> = today's low went under the 9 or 21 and price is back over it (or it closed under in the last 3 sessions and is back over now).
+    <p class="note" style="padding:4px 0 0">Your names from <b>Box trades</b> (long retests + springs) and <b>Strength on Weakness</b>, checked against the ${WK ? "<b>weekly 9 and 21 EMAs</b> (9- and 21-week, the same ones Strength on Weakness uses; this week counts as it stands, and its low is the week's low so far)" : "<b>daily 9 and 21 EMAs</b> (9- and 21-day)"}. Switch Daily / Weekly below.
+      <b>Wicked under & back above</b> = ${WK ? "this week's" : "today's"} low went under the 9 or 21 and price is back over it (or it closed under in the last 3 ${pers} and is back over now).
       <b>Under now</b> = price below the 9 or 21. ${anyLive ? "Live: the EMAs move with the price exactly as today's close will set them." : "As of the last close; turns live once Google has a newer session."}
       ${noLow ? ' <b>Today\'s low isn\'t in the sheet yet</b>, so wicks use the open until column L fills.' : ""}
       <br>Now: <b>${nBack}</b> wicked & back · <b>${nUnder}</b> under the 9 or 21 · ${rows0.length} names watched.</p>
-    <div class="rbanner watch" style="margin-top:8px"><b>What the test said</b> (Oct 2024–Oct 2026, every liquid RS 70+ stock in an uptrend): a wick under the 9 or 21 that closed back above did about the same as any uptrend day over the next 5–10 sessions (vs SPY within ±0.1 pts, t &lt; 1), and with the stop under the wick low it made +0.05R vs +0.03R. So the dip is a <b>place to enter with a close stop</b>, not an edge on its own: let the Box / SoW setup and the ★ group do the picking.</div>
+    <div class="rbanner watch" style="margin-top:8px"><b>What the test said</b> (Oct 2024–Oct 2026, every liquid RS 70+ stock in an uptrend): a wick under the 9 or 21 that closed back above did about the same as any uptrend day over the next 5–10 sessions (vs SPY within ±0.1 pts, t &lt; 1), and with the stop under the wick low it made +0.05R vs +0.03R. So the dip is a <b>place to enter with a close stop</b>, not an edge on its own: let the Box / SoW setup and the ★ group do the picking.${WK ? " <b>The weekly version hasn't been tested yet</b> (only ~1 year of weekly history is usable)." : ""}</div>
     <div class="filters" style="margin:8px 0 4px"></div><div class="dipbody"></div></section>`);
   const fl = card.querySelector(".filters"), body = card.querySelector(".dipbody");
   const sq = (v) => `<i class="dsq d${v}" title="${["above both", "wicked under, closed back above", "closed under the 9", "closed under the 21"][v]}"></i>`;
@@ -4617,12 +4628,12 @@ function dipCard(T, where) {
     r.sow ? `<span class="tg sow-${esc(r.sow.state)}" title="Strength on Weakness (weekly)">${r.sow.prime ? "⭐ " : ""}SoW · ${esc(r.sow.state)}</span>` : ""].join("");
   const st = (r) => [r.wick21 ? '<span class="tg dip-w21">Wicked 21 · back</span>' : r.wick9 ? '<span class="tg dip-w9">Wicked 9 · back</span>' : "",
     !r.wick21 && r.reclaim21 ? '<span class="tg dip-w21">Reclaimed 21</span>' : !r.wick9 && !r.wick21 && r.reclaim9 ? '<span class="tg dip-w9">Reclaimed 9</span>' : "",
-    r.under21 ? `<span class="tg dip-u21">Under 21${r.run21 && !r.live ? " · " + r.run21 + "d" : ""}</span>` : r.under9 ? `<span class="tg dip-u9">Under 9${r.run9 && !r.live ? " · " + r.run9 + "d" : ""}</span>` : ""].join("");
+    r.under21 ? `<span class="tg dip-u21">Under 21${r.run21 && !r.live ? " · " + r.run21 + (WK ? "w" : "d") : ""}</span>` : r.under9 ? `<span class="tg dip-u9">Under 9${r.run9 && !r.live ? " · " + r.run9 + (WK ? "w" : "d") : ""}</span>` : ""].join("");
   const ad = (v) => v == null ? "–" : (v > 0 ? "+" : "") + v.toFixed(1);
   const cols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "_o", h: "Status", l: true, asc: true }, { k: null, h: "From", l: true },
-    { k: "d9", h: "vs 9 EMA<small>ADRs · level</small>", asc: true }, { k: "d21", h: "vs 21 EMA<small>ADRs · level</small>", asc: true },
-    { k: "dep", h: "Low vs EMA<small>wick depth, ADRs</small>", asc: true }, { k: "risk", h: "Stop<small>under the low · risk</small>" },
-    { k: null, h: "Last 10<small>daily closes</small>" }, { k: "rsr", h: "RS" }, { k: "adr", h: "ADR %" }];
+    { k: "d9", h: `vs 9 EMA<small>${WK ? "weekly ATRs" : "ADRs"} · level</small>`, asc: true }, { k: "d21", h: `vs 21 EMA<small>${WK ? "weekly ATRs" : "ADRs"} · level</small>`, asc: true },
+    { k: "dep", h: `Low vs EMA<small>wick depth, ${WK ? "weekly ATRs" : "ADRs"}</small>`, asc: true }, { k: "risk", h: `Stop<small>under the ${per}'s low · risk</small>` },
+    { k: null, h: `Last 10<small>${WK ? "weekly" : "daily"} closes</small>` }, { k: "rsr", h: "RS" }, { k: "adr", h: WK ? "Weekly ATR %" : "ADR %" }];
   body.innerHTML = `<div class="scroll"><table class="grid diptab"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta dipempty" style="display:none">Nothing matches these filters right now.</p><button class="xopen dipmore" style="margin-top:6px"></button>`;
   const tb = body.querySelector("tbody"), TOP = 25;
   let shown = [];
@@ -4632,7 +4643,7 @@ function dipCard(T, where) {
     const mb = body.querySelector(".dipmore"); mb.style.display = all.length > TOP ? "" : "none";
     mb.textContent = U.more ? `Show the top ${TOP} only` : `Show all ${all.length}`;
     tb.innerHTML = rows.map(r => `<tr>${nameCell(r)}
-      <td class="l">${st(r) || '<span class="meta">above both</span>'}${r.live && r.chg != null ? `<small class="meta" style="display:block">today ${pct(r.chg)}</small>` : ""}${stairBits(r)}</td>
+      <td class="l">${st(r) || '<span class="meta">above both</span>'}${r.live && r.chg != null ? `<small class="meta" style="display:block">today ${pct(r.chg)}</small>` : ""}${WK && !X.week_done && !r.live ? '<small class="meta" style="display:block">week not finished</small>' : ""}${stairBits(r)}</td>
       <td class="l">${src(r)}</td>
       <td class="num ${r.d9 < 0 ? "dn" : ""}">${ad(r.d9)}<small class="meta" style="display:block">$${fmt(r.x9, 2)}</small></td>
       <td class="num ${r.d21 < 0 ? "dn" : ""}">${ad(r.d21)}<small class="meta" style="display:block">$${fmt(r.x21, 2)}</small></td>
@@ -4644,6 +4655,7 @@ function dipCard(T, where) {
   const current = sortable(body.querySelector("table"), cols, filtered, fill, U.sort);
   const draw = () => fill(current());
   body.querySelector(".dipmore").addEventListener("click", () => { U.more = !U.more; draw(); });
+  fl.append(chips("EMAs", [["d", "Daily 9 / 21"], ["w", "Weekly 9 / 21"]], U, "tf", () => { ss("dipTf", U.tf); U.more = false; const n = dipCard(T, where); card.replaceWith(n); }));
   fl.append(chips("Show", DIP_F.map(([k, l]) => [k, k === "back" ? `${l} (${nBack})` : k === "under" ? `${l} (${nUnder})` : l]), U, "f", () => { ss("dipF", U.f); U.more = false; draw(); }));
   fl.append(chips("From", DIP_SRC, U, "src", () => { ss("dipSrc", U.src); U.more = false; draw(); }));
   fl.append(chips("Trend", [["up", "9 EMA over 21"], ["all", "Any"]], U, "trend", () => { ss("dipTrend", U.trend); draw(); }));

@@ -444,6 +444,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   dipTrend / dipStair. Sheet rows: `intraday.sheet_rows(extra=dips.tickers(...))` adds missing names (flag 0) and gives R2K-only dip names **flag 3**
   (open + low fetched; marketcap/volumeavg still only flag 1). Test (`tools/dip_study/test.py`, all liquid RS 70+ uptrend stocks): wick & back ≈
   any uptrend day (±0.1 pts vs SPY, t < 1, R +0.05 vs +0.03, halves flip) → entry-location tool, no edge alone.
+  Weekly switch (Oct 24, Adam; chip "EMAs" Daily / Weekly, localStorage dipTf): rows carry `w` = same flags on `sow.weekly` bars with 9/21-WEEK EMAs
+  (min_periods 1, as SoW), `low` = week's low so far, `p9/p21` = last week's EMAs, `atr` weekly range %, strip in weeks; payload `week`, `week_done`,
+  `week_days`. Live weekly: week finished at the last close → base = that week's EMAs, low = today's; else base = p9/p21, low = min(week so far, today).
+  Weekly version untested.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.
