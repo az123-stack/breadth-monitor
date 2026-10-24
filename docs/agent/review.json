@@ -1,18 +1,21 @@
 {
- "for_date": "2026-10-16",
- "written": "2026-10-17T13:15Z",
- "summary": "Nothing is proven yet, so nothing should change. The macro-fit layer still fails its backtest: setups with a recent macro tailwind did worse, not better (+0.40% vs +2.03% over 5 sessions, t -1.65, both halves negative), so it stays information only. The forward log has no settled ideas yet (48 carded ideas from Oct 15-16 are all still open; the first ones settle around Oct 22-23), so the catalyst, earnings, red-flag and macro-brief layers cannot be judged. Separately, the setup review flag is up (breadth thrust Oct 15, Minervini VCP slumping, leadership rotated), which is worth a 'review my trade setups' session.",
+ "for_date": "2026-10-23",
+ "written": "2026-10-24T13:18Z",
+ "summary": "Still too early to judge the agent layers: only one day of ideas (Oct 15, 24 ideas) has settled, and that day was carded before the catalyst and macro agents started, so news, red flags, earnings and macro-brief risk have no forward results yet. The macro-fit backtest again points the wrong way: recent macro tailwinds came before WORSE setup results than headwinds, so it stays information only. The Top 2 scoreboard is off to a weak start (9 closed picks, avg -1.7% with stops vs +1.4% for the average candidate), but 9 trades is far too few to conclude anything. No ranking changes proposed.",
  "findings": [
-  "Macro fit, 5-day (backtest Mar 31 2025 - Oct 8 2026, 6,268 signals, 243 dates): tailwind +0.40% (n 1,006) vs headwind +2.03% (n 800), diff -1.63 pts, t -1.65, halves -1.9 / -1.4 pts \u2192 NOT PASSED (wrong direction, and t below 2).",
-  "Macro fit, 20-day: tailwind +1.16% vs headwind +1.05%, t -0.28, halves -1.2 / +1.3 pts \u2192 NOT PASSED (no difference).",
-  "Macro fit by setup: every setup leans the same way (headwind better); only Round Number Magnet reaches |t| above 2 (-2.28 pts, t -2.27, n 317/188), halves not tested per setup \u2192 a hint of mean reversion, not a rule.",
-  "Forward decision log: 48 ideas carded (Oct 15: 25, Oct 16: 23; 2 pick1, 2 pick2, 37 candidates, 7 watch), 0 settled over 0 dates \u2192 too thin, no test possible for catalyst, red flags (7 ideas flagged), earnings inside hold (6 with a date), m",
-  "Top 2 scoreboard (pick_ledger): 12 picks Oct 9-16; 9 open, 1 no fill (ABCL), 2 pending; none closed yet \u2192 no results to report.",
-  "Setup review flag is ON: breadth thrust Oct 15 (post-thrust playbook favors Rotation Rookie +0.35R, Leader Pullback +0.29R, VCP +0.29R); breadth Weak 3+ sessions vs the Mixed baseline; Minervini VCP -0.25R over its last 75 signals; Box Rete"
+  "Macro fit (backtest, 6,326 signals Apr 2025-Oct 2026): 5-day tailwind +0.59% (n 1,026) vs headwind +1.99% (n 804), t -1.67, halves -1.1% / -1.1%. Same sign both halves but t 2 - NOT PASSED, info only.",
+  "Macro fit 20-day: tailwind +1.38% vs headwind +0.95%, t -0.81, halves -0.9% / -0.1% - not passed. By setup only Round Number Magnet reaches t -2.05 (tailwind worse); not a layer test.",
+  "Forward log: 152 ideas carded Oct 15-23 over 7 dates; 24 settled, all from Oct 15 (1 date). Settled ideas +0.2% vs SPY on average (SPY -1.7% that week).",
+  "Catalyst, red flags, earnings-in-hold, macro-brief risk: 0 checked rows settled (Oct 15 cards predate the agents) - no evidence yet. First agent-researched rows (Oct 16 cards) settle next week.",
+  "More supporting layers (n 3) -0.8% vs fewer (n 9) +5.5% abs; macro tailwind n 10 -1.3%. Single date, far too thin to read.",
+  "By role (Oct 15 only): candidates +1.0% vs SPY (n 19), pick1 OSCR -5.4%, pick2 SN +3.1%, watch -4.0% (n 3).",
+  "Top 2 scoreboard: 9 closed picks Oct 9-15, 3 winners, avg -1.70% with stops (5 of 9 stopped), -0.70% without stops, vs avg candidate +1.45%. 1 no-fill (ABCL). Too few to judge.",
+  "Setup review flag is ON: follow-through Oct 22 (post-thrust playbook: Rotation Rookie +0.34R, Leader Pullback +0.29R, Round Number +0.29R), breadth Weak 3+ sessions, 3 of top 5 themes new since Oct 11."
  ],
  "proposals": [
-  "No layer changes yet: not enough data. Macro fit stays information only (failed its backtest); agent layers stay flags until ~60 settled ideas over ~20 dates (about late November).",
-  "Keep watching the macro-fit mean-reversion hint (headwind beat tailwind in both halves, strongest in Round Number Magnet); if it reaches t of 2 or more with both halves agreeing, test it as a contrarian flag (needs your approval).",
-  "Consider a 'review my trade setups' session this weekend: the review flag is up for the Oct 15 thrust, the VCP slump (-0.25R last 75 signals) and the leadership rotation. This is the existing setup review, not a layer promotion."
+  "No layer changes yet: not enough data. Macro fit did not pass (t -1.67); agent layers have 0 settled checked rows. Revisit when the log has ~60 settled ideas over ~20 dates (around late Nov).",
+  "Keep macro fit as information only. Optional research (not a ranking change): test whether a macro HEADWIND is a mean-reversion plus; it is negative in both halves but t -1.67, so it is not proven.",
+  "Watch the stop rule: 5 of 9 picks stopped out and the no-stop result (-0.7%) beat the stopped result (-1.7%). Too few trades to change anything; re-check at 30+ closed picks (the replay in trade_bt.pick_replay can test it now if Adam wants).",
+  "Act on the existing setup review flag (say 'review my trade setups'): post-thrust playbook after the Oct 22 follow-through, plus Weak breadth and theme rotation since the Oct 11 baseline. Any change needs Adam's approval."
  ]
 }
