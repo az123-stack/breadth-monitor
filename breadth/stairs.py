@@ -224,6 +224,27 @@ def build(adjusted, stocks=None, names=None, subthemes=None, with_evidence=True)
             ev = evidence(G, spy, setting, stepping, breaks)
         except Exception:  # evidence is optional
             ev = None
+    # Whole themes (data/themes.csv members, ETFs left out) get the same group state, for the Themes tab tags.
+    theme_tags = {}
+    try:
+        tt = store.load_themes()
+        tt = tt[tt["role"] != "etf"]
+        tmem = {g: list(dict.fromkeys(s.ticker)) for g, s in tt.groupby("theme")}
+        TG = group_frames(c, S, tmem)
+        if not TG["idx"].empty:
+            t_set, t_step, _, t_lift = states(TG)
+            tr60 = (TG["idx"] / TG["idx"].shift(60)).rank(axis=1, pct=True)
+            for g in TG["idx"].columns:
+                n = TG["n"].at[d, g]
+                if not np.isfinite(n) or n < CFG["min_members"]:
+                    continue
+                stt = "stepping" if t_step.at[d, g] else "setting" if t_set.at[d, g] else "none"
+                theme_tags[g] = {"status": stt, "since": since(t_step, g) if stt == "stepping" else since(t_set, g) if stt == "setting" else 0,
+                                 "fresh": bool(first(t_step)[g].iat[-1] or first(t_set)[g].iat[-1]),
+                                 "leader": bool((tr60.at[d, g] or 0) >= CFG["leader_pct"]), "r60": rnd(tr60.at[d, g]),
+                                 "nuz5": rnd(TG["nuz5"].at[d, g]), "lifted": rnd(t_lift.at[d, g]), "n": int(n)}
+    except Exception:  # theme tags are optional
+        theme_tags = {}
     return {"date": d.strftime("%Y-%m-%d"), "dates": [x.strftime("%Y-%m-%d") for x in dates[-H:]], "cfg": CFG,
             "n_stepping": sum(r["status"] == "stepping" for r in rows), "n_setting": sum(r["status"] == "setting" for r in rows),
-            "rows": rows, "evidence": ev}
+            "rows": rows, "themes": theme_tags, "evidence": ev}

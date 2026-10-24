@@ -514,6 +514,7 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .tg.sow-breakout { background: color-mix(in srgb, var(--good) 35%, transparent); } .tg.sow-pop { background: color-mix(in srgb, var(--good) 22%, transparent); }
 .tg.sow-prime { background: color-mix(in srgb, var(--warning) 45%, transparent); font-weight: 700; } .tg.sow-box { background: var(--grid); } .tg.sow-rshi { background: color-mix(in srgb, var(--s1) 18%, transparent); }
 .tg.sow-nuzzle { background: color-mix(in srgb, var(--s1) 25%, transparent); } .tg.sow-riding { background: var(--grid); } .tg.sow-extended { background: color-mix(in srgb, var(--warning) 28%, transparent); }
+.stairstar { color: var(--warning); font-weight: 700; margin: 0 2px 0 4px; cursor: help; }
 .tg.st-step { background: color-mix(in srgb, var(--good) 38%, transparent); font-weight: 700; } .tg.st-set { background: color-mix(in srgb, var(--s1) 28%, transparent); font-weight: 700; }
 .tg.st-break { background: color-mix(in srgb, var(--good) 35%, transparent); } .tg.st-lift { background: color-mix(in srgb, var(--good) 18%, transparent); }
 .tg.st-nuzzle { background: color-mix(in srgb, var(--s1) 25%, transparent); } .tg.st-riding { background: var(--grid); } .tg.st-extended { background: color-mix(in srgb, var(--warning) 28%, transparent); } .tg.st-down { background: var(--grid); opacity: .6; }
@@ -1420,6 +1421,21 @@ const STAIR = {
 const STAIR_ORD = { nuzzle: 0, lift: 1, break: 2, riding: 3, extended: 4, down: 5 };   // stocks view: pick-up zone first (breaks alone lagged)
 const STAIR_TOP = 30;
 const shr = (v) => v == null ? "–" : Math.round(v * 100) + "%";
+/* Stair-step tags next to theme / sub-theme names (Themes tab): ★ = top 30% on 60-day return, plus the group's
+   setting-up / stepping-up state from breadth/stairs.py (last official close). */
+let STAIR_SUB = null;
+function stairTag(kind, name) {
+  const X = (DATA.themes || {}).stairs;
+  if (!X) return "";
+  if (!STAIR_SUB) STAIR_SUB = Object.fromEntries((X.rows || []).map(r => [r.g, r]));
+  const o = kind === "sub" ? STAIR_SUB[name] : (X.themes || {})[name];
+  if (!o) return "";
+  const asof = ` (as of the ${shortDate(X.date)} close)`;
+  const star = o.leader ? `<span class="stairstar" title="Leading group: top ${Math.max(1, Math.round((1 - (o.r60 || 0)) * 100))}% on 60-day return${asof}">★</span>` : "";
+  const st = o.status === "stepping" ? `<span class="tg st-step" title="Stepping up together: ${Math.round((o.lifted || 0) * 100)}% of its stocks lifted off the 9/21 EMAs or broke their step in the last 3 sessions after pulling in${asof}. See Rotation → Stair steps.">Stepping up · day ${o.since}</span>`
+    : o.status === "setting" ? `<span class="tg st-set" title="Setting up together: ${Math.round((o.nuz5 || 0) * 100)}% of its stocks nuzzled into their 9/21 EMAs in the last 5 sessions${asof}. See Rotation → Stair steps.">Setting up · day ${o.since}</span>` : "";
+  return star || st ? ` ${star}${st}` : "";
+}
 function stairSpark(r) {
   const n = r.h_nuz.length, W = 8, H = 26, w = n * W;
   const bars = r.h_nuz.map((v, i) => {
@@ -2695,7 +2711,7 @@ function renderThemes(app) {
     rows.forEach(r => {
       const small = sub ? `${esc(r.group)} · ${r.n} stocks` : `${r.etf ? r.etf + " · " : ""}${r.n} stocks`;
       const tr = $(`<table><tr class="trow${U.open.has(r.theme) ? " open" : ""}">
-        <td class="l tname">${esc(r.theme)}<small>${small}</small></td><td class="num">${r[rkK] ?? "–"}</td>
+        <td class="l tname">${esc(r.theme)}${stairTag(sub ? "sub" : "theme", r.theme)}<small>${small}</small></td><td class="num">${r[rkK] ?? "–"}</td>
         <td>${strengthBar(r.strength)}</td><td>${badge(r)}</td><td>${mvCell(r[mvK])}</td>
         <td>${byS ? trailHTML((r.s_trail || []).map(v => v == null ? null : v / 12.5)) : trailHTML(r.trail)}</td><td class="l">${ROT[r.rotation] || r.rotation}</td>
         ${H.map(k => retCell(r[k], k)).join("")}<td class="num ${tint(r.rs, SCALE.rs)}">${num(r.rs)}</td>

@@ -1,0 +1,41 @@
+name: Rebuild page
+
+# Rebuilds docs/ from the data already in the repo (`update --rebuild-only`: no Massive API calls), so a code change
+# shows on the live page without waiting behind a long data job in the breadth-update queue. Yahoo / FINRA top-ups
+# work here (they don't in Claude's sandbox). Shares the agent-rebuild queue; starts over if main moves while it runs.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: agent-rebuild
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main, fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -q -r requirements.txt
+      - name: Rebuild on the latest main and push (start over if main moved)
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          for i in 1 2 3; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            python -m breadth.update --rebuild-only
+            git add docs data
+            if git diff --cached --quiet; then echo "no change"; exit 0; fi
+            git commit -qm "Rebuild page"
+            if git push -q; then exit 0; fi
+            echo "main moved; rebuilding again"
+          done
+          echo "could not push the rebuild"; exit 1

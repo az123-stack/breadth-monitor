@@ -415,6 +415,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   members. Views Groups / Stocks (nuzzled first, top 30, ⬇ TradingView). `evidence` recomputed each build (~10 s). Finding: alone ≈ avg
   group; inside leading groups vs other leading groups 20d setting up +2.2% (t 1.9, halves +1.3/+3.5), stepping up +1.7% (t 2.0),
   pure step breaks −1.1%. Oct 23: Cybersecurity Platforms stepping up day 3; 8 stepping, 11 setting up.
+  Themes tab tags (Oct 24, Adam): `stairTag` puts ★ (top 30% on 60-day) + "Setting up · day N" / "Stepping up · day N" next to every
+  theme and sub-theme name; themes use `stairs.themes` (same rules on data/themes.csv members, ETFs out; TECH - Cybersecurity stepping Oct 23).
+- `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
+  reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
+  `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.
 - `tools/orb_study/` ORB × sub-theme study (Oct 24, 2026; Adam): `download.py` 15-minute regular-session bars for ~1,040 liquid
   sub-theme stocks + SPY/QQQ via `.github/workflows/orb_study.yml` → branch `orb-data` (parts of 50 tickers, resumable; GitHub
   artifacts are blocked from Claude's sandbox, git works). `study.py --bars <orb-data folder>`: rankings prior / or (+vol), SPY/QQQ
