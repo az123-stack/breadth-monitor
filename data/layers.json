@@ -396,6 +396,20 @@
     "R-2026-10-22-trade-stories"
    ],
    "notes": "forward-only test from Oct 22, 2026"
+  },
+  {
+   "id": "stairs",
+   "name": "Stair steps (groups nuzzling into the 9/21 EMAs and stepping up together)",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "breadth/stairs.py → DATA.themes.stairs, Rotation tab stairsCard",
+   "what": "per stock: nuzzled / lifting / step break vs the 9/21 EMAs and the last 15-session step high; per sub-theme: setting up together (50%+ nuzzled) / stepping up together (40%+ lifting or breaking after nuzzling), 15-session strip",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-24-stair-steps"
+   ],
+   "notes": "alone ≈ average group; inside top-30% (60d) groups setting up +2.2% vs other leaders over 20 sessions (t 1.9, both halves), stepping up +1.7% (t 2.0); pure step breaks lagged"
   }
  ]
 }

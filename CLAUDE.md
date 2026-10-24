@@ -404,6 +404,21 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   `python -m breadth.stories facts | guide | check --file F | publish --file F --push` (gzip+base64 → `.github/workflows/stories.yml`,
   `save --gz-b64`). Stdlib only. Seeded Oct 22 with 5 sourced stories (AI spending repriced, 10-year near 5%, Gulf oil, IT services
   re-rating, managed care).
+- `stairs.py` **Stair steps** (Oct 24, 2026; Adam: cyber broke out of its stair step Oct 22–23 and he couldn't see it across sessions;
+  card R-2026-10-24-stair-steps, layer `stairs`, info) → `DATA.themes.stairs`, `stairsCard` on the Rotation tab under Group ignition
+  ("Unproven" tag, never touches picks). Stock states (`frames`): uptrend (21 EMA > 50, 50 rising 10 sessions); ◆ nuzzle (closed 2+ ADRs
+  over the 21 within 20 sessions, then low into the 9/21 ribbon ≤ upper + 0.5 ADR, close ≥ 21 − 1.5 ADR and ≤ ribbon + 1 ADR; counts 5
+  sessions); ↗ lift (nuzzled in the prior 5, close > 9 EMA and > prior high); ▲ step break (first close > prior 15-session high after a
+  nuzzle in that window). Group (4+ liquid $5+/$10M+): setting up together = 50%+ nuzzled in 5 sessions; stepping up together = 40%+
+  lifted/broke in 3 sessions after 40%+ nuzzled 3 sessions earlier. Rows: status + day count, ★ leader (top 30% on 60-day), 15-session
+  strip (h_nuz / h_lift / h_st), members with d9/d21 (ADRs), e9/e21, step high, to_step; quiet non-leader groups keep only active
+  members. Views Groups / Stocks (nuzzled first, top 30, ⬇ TradingView). `evidence` recomputed each build (~10 s). Finding: alone ≈ avg
+  group; inside leading groups vs other leading groups 20d setting up +2.2% (t 1.9, halves +1.3/+3.5), stepping up +1.7% (t 2.0),
+  pure step breaks −1.1%. Oct 23: Cybersecurity Platforms stepping up day 3; 8 stepping, 11 setting up.
+- `tools/orb_study/` ORB × sub-theme study (Oct 24, 2026; Adam): `download.py` 15-minute regular-session bars for ~1,040 liquid
+  sub-theme stocks + SPY/QQQ via `.github/workflows/orb_study.yml` → branch `orb-data` (parts of 50 tickers, resumable; GitHub
+  artifacts are blocked from Claude's sandbox, git works). `study.py --bars <orb-data folder>`: rankings prior / or (+vol), SPY/QQQ
+  15/30-min ORB trigger on 15-min closes, stock's own OR stop, exits close / 2R / 5d, baselines any / basket / anywhere, splits.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

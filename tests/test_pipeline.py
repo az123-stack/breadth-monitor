@@ -1300,6 +1300,34 @@ def test_futures_feed_parse():
     assert PMK.parse_live({"meta": {}, "timestamp": [], "indicators": {"quote": [{}]}}, "2026-10-22") is None
 
 
+def test_stair_steps():
+    """A group that runs up, pulls back into its 9/21 EMAs together, then lifts: setting up -> stepping up."""
+    import numpy as np
+    import pandas as pd
+    from breadth import stairs
+    n, tick = 160, ["AAA", "BBB", "CCC", "DDD", "EEE"]
+    dates = pd.bdate_range("2026-01-02", periods=n)
+    rng = np.random.default_rng(1)
+    base = np.concatenate([np.linspace(20, 40, 120),            # steady climb (21 > 50, 50 rising)
+                           np.linspace(40, 44, 20) * 1.0,         # last push higher (stretched above the 21)
+                           np.linspace(44, 41.5, 12),             # pull back into the ribbon
+                           np.linspace(42.5, 47, 8)])             # lift + break the step
+    c = pd.DataFrame({t: base * (1 + 0.002 * rng.standard_normal(n)) for t in tick}, index=dates)
+    c["SPY"] = np.linspace(500, 520, n)
+    h, l, v = c * 1.006, c * 0.994, pd.DataFrame(2e6, index=dates, columns=c.columns)   # ADR ~1.2%
+    S = stairs.frames(c, h, l, v)
+    G = stairs.group_frames(c, S, {"Test group": tick})
+    setting, stepping, breaks, lifted = stairs.states(G)
+    i_set = np.where(setting["Test group"].to_numpy())[0]
+    i_step = np.where(stepping["Test group"].to_numpy())[0]
+    assert len(i_set) and len(i_step), (len(i_set), len(i_step))
+    assert i_set.min() >= 140 and i_step.min() > i_set.min(), (i_set.min(), i_step.min())   # sets up in the pullback, steps up after
+    assert S["brk"][tick].iloc[-8:].any().all(), "every stock breaks its step in the last leg"
+    ev = stairs.first(stepping)["Test group"]
+    assert ev.sum() >= 1 and (ev & ~stepping["Test group"]).sum() == 0
+    return f"set up day {i_set.min()}, stepping day {i_step.min()}"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

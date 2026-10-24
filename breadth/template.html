@@ -514,6 +514,9 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .tg.sow-breakout { background: color-mix(in srgb, var(--good) 35%, transparent); } .tg.sow-pop { background: color-mix(in srgb, var(--good) 22%, transparent); }
 .tg.sow-prime { background: color-mix(in srgb, var(--warning) 45%, transparent); font-weight: 700; } .tg.sow-box { background: var(--grid); } .tg.sow-rshi { background: color-mix(in srgb, var(--s1) 18%, transparent); }
 .tg.sow-nuzzle { background: color-mix(in srgb, var(--s1) 25%, transparent); } .tg.sow-riding { background: var(--grid); } .tg.sow-extended { background: color-mix(in srgb, var(--warning) 28%, transparent); }
+.tg.st-step { background: color-mix(in srgb, var(--good) 38%, transparent); font-weight: 700; } .tg.st-set { background: color-mix(in srgb, var(--s1) 28%, transparent); font-weight: 700; }
+.tg.st-break { background: color-mix(in srgb, var(--good) 35%, transparent); } .tg.st-lift { background: color-mix(in srgb, var(--good) 18%, transparent); }
+.tg.st-nuzzle { background: color-mix(in srgb, var(--s1) 25%, transparent); } .tg.st-riding { background: var(--grid); } .tg.st-extended { background: color-mix(in srgb, var(--warning) 28%, transparent); } .tg.st-down { background: var(--grid); opacity: .6; }
 .storycard { padding: 10px 14px; } .storycard > summary { cursor: pointer; list-style: none; } .storycard > summary::-webkit-details-marker { display: none; }
 .storycard .sthead { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; } .storycard .sttitle { font-size: 16px; }
 .storycard .stsum { margin: 6px 0 2px; font-weight: 500; } .storycard .stchg { font-size: 12.5px; }
@@ -1406,10 +1409,116 @@ function ignitionCard() {
       <div class="scroll"><table class="grid"><thead><tr><th class="l">Date</th><th class="l">Sub-theme</th><th>Since, vs SPY</th><th>Since, group</th><th class="l">Breadth then<small>last ${gd} sessions</small></th><th class="l">Leaders then</th></tr></thead><tbody>${rec || '<tr><td class="l meta" colspan="6">None.</td></tr>'}</tbody></table></div></details>
     <div class="note" style="padding:8px 0 0">How to use it: put "warming up" groups on your watch list (Refiners showed a breadth thrust inside the group and moved into the rotation graph's leading quadrant ~1 week before its July ignition). Act on an ignition when breadth is strong, trading the group's leaders (top stocks by RS; check the Trade Setups tags for an entry). A day or two later, a 60-day relative high and the money-flow card's "confirmed" tier confirm it, at a higher price. Macro drivers (crack spread, oil, gold, copper…) rising 8%+ in a month looked like a plus (+5.5% vs +3.6%) but on only 16 cases. Backtest uses each group's equal-weight index vs SPY, no costs, ~2 years; false starts happen (Refiners May 2026: −3%). During the session (and after the close until tonight's update) the four checks are recomputed from your Google Sheet's live prices; the rotation-graph position and the track record stay as of the last close.</div></section>`);
 }
+/* ---------- Stair steps (Oct 24, 2026; breadth/stairs.py): stocks + sub-themes nuzzling into the 9/21 EMAs and stepping up together ---------- */
+const STAIR = {
+  break: ["▲ Step break", "Closed above its last 15-session step high (first close above it), after pulling into the 9/21 EMAs"],
+  lift: ["↗ Lifting", "Pulled into the 9/21 EMAs in the last 5 sessions, now closing above the 9 EMA and above the prior day's high"],
+  nuzzle: ["◆ Nuzzled", "Pulled back into the 9/21 EMA ribbon in the last 5 sessions after stepping up: the pick-up zone"],
+  riding: ["Riding", "Uptrend, between the ribbon and 2 ADRs above the 21 EMA"],
+  extended: ["Extended", "More than 2 ADRs above the 21 EMA: wait for the next nuzzle"],
+  down: ["No uptrend", "21 EMA under the 50 EMA, or the 50 not rising"] };
+const STAIR_ORD = { nuzzle: 0, lift: 1, break: 2, riding: 3, extended: 4, down: 5 };   // stocks view: pick-up zone first (breaks alone lagged)
+const STAIR_TOP = 30;
+const shr = (v) => v == null ? "–" : Math.round(v * 100) + "%";
+function stairSpark(r) {
+  const n = r.h_nuz.length, W = 8, H = 26, w = n * W;
+  const bars = r.h_nuz.map((v, i) => {
+    const a = Math.max(0, Math.min(1, v || 0)) * (H - 6), b = Math.max(0, Math.min(1, r.h_lift[i] || 0)) * (H - 6);
+    const st = r.h_st[i], dot = st ? `<circle cx="${i * W + 3.5}" cy="2.5" r="2" fill="var(${st === "S" ? "--good" : "--s1"})"/>` : "";
+    return `<rect x="${i * W}" y="${H - a}" width="3.5" height="${a}" fill="color-mix(in srgb, var(--s1) 55%, transparent)"/><rect x="${i * W + 3.5}" y="${H - b}" width="3.5" height="${b}" fill="var(--good)"/>${dot}`;
+  }).join("");
+  return `<svg width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" role="img" aria-label="last ${n} sessions"><title>Last ${n} sessions, oldest left. Blue = share of members nuzzled in the last 5 sessions; green = share lifting or breaking a step in the last 3; top dot green = stepping up together, blue = setting up together.</title><line x1="0" x2="${w}" y1="${H - 0.5}" y2="${H - 0.5}" stroke="var(--grid)"/>${bars}</svg>`;
+}
+function stairsCard(T) {
+  const X = T.stairs;
+  if (!X || !X.rows) return $('<div></div>');
+  UI.stair = UI.stair || { view: "groups", show: "active", gsort: ["_o", 1], ssort: ["_o", 1], more: false };
+  const U = UI.stair, E = (X.evidence || {}).d20 || {}, C = X.cfg || {};
+  const pp = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const ev = (o) => !o || o.ex == null ? "not enough cases yet" : `${pp(o.ex)} (median ${pp(o.med)}, t ${o.t ?? "–"}, halves ${pp(o.h1)} / ${pp(o.h2)}, ${o.n} cases)`;
+  const stp = X.rows.filter(r => r.status === "stepping"), set = X.rows.filter(r => r.status === "setting");
+  const nm = (a) => a.length ? a.slice(0, 6).map(r => `<b>${esc(r.g)}</b>${r.leader ? " ★" : ""}`).join(", ") + (a.length > 6 ? ` +${a.length - 6} more` : "") : "none";
+  const card = $(`<section class="card regcard stcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv unproven" title="Information only: never changes the Top 2 picks">Unproven</span> Stair steps <span class="meta">· pulling into the 9/21 EMAs and stepping up together · ${shortDate(X.date)} close</span></h2>
+      <div class="tsbtns"><button class="stdl" title="Download the stocks shown as a TradingView watchlist">⬇ TradingView</button></div></div>
+    <p class="note" style="padding:4px 0 0"><b>Stepping up together</b> (${stp.length}): ${nm(stp)}.<br><b>Setting up together</b> (${set.length}): ${nm(set)}. ★ = already a leading group (top 30% of sub-themes on 60-day return).</p>
+    <div class="rbanner watch" style="margin-top:8px"><b>What it's worth</b> (next 20 sessions, ${shortDate((X.evidence || {}).from || X.date)} on): the state alone did about the same as the average group. Where it helped was <b>inside groups that were already leading</b> (top 30% on 60 days), compared with other leading groups on the same days: setting up together ${ev((E.setting || {}).leaders)}; stepping up together ${ev((E.stepping || {}).leaders)}. <b>Step breaks with no pullback first lagged</b>: ${ev((E.breaks || {}).leaders)}. Leading groups themselves beat the average group by ${pp(E.leaders_vs_avg)}. Read: the nuzzle into the EMAs inside a leading group is the useful part, like your note on CRWD (“pick up near the 9 EMA”); chasing the breakout bar adds nothing. Information only.</div>
+    <div class="filters" style="margin:8px 0 4px"></div><div class="stbody"></div>
+    <details class="kqsec" style="margin-top:8px"><summary><b>The rules in code</b></summary><ul class="meta" style="margin:6px 0 0 18px;padding:0;font-size:12.5px">
+      <li><b>Uptrend:</b> 21 EMA above the 50 EMA and the 50 EMA higher than 10 sessions ago. Liquid: $${C.min_price}+, $${Math.round((C.min_dvol || 0) / 1e6)}M+ a day (50-day).</li>
+      <li><b>◆ Nuzzled:</b> it stepped up first (closed ${C.stretch_adr}+ ADRs above the 21 EMA within 20 sessions), then the day's low reached into the 9/21 ribbon (within ${C.ribbon_adr} ADR above it, or under it), closing no more than ${C.under21_adr} ADRs under the 21 EMA and no more than ${C.above_adr} ADR above the ribbon. Counts for ${C.nuz_days} sessions.</li>
+      <li><b>↗ Lifting:</b> nuzzled in the ${C.nuz_days} sessions before, then a close above the 9 EMA and above the prior day's high. <b>▲ Step break:</b> the first close above the highest high of the prior ${C.step_days} sessions (the top of the last step), after a nuzzle inside that window.</li>
+      <li><b>Group</b> (sub-theme, ${C.min_members}+ liquid members): <b>setting up together</b> = ${Math.round((C.setting || 0) * 100)}%+ of members nuzzled in the last ${C.nuz_days} sessions and half in an uptrend; <b>stepping up together</b> = ${Math.round((C.stepping || 0) * 100)}%+ lifted or broke a step in the last ${C.recent} sessions after ${Math.round((C.set_before || 0) * 100)}%+ were nuzzled ${C.recent} sessions earlier.</li>
+      <li>The strip shows the last ${(X.dates || []).length} sessions so you can see a group coil and go: blue bars = share nuzzled, green = share lifting/breaking, top dot = group state that day.</li>
+      <li>Evidence: each group's equal-weight index vs SPY from the next close, first day of each state (one per 10 sessions), averaged by date; ~2 years, survivors only, no costs.</li></ul></details></section>`);
+  const fl = card.querySelector(".filters"), body = card.querySelector(".stbody");
+  const statusTag = (r) => r.status === "stepping" ? `<span class="tg st-step" title="40%+ of members lifted or broke a step in the last 3 sessions after 40%+ were nuzzled">Stepping up together · day ${r.since}${r.fresh ? " · new" : ""}</span>`
+    : r.status === "setting" ? `<span class="tg st-set" title="50%+ of members nuzzled into their 9/21 EMAs in the last 5 sessions">Setting up together · day ${r.since}${r.fresh ? " · new" : ""}</span>` : '<span class="meta">–</span>';
+  const leadCell = (r) => `<td class="num">${r.r60 == null ? "–" : (r.leader ? "★ " : "") + "top " + Math.max(1, Math.round((1 - r.r60) * 100)) + "%"}</td>`;
+  const chip = (m) => `<span class="tg st-${m.state}" title="${esc(m.t)} · ${esc(STAIR[m.state][0])}: ${esc(STAIR[m.state][1])}${m.d9 != null ? ` · close ${m.d9 >= 0 ? "+" : ""}${m.d9} ADRs vs the 9 EMA` : ""}${m.step ? ` · step high $${m.step}` : ""}${m.rsr != null ? ` · RS ${m.rsr}` : ""}">${esc(m.t)}</span>`;
+  const plan = (m) => m.state === "nuzzle" ? `Pick-up zone: 9 EMA $${m.e9} / 21 EMA $${m.e21}. Buy the lift over today's high`
+    : m.state === "lift" ? `Lifting off the EMAs${m.step ? `; step high $${m.step} (${pct(m.to_step)} away)` : ""}`
+    : m.state === "break" ? `Broke the step${m.ago ? ` ${m.ago} session${m.ago === 1 ? "" : "s"} ago` : " today"}; breaks alone lagged, so wait for a nuzzle back toward the 9 EMA ($${m.e9})` : "";
+  let shown = [];
+  const draw = () => {
+    if (U.view === "groups") {
+      const cols = [{ k: "g", h: "Sub-theme", l: true, asc: true }, { k: "_o", h: "Group state", l: true, asc: true }, { k: "r60", h: "Leading?<small>60-day rank</small>" },
+        { k: null, h: `Last ${(X.dates || []).length} sessions<small>blue nuzzled · green lifting</small>` }, { k: "nuz5", h: "Nuzzled<small>last 5 sessions</small>" },
+        { k: "lifted", h: "Lifting / broke<small>last 3 sessions</small>" }, { k: "up", h: "In uptrend" }, { k: "rel5", h: "vs SPY<small>5 days</small>" }, { k: "rel20", h: "vs SPY<small>20 days</small>" },
+        { k: null, h: "Stocks<small>▲ break · ↗ lifting · ◆ nuzzled</small>", l: true }];
+      const rows = () => X.rows.filter(r => U.show === "all" || (U.show === "lead" ? r.leader : r.status !== "none")).map(r => Object.assign(r, { _o: ({ stepping: 0, setting: 1, none: 2 })[r.status] * 10 - (r.leader ? 1 : 0) }));
+      body.innerHTML = `<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta stempty" style="display:none">No groups in this view today.</p>`;
+      const tb = body.querySelector("tbody");
+      const fill = (rs) => {
+        shown = rs.flatMap(r => r.members.filter(m => ["break", "lift", "nuzzle"].includes(m.state)).map(m => m.t));
+        body.querySelector(".stempty").style.display = rs.length ? "none" : "";
+        tb.innerHTML = rs.map(r => `<tr><td class="l">${esc(r.g)}<small class="meta" style="display:block">${esc(r.theme || "")} · ${r.n} stocks</small></td><td class="l">${statusTag(r)}</td>${leadCell(r)}<td>${stairSpark(r)}</td>
+          <td class="num">${shr(r.nuz5)}</td><td class="num">${shr(r.lifted)}</td><td class="num">${shr(r.up)}</td>${retCell(r.rel5, "d5")}${retCell(r.rel20, "d20")}
+          <td class="l" style="min-width:220px">${r.members.filter(m => m.state !== "down").map(chip).join("") || '<span class="meta">–</span>'}</td></tr>`).join("");
+      };
+      const cur = sortable(body.querySelector("table"), cols, rows, fill, U.gsort);
+      fill(cur());
+    } else {
+      const best = {};
+      X.rows.forEach(r => r.members.forEach(m => {
+        if (!["break", "lift", "nuzzle"].includes(m.state)) return;
+        const pri = ({ stepping: 0, setting: 1, none: 2 })[r.status] - (r.leader ? 0.5 : 0);
+        if (!best[m.t] || pri < best[m.t]._pri) best[m.t] = Object.assign({}, m, { sub: r.g, gstatus: r.status, leader: r.leader, _pri: pri, gr: r });
+      }));
+      const cols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "_o", h: "State", l: true, asc: true }, { k: "_pri", h: "Group", l: true, asc: true },
+        { k: "d9", h: "vs 9 EMA<small>in ADRs</small>", asc: true }, { k: "d21", h: "vs 21 EMA<small>in ADRs</small>", asc: true }, { k: "to_step", h: "To step high", asc: true },
+        { k: "rsr", h: "RS" }, { k: "adr", h: "ADR %" }, { k: null, h: "Plan", l: true }];
+      const rows = () => Object.values(best).filter(m => U.show === "all" || (U.show === "lead" ? m.leader : m.gstatus !== "none")).map(m => Object.assign(m, { _o: STAIR_ORD[m.state] * 100 + m._pri * 10 - (m.rsr || 0) / 100 }));
+      body.innerHTML = `<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta stempty" style="display:none">No stocks in this view today.</p><button class="xopen stmore" style="margin-top:6px"></button>`;
+      const tb = body.querySelector("tbody"), mb = body.querySelector(".stmore");
+      const fill = (all) => {
+        const ms = U.more ? all : all.slice(0, STAIR_TOP);
+        mb.style.display = all.length > STAIR_TOP ? "" : "none";
+        mb.textContent = U.more ? `Show the top ${STAIR_TOP} only` : `Show all ${all.length}`;
+        shown = ms.map(m => m.t);
+        body.querySelector(".stempty").style.display = ms.length ? "none" : "";
+        tb.innerHTML = ms.map(m => `<tr>${nameCell(m)}<td class="l"><span class="tg st-${m.state}" title="${esc(STAIR[m.state][1])}">${STAIR[m.state][0]}</span></td>
+          <td class="l">${m.leader ? "★ " : ""}${esc(m.sub)}<small class="meta" style="display:block">${m.gstatus === "stepping" ? "stepping up together" : m.gstatus === "setting" ? "setting up together" : "group not positioned"}</small></td>
+          <td class="num">${m.d9 ?? "–"}<small class="meta" style="display:block">$${m.e9}</small></td><td class="num">${m.d21 ?? "–"}<small class="meta" style="display:block">$${m.e21}</small></td>
+          <td class="num">${m.step ? pct(m.to_step) : "–"}<small class="meta" style="display:block">${m.step ? "$" + m.step : ""}</small></td>
+          <td class="num ${rsTint(m.rsr)}">${m.rsr ?? "–"}</td><td class="num">${m.adr ?? "–"}</td><td class="l" style="min-width:200px">${plan(m)}</td></tr>`).join("");
+      };
+      const cur = sortable(body.querySelector("table"), cols, rows, fill, U.ssort);
+      mb.addEventListener("click", () => { U.more = !U.more; fill(cur()); });
+      fill(cur());
+    }
+  };
+  fl.append(chips("View", [["groups", "Groups"], ["stocks", "Stocks"]], U, "view", draw));
+  fl.append(chips("Show", [["active", `Setting or stepping up (${stp.length + set.length})`], ["lead", "Leading groups ★"], ["all", "All groups"]], U, "show", draw));
+  card.querySelector(".stdl").addEventListener("click", () => tsDownload("stair-steps", [{ name: "Stair steps " + (U.view === "groups" ? "groups" : "stocks"), ticks: [...new Set(shown)] }]));
+  draw();
+  return card;
+}
 function renderRotation(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
   app.append(moneyTodayCard());
   app.append(ignitionCard());
+  app.append(stairsCard(DATA.themes));
   app.append(moneyFlowCard());
   app.append(rotationIdeasCard());
   app.append(macroStrip(false));
