@@ -1424,11 +1424,24 @@ const shr = (v) => v == null ? "–" : Math.round(v * 100) + "%";
 /* Stair-step tags next to theme / sub-theme names (Themes tab): ★ = top 30% on 60-day return, plus the group's
    setting-up / stepping-up state from breadth/stairs.py (last official close). */
 let STAIR_SUB = null;
+function stairOf(kind, name) {
+  const X = (DATA.themes || {}).stairs;
+  if (!X) return null;
+  if (!STAIR_SUB) STAIR_SUB = Object.fromEntries((X.rows || []).map(r => [r.g, r]));
+  return (kind === "sub" ? STAIR_SUB[name] : (X.themes || {})[name]) || null;
+}
+/* Themes-tab "Stair steps" filter: all / ★ leading / ★ leading + setting or stepping / stepping / setting / either */
+const STAIR_FILTERS = [["all", "All"], ["lead_active", "★ + setting/stepping"], ["active", "Setting or stepping"], ["stepping", "Stepping up"], ["setting", "Setting up"], ["lead", "★ Leading"]];
+function stairPass(kind, name, f) {
+  if (!f || f === "all") return true;
+  const o = stairOf(kind, name);
+  if (!o) return false;
+  const act = o.status === "stepping" || o.status === "setting";
+  return f === "lead" ? o.leader : f === "active" ? act : f === "lead_active" ? (o.leader && act) : o.status === f;
+}
 function stairTag(kind, name) {
   const X = (DATA.themes || {}).stairs;
-  if (!X) return "";
-  if (!STAIR_SUB) STAIR_SUB = Object.fromEntries((X.rows || []).map(r => [r.g, r]));
-  const o = kind === "sub" ? STAIR_SUB[name] : (X.themes || {})[name];
+  const o = stairOf(kind, name);
   if (!o) return "";
   const asof = ` (as of the ${shortDate(X.date)} close)`;
   const star = o.leader ? `<span class="stairstar" title="Leading group: top ${Math.max(1, Math.round((1 - (o.r60 || 0)) * 100))}% on 60-day return${asof}">★</span>` : "";
@@ -2702,10 +2715,15 @@ function renderThemes(app) {
   f.append(chips("Rank by", [["strength", "Rank by Strength"], ["score", "by Score /8"]], U, "by", () => { U.sort = [U.by === "score" ? "rank" : "s_rank", 1]; rerenderPanel(); }));
   f.append(chips("Class", [["All", "All"], ["STRONG", "Strong"], ["WATCHLIST", "Watchlist"], ["WEAK", "Weak"]], U, "cls", () => draw(current())));
   f.append(hzChips());
+  if ((DATA.themes || {}).stairs) {
+    U.stair = U.stair || "all";
+    const cnt = (k) => rowsAll.filter(r => stairPass(sub ? "sub" : "theme", r.theme, k)).length;
+    f.append(chips("Stair steps", STAIR_FILTERS.map(([k, t]) => [k, k === "all" ? "All" : `${t} (${cnt(k)})`]), U, "stair", () => draw(current())));
+  }
   const qi = $('<input type="search" placeholder="Search">'); qi.value = U.q; f.append(qi);
   app.append(card);
   const body = card.querySelector("tbody");
-  const filtered = () => rowsAll.filter(r => (U.cls === "All" || r.class === U.cls) && (!U.q || r.theme.toLowerCase().includes(U.q) || (r.group || "").toLowerCase().includes(U.q)));
+  const filtered = () => rowsAll.filter(r => (U.cls === "All" || r.class === U.cls) && stairPass(sub ? "sub" : "theme", r.theme, U.stair) && (!U.q || r.theme.toLowerCase().includes(U.q) || (r.group || "").toLowerCase().includes(U.q)));
   const draw = (rows) => {
     body.innerHTML = "";
     rows.forEach(r => {
