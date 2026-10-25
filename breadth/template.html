@@ -517,6 +517,9 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .favbox { margin: 10px 0 6px; padding: 10px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent); background: color-mix(in srgb, var(--warning) 7%, transparent); }
 .favrow { padding: 7px 0; border-top: 1px solid var(--grid); font-size: 13.5px; } .favrow:first-of-type { border-top: 0; } .favhead { display: flex; gap: 6px; flex-wrap: wrap; align-items: baseline; }
 .stairbits { margin-top: 3px; } .stairbits .tg { font-size: 10px; }
+.tg.lp-on { background: color-mix(in srgb, var(--good) 30%, transparent); } .tg.lp-off { background: transparent; color: var(--text-muted); text-decoration: line-through; opacity: .7; }
+.lgrade { display: inline-block; min-width: 22px; text-align: center; font-weight: 800; border-radius: 6px; padding: 1px 6px; margin-right: 4px; }
+.lgrade.A { background: color-mix(in srgb, var(--good) 45%, transparent); } .lgrade.B { background: color-mix(in srgb, var(--warning) 35%, transparent); } .lgrade.C { background: var(--grid); }
 .dstrip { display: inline-flex; gap: 2px; } .dsq { display: inline-block; width: 9px; height: 14px; border-radius: 2px; background: var(--grid); }
 .dsq.d1 { background: color-mix(in srgb, var(--s1) 70%, transparent); } .dsq.d2 { background: color-mix(in srgb, var(--warning) 75%, transparent); } .dsq.d3 { background: color-mix(in srgb, var(--critical) 75%, transparent); }
 .tg.dip-w21, .tg.dip-w9 { background: color-mix(in srgb, var(--good) 34%, transparent); font-weight: 700; } .tg.dip-w9 { font-weight: 600; }
@@ -616,6 +619,8 @@ function render() {
         { name: "Record volume - down days", ticks: DATA.themes.hve.rows.filter(r => r.chg < 0).map(r => r.t) },
         { name: "Record volume - short watch (turn triggered)", ticks: DATA.themes.hve.rows.filter(r => r.short && r.short.state === "triggered").map(r => r.t) },
         { name: "Record volume - short watch (spike, waiting)", ticks: DATA.themes.hve.rows.filter(r => r.profile === "spike" && !(r.short && r.short.state === "triggered")).map(r => r.t) }] : []),
+      ...(DATA.themes.launch ? [{ name: "Launch list - Grade A, early", ticks: DATA.themes.launch.rows.filter(r => r.grade === "A" && r.early).map(r => r.t) },
+        { name: "Launch list - Grade A, later", ticks: DATA.themes.launch.rows.filter(r => r.grade === "A" && !r.early).map(r => r.t) }] : []),
       ...(DATA.themes.sow ? ["breakout", "pop", "nuzzle"].map(k => ({ name: "Strength on Weakness - " + (DATA.themes.sow.states.find(x => x.key === k) || {}).name, ticks: DATA.themes.sow.rows.filter(r => r.state === k).map(r => r.t) })) : [])]);
   });
   const rf = app.querySelector(".revflag"); if (rf) rf.addEventListener("click", () => {
@@ -629,6 +634,7 @@ function render() {
     <button role="tab" data-tab="premarket">Pre-market</button>
     <button role="tab" data-tab="intraday">Intraday</button>
     <button role="tab" data-tab="trades">Trade Setups</button>
+    <button role="tab" data-tab="launch">Launch list</button>
     <button role="tab" data-tab="themes">Themes</button>
     <button role="tab" data-tab="rotation">Rotation</button>
     <button role="tab" data-tab="browse">Browse</button>
@@ -645,6 +651,7 @@ function render() {
     else if (TAB === "browse") renderBrowse(panel);
     else if (TAB === "setups") renderSetups(panel);
     else if (TAB === "trades") renderTrades(panel);
+    else if (TAB === "launch") renderLaunch(panel);
     else if (TAB === "intraday") renderIntraday(panel);
     else if (TAB === "premarket") renderPremarket(panel);
     else if (TAB === "rotation") renderRotation(panel);
@@ -4475,6 +4482,68 @@ function boxCard(T) {
       ${row("All tight-box breakouts", E.all)}${row("…RS 80+", E.rs80)}${row("…strong breadth", (E.regime || {}).strong)}${row("…weak breadth", (E.regime || {}).weak)}${row("Baseline: any close at a fresh 20-day high", E.base)}</tbody></table></div>`;
   draw(); drawEv();
   return card;
+}
+/* ---------- Launch list (launch.py): base breakouts graded on the tells that separated the ones that went ---------- */
+function renderLaunch(app) {
+  const X = (DATA.themes || {}).launch;
+  if (!X) { app.append($('<div class="card empty">The Launch list appears after the next data run.</div>')); return; }
+  const ls = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+  const ss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storage off */ } };
+  UI.launch = UI.launch || { g: ls("launchGrade", "A"), st: ls("launchStage", "early"), sort: ["_o", 1] };
+  const U = UI.launch, E = X.evidence || {}, C = X.cfg || {}, BG = E.by_grade || {}, HV = E.halves || {};
+  const pp = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + Math.round(v * 100) + "%";
+  const rate = (v) => v == null ? "–" : Math.round(v * 100) + "%";
+  const GDESC = { A: "Group leading + 2 or 3 of the other points", B: "Group leading, 0 or 1 other point", C: "Group not leading (or no sub-theme)" };
+  const evRow = (k) => { const o = BG[k] || {}; return `<tr><td class="l"><span class="lgrade ${k}">${k}</span>${GDESC[k]}</td><td class="num">${o.n ?? "–"}</td><td class="num"><b>${rate(o.went)}</b></td><td class="num">${pp(o.best)}</td><td class="num ${o.x13 > 0 ? "g1" : o.x13 < 0 ? "r1" : ""}">${pp(o.x13)}</td><td class="num">${rate(o.lost)}</td><td class="num">${o.atr == null ? "–" : (o.atr * 100).toFixed(0) + "%"}</td><td class="num">${rate((HV.h1 || {})[k]?.went)} / ${rate((HV.h2 || {})[k]?.went)}</td></tr>`; };
+  const A = BG.A || {}, all = E.all || {};
+  const card = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv unproven" title="Information only: tested, but not approved to change the Top 2 picks">Info only</span> Launch list <span class="meta">· base breakouts with the tells of the ones that went</span></h2>
+      <div class="tsbtns"><button class="lpdl" title="Download the stocks shown, in this order, as a TradingView watchlist">⬇ TradingView</button></div></div>
+    <p class="note" style="padding:4px 0 0"><b>The spot</b> (your CDNA / DINO / NTRA charts): a stock that spent most of the last 40 weeks under its <b>50-week EMA</b>, has now closed above it, with the 9-week EMA over a rising 21 and price not yet stretched (within ${C.ext_atr} weekly ATRs of the 50). Plus every Strength on Weakness name. Each is scored on the four tells that separated the ones that went:
+      ${(X.points || []).map(p => `<b>${esc(p.name)}</b> (${esc(p.desc)})`).join(" · ")}. Volume was tested and made no difference, so it isn't scored.</p>
+    <div class="rbanner watch" style="margin-top:8px"><b>The group decides it.</b> Of ${(E.n || 0).toLocaleString()} past setups (${esc(E.from || "")} to ${esc(E.to || "")}, bought at the next open), ${rate(all.went)} hit +50% within 26 weeks and the typical one lagged SPY by ${pp(-(all.x13 || 0)).replace("+", "")} over 13 weeks.
+      <b>Grade A</b> (group leading + 2–3 other points) hit +50% ${rate(A.went)} of the time, beat SPY by a median ${pp(A.x13)} over 13 weeks and lost the 50-week EMA ${rate(A.lost)} of the time, in both halves of the history. Without a leading group even 3 points lagged SPY: those names only "went" more because they swing harder.
+      Grade A names swing about ${A.atr == null ? "–" : (A.atr * 100).toFixed(0)}% a week, so size them smaller.</div>
+    <div class="scroll"><table class="grid" style="margin-top:8px"><thead><tr><th class="l">Grade</th><th>Setups</th><th>Hit +50%<small>within 26 wks</small></th><th>Best high<small>median, 26 wks</small></th><th>vs SPY<small>median, 13 wks</small></th><th>Lost the 50 WEMA<small>within 13 wks</small></th><th>Weekly swing<small>ATR</small></th><th>Hit +50%<small>1st / 2nd half</small></th></tr></thead><tbody>${["A", "B", "C"].map(evRow).join("")}</tbody></table></div>
+    <div class="filters" style="margin:8px 0 4px"></div><div class="lpbody"></div>
+    <details class="kqsec" style="margin-top:8px"><summary><b>How to read it</b></summary><ul class="meta" style="margin:6px 0 0 18px;padding:0;font-size:12.5px">
+      <li><b>Early</b> = ${C.run_lo}–${C.run_hi} weekly closes over the 50-week EMA: the spot you highlighted and the one the evidence was tested on. <b>Later</b> = longer over it (mostly Strength on Weakness names riding the 9/21): same grade, but the move may already be underway, untested.</li>
+      <li><b>Entry</b>: your Strength on Weakness routine, a nuzzle into the 9 / 21-week EMA and a pop over that week's high. <b>Exit</b>: a weekly close under the 50-week EMA breaks the setup (that's the "lost the 50" column).</li>
+      <li>Many of these take months: CDNA first fired Nov 28, 2025 at $17.69 and its real run started about 7 months later.</li>
+      <li>Limits: about 9 months of setups in a mostly bull market, today's survivors only, overlapping holds, 61% of setups have no sub-theme to grade. Group = sub-theme top third on 13-week return (equal weight, 3+ stocks). Research card R-2026-10-25-what-made-them-go.</li></ul></details></section>`);
+  const fl = card.querySelector(".filters"), body = card.querySelector(".lpbody");
+  const NAME = { breakout: "Breakout", pop: "Pop", nuzzle: "Nuzzling", riding: "Riding the 9/21", extended: "Extended", box: "In the box" };
+  X.rows.forEach((r, i) => { r._o = i; r._g = { A: 0, B: 1, C: 2 }[r.grade]; });
+  const filtered = () => X.rows.filter(r => (U.g === "all" || (U.g === "AB" ? r.grade !== "C" : r.grade === U.g)) && (U.st === "all" || (U.st === "early") === r.early));
+  const cols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "_o", h: "Grade · points", l: true, asc: true }, { k: "grank", h: "Group<small>13-wk rank</small>" },
+    { k: "rs", h: "RS" }, { k: "rsl13", h: "RS line<small>13 weeks</small>" }, { k: "gap", h: "Gap day<small>biggest, 13 wks</small>" },
+    { k: "run", h: "Stage<small>weeks over the 50 WEMA</small>", l: true }, { k: "vs50", h: "Plan<small>9 / 21 WEMA · 50 WEMA</small>", l: true },
+    { k: "atr", h: "Weekly swing<small>ATR %</small>" }, { k: "adr", h: "ADR %" }, { k: "dvol", h: "$ / day" }];
+  body.innerHTML = `<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta lpempty" style="display:none">No stocks match these filters today.</p>`;
+  const tb = body.querySelector("tbody");
+  let shown = [];
+  const fill = (rows) => {
+    shown = rows;
+    body.querySelector(".lpempty").style.display = rows.length ? "none" : "";
+    tb.innerHTML = rows.map(r => `<tr>${nameCell(r)}
+      <td class="l"><span class="lgrade ${r.grade}" title="${esc(GDESC[r.grade])}">${r.grade}</span>${(X.points || []).map(p => `<span class="tg ${r.pts[p.key] ? "lp-on" : "lp-off"}" title="${esc(p.desc)}">${esc(p.name)}</span>`).join("")}</td>
+      <td class="num">${r.grank == null ? '<span class="meta" title="Not in a sub-theme with 3+ stocks">none</span>' : "top " + Math.max(1, Math.round((1 - r.grank) * 100)) + "%"}</td>
+      <td class="num ${rsTint(r.rs)}">${r.rs ?? "–"}</td><td class="num">${pct(r.rsl13)}</td>
+      <td class="num">${r.gap_date ? `${pct(r.gap)}<small class="meta" style="display:block">${shortDate(r.gap_date)}</small>` : '<span class="meta">–</span>'}</td>
+      <td class="l">${r.early ? '<span class="tg sow-prime" title="The spot you highlighted: the tested window">Early</span>' : '<span class="tg sow-riding" title="Longer over the 50-week EMA than the tested window: the move may be underway">Later</span>'}${r.sow ? `<span class="tg sow-${r.sow}">${esc(NAME[r.sow] || r.sow)}</span>` : ""}${r.prime ? '<span class="tg sow-prime">⭐ Prime</span>' : ""}<small class="meta" style="display:block">${r.run} wk${r.run === 1 ? "" : "s"} over the 50 · ${r.ext ?? "–"} ATRs above it</small>${stairBits(r)}</td>
+      <td class="l" style="min-width:160px">Nuzzle zone $${r.e9} / $${r.e21}<small class="meta" style="display:block">Weekly close under $${r.e50} (${pct(-r.vs50)}) breaks it</small></td>
+      <td class="num">${r.atr ?? "–"}%</td><td class="num">${r.adr ?? "–"}</td><td class="num">$${r.dvol >= 1000 ? (r.dvol / 1000).toFixed(1) + "B" : Math.round(r.dvol || 0) + "M"}</td></tr>`).join("");
+  };
+  const current = sortable(body.querySelector("table"), cols, filtered, fill, U.sort);
+  const draw = () => fill(current());
+  const n = (g, st) => X.rows.filter(r => (g === "all" || (g === "AB" ? r.grade !== "C" : r.grade === g)) && (st === "all" || (st === "early") === r.early)).length;
+  const gchips = () => [["A", `Grade A (${n("A", U.st)})`], ["AB", `A + B (${n("AB", U.st)})`], ["all", `All (${n("all", U.st)})`]];
+  const schips = () => [["early", `Early (${n(U.g, "early")})`], ["later", `Later (${n(U.g, "later")})`], ["all", `All stages (${n(U.g, "all")})`]];
+  const redraw = () => { fl.innerHTML = ""; fl.append(chips("Grade", gchips(), U, "g", () => { ss("launchGrade", U.g); redraw(); }));
+    fl.append(chips("Stage", schips(), U, "st", () => { ss("launchStage", U.st); redraw(); })); draw(); };
+  card.querySelector(".lpdl").addEventListener("click", () => tsDownload("launch-list", [{ name: `Launch list ${U.g === "AB" ? "A+B" : U.g} ${U.st}`, ticks: shown.map(r => r.t) }]));
+  app.append(card);
+  redraw();
 }
 function renderTrades(app) {
   const T = DATA.themes, X = T && T.trade_setups;

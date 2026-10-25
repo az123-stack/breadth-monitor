@@ -8,8 +8,8 @@ horizon: 13 and 26 weeks
 sample: 1,142 events Aug 2025 – Apr 2026 (26 weeks of future each); 441 with a sub-theme
 result: base rate 22% made +50% within 26w, median 13w vs SPY −4.5%, 65% lost the 50 WEMA within 13w. Group (sub-theme top third on 13w) 13w vs SPY +5.9% vs −4.0% bottom third, lost-50 50% vs 67% (vol-adjusted IC +0.16, both halves). Volume trend / up-down volume / biggest volume week: no edge (IC −0.1 to 0). Score (sub-theme top third + RS 70+ + RS line +15% in 13w + a 6%+ gap day in 13w) 3–4 of 4: 53% went, 13w vs SPY +4.5–6.5%, lost-50 36–43% (n 91) vs 0 of 4: 11%, −6.0%, 73% (n 179)
 halves: score ≥ 3 went 49% / 57% vs others 22% / 17%; group IC 0.16 / 0.25 (vol-adjusted)
-layers: [sow]
-integrated: no
+layers: [sow, launch]
+integrated: yes
 source: tools/went_study/collect.py + test.py + test2.py (Adam, Oct 25 2026: CDNA / DINO / NTRA weekly charts, "find the tells")
 ---
 **Idea.** Adam has ~50 names sitting where CDNA, DINO and NTRA sat before they went parabolic (out of a long base through the
@@ -33,6 +33,13 @@ only +36% within 26 weeks, the run came ~7 months later; DINO Aug 1 2025 $42.89 
 **Caveats.** ~9 months of event dates in one mostly-bull stretch, survivors only, overlapping, 61% of events have no sub-theme
 (the group feature only covers listed groups), score thresholds picked from the terciles (not tuned out of sample). The score
 also selects more volatile names (median weekly ATR 10–15% vs 5%): size smaller.
+
+**Grades (built Oct 25 as the Launch list tab, `breadth/launch.py`).** Splitting by the group point: with the sub-theme in its
+top third, 13-week returns beat SPY at every score (0 other points +0% median, 1 +9%, 2 +9%, 3 +4%); without it even 3 of 3 other
+points lagged SPY (−5%, hit +50% 38% only through volatility). A = group + 2–3 others: 76 setups, hit +50% 57%, 13w vs SPY +5.6%,
+lost the 50 WEMA 41% (halves 55% / 58% hit); B = group + 0–1: 96, 33%, +3.1%, 62%; C: 970, 18%, −5.1%, 67%.
+Oct 23, 2026 Grade A early (2–8 weeks over the 50): ACN, CTSH, IT, CDW (IT services), DNA, NTSK, RPD, ZS, PTC, CART, DHR, FDS, CME,
+SPOT, ULTA; 80 more Grade A later in the move.
 
 **How it could be used.** Rank Adam's SoW / prime list by the 4-point score with group strength first; treat RS line as a
 failure filter, not a timing signal; stop using volume to choose. Needs a longer history (Massive Starter) to confirm.

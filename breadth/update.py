@@ -235,6 +235,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["sow"] = sow.build(adjusted, universe, theme_data.get("stocks"), store.load_names())
         except Exception as e:  # optional panel; never block the page
             log.exception("strength-on-weakness scan failed: %s", e)
+        try:   # Launch list: base breakouts graded on the tells that separated the ones that went (Adam, Oct 25 2026; info only)
+            from . import launch
+            theme_data["launch"] = launch.build(adjusted, universe, theme_data.get("stocks"), store.load_names(), theme_data.get("sow"))
+        except Exception as e:  # optional panel; never block the page
+            log.exception("launch list failed: %s", e)
         try:   # Stair steps: stocks / sub-themes nuzzling into the 9-21 EMAs and stepping up together (Adam, Oct 24 2026; info only)
             from . import stairs
             theme_data["stairs"] = stairs.build(adjusted, theme_data.get("stocks"), store.load_names(), store.load_subthemes())

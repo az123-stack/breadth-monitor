@@ -448,6 +448,15 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (min_periods 1, as SoW), `low` = week's low so far, `p9/p21` = last week's EMAs, `atr` weekly range %, strip in weeks; payload `week`, `week_done`,
   `week_days`. Live weekly: week finished at the last close → base = that week's EMAs, low = today's; else base = p9/p21, low = min(week so far, today).
   Weekly version untested.
+- `launch.py` **Launch list tab** (Oct 25, 2026; Adam's CDNA / DINO / NTRA charts: "what separates the ones that went"; card
+  R-2026-10-25-what-made-them-go, layer `launch`, info, never touches picks; study scripts `tools/went_study/`) → `DATA.themes.launch`,
+  tab "Launch list" after Trade Setups (`renderLaunch`). Names = fresh base breakouts (`frames`: liquid $5+/$10M+, 20+ of the prior 40
+  weekly closes under the 50 WEMA, now 2–8 in a row over it, 9 > rising 21, close ≤ 50 × (1 + 3 weekly ATR)) + every SoW row. Points:
+  group (sub-theme top third on 13-wk equal-weight return, 3+ stocks), RS 70+, RS line +15% in 13 wks, 6%+ gap-up day in 65 sessions.
+  Grade A = group + 2–3 others, B = group + 0–1, C = no group point. `early` = run ≤ 8 (the tested window). Evidence recomputed each build
+  (fresh setups, first per stock per 26 wks, next open → best high 26 wks, 13-wk vs SPY, lost the 50 WEMA): A 57% hit +50% (n 76, halves
+  55/58%), 13w vs SPY +5.6%; B 33%; C 18%, −5.1%. Volume (trend, up/down, biggest week) and volatility-adjusted RS line: no edge. Chips
+  Grade (A / A+B / all, localStorage launchGrade) · Stage (early / later / all, launchStage); header ⬇ Trade Setups adds Grade A early/later.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

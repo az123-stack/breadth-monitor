@@ -1357,6 +1357,43 @@ def test_dip_buys():
     return f"{p['n_wick']} wicked, {p['n_under']} under"
 
 
+def test_launch_list():
+    """Launch list: a base breakout in a leading sub-theme with a gap day grades A; the same shape alone grades C."""
+    from breadth import launch, config
+    old_bench, config.BENCHMARK = config.BENCHMARK, "SPY"     # an earlier test points the benchmark at a fake ticker
+    days = pd.bdate_range("2025-01-02", periods=420)
+    rows = []
+    def put(t, c, gap_at=None):
+        for i, d in enumerate(days):
+            o = c[i - 1] * 1.08 if gap_at is not None and i == gap_at else c[i]
+            rows.append({"ticker": t, "date": d, "o": o, "h": max(o, c[i]) * 1.03, "l": min(o, c[i]) * 0.97, "c": c[i], "v": 2e6})
+    n = len(days)
+    base = np.linspace(20, 18, n - 30)
+    run_up = np.linspace(18, 22.5, 30)
+    shape = np.concatenate([base, run_up])
+    for t in ("UP", "P1", "P2"):
+        put(t, shape, gap_at=n - 22)
+    put("LONE", shape)
+    for k in range(6):                                  # a weak group and filler stocks
+        put(f"W{k}", np.linspace(30, 22, n))
+    put("SPY", np.full(n, 500.0))
+    adj = pd.DataFrame(rows)
+    subs = pd.DataFrame({"group": "g", "subtheme": ["Hot"] * 3 + ["Cold"] * 6, "ticker": ["UP", "P1", "P2"] + [f"W{k}" for k in range(6)]})
+    uni = ["UP", "P1", "P2", "LONE"] + [f"W{k}" for k in range(6)]
+    try:
+        p = launch.build(adj, uni, None, {}, None, subthemes=subs, evidence_on=False)
+    finally:
+        config.BENCHMARK = old_bench
+    R = {r["t"]: r for r in p["rows"]}
+    assert "UP" in R and "LONE" in R, sorted(R)
+    assert R["UP"]["fresh"] and R["UP"]["early"] and R["UP"]["pts"]["group"] and R["UP"]["pts"]["gap"], R["UP"]
+    assert R["UP"]["grade"] == "A", R["UP"]
+    assert not R["LONE"]["pts"]["group"] and R["LONE"]["grade"] == "C", R["LONE"]
+    assert launch.grade(True, 3) == "A" and launch.grade(True, 1) == "B" and launch.grade(False, 4) == "C"
+    assert p["rows"][0]["grade"] == "A"
+    return f"{len(p['rows'])} rows, UP score {R['UP']['score']}"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

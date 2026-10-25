@@ -440,6 +440,20 @@
     "R-2026-10-24-dip-buys"
    ],
    "notes": "generic test: no edge vs any uptrend day (entry-location tool only)"
+  },
+  {
+   "id": "launch",
+   "name": "Launch list: base breakouts graded on the tells of the ones that went",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "breadth/launch.py → DATA.themes.launch → Launch list tab (renderLaunch)",
+   "what": "Fresh base breakouts (20+ of 40 weeks under the 50 WEMA, now 2-8 weekly closes over it, 9 > rising 21, within 3 weekly ATRs) + every SoW row; points: sub-theme top third on 13-wk return, RS 70+, RS line +15% in 13 wks, 6%+ gap day in 13 wks; grade A = group + 2-3 others, B = group + 0-1, C = no group",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-25-what-made-them-go"
+   ],
+   "notes": "Grade A 57% hit +50% in 26 wks vs 18% for C, 13-wk vs SPY +5.6% vs -5.1%, both halves (76 A setups, ~9 months); evidence recomputed each build"
   }
  ]
 }
