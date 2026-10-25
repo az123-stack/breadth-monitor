@@ -61,5 +61,11 @@ showed a 34% weekly ATR makes the curl stop ~50% away) → cap chosen AFTER seei
 > 1 ATR over the 9 WEMA did not help (t 3.36 / 3.29). Live check: data/launch_ledger.csv (weekly, frozen at the week's close).
 First week logged Oct 23, 2026: AI (curl), DHR (early), IT (early).
 
+**Does the ranking matter? (`tools/went_study/rank_check.py`, Adam: "random or best chance?")** Each past week, the whole eligible
+pool (all pick filters, one per sub-theme, median 16 names) in rank order, same exits as the tracker, 13w vs SPY: top 3 +15.4%, whole pool
++9.4%, ranks 4+ +8.0%; top 3 minus pool +6.1% (t 2.45, halves +6.9% / +5.3%); by rank #1 +18.4%, #2 +16.8%, #3 +11.2%, #4 +13.9%,
+#5 +11.3%, #6+ +8.1% (medians 14% → 1%). (No held-name skip here, so numbers differ from the pick replay.) The filter (leading group)
+does most of the work; the ranking adds a further ~6 pts, mostly from grade A + curl first.
+
 **How it could be used.** Rank Adam's SoW / prime list by the 4-point score with group strength first; treat RS line as a
 failure filter, not a timing signal; stop using volume to choose. Needs a longer history (Massive Starter) to confirm.
