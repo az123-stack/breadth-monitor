@@ -454,6 +454,20 @@
     "R-2026-10-25-what-made-them-go"
    ],
    "notes": "Approved by Adam Oct 25 2026 as the headline picks. Proof: grade A minus C 13w vs SPY by week, fresh t 3.1 (halves +15/+19%), curl t 2.5 (+33/+28%). Pick rule replay (top 3 a week, stops, weekly ATR <= 15%): +9.7% vs SPY over 13 wks, t 3.66, halves +11.4/+8.7%, median ~0, beat SPY 49%, worst -38%. Live check: data/launch_ledger.csv"
+  },
+  {
+   "id": "polished",
+   "name": "Best Setups: EMA pullbacks + high tight flags inside leading groups",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "breadth/polished.py → DATA.themes.polished → Best Setups tab (renderBest)",
+   "what": "Leading group = sub-theme top third on 13-wk return; nuzzle = leader (9+ wks over 50 WEMA) touching the daily 9/21 ribbon; flag = 30%+ leg, tight flag within 1 ADR of the high",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-25-polished-setups"
+   ],
+   "notes": "nuzzle in leading groups +0.19R vs rest, t 2.57, both halves (passes); flags edge t 2.96 but 2nd half -0.04R (fails); recomputed each build"
   }
  ]
 }

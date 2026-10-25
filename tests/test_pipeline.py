@@ -1432,6 +1432,37 @@ def test_launch_picks_ledger():
     return f"{r['t']} {r['stage']} stopped {r['ret']:+.1%}"
 
 
+def test_best_setups_flag_and_nuzzle():
+    """Best Setups: a 40% leg into a high, then a tight flag just under it, is a high tight flag with the pivot at the high and
+    the stop at the flag low; a stock pulling into its daily 9/21 EMAs after a long run is a nuzzle."""
+    from breadth import launch, polished, strength
+    days = pd.bdate_range("2025-01-02", periods=420)
+    n = len(days)
+    rows = []
+    def put(t, c, rng=0.02):
+        for i, d in enumerate(days):
+            rows.append({"ticker": t, "date": d, "o": c[i], "h": c[i] * (1 + rng), "l": c[i] * (1 - rng), "c": c[i], "v": 3e6})
+    base = np.linspace(20, 18, n - 40)
+    flag = np.concatenate([base, np.linspace(18, 26, 30), 25.9 + 0.1 * np.sin(np.arange(10))])        # leg, then a tight flag
+    put("FLG", flag, 0.01)
+    trend = np.concatenate([np.linspace(10, 30, n - 6), [29.2, 28.6, 28.2, 28.0, 27.9, 27.9]])         # long run, now dipping
+    put("NZ", trend)
+    for k in range(6):
+        put(f"W{k}", np.linspace(30, 22, n))
+    put("SPY", np.full(n, 500.0))
+    w = strength.wide_all(pd.DataFrame(rows))
+    cols = ["FLG", "NZ"] + [f"W{k}" for k in range(6)]
+    F = launch.frames(w, cols, pd.DataFrame({"group": "g", "subtheme": ["Hot"] * 2 + ["Cold"] * 6, "ticker": cols}))
+    P = polished.frames(w, cols, F)
+    i = n - 1
+    assert bool(P["flag"]["FLG"].iat[i]), {k: P[k]["FLG"].iat[i] for k in ("leg", "since", "depth")}
+    assert abs(P["hh"]["FLG"].iat[i] - w["h"]["FLG"].iloc[-40:].max()) < 1e-9 and P["fl_lo"]["FLG"].iat[i] < P["hh"]["FLG"].iat[i]
+    assert bool(P["touch"]["NZ"].iloc[-6:].any()), "NZ never touched its 9/21 ribbon"
+    ev = polished.evidence(P, w)
+    assert isinstance(ev, dict)
+    return f"flag pivot {P['hh']['FLG'].iat[i]:.2f}, NZ touched"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

@@ -474,6 +474,15 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (fresh setups, first per stock per 26 wks, next open → best high 26 wks, 13-wk vs SPY, lost the 50 WEMA): A 57% hit +50% (n 76, halves
   55/58%), 13w vs SPY +5.6%; B 33%; C 18%, −5.1%. Volume (trend, up/down, biggest week) and volatility-adjusted RS line: no edge. Chips
   Grade (A / A+B / all, localStorage launchGrade) · Stage (early / later / all, launchStage); header ⬇ Trade Setups adds Grade A early/later.
+- `polished.py` **Best Setups tab** (Oct 25, 2026; Adam: "a new tab for the polished setups"; card R-2026-10-25-polished-setups, layer
+  `polished`, info) → `DATA.themes.polished` (groups, nuzzle, flags, evidence), tab "Best Setups" before Trade Setups (`renderBest`):
+  Launch picks card + tracker on top, leading-groups table (sub-theme top third on 13 wks, counts per section), 1 Early (Launch list
+  rows grade A/B, stage curl/early), 2 EMA pullbacks (leaders: weekly run > 8 over the 50 WEMA + weekly stack, daily 21 > 50 rising,
+  RS 70+, $20M+; `touch` = low within 0.25 ADR of the daily 9/21 ribbon, close ≥ 21 − 0.5 ADR and ≤ 9 + 1 ADR; states nuzzle / touched
+  (last 5 sessions) / close (within 1 ADR above, untested); chips Show, localStorage bestNz; top 30), 3 high tight flags (30%+ leg,
+  high 3–15 sessions ago, flag low = lowest low SINCE the high via sliding windows, depth ≤ 25% and ≤ 3 ADR, 5-day range ≤ 2 ADR,
+  close within 1 ADR of the high, above 21 EMA, RS 70+). Evidence (backtest uses the prior week's group rank): nuzzle lead +0.19R vs
+  rest, t 2.57, halves +0.23/+0.15 (proven); flags lead +0.12R, edge t 2.96, halves +0.29/−0.04 (unproven). ~10 s per build.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.
@@ -481,7 +490,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   sub-theme stocks + SPY/QQQ via `.github/workflows/orb_study.yml` → branch `orb-data` (parts of 50 tickers, resumable; GitHub
   artifacts are blocked from Claude's sandbox, git works). `study.py --bars <orb-data folder>`: rankings prior / or (+vol), SPY/QQQ
   15/30-min ORB trigger on 15-min closes, stock's own OR stop, exits close / 2R / 5d, baselines any / basket / anywhere, splits.
-- `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Breadth, Pre-market, Intraday, Trade Setups, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
+- `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Trade Stories, Breadth, Pre-market, Intraday, Best Setups, Trade Setups, Launch list, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 

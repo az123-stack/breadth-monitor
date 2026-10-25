@@ -634,6 +634,7 @@ function render() {
     <button role="tab" data-tab="breadth">Breadth</button>
     <button role="tab" data-tab="premarket">Pre-market</button>
     <button role="tab" data-tab="intraday">Intraday</button>
+    <button role="tab" data-tab="best">Best Setups</button>
     <button role="tab" data-tab="trades">Trade Setups</button>
     <button role="tab" data-tab="launch">Launch list</button>
     <button role="tab" data-tab="themes">Themes</button>
@@ -653,6 +654,7 @@ function render() {
     else if (TAB === "setups") renderSetups(panel);
     else if (TAB === "trades") renderTrades(panel);
     else if (TAB === "launch") renderLaunch(panel);
+    else if (TAB === "best") renderBest(panel);
     else if (TAB === "intraday") renderIntraday(panel);
     else if (TAB === "premarket") renderPremarket(panel);
     else if (TAB === "rotation") renderRotation(panel);
@@ -4488,6 +4490,83 @@ function boxCard(T) {
       ${row("All tight-box breakouts", E.all)}${row("…RS 80+", E.rs80)}${row("…strong breadth", (E.regime || {}).strong)}${row("…weak breadth", (E.regime || {}).weak)}${row("Baseline: any close at a fresh 20-day high", E.base)}</tbody></table></div>`;
   draw(); drawEv();
   return card;
+}
+/* ---------- Best Setups tab (polished.py + launch.py): everything in the leading groups, by entry type (Adam, Oct 25 2026) ---------- */
+function renderBest(app) {
+  const T = DATA.themes || {}, X = T.polished, L = T.launch;
+  if (!X) { app.append($('<div class="card empty">Best Setups appear after the next data run.</div>')); return; }
+  app.append(liveBar());
+  if (L) app.append(launchPicksCard(L));
+  const ls = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+  const ss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storage off */ } };
+  UI.best = UI.best || { nz: ls("bestNz", "nuzzle"), more: false };
+  const U = UI.best, E = X.evidence || {}, C = X.cfg || {};
+  const pp = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const R = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + v.toFixed(2) + "R";
+  const lead = new Set((X.groups || []).map(g => g.sub));
+  const grpCell = (r) => `<td class="num">${r.grank == null ? "–" : "top " + Math.max(1, Math.round((1 - r.grank) * 100)) + "%"}</td>`;
+  const money = (v) => "$" + (v >= 1000 ? (v / 1000).toFixed(1) + "B" : Math.round(v || 0) + "M");
+  const dl = (name, rows) => tsDownload("best-setups", [{ name, ticks: rows.map(r => r.t) }]);
+  // leading groups strip
+  const G = X.groups || [];
+  const early = ((L || {}).rows || []).filter(r => r.grade !== "C" && (r.stage === "curl" || r.stage === "early"));
+  const cnt = (g) => ({ e: early.filter(r => r.sub === g).length, n: (X.nuzzle || []).filter(r => r.sub === g).length, f: (X.flags || []).filter(r => r.sub === g).length });
+  app.append($(`<section class="card regcard"><div class="kicker">Leading groups · ${G.length} sub-themes in the top third on 13-week return · ${shortDate(X.date)} close</div>
+    <p class="note" style="padding:4px 0 6px">Everything on this tab comes from these groups: the group was the one tell that separated the stocks that went (Launch list study). Counts = names in each section below.</p>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Sub-theme</th><th>13 weeks<small>equal weight</small></th><th>Rank</th><th>Stocks</th><th>Early</th><th>Nuzzling</th><th>Flags</th></tr></thead><tbody>
+    ${G.map(g => { const k = cnt(g.sub); return `<tr><td class="l">${esc(g.sub)}</td>${retCell(g.r13, "d60")}<td class="num">top ${Math.max(1, Math.round((1 - g.rank) * 100))}%</td><td class="num">${g.n}</td><td class="num">${k.e || "–"}</td><td class="num">${k.n || "–"}</td><td class="num">${k.f || "–"}</td></tr>`; }).join("")}</tbody></table></div></section>`));
+  // 1. early
+  const NAMEST = { curl: "Curl · before the break", early: "Early · just broke out" };
+  const s1 = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv focus" title="Passed: grade A/B vs C, both halves">Tested</span> 1 · Early <span class="meta">· base breakouts in leading groups (${early.length})</span></h2>
+      <div class="tsbtns"><button class="b1">⬇ TradingView</button></div></div>
+    <p class="note" style="padding:4px 0 0">From the Launch list: curl (9-week EMA over a rising 21 while price is at or just under the 50-week EMA) or just broken over the 50, with the group leading. The earliest, cheapest entries, but they can take months. Entry: the flag break or a nuzzle into the 9-week EMA; stop: a weekly close under the 50-week EMA.</p>
+    <div class="scroll"><table class="grid" style="margin-top:6px"><thead><tr><th class="l">Stock</th><th class="l">Grade · stage</th><th>Group</th><th>RS</th><th>RS line<small>13 weeks</small></th><th class="l">Where to buy<small>vs the 9-week EMA</small></th><th class="l">Plan</th><th>Weekly swing</th><th>$ / day</th></tr></thead><tbody>
+    ${early.map(r => `<tr>${nameCell(r)}<td class="l"><span class="lgrade ${r.grade}">${r.grade}</span>${NAMEST[r.stage]}${r.flag ? ' <span class="tg sow-breakout">Flag break</span>' : ""}</td>${grpCell(r)}
+      <td class="num ${rsTint(r.rs)}">${r.rs ?? "–"}</td><td class="num">${pct(r.rsl13)}</td><td class="l">${r.vs9 == null ? "–" : (r.vs9 >= 0 ? "+" : "") + r.vs9 + " ATRs"}</td>
+      <td class="l" style="min-width:150px">9 / 21 WEMA $${r.e9} / $${r.e21}<small class="meta" style="display:block">50 WEMA $${r.e50}</small></td><td class="num">${r.atr ?? "–"}%</td><td class="num">${money(r.dvol)}</td></tr>`).join("") || '<tr><td colspan="9" class="meta">None today.</td></tr>'}</tbody></table></div></section>`);
+  s1.querySelector(".b1").addEventListener("click", () => dl("Best setups - early", early));
+  app.append(s1);
+  // 2. nuzzles
+  const NE = E.nuzzle || {}, NL = NE.lead || {}, NO = NE.other || {}, NN = NE.none || {};
+  const ST = { nuzzle: ["Nuzzling today", "sow-nuzzle", "Today's low came into the daily 9/21 EMA ribbon and the close held the 21: the tested entry"],
+    touched: ["Touched this week", "sow-riding", "Came into the ribbon in the last 5 sessions and is still close to it"],
+    close: ["Close to the EMAs", "sow-riding", "Within 1 ADR above the 9/21 ribbon but hasn't touched it yet (untested): set an alert at the ribbon"] };
+  const s2 = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv ${NE.proven ? "focus" : "unproven"}">${NE.proven ? "Tested" : "Unproven"}</span> 2 · Already went: pullbacks into the EMAs <span class="meta">· leaders in leading groups</span></h2>
+      <div class="tsbtns"><button class="b2">⬇ TradingView</button></div></div>
+    <p class="note" style="padding:4px 0 0">The stock already moved (9+ weekly closes over the 50-week EMA, weekly 9 &gt; 21 &gt; 50), RS 70+, and is pulling back into its <b>daily 9 / 21 EMA</b>: the late entry, where the entry price is what matters.</p>
+    <div class="rbanner ${NE.proven ? "act" : "watch"}" style="margin-top:6px"><b>What the test said</b> (${esc(NE.from || "")} to ${esc(NE.to || "")}, first touch, bought at the next open, stop 1 ADR, 20 sessions): in leading groups <b>${R(NL.R)}</b> a trade (n ${NL.n ?? "–"}, halves ${R(NL.h1)} / ${R(NL.h2)}) vs ${R(NO.R)} in other groups and ${R(NN.R)} for stocks outside any group; leading minus the rest ${R(NE.edge)} (t ${NE.t ?? "–"}). Only ${NL.win == null ? "–" : Math.round(NL.win * 100) + "%"} of trades win: the 1-ADR stop gets hit often and the winners pay for it, so keep the stop and let the winners run.</div>
+    <div class="filters" style="margin:8px 0 4px"></div><div class="b2body"></div></section>`);
+  const fl2 = s2.querySelector(".filters"), b2 = s2.querySelector(".b2body");
+  const nzRows = () => (X.nuzzle || []).filter(r => U.nz === "all" || (U.nz === "nuzzle" ? r.state !== "close" : r.state === "close"));
+  const draw2 = () => {
+    const all = nzRows(), rows = U.more ? all : all.slice(0, 30);
+    b2.innerHTML = `<div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th class="l">State</th><th>Group</th><th>RS</th><th>vs 21 EMA<small>ADRs</small></th><th class="l">EMAs<small>daily 9 / 21</small></th><th>Stop<small>1 ADR</small></th><th>Weeks over<small>50 WEMA</small></th><th>ADR %</th><th>$ / day</th></tr></thead><tbody>
+      ${rows.map(r => `<tr>${nameCell(r)}<td class="l"><span class="tg ${ST[r.state][1]}" title="${esc(ST[r.state][2])}">${ST[r.state][0]}</span>${stairBits(r)}</td>${grpCell(r)}<td class="num ${rsTint(r.rs)}">${r.rs ?? "–"}</td>
+        <td class="num">${r.vs21 == null ? "–" : (r.vs21 >= 0 ? "+" : "") + r.vs21}</td><td class="l">$${r.e9} / $${r.e21}</td><td class="num">$${r.stop}</td><td class="num">${r.wk_run ?? "–"}</td><td class="num">${r.adr ?? "–"}</td><td class="num">${money(r.dvol)}</td></tr>`).join("") || '<tr><td colspan="10" class="meta">None today.</td></tr>'}</tbody></table></div>
+      ${all.length > 30 ? `<button class="xopen b2more" style="margin-top:6px">${U.more ? "Show the top 30 only" : "Show all " + all.length}</button>` : ""}`;
+    const mb = b2.querySelector(".b2more"); if (mb) mb.addEventListener("click", () => { U.more = !U.more; draw2(); });
+  };
+  const n2 = (k) => (X.nuzzle || []).filter(r => k === "all" || (k === "nuzzle" ? r.state !== "close" : r.state === "close")).length;
+  fl2.append(chips("Show", [["nuzzle", `In the EMAs (${n2("nuzzle")})`], ["close", `Close to them (${n2("close")})`], ["all", `All (${n2("all")})`]], U, "nz", () => { ss("bestNz", U.nz); U.more = false; draw2(); }));
+  s2.querySelector(".b2").addEventListener("click", () => dl("Best setups - EMA pullbacks", nzRows()));
+  draw2();
+  app.append(s2);
+  // 3. flags
+  const FE = E.flag || {}, FL = FE.lead || {}, FO = FE.other || {}, FN = FE.none || {};
+  const flags = X.flags || [];
+  const s3 = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv ${FE.proven ? "focus" : "unproven"}">${FE.proven ? "Tested" : "Unproven"}</span> 3 · High tight flags about to break <span class="meta">· in leading groups (${flags.length})</span></h2>
+      <div class="tsbtns"><button class="b3">⬇ TradingView</button></div></div>
+    <p class="note" style="padding:4px 0 0">A ${Math.round((C.leg || 0.3) * 100)}%+ leg into a high ${C.flag_min}–${C.flag_max} sessions ago, then a tight flag (no deeper than ${Math.round((C.depth || 0.25) * 100)}% and ${C.depth_adr} ADRs, last 5 sessions within ${C.tight} ADRs) closing within ${C.near} ADR of the high. <b>Plan:</b> buy-stop at the pivot (the high), stop at the flag low, sell on a close under the 10 EMA after day 3.</p>
+    <div class="rbanner watch" style="margin-top:6px"><b>What the test said</b> (${esc(FE.from || "")} to ${esc(FE.to || "")}, buy-stop at the pivot within 5 sessions): in leading groups ${R(FL.R)} a trade (n ${FL.n ?? "–"}) vs ${R(FO.R)} in other groups (n ${FO.n ?? "–"}) and ${R(FN.R)} for stocks outside any group (leading minus the rest ${R(FE.edge)}, t ${FE.t ?? "–"}). ${FE.proven ? "Both halves held." : `But the halves split (${R(FL.h1)} / ${R(FL.h2)}): it worked in the first half and not lately, so treat these as your chart read, not a proven edge.`}</div>
+    <div class="scroll"><table class="grid" style="margin-top:8px"><thead><tr><th class="l">Stock</th><th>Group</th><th>RS</th><th>Pivot<small>buy-stop</small></th><th>To pivot<small>ADRs</small></th><th>Stop<small>flag low</small></th><th>Risk<small>pivot → stop</small></th><th>Leg</th><th>Flag<small>days · depth</small></th><th>ADR %</th><th>$ / day</th></tr></thead><tbody>
+    ${flags.map(r => `<tr>${nameCell(r)}${grpCell(r)}<td class="num ${rsTint(r.rs)}">${r.rs ?? "–"}</td><td class="num"><b>$${r.pivot}</b></td><td class="num">${r.to_pivot ?? "–"}</td><td class="num">$${r.stop}</td>
+      <td class="num">${pct(-r.risk)}</td><td class="num">${pct(r.leg)}</td><td class="num">${r.days} · ${pct(-r.depth)}</td><td class="num">${r.adr ?? "–"}</td><td class="num">${money(r.dvol)}</td></tr>`).join("") || '<tr><td colspan="11" class="meta">No flags in leading groups today.</td></tr>'}</tbody></table></div></section>`);
+  s3.querySelector(".b3").addEventListener("click", () => dl("Best setups - high tight flags", flags));
+  app.append(s3);
+  app.append($(`<p class="meta" style="padding:0 4px 12px">Information only: the headline picks (top) are the Launch picks and their live tracker. Research card R-2026-10-25-polished-setups.</p>`));
 }
 /* ---------- Launch picks (launch.select): the headline recommendations + live tracker (Adam, Oct 25 2026) ---------- */
 function launchPicksCard(L) {
