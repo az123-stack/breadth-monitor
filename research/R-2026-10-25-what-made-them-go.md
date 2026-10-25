@@ -1,0 +1,38 @@
+---
+id: R-2026-10-25-what-made-them-go
+title: "Base breakouts riding the 9 WEMA: what separated the ones that went"
+date: 2026-10-25
+status: mixed
+kind: stock
+horizon: 13 and 26 weeks
+sample: 1,142 events Aug 2025 – Apr 2026 (26 weeks of future each); 441 with a sub-theme
+result: base rate 22% made +50% within 26w, median 13w vs SPY −4.5%, 65% lost the 50 WEMA within 13w. Group (sub-theme top third on 13w) 13w vs SPY +5.9% vs −4.0% bottom third, lost-50 50% vs 67% (vol-adjusted IC +0.16, both halves). Volume trend / up-down volume / biggest volume week: no edge (IC −0.1 to 0). Score (sub-theme top third + RS 70+ + RS line +15% in 13w + a 6%+ gap day in 13w) 3–4 of 4: 53% went, 13w vs SPY +4.5–6.5%, lost-50 36–43% (n 91) vs 0 of 4: 11%, −6.0%, 73% (n 179)
+halves: score ≥ 3 went 49% / 57% vs others 22% / 17%; group IC 0.16 / 0.25 (vol-adjusted)
+layers: [sow]
+integrated: no
+source: tools/went_study/collect.py + test.py + test2.py (Adam, Oct 25 2026: CDNA / DINO / NTRA weekly charts, "find the tells")
+---
+**Idea.** Adam has ~50 names sitting where CDNA, DINO and NTRA sat before they went parabolic (out of a long base through the
+weekly 50 EMA, riding the 9 WEMA). Volume didn't look like the tell. Which features separated the ones that went?
+
+**How it was tested.** Weekly bars from daily (split-adjusted). Event = liquid ($5+, $10M+/day), 20+ of the prior 40 weekly
+closes under the 50 WEMA, now 2–8 weekly closes in a row above it, 9 WEMA over a rising 21, close within 3 weekly ATRs of the 50;
+first event per stock per 26 weeks. Entry next session's open. Outcomes: best high within 26 weeks (raw and in weekly ATRs),
+13-week return vs SPY, lost the 50 WEMA on a weekly close within 13 weeks. Features known at the event week's close. Terciles,
+rank IC, halves split by date, plus within-ADR checks.
+
+**Result.** Most of these fail. Raw "went +50%" is dominated by volatility (ADR top third 39% vs 6%), gap days, deep bases, low
+price and RS, but almost all of that vanishes once the move is measured in the stock's own ATRs or vs SPY: volatile stocks simply
+swing further both ways. What survived: the stock's GROUP already leading (sub-theme top third on 13-week return) in both
+halves on every yardstick, strongest in mid/high-ADR names. RS rating and the RS line mainly cut failures (lost the 50 WEMA 49%
+vs 77% for RS top vs bottom third) rather than predicting the parabolic run. Volume (10 vs 26-week trend, up vs down weeks, biggest
+week) added nothing. Stacked score (group top third + RS 70+ + RS line up 15%+ over 13 weeks + a 6%+ gap day in 13 weeks): 3–4 of
+4 → 53% went, 2.4× the base rate, both halves. CDNA fired Nov 28 2025 at $17.69 (RS 52, diagnostics group top 11%, score 2):
+only +36% within 26 weeks, the run came ~7 months later; DINO Aug 1 2025 $42.89 (refiners top 16%) +37% in 26 weeks, ran after.
+
+**Caveats.** ~9 months of event dates in one mostly-bull stretch, survivors only, overlapping, 61% of events have no sub-theme
+(the group feature only covers listed groups), score thresholds picked from the terciles (not tuned out of sample). The score
+also selects more volatile names (median weekly ATR 10–15% vs 5%): size smaller.
+
+**How it could be used.** Rank Adam's SoW / prime list by the 4-point score with group strength first; treat RS line as a
+failure filter, not a timing signal; stop using volume to choose. Needs a longer history (Massive Starter) to confirm.
