@@ -250,7 +250,7 @@ def build(adjusted, universe, stocks=None, names=None, sow_payload=None, subthem
 # Ledger data/launch_ledger.csv: picks freeze at the week's close (only complete weeks are recorded), entry = the next
 # session's open, exit = the close 13 weeks (65 sessions) after entry or a weekly close through the failure line
 # (under the 50 WEMA; for curl picks 1.5 weekly ATRs under it). Best high tracked for 26 weeks (hit +50%).
-PICK = {"n": 3, "min_dvol": 20e6, "hold_wk": 13, "hold_days": 65, "best_days": 130, "floor_cap": 0.15, "max_atr": 0.15, "max_vs9": None}
+PICK = {"n": 3, "min_dvol": 20e6, "hold_wk": 13, "hold_days": 65, "best_days": 130, "floor_cap": 0.15, "max_atr": 0.15, "max_vs9": None, "one_per_sub": True}
 LCOLS = ["week", "rank", "t", "grade", "stage", "sub", "name", "close", "e50", "atr", "vs9", "floor", "status", "entry_date", "entry",
          "spy_entry", "exit_date", "exit", "ret", "spy_ret", "xspy", "best", "last_date", "last", "why"]
 
@@ -294,7 +294,7 @@ def select(F, i, held=(), n=None):
     out, subs = [], set()
     for _, j, g, curl, vs9 in cand:
         s = F["sub_of"].get(cols[j])
-        if s in subs:
+        if s in subs and PICK["one_per_sub"]:
             continue
         subs.add(s)
         out.append({"j": j, "t": cols[j], "grade": g, "stage": "curl" if curl else "early", "vs9": vs9})

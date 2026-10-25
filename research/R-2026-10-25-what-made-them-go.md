@@ -67,5 +67,10 @@ pool (all pick filters, one per sub-theme, median 16 names) in rank order, same 
 #5 +11.3%, #6+ +8.1% (medians 14% → 1%). (No held-name skip here, so numbers differ from the pick replay.) The filter (leading group)
 does most of the work; the ranking adds a further ~6 pts, mostly from grade A + curl first.
 
+**One per sub-theme or the top 3 anywhere? (`tools/went_study/same_group.py`, Adam)** Same replay and exits, but letting the top 3
+come from one group: 17 of 51 weeks would have doubled up; 13w vs SPY +9.6% vs +10.1% now (difference −0.5 pts, t −0.43 = no
+difference), same median and win rate, slightly more correlated picks (0.17 vs 0.15), worst weeks the same. Kept one per sub-theme:
+no return cost and less riding on a single group (`PICK.one_per_sub`).
+
 **How it could be used.** Rank Adam's SoW / prime list by the 4-point score with group strength first; treat RS line as a
 failure filter, not a timing signal; stop using volume to choose. Needs a longer history (Massive Starter) to confirm.
