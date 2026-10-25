@@ -3305,11 +3305,16 @@ function roGroups(live) {
 // --- your plan / trades (reads prices through liveRow, so it works on pre-market rows too) ---
 function roTrades(mode) {
   const T = DATA.themes, PB = T.playbook || {}, X = T.trade_setups || {}, SB = T.scoreboard || {}, pc = pcI, out = [];
+  const LP = T.launch || {}, LK = (LP.tracker || {}).rows || [];
+  (LP.picks || []).forEach((c, i) => { const r = liveRow(c.t), px = r ? r.price : null;
+    out.push(`<b>Launch pick #${i + 1} ${c.t}</b> · grade ${c.grade}, ${c.stage === "curl" ? "curl" : "early breakout"}${px ? ` · ${mode === "pre" ? "pre-market" : "now"} $${px.toFixed(2)} (${pc(r.chg, 1)})` : ""} · <span class="meta">${esc(c.plan.stop)}</span>`); });
+  LK.filter(o => o.status === "open" && o.entry).forEach(o => { const r = liveRow(o.t); if (!r) return;
+    out.push(`<b>Open launch pick ${o.t}</b> (week of ${shortDate(o.week)}): ${pc(r.price / o.entry - 1, 1)} since entry`); });
   (PB.picks || []).forEach((c, i) => { const r = liveRow(c.t), px = r ? r.price : null;
     let st = "";
     if (c.trigger && px) { const d = px / c.trigger - 1; st = d >= 0 ? `<b class="up">through the trigger</b> $${(+c.trigger).toFixed(2)}${mode === "pre" ? " (pre-market; it counts once it trades there after the open)" : ""}` : `${pc(-d, 1)} below the trigger $${(+c.trigger).toFixed(2)}`; }
     else if (c.entry_type === "open") st = mode === "pre" ? "plan: buy the open" : "bought at the open (plan)";
-    out.push(`<b>Pick #${i + 1} ${c.t}</b> · ${esc(c.setup_name)}${px ? ` · ${mode === "pre" ? "pre-market" : "now"} $${px.toFixed(2)} (${pc(r.chg, 1)})` : ""} · ${st}${mode === "pre" && c.plan ? `<br><small class="meta">Stop: ${esc(c.plan.stop)} · ${esc(c.plan.target)}</small>` : ""}`); });
+    out.push(`<b>Swing pick #${i + 1} ${c.t}</b> · ${esc(c.setup_name)}${px ? ` · ${mode === "pre" ? "pre-market" : "now"} $${px.toFixed(2)} (${pc(r.chg, 1)})` : ""} · ${st}${mode === "pre" && c.plan ? `<br><small class="meta">Stop: ${esc(c.plan.stop)} · ${esc(c.plan.target)}</small>` : ""}`); });
   if (!(PB.picks || []).length) out.push("No top picks today: no setup is actionable in this state.");
   const trig = [];
   (X.setups || []).forEach(S => (S.top || []).forEach(t => { const row = (X.rows || {})[t], pv = S.key === "kq" ? row && row.kq_pivot : S.key === "vcp" ? row && row.vcp_pivot : null, r = liveRow(t);
@@ -4484,6 +4489,36 @@ function boxCard(T) {
   draw(); drawEv();
   return card;
 }
+/* ---------- Launch picks (launch.select): the headline recommendations + live tracker (Adam, Oct 25 2026) ---------- */
+function launchPicksCard(L) {
+  if (!L || !(L.picks || []).length && !(L.tracker || {}).n) return $('<div></div>');
+  const B = L.pick_bt || {}, K = L.tracker || {}, P = L.picks || [];
+  const pp = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const LOC = { at9: "at the 9", near: "near the 9", up: "above the 9", far: "stretched" };
+  const STAT = { pending: "buys next open", open: "open", done: "closed (13 wks)", stopped: "stopped out" };
+  const head = L.week_done ? (K.recorded ? `picked at the close of the week of ${shortDate(L.week)} · logged in the tracker` : `week of ${shortDate(L.week)} · complete`)
+    : `this week so far (through ${shortDate(L.date)}) · final at Friday's close, then logged`;
+  return $(`<section class="card regcard pickcard"><div class="kicker">Top ${P.length} picks · Launch list · weekly position trades · ${head}</div>
+    <div class="picks">${P.map((c, i) => `<div class="pick">
+      <div class="phead"><span class="pnum">#${i + 1}</span><span class="pt">${c.t}</span><span class="lgrade ${c.grade}">${c.grade}</span><span class="pbv focus">${c.stage === "curl" ? "Curl" : "Early breakout"}</span>${c.flag ? '<span class="pbv selective">Flag break</span>' : ""}<span class="pscore" title="RS Rating">RS ${c.rs ?? "–"}</span></div>
+      <div class="meta" style="font-size:12px">${esc((c.name || "").slice(0, 34))}${c.sub ? " · " + esc(c.sub) : ""}${c.price ? ` · last close $${(+c.price).toFixed(2)}` : ""} · ${LOC[c.loc] || ""} (${c.vs9 ?? "–"} ATRs)</div>
+      <p class="pwhy">${esc(c.why)}</p>
+      <div class="pplan">${[["Entry", c.plan.entry], ["Stop", c.plan.stop], ["Hold", c.plan.hold]].map(([k, v]) => `<div><b>${k}</b> ${esc(v)}</div>`).join("")}</div>
+    </div>`).join("") || '<p class="meta">No stock passes the pick rule this week.</p>'}</div>
+    <div class="rbanner ${B.t >= 2 ? "act" : "watch"}" style="margin-top:8px"><b>Why these:</b> run every past week the same way (${esc(B.from || "")} to ${esc(B.to || "")}, ${B.n || 0} picks over ${B.weeks || 0} weeks, bought at the next open, sold after 13 weeks or at the stop),
+      the picks beat SPY by <b>${pp(B.xspy)}</b> on average (t ${B.t ?? "–"}; first half ${pp(B.h1)}, second half ${pp(B.h2)}) and the average stock by ${pp(B.xbase)}. It's lumpy: the median pick did ${pp(B.xspy_med)} vs SPY, ${B.beat == null ? "–" : Math.round(B.beat * 100) + "%"} beat SPY, ${B.stop == null ? "–" : Math.round(B.stop * 100) + "%"} hit the stop, the worst lost ${pp(B.worst)} and the best made ${pp(B.best)}. A few big winners pay for the rest, so take all of them at a size you can hold, not just the one you like.</div>
+    <details class="kqsec" style="margin-top:8px" open><summary><b>Live tracker</b> · ${K.n || 0} picks logged${K.closed ? ` · ${K.closed} closed: average ${pp(K.avg)}, ${pp(K.xspy)} vs SPY, ${Math.round((K.beat || 0) * 100)}% beat SPY` : ""}${K.open ? ` · ${K.open} open: ${pp(K.live_avg)} so far (${pp(K.live_xspy)} vs SPY)` : ""}</summary>
+      ${(K.rows || []).length ? `<div class="scroll"><table class="grid" style="margin-top:6px"><thead><tr><th class="l">Week</th><th>#</th><th class="l">Stock</th><th class="l">Grade · stage</th><th>Entry</th><th class="l">Status</th><th>Return</th><th>vs SPY</th><th>Best high<small>26 wks</small></th><th>Stop line<small>under the 50 WEMA</small></th></tr></thead><tbody>
+      ${K.rows.map(r => `<tr><td class="l">${shortDate(r.week)}</td><td class="num">${r.rank}</td><td class="l"><b>${r.t}</b><small class="meta" style="display:block">${esc(r.sub || "")}</small></td>
+        <td class="l"><span class="lgrade ${r.grade}">${r.grade}</span>${r.stage === "curl" ? "Curl" : "Early"}</td>
+        <td class="num">${r.entry != null ? "$" + (+r.entry).toFixed(2) + `<small class="meta" style="display:block">${shortDate(r.entry_date)}</small>` : '<span class="meta">next open</span>'}</td>
+        <td class="l">${esc(STAT[r.status] || r.status)}${r.exit_date ? `<small class="meta" style="display:block">${shortDate(r.exit_date)}</small>` : ""}</td>
+        ${r.ret == null ? '<td class="num meta">–</td><td class="num meta">–</td><td class="num meta">–</td>' : `${retCell(r.ret, "d60")}${retCell(r.xspy, "d15")}<td class="num">${pp(r.best)}</td>`}
+        <td class="num">${r.floor ? Math.round(r.floor * 100) + "%" : "0%"}</td></tr>`).join("")}</tbody></table></div>`
+        : '<p class="meta" style="margin:6px 0">The first picks are logged at this week\'s close and bought at the next open; results show here as they come in.</p>'}
+      <p class="meta" style="margin:6px 0 0">Every pick is logged when its week closes (never changed after), bought at the next session's open, and sold at the close 13 weeks later or at the first weekly close through its stop line. This is the real-time check that the edge holds: compare the closed picks' average vs SPY with the replay above.</p></details>
+    <div class="note" style="padding:8px 0 0"><b>The rule:</b> ${esc(L.pick_rule || "")} The old 5-day swing picks still run and log further down, unchanged.</div></section>`);
+}
 /* ---------- Launch list (launch.py): base breakouts graded on the tells that separated the ones that went ---------- */
 function renderLaunch(app) {
   const X = (DATA.themes || {}).launch;
@@ -4557,6 +4592,7 @@ function renderLaunch(app) {
     fl.append(chips("Grade", gchips(), U, "g", () => { ss("launchGrade2", U.g); redraw(); }));
     fl.append(chips("Where", lchips(), U, "loc", () => { ss("launchLoc", U.loc); redraw(); })); evDraw(); draw(); };
   card.querySelector(".lpdl").addEventListener("click", () => tsDownload("launch-list", [{ name: `Launch list ${U.g === "AB" ? "A+B" : U.g} ${U.st}${U.loc === "near" ? " near the 9" : ""}`, ticks: shown.map(r => r.t) }]));
+  app.append(launchPicksCard(X));
   app.append(card);
   redraw();
 }
@@ -4564,6 +4600,7 @@ function renderTrades(app) {
   const T = DATA.themes, X = T && T.trade_setups;
   if (!X) { app.append($('<div class="card empty">Trade setups appear after the next data run.</div>')); return; }
   app.append(liveBar());
+  if (T.launch) app.append(launchPicksCard(T.launch));   // Adam, Oct 25: the headline picks come from the Launch list
   if (T.dips) app.append(dipCard(T, "trades"));      // Adam: dip buys at the very top of Trade Setups
   const live = !!LIVE_T, asOf = longDate(T.date), now = T.regime_now || "mixed";
   const REG = { strong: "Strong", mixed: "Mixed", weak: "Weak" };
@@ -4884,7 +4921,7 @@ function picksCard(P, T) {
   const R = (T.trade_bt || {}).pick_replay;
   const ev = R ? `In a day-by-day replay of ${R.days} past sessions (${R.from} to ${R.to}), traded exactly this way (next-session entry, 5-day hold), the rule's #1 pick made <b>${pct(R.pick_ret)}</b> (about ${R.pick_ret >= 0 ? "+" : "−"}$${Math.abs(Math.round(R.pick_ret * 10000))} per $10k) against ${pct(R.avg_ret)} for the average actionable candidate, beating it on ${Math.round(R.beat * 100)}% of days${R.no_fill ? `; ${R.no_fill} trigger picks never filled` : ""}. ${Math.abs(R.t) < 2 ? `Not statistically solid yet (t = ${R.t}): the scoreboard below tracks it live.` : `t = ${R.t}.`}` : "";
   const W = P.pick_watch || [];
-  const el = $(`<section class="card regcard pickcard"><div class="kicker">Today's top ${P.picks.length} trades · actionable today · highest RS in today's ${P.picks[0].verdict.toLowerCase()} setups</div>
+  const el = $(`<section class="card regcard pickcard"><div class="kicker">Swing picks (old rule, still logged) · today's top ${P.picks.length} 5-day trades · highest RS in today's ${P.picks[0].verdict.toLowerCase()} setups</div>
     <div class="picks">${P.picks.map((c, i) => `<div class="pick">
       <div class="phead"><span class="pnum">#${i + 1}</span><span class="pt">${c.t}</span><span class="pbv ${c.verdict.toLowerCase()}">${esc(c.setup_name)}</span><span class="pscore" title="RS Rating">RS ${c.rsr}</span></div>
       <div class="meta" style="font-size:12px">${esc((c.name || "").slice(0, 34))}${c.sub ? " · " + esc(c.sub) : ""}${c.price ? ` · last close $${c.price.toFixed(2)}` : ""}</div>

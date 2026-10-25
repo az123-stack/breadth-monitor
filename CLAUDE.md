@@ -460,7 +460,17 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (halves agree). IT curled Aug 21 at $196 (flag break), ACN Oct 2 at $199. RS / RS line / gap points mostly switch on after the move
   starts (ACN RS 8–14 in Aug): the group is the early clue. Row `stage` curl / early / later, `flag` (close above the prior 4-week high),
   `vs9` (ATRs over the 9 WEMA) + `loc` at9 ≤ 0.5 / near ≤ 1 / up ≤ 1.5 / far: Grade A breakouts within 1 ATR of the 9 hit +50% 53–54%
-  vs 43% beyond 1.5. Page chips Stage (default curl, launchStage2) · Grade (default A+B, launchGrade2) · Where (launchLoc). Evidence recomputed each build
+  vs 43% beyond 1.5. Page chips Stage (default curl, launchStage2) · Grade (default A+B, launchGrade2) · Where (launchLoc).
+  **LAUNCH PICKS = the headline recommendations** (Oct 25, Adam approved; `config.APPROVED_LAYERS = ("launch",)`, registry status live):
+  `launch.select(F, i, held)` each week: curl or fresh, group point on, $20M+/day, weekly ATR ≤ 15% (`PICK.max_atr`), rank grade A → curl →
+  within 1 ATR of the 9 → group rank → RS, one per sub-theme, skip held names, top 3 (`PICK.n`). `launch.replay` runs the same rule on every
+  past week with the tracker's exits → `pick_bt` (Oct 25: 148 picks, +9.7% vs SPY 13w, t 3.66, halves +11.4/+8.7%, median ≈ 0, worst −38%).
+  Ledger `data/launch_ledger.csv` (`ledger_record` only when the week is complete and never rewrites a recorded week; `ledger_settle`:
+  entry next session's open, exit close 65 sessions later or the first complete weekly close under 50 WEMA × `stop_mult` (curl: min(1.5
+  weekly ATR, 15%) under; `floor` column), best high 130 sessions) → `tracker`. Built only with `ledger=True` (update.py). Page:
+  `launchPicksCard` at the top of Trade Setups and the Launch list tab (picks with why/plan, replay banner, live tracker table); Read-out
+  plan lists launch picks + open launch picks first. Old 5-day picks card relabeled "Swing picks (old rule, still logged)", unchanged.
+  Test `test_launch_picks_ledger`. First week logged Oct 23, 2026: AI, DHR, IT. Evidence recomputed each build
   (fresh setups, first per stock per 26 wks, next open → best high 26 wks, 13-wk vs SPY, lost the 50 WEMA): A 57% hit +50% (n 76, halves
   55/58%), 13w vs SPY +5.6%; B 33%; C 18%, −5.1%. Volume (trend, up/down, biggest week) and volatility-adjusted RS line: no edge. Chips
   Grade (A / A+B / all, localStorage launchGrade) · Stage (early / later / all, launchStage); header ⬇ Trade Setups adds Grade A early/later.

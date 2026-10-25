@@ -1395,6 +1395,43 @@ def test_launch_list():
     return f"{len(p['rows'])} rows, UP score {R['UP']['score']}"
 
 
+def test_launch_picks_ledger():
+    """Launch picks: the weekly pick rule picks the leading-group stock, the ledger freezes the week, fills the next open,
+    and stops it on a weekly close through the failure line; rows for a week are never rewritten."""
+    from breadth import launch, strength
+    days = pd.bdate_range("2025-01-02", periods=440)
+    n, cut = len(days), 410                     # pick at the week ending near session `cut`, then the stock collapses
+    rows = []
+    def put(t, c):
+        for i, d in enumerate(days):
+            rows.append({"ticker": t, "date": d, "o": c[i], "h": c[i] * 1.03, "l": c[i] * 0.97, "c": c[i], "v": 2e6})
+    shape = np.concatenate([np.linspace(20, 18, cut - 30), np.linspace(18, 22.5, 30), np.linspace(22.5, 12, n - cut)])
+    for t in ("UP", "P1", "P2"):
+        put(t, shape)
+    for k in range(6):
+        put(f"W{k}", np.linspace(30, 22, n))
+    put("SPY", np.full(n, 500.0))
+    w = strength.wide_all(pd.DataFrame(rows))
+    cols = ["UP", "P1", "P2"] + [f"W{k}" for k in range(6)]
+    subs = pd.DataFrame({"group": "g", "subtheme": ["Hot"] * 3 + ["Cold"] * 6, "ticker": cols})
+    F = launch.frames(w, cols, subs)
+    F["week_done"] = True
+    wi = int(F["wd"].searchsorted(days[cut - 1], side="right")) - 1
+    got = launch.select(F, wi)
+    assert got and got[0]["t"] in ("UP", "P1", "P2") and len(got) == 1, got     # one per sub-theme
+    p = [{**got[0], "price": 22.0, "e50": float(F["e50"][got[0]["t"]].iat[wi]), "atr": 5.0}]
+    df = launch.ledger_record(pd.DataFrame(columns=launch.LCOLS), str(F["wd"][wi].date()), p)
+    df2 = launch.ledger_record(df, str(F["wd"][wi].date()), [{**p[0], "t": "W0"}])
+    assert len(df2) == 1 and df2["t"].iat[0] == got[0]["t"]                     # a recorded week is frozen
+    df = launch.ledger_settle(df, F, w)
+    r = df.iloc[0]
+    assert r["entry_date"] > str(F["wd"][wi].date()) and r["entry"] > 0, r
+    assert r["status"] == "stopped" and r["ret"] < 0 and r["exit_date"], r           # the collapse closes it through the stop line
+    s = launch.ledger_summary(df)
+    assert s["closed"] == 1 and s["stopped"] == 1 and s["rows"][0]["t"] == r["t"]
+    return f"{r['t']} {r['stage']} stopped {r['ret']:+.1%}"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

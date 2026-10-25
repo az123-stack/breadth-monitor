@@ -50,5 +50,16 @@ the group is the early clue, the other points switch on after the move starts. E
 the 9 WEMA 53–54% hit +50% vs 43% beyond 1.5 ATRs (mild). Built: `curl` stage (default view) + "where to buy" (ATRs over the 9).
 Oct 23 curl with group: AI, SBET, BMNR (A); HUBS, ADSK, TRMB (flag breaks), SNPS, DUOL, GEHC (B).
 
+**Promoted to the headline picks (Oct 25, Adam approved; `tools/went_study/picks.py`, `launch.select` / `launch.replay`).**
+Proof rule: grade A minus C, 13-week return vs SPY averaged by week — fresh breakouts +17%, t 3.13, 39 weeks, halves +15% / +19%;
+curl +30%, t 2.48, 28 weeks, halves +33% / +28% (means include a few huge winners, clipped at +300%). Pick rule = each week, curl or
+fresh stocks with the group point, $20M+/day, weekly ATR ≤ 15%, ranked grade A → curl → within 1 ATR of the 9 WEMA → group rank → RS,
+one per sub-theme, skip names held, top 3; next open; exit 13 weeks or a weekly close under the 50 WEMA (curl: min(1.5 ATR, 15%) under).
+Replay (148 picks, 51 weeks, Aug 2025 – Jul 2026): +9.7% vs SPY mean, t 3.66, halves +11.4% / +8.7%, median −0.5%, beat SPY 49%,
+stopped 39%, worst −38%, best +126%. Without the ATR cap (with stops) +7.0% vs SPY but median −7.1%, beat 40% (lottery tickets; WYFI
+showed a 34% weekly ATR makes the curl stop ~50% away) → cap chosen AFTER seeing this, mild snooping. Excluding names stretched > 1.5 /
+> 1 ATR over the 9 WEMA did not help (t 3.36 / 3.29). Live check: data/launch_ledger.csv (weekly, frozen at the week's close).
+First week logged Oct 23, 2026: AI (curl), DHR (early), IT (early).
+
 **How it could be used.** Rank Adam's SoW / prime list by the 4-point score with group strength first; treat RS line as a
 failure filter, not a timing signal; stop using volume to choose. Needs a longer history (Massive Starter) to confirm.

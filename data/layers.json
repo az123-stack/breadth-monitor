@@ -446,14 +446,14 @@
    "name": "Launch list: base breakouts graded on the tells of the ones that went",
    "kind": "code",
    "owner": "daily update",
-   "status": "info",
-   "where": "breadth/launch.py → DATA.themes.launch → Launch list tab (renderLaunch)",
+   "status": "live",
+   "where": "breadth/launch.py → DATA.themes.launch (picks, pick_bt, tracker) → Launch list tab + top of Trade Setups + Read-out plan; data/launch_ledger.csv",
    "what": "Fresh base breakouts (20+ of 40 weeks under the 50 WEMA, now 2-8 weekly closes over it, 9 > rising 21, within 3 weekly ATRs) + every SoW row; points: sub-theme top third on 13-wk return, RS 70+, RS line +15% in 13 wks, 6%+ gap day in 13 wks; grade A = group + 2-3 others, B = group + 0-1, C = no group",
-   "affects_picks": false,
+   "affects_picks": true,
    "evidence": [
     "R-2026-10-25-what-made-them-go"
    ],
-   "notes": "Grade A 57% hit +50% in 26 wks vs 18% for C, 13-wk vs SPY +5.6% vs -5.1%, both halves (76 A setups, ~9 months); evidence recomputed each build"
+   "notes": "Approved by Adam Oct 25 2026 as the headline picks. Proof: grade A minus C 13w vs SPY by week, fresh t 3.1 (halves +15/+19%), curl t 2.5 (+33/+28%). Pick rule replay (top 3 a week, stops, weekly ATR <= 15%): +9.7% vs SPY over 13 wks, t 3.66, halves +11.4/+8.7%, median ~0, beat SPY 49%, worst -38%. Live check: data/launch_ledger.csv"
   }
  ]
 }

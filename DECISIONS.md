@@ -21,6 +21,12 @@ Decision engine (`decision.py`): builds one **Decision Card** per pick / top can
 and appends every layer's value to `data/decision_log.csv` each morning. Agent layers become testable once
 the log has ~2–3 months of settled rows; the Reviewer then proposes promotion (needs both-halves evidence).
 
+## Approved layers
+- **launch** (Oct 25, 2026, Adam): the headline picks now come from the Launch list (`breadth/launch.py`, top 3 a week, weekly position
+  trades, 13-week hold, logged in `data/launch_ledger.csv`). Passed: grade A minus C t 3.1 / 2.5 (both halves positive); pick-rule replay
+  +9.7% vs SPY over 13 weeks, t 3.66, halves +11.4% / +8.7%. The old 5-day swing Top 2 (playbook + pick_ledger + decision cards) still runs
+  and logs unchanged, shown below the Launch picks as "Swing picks (old rule)". Agent layers still cannot move either.
+
 ## Rules that keep it honest
 - No layer re-ranks the live Top 2 picks until (a) it passes a backtest in both halves of the history
   (t ≥ 2 overall, same sign in each half) and (b) Adam approves.
