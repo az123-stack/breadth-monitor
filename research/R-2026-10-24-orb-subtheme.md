@@ -3,7 +3,7 @@ id: R-2026-10-24-orb-subtheme
 title: "ORB x sub-theme: buy the best stock in the top 2 sub-themes (short the worst in the bottom 2) when SPY/QQQ breaks its opening range"
 date: 2026-10-24
 status: doesnt
-kind: intraday
+kind: setup
 horizon: same day (close / 2R) and 5 sessions
 sample: ~2 years of 15-minute bars (Massive free plan), 703 of ~1,040 liquid sub-theme stocks (alphabetical A to ~M; download stopped at Adam's request), ~450 trigger days per variant
 result: picks ~0R (long) and -0.08 to -0.3R (short) in every variant; vs buying any liquid stock on the same breakout +0.02 to +0.09R, t mostly < 2 (2R-exit longs t 2.0-2.3 only); first and second halves disagree (long picks +0.10R / -0.06 to -0.09R)
