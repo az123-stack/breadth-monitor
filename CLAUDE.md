@@ -453,7 +453,14 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   tab "Launch list" after Trade Setups (`renderLaunch`). Names = fresh base breakouts (`frames`: liquid $5+/$10M+, 20+ of the prior 40
   weekly closes under the 50 WEMA, now 2–8 in a row over it, 9 > rising 21, close ≤ 50 × (1 + 3 weekly ATR)) + every SoW row. Points:
   group (sub-theme top third on 13-wk equal-weight return, 3+ stocks), RS 70+, RS line +15% in 13 wks, 6%+ gap-up day in 65 sessions.
-  Grade A = group + 2–3 others, B = group + 0–1, C = no group point. `early` = run ≤ 8 (the tested window). Evidence recomputed each build
+  Grade A = group + 2–3 others, B = group + 0–1, C = no group point. `early` = run ≤ 8 (the tested window).
+  STAGES (Oct 25 follow-up, Adam: "ACN / IT had already gone; the buy was the flag under the 50 WEMA"; `tools/went_study/early.py`):
+  `curl` = base + 9 WEMA over a rising 21 + close within 1.5 weekly ATRs under to 0.5 over the 50 WEMA (the flag before the break)
+  → evidence `evidence_curl` (failure = close 1.5 ATRs under the 50): group A 57% hit +50%, 13w vs SPY +11%; B 40% / +3%; C 18% / −5%
+  (halves agree). IT curled Aug 21 at $196 (flag break), ACN Oct 2 at $199. RS / RS line / gap points mostly switch on after the move
+  starts (ACN RS 8–14 in Aug): the group is the early clue. Row `stage` curl / early / later, `flag` (close above the prior 4-week high),
+  `vs9` (ATRs over the 9 WEMA) + `loc` at9 ≤ 0.5 / near ≤ 1 / up ≤ 1.5 / far: Grade A breakouts within 1 ATR of the 9 hit +50% 53–54%
+  vs 43% beyond 1.5. Page chips Stage (default curl, launchStage2) · Grade (default A+B, launchGrade2) · Where (launchLoc). Evidence recomputed each build
   (fresh setups, first per stock per 26 wks, next open → best high 26 wks, 13-wk vs SPY, lost the 50 WEMA): A 57% hit +50% (n 76, halves
   55/58%), 13w vs SPY +5.6%; B 33%; C 18%, −5.1%. Volume (trend, up/down, biggest week) and volatility-adjusted RS line: no edge. Chips
   Grade (A / A+B / all, localStorage launchGrade) · Stage (early / later / all, launchStage); header ⬇ Trade Setups adds Grade A early/later.

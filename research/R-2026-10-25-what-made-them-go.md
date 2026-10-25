@@ -41,5 +41,14 @@ lost the 50 WEMA 41% (halves 55% / 58% hit); B = group + 0–1: 96, 33%, +3.1%, 
 Oct 23, 2026 Grade A early (2–8 weeks over the 50): ACN, CTSH, IT, CDW (IT services), DNA, NTSK, RPD, ZS, PTC, CART, DHR, FDS, CME,
 SPOT, ULTA; 80 more Grade A later in the move.
 
+**Follow-up: earlier entry (Adam: ACN / IT had already gone when the list flagged them; the buy was the flag under the 50).**
+`tools/went_study/early.py`. "Curl" = base + 9 WEMA over a rising 21 + close within 1.5 weekly ATRs under to 0.5 over the 50 WEMA
+(1,076 events). Group point again decides it: group 46% hit +50%, 13w vs SPY +5.4% vs 18% / −5.4% without (halves 53/38% vs 20/17%);
+group + 2 other points 58%, +11%; WITHOUT the group, RS / RS line / gap points made it worse (−12% vs SPY). Adding a 4-week flag break:
+small (31 with group), halves 62% / 17% → shown as a tag only. ACN's RS was 8–14 in August while IT Services was already top 30%:
+the group is the early clue, the other points switch on after the move starts. Entry location inside Grade A breakouts: within 1 ATR of
+the 9 WEMA 53–54% hit +50% vs 43% beyond 1.5 ATRs (mild). Built: `curl` stage (default view) + "where to buy" (ATRs over the 9).
+Oct 23 curl with group: AI, SBET, BMNR (A); HUBS, ADSK, TRMB (flag breaks), SNPS, DUOL, GEHC (B).
+
 **How it could be used.** Rank Adam's SoW / prime list by the 4-point score with group strength first; treat RS line as a
 failure filter, not a timing signal; stop using volume to choose. Needs a longer history (Massive Starter) to confirm.

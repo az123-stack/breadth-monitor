@@ -10,8 +10,13 @@ Volume was tested and added nothing, so it is not scored. The group point is the
 SPY at every score; without it even 3 other points lagged SPY (those names only "went" more because they swing harder).
 Grades: A = group + 2-3 others, B = group + 0-1 others, C = no group point (or no sub-theme). Size A names smaller: they swing more.
 
-Names = the tested setup ("fresh": 2-8 weekly closes over the 50 WEMA after 20+ of 40 weeks under it) plus every
-Strength on Weakness row (Adam's watchlist), all scored the same way. The evidence is recomputed every build on the
+Stages (Adam, Oct 25: "ACN / IT had already gone when they showed up; the buy was the flag under the 50"):
+  curl  - the 9 WEMA has crossed over a rising 21 while price is still within 1.5 weekly ATRs under to 0.5 over the 50 WEMA
+          (his yellow box: the flag before the break). Group point: 46% hit +50% vs 18% without, 13w vs SPY +5.4% vs -5.4%.
+  early - 2-8 weekly closes over the 50 WEMA (the first test); later = longer over it (untested).
+Names = curl + early stocks plus every Strength on Weakness row, all scored the same way. RS, RS line and gap points
+mostly switch on AFTER the move starts; the group is the early clue. Each row also carries its distance over the 9 WEMA
+in weekly ATRs (Grade A bought within 1 ATR of the 9 hit +50% 53-54% of the time vs 43% beyond 1.5 ATRs). The evidence is recomputed every build on the
 fresh setup: entry next session's open, best high within 26 weeks, 13-week return vs SPY, lost the 50 WEMA within 13 weeks.
 Never touches the picks."""
 import numpy as np
@@ -19,7 +24,8 @@ import pandas as pd
 
 CFG = {"min_price": 5.0, "min_dvol": 10e6, "run_lo": 2, "run_hi": 8, "base_wk": 40, "base_below": 20, "ext_atr": 3.0,
        "grp_top": 2 / 3, "grp_wk": 13, "grp_min": 3, "rs_min": 70, "rsl_wk": 13, "rsl_min": 0.15, "gap_days": 65, "gap_min": 0.06,
-       "warm": 40, "hold": 26, "mid": 13, "went": 0.5, "gap_every": 26}
+       "warm": 40, "hold": 26, "mid": 13, "went": 0.5, "gap_every": 26, "curl_lo": 1.5, "curl_hi": 0.5, "flag_wk": 4,
+       "near9": 1.0, "far9": 1.5}
 POINTS = [("group", "Group leading", "Its sub-theme is in the top third of sub-themes on 13-week return. The strongest tell in the study."),
           ("rs", "RS 70+", "RS Rating 70 or higher."),
           ("rsline", "RS line rising", "RS line (price ÷ SPY) up 15%+ over 13 weeks."),
@@ -55,6 +61,10 @@ def frames(w, cols, subthemes, bench="SPY"):
     liq = (c >= CFG["min_price"]) & (dvol.reindex(wd)[cols] >= CFG["min_dvol"])
     zone = liq & (below >= CFG["base_below"]) & (e9 > e21) & (e21 > e21.shift(4)) & (c <= e50 * (1 + CFG["ext_atr"] * atr))
     fresh = zone & (run >= CFG["run_lo"]) & (run <= CFG["run_hi"])
+    # the yellow box: 9 curled over a rising 21 while price still sits at / just under the 50 WEMA (before the breakout)
+    curl = liq & (below >= CFG["base_below"]) & (e9 > e21) & (e21 > e21.shift(4)) & \
+        (c >= e50 * (1 - CFG["curl_lo"] * atr)) & (c <= e50 * (1 + CFG["curl_hi"] * atr))
+    flag = c > h.shift(1).rolling(CFG["flag_wk"], min_periods=3).max()     # closed above the last 4 weeks' high (the flag break)
     spy = w["c"][bench].groupby(days.to_period("W-FRI")).last()
     spy.index = wd
     rsl = c.div(spy, axis=0)
@@ -72,7 +82,7 @@ def frames(w, cols, subthemes, bench="SPY"):
     pts = {"group": gr >= CFG["grp_top"], "rs": rs_w >= CFG["rs_min"], "rsline": rsl13 >= CFG["rsl_min"], "gap": gap_w >= CFG["gap_min"]}
     score = sum(p.astype(int) for p in pts.values())
     return {"W": W, "nday": nday, "wd": wd, "days": days, "e9": e9, "e21": e21, "e50": e50, "atr": atr, "run": run, "below": below,
-            "zone": zone, "fresh": fresh, "rs": rs_w, "rsl13": rsl13, "grank": gr, "gap": gap_w, "pts": pts, "score": score,
+            "zone": zone, "fresh": fresh, "curl": curl, "flag": flag, "rs": rs_w, "rsl13": rsl13, "grank": gr, "gap": gap_w, "pts": pts, "score": score,
             "sub_of": sub_of, "dO": dO, "dH": dH, "dC": dC, "dvol": dvol, "rsd": rsd}
 
 
@@ -88,14 +98,15 @@ def _sum(x):
             "lost": _r(float(np.mean(x["lost"])), 3), "atr": _r(float(np.median(x["atr"])), 3)}
 
 
-def evidence(F, w, bench="SPY"):
-    """Every fresh setup (first per stock per 26 weeks) with 26 weeks of future: outcomes by score."""
+def evidence(F, w, bench="SPY", key="fresh"):
+    """Every setup of one stage (first per stock per 26 weeks) with 26 weeks of future: outcomes by score and grade."""
     days, wd = F["days"], F["wd"]
-    M = F["fresh"].to_numpy().copy()
+    M = F[key].to_numpy().copy()
     M[:CFG["warm"]] = False
     O, H, C = F["dO"].to_numpy(), F["dH"].to_numpy(), F["dC"].to_numpy()
     WC, E50 = F["W"]["c"].to_numpy(), F["e50"].to_numpy()
     S, A = F["score"].to_numpy(), F["atr"].to_numpy()
+    floor = CFG["curl_lo"] if key == "curl" else 0.0        # curl starts under the 50: failure = a close below the curl floor
     G = F["grank"].to_numpy()
     PG = F["pts"]["group"].to_numpy()
     spy = w["c"][bench].to_numpy()
@@ -117,7 +128,7 @@ def evidence(F, w, bench="SPY"):
             mx = np.nanmax(H[a:a + hd, j]) / e - 1
             r13 = C[a + md, j] / e - 1 if a + md < len(days) else np.nan
             s13 = spy[a + md] / spy[a] - 1 if a + md < len(days) else np.nan
-            lost = bool(np.any(WC[i + 1:i + 1 + CFG["mid"], j] < E50[i + 1:i + 1 + CFG["mid"], j]))
+            lost = bool(np.any(WC[i + 1:i + 1 + CFG["mid"], j] < E50[i + 1:i + 1 + CFG["mid"], j] * (1 - floor * A[i, j])))
             rows.append((wd[i], S[i, j], np.isfinite(G[i, j]), mx, r13 - s13, lost, A[i, j], grade(bool(PG[i, j]), int(S[i, j]))))
     if not rows:
         return None
@@ -152,8 +163,9 @@ def build(adjusted, universe, stocks=None, names=None, sow_payload=None, subthem
     rows = []
     for j, t in enumerate(cols):
         fresh = bool(F["fresh"].iat[wi, j])
+        curl = bool(F["curl"].iat[wi, j]) and not fresh
         s = sow_rows.get(t)
-        if not fresh and not s:
+        if not fresh and not curl and not s:
             continue
         pts = {k: bool(F["pts"][k].iat[wi, j]) for k, _, _ in POINTS}
         gser = gap_day[t]
@@ -163,14 +175,20 @@ def build(adjusted, universe, stocks=None, names=None, sow_payload=None, subthem
         e50, e9, e21, atr = F["e50"].iat[wi, j], F["e9"].iat[wi, j], F["e21"].iat[wi, j], F["atr"].iat[wi, j]
         ir = info.get(t, {})
         sc = int(sum(pts.values()))
-        rows.append({"t": t, "grade": grade(pts["group"], sc), "early": bool(F["run"].iat[wi, j] <= CFG["run_hi"]), "name": names.get(t, ir.get("name", "")), "sub": F["sub_of"].get(t), "theme": (ir.get("themes") or [None])[0],
+        run = int(F["run"].iat[wi, j])
+        stage = "curl" if curl or run == 0 else "early" if run <= CFG["run_hi"] else "later"
+        vs9 = (c / e9 - 1) / atr if atr else np.nan
+        rows.append({"t": t, "grade": grade(pts["group"], sc), "stage": stage, "early": stage != "later", "curl": curl,
+                     "flag": bool(F["flag"].iat[wi, j]), "vs9": _r(vs9, 2),
+                     "loc": None if not np.isfinite(vs9) else "at9" if vs9 <= 0.5 else "near" if vs9 <= CFG["near9"] else "up" if vs9 <= CFG["far9"] else "far", "name": names.get(t, ir.get("name", "")), "sub": F["sub_of"].get(t), "theme": (ir.get("themes") or [None])[0],
                      "score": sc, "pts": pts, "fresh": fresh, "sow": s.get("state") if s else None,
                      "prime": bool(s.get("prime")) if s else False, "grank": _r(F["grank"].iat[wi, j], 3), "rs": _r(F["rs"].iat[wi, j], 0),
                      "rsl13": _r(F["rsl13"].iat[wi, j], 3), "gap": _r(gmax, 3), "gap_date": gdate if (gmax or 0) >= CFG["gap_min"] else None,
                      "run": int(F["run"].iat[wi, j]), "ext": _r((c / e50 - 1) / atr if atr else np.nan, 2), "atr": _r(atr * 100, 1),
                      "adr": _r(adr.get(t, np.nan), 1), "price": _r(c, 2), "e9": _r(e9, 2), "e21": _r(e21, 2), "e50": _r(e50, 2),
                      "vs50": _r(c / e50 - 1, 3), "dvol": _r(F["dvol"][t].iat[di] / 1e6, 0)})
-    rows.sort(key=lambda r: (r["grade"], -r["score"], not r["early"], -(r["grank"] or 0), -(r["rs"] or 0)))
+    SO = {"curl": 0, "early": 1, "later": 2}
+    rows.sort(key=lambda r: (r["grade"], SO[r["stage"]], (r["vs9"] if r["vs9"] is not None else 9) > CFG["near9"], -r["score"], -(r["grank"] or 0), -(r["rs"] or 0)))
     from . import sow
     done = bool(sow.complete_weeks(F["nday"], F["days"][-1])[-1])
     out = {"date": str(F["days"][-1].date()), "week": str(F["wd"][-1].date()), "week_done": done, "week_days": int(F["nday"].iloc[-1]),
@@ -178,4 +196,5 @@ def build(adjusted, universe, stocks=None, names=None, sow_payload=None, subthem
            "counts": {k: sum(1 for r in rows if r["grade"] == k) for k in "ABC"}}
     if evidence_on:
         out["evidence"] = evidence(F, w, config.BENCHMARK)
+        out["evidence_curl"] = evidence(F, w, config.BENCHMARK, "curl")
     return out

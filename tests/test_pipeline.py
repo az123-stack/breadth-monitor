@@ -1388,6 +1388,7 @@ def test_launch_list():
     assert "UP" in R and "LONE" in R, sorted(R)
     assert R["UP"]["fresh"] and R["UP"]["early"] and R["UP"]["pts"]["group"] and R["UP"]["pts"]["gap"], R["UP"]
     assert R["UP"]["grade"] == "A", R["UP"]
+    assert R["UP"]["stage"] == "early" and R["UP"]["vs9"] is not None and R["UP"]["loc"] in ("at9", "near", "up", "far"), R["UP"]
     assert not R["LONE"]["pts"]["group"] and R["LONE"]["grade"] == "C", R["LONE"]
     assert launch.grade(True, 3) == "A" and launch.grade(True, 1) == "B" and launch.grade(False, 4) == "C"
     assert p["rows"][0]["grade"] == "A"
