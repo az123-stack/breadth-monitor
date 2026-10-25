@@ -72,5 +72,11 @@ come from one group: 17 of 51 weeks would have doubled up; 13w vs SPY +9.6% vs +
 difference), same median and win rate, slightly more correlated picks (0.17 vs 0.15), worst weeks the same. Kept one per sub-theme:
 no return cost and less riding on a single group (`PICK.one_per_sub`).
 
+**How many to hold at once? (`tools/went_study/portfolio.py`, Adam: "three might be too many")** Weekly steps, positions held to
+the stop or 13 weeks (avg ~10 weeks), free slots filled from the ranked list. 3 new a week, no cap: ~23 open (max 31), 150 trades,
++10.5% vs SPY a trade, t 3.7. Top pick only (1 new a week): ~8.5 open (max 11), 51 trades, +18.2% (median +12.6%, beat 65%), t 3.5,
+halves +19% / +17%. Cap 6 open (3 a week to fill slots): ~5 open, 32 trades, +16.4%, halves +17% / +16%, t 3.3. Cap 8: +23% (40 trades)
+and cap 3: +28% (15 trades) — too few trades to trust the differences. Fewer, top-ranked positions did at least as well per trade.
+
 **How it could be used.** Rank Adam's SoW / prime list by the 4-point score with group strength first; treat RS line as a
 failure filter, not a timing signal; stop using volume to choose. Needs a longer history (Massive Starter) to confirm.
