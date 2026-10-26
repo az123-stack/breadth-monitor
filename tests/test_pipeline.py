@@ -1463,6 +1463,91 @@ def test_best_setups_flag_and_nuzzle():
     return f"flag pivot {P['hh']['FLG'].iat[i]:.2f}, NZ touched"
 
 
+def _sheet_csv(day_mdY, rows=120, stamp10="", stamp11="", anchor=lambda t: ""):
+    lines = ["ticker,index,symbol,price,closeyest,open,volume,marketcap,volumeavg,at10,at11,low",
+             f"_asof,{day_mdY} 9:00:00,,,,,,,,{stamp10},{stamp11}", f"_spytime,{day_mdY} 12:00:00"]
+    for k in range(rows):
+        t = f"T{k}"
+        lines.append(f"{t},1,{t},{10 + k},{10 + k},{10 + k},1000,,,{anchor(t)},{anchor(t)},")
+    return "\n".join(lines) + "\n"
+
+
+def test_anchor_backup_snapshot():
+    """Second-half movers backup (Oct 26 2026: the sheet's 10:00 freeze stuck on Oct 13 for two weeks): take() saves a slot
+    only inside its window, once a day, only for today's session; check() flags a day with neither source."""
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from breadth import anchors
+    ET = ZoneInfo("America/New_York")
+    csv_today = _sheet_csv("10/26/2026")
+    d, m = anchors.take(csv_today, datetime(2026, 10, 26, 10, 3, tzinfo=ET))
+    assert "saved" in m and d["date"] == "2026-10-26" and len(d["at10"]["rows"]) == 120 and d["at10"]["rows"]["T5"] == [15.0, 1000.0], m
+    d2, m2 = anchors.take(csv_today, datetime(2026, 10, 26, 10, 20, tzinfo=ET), doc=d)
+    assert "already" in m2 and d2["at10"]["time"].endswith("10:03")
+    d3, m3 = anchors.take(csv_today, datetime(2026, 10, 26, 10, 50, tzinfo=ET), doc=d)
+    assert "outside" in m3 and "at11" not in d3
+    d4, m4 = anchors.take(csv_today, datetime(2026, 10, 26, 11, 2, tzinfo=ET), doc=d)
+    assert "saved" in m4 and d4["at10"] and d4["at11"]
+    _, m5 = anchors.take(_sheet_csv("10/23/2026"), datetime(2026, 10, 26, 10, 3, tzinfo=ET))
+    assert "not today" in m5                                                # stale sheet / holiday: never saves old prices
+    d6, _ = anchors.take(csv_today, datetime(2026, 10, 27, 10, 3, tzinfo=ET), doc=d4)
+    assert "at10" not in d6 or d6.get("date") != "2026-10-27"               # new day doesn't reuse yesterday's doc
+    stuck = _sheet_csv("10/26/2026", stamp10="2026-10-13 20:00", stamp11="2026-10-13 20:00")
+    bad = anchors.check(stuck, datetime(2026, 10, 26, 16, 25, tzinfo=ET), {})
+    assert bad["ok"] is False and bad["sheet"]["at10"] is False             # the Oct 14-26 failure is caught
+    good = anchors.check(stuck, datetime(2026, 10, 26, 16, 25, tzinfo=ET), d4)
+    assert good["ok"] and good["backup"]["at10"] and good["backup"]["at11"]
+    fresh = _sheet_csv("10/26/2026", stamp10="2026-10-26 10:01", stamp11="2026-10-26 11:01")
+    assert anchors.check(fresh, datetime(2026, 10, 26, 16, 25, tzinfo=ET), {})["ok"]
+    return "take / check ok"
+
+
+def test_anchor_page_logic():
+    """The page never uses a stale 10:00 / 11:00 snapshot, uses today's sheet freeze when it has one, and falls back to the
+    GitHub backup otherwise (runs the page's own parseLiveCSV / resolveAnchors in Node)."""
+    import re, shutil, subprocess, json as _json
+    node = shutil.which("node")
+    if not node:
+        return "skipped (no node)"
+    src = (config.ROOT / "breadth" / "template.html").read_text()
+    def grab(name):
+        i = src.index(name)
+        depth, j = 0, src.index("{", i)
+        while True:
+            ch = src[j]
+            depth += ch == "{"
+            depth -= ch == "}"
+            j += 1
+            if depth == 0:
+                return src[i:j]
+    code = "\n".join([grab("function csvSplit("), src[src.index("const liveNum ="):src.index("\n", src.index("const liveNum ="))],
+                      grab("function parseLiveCSV("), grab("function parseAnchor("), grab("function resolveAnchors(")])
+    old = lambda t: f"{t}|5|9"                                             # undated legacy freeze from another day
+    today = lambda t: f"{t}|7|9|2026-10-26"
+    cases = {
+        "stuck": _sheet_csv("10/26/2026", 60, "2026-10-13 20:00", "2026-10-13 20:00", old),
+        "fresh": _sheet_csv("10/26/2026", 60, "2026-10-26 10:01", "2026-10-26 11:01", today),
+    }
+    backup = {"date": "2026-10-26", "at10": {"time": "2026-10-26 10:03", "rows": {f"T{k}": [3.0, 1] for k in range(60)}}}
+    js = code + f"""
+const C = {_json.dumps(cases)}, B = {_json.dumps(backup)};
+const out = {{}};
+for (const [k, txt] of Object.entries(C)) {{
+  const a = resolveAnchors(parseLiveCSV(txt), null), b = resolveAnchors(parseLiveCSV(txt), B);
+  out[k] = {{ none: [a.anchorSrc, a.anchors, a.rows.T1.at10, a.rows.T1.at11], backup: [b.anchorSrc, b.anchors, b.rows.T1.at10, b.rows.T1.at11] }};
+}}
+console.log(JSON.stringify(out));"""
+    r = subprocess.run([node, "-e", js], capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr[-800:]
+    o = _json.loads(r.stdout)
+    st = o["stuck"]
+    assert st["none"][0] == {"at10": "stale", "at11": "stale"} and st["none"][1] == {} and st["none"][2] is None, st["none"]
+    assert st["backup"][0]["at10"] == "backup" and st["backup"][2]["p"] == 3 and st["backup"][0]["at11"] == "stale" and st["backup"][3] is None
+    fr = o["fresh"]
+    assert fr["backup"][0] == {"at10": "sheet", "at11": "sheet"} and fr["backup"][2]["p"] == 7, fr      # today's sheet freeze wins over the backup
+    return "stale dropped, backup used, sheet preferred"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

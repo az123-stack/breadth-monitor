@@ -38,11 +38,21 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   reach the sheet on their own. D:I formulas (rows 4-3600) ask GOOGLEFINANCE for column C (`symbol`);
   marketcap/volumeavg only where index = 1, open skipped where index = 2 (Russell 2000 rows). Formulas run to row 3600; if the list passes ~3,590 rows, extend them.
   The page parser reads the header, so old 2-column sheets still work.
-  Columns J:K `at10` / `at11` (Oct 13) freeze each row as "TICKER|price|volume" at the first recalc after 10:00 / 11:00 ET, using
-  iterative calculation (File → Settings → Calculation, max 1 iteration — must stay ON) and self-referencing formulas; blank before
-  that time on weekdays, held overnight/weekends; a row whose ticker moved reads "TICKER|x" (page ignores it). J2/K2 hold the freeze
-  time ("yyyy-mm-dd hh:mm" ET). The sheet's timezone is America/Los_Angeles, so formulas use NOW()+3/24 for ET — if the sheet timezone
-  changes, fix those. Self-reference starts at 0, hence the OR(J4="",J4=0) checks.
+  Columns J:K `at10` / `at11` freeze each row at the first recalc after 10:00 / 11:00 ET on a weekday, using iterative calculation
+  (File → Settings → Calculation, max 1 iteration — must stay ON) and self-referencing formulas. **Date-stamped since Oct 26, 2026**:
+  rows hold "TICKER|price|volume|YYYY-MM-DD" and refreeze whenever the stored date isn't today (before 10:00 / weekends they keep the
+  last value; the page ignores any date that isn't the sheet's session). The original Oct 13 version only reset when the sheet
+  recalculated on a weekday BEFORE 10:00 ET, which it stopped doing, so the snapshot stayed stuck on Oct 13 until Oct 26 and the
+  Second-half movers card was empty. A row whose ticker moved reads "TICKER|x|date" (ignored). J2/K2 hold the freeze time
+  ("yyyy-mm-dd hh:mm" ET). The sheet's timezone is America/Los_Angeles, so formulas use NOW()+3/24 for ET — if the sheet timezone
+  changes, fix those. J4:K4 formulas are copied down to row 3600 (Sheets API copyPaste PASTE_FORMULA).
+  BACKUP (`breadth/anchors.py`, `.github/workflows/anchors.yml`): GitHub reads the published CSV at 10:00–10:45 / 11:00–11:45 ET and
+  saves docs/anchors.json {date, at10/at11: {time, rows: {T: [price, volume]}}, health}; dispatched by the Claude scheduled task
+  "Market Monitor · 10/11 snapshot kick" (10:02 + 11:02 ET Mon–Fri), crons as backup. Page (`fetchAnchors`, `resolveAnchors` in
+  fetchLive): per slot, today's sheet freeze if it has one, else the backup, else nothing — stale anchors are removed from every row
+  (`LIVE.anchorSrc`, `LIVE.anchorStale`), so the Read-out's `roLate` can't use old prices either. close.yml (4:25 PM) runs
+  `python -m breadth.anchors check` and fails red when neither source had a snapshot. Tests `test_anchor_backup_snapshot`,
+  `test_anchor_page_logic` (runs the page's parser in Node).
 
 ## Code map
 - `breadth/config.py` settings and thresholds · `massive.py` API client

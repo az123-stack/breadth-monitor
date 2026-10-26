@@ -1,0 +1,46 @@
+name: 10-11 snapshot
+
+# Saves every stock's price at 10:00 and 11:00 ET (docs/anchors.json) for the Second-half movers card, as a backup to the
+# Google Sheet's own at10 / at11 freeze columns (which stalled Oct 14-26, 2026). Started by a Claude scheduled task at
+# 10:02 and 11:02 ET on weekdays (GitHub fires cron late on this repo); the crons below are a backup. The script only
+# saves inside 10:00-10:45 / 11:00-11:45 ET and once per slot per day, so extra or late runs are harmless.
+on:
+  schedule:
+    - cron: "3,23 14,15,16 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "at10 or at11 (blank = by the clock)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: anchors
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Snapshot the live sheet
+        run: |
+          if [ -n "${{ inputs.slot }}" ]; then python -m breadth.anchors take --slot "${{ inputs.slot }}"; else python -m breadth.anchors take; fi
+      - name: Commit
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          git add docs/anchors.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -qm "Snapshot $(TZ=America/New_York date +%H:%M) ET"
+          for i in 1 2 3; do
+            git push -q && break
+            git pull -q --rebase -X theirs || { git rebase --abort; break; }
+          done

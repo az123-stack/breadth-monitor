@@ -28,10 +28,15 @@ jobs:
           python-version: "3.12"
       - name: Save closing prices from the live Google Sheet
         run: python -m breadth.story snapshot
+      - name: Check today's 10:00 / 11:00 snapshots (Second-half movers)
+        id: anchors
+        continue-on-error: true
+        run: python -m breadth.anchors check
       - name: Commit
         run: |
           git config user.name "breadth-bot"
           git config user.email "breadth-bot@users.noreply.github.com"
+          git add docs/anchors.json 2>/dev/null || true
           git add data/close_snapshot.csv
           if git diff --cached --quiet; then echo "no change"; exit 0; fi
           git commit -qm "Close snapshot $(TZ=America/New_York date +%Y-%m-%d)"
@@ -39,3 +44,8 @@ jobs:
             git push -q && break
             git pull -q --rebase -X theirs || { git rebase --abort; break; }
           done
+      - name: Fail loudly if the Second-half movers card had no snapshot today
+        if: steps.anchors.outcome == 'failure'
+        run: |
+          echo "::error::No 10:00 / 11:00 snapshot today from the sheet or the backup (see the check step above)."
+          exit 1

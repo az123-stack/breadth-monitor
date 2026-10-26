@@ -2388,13 +2388,45 @@ function parseLiveCSV(text) {
   if (m) spyDate = `${m[3]}-${m[1].padStart(2, "0")}-${m[2].padStart(2, "0")}`;
   return { prices, rows, spyTime, spyDate, asof, anchors };
 }
-// Sheet columns at10 / at11 freeze each row as "TICKER|price|volume" the first time the sheet recalculates after
-// 10:00 / 11:00 ET (blank before that on weekdays). A row whose ticker moved since then reads "TICKER|x" (ignored).
+// Sheet columns at10 / at11 freeze each row as "TICKER|price|volume|YYYY-MM-DD" the first time the sheet recalculates after
+// 10:00 / 11:00 ET on a weekday (Oct 26, 2026: date-stamped so a day the sheet didn't recalc early can't leave yesterday's
+// snapshot stuck). Older rows have no date ("TICKER|price|volume"). A row whose ticker moved reads "TICKER|x|..." (ignored).
 function parseAnchor(v, key) {
-  if (!v) return null; const [t, p, vol] = String(v).split("|");
+  if (!v) return null; const [t, p, vol, d] = String(v).split("|");
   if ((t || "").toUpperCase() !== key) return null;
   const px = liveNum(p); if (px == null || px <= 0) return null;
-  return { p: px, v: liveNum(vol) };
+  return { p: px, v: liveNum(vol), d: /^\d{4}-\d{2}-\d{2}$/.test(d || "") ? d : null };
+}
+// Keep only today's 10:00 / 11:00 snapshots (the session the sheet is showing). Source per slot: the sheet's own freeze when
+// it is from today, else the GitHub backup (docs/anchors.json). Stale anchors are removed from every row, so no card can use
+// an old snapshot (the Read-out's "after the morning" used the stuck Oct 13 prices without checking).
+let ANCH = null, ANCH_BUSY = false;
+async function fetchAnchors() {
+  if (ANCH_BUSY) return; ANCH_BUSY = true;
+  try { const r = await fetch("anchors.json?cb=" + Date.now(), { cache: "no-store" }); if (r.ok) ANCH = await r.json(); } catch (e) { /* optional backup */ }
+  ANCH_BUSY = false;
+}
+function resolveAnchors(L, B) {
+  if (!L) return L;
+  const day = L.spyDate, src = {}, stamps = {};
+  ["at10", "at11"].forEach(at => {
+    const st = L.anchors && L.anchors[at], sheetOk = !!(st && day && st.slice(0, 10) === day);
+    let n = 0;
+    Object.values(L.rows || {}).forEach(r => { const a = r[at];
+      if (!a) return;
+      if (!sheetOk || (a.d && a.d !== day)) r[at] = null; else n++; });
+    const b = B && day && B.date === day && B[at] && B[at].rows;
+    if (sheetOk && n >= 50) { src[at] = "sheet"; stamps[at] = st; return; }
+    if (b) {
+      Object.entries(L.rows || {}).forEach(([t, r]) => { const x = b[t]; r[at] = x && x[0] > 0 ? { p: x[0], v: x[1], d: day } : null; });
+      src[at] = "backup"; stamps[at] = B[at].time; return;
+    }
+    Object.values(L.rows || {}).forEach(r => { if (r[at]) r[at] = null; });
+    src[at] = st ? "stale" : "none"; if (st) stamps["stale_" + at] = st;
+  });
+  L.anchors = Object.fromEntries(Object.entries(stamps).filter(([k]) => !k.startsWith("stale_")));
+  L.anchorSrc = src; L.anchorStale = { at10: stamps.stale_at10, at11: stamps.stale_at11 };
+  return L;
 }
 
 async function fetchLive() {
@@ -2406,7 +2438,8 @@ async function fetchLive() {
     if (!r.ok) throw new Error("HTTP " + r.status);
     const parsed = parseLiveCSV(await r.text());
     if (!Object.keys(parsed.prices).length) throw new Error("no prices in sheet");
-    LIVE = { ...parsed, fetched: new Date() }; LIVE_ERR = null;
+    await fetchAnchors();
+    LIVE = resolveAnchors({ ...parsed, fetched: new Date() }, ANCH); LIVE_ERR = null;
     LIVE_T = liveActive() ? computeLive(DATA.themes, LIVE.prices, LIVE.spyDate) : null;
   } catch (e) { LIVE_ERR = String(e.message || e); }
   LIVE_BUSY = false;
@@ -3195,11 +3228,10 @@ function lateMoversCard(clk, pace) {
   bt.append(document.createTextNode(" "));
   bt.append(chips("Sort", [["move", "Biggest move"], ["adr", "Move in ADRs"], ["vol", "Volume since"]], ID, "ls", rerenderPanel));
   const body = sec.querySelector(".ibody"), A = (LIVE && LIVE.anchors) || {}, stamp = A[at];
+  const SRC = (LIVE && LIVE.anchorSrc) || {}, stale = ((LIVE && LIVE.anchorStale) || {})[at];
   const msg = (t) => { body.append($(`<p class="meta" style="margin:8px 0">${t}</p>`)); return sec; };
-  if (!LIVE.rows || !Object.values(LIVE.rows).some(r => r[at] !== undefined))
-    return msg(`The live sheet doesn't have the ${esc(at)} column yet, so there's no ${label} snapshot to compare against.`);
-  if (!stamp) return msg(clk.open && clk.mins < target ? `Starts at ${label} ET: the sheet freezes every stock's price then, and this card tracks what moves after it.`
-    : `No ${label} snapshot yet for today. The sheet takes it the first time it recalculates after ${label} ET (usually within a minute or two).`);
+  if (!stamp) return msg(clk.open && clk.mins < target ? `Starts at ${label} ET: every stock's price is frozen then (by the sheet, with a GitHub backup a couple of minutes later), and this card tracks what moves after it.`
+    : `No ${label} snapshot for today yet.${stale ? ` The sheet's own snapshot is from ${esc(stale)}, not today, so it's ignored.` : ""} The GitHub backup is taken at about ${label}–${at === "at11" ? "11:05" : "10:05"} ET and shows up here within a few minutes; if it's past ${at === "at11" ? "11:45" : "10:45"} ET and still empty, both sources missed today (the 4:25 PM check flags it).`);
   const aDate = stamp.slice(0, 10), [hh, mm] = stamp.slice(11, 16).split(":").map(Number), aMin = hh * 60 + mm - 570;
   if (!LIVE.spyDate || aDate !== LIVE.spyDate) return msg(`The ${label} snapshot (${esc(stamp)}) isn't from the session the sheet is showing (${esc(LIVE.spyDate || "?")}), so it's skipped. A fresh one is taken at ${label} ET on the next trading day.`);
   const late = aMin - target > 15;
@@ -3229,7 +3261,8 @@ function lateMoversCard(clk, pace) {
   const gtab = (title, rs) => `<div><h3 class="ih">${title}</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Group</th><th>Avg since ${label}</th><th>Up since</th></tr></thead><tbody>${rs.map(g => `<tr><td class="l">${esc(g.name)}</td><td class="num ${cls(g.avg)}">${pc(g.avg, 2)}</td><td class="num">${g.up}/${g.n}</td></tr>`).join("") || '<tr><td class="l meta" colspan="3">–</td></tr>'}</tbody></table></div></div>`;
   const upShare = L.rows.length ? L.rows.filter(x => x.rel > 0).length / L.rows.length : null;
   body.append($(`<div>
-    ${late ? `<div class="r2kwarn">⚠ The sheet took this snapshot at ${esc(stamp.slice(11, 16))} ET instead of ${label} (it only freezes prices when it recalculates), so moves are measured from ${esc(stamp.slice(11, 16))}.</div>` : ""}
+    ${late ? `<div class="r2kwarn">⚠ The ${SRC[at] === "backup" ? "backup" : "sheet"} took this snapshot at ${esc(stamp.slice(11, 16))} ET instead of ${label}, so moves are measured from ${esc(stamp.slice(11, 16))}.</div>` : ""}
+    <p class="meta" style="margin:4px 0">Snapshot: ${SRC[at] === "backup" ? `GitHub backup at ${esc(stamp.slice(11, 16))} ET${stale ? ` (the sheet's own one is stuck on ${esc(stale.slice(0, 10))})` : ""}` : `the sheet's freeze at ${esc(stamp.slice(11, 16))} ET`}.</p>
     <div class="igrid" style="margin:8px 0">${idx}
       <div class="itile"><small>Beating SPY since ${label}</small><b>${upShare == null ? "–" : Math.round(upShare * 100) + "%"}</b><span class="meta">${L.rows.length} stocks with a snapshot</span></div></div>
     <h3 class="ih">Catching a bid <small class="meta">up 1%+ since ${label} and beating SPY (${pc(L.spySince, 2)})</small></h3>
