@@ -1,218 +1,224 @@
 {
- "for_date": "2026-10-22",
- "written": "2026-10-23T11:24Z",
+ "for_date": "2026-10-23",
+ "written": "2026-10-26T11:20Z",
  "stocks": {
-  "SN": {
-   "why": "Hit new 52-week high Oct 13 with no fresh company news found; backdrop is the Aug 5 beat (rev +22%) with analyst PT raises. Q3 report Nov 4.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": "2026-11-04",
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/402373/sharkninja-announces-third-quarter-2026-earnings-release-and-conference-call-date",
-    "https://www.marketbeat.com/instant-alerts/price-sharkninja-nyse-sn-sets-new-52-week-high-heres-why-2026-10-13/"
-   ]
-  },
   "VEEV": {
-   "why": "Drifting higher since the Aug 26 beat-and-raise (+17% post-earnings drift); no fresh Oct catalyst found. Next report expected Nov 30 (unconfirmed by company).",
+   "why": "Still drifting up (~+17% since the Aug 26 beat-and-raise report); no fresh news found for this week.",
    "direction": "positive",
    "quality": "real",
    "depth": "full",
-   "earnings_date": null,
+   "earnings_date": "2026-11-30",
    "red_flags": [],
    "sources": [
     "https://www.earningswhispers.com/stocks/veev"
    ]
   },
-  "MPC": {
-   "why": "Refiners strong on wide refining margins; no stock-specific fresh news found. Q3 report expected ~Nov 3 (unconfirmed).",
-   "direction": "positive",
+  "EBAY": {
+   "why": "No fresh catalyst found; earnings report is due Oct 28 after the close (options imply about \u00b16%), inside the holding window.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": "2026-10-28",
+   "red_flags": [
+    "earnings inside 5 sessions"
+   ],
+   "sources": [
+    "https://unusualwhales.com/stock/EBAY/earnings"
+   ]
+  },
+  "CVI": {
+   "why": "Refiner moving with the sector; a Barchart headline points to a refining-margin collapse risk. No fresh company news read. Earnings Nov 3 before the open.",
+   "direction": "mixed",
    "quality": "weak",
+   "depth": "full",
+   "earnings_date": "2026-11-03",
+   "red_flags": [
+    "refining margin weakness (headline only)"
+   ],
+   "sources": [
+    "https://unusualwhales.com/stock/CVI/earnings",
+    "https://www.barchart.com/story/news/3511424/cvr-energy-s-refining-margin-collapse-tests-whether-the-balance-sheet-recovery-still-matters"
+   ]
+  },
+  "VLO": {
+   "why": "Refiner sympathy; its Q3 report was scheduled Oct 22 (already out) but the result was not readable, so no clear catalyst found in readable sources.",
+   "direction": "none",
+   "quality": "unknown",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://unusualwhales.com/stock/MPC/earnings"
+    "https://unusualwhales.com/stock/VLO/earnings"
    ]
   },
   "DINO": {
-   "why": "Refiner sympathy with margins; no stock-specific news found. Q3 report expected Oct 28 premarket (unconfirmed, inside 5 sessions).",
-   "direction": "mixed",
+   "why": "Refiner sympathy; earnings due Oct 28 before the open (options imply about \u00b110.8%), inside the holding window. No fresh company news read.",
+   "direction": "none",
    "quality": "weak",
    "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
+   "earnings_date": "2026-10-28",
+   "red_flags": [
+    "earnings inside 5 sessions"
+   ],
    "sources": [
     "https://unusualwhales.com/stock/DINO/earnings"
    ]
   },
-  "PBF": {
-   "why": "Refiner sympathy; no fresh stock-specific news found. Q3 results confirmed Oct 29, inside 5 sessions.",
-   "direction": "mixed",
-   "quality": "weak",
+  "ATRC": {
+   "why": "no clear catalyst found in readable sources; only older headlines (a 6% drop Oct 1, a post-July-earnings slide).",
+   "direction": "none",
+   "quality": "none",
    "depth": "full",
-   "earnings_date": "2026-10-29",
+   "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://finviz.com/news/396193/pbf-energy-to-release-third-quarter-2026-earnings-results"
+    "https://www.marketbeat.com/instant-alerts/price-atricure-nasdaq-atrc-stock-falls-62-time-to-sell-2026-10-01/"
    ]
   },
-  "CVI": {
-   "why": "Barchart piece flags a refining-margin collapse testing the balance-sheet recovery; no other fresh news found. Q3 report expected ~Nov 3 (unconfirmed).",
+  "GTLB": {
+   "why": "no clear catalyst found in readable sources.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://stockanalysis.com/stocks/gtlb/history/"
+   ]
+  },
+  "HTFL": {
+   "why": "Rose 9% on Oct 20 after Piper Sandler raised its target to $64 (from $45, Overweight), citing its moat; backed by Q2 revenue +48% and raised 2026 guidance.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": "2026-11-12",
+   "red_flags": [],
+   "sources": [
+    "https://www.quiverquant.com/news/Heartflow+climbs+as+price-target+hike+adds+to+momentum"
+   ]
+  },
+  "INTA": {
+   "why": "no clear catalyst found in readable sources; earnings Nov 3.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": "2026-11-03",
+   "red_flags": [],
+   "sources": [
+    "https://unusualwhales.com/stock/INTA/earnings"
+   ]
+  },
+  "MPC": {
+   "why": "Refiner sympathy; no clear catalyst found in readable sources.",
+   "direction": "none",
+   "quality": "weak",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/MPC"
+   ]
+  },
+  "NTRA": {
+   "why": "An analyst price-target raise to $500 was reported Oct 19; a Barchart piece discusses a guidance reset. Details not readable.",
    "direction": "mixed",
    "quality": "weak",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "refining margin pressure noted by Barchart"
+    "guidance reset (headline only)"
    ],
    "sources": [
-    "https://www.barchart.com/story/news/3511424/cvr-energy-s-refining-margin-collapse-tests-whether-the-balance-sheet-recovery-still-matters",
-    "https://unusualwhales.com/stock/CVI/earnings"
+    "https://www.marketbeat.com/instant-alerts/analyst-natera-nasdaq-ntra-price-target-raised-to-50000-2026-10-19/",
+    "https://www.barchart.com/story/news/3676416/natera-s-guidance-reset-could-finally-align-expectations-with-reality"
    ]
   },
-  "PSX": {
-   "why": "Refiner sympathy; no stock-specific news found. Q3 report expected Oct 28 premarket (unconfirmed, inside 5 sessions).",
-   "direction": "mixed",
+  "NTSK": {
+   "why": "Up 5.5% on Oct 21 on below-average volume with no stated cause; Wells Fargo raised its target to $22 (Overweight) on Oct 15. Next earnings date not found.",
+   "direction": "positive",
    "quality": "weak",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://unusualwhales.com/stock/PSX/earnings"
+    "https://www.marketbeat.com/instant-alerts/price-netskope-nasdaq-ntsk-stock-jumps-55-whats-next-2026-10-21/"
    ]
   },
-  "ABNB": {
-   "why": "no clear catalyst found; limited news retrieved. Q3 report confirmed Nov 5 after close.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": "2026-11-05",
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/397976/airbnb-to-announce-third-quarter-2026-results"
-   ]
-  },
-  "CDNA": {
-   "why": "no clear catalyst found; limited news retrieved. Q3 report confirmed Oct 29, inside 5 sessions.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": "2026-10-29",
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/403261/caredx-to-report-third-quarter-2026-financial-results-on-october-29-2026"
-   ]
-  },
-  "FTRE": {
-   "why": "no clear catalyst found; limited news retrieved. Q3 report confirmed Oct 29 premarket, inside 5 sessions.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": "2026-10-29",
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/398507/fortrea-announces-date-for-third-quarter-2026-financial-results-and-conference-call"
-   ]
-  },
-  "IOVA": {
-   "why": "no clear catalyst found; limited news retrieved; next earnings date not confirmed.",
+  "OVV": {
+   "why": "no clear catalyst found in readable sources.",
    "direction": "none",
    "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://therighttrader.com/earnings-calendar/iova"
-   ]
-  },
-  "KNSA": {
-   "why": "no clear catalyst found; limited news retrieved; next earnings date not confirmed.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://beta.earningswhispers.com/go/w/KNSA"
-   ]
-  },
-  "NHC": {
-   "why": "no clear catalyst found; limited news retrieved; next earnings date not confirmed (Q2 reported Aug 7).",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://secure.businesswire.com/news/home/20260807142918/en/NHC-Reports-Second-Quarter-2026-Earnings"
+    "https://www.earningswhispers.com/stocks/ovv"
    ]
   },
   "PACS": {
-   "why": "no clear catalyst found; limited news retrieved; next earnings date not confirmed.",
+   "why": "no clear catalyst found in readable sources; earnings Nov 18.",
    "direction": "none",
    "quality": "none",
    "depth": "full",
-   "earnings_date": null,
+   "earnings_date": "2026-11-18",
    "red_flags": [],
    "sources": [
-    "https://beta.earningswhispers.com/go/w/PACS"
+    "https://unusualwhales.com/stock/PACS/earnings"
    ]
   },
-  "QLYS": {
-   "why": "Raised 2026 revenue guidance to $732-738M with Q2 (Aug 4); no fresh Oct news found. Next earnings date not confirmed.",
-   "direction": "positive",
-   "quality": "real",
+  "PSX": {
+   "why": "Refiner sympathy; no clear catalyst found in readable sources.",
+   "direction": "none",
+   "quality": "weak",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://startupmap.iamsterdam.com/news/feed/qualys-raises-2026-revenue-guidance-to-732m--738m-on-11-q2-growth"
+    "https://www.marketbeat.com/instant-alerts/phillips-66-nysepsx-announces-quarterly-earnings-results-beats-estimates-by-191-eps-2026-08-05/"
    ]
   },
-  "ROIV": {
+  "PTEN": {
    "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": "2026-11-09",
-   "red_flags": [],
-   "sources": [
-    "https://www.biopharmawatch.com/news/ROIV/roivant-financial-results-business-update-november-2026"
-   ]
-  },
-  "SAIC": {
-   "why": "earnings date check only; next date not found",
    "direction": "none",
    "quality": "unknown",
    "depth": "earnings_only",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://bullstory.io/en/stocks/saic/earnings/2027-q3"
+    "https://therighttrader.com/earnings-calendar/pten"
    ]
   },
-  "SLDE": {
+  "QLYS": {
    "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": "2026-10-27",
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/398043/slide-to-report-2026-third-quarter-earnings-results-on-october-27-2026"
-   ]
-  },
-  "VLO": {
-   "why": "earnings date check only; Q3 reported Oct 22, next date not found",
    "direction": "none",
    "quality": "unknown",
    "depth": "earnings_only",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://finviz.com/news/389791/valero-energy-corporation-to-announce-third-quarter-2026-earnings-results-on-october-22-2026"
+    "https://www.marketbeat.com/stocks/NASDAQ/QLYS/earnings"
+   ]
+  },
+  "RBRK": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.marketbeat.com/stocks/NYSE/RBRK/earnings"
+   ]
+  },
+  "ZBRA": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.marketbeat.com/stocks/NASDAQ/ZBRA/earnings"
    ]
   }
  }
