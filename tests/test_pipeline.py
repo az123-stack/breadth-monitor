@@ -1472,6 +1472,38 @@ def _sheet_csv(day_mdY, rows=120, stamp10="", stamp11="", anchor=lambda t: ""):
     return "\n".join(lines) + "\n"
 
 
+def test_theme_lifecycle():
+    """Theme lifecycle: a group climbing with its members becomes ready (stage 3/4, leaders, inflow); BUY waits when breadth is
+    weak and turns on when it isn't; stages for past days never change when later days are added (no look-ahead)."""
+    from breadth import lifecycle as LC
+    days = pd.bdate_range("2025-01-02", periods=260)
+    n = len(days)
+    rng = np.random.default_rng(7)
+    cols, members = {}, {}
+    for g, drift in (("Hot", 0.004), ("Flat", 0.0), ("Cold", -0.002), ("Mid", 0.001), ("Dull", 0.0005)):
+        members[g] = []
+        for k in range(4):
+            t = f"{g[:2].upper()}{k}"
+            r = drift + rng.normal(0, 0.008, n)
+            if g == "Hot":
+                r[:120] = rng.normal(0, 0.008, 120)       # forgotten first, then it goes
+            cols[t] = 50 * np.cumprod(1 + r)
+            members[g].append(t)
+    cols["SPY"] = 400 * np.cumprod(1 + rng.normal(0.0003, 0.006, n))
+    close = pd.DataFrame(cols, index=days)
+    vol = pd.DataFrame(1e6, index=days, columns=close.columns) * (1 + (close.pct_change().fillna(0) > 0))   # heavier on up days
+    hist = lambda r10: pd.DataFrame({"ratio5": r10, "ratio10": r10, "complete": True}, index=days)
+    G = LC.group_state(close, vol, members, hist(0.8))
+    assert bool(G["ready"]["Hot"].iloc[-1]) and int(G["stage"]["Hot"].iloc[-1]) in (3, 4), G["stage"]["Hot"].iloc[-5:]
+    assert not bool(G["buy"]["Hot"].iloc[-1])                     # weak breadth: ready, not BUY
+    G2 = LC.group_state(close, vol, members, hist(1.6))
+    assert bool(G2["buy"]["Hot"].iloc[-1]) and bool(G2["act"].iloc[-1])
+    assert not bool(G2["buy"]["Cold"].iloc[-1])
+    Gs = LC.group_state(close.iloc[:200], vol.iloc[:200], members, hist(1.6).iloc[:200])
+    assert (Gs["stage"].iloc[:200] == G2["stage"].iloc[:200]).all().all()        # no look-ahead
+    assert (Gs["buy"].iloc[:200] == G2["buy"].iloc[:200]).all().all()
+
+
 def test_anchor_backup_snapshot():
     """Second-half movers backup (Oct 26 2026: the sheet's 10:00 freeze stuck on Oct 13 for two weeks): take() saves a slot
     only inside its window, once a day, only for today's session; check() flags a day with neither source."""

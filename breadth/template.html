@@ -3325,6 +3325,14 @@ function roGroups(live) {
   let rows = X.rows || [], d1 = (X.day1 || {}).rows || [], near = [];
   if (live) { const G = ignLiveGroups(X); if (G) { rows = liveIgnition(X, G) || rows; const d = liveDay1(X, G); if (d) { d1 = d; near = d.near || []; } } }
   const pc = pcI, out = [], FT = ((X.day1 || {}).rules || {}).ft || 3;
+  const LC = (DATA.themes || {}).lifecycle;
+  if (LC) {   // theme lifecycle signals (lifecycle.py): BUY / ready groups with their first tickers, new WATCH groups
+    const rd = (LC.rows || []).filter(r => r.ready), wn = (LC.rows || []).filter(r => r.watch && r.new);
+    const tk = (r) => (r.picks || []).slice(0, 2).map(p => `${p.t} (${p.entry === "pullback" ? "pullback, over $" + p.trigger : p.entry})`).join(", ");
+    if (rd.length) out.push(`${LC.size === "hold off" ? "⏸ <b>Theme BUYs on hold</b> (breadth weak, 10-day ratio " + (LC.ratio10 ?? "–") + "). Ready:" : `🟢 <b>Theme BUY${LC.size === "half" ? " · half size" : ""}:</b>`} ${rd.slice(0, 5).map(r => `<b>${roNm(r.g)}</b>${r.new ? " (new)" : ""}${(r.picks || []).length ? " → " + tk(r) : ""}`).join(" · ")}`);
+    if (wn.length) out.push(`👀 <b>New WATCH:</b> ${wn.slice(0, 5).map(r => `${roNm(r.g)} (${esc(r.stage)})`).join(", ")} <span class="meta">· line up the names; about half turn into a BUY</span>`);
+    if (rd.length || wn.length) out.push(`<span class="meta">${roGo("best", "Theme lifecycle card")}</span>`);
+  }
   const ign = rows.filter(r => r.status === "ignition");
   ign.forEach(r => out.push(`🔥 <b>${roNm(r.g)}</b> ${r.ago === 0 ? (live ? (nyClock().open ? "is igniting today" : "ignited today (close estimate)") : "ignited at the close") : `ignited ${r.ago} session${r.ago > 1 ? "s" : ""} ago (${pc(r.since, 1)} vs SPY since)`} · <b>Grade ${roGrade(r, X.act)}</b>${r.lead && r.lead.ok ? " · ★ has leaders" : ""}${r.stocks && r.stocks.length ? ` · leaders ${r.stocks.slice(0, 3).map(s => s.t).join(", ")}` : ""}`));
   d1.forEach(r => out.push(r.ago === 0 ? `🟢 <b>${roNm(r.g)}</b>: Day 1 ${live ? "today" : "at the close"} (${pc(r.r1, 1)} vs SPY on ${r.rv ? r.rv.toFixed(1) + "×" : "–"} volume). Watch the next ${FT} sessions.`
@@ -4530,6 +4538,7 @@ function renderBest(app) {
   if (!X) { app.append($('<div class="card empty">Best Setups appear after the next data run.</div>')); return; }
   app.append(liveBar());
   if (L) app.append(launchPicksCard(L));
+  if (T.lifecycle) app.append(lifecycleCard(T.lifecycle));
   const ls = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
   const ss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storage off */ } };
   UI.best = UI.best || { nz: ls("bestNz", "nuzzle"), more: false };
@@ -4600,6 +4609,68 @@ function renderBest(app) {
   s3.querySelector(".b3").addEventListener("click", () => dl("Best setups - high tight flags", flags));
   app.append(s3);
   app.append($(`<p class="meta" style="padding:0 4px 12px">Information only: the headline picks (top) are the Launch picks and their live tracker. Research card R-2026-10-25-polished-setups.</p>`));
+}
+/* ---------- Theme lifecycle (lifecycle.py): stage of every sub-theme, WATCH / BUY signals, tickers to buy (Adam, Oct 27 2026) ---------- */
+function lifecycleCard(X) {
+  if (!X) return $('<div></div>');
+  const ls = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+  const ss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storage off */ } };
+  UI.life = UI.life || { show: ls("lifeShow", "signals") };
+  const U = UI.life, E = X.evidence || {}, D20 = E.d20 || {}, D40 = E.d40 || {}, SE = X.stock_evidence || {};
+  const pp = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const R = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + v.toFixed(2) + "R";
+  const rows = X.rows || [], ready = rows.filter(r => r.ready), watch = rows.filter(r => r.watch);
+  const B = D20.buy || {}, BW = D20.ready_weak || {}, W = D20.watch || {}, WB = E.watch_to_buy || {};
+  const STAGE_CLS = { "Forgotten": "unproven", "First push": "selective", "Ignition": "selective", "Quiet build": "focus", "Blossom": "focus", "Fading": "avoid" };
+  const gate = X.size === "full" ? `<div class="rbanner act"><b>BUY is on, full size.</b> Breadth has been strong in the last 15 sessions (10-day ratio ${X.ratio10 ?? "–"} now). Buy groups earned ${pp((D20.buy_act || {}).xs)} vs the average group over 20 sessions in that state.</div>`
+    : X.size === "half" ? `<div class="rbanner watch"><b>BUY is on, half size.</b> Breadth is mixed (10-day ratio ${X.ratio10 ?? "–"}, no strong reading in 15 sessions). Buy groups still beat the average group (${pp((D20.buy_noact || {}).xs)} over 20 sessions) but less reliably.</div>`
+    : `<div class="rbanner watch" style="background:color-mix(in srgb, var(--critical) 12%, transparent);border-color:var(--critical)"><b>Hold off: breadth is weak</b> (10-day ratio ${X.ratio10 ?? "–"} under 1). The groups below are <b>ready</b>, but in weak breadth the same setup earned ${pp(BW.xs)} with no reliable edge (t ${BW.t ?? "–"}, halves ${pp(BW.h1)} / ${pp(BW.h2)}). BUY turns on when the 10-day ratio is back over 1; line up the names now.</div>`;
+  const alerts = (X.alerts || []);
+  const alertStrip = alerts.length ? `<div class="note" style="padding:6px 0 2px"><b>New in the last ${(X.cfg || {}).new_days || 3} sessions:</b> ${alerts.map(a => `<span class="tg ${a.kind === "watch" ? "sow-riding" : "sow-breakout"}">${a.kind === "buy" ? "BUY" : a.kind === "ready" ? "READY" : "WATCH"}</span> ${esc(a.g)} <small class="meta">(${esc(a.stage)}, day ${a.days})</small>`).join(" · ")}</div>` : "";
+  const ENTRY = { pullback: ["Pullback", "sow-nuzzle"], flag: ["Flag", "sow-breakout"], curl: ["Curl", "sow-pop"], near: ["Near the EMAs", "sow-riding"], extended: ["Extended", "sow-extended"] };
+  const pick = (p) => `<tr><td class="l"><b>${p.t}</b>${p.earn ? `<small class="meta" style="display:block">earnings ${shortDate(p.earn)}</small>` : ""}</td>
+    <td class="l"><span class="tg ${ENTRY[p.entry][1]}">${ENTRY[p.entry][0]}</span></td>
+    <td class="num">${p.trigger != null ? "$" + p.trigger : "–"}</td><td class="num">${p.stop != null ? "$" + p.stop : "–"}</td>
+    <td class="num ${rsTint(p.rs)}">${p.rs ?? "–"}</td><td class="num">${p.vs21 == null ? "–" : (p.vs21 >= 0 ? "+" : "") + p.vs21}</td><td class="num">${p.adr ?? "–"}</td>
+    <td class="l" style="min-width:220px"><small>${esc(p.plan)}</small></td></tr>`;
+  const groupBlock = (r, kind) => `<div class="lcg" style="border-top:1px solid var(--border);padding:10px 0 4px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:baseline">
+      <span class="tg ${kind === "watch" ? "sow-riding" : r.buy ? "sow-breakout" : "sow-pop"}">${kind === "watch" ? (r.hot ? "WATCH · ignited" : "WATCH") : r.buy ? "BUY" : "READY"}</span>
+      <b>${esc(r.g)}</b><span class="meta">${esc(r.sector || "")}</span>
+      <span class="pbv ${STAGE_CLS[r.stage] || "unproven"}">${esc(r.stage)} · day ${r.stage_days}</span>
+      <span class="meta">Strength ${r.strength ?? "–"}${r.s_rank ? " (#" + r.s_rank + ")" : ""} · ${r.new ? "<b>new</b> · " : ""}on ${r.on_days} session${r.on_days === 1 ? "" : "s"}</span></div>
+    <div class="meta" style="font-size:12px;margin:3px 0 4px">${(r.why || []).map(esc).join(" · ")}</div>
+    ${(r.picks || []).length ? `<div class="scroll"><table class="grid"><thead><tr><th class="l">Ticker</th><th class="l">Entry</th><th>Buy over</th><th>Stop</th><th>RS</th><th>vs 21 EMA<small>ADRs</small></th><th>ADR %</th><th class="l">Plan</th></tr></thead><tbody>${r.picks.map(pick).join("")}</tbody></table></div>`
+      : `<p class="meta" style="margin:2px 0">No member at a buyable spot today${(r.wait || []).length ? "" : " (none liquid with RS 70+)"}.</p>`}
+    ${(r.wait || []).length ? `<p class="meta" style="margin:4px 0 0">Wait for a pullback: ${r.wait.map(w => `<b>${w.t}</b> (RS ${w.rs}, ${w.vs21 >= 0 ? "+" : ""}${w.vs21} ADRs over the 21 EMA)`).join(", ")}</p>` : ""}</div>`;
+  const evRow = (k, label) => { const a = D20[k] || {}, b = D40[k] || {}; return `<tr><td class="l">${label}</td><td class="num">${a.n ?? "–"}</td><td class="num ${a.xs > 0 ? "g1" : a.xs < 0 ? "r1" : ""}"><b>${pp(a.xs)}</b></td><td class="num">${a.t ?? "–"}</td><td class="num">${pp(a.h1)} / ${pp(a.h2)}</td><td class="num">${a.win == null ? "–" : Math.round(a.win * 100) + "%"}</td><td class="num">${pp(b.xs)}</td></tr>`; };
+  const counts = (X.stages || []).map(s => `<span class="meta">${esc(s.name)} <b>${(X.counts || {})[s.k] ?? 0}</b></span>`).join(" · ");
+  const sec = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv ${B.t >= 2 && B.h1 > 0 && B.h2 > 0 ? "focus" : "unproven"}">${B.t >= 2 && B.h1 > 0 && B.h2 > 0 ? "Tested" : "Unproven"}</span> Theme lifecycle · Watch → Buy <span class="meta">· ${shortDate(X.date)} close</span></h2>
+      <div class="tsbtns"><button class="lcdl">⬇ TradingView</button></div></div>
+    <p class="note" style="padding:4px 0 0">Every sub-theme is placed in a stage of the blossoming-theme lifecycle. <b>WATCH</b> = a first push or ignition with leaders present: line up the names (about ${WB.rate == null ? "half" : Math.round(WB.rate * 100) + "%"} turn into a BUY within ${WB.within || 30} sessions; on their own they don't beat the average group yet). <b>BUY</b> = quiet build or blossom + leaders + money flow confirmed or steady, in breadth that isn't weak. Tickers = members with RS 70+ at a buyable spot, best entry first.</p>
+    ${gate}${alertStrip}
+    <div class="filters" style="margin:8px 0 4px"></div><div class="lcbody"></div>
+    <details class="kqsec" style="margin-top:8px"><summary><b>What the test said</b> · ${esc(E.from || "")} to ${esc(E.to || "")}, ${E.groups || "–"} sub-themes, group vs the average group</summary>
+      <div class="scroll"><table class="grid" style="margin-top:6px"><thead><tr><th class="l">State</th><th>Signals<small>one per 20 sessions</small></th><th>Next 20 sessions<small>vs avg group</small></th><th>t</th><th>Halves</th><th>Beat</th><th>Next 40</th></tr></thead><tbody>
+      ${evRow("buy", "<b>BUY</b> (any breadth but weak)")}${evRow("buy_act", "BUY · breadth strong in 15 sessions (full size)")}${evRow("buy_noact", "BUY · mixed breadth (half size)")}${evRow("ready_weak", "Ready but breadth weak (hold off)")}${evRow("stage34_not_buy", "Build / blossom without leaders or inflow")}${evRow("watch", "<b>WATCH</b> (push / ignition + leaders)")}
+      ${(X.stages || []).map(s => evRow(s.k, "Stage · " + esc(s.name))).join("")}</tbody></table></div>
+      <p class="meta" style="margin:6px 0 0">Pullback entries (low into the 9/21 EMA ribbon, bought next open, stop 1 ADR, 20 sessions) in BUY groups: <b>${R((SE.buy || {}).R)}</b> a trade (n ${(SE.buy || {}).n ?? "–"}, halves ${R((SE.buy || {}).h1)} / ${R((SE.buy || {}).h2)}) vs ${R((SE.watch || {}).R)} in WATCH groups and ${R((SE.other || {}).R)} elsewhere; edge ${R(SE.edge)} (t ${SE.t ?? "–"}). Only ${(SE.buy || {}).win == null ? "–" : Math.round(SE.buy.win * 100) + "%"} win: the stop gets hit often and the winners pay for it.</p>
+      <p class="meta" style="margin:4px 0 0">Stages today: ${counts}. Two years of data, mostly a bull market; information only, never re-ranks the picks. Research card R-2026-10-27-theme-lifecycle.</p></details></section>`);
+  const fl = sec.querySelector(".filters"), body = sec.querySelector(".lcbody");
+  const draw = () => {
+    const parts = [];
+    if (U.show !== "watch") parts.push(`<div class="kicker" style="margin-top:6px">${X.size === "hold off" ? "Ready · waiting on breadth" : "BUY"} (${ready.length})</div>` + (ready.map(r => groupBlock(r, "buy")).join("") || '<p class="meta">No group passes the BUY rule today.</p>'));
+    if (U.show !== "buy") parts.push(`<div class="kicker" style="margin-top:10px">WATCH (${watch.length})</div>` + (watch.map(r => groupBlock(r, "watch")).join("") || '<p class="meta">No group on watch today.</p>'));
+    body.innerHTML = parts.join("");
+  };
+  fl.append(chips("Show", [["signals", `Buy + Watch`], ["buy", `Buy (${ready.length})`], ["watch", `Watch (${watch.length})`]], U, "show", () => { ss("lifeShow", U.show); draw(); }));
+  sec.querySelector(".lcdl").addEventListener("click", () => tsDownload("theme-lifecycle", [
+    { name: "Theme lifecycle - BUY / ready", ticks: ready.flatMap(r => (r.picks || []).map(p => p.t)) },
+    { name: "Theme lifecycle - wait for pullback", ticks: ready.flatMap(r => (r.wait || []).map(p => p.t)) },
+    { name: "Theme lifecycle - WATCH", ticks: watch.flatMap(r => (r.picks || []).map(p => p.t)) }]));
+  draw();
+  return sec;
 }
 /* ---------- Launch picks (launch.select): the headline recommendations + live tracker (Adam, Oct 25 2026) ---------- */
 function launchPicksCard(L) {

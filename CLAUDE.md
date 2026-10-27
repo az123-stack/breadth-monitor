@@ -493,6 +493,23 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   high 3–15 sessions ago, flag low = lowest low SINCE the high via sliding windows, depth ≤ 25% and ≤ 3 ADR, 5-day range ≤ 2 ADR,
   close within 1 ADR of the high, above 21 EMA, RS 70+). Evidence (backtest uses the prior week's group rank): nuzzle lead +0.19R vs
   rest, t 2.57, halves +0.23/+0.15 (proven); flags lead +0.12R, edge t 2.96, halves +0.29/−0.04 (unproven). ~10 s per build.
+- `lifecycle.py` **Theme lifecycle · Watch → Buy** (Oct 27, 2026; Adam: "trigger a watch for a buy on a theme, activate a buy, and
+  recommend which tickers"; from the "Anatomy of a Blossomed Theme" doc; card R-2026-10-27-theme-lifecycle, layer `lifecycle`, info, never
+  touches picks) → `DATA.themes.lifecycle`, `lifecycleCard` right under the Launch picks on the Best Setups tab + lines at the top of the
+  Read-out group signals (`roGroups`). Reuses `rotation.group_frames` / `flow_frames` / `ignition_frames` on the sub-theme members (~3 s).
+  Stages per day (`group_state`, priority blossom > fade > build > ignition > push > forgotten; `CFG`): forgotten rk60 ≤ 0.2 · push = RS-rank
+  +30 pts in 10 from rk60 < 0.5 or 3/4 ignition checks · ignition in 10 sessions · build rk60 ≥ 0.6, within 15% of the 60-day high,
+  inflow tier or trend 12/20 · blossom rk60 ≥ 0.8, within 3%, ignition in 40 or confirmed · fade = was rk60 ≥ 0.8 in 40, fading/outflow,
+  breadth < 50% (rk60 = percentile of 60-day relative return). `ready` = build/blossom + leaders (`ignition_frames` lead) + confirmed/steady;
+  `buy` = ready and ratio10 ≥ 1; size full when `act` (ratio10 ≥ 1.5 in 15 sessions) else half; weak → "hold off" (card banner).
+  `watch` = push/ignition + leaders, not ready (`hot` = ignition). Picks (`picks`): members $10+, $20M+/day, RS 70+: pullback (low into the
+  9/21 ribbon in the last 3 sessions, buy over the day's high, stop the low ≤ 1 ADR) > flag (polished flags pivot/stop) > curl (Launch
+  A/B curl/early) > near (within 1 ADR above the ribbon); > 2 ADRs over the 21 EMA → `wait`; earnings date from docs/agent/catalysts.json.
+  Rows only for staged/ready/watch groups; `alerts` = ready/watch that started within 3 sessions. Evidence each build: `evidence.d20/d40`
+  per stage / buy / watch / buy_act / buy_noact / ready_weak / stage34_not_buy, `watch_to_buy`, `stock_evidence` (ribbon pullbacks by
+  group state, 1-ADR stop, 20 sessions). Oct 27: BUY +2.7% vs avg group 20d (t 3.5, halves +2.8/+2.9), 40d +3.9%; weak breadth ≈ 0;
+  WATCH ≈ 0, 53% turn BUY in 30 sessions; pullbacks in BUY groups +0.74R vs +0.27R (edge +0.31R, t 2.2); stage alone: blossom +3.0%
+  (t 3.6), push −0.8%, forgotten −0.65%. Test `test_theme_lifecycle` (gating + no look-ahead).
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

@@ -468,6 +468,20 @@
     "R-2026-10-25-polished-setups"
    ],
    "notes": "nuzzle in leading groups +0.19R vs rest, t 2.57, both halves (passes); flags edge t 2.96 but 2nd half -0.04R (fails); recomputed each build"
+  },
+  {
+   "id": "lifecycle",
+   "name": "Theme lifecycle: stage per sub-theme, WATCH / BUY signals, tickers to buy",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "breadth/lifecycle.py → DATA.themes.lifecycle → Best Setups tab (lifecycleCard) + Read-out group signals",
+   "what": "Stages forgotten / first push / ignition / quiet build / blossom / fading from 60-day rank, 60-day high, ignition, money-flow tiers; WATCH = push or ignition with leaders; BUY = build or blossom + leaders + confirmed/steady flow, breadth not weak (full size when the 10-day ratio hit 1.5 in 15 sessions); tickers = RS 70+ members at a pullback / flag / curl",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-27-theme-lifecycle"
+   ],
+   "notes": "BUY groups +2.7% vs avg group over 20 sessions (t 3.5, halves +2.8/+2.9), 40d +3.9%; same setup in weak breadth ~0 (t -0.5); WATCH ~0 but 53% turn BUY within 30 sessions; pullbacks in BUY groups +0.74R vs +0.27R elsewhere (edge +0.31R, t 2.2, both halves); recomputed each build"
   }
  ]
 }
