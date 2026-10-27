@@ -611,8 +611,9 @@ function render() {
   const tso = app.querySelector(".tsopen"); if (tso) tso.addEventListener("click", () => {
     const X = DATA.themes.trade_setups, P = DATA.themes.playbook || {};
     const rank = Object.fromEntries((P.rows || []).map(r => [r.key, r.rank]));
-    const picks = (P.picks || []).map(c => c.t);
-    tsDownload("trade-setups", [...(picks.length ? [{ name: "Today's top picks", ticks: picks }] : []),
+    const picks = [...launchPickSet()], lu = lineupNow();
+    tsDownload("trade-setups", [...(picks.length ? [{ name: "Launch picks", ticks: picks }] : []),
+      ...(lu.length ? [{ name: "Lined-up buys - triggered / in the EMAs", ticks: lu.map(r => r.t) }] : []),
       ...X.setups.slice().sort((a, b) => (rank[a.key] || 9) - (rank[b.key] || 9)).map(s => ({ name: s.name, ticks: s.top })),
       ...(DATA.themes.hve ? [{ name: "Record volume - up days (warning list)", ticks: DATA.themes.hve.rows.filter(r => r.chg > 0).map(r => r.t) },
         { name: "Record volume - down days", ticks: DATA.themes.hve.rows.filter(r => r.chg < 0).map(r => r.t) },
@@ -3198,7 +3199,7 @@ function lateMovers(at, withR2K) {
   (T.stocks || []).filter(s => s.is_stock).forEach(s => { pool[s.t] = { t: s.t, sub: s.sub, adr: s.adr, rsr: s.rsr, avg: s.v50, ours: true }; });
   ["SPX", "NDX"].concat(withR2K ? ["R2K"] : []).forEach(k => ((I.members || {})[k] || []).forEach(([t, sector]) => { if (!pool[t]) pool[t] = { t, sub: sector, idx: k }; }));
   const spy = liveRow("SPY"), spyA = spy && spy[at], spySince = spyA ? spy.price / spyA.p - 1 : 0;
-  const X = (T.trade_setups || {}).rows || {}, picks = new Set(((T.playbook || {}).picks || []).map(c => c.t));
+  const X = (T.trade_setups || {}).rows || {}, picks = launchPickSet();
   const out = [];
   Object.values(pool).forEach(x => {
     const r = liveRow(x.t); if (!r || !r[at] || !(r.price >= 5)) return;
@@ -3209,6 +3210,26 @@ function lateMovers(at, withR2K) {
       mine: picks.has(x.t) ? "pick" : X[x.t] ? "setup" : "" });
   });
   return { rows: out, spySince };
+}
+/* Top late mover (Adam, Oct 27 2026; card R-2026-10-27-late-mover, tools/late_mover/study.py, 15-min bars Oct 2024–Oct 2026).
+   Rule tested best: at 12:00 ET, among RS 80+ stocks in a leading sub-theme (top third on 13 weeks) that are up 1%+ since 10:00
+   and beating SPY, the highest RS. 5-day hold +0.21R (vs +0.15R over the average stock, halves +0.15/+0.15, t 1.3: not proven).
+   As a day trade nothing worked (top move ≈ 0R after costs, next day ≈ 0). Watch line only. */
+const LATE_EV = { r5: 0.21, edge: 0.15, t: 1.3, n: 431 };
+function lateLeader(clk) {
+  const A = (LIVE && LIVE.anchors) || {};
+  if (!A.at10 || !LIVE || !LIVE.spyDate || A.at10.slice(0, 10) !== LIVE.spyDate) return "";
+  const lead = new Set((((DATA.themes || {}).polished || {}).groups || []).map(g => g.sub));
+  const before = clk && clk.open && clk.mins < 150;
+  const L = lateMovers("at10", false);
+  const c = L.rows.filter(x => x.ours && (x.rsr || 0) >= 80 && lead.has(x.sub) && x.since >= 0.01 && x.rel > 0 && x.r.price >= 5 && (!x.avg || x.avg * x.r.price >= 20e6))
+    .sort((a, b) => (b.rsr - a.rsr) || (b.since - a.since));
+  const pc = (v) => (v > 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const top = c[0];
+  const ev = `Tested on 2 years of 15-minute bars: held 5 sessions this made ${"+" + LATE_EV.r5.toFixed(2)}R a trade (${"+" + LATE_EV.edge.toFixed(2)}R better than the average stock, t ${LATE_EV.t}: not proven); as a same-day or next-day trade it made about nothing. Buying the BIGGEST mover did worse. Watch list, not a buy signal.`;
+  return `<div class="rbanner watch" style="margin:6px 0"><span class="pbv unproven">Unproven</span> <b>Top late mover${before ? " (picked at 12:00 ET)" : ""}:</b> ${before ? "the rule picks at 12:00 ET, once the morning has settled." : top
+    ? `<b>${top.t}</b> <small class="meta">${esc(top.sub || "")}</small> · RS ${top.rsr} · ${pc(top.since)} since 10:00 (SPY ${pc(L.spySince)}) · day ${pc(top.r.chg)}${c.length > 1 ? ` · next: ${c.slice(1, 4).map(x => `${x.t} (RS ${x.rsr})`).join(", ")}` : ""}`
+    : "nothing qualifies right now (RS 80+ in a leading group, up 1%+ since 10:00 and beating SPY)."}<br><small class="meta">${ev}</small></div>`;
 }
 function lateMoversCard(clk, pace) {
   const at = ID.at, target = at === "at11" ? 90 : 30, label = at === "at11" ? "11:00" : "10:00";
@@ -3228,6 +3249,7 @@ function lateMoversCard(clk, pace) {
   if (!LIVE.spyDate || aDate !== LIVE.spyDate) return msg(`The ${label} snapshot (${esc(stamp)}) isn't from the session the sheet is showing (${esc(LIVE.spyDate || "?")}), so it's skipped. A fresh one is taken at ${label} ET on the next trading day.`);
   const late = aMin - target > 15;
   const L = lateMovers(at, ID.lu === "all");
+  const topLate = lateLeader(clk);
   L.rows.forEach(x => { const exp = x.avg && pace != null ? x.avg * Math.max(0, pace - volPace(Math.max(1, aMin))) : null;
     x.rv = x.vsince != null && exp > 0 && x.vsince >= 20000 ? x.vsince / exp : null; });
   const pc = (v, d = 1) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
@@ -3241,7 +3263,7 @@ function lateMoversCard(clk, pace) {
   const key = ID.ls === "vol" ? (x) => x.rv ?? -1 : ID.ls === "adr" ? (x) => x.adrX ?? x.since * 100 / 3 : (x) => x.since;
   const bids = L.rows.filter(x => liquid(x) && x.since >= 0.01 && x.rel > 0).sort((a, b) => key(b) - key(a)).slice(0, 20);
   const asks = L.rows.filter(x => liquid(x) && x.since <= -0.01 && x.rel < 0).sort((a, b) => ID.ls === "vol" ? key(b) - key(a) : key(a) - key(b)).slice(0, 10);
-  const nm = (x) => `<td class="l"><b>${x.t}</b>${x.mine ? ` <span class="tg ppull" title="${x.mine === "pick" ? "Today's top pick" : "On a Trade Setups list"}">${x.mine === "pick" ? "pick" : "setup"}</span>` : ""} <small class="meta">${esc(x.sub || "")}</small></td>`;
+  const nm = (x) => `<td class="l"><b>${x.t}</b>${x.mine ? ` <span class="tg ppull" title="${x.mine === "pick" ? "Launch pick" : "On a Trade Setups list"}">${x.mine === "pick" ? "pick" : "setup"}</span>` : ""} <small class="meta">${esc(x.sub || "")}</small></td>`;
   const rowsHtml = (rs) => rs.map(x => `<tr>${nm(x)}<td class="num ${cls(x.since)}"><b>${pc(x.since)}</b></td><td class="num">${x.adrX == null ? "–" : (x.adrX > 0 ? "+" : "") + x.adrX.toFixed(1)}</td>
     <td class="num ${cls(x.am)}">${pc(x.am)}</td><td class="num ${cls(x.r.chg)}">${pc(x.r.chg)}</td><td class="num">${x.rv == null ? "–" : x.rv.toFixed(1) + "×"}</td>
     <td class="num ${rsTint(x.rsr)}">${x.rsr ?? "–"}</td><td class="l">${kind(x)}</td></tr>`).join("");
@@ -3253,6 +3275,7 @@ function lateMoversCard(clk, pace) {
   const gtab = (title, rs) => `<div><h3 class="ih">${title}</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Group</th><th>Avg since ${label}</th><th>Up since</th></tr></thead><tbody>${rs.map(g => `<tr><td class="l">${esc(g.name)}</td><td class="num ${cls(g.avg)}">${pc(g.avg, 2)}</td><td class="num">${g.up}/${g.n}</td></tr>`).join("") || '<tr><td class="l meta" colspan="3">–</td></tr>'}</tbody></table></div></div>`;
   const upShare = L.rows.length ? L.rows.filter(x => x.rel > 0).length / L.rows.length : null;
   body.append($(`<div>
+    ${topLate}
     ${late ? `<div class="r2kwarn">⚠ The ${SRC[at] === "backup" ? "backup" : "sheet"} took this snapshot at ${esc(stamp.slice(11, 16))} ET instead of ${label}, so moves are measured from ${esc(stamp.slice(11, 16))}.</div>` : ""}
     <p class="meta" style="margin:4px 0">Snapshot: ${SRC[at] === "backup" ? `GitHub backup at ${esc(stamp.slice(11, 16))} ET${stale ? ` (the sheet's own one is stuck on ${esc(stale.slice(0, 10))})` : ""}` : `the sheet's freeze at ${esc(stamp.slice(11, 16))} ET`}.</p>
     <div class="igrid" style="margin:8px 0">${idx}
@@ -3344,19 +3367,16 @@ function roTrades(mode) {
     out.push(`<b>Launch pick #${i + 1} ${c.t}</b> · grade ${c.grade}, ${c.stage === "curl" ? "curl" : "early breakout"}${px ? ` · ${mode === "pre" ? "pre-market" : "now"} $${px.toFixed(2)} (${pc(r.chg, 1)})` : ""} · <span class="meta">${esc(c.plan.stop)}</span>`); });
   LK.filter(o => o.status === "open" && o.entry).forEach(o => { const r = liveRow(o.t); if (!r) return;
     out.push(`<b>Open launch pick ${o.t}</b> (week of ${shortDate(o.week)}): ${pc(r.price / o.entry - 1, 1)} since entry`); });
-  (PB.picks || []).forEach((c, i) => { const r = liveRow(c.t), px = r ? r.price : null;
-    let st = "";
-    if (c.trigger && px) { const d = px / c.trigger - 1; st = d >= 0 ? `<b class="up">through the trigger</b> $${(+c.trigger).toFixed(2)}${mode === "pre" ? " (pre-market; it counts once it trades there after the open)" : ""}` : `${pc(-d, 1)} below the trigger $${(+c.trigger).toFixed(2)}`; }
-    else if (c.entry_type === "open") st = mode === "pre" ? "plan: buy the open" : "bought at the open (plan)";
-    out.push(`<b>Swing pick #${i + 1} ${c.t}</b> · ${esc(c.setup_name)}${px ? ` · ${mode === "pre" ? "pre-market" : "now"} $${px.toFixed(2)} (${pc(r.chg, 1)})` : ""} · ${st}${mode === "pre" && c.plan ? `<br><small class="meta">Stop: ${esc(c.plan.stop)} · ${esc(c.plan.target)}</small>` : ""}`); });
-  if (!(PB.picks || []).length) out.push("No top picks today: no setup is actionable in this state.");
+  const LCx = T.lifecycle || {}, lu = lineupNow();
+  if (lu.length) {
+    const hold = LCx.size === "hold off", over = lu.filter(r => r.st === "over" && r.kind === "buy");
+    out.push(`<b>Lined-up buys</b>${hold ? " (on hold: breadth weak)" : ""}: ${over.length && !hold ? `<b class="up">triggered</b> ${over.slice(0, 4).map(r => `${r.t} over $${(+r.trig).toFixed(2)}`).join(", ")}; ` : ""}in the EMAs ${lu.filter(r => r.st === "zone").slice(0, 5).map(r => `${r.t} (buy over $${(+r.trig).toFixed(2)}, stop $${r.stop.toFixed(2)})`).join(", ") || "–"}`);
+  }
+  if (!(LP.picks || []).length && !lu.length) out.push("No Launch picks or lined-up buys right now.");
   const trig = [];
   (X.setups || []).forEach(S => (S.top || []).forEach(t => { const row = (X.rows || {})[t], pv = S.key === "kq" ? row && row.kq_pivot : S.key === "vcp" ? row && row.vcp_pivot : null, r = liveRow(t);
-    if (pv && r && r.price >= pv && !(PB.picks || []).some(c => c.t === t)) trig.push(`${t} (${esc(S.name)})`); }));
+    if (pv && r && r.price >= pv) trig.push(`${t} (${esc(S.name)})`); }));
   if (trig.length) out.push(`<b>Setups through their pivot ${mode === "pre" ? "pre-market" : "now"}:</b> ${trig.join(", ")}.`);
-  (SB.open || []).filter(o => o.status === "open" && o.entry).forEach(o => { const r = liveRow(o.t); if (!r) return;
-    const stop = o.setup === "vcp" && o.vcp_stop ? o.vcp_stop : o.entry * (1 - (o.stop_pct || 0)), g = r.price / o.entry - 1;
-    out.push(`<b>Open trade ${o.t}</b> (picked ${shortDate(o.date)}): ${pc(g, 1)} since entry · ${r.price <= stop ? `<b class="dn">at/below the stop ≈$${stop.toFixed(2)}</b>` : r.price <= stop * 1.01 ? `<b>within 1% of the stop ≈$${stop.toFixed(2)}</b>` : `stop ≈$${stop.toFixed(2)}`}`); });
   out.push(`<span class="meta">${roGo(mode === "pre" ? "premarket" : mode === "live" ? "intraday" : "trades", mode === "pre" ? "Pre-market tab" : mode === "live" ? "Intraday tab" : "Trade Setups")}</span>`);
   return out;
 }
@@ -3546,7 +3566,7 @@ function storyScore(s) {
 function storyStocks(groups) {
   const T = DATA.themes || {}, on = {};
   ((T.trade_setups || {}).setups || []).forEach(st => (st.top || []).forEach(t => { (on[t] = on[t] || []).push(st.name); }));
-  ((T.playbook || {}).picks || []).forEach((p, i) => { (on[p.t] = on[p.t] || []).unshift("Top pick #" + (i + 1)); });
+  ((T.launch || {}).picks || []).forEach((p, i) => { (on[p.t] = on[p.t] || []).unshift("Launch pick #" + (i + 1)); });
   const G = new Set(groups);
   return (T.stocks || []).filter(s => G.has(s.sub) && (s.rsr || 0) >= 80 && (s.price || 0) >= 10)
     .map(s => { const ext = s.adr ? (s.e21 || 0) / (s.adr / 100) : null; return Object.assign({}, s, { ext, chase: ext != null && ext > 2, on: on[s.t] || [] }); })
@@ -3998,7 +4018,7 @@ function renderPremarketCards(app, I, T, R) {
   const ago = (x) => x.r.last && asofMin != null ? asofMin - (+x.r.last.slice(0, 2) * 60 + +x.r.last.slice(3, 5)) : null;
   const real = (x) => x.r.bars >= 6 && (ago(x) ?? 99) <= 30;
   const liquid = (x) => x.r.price >= 5 && (!x.avg || x.avg * x.r.price >= 5e6);
-  const X = (T.trade_setups || {}).rows || {}, picks = new Set(((T.playbook || {}).picks || []).map(c => c.t));
+  const X = (T.trade_setups || {}).rows || {}, picks = launchPickSet();
   const tag = (x) => picks.has(x.t) ? ' <span class="tg ppull">pick</span>' : X[x.t] ? ' <span class="tg ppull">setup</span>' : "";
   // Morning read
   const ours = pool.filter(x => x.ours), up = ours.filter(x => x.r.chg > 0.001).length, dn = ours.filter(x => x.r.chg < -0.001).length;
@@ -4128,10 +4148,10 @@ function yourTradesCard(kicker, note) {
   const T = DATA.themes, pc = pcI, cls = clsI;
   const X = T.trade_setups || {}, PB = T.playbook || {}, SB = T.scoreboard || {};
   const items = [];
-  (PB.picks || []).forEach(c => items.push({ t: c.t, where: "Top pick #" + ((PB.picks || []).indexOf(c) + 1), setup: c.setup, setup_name: c.setup_name, trig: c.trigger, row: (X.rows || {})[c.t] }));
+  (((T.launch || {}).picks) || []).forEach((c, i) => items.push({ t: c.t, where: "Launch pick #" + (i + 1), setup_name: "Launch list · " + c.stage, row: (X.rows || {})[c.t] }));
+  lineupNow().forEach(r => items.push({ t: r.t, where: "Lined-up buy", setup_name: r.st === "over" ? "over yesterday's high" : "in the 9/21 EMAs", trig: r.trig, row: (X.rows || {})[r.t] }));
   (X.setups || []).forEach(S => S.top.forEach(t => { if (!items.some(i => i.t === t && i.setup === S.key)) items.push({ t, where: S.name, setup: S.key, setup_name: S.name, row: X.rows[t],
     trig: S.key === "kq" ? X.rows[t].kq_pivot : S.key === "vcp" ? X.rows[t].vcp_pivot : null }); }));
-  (PB.pick_watch || []).forEach(w => items.push({ t: w.t, where: "Watch (not actionable yet)", setup_name: w.setup_name, trig: w.trigger, row: (X.rows || {})[w.t] }));
   const statusOf = (it, r) => {
     if (!r) return ["meta", "no live price"];
     if (it.trig) { const dist = r.price / it.trig - 1; return dist >= 0 ? ["up", "Triggered: through $" + (+it.trig).toFixed(2)] : ["", `${pc(dist, 1)} to trigger $${(+it.trig).toFixed(2)}`]; }
@@ -4141,14 +4161,21 @@ function yourTradesCard(kicker, note) {
   };
   const trows = items.map(it => { const r = liveRow(it.t), [c, txt] = statusOf(it, r);
     return `<tr><td class="l"><b>${it.t}</b> <small class="meta">${esc(it.where)}</small></td><td class="l">${esc(it.setup_name || "")}</td><td class="num">${r ? r.price.toFixed(2) : "–"}</td><td class="num ${cls(r && r.chg)}">${r ? pc(r.chg, 1) : "–"}</td><td class="l ${c}">${txt}</td></tr>`; }).join("");
-  const opens = (SB.open || []).filter(o => o.status === "open" && o.entry).map(o => { const r = liveRow(o.t); const stop = o.setup === "vcp" && o.vcp_stop ? o.vcp_stop : o.entry * (1 - (o.stop_pct || 0));
-    return `<tr><td class="l"><b>${o.t}</b> <small class="meta">picked ${o.date.slice(5)}</small></td><td class="num">${(+o.entry).toFixed(2)}</td><td class="num">${r ? r.price.toFixed(2) : "–"}</td><td class="num ${cls(r && r.price / o.entry - 1)}">${r ? pc(r.price / o.entry - 1, 1) : "–"}</td><td class="l ${r && r.price <= stop ? "dn" : ""}">${r ? (r.price <= stop ? "Stop hit (≈$" + stop.toFixed(2) + ")" : "Above stop ≈$" + stop.toFixed(2)) : ""}</td></tr>`; }).join("");
+  const opens = (((T.launch || {}).tracker || {}).rows || []).filter(o => o.status === "open" && o.entry).map(o => { const r = liveRow(o.t); const stop = o.e50 && o.floor != null ? o.e50 * (1 - o.floor) : o.entry * 0.85; o.date = o.week;
+    return `<tr><td class="l"><b>${o.t}</b> <small class="meta">picked ${o.date.slice(5)}</small></td><td class="num">${(+o.entry).toFixed(2)}</td><td class="num">${r ? r.price.toFixed(2) : "–"}</td><td class="num ${cls(r && r.price / o.entry - 1)}">${r ? pc(r.price / o.entry - 1, 1) : "–"}</td><td class="l ${r && r.price <= stop ? "dn" : ""}">${r ? (r.price <= stop ? "Under the exit line ≈$" + stop.toFixed(2) + " (exit on a weekly close)" : "Exit on a weekly close under ≈$" + stop.toFixed(2)) : ""}</td></tr>`; }).join("");
   return $(`<section class="icard card regcard"><div class="kicker">${kicker}</div>
     <div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th class="l">Setup</th><th>Price</th><th>Change</th><th class="l">Status</th></tr></thead><tbody>${trows}</tbody></table></div>
-    ${opens ? `<h3 class="ih">Scoreboard trades in progress</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Entry</th><th>Price</th><th>Since entry</th><th class="l">Stop</th></tr></thead><tbody>${opens}</tbody></table></div>` : ""}
+    ${opens ? `<h3 class="ih">Open Launch picks</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Entry</th><th>Price</th><th>Since entry</th><th class="l">Stop</th></tr></thead><tbody>${opens}</tbody></table></div>` : ""}
     <div class="note" style="padding:8px 0 0">${note || `Flag and VCP names show "Triggered" once Google's price trades through the pivot; that's a cue to check the chart, not an order. ATH Magnet names flag when they reach the all-time high.`}</div></section>`);
 }
 /* ---------- Lined-up buys · live (lifecycle.live): BUY-group leaders dipping into their 9/21 EMAs today (Adam, Oct 27 2026) ---------- */
+// The headline picks (Adam, Oct 27): Launch picks + Lined-up buys. The old 5-day swing picks and Decision Cards were retired
+// from the page; their logs still run quietly in Python.
+const launchPickSet = () => new Set((((DATA.themes || {}).launch || {}).picks || []).map(c => c.t));
+function lineupNow() {
+  const LC = (DATA.themes || {}).lifecycle;
+  return LC ? (LC.live || []).map(lineupState).filter(r => r.st === "over" || r.st === "zone") : [];
+}
 function lineupState(x) {
   const L = liveActive() ? liveRow(x.t) : null, a = x.adr || 0;
   let p, low, live = false;
@@ -4908,11 +4935,6 @@ function renderTrades(app) {
       ${b.date ? `Last reviewed ${longDate(b.date)} in ${b.regime} breadth.` : ""}</div></section>`)
       : $(`<div class="note revcard" style="padding:0 2px 10px">✓ Setups still fit the market. Last reviewed ${b.date ? longDate(b.date) : "–"} in ${b.regime || "–"} breadth; checked daily for a breadth-regime change (${RV.checks.regime_days}+ sessions), a setup going dry (${RV.checks.dry_days} sessions with no names) or slumping (≤ ${RV.checks.slump_r}R over its last 30 sessions), 3+ new top-5 themes, or ${RV.checks.stale_days}+ days since review — and the same morning a major breadth thrust fires.</div>`));
   }
-  if (T.playbook && (T.playbook.picks || []).length) app.append(picksCard(T.playbook, T));
-  if (T.decision && (T.decision.cards || []).length) {
-    try { app.append(decisionCard(T.decision)); }      // a bad agent field can only cost this card, never the tab
-    catch (e) { console.error("decision cards", e); app.append($('<section class="card regcard"><div class="kicker">Decision cards</div><p class="meta">Couldn\'t show the decision cards today (bad input data). Everything else on this tab is unaffected.</p></section>')); }
-  }
   if (T.playbook) app.append(playbookCard(T.playbook));
   head.querySelector(".tsall").addEventListener("click", () => document.querySelector(".tsopen").click());
   app.append(head);
@@ -4961,7 +4983,6 @@ function renderTrades(app) {
   });
   app.append(boxCard(T));
   app.append(sowCard(T));
-  app.append(scoreboardCard(T.scoreboard));
   app.append(tagStatsCard((T.trade_bt || {}).tag_stats));
   app.append(hveCard(T));
   app.append(tsBacktest(T.trade_bt, (T.playbook && T.playbook.state) || now));
@@ -5168,84 +5189,6 @@ function sowCard(T) {
   draw();
   return card;
 }
-const isNum = (x) => typeof x === "number" && isFinite(x);
-function decisionCard(D) {
-  const ROLE = { pick1: "Top pick #1", pick2: "Top pick #2", watch: "Watch (trigger not close yet)", cand: "Candidate" };
-  const SET = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Q-Flag", vcp: "VCP", round: "Round Number", box: "Box Retest", spring: "Box Spring" };
-  const src = (l) => (l.links || []).filter(u => /^https?:\/\//.test(u)).map((u, i) => ` <a href="${esc(u)}" target="_blank" rel="noopener noreferrer" class="meta" title="${esc(u)}">[${i + 1}]</a>`).join("");
-  const lay = (l) => `<div class="dlay"><span><i class="ddot ${l.state}" title="${l.state}"></i></span><span>${esc(l.name)}</span><span>${esc(l.text)}${src(l)}${l.proven ? "" : ' <span class="dtag" title="Shown for information: not backtested yet, or failed its backtest. It does not change rankings.">unproven</span>'}</span></div>`;
-  const sum = (c) => `<div class="dsum meta">${c.support} layer${c.support === 1 ? "" : "s"} support · ${c.warn} warning${c.warn === 1 ? "" : "s"}${c.layers.some(l => l.state === "unknown") ? " · some not checked yet" : ""}</div>`;
-  const big = D.cards.filter(c => c.role !== "cand"), rest = D.cards.filter(c => c.role === "cand");
-  const M = D.macro, A = D.agents || {}, B = A.brief;
-  const mline = M ? `Macro backdrop (official close ${M.date}): 10-yr ${M.tnx.toFixed(2)}% (${M.tnx_d5 >= 0 ? "+" : ""}${M.tnx_d5}bp in 5 days) · WTI $${M.oil.toFixed(2)} (${M.oil_d5 >= 0 ? "+" : ""}${M.oil_d5}%) · dollar ${M.usd.toFixed(1)} (${M.usd_d5 >= 0 ? "+" : ""}${M.usd_d5}%)` : "";
-  const bline = B ? `<div style="margin:6px 0"><b>Macro brief</b> <span class="pbv ${B.risk === "high" ? "avoid" : B.risk === "low" ? "focus" : "selective"}">${esc(B.risk || "?")} risk</span> ${esc(B.headline || "")}
-    ${(B.events || []).length ? `<div class="meta" style="font-size:12px;margin-top:3px">Coming up: ${B.events.slice(0, 6).map(e => `${esc(e.date)} ${esc(e.time || "")} <b>${esc(e.name)}</b>${e.impact === "high" ? " ⚠" : ""}`).join(" · ")}</div>` : ""}</div>` : `<div class="meta" style="margin:6px 0">Macro brief, earnings dates and catalysts: not checked yet (the agents run around 7:00 AM ET on weekdays).</div>`;
-  const RV = D.review, LG = (D.evidence || {}).log || {};
-  const rline = RV ? `<details class="kqsec" style="margin-top:8px"><summary><b>Weekly review</b> (${esc(RV.for_date || "")}) · ${esc(String(RV.summary || "").slice(0, 140))}${String(RV.summary || "").length > 140 ? "…" : ""}</summary>
-    <p style="margin:6px 0">${esc(RV.summary || "")}</p>${(RV.findings || []).length ? `<div class="meta" style="font-size:12px"><b>Findings</b><ul style="margin:4px 0 6px 18px;padding:0">${RV.findings.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
-    ${(RV.proposals || []).length ? `<div style="font-size:13px"><b>Proposals</b> (nothing changes until you approve)<ul style="margin:4px 0 6px 18px;padding:0">${RV.proposals.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}</details>` : "";
-  const PL = D.plan, VERD = { build: ["focus", "Ready to build"], test_first: ["selective", "Test first"], watch: ["unproven", "Watch"], duplicate: ["unproven", "Duplicate"], reject: ["avoid", "Reject"] };
-  const pline = PL ? `<details class="kqsec" style="margin-top:8px"><summary><b>🧠 Integrator plan</b> (${esc(PL.for_date || "")}) · ${esc(String(PL.summary || "").slice(0, 150))}${String(PL.summary || "").length > 150 ? "…" : ""}</summary>
-    <p style="margin:6px 0">${esc(PL.summary || "")}</p>
-    ${(PL.items || []).map((it, i) => { const v = VERD[it.verdict] || VERD.watch; return `<div class="dlay" style="grid-template-columns:22px minmax(0,1fr)"><span class="meta">${it.priority || i + 1}.</span><span><b>${esc(it.title || "")}</b> <span class="pbv ${v[0]}">${v[1]}</span>${it.effort ? ` <span class="dtag">effort ${esc(it.effort)}</span>` : ""}
-      ${it.where ? `<div class="meta" style="font-size:12px">Where: ${esc(it.where)}</div>` : ""}${it.how ? `<div style="font-size:12.5px">${esc(it.how)}</div>` : ""}
-      ${it.test ? `<div class="meta" style="font-size:12px">Test: ${esc(it.test)}</div>` : ""}${it.kill ? `<div class="meta" style="font-size:12px">Drop it if: ${esc(it.kill)}</div>` : ""}
-      ${(it.cards || []).length ? `<div class="meta" style="font-size:11.5px">Research: ${it.cards.map(esc).join(", ")}</div>` : ""}</span></div>`; }).join("")}
-    ${(PL.new_agents || []).length ? `<div style="margin-top:8px;font-size:13px"><b>Proposed new agents</b>${PL.new_agents.map(a => `<div class="dlay" style="grid-template-columns:minmax(0,1fr)"><span><b>${esc(a.name || "")}</b> — ${esc(a.job || "")}<div class="meta" style="font-size:12px">${[a.schedule && "When: " + a.schedule, a.cost && "Cost: " + a.cost, a.why && "Why: " + a.why, a.kill && "Retire if: " + a.kill].filter(Boolean).map(esc).join(" · ")}</div></span></div>`).join("")}</div>` : ""}
-    ${(PL.retire || []).length ? `<div class="meta" style="margin-top:6px;font-size:12px"><b>Proposed to retire:</b> ${PL.retire.map(r => `${esc(r.target || "")} (${esc(r.why || "")})`).join(" · ")}</div>` : ""}
-    <div class="note" style="padding:6px 0 0">Proposals only. Nothing is built, changed or switched on until you say "build #N" in the project chat; each build goes through tests, the information-only check and an independent grader.</div></details>` : "";
-  const lline = isNum(LG.closed) && LG.closed ? ` Forward log so far: ${LG.closed} settled ideas over ${LG.dates} days.` : " The forward log has no settled ideas yet (each idea is scored 5 sessions after its card).";
-  const E = (D.evidence || {}).macro_fit;
-  const ev = E && E.tail5 && isNum(E.signals) && isNum(E.tail5.avg_good) && isNum(E.tail5.avg_bad) && isNum(E.tail5.t) ? `Macro fit backtest (${E.signals.toLocaleString()} past setup trades, ${E.from} to ${E.to}): a recent macro tailwind made ${pct(E.tail5.avg_good)} vs ${pct(E.tail5.avg_bad)} with a headwind (t ${E.tail5.t}) — ${E.passed ? "passed" : "not proven, so it's shown for information only"}.` : "";
-  const el = $(`<section class="card regcard"><div class="kicker">Decision cards · every layer behind today's ideas</div>
-    <div class="meta" style="font-size:12px;margin-top:4px">${mline}</div>${bline}
-    ${rline}${pline}<div class="picks">${big.map(c => `<div class="pick"><div class="phead"><span class="pt">${c.t}</span><span class="pbv unproven">${esc(ROLE[c.role] || c.role)}</span>${c.setup ? `<span class="pbv focus">${esc(c.setup_name || SET[c.setup] || c.setup)}</span>` : ""}</div>
-      <div class="meta" style="font-size:12px">${esc((c.name || "").slice(0, 40))}${c.price ? ` · last close $${c.price.toFixed(2)}` : ""}</div>${sum(c)}${c.layers.map(lay).join("")}</div>`).join("")}</div>
-    ${rest.length ? `<details class="kqsec" style="margin-top:10px"><summary><b>Other candidates</b> · ${rest.length} more, same layers</summary>
-      <div class="scroll"><table class="grid"><thead><tr><th class="l">Ticker</th><th class="l">Setup</th>${rest[0].layers.map(l => `<th>${esc(l.name)}</th>`).join("")}<th>Support</th><th>Warnings</th></tr></thead><tbody>
-      ${rest.map(c => `<tr><td class="l"><b>${c.t}</b></td><td class="l">${esc(SET[c.setup] || c.setup || "–")}</td>${c.layers.map(l => `<td title="${esc(l.text)}" style="text-align:center"><i class="ddot ${l.state}"></i></td>`).join("")}<td class="num">${c.support}</td><td class="num">${c.warn}</td></tr>`).join("")}</tbody></table></div></details>` : ""}
-    <div class="note" style="padding:8px 0 0">Dots: <i class="ddot good"></i> supports the trade · <i class="ddot bad"></i> warning · <i class="ddot neutral"></i> neutral · <i class="ddot info"></i> information only · <i class="ddot unknown"></i> not checked. Market, group and setup are the dashboard's backtested measures; macro fit, calendar, catalyst and the macro brief are <b>unproven</b> and never change the Top 2 ranking. Every layer is logged each day (data/decision_log.csv) and the weekly review tests which ones actually separate winners from losers. ${ev}${lline}</div></section>`);
-  return el;
-}
-function picksCard(P, T) {
-  const R = (T.trade_bt || {}).pick_replay;
-  const ev = R ? `In a day-by-day replay of ${R.days} past sessions (${R.from} to ${R.to}), traded exactly this way (next-session entry, 5-day hold), the rule's #1 pick made <b>${pct(R.pick_ret)}</b> (about ${R.pick_ret >= 0 ? "+" : "−"}$${Math.abs(Math.round(R.pick_ret * 10000))} per $10k) against ${pct(R.avg_ret)} for the average actionable candidate, beating it on ${Math.round(R.beat * 100)}% of days${R.no_fill ? `; ${R.no_fill} trigger picks never filled` : ""}. ${Math.abs(R.t) < 2 ? `Not statistically solid yet (t = ${R.t}): the scoreboard below tracks it live.` : `t = ${R.t}.`}` : "";
-  const W = P.pick_watch || [];
-  const el = $(`<section class="card regcard pickcard"><div class="kicker">Swing picks (old rule, still logged) · today's top ${P.picks.length} 5-day trades · highest RS in today's ${P.picks[0].verdict.toLowerCase()} setups</div>
-    <div class="picks">${P.picks.map((c, i) => `<div class="pick">
-      <div class="phead"><span class="pnum">#${i + 1}</span><span class="pt">${c.t}</span><span class="pbv ${c.verdict.toLowerCase()}">${esc(c.setup_name)}</span><span class="pscore" title="RS Rating">RS ${c.rsr}</span></div>
-      <div class="meta" style="font-size:12px">${esc((c.name || "").slice(0, 34))}${c.sub ? " · " + esc(c.sub) : ""}${c.price ? ` · last close $${c.price.toFixed(2)}` : ""}</div>
-      ${(c.tags || []).length ? `<div style="margin-top:6px">${tagBadges(c.tags)} <small class="meta">${convCount(c.tags)} conviction tag${convCount(c.tags) === 1 ? "" : "s"}</small></div>` : ""}
-      <p class="pwhy">${esc(c.why)}</p>
-      <div class="pplan">${[["Entry", c.plan.entry], ["Stop", c.plan.stop], ["Target", c.plan.target], ["Logged as", `Entry next session (${c.entry_type === "trigger" ? "only if the trigger trades" : "at the open"}), exit at the close 5 sessions later or at the stop`], ["On $10k", c.risk10k ? `About $${c.risk10k.toLocaleString()} lost if the stop is hit` : null]].filter(x => x[1]).map(([k, v]) => `<div><span>${k}</span><span>${esc(v)}</span></div>`).join("")}</div>
-    </div>`).join("")}</div>
-    ${W.length ? `<div class="note" style="padding:8px 0 0"><b>Not actionable yet</b> (trigger more than 1 ADR away): ${W.map(w => `<b>${w.t}</b> <span class="meta">${esc(w.setup_name)}, RS ${w.rsr}, trigger $${(+w.trigger).toFixed(2)} (${pct(w.dist_pct)}, ${w.trig_adr} ADR)</span>`).join(", ")}</div>` : ""}
-    <div class="note" style="padding:8px 0 0">The rule: from the top 5 of every setup rated Focus today, keep what you can act on today (flag and VCP triggers within 1 ADR of the close; the other setups buy the next open), then pick the highest RS Rating (ties go to the bigger 60-day gain), one per sub-theme. ${ev} The data can't see chart quality, news or earnings dates — check those before committing.</div></section>`);
-  return el;
-}
-function scoreboardCard(B) {
-  if (!B) return $('<div></div>');
-  const fmtd = (d) => d ? d.slice(5) : "–";
-  const NAME = { ath: "ATH Magnet", pullback: "Leader Pullback", rotation: "Rotation Rookie", kq: "Qullamaggie Flag", vcp: "Minervini VCP", round: "Round Number Magnet", box: "Box Retest", spring: "Box Spring" };
-  const sum = B.n ? `${B.n} closed picks · average ${pct(B.avg_ret)} a trade with stops (${B.pnl10k >= 0 ? "+" : "−"}$${Math.abs(B.pnl10k).toLocaleString()} total on $10k each) · ${Math.round(B.win * 100)}% winners · stop hit on ${Math.round((B.stops || 0) * 100)}% · held 5 days without the stop ${pct(B.avg_nostop)} vs ${pct(B.avg_cand)} for the average candidate (beat it ${B.beat == null ? "–" : Math.round(B.beat * 100) + "% of the time"})${B.no_fill ? ` · ${B.no_fill} trigger pick${B.no_fill > 1 ? "s" : ""} never filled` : ""}`
-    : `No closed picks yet: each pick enters the next session and is scored 5 sessions later.${B.no_fill ? ` ${B.no_fill} trigger pick${B.no_fill > 1 ? "s" : ""} didn't fill.` : ""}`;
-  const rows = [...(B.open || []), ...(B.closed || [])];
-  const body = rows.map(r => {
-    const st = r.status || "pending";
-    const res = st === "closed" ? `${retCell(r.ret, "d5")}${retCell(r.ret_nostop, "d5")}${retCell(r.cand_ret, "d5")}<td class="l">${String(r.stop_hit).toLowerCase() === "true" ? "stopped" : "held"}</td>`
-      : st === "no fill" ? `<td class="num meta">–</td><td class="num meta">–</td><td class="num meta">–</td><td class="l meta">trigger not hit</td>`
-      : st === "open" ? `<td class="num meta">${r.now_ret == null ? "open" : pct(r.now_ret) + " so far"}</td><td class="num meta">–</td><td class="num meta">–</td><td class="l meta">in the trade</td>`
-      : `<td class="num meta">–</td><td class="num meta">–</td><td class="num meta">–</td><td class="l meta">enters next session</td>`;
-    return `<tr><td class="l">${fmtd(r.date)}</td><td class="num">#${r.rank}</td><td class="l"><b>${r.t}</b></td><td class="l">${esc(NAME[r.setup] || r.setup)}</td>
-      <td class="num">${r.entry != null ? (+r.entry).toFixed(2) : r.entry_type === "trigger" && r.trigger != null ? "above " + (+r.trigger).toFixed(2) : "next open"}</td>${res}</tr>`;
-  }).join("");
-  return $(`<section class="card regcard"><div class="kicker">Pick scoreboard · live results of the daily top picks</div>
-    <p style="margin:6px 0 8px">${sum}</p>
-    ${rows.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="l">Picked</th><th>#</th><th class="l">Ticker</th><th class="l">Setup</th><th>Entry</th><th>Result<small>with stop</small></th><th>Held 5 days<small>no stop</small></th><th>Candidates avg<small>same day</small></th><th class="l">Outcome</th></tr></thead><tbody>${body}</tbody></table></div>` : ""}
-    <details class="kqsec" open style="margin-top:10px"><summary><b>Scorecard</b> · win rate and R by setup and breadth state</summary>${scorecardHTML(B)}</details>
-    <div class="note" style="padding:8px 0 0">Logged automatically every morning, traded the way you would: entry the next session (the open, or the trigger for flags and VCPs, which may not fill), stop 1 ADR below the fill (entry-day low for flags, the VCP stop for VCPs), exit at the close 5 sessions after entry. "Candidates avg" is what buying a random name from the same list at the same open would have made. Give it 2–3 months before reading much into it.</div></section>`);
-}
-
 function playbookCard(P) {
   const tbl = (rows) => `<div class="scroll"><table class="grid pbtab"><thead><tr><th>#</th><th class="l">Setup</th><th class="l">Verdict</th><th class="l">Why</th><th class="l">Find it</th></tr></thead><tbody>
     ${rows.map(r => `<tr class="${r.verdict === "Avoid" ? "pbdim" : ""}"><td class="num">${r.rank}</td><td class="l"><b>${esc(r.name)}</b></td><td class="l"><span class="pbv ${r.verdict.toLowerCase()}">${r.verdict}</span></td><td class="l pbwhy">${esc(r.why)}</td><td class="l meta">${r.where}</td></tr>`).join("")}</tbody></table></div>`;

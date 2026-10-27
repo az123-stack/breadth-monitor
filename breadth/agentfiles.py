@@ -89,9 +89,26 @@ def worklist():
     D = _data()
     dec = (D.get("themes") or {}).get("decision") or {}
     cards = dec.get("cards") or []
-    stocks = [{"t": c["t"], "role": c["role"], "name": c.get("name"), "setup": c.get("setup_name") or c.get("setup"),
-               "price": c.get("price"), "depth": "full" if k < FULL_RESEARCH else "earnings_only"}
-              for k, c in enumerate(cards)]
+    T = D.get("themes") or {}
+    # Oct 27 2026 (Adam): the headline picks are now Launch picks + Lined-up buys, so they get the full research first; then the
+    # BUY / ready theme tickers; the old Decision-Card names (still logged quietly) only fill the rest.
+    first = []
+    for c in (T.get("launch") or {}).get("picks") or []:
+        first.append({"t": c["t"], "role": "launch", "name": c.get("name"), "setup": "Launch pick", "price": c.get("close")})
+    for r in (T.get("lifecycle") or {}).get("live") or []:
+        first.append({"t": r["t"], "role": "lineup", "name": None, "setup": "Lined-up buys (" + str(r.get("g")) + ")", "price": r.get("c")})
+    for g in (T.get("lifecycle") or {}).get("rows") or []:
+        if g.get("buy") or g.get("ready"):
+            for p in g.get("picks") or []:
+                first.append({"t": p["t"], "role": "theme_buy", "name": None, "setup": "Theme BUY (" + str(g.get("g")) + ")", "price": p.get("c")})
+    seen, merged = set(), []
+    for c in first + [{"t": c["t"], "role": c["role"], "name": c.get("name"), "setup": c.get("setup_name") or c.get("setup"),
+                       "price": c.get("price")} for c in cards]:
+        if c["t"] in seen:
+            continue
+        seen.add(c["t"])
+        merged.append(c)
+    stocks = [dict(c, depth="full" if k < FULL_RESEARCH else "earnings_only") for k, c in enumerate(merged[:45])]
     from datetime import datetime, timezone
     from . import nyse
     fd = dec.get("date")

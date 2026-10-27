@@ -554,6 +554,19 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   that earnings date; cluster = 2+ in a sub-theme within 5 sessions, ≥ 2/3 the same way; `quiet` = members without a reaction; `next` =
   catalyst-agent earnings dates ahead. Evidence (~2 s): UP cluster → non-reporters +1.9% vs avg group 20d (t 1.93, halves +1.9/+1.9),
   DOWN → ~0. `python -m breadth.earnings` prints today + evidence. Test `test_earnings_clusters`.
+- **Headline picks = Launch picks + Lined-up buys** (Oct 27, Adam). Retired from the page: Top 2 swing picks (`picksCard`), Decision
+  Cards (`decisionCard`) and the pick scoreboard card; their Python (playbook.picks, ledger, decision.py log) still runs quietly. Every
+  setup and trade list stays (Adam downloads them for weekend chart review); the header "⬇ Trade Setups" starts with Launch picks +
+  lined-up buys (`launchPickSet`, `lineupNow`). Read-out plan, "Your trades" cards and story tags use them too. Catalyst agent worklist
+  (`agentfiles.worklist`) = Launch picks → lined-up buys → theme-BUY tickers → old card names, max 45 (first 15 full research). Macro
+  brief agent retired with the cards (Adam to pause the scheduled task). `config.APPROVED_LAYERS` = launch, box_favorites, lifecycle.
+- ★ in box grades (Oct 27, Adam approved): condition "★ Leading group (sub-theme top 30% on 60-day return)" in `boxstudy.conditions`
+  (feeds `expected()` grades when proven) and in `GROUP_OK` (Box Retest / Box Spring playbook confluence).
+- Top late mover (Oct 27; `lateLeader` at the top of the Intraday Second-half movers card; card R-2026-10-27-late-mover; study
+  `tools/late_mover/study.py` on the orb-data 15-min bars, results.json): at 12:00 ET, RS 80+, sub-theme top third on 13 wks
+  (`polished.groups`), up 1%+ since 10:00 and beating SPY, $20M+/day → highest RS. 5d +0.21R (+0.15R vs avg stock, t 1.3);
+  same/next day ≈ 0R; the biggest mover did worse. "Unproven" watch line.
+- Scheduled-task models (Oct 27): "lined-up alerts (hourly)" and "10/11 snapshot kick" moved to Sonnet.
 - Page tabs (Oct 27 cleanup): one `renderTab` table serves tab clicks and live refreshes (before, `rerenderPanel` lacked Best Setups and
   Launch list, so a live price refresh on those tabs drew the Breadth tab). Removed dead payload fields (stocks `rsraw`/`v1`, SoW
   `lo52`/`hi52`/`prime_wks`/`rs_up`, box live feature columns `g_r20`…`s_r126q`) and dead helpers (`fmtK`, `roPts`, `boxes._adr`,
@@ -676,10 +689,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
 - Limits: survivorship bias in backfill, small strong-regime sample, no costs, no intraday H/L/volume.
 
 ## Play ideas Adam logged (not built yet — ask where they go before building)
-- Oct 13, 2026 — "Theme breadth play": any theme at 95–100% breadth (share of its stocks up; Energy-Oil hit it Oct 13) should be
-  flagged every day, and he wants to look at / play its top 2 stocks.
-- Oct 13, 2026 — "Top late mover": the strongest mover after the morning window (window not yet defined in this repo's history;
-  confirm with Adam — likely after the first 30–60 min).
+- Oct 13, 2026 — "Theme breadth play" (95–100% of a theme's stocks up): DROPPED by Adam Oct 27.
+- Oct 13, 2026 — "Top late mover": BUILT Oct 27 as a watch line (`lateLeader`, see below); tested, not proven.
+- Oct 27, 2026 — to-do: a "my positions" card for Adam's own real trades that flags his exit rules live (sell part after 3–5
+  days, trail the 10/20 EMA, stop alerts). Not started.
+- Oct 27, 2026 — "R stacking" (Adam: "this trade is 0.8R, that one 0.5R, but layered together 1.3R — keep making this smarter"):
+  first test bed `tools/rstack/box_stack.py` on Box trades (see Findings). Goal: a common trade warehouse across setups + a stacked
+  expected R per live trade, with synergy pairs validated out of sample, refreshed weekly for the Integrator.
 
 ## Working preferences
 - Start every answer with a TL;DR, then detail.

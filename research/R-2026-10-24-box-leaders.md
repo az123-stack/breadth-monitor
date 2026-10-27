@@ -9,7 +9,7 @@ sample: Jan 2025 – Oct 2026 box trades, next-open entry: 3,784 retest bounces,
 result: retest bounce in a ★ leading group (sub-theme else theme top 30% on 60-day) +0.23R vs −0.02R (edge +0.25R, t 3.2, halves +0.27/+0.25; post-thrust +0.56R); still +0.29R vs −0.02R outside the existing sub-theme-top-20%-60d badge (t 2.7); stock's own nuzzle/lift adds nothing inside ★ groups (+0.24 vs +0.22R); group setting/stepping adds nothing (halves disagree); springs ★ +0.22R vs +0.04R (t 1.7, 2nd half only); shorts in ★ groups much worse (retest −0.28R t −3.5, failed breakout −0.23R t −3.4)
 halves: retest ★ +0.27 / +0.25; ★ outside top-20% badge +0.33 / +0.28; shorts ★ −0.33 / −0.24
 layers: [stairs, box_favorites]
-integrated: partly
+integrated: yes         # Oct 27 2026: Adam approved; ★ Leading group is a box-grade condition + Box Retest / Spring group confluence
 source: tools/box_stairs/ (Adam, Oct 24 2026: "couple this with our box setups" → "your favorite of these trades")
 ---
 **Idea.** Adam liked the stair-step names ("leading names in great setups") and asked to couple them with the box trades, then for a

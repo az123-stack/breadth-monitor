@@ -248,6 +248,9 @@ def conditions(dd):
         ("Theme / group", "Sub-theme top 20% on 20-day return", f("g_r20", lambda x: x >= 0.8)),
         ("Theme / group", "Sub-theme bottom 20% on 20-day return", f("g_r20", lambda x: x <= 0.2)),
         ("Theme / group", "Sub-theme top 20% on 60-day return", f("g_r60", lambda x: x >= 0.8)),
+        # ★ leading group (Oct 27, Adam approved; card R-2026-10-24-box-leaders): sub-theme top 30% on 60-day return, the
+        # same ★ as the Stair steps card. Retest bounce +0.23R vs −0.02R (t 3.2, both halves).
+        ("Theme / group", "★ Leading group (sub-theme top 30% on 60-day return)", f("g_r60", lambda x: x >= 0.7)),
         ("Theme / group", "Sub-theme bottom 20% on 60-day return", f("g_r60", lambda x: x <= 0.2)),
         ("Theme / group", "Sub-theme above its 50-day", f("g_a50", lambda x: x == 1)),
         ("Theme / group", "Sub-theme below its 50-day", f("g_a50", lambda x: x == 0)),
@@ -409,7 +412,8 @@ def episodes(ev, breadth, typ):
 TAGS = {"retest_long": ["go", "at", "inside", "coming"], "retest_short": ["go", "at", "inside", "coming"],
         "trap_short": ["failed", "far", "falling"], "trap_long": ["failed", "far", "falling"]}
 INDEX = ["QQQ", "SPY", "IWM", "SMH", "DIA"]
-GROUP_OK = ("Sub-theme above its 50-day", "Sub-theme top 20% on 20-day return", "Theme top 20% on 20-day return")
+GROUP_OK = ("Sub-theme above its 50-day", "Sub-theme top 20% on 20-day return", "Theme top 20% on 20-day return",
+            "★ Leading group (sub-theme top 30% on 60-day return)")
 
 
 def live(w, cols, liq, rs, ADR, h52, dates, info, names, window=60):

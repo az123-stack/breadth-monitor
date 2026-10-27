@@ -1,0 +1,674 @@
+[
+ {
+  "type": "retest_long",
+  "n_train": 1664,
+  "n_test": 2117,
+  "split": "2025-12-04",
+  "base_train": 0.086,
+  "base_test": 0.001,
+  "flags": 42,
+  "single_held": [
+   {
+    "k": "In-vogue theme (top 20% on 6-month return)",
+    "n1": 85,
+    "lift1": 0.441,
+    "t1": 1.94,
+    "n2": 250,
+    "lift2": 0.06,
+    "t2": 0.41
+   },
+   {
+    "k": "Thrust day to 5 sessions after",
+    "n1": 138,
+    "lift1": 0.366,
+    "t1": 2.27,
+    "n2": 273,
+    "lift2": 0.548,
+    "t2": 3.87
+   },
+   {
+    "k": "\u2605 Leading group (sub-theme top 30% on 60-day return)",
+    "n1": 316,
+    "lift1": 0.311,
+    "t1": 2.61,
+    "n2": 474,
+    "lift2": 0.279,
+    "t2": 2.58
+   },
+   {
+    "k": "2-4 week tight box",
+    "n1": 374,
+    "lift1": 0.297,
+    "t1": 2.49,
+    "n2": 438,
+    "lift2": 0.101,
+    "t2": 0.94
+   },
+   {
+    "k": "50-day falling",
+    "n1": 105,
+    "lift1": 0.285,
+    "t1": 1.5,
+    "n2": 114,
+    "lift2": 0.17,
+    "t2": 0.88
+   },
+   {
+    "k": "SPY above its 50-day",
+    "n1": 1530,
+    "lift1": 0.256,
+    "t1": 1.83,
+    "n2": 1783,
+    "lift2": 0.195,
+    "t2": 1.85
+   },
+   {
+    "k": "RS line within 3% of its 1-year high",
+    "n1": 301,
+    "lift1": 0.236,
+    "t1": 2.06,
+    "n2": 437,
+    "lift2": 0.074,
+    "t2": 0.73
+   },
+   {
+    "k": "Sub-theme top 20% on 20-day return",
+    "n1": 242,
+    "lift1": 0.222,
+    "t1": 1.63,
+    "n2": 319,
+    "lift2": 0.135,
+    "t2": 1.14
+   },
+   {
+    "k": "Signal-day volume 1.5\u00d7+ average",
+    "n1": 252,
+    "lift1": 0.183,
+    "t1": 1.47,
+    "n2": 331,
+    "lift2": 0.128,
+    "t2": 1.2
+   },
+   {
+    "k": "Sub-theme top 20% on 60-day return",
+    "n1": 196,
+    "lift1": 0.18,
+    "t1": 1.29,
+    "n2": 312,
+    "lift2": 0.216,
+    "t2": 1.6
+   },
+   {
+    "k": "Sub-theme breadth 70%+ above 21 EMA",
+    "n1": 586,
+    "lift1": 0.171,
+    "t1": 1.76,
+    "n2": 665,
+    "lift2": 0.179,
+    "t2": 2.0
+   },
+   {
+    "k": "Sub-theme above its 50-day",
+    "n1": 754,
+    "lift1": 0.158,
+    "t1": 1.74,
+    "n2": 884,
+    "lift2": 0.218,
+    "t2": 2.64
+   }
+  ],
+  "synergy_top": [
+   {
+    "a": "6-25 sessions after a thrust",
+    "b": "Sub-theme top 20% on 20-day return",
+    "n1": 49,
+    "n2": 94,
+    "joint1": 0.994,
+    "joint2": 0.387,
+    "add1": 0.309,
+    "add2": 0.316,
+    "syn1": 0.685,
+    "syn2": 0.071
+   },
+   {
+    "a": "RS line within 3% of its 1-year high",
+    "b": "Wide range (multi-touch level)",
+    "n1": 98,
+    "n2": 184,
+    "joint1": 0.56,
+    "joint2": -0.019,
+    "add1": 0.012,
+    "add2": 0.189,
+    "syn1": 0.547,
+    "syn2": -0.207
+   },
+   {
+    "a": "6-25 sessions after a thrust",
+    "b": "Sub-theme top 20% on 60-day return",
+    "n1": 40,
+    "n2": 97,
+    "joint1": 0.793,
+    "joint2": 0.429,
+    "add1": 0.267,
+    "add2": 0.397,
+    "syn1": 0.526,
+    "syn2": 0.033
+   },
+   {
+    "a": "Money leaving (10-day share in falling \u2265 52%)",
+    "b": "Not in any sub-theme",
+    "n1": 51,
+    "n2": 155,
+    "joint1": 0.591,
+    "joint2": -0.121,
+    "add1": 0.077,
+    "add2": -0.234,
+    "syn1": 0.514,
+    "syn2": 0.113
+   },
+   {
+    "a": "6-25 sessions after a thrust",
+    "b": "Stock up 50%+ in 6 months",
+    "n1": 42,
+    "n2": 132,
+    "joint1": 0.823,
+    "joint2": -0.106,
+    "add1": 0.331,
+    "add2": -0.131,
+    "syn1": 0.491,
+    "syn2": 0.025
+   },
+   {
+    "a": "New lows beating new highs",
+    "b": "Not in any sub-theme",
+    "n1": 51,
+    "n2": 75,
+    "joint1": 0.703,
+    "joint2": -0.262,
+    "add1": 0.212,
+    "add2": -0.595,
+    "syn1": 0.491,
+    "syn2": 0.333
+   },
+   {
+    "a": "SPY below its 50-day",
+    "b": "New lows beating new highs",
+    "n1": 49,
+    "n2": 79,
+    "joint1": 0.545,
+    "joint2": 0.182,
+    "add1": 0.072,
+    "add2": -0.576,
+    "syn1": 0.472,
+    "syn2": 0.758
+   },
+   {
+    "a": "50-day rising",
+    "b": "Wide range (multi-touch level)",
+    "n1": 825,
+    "n2": 1145,
+    "joint1": -0.071,
+    "joint2": 0.044,
+    "add1": -0.509,
+    "add2": -0.055,
+    "syn1": 0.437,
+    "syn2": 0.099
+   },
+   {
+    "a": "6-25 sessions after a thrust",
+    "b": "\u2605 Leading group (sub-theme top 30% on 60-day return)",
+    "n1": 54,
+    "n2": 158,
+    "joint1": 0.813,
+    "joint2": 0.399,
+    "add1": 0.398,
+    "add2": 0.46,
+    "syn1": 0.415,
+    "syn2": -0.061
+   },
+   {
+    "a": "SPY below its 50-day",
+    "b": "Above its 200-day",
+    "n1": 49,
+    "n2": 308,
+    "joint1": 0.545,
+    "joint2": -0.169,
+    "add1": 0.154,
+    "add2": -0.338,
+    "syn1": 0.39,
+    "syn2": 0.169
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "50-day rising",
+    "n1": 1146,
+    "n2": 1026,
+    "joint1": 0.029,
+    "joint2": -0.199,
+    "add1": -0.344,
+    "add2": -0.582,
+    "syn1": 0.372,
+    "syn2": 0.384
+   },
+   {
+    "a": "Out-of-favor sub-theme (bottom 20% on 6-month return)",
+    "b": "Below its 200-day",
+    "n1": 44,
+    "n2": 31,
+    "joint1": -0.253,
+    "joint2": 0.347,
+    "add1": -0.621,
+    "add2": 0.352,
+    "syn1": 0.368,
+    "syn2": -0.005
+   },
+   {
+    "a": "50-day rising",
+    "b": "Within 10% of 52-week high",
+    "n1": 1028,
+    "n2": 1424,
+    "joint1": 0.017,
+    "joint2": -0.042,
+    "add1": -0.35,
+    "add2": -0.279,
+    "syn1": 0.367,
+    "syn2": 0.238
+   },
+   {
+    "a": "Theme top 20% on 20-day return",
+    "b": "Within 10% of 52-week high",
+    "n1": 109,
+    "n2": 184,
+    "joint1": 0.417,
+    "joint2": -0.014,
+    "add1": 0.054,
+    "add2": 0.198,
+    "syn1": 0.363,
+    "syn2": -0.212
+   },
+   {
+    "a": "Thrust day to 5 sessions after",
+    "b": "Not in any sub-theme",
+    "n1": 72,
+    "n2": 152,
+    "joint1": 0.692,
+    "joint2": 0.427,
+    "add1": 0.336,
+    "add2": 0.335,
+    "syn1": 0.356,
+    "syn2": 0.092
+   }
+  ],
+  "synergy_held": 11,
+  "synergy_tested": 15,
+  "model": {
+   "lam": 0.003,
+   "ic_additive": 0.022,
+   "ic_with_synergy": 0.032,
+   "quintiles_additive": [
+    -0.096,
+    0.096,
+    -0.102,
+    -0.039,
+    0.144
+   ],
+   "quintiles_with_synergy": [
+    -0.012,
+    -0.056,
+    -0.05,
+    -0.117,
+    0.238
+   ],
+   "top_coef": {
+    "ADR 4%+": 0.257,
+    "\u2605 Leading group (sub-theme top 30% on 60-day return)": 0.251,
+    "Mixed breadth": 0.232,
+    "Money leaving (10-day share in falling \u2265 52%)": 0.198,
+    "50-day falling": 0.17,
+    "Signal-day volume 1.5\u00d7+ average": 0.159
+   },
+   "bottom_coef": {
+    "SPY below its 200-day": -0.673,
+    "Out-of-favor sub-theme (bottom 20% on 6-month return)": -0.416,
+    "Stock up 50%+ in 6 months": -0.22,
+    "Sub-theme top 20% on 60-day return": -0.197
+   }
+  }
+ },
+ {
+  "type": "trap_long",
+  "n_train": 1369,
+  "n_test": 1612,
+  "split": "2025-12-04",
+  "base_train": -0.002,
+  "base_test": 0.117,
+  "flags": 48,
+  "single_held": [
+   {
+    "k": "Thrust day to 5 sessions after",
+    "n1": 256,
+    "lift1": 0.554,
+    "t1": 5.8,
+    "n2": 412,
+    "lift2": 0.395,
+    "t2": 3.77
+   },
+   {
+    "k": "In-vogue sub-theme (top 20% on 6-month return)",
+    "n1": 58,
+    "lift1": 0.438,
+    "t1": 1.56,
+    "n2": 106,
+    "lift2": 0.09,
+    "t2": 0.47
+   },
+   {
+    "k": "Theme top 20% on 20-day return",
+    "n1": 65,
+    "lift1": 0.398,
+    "t1": 1.91,
+    "n2": 88,
+    "lift2": 0.663,
+    "t2": 2.81
+   },
+   {
+    "k": "New lows beating new highs",
+    "n1": 171,
+    "lift1": 0.34,
+    "t1": 3.36,
+    "n2": 276,
+    "lift2": 0.223,
+    "t2": 1.78
+   },
+   {
+    "k": "Money leaving (10-day share in falling \u2265 52%)",
+    "n1": 277,
+    "lift1": 0.314,
+    "t1": 3.23,
+    "n2": 274,
+    "lift2": 0.059,
+    "t2": 0.63
+   },
+   {
+    "k": "RS line within 3% of its 1-year high",
+    "n1": 40,
+    "lift1": 0.272,
+    "t1": 1.28,
+    "n2": 82,
+    "lift2": 0.053,
+    "t2": 0.27
+   },
+   {
+    "k": "RS 80+",
+    "n1": 196,
+    "lift1": 0.18,
+    "t1": 1.43,
+    "n2": 227,
+    "lift2": 0.128,
+    "t2": 0.94
+   },
+   {
+    "k": "Sub-theme top 20% on 20-day return",
+    "n1": 109,
+    "lift1": 0.16,
+    "t1": 1.0,
+    "n2": 94,
+    "lift2": 0.467,
+    "t2": 2.37
+   },
+   {
+    "k": "Sub-theme breadth 70%+ above 21 EMA",
+    "n1": 293,
+    "lift1": 0.117,
+    "t1": 1.29,
+    "n2": 392,
+    "lift2": 0.129,
+    "t2": 1.43
+   },
+   {
+    "k": "50-day falling",
+    "n1": 891,
+    "lift1": 0.099,
+    "t1": 1.29,
+    "n2": 1016,
+    "lift2": 0.103,
+    "t2": 1.35
+   },
+   {
+    "k": "Sub-theme above its 50-day",
+    "n1": 359,
+    "lift1": 0.076,
+    "t1": 0.87,
+    "n2": 443,
+    "lift2": 0.211,
+    "t2": 2.35
+   },
+   {
+    "k": "SPY below its 50-day",
+    "n1": 359,
+    "lift1": 0.066,
+    "t1": 0.75,
+    "n2": 322,
+    "lift2": 0.399,
+    "t2": 3.55
+   }
+  ],
+  "synergy_top": [
+   {
+    "a": "Strong breadth",
+    "b": "RS 80+",
+    "n1": 43,
+    "n2": 56,
+    "joint1": 0.648,
+    "joint2": 0.522,
+    "add1": 0.051,
+    "add2": 0.414,
+    "syn1": 0.597,
+    "syn2": 0.107
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "RS 30 or lower",
+    "n1": 235,
+    "n2": 268,
+    "joint1": -0.145,
+    "joint2": 0.201,
+    "add1": -0.717,
+    "add2": -0.151,
+    "syn1": 0.572,
+    "syn2": 0.352
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "Tight box",
+    "n1": 754,
+    "n2": 668,
+    "joint1": -0.236,
+    "joint2": 0.008,
+    "add1": -0.789,
+    "add2": -0.077,
+    "syn1": 0.554,
+    "syn2": 0.085
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "SPY above its 50-day",
+    "n1": 702,
+    "n2": 688,
+    "joint1": -0.106,
+    "joint2": -0.032,
+    "add1": -0.646,
+    "add2": -0.504,
+    "syn1": 0.54,
+    "syn2": 0.471
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "30%+ below 52-week high",
+    "n1": 148,
+    "n2": 230,
+    "joint1": -0.189,
+    "joint2": 0.111,
+    "add1": -0.686,
+    "add2": -0.082,
+    "syn1": 0.497,
+    "syn2": 0.192
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "50-day rising",
+    "n1": 351,
+    "n2": 333,
+    "joint1": -0.197,
+    "joint2": -0.056,
+    "add1": -0.679,
+    "add2": -0.208,
+    "syn1": 0.483,
+    "syn2": 0.151
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "Within 10% of 52-week high",
+    "n1": 312,
+    "n2": 244,
+    "joint1": -0.288,
+    "joint2": -0.052,
+    "add1": -0.768,
+    "add2": -0.064,
+    "syn1": 0.481,
+    "syn2": 0.012
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "Sub-theme bottom 20% on 20-day return",
+    "n1": 57,
+    "n2": 44,
+    "joint1": -0.202,
+    "joint2": -0.263,
+    "add1": -0.672,
+    "add2": -0.29,
+    "syn1": 0.47,
+    "syn2": 0.027
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "Not in any sub-theme",
+    "n1": 492,
+    "n2": 470,
+    "joint1": -0.186,
+    "joint2": 0.029,
+    "add1": -0.637,
+    "add2": -0.237,
+    "syn1": 0.451,
+    "syn2": 0.265
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "Out-of-favor sub-theme (bottom 20% on 6-month return)",
+    "n1": 77,
+    "n2": 47,
+    "joint1": -0.199,
+    "joint2": 0.229,
+    "add1": -0.646,
+    "add2": 0.089,
+    "syn1": 0.447,
+    "syn2": 0.139
+   },
+   {
+    "a": "SPY below its 50-day",
+    "b": "New lows beating new highs",
+    "n1": 42,
+    "n2": 171,
+    "joint1": 0.828,
+    "joint2": 0.872,
+    "add1": 0.404,
+    "add2": 0.739,
+    "syn1": 0.425,
+    "syn2": 0.133
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "Below its 200-day",
+    "n1": 516,
+    "n2": 358,
+    "joint1": -0.322,
+    "joint2": 0.215,
+    "add1": -0.737,
+    "add2": -0.104,
+    "syn1": 0.415,
+    "syn2": 0.319
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "Sub-theme top 20% on 60-day return",
+    "n1": 43,
+    "n2": 47,
+    "joint1": -0.198,
+    "joint2": -0.122,
+    "add1": -0.61,
+    "add2": 0.186,
+    "syn1": 0.412,
+    "syn2": -0.309
+   },
+   {
+    "a": "SPY above its 50-day",
+    "b": "Sub-theme top 20% on 60-day return",
+    "n1": 44,
+    "n2": 59,
+    "joint1": 0.3,
+    "joint2": 0.031,
+    "add1": -0.098,
+    "add2": 0.009,
+    "syn1": 0.398,
+    "syn2": 0.021
+   },
+   {
+    "a": "No thrust in 25 sessions",
+    "b": "Sub-theme above its 50-day",
+    "n1": 243,
+    "n2": 226,
+    "joint1": -0.113,
+    "joint2": 0.065,
+    "add1": -0.504,
+    "add2": 0.106,
+    "syn1": 0.392,
+    "syn2": -0.041
+   }
+  ],
+  "synergy_held": 13,
+  "synergy_tested": 15,
+  "model": {
+   "lam": 0.1,
+   "ic_additive": -0.015,
+   "ic_with_synergy": -0.011,
+   "quintiles_additive": [
+    0.123,
+    -0.035,
+    0.127,
+    0.117,
+    0.255
+   ],
+   "quintiles_with_synergy": [
+    0.183,
+    -0.036,
+    0.052,
+    0.132,
+    0.254
+   ],
+   "top_coef": {
+    "ADR 4%+": 0.249,
+    "6-25 sessions after a thrust": 0.148,
+    "Thrust day to 5 sessions after": 0.14,
+    "In-vogue theme (top 20% on 6-month return)": 0.14,
+    "Money leaving (10-day share in falling \u2265 52%)": 0.102,
+    "Theme top 20% on 20-day return": 0.087
+   },
+   "bottom_coef": {
+    "No thrust in 25 sessions": -0.289,
+    "SPY below its 200-day": -0.165,
+    "Within 10% of 52-week high": -0.126,
+    "30%+ below 52-week high": -0.119
+   }
+  }
+ }
+]

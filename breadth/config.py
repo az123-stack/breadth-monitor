@@ -102,4 +102,4 @@ TILT_UNCONFIRM_SHARE = 70   # experimental: thrust "unconfirmed" if a next-1-2-s
 
 # Unproven layers (macro_fit, ...) that Adam has approved to color the Decision Cards after passing their backtest.
 # Passing a backtest alone never changes anything; see DECISIONS.md.
-APPROVED_LAYERS = ("launch",)   # Oct 25, 2026: Adam approved the Launch list as the source of the headline picks (passed t >= 2, both halves)
+APPROVED_LAYERS = ("launch", "box_favorites", "lifecycle")   # Oct 25: Launch list = headline picks; Oct 27 (Adam): Lined-up buys (lifecycle) are the 2nd headline list, ★ leading group in box grades + playbook
