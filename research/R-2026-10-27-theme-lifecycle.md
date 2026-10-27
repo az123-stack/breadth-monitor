@@ -49,3 +49,10 @@ the case studies, not tuned. Weak-breadth sample 142 days.
 group-signal lines with the first tickers). Candidate for promotion: BUY groups as a context point for the swing picks (like the
 ignition re-rank) or a filter on Best Setups pullbacks — needs Adam's approval (config.APPROVED_LAYERS). Watch the live record before
 promoting; a push alert when a group turns BUY was offered as a scheduled task.
+
+**Follow-up: lined-up buys (Oct 27, Adam: "stock buys when everything lines up and tickers are into their EMAs", top of Intraday).**
+The live rule: a member of a BUY group (RS 70+, uptrend) dips into its 9/21 EMA ribbon; buy the break of that day's high within 3
+sessions; stop at the dip low (max 1 ADR); hold 20 sessions. Daily-bar test: BUY groups +0.84R a trade (n 750, halves +0.98 / +0.69R,
+29% win) vs other groups +0.13R and WATCH groups −0.15R (edge +0.49R, t 2.03, passes). 68% of dips triggered. Built as the "Lined-up
+buys" card at the top of the Intraday tab (live from Google prices; info only). WATCH-group names are left out because their dips lost.
+

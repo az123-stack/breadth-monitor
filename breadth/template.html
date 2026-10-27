@@ -4139,6 +4139,66 @@ function yourTradesCard(kicker, note) {
     ${opens ? `<h3 class="ih">Scoreboard trades in progress</h3><div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th>Entry</th><th>Price</th><th>Since entry</th><th class="l">Stop</th></tr></thead><tbody>${opens}</tbody></table></div>` : ""}
     <div class="note" style="padding:8px 0 0">${note || `Flag and VCP names show "Triggered" once Google's price trades through the pivot; that's a cue to check the chart, not an order. ATH Magnet names flag when they reach the all-time high.`}</div></section>`);
 }
+/* ---------- Lined-up buys · live (lifecycle.live): BUY-group leaders dipping into their 9/21 EMAs today (Adam, Oct 27 2026) ---------- */
+function lineupState(x) {
+  const L = liveActive() ? liveRow(x.t) : null, a = x.adr || 0;
+  let p, low, live = false;
+  if (L && L.price > 0) { live = true; p = L.price; low = L.low != null && L.low > 0 ? Math.min(L.low, p) : (L.open ? Math.min(L.open, p) : p); }
+  else { p = x.c; low = x.lo; }
+  const x9 = live ? x.e9 + (p - x.e9) * 0.2 : x.e9, x21 = live ? x.e21 + (p - x.e21) * 2 / 22 : x.e21, rib = Math.max(x9, x21);
+  const touchNow = low <= rib + 0.25 * a * p && p >= x21 - 0.5 * a * p;
+  const trig = x.hi;
+  // in the EMAs, holding the 21, not stretched, and yesterday's high within 1.5 ADRs (a deeper flush isn't this setup)
+  const zone = (touchNow || x.t3) && p >= x21 - 0.5 * a * p && p <= x9 + a * p && (trig / p - 1) <= 1.5 * a;
+  const over = zone && live && p > trig;
+  const near = !zone && p > rib && p <= rib * (1 + a);
+  const stopBase = touchNow ? low : x.lo;
+  const stop = Math.max(stopBase, trig * (1 - a));
+  const st = over ? "over" : zone ? "zone" : near ? "near" : null;
+  return { ...x, live, p, low, x9, x21, rib, touchNow, zone, over, near, st, trig, stop, risk: trig > 0 ? 1 - stop / trig : null,
+    chg: L ? L.chg : null, toTrig: a && p ? (trig / p - 1) / a : null };
+}
+function lineupCard(T) {
+  const LC = (T || {}).lifecycle;
+  if (!LC || !(LC.live || []).length) return $('<div></div>');
+  const SE = ((LC.stock_evidence || {}).trigger) || {}, B = SE.buy || {}, O = SE.other || {}, W = SE.watch || {};
+  const R = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + v.toFixed(2) + "R";
+  const pc = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const onHold = LC.size === "hold off";
+  const rows = (LC.live || []).map(lineupState).filter(r => r.st);
+  const ORD = { over: 0, zone: 1, near: 2 };
+  rows.sort((a, b) => ORD[a.st] - ORD[b.st] || (a.kind === "buy" ? 0 : 1) - (b.kind === "buy" ? 0 : 1) || (b.rs || 0) - (a.rs || 0));
+  const isLive = rows.some(r => r.live);
+  const chk = (ok, txt) => `<span class="tg ${ok ? "sow-breakout" : "sow-extended"}" style="margin:1px 2px 1px 0">${ok ? "✓" : "✗"} ${txt}</span>`;
+  const LBL = { over: ["BUY · over yesterday's high", "sow-breakout"], zone: ["In the EMAs · set the buy-stop", "sow-nuzzle"], near: ["Approaching the EMAs", "sow-riding"] };
+  const row = (r) => { const go = r.kind === "buy" && !onHold;
+    const lab = r.st === "over" && !go ? ["Triggered · on hold (breadth)", "sow-pop"] : LBL[r.st];
+    return `<tr${r.st === "over" && go ? ' style="background:color-mix(in srgb, var(--good) 10%, transparent)"' : ""}>
+      <td class="l"><b>${r.t}</b><small class="meta" style="display:block">${esc(r.g)}</small>${r.earn ? `<small class="meta" style="display:block">earnings ${shortDate(r.earn)}</small>` : ""}</td>
+      <td class="l"><span class="tg ${lab[1]}">${lab[0]}</span></td>
+      <td class="num">$${r.p.toFixed(2)}${r.chg != null ? `<small class="meta" style="display:block">${pc(r.chg)}</small>` : ""}</td>
+      <td class="num"><b>$${(+r.trig).toFixed(2)}</b>${r.toTrig != null && r.st !== "over" ? `<small class="meta" style="display:block">${r.toTrig.toFixed(2)} ADR away</small>` : ""}</td>
+      <td class="num">$${r.stop.toFixed(2)}<small class="meta" style="display:block">${pc(-r.risk)}</small></td>
+      <td class="num">$${r.x9.toFixed(2)} / $${r.x21.toFixed(2)}</td>
+      <td class="num ${rsTint(r.rs)}">${r.rs ?? "–"}</td>
+      <td class="l" style="min-width:250px">${chk(go, r.kind === "buy" ? "Group BUY" : "Group ready, breadth weak")}${chk(r.lead, "Leaders")}${chk(true, "RS 70+ · uptrend")}${chk(r.zone, "Into the 9/21")}${chk(r.st === "over", "Over yesterday's high")}</td></tr>`; };
+  const nGo = rows.filter(r => r.st === "over" && r.kind === "buy" && !onHold).length;
+  const head = onHold ? `<div class="rbanner watch" style="background:color-mix(in srgb, var(--critical) 12%, transparent);border-color:var(--critical)"><b>Not everything lines up: breadth is weak</b> (10-day ratio ${LC.ratio10 ?? "–"} at the last close). The names below are in BUY-ready groups and dipping into their EMAs, but the group BUY is on hold until the 10-day ratio is back over 1. Track them; don't buy yet.</div>`
+    : `<div class="rbanner ${nGo ? "act" : "watch"}"><b>${nGo ? `${nGo} lined up and triggered${LC.size === "half" ? " · half size (mixed breadth)" : ""}` : "Nothing triggered yet"}.</b> Every check green = group in BUY, leaders present, the stock RS 70+ in an uptrend, today's dip into its 9/21 EMAs, and price back over yesterday's high.</div>`;
+  const sec = $(`<section class="icard card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv ${B.R > 0 && (SE.t || 0) >= 2 ? "focus" : "unproven"}">${B.R > 0 && (SE.t || 0) >= 2 ? "Tested" : "Unproven"}</span> Lined-up buys <span class="meta">· theme BUY + dip into the 9/21 EMAs · ${isLive ? "live" : "as of the " + shortDate(LC.date) + " close"}</span></h2>
+      <div class="tsbtns"><button class="ludl">⬇ TradingView</button></div></div>
+    ${head}
+    <div class="scroll"><table class="grid" style="margin-top:8px"><thead><tr><th class="l">Stock</th><th class="l">Now</th><th>Price</th><th>Buy over<small>yesterday's high</small></th><th>Stop<small>dip low, max 1 ADR</small></th><th>9 / 21 EMA<small>live</small></th><th>RS</th><th class="l">Lined up?</th></tr></thead><tbody>
+    ${rows.slice(0, 25).map(row).join("") || `<tr><td colspan="8" class="meta">No BUY-group leader is in or near its 9/21 EMAs ${isLive ? "right now" : "at the last close"}.</td></tr>`}</tbody></table></div>
+    <p class="meta" style="margin:6px 0 0">What the test said (daily bars, ${esc((LC.stock_evidence || {}).from || "")} to ${esc((LC.stock_evidence || {}).to || "")}): a dip into the 9/21 EMAs, bought on the break of that day's high within 3 sessions, stop at the dip low (max 1 ADR), held 20 sessions: in BUY groups <b>${R(B.R)}</b> a trade (n ${B.n ?? "–"}, halves ${R(B.h1)} / ${R(B.h2)}, ${B.win == null ? "–" : Math.round(B.win * 100) + "%"} win) vs ${R(O.R)} in other groups and ${R(W.R)} in WATCH groups (edge ${R(SE.edge)}, t ${SE.t ?? "–"}). Most trades lose small and the winners pay: keep the stop. Google prices run up to ~20 min behind, and the sheet has no intraday high, so "over yesterday's high" uses the last price. Groups and checks: <a href="#best" data-go="best">Theme lifecycle card ›</a></p></section>`);
+  sec.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); const b = document.querySelector(`nav.tabs button[data-tab="${a.dataset.go}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
+  sec.querySelector(".ludl").addEventListener("click", () => tsDownload("lined-up-buys", [
+    { name: "Lined-up buys - triggered", ticks: rows.filter(r => r.st === "over").map(r => r.t) },
+    { name: "Lined-up buys - in the EMAs", ticks: rows.filter(r => r.st === "zone").map(r => r.t) },
+    { name: "Lined-up buys - approaching", ticks: rows.filter(r => r.st === "near").map(r => r.t) }]));
+  return sec;
+}
 function renderIntraday(app) {
   const I = DATA.intraday, T = DATA.themes;
   if (!I) { app.append($('<div class="icard card empty">Intraday data appears after the next build.</div>')); return; }
@@ -4149,6 +4209,7 @@ function renderIntraday(app) {
     : `<b>${clk.open ? "Session open" : "Market closed"}</b> · ${clk.label} · Google prices fetched ${LIVE.fetched.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} (Google runs up to ~20 min behind) · refreshes every 3 min`}</span><button>Refresh</button></div>`));
   app.querySelector(".livebar:last-child button").addEventListener("click", () => fetchLive());
   if (!hasCols) { app.append(oilCard()); return; }   // the futures feed doesn't need the Google sheet
+  app.append(lineupCard(T));   // Lined-up buys: theme BUY + dip into the 9/21 EMAs (top of the tab, Adam Oct 27)
   const pc = (v, d = 2) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
   const cls = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "dn" : "";
   // 0. Thrust watch

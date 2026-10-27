@@ -217,8 +217,20 @@ def stock_evidence(P, G, members, bench_c, bench_o):
             spy = bench_c.iat[i + H] / bench_o.iat[i + 1] - 1
             b = any(bool(buy[g].iat[i]) for g in gs)
             wv = any(bool(watch[g].iat[i]) for g in gs)
-            rows.append((days[i], "buy" if b else "watch" if wv else "other", ret / a, ex / e - 1 - spy))
-    X = pd.DataFrame(rows, columns=["date", "grp", "R", "xs"])
+            # live rule: buy the break of the touch-day high within 3 sessions, stop the touch-day low (max 1 ADR)
+            hi_i, lo_i = P["h"][t].iat[i], P["l"][t].iat[i]
+            Rt = None
+            for j in range(i + 1, min(i + 4, n - H)):
+                if P["h"][t].iat[j] >= hi_i:
+                    en = max(P["o"][t].iat[j], hi_i)
+                    st = max(lo_i, en * (1 - a))
+                    risk = max(en - st, 0.3 * a * en)
+                    lw = P["l"][t].iloc[j:j + H].to_numpy()
+                    hit2 = np.flatnonzero(lw <= st)
+                    Rt = (st - en) / risk if len(hit2) else (P["c"][t].iat[j + H - 1] - en) / risk
+                    break
+            rows.append((days[i], "buy" if b else "watch" if wv else "other", ret / a, ex / e - 1 - spy, Rt))
+    X = pd.DataFrame(rows, columns=["date", "grp", "R", "xs", "Rt"])
     if not len(X):
         return None
     split = X["date"].sort_values().iloc[len(X) // 2]
@@ -231,6 +243,16 @@ def stock_evidence(P, G, members, bench_c, bench_o):
     out["edge"] = _r(d.mean(), 3)
     out["t"] = _r(d.mean() / (d.std(ddof=1) / np.sqrt(len(d))), 2) if len(d) > 2 and d.std(ddof=1) > 0 else None
     out["proven"] = bool(out["t"] is not None and out["t"] >= 2 and (out["buy"]["h1"] or 0) > 0 and (out["buy"]["h2"] or 0) > 0)
+    Y = X.dropna(subset=["Rt"])           # the intraday rule the live card uses (trigger over the touch-day high)
+    tr = {"filled": _r(len(Y) / len(X), 3) if len(X) else None}
+    for g in ("buy", "watch", "other"):
+        y = Y[Y["grp"] == g]
+        tr[g] = {"n": int(len(y)), "R": _r(y["Rt"].mean(), 3), "win": _r((y["Rt"] > 0).mean(), 3),
+                 "h1": _r(y[y["date"] < split]["Rt"].mean(), 3), "h2": _r(y[y["date"] >= split]["Rt"].mean(), 3)}
+    d2 = (Y[Y["grp"] == "buy"].groupby("date")["Rt"].mean() - Y[Y["grp"] != "buy"].groupby("date")["Rt"].mean()).dropna()
+    tr["edge"] = _r(d2.mean(), 3)
+    tr["t"] = _r(d2.mean() / (d2.std(ddof=1) / np.sqrt(len(d2))), 2) if len(d2) > 2 and d2.std(ddof=1) > 0 else None
+    out["trigger"] = tr
     return out
 
 
@@ -363,13 +385,33 @@ def build(adjusted, theme_data, history, evidence_on=True):
     act = bool(G["act"].iat[i])
     weak = bool(G["weak"].iat[i]) if G["weak"].iat[i] == G["weak"].iat[i] else False
     size = "full" if act else ("hold off" if weak else "half")
+    # Live "lined up" list for the Intraday tab: every liquid RS 70+ uptrend member of a ready / watch group, with what the
+    # browser needs to test today's dip into the 9/21 EMAs from Google prices (lifecycleLive in template.html).
+    live, rank = {}, {"buy": 0, "ready": 1, "watch": 2}
+    for r in rows:
+        kind = ("buy" if r["buy"] else "ready") if r["ready"] else None   # WATCH-group dips lost (-0.16R): not listed
+        if not kind:
+            continue
+        for t in members.get(r["g"], []):
+            if t not in P["c"].columns or not (stocks.get(t) or {}).get("is_stock") or not bool(P["base"][t].iat[i]):
+                continue
+            rs = (stocks.get(t) or {}).get("rsr")
+            if rs is None or rs < CFG["rs_min"] or (t in live and rank[live[t]["kind"]] <= rank[kind]):
+                continue
+            a = P["adr"][t].iat[i]
+            live[t] = {"t": t, "g": r["g"], "kind": kind, "lead": r["lead"], "stage": r["stage"], "rs": _r(rs, 0),
+                       "c": _r(P["c"][t].iat[i], 4), "hi": _r(P["h"][t].iat[i], 4), "lo": _r(P["l"][t].iat[i], 4),
+                       "e9": _r(P["e9"][t].iat[i], 4), "e21": _r(P["e21"][t].iat[i], 4), "adr": _r(a, 4),
+                       "t3": bool(P["touch"][t].iloc[i - CFG["fresh"] + 1:i + 1].any()), "t0": bool(P["touch"][t].iat[i]),
+                       "earn": earn.get(t)}
     rows.sort(key=lambda r: (not r["ready"], not r["watch"], not r["new"], -(r["strength"] or 0)))
     counts = {k: int((G["stage"].iloc[i] == NUM[k]).sum()) for _, k, _ in STAGES}
     alerts = [{"g": r["g"], "kind": ("buy" if r["buy"] else "ready") if r["ready"] else "watch", "days": r["on_days"], "stage": r["stage"]}
               for r in rows if r["new"]]
     out = {"date": dates[i].strftime("%Y-%m-%d"), "cfg": CFG, "stages": [{"n": n, "k": k, "name": nm} for n, k, nm in STAGES],
            "rows": rows, "counts": counts, "alerts": alerts, "act": act, "weak": weak, "size": size,
-           "ratio10": _r(G["r10"].iat[i], 2), "regime": str(G["regime"].iat[i])}
+           "ratio10": _r(G["r10"].iat[i], 2), "regime": str(G["regime"].iat[i]),
+           "live": sorted(live.values(), key=lambda x: (rank[x["kind"]], -(x["rs"] or 0)))}
     if evidence_on:
         out["evidence"] = group_evidence(G)
         try:

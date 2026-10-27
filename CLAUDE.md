@@ -510,6 +510,16 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   group state, 1-ADR stop, 20 sessions). Oct 27: BUY +2.7% vs avg group 20d (t 3.5, halves +2.8/+2.9), 40d +3.9%; weak breadth ≈ 0;
   WATCH ≈ 0, 53% turn BUY in 30 sessions; pullbacks in BUY groups +0.74R vs +0.27R (edge +0.31R, t 2.2); stage alone: blossom +3.0%
   (t 3.6), push −0.8%, forgotten −0.65%. Test `test_theme_lifecycle` (gating + no look-ahead).
+  **Lined-up buys · live** (Oct 27, Adam: "stock buys when everything lines up and tickers are into their EMAs", top of Intraday):
+  `lifecycle.live` = every liquid RS 70+ uptrend member (`P["base"]`) of a BUY / ready group (WATCH groups left out: their dips lost
+  −0.15R) with c, hi, lo, e9, e21, adr, t3/t0 (ribbon touch in 3 sessions / last), earn. Browser `lineupState` (live EMAs as `dipLive`:
+  α 0.2 / 2/22; low from sheet column L) → states over (in the zone and price > yesterday's high = the trigger) / zone (low into the
+  9/21 ribbon today or t3, price ≥ 21 − 0.5 ADR, ≤ 9 + 1 ADR, trigger within 1.5 ADRs) / near (within 1 ADR above the ribbon); stop =
+  dip low, max 1 ADR under the trigger. `lineupCard` = first card on the Intraday tab (after the live bar): banner hold-off (breadth weak)
+  / N lined up and triggered (half size when mixed), checklist chips per row (Group BUY, Leaders, RS 70+ · uptrend, Into the 9/21, Over
+  yesterday's high), top 25, ⬇ TradingView. Evidence `stock_evidence.trigger` (daily bars: touch, buy the break of the touch-day high within
+  3 sessions, stop touch-day low ≤ 1 ADR, 20 sessions): BUY groups +0.84R (n 750, halves +0.98/+0.69R, 29% win) vs other +0.13R, WATCH
+  −0.15R; edge +0.49R, t 2.03.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.
