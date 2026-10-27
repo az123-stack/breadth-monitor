@@ -61,3 +61,7 @@ data/lineup_ledger.csv and settled with the backtest's exact rule, so the live r
 signals are logged too, to test the breadth gate forward. Phone alerts: GitHub checks every 5 minutes in the session
 (breadth/lineup.py → docs/lineup_live.json) and a Claude scheduled task pushes new "in the EMAs" / "over yesterday's high" events.
 
+**EMA location tags (Oct 27, Adam: OKTA read "in the EMAs" while ~0.9 ADR above the 9).** Each lined-up row now says where price is
+against the live 9/21 EMAs: reclaimed the 21 / 9 (wicked under today, back over, within 0.5 ADR), on the 21 / 9 (within 0.3 ADR),
+between them, under the 21, or "over the 9 · x ADR". Phone alerts for the dip now wait until price is on or reclaiming a line. Not
+tested as an edge yet (follow-up: split the +0.84R trigger trades by where the dip day closed vs the 9/21).

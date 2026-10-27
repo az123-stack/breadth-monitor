@@ -26,6 +26,9 @@ from . import config
 ET = ZoneInfo("America/New_York")
 OUT = config.ROOT / "docs" / "lineup_live.json"
 DATA = config.ROOT / "docs" / "data.json"
+PRECISE = ("reclaim21", "reclaim9", "on21", "on9", "between")   # price on the line, not above it (OKTA, Oct 27)
+LOC_TEXT = {"reclaim21": "reclaimed the 21", "reclaim9": "reclaimed the 9", "on21": "on the 21 EMA", "on9": "on the 9 EMA",
+            "between": "between the 9 and 21"}
 
 
 def read_rows(text):
@@ -80,8 +83,13 @@ def state(x, L):
     near = (not zone) and p > rib and p <= rib * (1 + a)
     stop = max(low if touch_now else x["lo"], trig * (1 - a))
     st = "over" if over else "zone" if zone else "near" if near else None
+    d9 = (p - x9) / (a * p) if a else 0.0
+    d21 = (p - x21) / (a * p) if a else 0.0
+    loc = ("reclaim21" if low < x21 and p >= x21 and d21 <= 0.5 else "reclaim9" if low < x9 and p >= x9 and d9 <= 0.5 else "on21" if abs(d21) <= 0.3
+           else "on9" if abs(d9) <= 0.3 else "under21" if p < x21 else "between" if p < x9 else "above")
     return {"t": x["t"], "g": x["g"], "kind": x["kind"], "st": st, "live": live, "price": round(p, 2), "trigger": round(trig, 2),
-            "stop": round(stop, 2), "x9": round(x9, 2), "x21": round(x21, 2), "rs": x.get("rs"), "earn": x.get("earn")}
+            "stop": round(stop, 2), "x9": round(x9, 2), "x21": round(x21, 2), "rs": x.get("rs"), "earn": x.get("earn"),
+            "loc": loc, "precise": loc in PRECISE, "d9": round(d9, 2), "d21": round(d21, 2)}
 
 
 def run(text, lc, doc, now):
@@ -103,10 +111,12 @@ def run(text, lc, doc, now):
     for c in cur:
         if c["st"] not in ("zone", "over") or c["kind"] != "buy" or gate == "hold" or not c["live"]:
             continue
+        if c["st"] == "zone" and not c["precise"]:     # bounced well above the EMAs: no alert until it's on the line
+            continue
         if (c["t"], c["st"]) in seen:
             continue
         new.append({"time": now.strftime("%H:%M"), "t": c["t"], "g": c["g"], "state": c["st"], "price": c["price"],
-                    "trigger": c["trigger"], "stop": c["stop"], "rs": c["rs"], "earn": c["earn"]})
+                    "trigger": c["trigger"], "stop": c["stop"], "rs": c["rs"], "earn": c["earn"], "where": LOC_TEXT.get(c["loc"], f"{c['d9']:+.1f} ADR from the 9")})
     doc.update({"time": now.strftime("%H:%M"), "gate": gate, "ratio10": (lc or {}).get("ratio10"), "built": (lc or {}).get("date"),
                 "rows": cur, "events": (doc.get("events") or []) + new})
     doc.pop("note", None)
@@ -118,7 +128,7 @@ def _ntfy(events):
     if not topic or not events:
         return
     for e in events:
-        title = f"{e['t']} {'BUY: over yesterday high' if e['state'] == 'over' else 'in its 9/21 EMAs'}"
+        title = f"{e['t']} {'BUY: over yesterday high' if e['state'] == 'over' else e.get('where') or 'in its 9/21 EMAs'}"
         body = f"{e['g']} · ${e['price']} · buy over ${e['trigger']}, stop ${e['stop']}"
         try:
             req = urllib.request.Request(f"https://ntfy.sh/{topic}", data=body.encode(), headers={"Title": title, "Tags": "chart_with_upwards_trend"})

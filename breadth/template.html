@@ -4155,8 +4155,20 @@ function lineupState(x) {
   const stopBase = touchNow ? low : x.lo;
   const stop = Math.max(stopBase, trig * (1 - a));
   const st = over ? "over" : zone ? "zone" : near ? "near" : null;
+  // where price sits against the EMAs right now (in ADRs), for entries on the line rather than above it (Adam, OKTA Oct 27)
+  const d9 = a ? (p - x9) / (a * p) : null, d21 = a ? (p - x21) / (a * p) : null;
+  const loc = low < x21 && p >= x21 && d21 <= 0.5 ? "reclaim21" : low < x9 && p >= x9 && d9 <= 0.5 ? "reclaim9" : Math.abs(d21) <= 0.3 ? "on21"
+    : Math.abs(d9) <= 0.3 ? "on9" : p < x21 ? "under21" : p < x9 ? "between" : "above";
+  const precise = ["reclaim21", "reclaim9", "on21", "on9", "between"].includes(loc);
   return { ...x, live, p, low, x9, x21, rib, touchNow, zone, over, near, st, trig, stop, risk: trig > 0 ? 1 - stop / trig : null,
-    chg: L ? L.chg : null, toTrig: a && p ? (trig / p - 1) / a : null };
+    chg: L ? L.chg : null, toTrig: a && p ? (trig / p - 1) / a : null, d9, d21, loc, precise };
+}
+const LINEUP_LOC = { reclaim21: ["Reclaimed the 21", "sow-breakout"], reclaim9: ["Reclaimed the 9", "sow-breakout"], on21: ["On the 21 EMA", "sow-nuzzle"],
+  on9: ["On the 9 EMA", "sow-nuzzle"], between: ["Between the 9 and 21", "sow-nuzzle"], under21: ["Under the 21", "sow-extended"], above: ["Over the 9", "sow-riding"] };
+function lineupLocTag(r) {
+  const [t, c] = LINEUP_LOC[r.loc] || ["", ""];
+  const n = r.loc === "above" ? ` · ${r.d9.toFixed(1)} ADR` : r.loc === "under21" ? ` · ${(-r.d21).toFixed(1)} ADR` : "";
+  return `<span class="tg ${c}" title="9 EMA ${r.d9 >= 0 ? "+" : ""}${r.d9.toFixed(2)} ADR · 21 EMA ${r.d21 >= 0 ? "+" : ""}${r.d21.toFixed(2)} ADR">${t}${n}</span>`;
 }
 function lineupRecord(LC) {
   const K = LC.tracker || {}, SE = ((LC.stock_evidence || {}).trigger) || {}, B = SE.buy || {};
@@ -4192,21 +4204,21 @@ function lineupCard(T) {
   const onHold = LC.size === "hold off";
   const rows = (LC.live || []).map(lineupState).filter(r => r.st);
   const ORD = { over: 0, zone: 1, near: 2 };
-  rows.sort((a, b) => ORD[a.st] - ORD[b.st] || (a.kind === "buy" ? 0 : 1) - (b.kind === "buy" ? 0 : 1) || (b.rs || 0) - (a.rs || 0));
+  rows.sort((a, b) => ORD[a.st] - ORD[b.st] || (b.precise ? 1 : 0) - (a.precise ? 1 : 0) || (a.kind === "buy" ? 0 : 1) - (b.kind === "buy" ? 0 : 1) || Math.abs(a.d9) - Math.abs(b.d9));
   const isLive = rows.some(r => r.live);
   const chk = (ok, txt) => `<span class="tg ${ok ? "sow-breakout" : "sow-extended"}" style="margin:1px 2px 1px 0">${ok ? "✓" : "✗"} ${txt}</span>`;
-  const LBL = { over: ["BUY · over yesterday's high", "sow-breakout"], zone: ["In the EMAs · set the buy-stop", "sow-nuzzle"], near: ["Approaching the EMAs", "sow-riding"] };
+  const LBL = { over: ["BUY · over yesterday's high", "sow-breakout"], zone: ["Dipped · set the buy-stop", "sow-nuzzle"], near: ["Approaching the EMAs", "sow-riding"] };
   const row = (r) => { const go = r.kind === "buy" && !onHold;
     const lab = r.st === "over" && !go ? ["Triggered · on hold (breadth)", "sow-pop"] : LBL[r.st];
     return `<tr${r.st === "over" && go ? ' style="background:color-mix(in srgb, var(--good) 10%, transparent)"' : ""}>
       <td class="l"><b>${r.t}</b><small class="meta" style="display:block">${esc(r.g)}</small>${r.earn ? `<small class="meta" style="display:block">earnings ${shortDate(r.earn)}</small>` : ""}</td>
-      <td class="l"><span class="tg ${lab[1]}">${lab[0]}</span></td>
+      <td class="l"><span class="tg ${lab[1]}">${r.st === "zone" && !r.precise ? "Bounced off the EMAs" : lab[0]}</span><div style="margin-top:3px">${lineupLocTag(r)}</div></td>
       <td class="num">$${r.p.toFixed(2)}${r.chg != null ? `<small class="meta" style="display:block">${pc(r.chg)}</small>` : ""}</td>
       <td class="num"><b>$${(+r.trig).toFixed(2)}</b>${r.toTrig != null && r.st !== "over" ? `<small class="meta" style="display:block">${r.toTrig.toFixed(2)} ADR away</small>` : ""}</td>
       <td class="num">$${r.stop.toFixed(2)}<small class="meta" style="display:block">${pc(-r.risk)}</small></td>
       <td class="num">$${r.x9.toFixed(2)} / $${r.x21.toFixed(2)}</td>
       <td class="num ${rsTint(r.rs)}">${r.rs ?? "–"}</td>
-      <td class="l" style="min-width:250px">${chk(go, r.kind === "buy" ? "Group BUY" : "Group ready, breadth weak")}${chk(r.lead, "Leaders")}${chk(true, "RS 70+ · uptrend")}${chk(r.zone, "Into the 9/21")}${chk(r.st === "over", "Over yesterday's high")}</td></tr>`; };
+      <td class="l" style="min-width:250px">${chk(go, r.kind === "buy" ? "Group BUY" : "Group ready, breadth weak")}${chk(r.lead, "Leaders")}${chk(true, "RS 70+ · uptrend")}${chk(r.zone, "Dipped into the 9/21")}${chk(r.precise, "On / reclaiming the EMA now")}${chk(r.st === "over", "Over yesterday's high")}</td></tr>`; };
   const nGo = rows.filter(r => r.st === "over" && r.kind === "buy" && !onHold).length;
   const head = onHold ? `<div class="rbanner watch" style="background:color-mix(in srgb, var(--critical) 12%, transparent);border-color:var(--critical)"><b>Not everything lines up: breadth is weak</b> (10-day ratio ${LC.ratio10 ?? "–"} at the last close). The names below are in BUY-ready groups and dipping into their EMAs, but the group BUY is on hold until the 10-day ratio is back over 1. Track them; don't buy yet.</div>`
     : `<div class="rbanner ${nGo ? "act" : "watch"}"><b>${nGo ? `${nGo} lined up and triggered${LC.size === "half" ? " · half size (mixed breadth)" : ""}` : "Nothing triggered yet"}.</b> Every check green = group in BUY, leaders present, the stock RS 70+ in an uptrend, today's dip into its 9/21 EMAs, and price back over yesterday's high.</div>`;

@@ -532,6 +532,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   gate buy/half/hold, rows, events}; events = first time today a BUY-group name (gate not hold) reaches zone or over; optional instant
   ntfy.sh post when repo secret NTFY_TOPIC is set. Claude scheduled task "Market Monitor · lined-up alerts" (every 15 min in the session)
   reads `python -m breadth.lineup events --since 15` and pushes a phone notification for new events. Test `test_lineup_live_and_ledger`.
+  EMA LOCATION TAGS (Oct 27, Adam's OKTA chart: "In the EMAs" while 0.9 ADR above the 9): `loc` in `lineupState` / `lineup.state` (twins,
+  parity tested) from live price vs live 9/21 EMAs in ADRs (`d9`, `d21`): reclaim21 / reclaim9 (low under the EMA today, price back over it
+  and ≤ 0.5 ADR above) > on21 / on9 (within 0.3 ADR) > under21 / between (9–21) / above ("Over the 9 · x ADR"). `precise` = reclaim / on /
+  between. Zone rows that aren't precise read "Bounced off the EMAs"; precise rows sort first; checklist chip "On / reclaiming the EMA
+  now". Alerts: zone events fire only when precise (plus every "over"); ntfy title says where ("reclaimed the 9"). Untested as an edge.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

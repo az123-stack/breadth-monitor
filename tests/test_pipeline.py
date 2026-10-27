@@ -1532,10 +1532,13 @@ def test_lineup_live_and_ledger():
         js = f"""const liveActive = () => true; const LV = {_json.dumps(L)};
 const liveRow = (t) => {{ const r = LV[t]; return r ? {{ ...r, chg: r.price / r.closeyest - 1 }} : null; }};
 {src[i:j]}
-console.log(JSON.stringify(Object.fromEntries({_json.dumps(xs)}.map(x => [x.t, lineupState(x).st]))));"""
+console.log(JSON.stringify(Object.fromEntries({_json.dumps(xs)}.map(x => {{ const s = lineupState(x); return [x.t, [s.st, s.loc]]; }}))));"""
         r = subprocess.run([node, "-e", js], capture_output=True, text=True)
         assert r.returncode == 0, r.stderr[-600:]
-        assert _json.loads(r.stdout) == py, (r.stdout, py)
+        pyl = {x["t"]: [lineup.state(x, L[x["t"]])["st"], lineup.state(x, L[x["t"]])["loc"]] for x in xs}
+        assert _json.loads(r.stdout) == pyl, (r.stdout, pyl)
+    locs = {x["t"]: lineup.state(x, L[x["t"]])["loc"] for x in xs}
+    assert locs["DIP"] == "reclaim9" and locs["FAR"] == "above", locs                                       # wick under the 9 and back
     now = datetime(2026, 10, 27, 11, 0, tzinfo=ZoneInfo("America/New_York"))
     text = "ticker,index,symbol,price,closeyest,open,volume,marketcap,volumeavg,at10,at11,low\n_asof,x\n_spytime,10/27/2026 11:00:00\n" + \
         "\n".join(f"{t},1,{t},{r['price']},{r['closeyest']},{r['open']},1,1,1,,,{r['low']}" for t, r in L.items())
