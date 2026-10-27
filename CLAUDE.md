@@ -689,6 +689,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   mid $5–25M A +8.8% / B +0.14R; liquid $25M+ ≈ 0 (A +0.3%, B −1.2% test, C −2%). Non-spike: no edge. Bear flag weakest.
 - Limits: survivorship bias in backfill, small strong-regime sample, no costs, no intraday H/L/volume.
 
+## To-do list
+**ROADMAP.md** in the repo root is the running to-do list (priorities, review dates, done). Read it at the start of a work session
+and keep it current.
+
 ## Play ideas Adam logged (not built yet — ask where they go before building)
 - Oct 13, 2026 — "Theme breadth play" (95–100% of a theme's stocks up): DROPPED by Adam Oct 27.
 - Oct 13, 2026 — "Top late mover": BUILT Oct 27 as a watch line (`lateLeader`, see below); tested, not proven.
