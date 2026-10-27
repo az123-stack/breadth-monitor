@@ -6,7 +6,7 @@ status: mixed           # works | doesnt | mixed | untested | process
 kind: group             # market | group | setup | stock | exit | sizing | macro | news | data | process
 horizon: 21 sessions
 sample: 127 sub-themes (4+ liquid members), Jan 2025–Sep 2026 signal dates; 55 SPY −1% days / 89 heavy-breadth days; ~11–17 independent 21-day windows
-result: raw "held up best on bad days" LOST (top fifth −1.1% vs avg group 21d, bottom fifth +2.0%; same sign both halves). Beta-adjusted ("better than its beta predicts") top fifth +1.9% 21d (t 1.5) / +3.6% 42d, high-beta groups +2.8% / +6.7%, both halves positive — but adds ~nothing beyond plain 30-day relative strength (residual IC +0.05, t 0.6)
+result: single red-day strong sessions no edge (−0.4% 21d, t −1.8). 30-day version: raw "held up best on bad days" LOST (top fifth −1.1% vs avg group 21d, bottom fifth +2.0%; same sign both halves). Beta-adjusted ("better than its beta predicts") top fifth +1.9% 21d (t 1.5) / +3.6% 42d, high-beta groups +2.8% / +6.7%, both halves positive — but adds ~nothing beyond plain 30-day relative strength (residual IC +0.05, t 0.6)
 halves: raw top fifth −0.5 / −1.6%; beta-adjusted top fifth +2.4 / +1.9% (21d), high-beta +6.0 / +2.7%
 layers: [the_trade]     # ids from data/layers.json this is evidence for (empty = new idea)
 integrated: no          # yes | partly | no | rejected
@@ -39,3 +39,12 @@ Enterprise SaaS (79th); CROs 43rd, Life Science Tools 54th; among beta ≥ 1 gro
 **How it could be used.** Not as a stand-alone rule. Possible info column on the Rotation / ignition card: "held up on bad days, beyond its beta"
 as a tiebreaker for groups that are already leading, labeled unproven. Never use the raw "fell least" version — it selects defensives.
 Re-test once there are more bad days (or with 5 years of history via Massive Starter).
+
+**Follow-up: single-session tells (Oct 27, Adam: "CROs had great breadth and growth on a few bad days").** Event = a sub-theme up 1%+
+with 75%+ of its members up on a bad day; same group within 10 sessions = one event; next open → 21 / 42 sessions vs the average group.
+SPY −1% days: −0.4% (292 events, 41 dates, beat 53%, t −1.8); heavy-breadth days −0.4% (567); any red day (SPY ≤ −0.4%) +0.2% (845);
+excluding defensives (beta ≥ 0.8) −1.3% / −0.1% / −0.2%. Repeats (2 or 3 such days within 20 sessions) +0.1% / +0.6%. Control: the same
+move on a normal up day +0.6%. → No edge: a single strong session on a red day is not a tell. CROs' own record: strong on Sep 15
+(+4.7%, 3/4 up), Sep 24 (+3.0%, 4/4), Oct 12 (4/4), Oct 14 (SPY −1.1%, 517 stocks down 4%: CROs +1.2% 4/4, Large-cap Pharma 16/20 up)
+but weak on Oct 16 (−1.6%, 0/4) and Oct 22 (−0.7%, 1/4); its breakout came on Oct 21 with the TMO / DHR / MEDP earnings, a catalyst.
+Memory keeps the tells from groups that later ran and drops the misses.
