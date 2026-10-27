@@ -559,7 +559,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   setup and trade list stays (Adam downloads them for weekend chart review); the header "⬇ Trade Setups" starts with Launch picks +
   lined-up buys (`launchPickSet`, `lineupNow`). Read-out plan, "Your trades" cards and story tags use them too. Catalyst agent worklist
   (`agentfiles.worklist`) = Launch picks → lined-up buys → theme-BUY tickers → old card names, max 45 (first 15 full research). Macro
-  brief agent retired with the cards (Adam to pause the scheduled task). `config.APPROVED_LAYERS` = launch, box_favorites, lifecycle.
+  brief agent KEPT (Adam: important): `macroBriefCard` on the Read-out ("Macro & the week ahead": risk, rates / Fed / oil / geo, the
+  coming events from today on, sources), fetched from docs/agent/macro_brief.json on Pages every 15 min. `config.APPROVED_LAYERS` = launch, box_favorites, lifecycle.
 - ★ in box grades (Oct 27, Adam approved): condition "★ Leading group (sub-theme top 30% on 60-day return)" in `boxstudy.conditions`
   (feeds `expected()` grades when proven) and in `GROUP_OK` (Box Retest / Box Spring playbook confluence).
 - Top late mover (Oct 27; `lateLeader` at the top of the Intraday Second-half movers card; card R-2026-10-27-late-mover; study

@@ -3494,6 +3494,33 @@ function roBoard(live) {
 }
 
 /* ---------- The story (top of Read-out): scenario tracker (mirrors breadth/story.py scenario/baskets) + Claude's chapters (docs/story.json) ---------- */
+/* ---------- Macro & the week ahead (the 7:02 AM macro brief agent → docs/agent/macro_brief.json). Shown here since Oct 27, 2026,
+   when the Decision Cards it used to sit in were retired (Adam: "I think it's important"). ---------- */
+let MBJ = null, MB_ERR = null, MB_BUSY = false;
+async function fetchMacroBrief() {
+  if (MB_BUSY) return; MB_BUSY = true;
+  try { const r = await fetch("agent/macro_brief.json?cb=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw new Error("HTTP " + r.status); MBJ = await r.json(); MB_ERR = null; }
+  catch (e) { MB_ERR = String(e.message || e); }
+  MB_BUSY = false; if (TAB === "readout") rerenderPanel();
+}
+setInterval(() => { if (document.visibilityState === "visible" && TAB === "readout") fetchMacroBrief(); }, 15 * 60 * 1000);
+function macroBriefCard() {
+  if (!MBJ && !MB_ERR && !MB_BUSY) fetchMacroBrief();
+  if (!MBJ) return $('<div></div>');
+  const B = MBJ, today = etToday();
+  const RISK = { high: ["avoid", "High"], medium: ["watch", "Medium"], low: ["act", "Low"] };
+  const rk = RISK[B.risk] || ["watch", B.risk || "–"];
+  const ev = (B.events || []).filter(e => (e.date || "") >= today).sort((a, b) => (a.date + (a.time || "")).localeCompare(b.date + (b.time || "")));
+  const age = B.written ? Math.round((Date.now() - Date.parse(B.written)) / 36e5) : null;
+  const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return "source"; } };
+  const line = (k, v) => v ? `<li><b>${k}:</b> ${esc(v)}</li>` : "";
+  const d = $(`<details class="card regcard"${B.risk === "high" ? " open" : ""}><summary><span class="pbv ${rk[0]}">Macro risk ${rk[1]}</span> <b>Macro &amp; the week ahead</b> <span class="meta">· ${esc(B.headline || "")}</span></summary>
+    <ul style="margin:8px 0 4px;padding-left:18px">${line("Rates", B.rates)}${line("Fed", B.fed)}${line("Oil", B.oil)}${line("Geopolitics", B.geo)}</ul>
+    ${ev.length ? `<div class="scroll"><table class="grid" style="margin-top:6px"><thead><tr><th class="l">When</th><th class="l">Event</th><th class="l">Impact</th></tr></thead><tbody>
+      ${ev.map(e => `<tr${e.impact === "high" ? ' style="background:color-mix(in srgb, var(--critical) 8%, transparent)"' : ""}><td class="l">${e.date === today ? "<b>Today</b>" : shortDate(e.date)} <small class="meta">${esc(e.time || "")}</small></td><td class="l">${esc(e.name)}</td><td class="l">${e.impact === "high" ? "<b>High</b>" : "Medium"}</td></tr>`).join("")}</tbody></table></div>` : ""}
+    <p class="meta" style="margin:6px 0 0">Written by the macro brief agent at 7:02 AM ET${age != null ? ` (${age < 24 ? age + " h ago" : Math.round(age / 24) + " days ago: may be stale"})` : ""} from web sources: ${(B.sources || []).slice(0, 5).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(host(u))}</a>`).join(" · ")}. Information only: it doesn't change any pick.</p></details>`);
+  return d;
+}
 let STORYJ = null, STORY_ERR = null, STORY_BUSY = false;
 async function fetchStory() {
   if (STORY_BUSY) return; STORY_BUSY = true;
@@ -3895,6 +3922,7 @@ function renderReadout(app) {
   if (dB) app.append(dB);
   app.append(roSchedule());
   if (dC) app.append(dC);
+  app.append(macroBriefCard());
   if (DATA.themes && DATA.themes.thetrade) app.append(tradeCard(DATA.themes.thetrade));
   app.append(storyCard());
   const wrap = $(`<div class="ro">${order.map(k => cards[k]).join("")}

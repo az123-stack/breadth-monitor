@@ -278,12 +278,12 @@
    "name": "Macro brief",
    "kind": "agent",
    "owner": "macro brief agent",
-   "status": "retired",
-   "where": "decision.py",
+   "status": "info",
+   "where": "agent 7:02 AM ET → docs/agent/macro_brief.json → Read-out 'Macro & the week ahead' card (macroBriefCard); also still read by decision.py (quiet log)",
    "what": "rates, Fed, oil, geopolitics, event risk; forward-logged",
    "affects_picks": false,
    "evidence": [],
-   "notes": " · Oct 27 2026: retired with the Decision Cards; agent to be paused."
+   "notes": " · Oct 27 2026: kept (Adam: important); shown as the 'Macro & the week ahead' card on the Read-out since the Decision Cards were retired."
   },
   {
    "id": "position_exits",
