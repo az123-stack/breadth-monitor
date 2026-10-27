@@ -1642,6 +1642,53 @@ console.log(JSON.stringify(out));"""
     return "stale dropped, backup used, sheet preferred"
 
 
+def test_earnings_clusters():
+    """Earnings clusters: two members gapping up on heavy volume in one week make an UP cluster, one alone doesn't; the
+    story fact sheet adds today's reactions from the close snapshot; reactions for past days never change with later data."""
+    from breadth import earnings as EA, story as ST
+    days = pd.bdate_range("2025-01-02", periods=120)
+    n, rng = len(days), np.random.default_rng(3)
+    W = {k: {} for k in ("o", "h", "l", "c", "v")}
+    for t in ["A0", "A1", "A2", "A3", "B0", "B1", "B2", "SPY"]:
+        c = 50 * np.cumprod(1 + rng.normal(0, 0.01, n))
+        o = c * (1 + rng.normal(0, 0.002, n))
+        v = np.full(n, 1e6)
+        if t in ("A0", "A1"):                       # both report in the last week: gap up 8% on 5x volume, close up 10%
+            j = n - 3 if t == "A0" else n - 2
+            c[j:] *= 1.10
+            o[j] = c[j - 1] * 1.08
+            v[j] = 5e6
+        if t == "B0":                               # a lone reaction in group B
+            j = n - 2
+            c[j:] *= 1.10
+            o[j] = c[j - 1] * 1.08
+            v[j] = 5e6
+        for k, x in (("o", o), ("h", np.maximum(o, c) * 1.01), ("l", np.minimum(o, c) * 0.99), ("c", c), ("v", v)):
+            W[k][t] = x
+    W = {k: pd.DataFrame(v, index=days) for k, v in W.items()}
+    mem = {"A": ["A0", "A1", "A2", "A3"], "B": ["B0", "B1", "B2"]}
+    F = EA.frames(W)
+    CL = EA.clusters(F, mem)
+    assert int(CL["A"]["dir"].iloc[-1]) == 1 and int(CL["A"]["n"].iloc[-1]) == 2, CL["A"].iloc[-3:]
+    assert int(CL["B"]["dir"].iloc[-1]) == 0
+    F2 = EA.frames({k: v.iloc[:-2] for k, v in W.items()})            # no look-ahead
+    a, b = F2["react"], F["react"].iloc[:-2]
+    assert a.fillna(9).equals(b.fillna(9))
+    # fact sheet: B's lone official reaction + a TODAY reaction in B1 from the snapshot -> listed; A listed UP
+    T = {"earnings": {"rows": [{"g": "A", "dir": "up", "n": 2, "members": 4, "grp": 0.05, "quiet": 0.01, "next": [],
+                                "reports": [{"t": "A0", "date": "2025-06-10", "dir": 1, "gap": 0.08, "move": 0.1, "rvol": 5.0, "conf": True},
+                                            {"t": "A1", "date": "2025-06-11", "dir": 1, "gap": 0.08, "move": 0.1, "rvol": 5.0, "conf": False}]},
+                               {"g": "B", "dir": "mixed", "n": 1, "members": 3, "grp": 0.03, "quiet": 0.0, "next": [],
+                                "reports": [{"t": "B0", "date": "2025-06-11", "dir": 1, "gap": 0.08, "move": 0.1, "rvol": 5.0}]}],
+                      "window": ["2025-06-06", "2025-06-12"], "spy": 0.01, "cfg": EA.CFG},
+         "stocks": [{"t": "B1", "sub": "B", "v50": 1e6, "adr": 3.0}, {"t": "B2", "sub": "B", "v50": 1e6, "adr": 3.0}]}
+    snap = {"B1": {"price": 55.0, "closeyest": 50.0, "open": 54.0, "volume": 4e6}, "B2": {"price": 50.2, "closeyest": 50.0, "open": 50.1, "volume": 1e6}}
+    L = "\n".join(ST.earnings_lines(T, "pm", snap))
+    assert "**A** · UP" in L and "**B** · UP" in L and "B1 TODAY" in L and "B2" not in L, L
+    assert ST.earnings_lines({"earnings": {"rows": []}}, "am") == []
+    return f"{len(L.splitlines())} fact lines"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

@@ -314,13 +314,12 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
             continue
         tick[tk] = {
             "rsr": _r(rlast.get(tk), 0), "rsr5": (_r(rlast.get(tk) - r5.get(tk), 0) if r5 is not None else None),
-            "rsraw": _r(raw.iloc[last][tk]),
             "rs_nh": bool(nh.iloc[last][tk]) if nh is not None and not pd.isna(nh.iloc[last][tk]) else False,
             "rs_lead": bool(lead.iloc[last][tk]) if lead is not None and not pd.isna(lead.iloc[last][tk]) else False,
             "adr": _r(t["adr"].iloc[last][tk], 2), "tight": _r(t["tight5"].iloc[last][tk], 2),
             "nr7": bool(t["nr7"].iloc[last][tk]), "inside": bool(t["inside"].iloc[last][tk]),
             "vdry": _r(t["vdry"].iloc[last][tk], 2), "off_hi": _r(t["off_high"].iloc[last][tk]),
-            "v50": _r(t["vol50"].iloc[last][tk], 0), "v1": _r(w["v"].iloc[last][tk], 0),
+            "v50": _r(t["vol50"].iloc[last][tk], 0),
         }
 
     # ---- setup lists (whole market, latest session; EPs over the last 5) ----

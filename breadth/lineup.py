@@ -131,7 +131,8 @@ def _ntfy(events):
         title = f"{e['t']} {'BUY: over yesterday high' if e['state'] == 'over' else e.get('where') or 'in its 9/21 EMAs'}"
         body = f"{e['g']} · ${e['price']} · buy over ${e['trigger']}, stop ${e['stop']}"
         try:
-            req = urllib.request.Request(f"https://ntfy.sh/{topic}", data=body.encode(), headers={"Title": title, "Tags": "chart_with_upwards_trend"})
+            req = urllib.request.Request(f"https://ntfy.sh/{topic}", data=body.encode(), headers={"Title": title, "Tags": "chart_with_upwards_trend",
+                                         "Click": "https://az123-stack.github.io/breadth-monitor/#best"})   # tap opens the card
             urllib.request.urlopen(req, timeout=20).read()
         except Exception as ex:   # an alert failure never stops the loop
             print("ntfy failed:", ex)

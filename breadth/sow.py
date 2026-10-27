@@ -205,7 +205,6 @@ def build(adjusted, universe, stocks=None, names=None, evidence=True):
             trig, stop = None, e21 * CFG["hold21"]
         s = info.get(t, {})
         n0 = max(0, wi - CFG["spark"] + 1)
-        lo52 = np.nanmin(W["l"].iloc[max(0, wi - 52):wi + 1, j].to_numpy())
         hi52 = np.nanmax(W["h"].iloc[max(0, wi - 52):wi + 1, j].to_numpy())
         rows.append({
             "t": t, "name": s.get("name") or names.get(t, ""), "state": st, "ago": ago, "price": _r(c),
@@ -215,13 +214,12 @@ def build(adjusted, universe, stocks=None, names=None, evidence=True):
             "box_atr": _r((hi10 / lo10 - 1) / atr, 1) if np.isfinite(atr) and atr > 0 else None,
             "volx": _r(F["vpace"].iat[k, j] / F["v20"].iat[k, j], 2) if F["v20"].iat[k, j] else None,
             "trig": _r(trig), "stop": _r(stop), "risk": _r(1 - stop / (trig or c), 4) if stop and np.isfinite(stop) else None,
-            "lo52": _r(lo52), "hi52": _r(hi52), "off_hi52": _r(c / hi52 - 1, 4),
+            "off_hi52": _r(c / hi52 - 1, 4),
             "rsr": s.get("rsr") if s.get("rsr") is not None else _r(rs.get(t), 0),
             "dvol": _r(dvol[t].iloc[-1] / 1e6, 0), "adr": _r(adr[t].iloc[-1], 1), "theme": (s.get("themes") or [None])[0], "sub": s.get("sub"),
             "prime": prime, "prime_new": prime and any(bool(F["prime_new"].iat[wi - a, j]) for a in range(0, 4) if wi - a >= 0),
-            "prime_wks": int(F["prime"].iloc[:wi + 1, j][::-1].cumprod().sum()) if prime else 0,
             "run50": int(F["run"].iat[wi, j]), "vr": _r(F["vr"].iat[wi, j], 2), "rsl_hi": bool(F["rsl_hi"].iat[wi, j]),
-            "rs_up": bool(F["rs_up"].iat[wi, j]), "ext50": _r((c / e50 - 1) / atr, 1) if np.isfinite(atr) and atr > 0 else None,
+            "ext50": _r((c / e50 - 1) / atr, 1) if np.isfinite(atr) and atr > 0 else None,
             "wk": [_r(x) for x in W["c"].iloc[n0:, j]], "w9": [_r(x) for x in F["e9"].iloc[n0:, j]],
             "w21": [_r(x) for x in F["e21"].iloc[n0:, j]], "w50": [_r(x) for x in F["e50"].iloc[n0:, j]],
         })

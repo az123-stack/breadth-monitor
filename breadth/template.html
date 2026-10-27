@@ -577,7 +577,6 @@ table.grid.hvetab td.pcell { min-width: 170px; } table.grid.hvetab td.pcell smal
 const DATA = /*__DATA__*/null;
 
 const $ = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstElementChild; };
-const fmtK = (v) => v == null ? "–" : v >= 1e6 ? (v / 1e6).toFixed(1) + "M" : v >= 1e3 ? Math.round(v / 1e3) + "K" : String(Math.round(v));
 const fmt = (v, d = 0) => v == null ? "–" : Number(v).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
 const ord = (n) => n == null ? "" : n + (["th","st","nd","rd"][(n % 100 - 20) % 10] || ["th","st","nd","rd"][n % 100] || "th");
 const shortDate = (s) => { const d = new Date(s + "T12:00:00"); return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }); };
@@ -648,18 +647,7 @@ function render() {
   const show = () => {
     tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === TAB));
     panel.innerHTML = "";
-    if (TAB === "themes") renderThemes(panel);
-    else if (TAB === "stocks") renderStocks(panel);
-    else if (TAB === "browse") renderBrowse(panel);
-    else if (TAB === "setups") renderSetups(panel);
-    else if (TAB === "trades") renderTrades(panel);
-    else if (TAB === "launch") renderLaunch(panel);
-    else if (TAB === "best") renderBest(panel);
-    else if (TAB === "intraday") renderIntraday(panel);
-    else if (TAB === "premarket") renderPremarket(panel);
-    else if (TAB === "rotation") renderRotation(panel);
-    else if (TAB === "readout") renderReadout(panel); else if (TAB === "stories") renderStories(panel);
-    else renderBreadth(panel);
+    renderTab(panel);
     reapplySorts(panel);
   };
   tabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
@@ -2592,13 +2580,17 @@ function liveBar() {
   const b = el.querySelector("button"); if (b) b.addEventListener("click", () => { b.textContent = "Refreshing…"; fetchLive(); });
   return el;
 }
+// One tab → renderer table, shared by tab clicks and live refreshes (before Oct 27 the refresh copy was missing Best Setups and
+// Launch list, so a live price refresh on those tabs re-drew the Breadth tab).
+function renderTab(panel) {
+  const R = { themes: renderThemes, stocks: renderStocks, browse: renderBrowse, setups: renderSetups, trades: renderTrades, launch: renderLaunch,
+    best: renderBest, intraday: renderIntraday, premarket: renderPremarket, rotation: renderRotation, readout: renderReadout, stories: renderStories };
+  (R[TAB] || renderBreadth)(panel);
+}
 function rerenderPanel() {
   const panel = document.querySelector(".panel"); if (!panel) return;
   const y = window.scrollY; panel.innerHTML = "";
-  if (TAB === "themes") renderThemes(panel); else if (TAB === "stocks") renderStocks(panel);
-  else if (TAB === "browse") renderBrowse(panel); else if (TAB === "setups") renderSetups(panel);
-  else if (TAB === "trades") renderTrades(panel);
-  else if (TAB === "intraday") renderIntraday(panel); else if (TAB === "premarket") renderPremarket(panel); else if (TAB === "rotation") renderRotation(panel); else if (TAB === "readout") renderReadout(panel); else if (TAB === "stories") renderStories(panel); else renderBreadth(panel);
+  renderTab(panel);
   reapplySorts(panel);
   window.scrollTo(0, y);
 }
@@ -3290,7 +3282,6 @@ const roNm = (s) => esc(String(s || "").replace(/^[A-Z &]+ - /, ""));
 const roGo = (tab, txt) => `<a href="#${tab}" class="rogo" data-go="${tab}">${txt} ›</a>`;
 const roList = (items) => `<ul class="rol">${items.filter(Boolean).map(x => `<li>${x}</li>`).join("")}</ul>`;
 const roSec = (title, items, link) => { const it = (items || []).filter(Boolean); return it.length ? `<h3 class="ih">${title}${link ? ` <small class="meta">${link}</small>` : ""}</h3>${roList(it)}` : ""; };
-const roPts = (v) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(2)} pts`;
 const roB = (v) => `${v >= 0 ? "+" : "−"}$${Math.abs(v / 1e9).toFixed(0)}B`;
 const roDs = (v) => v == null ? null : v > 1 ? v / 100 : v;   // breadth.csv stores dn_share in percent
 const roGrade = (r, act) => { const l = r.lead && r.lead.ok; return l && act ? "A" : l || act ? "B" : "C"; };
@@ -3608,6 +3599,7 @@ function renderStories(app) {
   const head = $(`<section class="card regcard"><div class="head"><h2><span class="pbv unproven" title="Information only: stories never change the picks; each is scored against price">Info only</span> Trade Stories <span class="meta">· the storylines moving the market, updated after each close${STORIESJ && STORIESJ.updated ? " · last update " + esc(STORIESJ.updated.replace("T", " ")) + " ET" : ""}</span></h2></div>
     <p class="meta" style="margin:4px 0 0">Each story pulls the news, earnings and macro behind a move into one case file: what's happening, why, how it works, whether price agrees, how to trade it, and what would prove it wrong. Claude updates them once a day after the close with sources; the price check and scorecard are computed by the dashboard from real group returns, so a story that price stops agreeing with shows it.${X && X.name ? ` The market's main rotation right now: <a href="#" data-go="readout"><b>${esc(X.name)}</b></a> (The trade card on Read-out).` : ""}</p></section>`);
   app.append(head);
+  app.append(earningsCard((DATA.themes || {}).earnings));
   if (!STORIESJ) { app.append($(`<div class="card empty">${STORIES_ERR ? "No stories yet (" + esc(STORIES_ERR) + ")." : "Loading stories…"}</div>`)); return; }
   const wrap = $(`<div>${open.map((s, i) => storyCardFull(s, i === 0)).join("")}
     ${closed.length ? `<details class="card"><summary><b>Closed stories</b> <span class="meta">${closed.length}</span></summary>${closed.map(s => storyCardFull(s, false)).join("")}</details>` : ""}</div>`);
@@ -3616,6 +3608,23 @@ function renderStories(app) {
   });
   head.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); const b = document.querySelector(`nav.tabs button[data-tab="${a.dataset.go}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
   app.append(wrap);
+}
+/* ---------- Earnings clusters (earnings.py): several members of one group reacting the same way in a week (Adam, Oct 27 2026) ---------- */
+function earningsCard(E) {
+  if (!E || !(E.rows || []).length) return $('<div></div>');
+  const pc = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const ev = E.evidence || {}, UQ = ev.up_quiet || {}, DQ = ev.down_quiet || {};
+  const DIR = { up: ["UP together", "sow-breakout"], down: ["DOWN together", "sow-extended"], mixed: ["Mixed", "sow-riding"] };
+  const rows = E.rows.filter(r => r.dir !== "mixed").concat(E.rows.filter(r => r.dir === "mixed").slice(0, 6));
+  const sec = $(`<section class="card regcard"><div class="head"><h2><span class="pbv unproven">Unproven</span> Earnings clusters <span class="meta">· groups where several companies reacted the same way · ${shortDate(E.window[0])} – ${shortDate(E.window[1])}</span></h2></div>
+    <p class="note" style="padding:4px 0 6px">An earnings-style day = a gap of at least 3% (and 1 ADR) on 2.5× normal volume. When 2+ members of a group get one in the same week and most went the same way, the reports are saying something about the whole theme: the story chapters search what they said and write it up under <b>What earnings said</b>. "Didn't report" = how the group's other members moved over the same days: the market reading it through.</p>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Sub-theme</th><th class="l">Read</th><th>Group<small>window</small></th><th>Didn't report<small>avg move</small></th><th class="l">Reactions<small>day move · × volume</small></th><th class="l">Reporting next</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td class="l">${esc(r.g)}<small class="meta" style="display:block">${r.n} of ${r.members} reacted</small></td><td class="l"><span class="tg ${DIR[r.dir][1]}">${DIR[r.dir][0]}</span></td>
+      <td class="num ${r.grp > 0 ? "up" : r.grp < 0 ? "dn" : ""}">${pc(r.grp)}</td><td class="num ${r.quiet > 0 ? "up" : r.quiet < 0 ? "dn" : ""}">${pc(r.quiet)}<small class="meta" style="display:block">${r.quiet_n} stocks</small></td>
+      <td class="l">${r.reports.map(x => `<span style="white-space:nowrap"><b>${x.t}</b> <span class="${x.move > 0 ? "up" : "dn"}">${pc(x.move)}</span> <small class="meta">${shortDate(x.date)} · ${x.rvol}×${x.conf ? " · earnings ✓" : ""}</small></span>`).join("<br>")}</td>
+      <td class="l"><small>${(r.next || []).map(x => `${x.t} ${shortDate(x.date)}`).join(", ") || "–"}</small></td></tr>`).join("")}</tbody></table></div>
+    <p class="meta" style="margin:6px 0 0">What the test said (${esc(ev.from || "")} to ${esc(ev.to || "")}, from the next close, ${ev.hold || 20} sessions vs the average group): after an UP cluster the members that hadn't reported yet ${pc(UQ.mean)} (n ${UQ.n ?? "–"}, t ${UQ.t ?? "–"}, halves ${pc(UQ.h1)} / ${pc(UQ.h2)}); after a DOWN cluster ${pc(DQ.mean)} (t ${DQ.t ?? "–"}): bad news didn't keep spreading. Not proven (t under 2, overlapping groups): context for the story, not a buy signal. Reporting dates come from the catalyst agent, so they cover the carded names only.</p></section>`);
+  return sec;
 }
 function tradeCard(X) {
   if (!X || !X.winners) return $('<div></div>');
@@ -4228,9 +4237,8 @@ function lineupCard(T) {
     ${head}
     <div class="scroll"><table class="grid" style="margin-top:8px"><thead><tr><th class="l">Stock</th><th class="l">Now</th><th>Price</th><th>Buy over<small>yesterday's high</small></th><th>Stop<small>dip low, max 1 ADR</small></th><th>9 / 21 EMA<small>live</small></th><th>RS</th><th class="l">Lined up?</th></tr></thead><tbody>
     ${rows.slice(0, 25).map(row).join("") || `<tr><td colspan="8" class="meta">No BUY-group leader is in or near its 9/21 EMAs ${isLive ? "right now" : "at the last close"}.</td></tr>`}</tbody></table></div>
-    <p class="meta" style="margin:6px 0 0">What the test said (daily bars, ${esc((LC.stock_evidence || {}).from || "")} to ${esc((LC.stock_evidence || {}).to || "")}): a dip into the 9/21 EMAs, bought on the break of that day's high within 3 sessions, stop at the dip low (max 1 ADR), held 20 sessions: in BUY groups <b>${R(B.R)}</b> a trade (n ${B.n ?? "–"}, halves ${R(B.h1)} / ${R(B.h2)}, ${B.win == null ? "–" : Math.round(B.win * 100) + "%"} win) vs ${R(O.R)} in other groups and ${R(W.R)} in WATCH groups (edge ${R(SE.edge)}, t ${SE.t ?? "–"}). Most trades lose small and the winners pay: keep the stop. Google prices run up to ~20 min behind, and the sheet has no intraday high, so "over yesterday's high" uses the last price. Groups and checks: <a href="#best" data-go="best">Theme lifecycle card ›</a></p></section>`);
+    <p class="meta" style="margin:6px 0 0">What the test said (daily bars, ${esc((LC.stock_evidence || {}).from || "")} to ${esc((LC.stock_evidence || {}).to || "")}): a dip into the 9/21 EMAs, bought on the break of that day's high within 3 sessions, stop at the dip low (max 1 ADR), held 20 sessions: in BUY groups <b>${R(B.R)}</b> a trade (n ${B.n ?? "–"}, halves ${R(B.h1)} / ${R(B.h2)}, ${B.win == null ? "–" : Math.round(B.win * 100) + "%"} win) vs ${R(O.R)} in other groups and ${R(W.R)} in WATCH groups (edge ${R(SE.edge)}, t ${SE.t ?? "–"}). Most trades lose small and the winners pay: keep the stop. Google prices run up to ~20 min behind, and the sheet has no intraday high, so "over yesterday's high" uses the last price. Which groups are in BUY and why: the Theme lifecycle card just above.</p></section>`);
   sec.append(lineupRecord(LC));
-  sec.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); const b = document.querySelector(`nav.tabs button[data-tab="${a.dataset.go}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
   sec.querySelector(".ludl").addEventListener("click", () => tsDownload("lined-up-buys", [
     { name: "Lined-up buys - triggered", ticks: rows.filter(r => r.st === "over").map(r => r.t) },
     { name: "Lined-up buys - in the EMAs", ticks: rows.filter(r => r.st === "zone").map(r => r.t) },
@@ -4247,7 +4255,6 @@ function renderIntraday(app) {
     : `<b>${clk.open ? "Session open" : "Market closed"}</b> · ${clk.label} · Google prices fetched ${LIVE.fetched.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} (Google runs up to ~20 min behind) · refreshes every 3 min`}</span><button>Refresh</button></div>`));
   app.querySelector(".livebar:last-child button").addEventListener("click", () => fetchLive());
   if (!hasCols) { app.append(oilCard()); return; }   // the futures feed doesn't need the Google sheet
-  app.append(lineupCard(T));   // Lined-up buys: theme BUY + dip into the 9/21 EMAs (top of the tab, Adam Oct 27)
   const pc = (v, d = 2) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
   const cls = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "dn" : "";
   // 0. Thrust watch
@@ -4638,6 +4645,7 @@ function renderBest(app) {
   app.append(liveBar());
   if (L) app.append(launchPicksCard(L));
   if (T.lifecycle) app.append(lifecycleCard(T.lifecycle));
+  app.append(lineupCard(T));   // Lined-up buys (live from the Google sheet): moved here from the top of Intraday (Adam, Oct 27)
   const ls = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
   const ss = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storage off */ } };
   UI.best = UI.best || { nz: ls("bestNz", "nuzzle"), more: false };

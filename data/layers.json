@@ -482,6 +482,20 @@
     "R-2026-10-27-theme-lifecycle"
    ],
    "notes": "BUY groups +2.7% vs avg group over 20 sessions (t 3.5, halves +2.8/+2.9), 40d +3.9%; same setup in weak breadth ~0 (t -0.5); WATCH ~0 but 53% turn BUY within 30 sessions; pullbacks in BUY groups +0.74R vs +0.27R elsewhere (edge +0.31R, t 2.2, both halves); recomputed each build"
+  },
+  {
+   "id": "earnings_clusters",
+   "name": "Earnings clusters: several members of one group reacting the same way in a week",
+   "kind": "code",
+   "owner": "daily update",
+   "status": "info",
+   "where": "breadth/earnings.py → DATA.themes.earnings → Trade Stories tab (earningsCard) + story fact sheet EARNINGS CLUSTERS → chapter 'What earnings said'",
+   "what": "Earnings-style day = gap ≥ max(3%, 1 ADR) on 2.5x 50-day volume; cluster = 2+ in a sub-theme within 5 sessions, 2/3 same way; read-through = members that didn't report; writer confirms what the reports said",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-27-earnings-clusters"
+   ],
+   "notes": "UP cluster → not-yet-reported members +1.9% vs avg group next 20 sessions (t 1.93, halves +1.9/+1.9); DOWN → ~0; recomputed each build"
   }
  ]
 }

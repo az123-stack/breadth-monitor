@@ -125,11 +125,6 @@ def find_box(h, l, c, v, e, adr, strict=True):
     return None
 
 
-def _adr(h, l):
-    """20-day ADR % series (mean high/low - 1)."""
-    return (pd.Series(h / l).rolling(20, min_periods=15).mean().to_numpy() - 1) * 100
-
-
 def _r(x, n=2):
     return None if x is None or not np.isfinite(x) else round(float(x), n)
 

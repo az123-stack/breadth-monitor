@@ -550,12 +550,3 @@ def tracker(df):
     days = sorted(set(df["date"].astype(str)))
     return {"since": days[0] if days else None, "sessions": len(days), "buy": stat(s[s["kind"] == "buy"]), "ready": stat(s[s["kind"] == "ready"]),
             "all": stat(s), "rows": rows}
-
-
-def build_safe(*a, **k):
-    try:
-        return build(*a, **k)
-    except Exception as e:  # optional panel; never block the page
-        import logging
-        logging.getLogger("breadth").exception("theme lifecycle failed: %s", e)
-        return None

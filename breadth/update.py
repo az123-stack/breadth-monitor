@@ -303,6 +303,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["thetrade"] = thetrade.build(adjusted, theme_data, history)
         except Exception as e:  # optional panel; never block the page
             log.exception("the trade failed: %s", e)
+        try:   # Earnings clusters: several members of one group reacting the same way in a week (Oct 27; info only)
+            from . import earnings
+            theme_data["earnings"] = earnings.build(adjusted, theme_data)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("earnings clusters failed: %s", e)
         try:
             from . import ledger
             pb = theme_data.get("playbook") or {}

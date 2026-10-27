@@ -549,9 +549,7 @@ def confluence(rows, R, w, cols, rs, ADR, spy, mk, grp, sub_of, theme_of, thm, e
         r.update(x)
         ex = x.get("exp")
         r["grade"] = "C" if ex is None else "A" if ex >= 0.40 else "B" if ex >= 0.15 else "C"
-        r["group_ok"] = any(fn(e) for g, nm, fn in conds if nm in GROUP_OK)
-        for k in ("g_r20", "th_r20", "g_br", "g_r120", "th_r120", "s_r126q"):
-            r[k] = BX._r(e.get(k), 2) if _ok(e.get(k)) else None
+        r["group_ok"] = any(fn(e) for g, nm, fn in conds if nm in GROUP_OK)   # used by boxes.attach (Box Retest / Box Spring group confluence)
         r.pop("_ev", None); r.pop("_j", None)
     return rows
 

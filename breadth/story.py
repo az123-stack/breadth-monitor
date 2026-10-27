@@ -226,6 +226,56 @@ def facts_data():
     return "\n".join(out)
 
 
+def earnings_lines(T, slot, snap_rows=None):
+    """EARNINGS CLUSTERS block (breadth/earnings.py): groups where 2+ members had an earnings-style day in the last 5 official
+    sessions, plus (pm) today's reactions from the close snapshot, so the writer can say what the reports said TOGETHER."""
+    E = T.get("earnings") or {}
+    pc = lambda v: "–" if v is None else f"{v * 100:+.1f}%"
+    C = E.get("cfg") or {}
+    stocks = {s["t"]: s for s in T.get("stocks") or []}
+    groups = {r["g"]: dict(r, today=[]) for r in E.get("rows") or []}
+    if snap_rows:   # today's reactions (Google close snapshot): same rule as earnings.py, ADR + 50-day volume from last night
+        for t, s in stocks.items():
+            r, g = snap_rows.get(t), s.get("sub")
+            if not g or not r or not r.get("open") or not r.get("closeyest") or not s.get("v50") or not s.get("adr"):
+                continue
+            gap, mv, adr = r["open"] / r["closeyest"] - 1, chg(r), s["adr"] / 100
+            if mv is None or (r["price"] or 0) < 5:
+                continue
+            if abs(gap) >= max(C.get("gap_min", 0.03), C.get("gap_adr", 1.0) * adr) and (r.get("volume") or 0) / s["v50"] >= C.get("rvol", 2.5):
+                d = 0 if abs(mv) < 0.5 * adr else (1 if mv > 0 else -1)
+                groups.setdefault(g, {"g": g, "dir": "mixed", "n": 0, "reports": [], "today": [], "next": [], "quiet": None})
+                groups[g]["today"].append({"t": t, "dir": d, "gap": gap, "move": mv, "rvol": r["volume"] / s["v50"]})
+    keep = []
+    for g, r in groups.items():
+        dirs = [x["dir"] for x in r["reports"]] + [x["dir"] for x in r["today"] if x["t"] not in {y["t"] for y in r["reports"]}]
+        n = len(dirs)
+        up, dn = sum(d > 0 for d in dirs), sum(d < 0 for d in dirs)
+        if n < 2:
+            continue
+        r["all_dir"] = "up" if up >= 2 and up >= 2 / 3 * n else "down" if dn >= 2 and dn >= 2 / 3 * n else "mixed"
+        keep.append(r)
+    if not keep:
+        return []
+    keep.sort(key=lambda r: (r["all_dir"] == "mixed", -(len(r["reports"]) + len(r["today"]))))
+    L = [f"\n## EARNINGS CLUSTERS (for **What earnings said:**; code found the reactions, YOU find what the reports said)",
+         f"Earnings-style day = gap ≥ max(3%, 1 ADR) on 2.5×+ the 50-day volume (could also be other news: confirm it was earnings). "
+         f"Window {' → '.join(E.get('window') or [])}{' + today (Google close)' if snap_rows else ''}; SPY {pc(E.get('spy'))} over the window."]
+    for r in keep[:8]:
+        rep = [f"{x['t']} {x['date'][5:]} gap {pc(x['gap'])} day {pc(x['move'])} {x['rvol']}× vol{' (earnings confirmed)' if x.get('conf') else ''}" for x in r["reports"]]
+        rep += [f"{x['t']} TODAY gap {pc(x['gap'])} day {pc(x['move'])} {x['rvol']:.1f}× vol" for x in r["today"]]
+        L.append(f"- **{r['g']}** · {r['all_dir'].upper()} · group {pc(r.get('grp'))} over the window, members that didn't report {pc(r.get('quiet'))}: " + "; ".join(rep))
+        if r.get("next"):
+            L.append(f"  - reporting next: " + ", ".join(f"{x['t']} {x['date'][5:]}" for x in r["next"]))
+    ev = E.get("evidence") or {}
+    uq, dq = ev.get("up_quiet") or {}, ev.get("down_quiet") or {}
+    if uq.get("n"):
+        L.append(f"Evidence ({ev.get('from')} to {ev.get('to')}, next {ev.get('hold')} sessions vs the average group): after an UP cluster the members that "
+                 f"hadn't reported yet {pc(uq.get('mean'))} (n {uq['n']}, t {uq.get('t')}, halves {pc(uq.get('h1'))} / {pc(uq.get('h2'))}); after a DOWN cluster "
+                 f"{pc(dq.get('mean'))} (n {dq.get('n')}, t {dq.get('t')}): bad news in a group did NOT keep spreading. Not proven (t < 2); context only.")
+    return L
+
+
 def facts(slot):
     if slot == "data":
         return facts_data()
@@ -445,6 +495,7 @@ def facts(slot):
         seen.add(g)
         top = sorted(stocks_by.get(g, []), key=lambda x: -(x.get("rsr") or 0))[:4]
         lines.append(f"- {g} ({why}): biggest names {', '.join(x['t'] for x in top) or '–'}")
+    out.extend(earnings_lines(T, slot, snap_rows if slot == "pm" else None))
     if lines:
         P("\n## WHY research list: search the news for what is driving each of these (earnings, guidance, policy, macro, deals) and confirm with the price action above")
         out.extend(lines[:12])

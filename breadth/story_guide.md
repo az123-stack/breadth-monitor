@@ -31,6 +31,8 @@ story he can absorb in two minutes, and it must CONTINUE the story from the prev
   See "In play (morning chapter)" below. 3–6 bullets, best edge first, then one "Skip:" line.
 **Why it's moving:** 3–6 bullets, one per key group: the driver in one line with the key number, its type (catalyst /
   rotation / sympathy / unexplained), and the source link. Lead with the groups that matter most to the story and the trades.
+**What earnings said:** (only when the fact sheet has an EARNINGS CLUSTERS block; see "What earnings said" below) 1–4
+  bullets, one per group where several companies reported the same thing this week.
 **What it means:** 2–3 sentences tying it together (rotation vs leaving, leadership, thrust setup, regime), using the why.
 **Scenario A — money keeps leaving:** signs to watch (concrete thresholds from the scenario engine) and what to trade / avoid.
 **Scenario B — money comes back:** signs to watch, and WHERE it is likely to go and how to trade each case (snapback in the
@@ -120,6 +122,28 @@ not just see which groups lead: it is what gives him the confidence to hold. It 
 - **Real or seesaw:** the fact sheet's read in plain words and what history says it usually means next.
 - **What confirms it / what breaks it:** specific upcoming events with dates (earnings, data, Fed) that would prove or
   disprove the "why", plus the code's kill switch (3 closes under the 20-day average) and the comeback trigger.
+
+## What earnings said (earnings season)
+Adam wants to know when several companies in ONE group say the same thing in the same week: that is a statement about the
+theme, not about one stock (e.g. three tower REITs all raising guidance on carrier spending; two chip-equipment makers both
+guiding China sales down). The fact sheet's EARNINGS CLUSTERS block lists the groups where 2+ members had an earnings-style
+day (big gap on heavy volume) in the last 5 sessions (pm: plus today), the direction, the group's move, and how the members
+that did NOT report moved (the market treating it as a read-through).
+1. For each cluster (UP / DOWN first, mixed only if it matters to the story), WebSearch each reporter ("<TICKER> earnings
+   <month year>", "<TICKER> guidance") and confirm it was earnings. If one wasn't (deal, FDA, downgrade), drop it from the
+   cluster; a cluster needs 2+ real reports.
+2. Find the COMMON message, with the key number and a source link per company: demand (orders, backlog, bookings), pricing,
+   margins, guidance raised/cut, a named driver (AI capex, China, the consumer, rates, oil). Say whether the reports AGREE
+   (a theme) or only moved the same way for different reasons (not a theme: say so).
+3. Bullet per real cluster: "**<Group>:** <A>, <B> (and <C>) all <common message> (<key numbers with links>). Read-through:
+   the members that haven't reported <moved +x% / didn't move> → <the market is / isn't treating it as a group story>.
+   Next up: <ticker date> (from the fact sheet's 'reporting next')."
+4. Use it: a theme confirmed by its own earnings belongs in **Why it's moving**, **The trade, explained** (Why / What
+   confirms it) and the Trade Stories (after-close task: add each confirmed cluster as a sourced timeline item to the story
+   it belongs to, or start a story when 3+ companies in a group say the same thing and nothing covers it).
+Evidence line from the fact sheet, in plain words: after UP clusters the not-yet-reported members drifted up vs other groups
+over the next 20 sessions (not proven yet); DOWN clusters did NOT keep spreading (bad news in a group tended to be priced in
+fast). Never call it a buy signal.
 
 ## Trade Stories
 The Trade Stories tab (docs/stories.json) holds the running storylines. In the morning chapter, if a story's catalyst lands

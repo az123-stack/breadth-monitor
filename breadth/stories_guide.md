@@ -10,6 +10,10 @@ without a one-clause explanation.
    stocks in their groups, catalysts due or just past, THE TRADE, and the exact sub-theme names.
 2. Read today's chapter (docs/story.json, latest pm) for today's researched why. Research more with WebSearch where a story
    moved or a catalyst happened (earnings results, data, policy). Never invent a fact, number, date or link.
+   Earnings clusters: the chapter's **What earnings said:** section (from the fact sheet's EARNINGS CLUSTERS block) names
+   groups where several companies reported the same thing this week. Add each confirmed cluster as ONE timeline item on the
+   story it belongs to ("Earnings: AMT, CCI, SBAC all raised guidance on carrier spending", source = one of the reports,
+   reaction = the group's move); start a new story only when 3+ companies in a group say the same thing and no story covers it.
 3. Copy docs/stories.json to /tmp/stories.json and EDIT it:
    - Update each open story that moved: add today's timeline items (with sources and the price reaction), rewrite the parts of
      the thesis that changed, set `changed` (one sentence: what changed today, or "" if nothing), update status, catalysts

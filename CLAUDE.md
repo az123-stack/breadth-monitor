@@ -515,7 +515,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   −0.15R) with c, hi, lo, e9, e21, adr, t3/t0 (ribbon touch in 3 sessions / last), earn. Browser `lineupState` (live EMAs as `dipLive`:
   α 0.2 / 2/22; low from sheet column L) → states over (in the zone and price > yesterday's high = the trigger) / zone (low into the
   9/21 ribbon today or t3, price ≥ 21 − 0.5 ADR, ≤ 9 + 1 ADR, trigger within 1.5 ADRs) / near (within 1 ADR above the ribbon); stop =
-  dip low, max 1 ADR under the trigger. `lineupCard` = first card on the Intraday tab (after the live bar): banner hold-off (breadth weak)
+  dip low, max 1 ADR under the trigger. `lineupCard` = on the Best Setups tab right under the Theme lifecycle card (moved from the top of
+  Intraday Oct 27 at Adam's request; still live from the Google sheet via `fetchLive` → `rerenderPanel`): banner hold-off (breadth weak)
   / N lined up and triggered (half size when mixed), checklist chips per row (Group BUY, Leaders, RS 70+ · uptrend, Into the 9/21, Over
   yesterday's high), top 25, ⬇ TradingView. Evidence `stock_evidence.trigger` (daily bars: touch, buy the break of the touch-day high within
   3 sessions, stop touch-day low ≤ 1 ADR, 20 sessions): BUY groups +0.84R (n 750, halves +0.98/+0.69R, 29% win) vs other +0.13R, WATCH
@@ -544,6 +545,19 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   sub-theme stocks + SPY/QQQ via `.github/workflows/orb_study.yml` → branch `orb-data` (parts of 50 tickers, resumable; GitHub
   artifacts are blocked from Claude's sandbox, git works). `study.py --bars <orb-data folder>`: rankings prior / or (+vol), SPY/QQQ
   15/30-min ORB trigger on 15-min closes, stock's own OR stop, exits close / 2R / 5d, baselines any / basket / anywhere, splits.
+- `earnings.py` **Earnings clusters** (Oct 27, 2026; Adam: "earnings results that together point to a theme, captured in the write-ups";
+  card R-2026-10-27-earnings-clusters, layer `earnings_clusters`, info) → `DATA.themes.earnings`, `earningsCard` on the Trade Stories tab
+  (under the header) + EARNINGS CLUSTERS block in `story.earnings_lines` (am: official last 5 sessions; pm: plus today's reactions from
+  data/close_snapshot.csv using stock rows' `adr` % and `v50`) → story_guide.md "What earnings said" (writer confirms each was earnings,
+  finds the common message with sources) → stories_guide.md (confirmed clusters become Trade Stories timeline items). Reaction = gap ≥
+  max(3%, 1 ADR) on 2.5× 50-day volume ($5+, $10M+), direction = close vs prior close (mixed < 0.5 ADR), `conf` when catalysts.json has
+  that earnings date; cluster = 2+ in a sub-theme within 5 sessions, ≥ 2/3 the same way; `quiet` = members without a reaction; `next` =
+  catalyst-agent earnings dates ahead. Evidence (~2 s): UP cluster → non-reporters +1.9% vs avg group 20d (t 1.93, halves +1.9/+1.9),
+  DOWN → ~0. `python -m breadth.earnings` prints today + evidence. Test `test_earnings_clusters`.
+- Page tabs (Oct 27 cleanup): one `renderTab` table serves tab clicks and live refreshes (before, `rerenderPanel` lacked Best Setups and
+  Launch list, so a live price refresh on those tabs drew the Breadth tab). Removed dead payload fields (stocks `rsraw`/`v1`, SoW
+  `lo52`/`hi52`/`prime_wks`/`rs_up`, box live feature columns `g_r20`…`s_r126q`) and dead helpers (`fmtK`, `roPts`, `boxes._adr`,
+  `lifecycle.build_safe`).
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Trade Stories, Breadth, Pre-market, Intraday, Best Setups, Trade Setups, Launch list, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
