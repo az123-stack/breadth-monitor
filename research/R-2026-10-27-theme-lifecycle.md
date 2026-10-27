@@ -56,3 +56,8 @@ sessions; stop at the dip low (max 1 ADR); hold 20 sessions. Daily-bar test: BUY
 29% win) vs other groups +0.13R and WATCH groups −0.15R (edge +0.49R, t 2.03, passes). 68% of dips triggered. Built as the "Lined-up
 buys" card at the top of the Intraday tab (live from Google prices; info only). WATCH-group names are left out because their dips lost.
 
+**Live record + alerts (Oct 27).** Every first dip of a BUY / ready-group leader is now frozen at the official close in
+data/lineup_ledger.csv and settled with the backtest's exact rule, so the live record can be compared with +0.84R; ready (hold-off)
+signals are logged too, to test the breadth gate forward. Phone alerts: GitHub checks every 5 minutes in the session
+(breadth/lineup.py → docs/lineup_live.json) and a Claude scheduled task pushes new "in the EMAs" / "over yesterday's high" events.
+

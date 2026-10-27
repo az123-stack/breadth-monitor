@@ -4158,6 +4158,31 @@ function lineupState(x) {
   return { ...x, live, p, low, x9, x21, rib, touchNow, zone, over, near, st, trig, stop, risk: trig > 0 ? 1 - stop / trig : null,
     chg: L ? L.chg : null, toTrig: a && p ? (trig / p - 1) / a : null };
 }
+function lineupRecord(LC) {
+  const K = LC.tracker || {}, SE = ((LC.stock_evidence || {}).trigger) || {}, B = SE.buy || {};
+  const R = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (+v).toFixed(2) + "R";
+  const pc = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const ST = { pending: "waiting for the trigger", open: "open", done: "closed (20 sessions)", stopped: "stopped out", nofill: "never triggered" };
+  const line = (lab, o) => `<tr><td class="l">${lab}</td><td class="num">${o.n ?? 0}</td><td class="num">${o.filled ?? 0}</td><td class="num">${o.closed ?? 0}</td>
+    <td class="num ${o.R > 0 ? "g1" : o.R < 0 ? "r1" : ""}"><b>${R(o.R)}</b></td><td class="num">${o.win == null ? "–" : Math.round(o.win * 100) + "%"}</td><td class="num">${pc(o.xspy)}</td>
+    <td class="num">${o.open ?? 0}${o.open ? ` <small class="meta">(${R(o.open_R)} so far)</small>` : ""}</td><td class="num">${R(o.total_R)}</td></tr>`;
+  const rows = (K.rows || []).filter(r => r.t);
+  const d = $(`<details class="kqsec" style="margin-top:8px"${rows.length ? " open" : ""}><summary><b>Track record</b> · live since ${K.since ? shortDate(K.since) : "the next close"} (${K.sessions || 0} session${K.sessions === 1 ? "" : "s"}) vs the backtest ${R(B.R)} a trade</summary>
+    <p class="meta" style="margin:6px 0">Every first dip of a BUY / ready-group leader into its 9/21 EMAs is logged at the official close and never changed. It fills if a later session trades over the dip-day high within 3 sessions (fill = that high, or the open if it gaps over), stop at the dip low (max 1 ADR), exit at the close of the 20th session or the stop: the same rule as the backtest, so the two can be compared. <b>Ready</b> rows are the same signal on hold-off days (breadth weak): they show whether the breadth gate is earning its keep.</p>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Signals</th><th>Logged</th><th>Filled</th><th>Closed</th><th>Avg R<small>closed</small></th><th>Win</th><th>vs SPY</th><th>Open</th><th>Total R</th></tr></thead><tbody>
+      ${line("<b>BUY</b> (breadth OK)", K.buy || {})}${line("Ready (breadth weak, on hold)", K.ready || {})}
+      <tr><td class="l meta">Backtest, BUY groups</td><td class="num meta">${B.n ?? "–"}</td><td class="num meta">${SE.filled == null ? "–" : Math.round(SE.filled * 100) + "% fill"}</td><td class="num meta">–</td><td class="num meta">${R(B.R)}</td><td class="num meta">${B.win == null ? "–" : Math.round(B.win * 100) + "%"}</td><td class="num meta">–</td><td class="num meta">–</td><td class="num meta">halves ${R(B.h1)} / ${R(B.h2)}</td></tr></tbody></table></div>
+    ${rows.length ? `<div class="scroll"><table class="grid" style="margin-top:8px"><thead><tr><th class="l">Signal</th><th class="l">Stock</th><th class="l">Group</th><th class="l">Status</th><th>Buy over</th><th>Entry</th><th>Stop</th><th>R</th><th>Return</th></tr></thead><tbody>
+      ${rows.map(r => `<tr><td class="l">${shortDate(r.date)}${r.kind === "ready" ? ' <span class="tg sow-pop">on hold</span>' : ""}</td><td class="l"><b>${r.t}</b></td><td class="l"><small>${esc(r.g || "")}</small></td>
+        <td class="l">${esc(ST[r.status] || r.status)}${r.entry_date ? `<small class="meta" style="display:block">in ${shortDate(r.entry_date)}${r.exit_date ? " · out " + shortDate(r.exit_date) : ""}</small>` : ""}</td>
+        <td class="num">$${(+r.trigger).toFixed(2)}</td><td class="num">${r.entry != null ? "$" + (+r.entry).toFixed(2) : "–"}</td><td class="num">${r.stop != null ? "$" + (+r.stop).toFixed(2) : "$" + (+r.stop_lo).toFixed(2)}</td>
+        <td class="num ${r.R > 0 ? "g1" : r.R < 0 ? "r1" : ""}">${R(r.R)}</td><td class="num">${pc(r.ret)}</td></tr>`).join("")}</tbody></table></div>`
+      : '<p class="meta" style="margin:6px 0">The first signals are logged at the next official close (about 12:30 AM ET) and settle from the next session on.</p>'}
+    ${(SE.recent || []).length ? `<details style="margin-top:8px"><summary class="meta">The backtest as a trade list: the last ${SE.recent.length} trades in BUY groups</summary><div class="scroll"><table class="grid" style="margin-top:6px"><thead><tr><th class="l">Dip</th><th class="l">Stock</th><th class="l">Group</th><th>Filled</th><th>Entry</th><th>R<small>20 sessions</small></th></tr></thead><tbody>
+      ${SE.recent.map(r => `<tr><td class="l">${shortDate(r.date)}</td><td class="l"><b>${r.t}</b></td><td class="l"><small>${esc(r.g)}</small></td><td class="num">${shortDate(r.entry_date)}</td><td class="num">$${r.entry}</td><td class="num ${r.R > 0 ? "g1" : r.R < 0 ? "r1" : ""}">${R(r.R)}</td></tr>`).join("")}</tbody></table></div></details>` : ""}
+  </details>`);
+  return d;
+}
 function lineupCard(T) {
   const LC = (T || {}).lifecycle;
   if (!LC || !(LC.live || []).length) return $('<div></div>');
@@ -4192,6 +4217,7 @@ function lineupCard(T) {
     <div class="scroll"><table class="grid" style="margin-top:8px"><thead><tr><th class="l">Stock</th><th class="l">Now</th><th>Price</th><th>Buy over<small>yesterday's high</small></th><th>Stop<small>dip low, max 1 ADR</small></th><th>9 / 21 EMA<small>live</small></th><th>RS</th><th class="l">Lined up?</th></tr></thead><tbody>
     ${rows.slice(0, 25).map(row).join("") || `<tr><td colspan="8" class="meta">No BUY-group leader is in or near its 9/21 EMAs ${isLive ? "right now" : "at the last close"}.</td></tr>`}</tbody></table></div>
     <p class="meta" style="margin:6px 0 0">What the test said (daily bars, ${esc((LC.stock_evidence || {}).from || "")} to ${esc((LC.stock_evidence || {}).to || "")}): a dip into the 9/21 EMAs, bought on the break of that day's high within 3 sessions, stop at the dip low (max 1 ADR), held 20 sessions: in BUY groups <b>${R(B.R)}</b> a trade (n ${B.n ?? "–"}, halves ${R(B.h1)} / ${R(B.h2)}, ${B.win == null ? "–" : Math.round(B.win * 100) + "%"} win) vs ${R(O.R)} in other groups and ${R(W.R)} in WATCH groups (edge ${R(SE.edge)}, t ${SE.t ?? "–"}). Most trades lose small and the winners pay: keep the stop. Google prices run up to ~20 min behind, and the sheet has no intraday high, so "over yesterday's high" uses the last price. Groups and checks: <a href="#best" data-go="best">Theme lifecycle card ›</a></p></section>`);
+  sec.append(lineupRecord(LC));
   sec.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); const b = document.querySelector(`nav.tabs button[data-tab="${a.dataset.go}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
   sec.querySelector(".ludl").addEventListener("click", () => tsDownload("lined-up-buys", [
     { name: "Lined-up buys - triggered", ticks: rows.filter(r => r.st === "over").map(r => r.t) },

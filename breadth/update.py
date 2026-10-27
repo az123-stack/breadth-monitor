@@ -290,7 +290,7 @@ def recompute_and_publish(bars, splits, universe, state):
             log.exception("rotation ideas failed: %s", e)
         try:   # Theme lifecycle: stage per sub-theme, WATCH / BUY signals, tickers to buy (Adam, Oct 27 2026; info only)
             from . import lifecycle
-            theme_data["lifecycle"] = lifecycle.build(adjusted, theme_data, history)
+            theme_data["lifecycle"] = lifecycle.build(adjusted, theme_data, history, ledger=True)
         except Exception as e:  # optional panel; never block the page
             log.exception("theme lifecycle failed: %s", e)
         try:   # top picks: re-rank with group / money-flow context now that rotation + ignition exist

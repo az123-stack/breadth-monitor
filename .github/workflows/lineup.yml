@@ -1,0 +1,57 @@
+name: Lined-up buys live
+
+# Every 5 minutes from 9:35 AM to 4:05 PM ET: `python -m breadth.lineup live` reads the published Google Sheet + the last
+# build's Theme lifecycle list and writes docs/lineup_live.json (current states + today's alert events). The Claude scheduled
+# task "Market Monitor · lined-up alerts" turns new events into phone notifications; if the secret NTFY_TOPIC is set the
+# script also posts each new event to ntfy.sh instantly. GitHub fires scheduled runs late, so there's one cron an hour:
+# the first to start loops until 4:05 PM ET (5 h cap per run); later ones queue and carry on or exit.
+on:
+  schedule:
+    - cron: "33 13-19 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lineup
+  cancel-in-progress: false
+
+jobs:
+  lineup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 310
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Check lined-up buys until 4:05 PM ET
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          end=$(TZ=America/New_York date -d "16:05" +%s)
+          cap=$(( $(date +%s) + 300*60 ))
+          [ "$cap" -lt "$end" ] && end=$cap
+          start=$(TZ=America/New_York date -d "09:35" +%s)
+          now=$(date +%s)
+          if [ "$now" -lt "$start" ] && [ "$start" -lt "$end" ]; then sleep $(( start - now )); fi
+          while [ "$(date +%s)" -lt "$end" ]; do
+            git pull -q --rebase -X theirs || git rebase --abort || true
+            python -m breadth.lineup live || echo "pass failed, retrying next round"
+            git add docs/lineup_live.json
+            if ! git diff --cached --quiet; then
+              git commit -qm "Lined-up $(TZ=America/New_York date +%H:%M) ET"
+              for i in 1 2 3; do
+                git push -q && break
+                git pull -q --rebase -X theirs || { git rebase --abort; break; }
+              done
+            fi
+            left=$(( end - $(date +%s) ))
+            [ "$left" -le 0 ] && break
+            sleep $(( left < 300 ? left : 300 ))
+          done

@@ -219,7 +219,7 @@ def stock_evidence(P, G, members, bench_c, bench_o):
             wv = any(bool(watch[g].iat[i]) for g in gs)
             # live rule: buy the break of the touch-day high within 3 sessions, stop the touch-day low (max 1 ADR)
             hi_i, lo_i = P["h"][t].iat[i], P["l"][t].iat[i]
-            Rt = None
+            Rt, ed, en_ = None, None, None
             for j in range(i + 1, min(i + 4, n - H)):
                 if P["h"][t].iat[j] >= hi_i:
                     en = max(P["o"][t].iat[j], hi_i)
@@ -228,9 +228,11 @@ def stock_evidence(P, G, members, bench_c, bench_o):
                     lw = P["l"][t].iloc[j:j + H].to_numpy()
                     hit2 = np.flatnonzero(lw <= st)
                     Rt = (st - en) / risk if len(hit2) else (P["c"][t].iat[j + H - 1] - en) / risk
+                    ed, en_ = days[j], en
                     break
-            rows.append((days[i], "buy" if b else "watch" if wv else "other", ret / a, ex / e - 1 - spy, Rt))
-    X = pd.DataFrame(rows, columns=["date", "grp", "R", "xs", "Rt"])
+            g0 = next((g for g in gs if bool(buy[g].iat[i])), gs[0])
+            rows.append((days[i], "buy" if b else "watch" if wv else "other", ret / a, ex / e - 1 - spy, Rt, t, g0, ed, en_))
+    X = pd.DataFrame(rows, columns=["date", "grp", "R", "xs", "Rt", "t", "g", "edate", "entry"])
     if not len(X):
         return None
     split = X["date"].sort_values().iloc[len(X) // 2]
@@ -252,6 +254,11 @@ def stock_evidence(P, G, members, bench_c, bench_o):
     d2 = (Y[Y["grp"] == "buy"].groupby("date")["Rt"].mean() - Y[Y["grp"] != "buy"].groupby("date")["Rt"].mean()).dropna()
     tr["edge"] = _r(d2.mean(), 3)
     tr["t"] = _r(d2.mean() / (d2.std(ddof=1) / np.sqrt(len(d2))), 2) if len(d2) > 2 and d2.std(ddof=1) > 0 else None
+    # the last 30 filled trades of the rule in BUY groups (the replay as a trade list, newest first)
+    Z = Y[Y["grp"] == "buy"].sort_values("edate", ascending=False).head(30)
+    tr["recent"] = [{"date": str(r.date.date()), "t": r.t, "g": r.g, "entry_date": str(r.edate.date()), "entry": _r(r.entry, 2),
+                     "R": _r(r.Rt, 2)} for r in Z.itertuples()]
+    tr["curve"] = [_r(v, 2) for v in Y[Y["grp"] == "buy"].sort_values("edate")["Rt"].cumsum().to_numpy()[::5]]
     out["trigger"] = tr
     return out
 
@@ -319,7 +326,7 @@ def picks(g, members, P, stocks, extra):
     return out[:CFG["picks"]], wait[:3]
 
 
-def build(adjusted, theme_data, history, evidence_on=True):
+def build(adjusted, theme_data, history, evidence_on=True, ledger=False):
     from . import config
     T = theme_data or {}
     subs = {r["theme"]: r for r in T.get("subthemes") or []}
@@ -403,6 +410,7 @@ def build(adjusted, theme_data, history, evidence_on=True):
                        "c": _r(P["c"][t].iat[i], 4), "hi": _r(P["h"][t].iat[i], 4), "lo": _r(P["l"][t].iat[i], 4),
                        "e9": _r(P["e9"][t].iat[i], 4), "e21": _r(P["e21"][t].iat[i], 4), "adr": _r(a, 4),
                        "t3": bool(P["touch"][t].iloc[i - CFG["fresh"] + 1:i + 1].any()), "t0": bool(P["touch"][t].iat[i]),
+                       "f0": bool(P["touch"][t].iat[i]) and not bool(P["touch"][t].iloc[max(0, i - 5):i].any()),
                        "earn": earn.get(t)}
     rows.sort(key=lambda r: (not r["ready"], not r["watch"], not r["new"], -(r["strength"] or 0)))
     counts = {k: int((G["stage"].iloc[i] == NUM[k]).sum()) for _, k, _ in STAGES}
@@ -412,6 +420,15 @@ def build(adjusted, theme_data, history, evidence_on=True):
            "rows": rows, "counts": counts, "alerts": alerts, "act": act, "weak": weak, "size": size,
            "ratio10": _r(G["r10"].iat[i], 2), "regime": str(G["regime"].iat[i]),
            "live": sorted(live.values(), key=lambda x: (rank[x["kind"]], -(x["rs"] or 0)))}
+    if ledger:
+        try:   # live record of the Lined-up buys rule (signals frozen from official closes, settled on daily bars)
+            df = ledger_record(ledger_load(), out["date"], out["live"])
+            df = ledger_settle(df, w, config.BENCHMARK)
+            ledger_save(df)
+            out["tracker"] = tracker(df)
+        except Exception as e:
+            import logging
+            logging.getLogger("breadth").exception("lined-up ledger failed: %s", e)
     if evidence_on:
         out["evidence"] = group_evidence(G)
         try:
@@ -420,6 +437,119 @@ def build(adjusted, theme_data, history, evidence_on=True):
             import logging
             logging.getLogger("breadth").exception("lifecycle stock evidence failed: %s", e)
     return out
+
+
+# ---------------------------------------------------------------- live record (forward test of the Lined-up buys rule)
+# Same rule as stock_evidence["trigger"]: a BUY / ready-group leader's FIRST dip into the 9/21 ribbon (no touch in the prior
+# 5 sessions) at an official close is frozen as a signal; it fills if a later session's high takes out the dip-day high
+# within 3 sessions (fill = max(open, trigger)); stop = dip low, never more than 1 ADR under the fill; exit = close of the
+# 20th session (counting the fill day) or the stop. A date's signals are written once and never changed (no look-ahead).
+LCOLS = ["date", "t", "g", "kind", "stage", "rs", "trigger", "stop_lo", "adr", "status", "entry_date", "entry", "stop",
+         "exit_date", "exit", "R", "ret", "xspy", "last_date", "last", "earn"]
+HOLD = 20
+
+
+def _lpath():
+    from . import config
+    return config.DATA_DIR / "lineup_ledger.csv"
+
+
+def ledger_load():
+    p = _lpath()
+    if not p.exists():
+        return pd.DataFrame(columns=LCOLS)
+    df = pd.read_csv(p, dtype={"date": str, "entry_date": str, "exit_date": str, "last_date": str, "status": str, "t": str, "earn": str})
+    for k in LCOLS:
+        if k not in df.columns:
+            df[k] = np.nan
+    return df[LCOLS]
+
+
+def ledger_save(df):
+    df.to_csv(_lpath(), index=False)
+
+
+def ledger_record(df, date, live):
+    """Freeze one session's new signals (first dip into the 9/21 EMAs of a BUY / ready-group leader). Never rewrites a date."""
+    if not date or (df["date"].astype(str) == date).any():
+        return df
+    rows = [{"date": date, "t": x["t"], "g": x["g"], "kind": x["kind"], "stage": x.get("stage"), "rs": x.get("rs"),
+             "trigger": x["hi"], "stop_lo": x["lo"], "adr": x["adr"], "status": "pending", "earn": x.get("earn")}
+            for x in live or [] if x.get("f0") and x.get("kind") in ("buy", "ready") and x.get("hi") and x.get("adr")]
+    if not rows:
+        rows = [{"date": date, "t": "", "status": "none"}]          # marks the date as recorded even with no signal
+    return pd.concat([df, pd.DataFrame(rows, columns=LCOLS)], ignore_index=True)
+
+
+def ledger_settle(df, w, bench="SPY"):
+    if not len(df):
+        return df
+    O, Hh, L, C = w["o"], w["h"], w["l"], w["c"]
+    days = C.index
+    df = df.copy()
+    for k, r in df.iterrows():
+        if r["status"] in ("done", "stopped", "nofill", "none") or r["t"] not in C.columns:
+            continue
+        i = days.searchsorted(pd.Timestamp(r["date"]))
+        if i >= len(days) or days[i] != pd.Timestamp(r["date"]):
+            continue
+        t, trig, a = r["t"], float(r["trigger"]), float(r["adr"])
+        if r["status"] == "pending":
+            j = None
+            for q in range(i + 1, min(i + 4, len(days))):
+                if Hh[t].iat[q] >= trig:
+                    j = q
+                    break
+            if j is None:
+                if i + 3 < len(days):
+                    df.at[k, "status"] = "nofill"
+                continue
+            en = max(float(O[t].iat[j]), trig)
+            df.at[k, "entry_date"], df.at[k, "entry"] = str(days[j].date()), round(en, 4)
+            df.at[k, "stop"] = round(max(float(r["stop_lo"]), en * (1 - a)), 4)
+            df.at[k, "status"] = "open"
+            r = df.loc[k]
+        j = days.searchsorted(pd.Timestamp(r["entry_date"]))
+        en, st = float(r["entry"]), float(r["stop"])
+        risk = max(en - st, 0.3 * a * en)
+        end = min(j + HOLD, len(days))
+        lows = L[t].iloc[j:end].to_numpy()
+        hit = np.flatnonzero(lows <= st)
+        spy0 = float(O[bench].iat[j])
+        if len(hit):
+            q = j + int(hit[0])
+            ex, status = st, "stopped"
+        elif j + HOLD <= len(days):
+            q = j + HOLD - 1
+            ex, status = float(C[t].iat[q]), "done"
+        else:
+            q = len(days) - 1
+            ex, status = float(C[t].iat[q]), "open"
+        ret = ex / en - 1
+        df.at[k, "status"] = status
+        df.at[k, "R"], df.at[k, "ret"] = round((ex - en) / risk, 3), round(ret, 4)
+        df.at[k, "xspy"] = round(ret - (float(C[bench].iat[q]) / spy0 - 1), 4)
+        df.at[k, "last_date"], df.at[k, "last"] = str(days[q].date()), round(ex, 4)
+        if status != "open":
+            df.at[k, "exit_date"], df.at[k, "exit"] = str(days[q].date()), round(ex, 4)
+    return df
+
+
+def tracker(df):
+    """Live record summary for the page: signals, fills, closed / open trades, by BUY (breadth ok) vs ready (breadth weak)."""
+    s = df[df["status"] != "none"]
+    def stat(x):
+        c = x[x["status"].isin(["done", "stopped"])]
+        o = x[x["status"] == "open"]
+        return {"n": int(len(x)), "filled": int(x["status"].isin(["open", "done", "stopped"]).sum()), "nofill": int((x["status"] == "nofill").sum()),
+                "closed": int(len(c)), "R": _r(c["R"].mean(), 3) if len(c) else None, "win": _r((c["R"] > 0).mean(), 3) if len(c) else None,
+                "xspy": _r(c["xspy"].mean(), 4) if len(c) else None, "open": int(len(o)), "open_R": _r(o["R"].mean(), 3) if len(o) else None,
+                "total_R": _r(pd.concat([c["R"], o["R"]]).sum(), 2) if len(c) + len(o) else None}
+    recent = s.sort_values(["date", "t"], ascending=[False, True]).head(40)
+    rows = [{k: (None if (isinstance(v, float) and not np.isfinite(v)) else v) for k, v in r.items()} for r in recent.to_dict("records")]
+    days = sorted(set(df["date"].astype(str)))
+    return {"since": days[0] if days else None, "sessions": len(days), "buy": stat(s[s["kind"] == "buy"]), "ready": stat(s[s["kind"] == "ready"]),
+            "all": stat(s), "rows": rows}
 
 
 def build_safe(*a, **k):

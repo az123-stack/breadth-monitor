@@ -520,6 +520,18 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   yesterday's high), top 25, ⬇ TradingView. Evidence `stock_evidence.trigger` (daily bars: touch, buy the break of the touch-day high within
   3 sessions, stop touch-day low ≤ 1 ADR, 20 sessions): BUY groups +0.84R (n 750, halves +0.98/+0.69R, 29% win) vs other +0.13R, WATCH
   −0.15R; edge +0.49R, t 2.03.
+  TRACK RECORD + ALERTS (Oct 27, Adam: "phone notifications when a stock is ready" + "are these being tracked, I want live backtest data"):
+  live ledger `data/lineup_ledger.csv` (`lifecycle.ledger_record / ledger_settle / tracker`, `build(..., ledger=True)` from update.py):
+  each official close freezes the FIRST ribbon dips (`f0`, no touch in the prior 5) of BUY / ready-group leaders (kind buy / ready),
+  a date is never rewritten (a "none" row marks dates with no signal); settle on daily bars = fill when a later session's high takes
+  the dip-day high within 3 sessions (fill max(open, trigger)), stop max(dip low, fill − 1 ADR), exit 20th session close or stop; R, ret,
+  xspy, status pending / open / done / stopped / nofill. `lifecycle.tracker` → card section "Track record" (`lineupRecord`: BUY vs ready
+  vs backtest, last 40 rows, backtest trade list `stock_evidence.trigger.recent`). Seeded Oct 26 (VEEV, VRNS, ready).
+  Alerts: `breadth/lineup.py` (`state` = Python twin of `lineupState`, parity tested in Node; `run` pure) via
+  `.github/workflows/lineup.yml` (hourly crons :33 13–19 UTC, loops every 5 min 9:35 AM–4:05 PM ET) → docs/lineup_live.json {date, time,
+  gate buy/half/hold, rows, events}; events = first time today a BUY-group name (gate not hold) reaches zone or over; optional instant
+  ntfy.sh post when repo secret NTFY_TOPIC is set. Claude scheduled task "Market Monitor · lined-up alerts" (every 15 min in the session)
+  reads `python -m breadth.lineup events --since 15` and pushes a phone notification for new events. Test `test_lineup_live_and_ledger`.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

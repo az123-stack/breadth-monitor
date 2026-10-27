@@ -1504,6 +1504,65 @@ def test_theme_lifecycle():
     assert (Gs["buy"].iloc[:200] == G2["buy"].iloc[:200]).all().all()
 
 
+def test_lineup_live_and_ledger():
+    """Lined-up buys: the Python alert pass matches the page's lineupState (run in Node), alerts only BUY-group names in the
+    EMAs / over the trigger and never twice, nothing on hold-off days; the live ledger freezes a date, fills on the trigger,
+    and stops out at the dip low."""
+    import shutil, subprocess, json as _json
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from breadth import lineup, lifecycle as LC
+    base = {"g": "Hot", "kind": "buy", "rs": 95, "c": 100.0, "hi": 101.0, "lo": 98.0, "e9": 99.0, "e21": 97.0, "adr": 0.03, "t3": False, "t0": False}
+    xs = [dict(base, t="DIP"), dict(base, t="OVR"), dict(base, t="NEAR", e9=97.0, e21=96.0), dict(base, t="FAR", e9=80.0, e21=78.0),
+          dict(base, t="RDY", kind="ready")]
+    L = {"DIP": {"price": 99.2, "closeyest": 100, "open": 100, "low": 97.5}, "OVR": {"price": 101.5, "closeyest": 100, "open": 100, "low": 98.2},
+         "NEAR": {"price": 99.5, "closeyest": 100, "open": 100, "low": 99.4}, "FAR": {"price": 100.5, "closeyest": 100, "open": 100, "low": 100.0},
+         "RDY": {"price": 101.5, "closeyest": 100, "open": 100, "low": 98.2}}
+    py = {x["t"]: lineup.state(x, L[x["t"]])["st"] for x in xs}
+    assert py == {"DIP": "zone", "OVR": "over", "NEAR": "near", "FAR": None, "RDY": "over"}, py
+    node = shutil.which("node")
+    if node:   # the page's own function gives the same states
+        src = (config.ROOT / "breadth" / "template.html").read_text()
+        i = src.index("function lineupState(")
+        depth, j = 0, src.index("{", i)
+        while True:
+            depth += src[j] == "{"; depth -= src[j] == "}"; j += 1
+            if depth == 0:
+                break
+        js = f"""const liveActive = () => true; const LV = {_json.dumps(L)};
+const liveRow = (t) => {{ const r = LV[t]; return r ? {{ ...r, chg: r.price / r.closeyest - 1 }} : null; }};
+{src[i:j]}
+console.log(JSON.stringify(Object.fromEntries({_json.dumps(xs)}.map(x => [x.t, lineupState(x).st]))));"""
+        r = subprocess.run([node, "-e", js], capture_output=True, text=True)
+        assert r.returncode == 0, r.stderr[-600:]
+        assert _json.loads(r.stdout) == py, (r.stdout, py)
+    now = datetime(2026, 10, 27, 11, 0, tzinfo=ZoneInfo("America/New_York"))
+    text = "ticker,index,symbol,price,closeyest,open,volume,marketcap,volumeavg,at10,at11,low\n_asof,x\n_spytime,10/27/2026 11:00:00\n" + \
+        "\n".join(f"{t},1,{t},{r['price']},{r['closeyest']},{r['open']},1,1,1,,,{r['low']}" for t, r in L.items())
+    lc = {"size": "full", "live": xs}
+    doc, new = lineup.run(text, lc, {}, now)
+    assert sorted((e["t"], e["state"]) for e in new) == [("DIP", "zone"), ("OVR", "over")], new          # ready / near / far: no alert
+    doc2, new2 = lineup.run(text, lc, doc, now)
+    assert new2 == [] and len(doc2["events"]) == 2                                                       # never twice
+    _, new3 = lineup.run(text, {"size": "hold off", "live": xs}, {}, now)
+    assert new3 == []                                                                                    # hold-off day: silent
+    # ledger: signal on day 0 (dip-day high 101, low 98), fills day 2 at 101, stopped on day 4 under 98
+    days = pd.bdate_range("2026-10-01", periods=8)
+    px = {"o": [100, 100, 100.5, 101.2, 99, 97, 97, 97], "h": [101, 100.8, 101.6, 102, 99.5, 98, 98, 98],
+          "l": [98, 99, 100.2, 100.5, 97.9, 96, 96, 96], "c": [100, 100.5, 101.4, 101, 98.5, 97, 97, 97]}
+    w = {k: pd.DataFrame({"ZZ": v, "SPY": [400.0] * 8}, index=days) for k, v in px.items()}
+    sig = [dict(base, t="ZZ", f0=True, hi=101.0, lo=98.0)]
+    df = LC.ledger_record(pd.DataFrame(columns=LC.LCOLS), str(days[0].date()), sig)
+    df = LC.ledger_record(df, str(days[0].date()), sig + [dict(base, t="YY", f0=True)])
+    assert len(df) == 1                                                                                  # a recorded date is frozen
+    df = LC.ledger_settle(df, w)
+    r = df.iloc[0]
+    assert r["status"] == "stopped" and r["entry_date"] == str(days[2].date()) and abs(r["entry"] - 101.0) < 1e-9 and r["R"] < 0, r.to_dict()
+    tr = LC.tracker(df)
+    assert tr["buy"]["closed"] == 1 and tr["buy"]["R"] < 0
+    return "states match the page, alerts gated, ledger fills + stops"
+
+
 def test_anchor_backup_snapshot():
     """Second-half movers backup (Oct 26 2026: the sheet's 10:00 freeze stuck on Oct 13 for two weeks): take() saves a slot
     only inside its window, once a day, only for today's session; check() flags a day with neither source."""
