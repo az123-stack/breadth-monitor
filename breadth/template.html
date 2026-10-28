@@ -4315,7 +4315,12 @@ function renderIntraday(app) {
   // 0. Thrust watch
   app.append(thrustWatchCard(T && T.thrust_watch, clk));
   // 1. Market pulse
-  const tile = (k, label) => { const r = liveRow(k); return `<div class="itile"><small>${esc(label)}</small><b class="${cls(r && r.chg)}">${r ? pc(r.chg) : "–"}</b><span class="meta">${r ? fmt(r.price, r.price < 100 ? 2 : 0) : ""}</span></div>`; };
+  const tile = (k, label) => { const r = liveRow(k);
+    if (k === "^TNX") {   // yield: show the level in % and the move in basis points (CBOE quotes it ×10, e.g. 49.8 = 4.98%)
+      const sc = r && r.price > 20 ? 10 : 1, y = r ? r.price / sc : null, bp = r && r.closeyest ? Math.round((r.price - r.closeyest) / sc * 100) : null;
+      return `<div class="itile"><small>${esc(label)}</small><b class="${bp == null ? "" : bp > 0 ? "dn" : bp < 0 ? "up" : ""}">${y == null ? "–" : y.toFixed(2) + "%"}</b><span class="meta">${bp == null ? "" : (bp > 0 ? "+" : "") + bp + " bp today" + (bp > 0 ? " (yields up: pressure on stocks)" : bp < 0 ? " (yields down)" : "")}</span></div>`;
+    }
+    return `<div class="itile"><small>${esc(label)}</small><b class="${cls(r && r.chg)}">${r ? pc(r.chg) : "–"}</b><span class="meta">${r ? fmt(r.price, r.price < 100 ? 2 : 0) : ""}</span></div>`; };
   const spread = (a, b, label, note) => { const x = liveRow(a), y = liveRow(b); const v = x && y ? x.chg - y.chg : null;
     return `<div class="itile"><small>${esc(label)}</small><b class="${cls(v)}">${v == null ? "–" : (v > 0 ? "+" : "") + (v * 100).toFixed(2) + " pts"}</b><span class="meta">${esc(note)}</span></div>`; };
   app.append($(`<section class="icard card regcard"><div class="kicker">Market pulse</div>

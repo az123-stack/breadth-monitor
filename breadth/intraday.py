@@ -28,7 +28,7 @@ PULSE = {
     "^SPX": ("INDEXSP:.INX", "S&P 500"), "^NDX": ("INDEXNASDAQ:NDX", "Nasdaq-100"),
     "SPY": ("SPY", "SPY"), "QQQ": ("QQQ", "QQQ"), "IWM": ("IWM", "Russell 2000 (IWM)"), "DIA": ("DIA", "Dow (DIA)"),
     "RSP": ("RSP", "S&P equal weight (RSP)"), "QQEW": ("QQEW", "Nasdaq-100 equal weight (QQEW)"),
-    "^VIX": ("INDEXCBOE:VIX", "VIX"), "TLT": ("TLT", "20y Treasuries (TLT)"), "UUP": ("UUP", "US dollar (UUP)"),
+    "^VIX": ("INDEXCBOE:VIX", "VIX"), "^TNX": ("INDEXCBOE:TNX", "10-year yield"), "TLT": ("TLT", "20y Treasuries (TLT)"), "UUP": ("UUP", "US dollar (UUP)"),
     "GLD": ("GLD", "Gold (GLD)"), "USO": ("USO", "Oil (USO)"), "^BTC": ("CURRENCY:BTCUSD", "Bitcoin"),
 }
 SECTOR_ETFS = {"XLK": "Technology", "XLC": "Communication", "XLY": "Consumer Disc.", "XLF": "Financials",

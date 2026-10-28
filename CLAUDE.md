@@ -567,6 +567,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   `tools/late_mover/study.py` on the orb-data 15-min bars, results.json): at 12:00 ET, RS 80+, sub-theme top third on 13 wks
   (`polished.groups`), up 1%+ since 10:00 and beating SPY, $20M+/day → highest RS. 5d +0.21R (+0.15R vs avg stock, t 1.3);
   same/next day ≈ 0R; the biggest mover did worse. "Unproven" watch line.
+- 10-year yield tile (Oct 27, Adam): `intraday.PULSE` "^TNX" = Google `INDEXCBOE:TNX` (CBOE quotes ×10; the tile divides when > 20) → Intraday
+  Market pulse shows the yield in % and the day's change in bp (green when yields fall). Joins the live sheet on the next build.
 - Scheduled-task models (Oct 27): "lined-up alerts (hourly)" and "10/11 snapshot kick" moved to Sonnet.
 - Page tabs (Oct 27 cleanup): one `renderTab` table serves tab clicks and live refreshes (before, `rerenderPanel` lacked Best Setups and
   Launch list, so a live price refresh on those tabs drew the Breadth tab). Removed dead payload fields (stocks `rsraw`/`v1`, SoW
