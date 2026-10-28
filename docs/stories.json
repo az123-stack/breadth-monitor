@@ -1,14 +1,14 @@
 {
- "updated": "2026-10-27T16:57",
+ "updated": "2026-10-28T16:56",
  "stories": [
   {
    "id": "ai-spending-repriced",
    "title": "AI spending gets repriced",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-10-27",
+   "updated": "2026-10-28",
    "summary": "Investors are questioning whether the AI build-out pays for itself at 5% rates, so money is leaving AI hardware for companies whose earnings don't depend on AI capex.",
-   "changed": "Second day of the AI-hardware bounce (Custom Silicon +7.6%, AI Servers +6.8%, Neoclouds +8.4%) while Enterprise SaaS fell 2.9%: the seesaw again, with Microsoft and Alphabet after Wednesday's close as the test.",
+   "changed": "AI hardware bounced again on memory and Oracle news; Microsoft's cloud beat and Alphabet's miss landed after the close, so the mixed read is unpriced.",
    "thesis": {
     "what": "Since early October the AI-hardware groups (chip equipment, optical, AI servers, custom chips, memory, neoclouds, data-center power) fell about 18% over 20 sessions while IT services, enterprise software and steady consumer names rose about 10%: a 28-point swing. On Oct 22 the S&P 500 fell 1.2% but the equal-weight S&P rose 0.7%: the money moved, it didn't leave.",
     "why": "Two worries feed each other. **Cost:** Meta announced non-voting shares to help fund its AI spending and fell 5%; Tesla cut capex; Lam Research guided below consensus ([Korea Times](https://www.koreatimes.co.kr/world/20261023/wall-street-sinks-as-nasdaq-falls-over-2-on-ai-cost-worries), [Investrade](https://investrade.com/market-review-october-22-2026/)). **Financing:** hot CPI pushed the 10-year to 5.26% and CoreWeave's credit spread past 1,000 bp, so borrowing to build data centers got expensive ([TradingKey](https://www.tradingkey.com/analysis/stocks/us-stocks/262218623-us-premarket-tsmc-record-profit-chip-stocks-fall-nvidia-micron-ppi-tradingkey)). Funding is the newest strain: Meta plans to raise up to $95B, starting with $35B in stock ([MarketScreener](https://www.marketscreener.com/news/wall-st-rises-as-anthropic-s-ipo-filing-sharpens-focus-on-ai-trade-ce785cdcdd8ff22d)), and Anthropic's filing adds a large new AI listing to the supply.",
@@ -79,6 +79,13 @@
      "url": "https://finance.yahoo.com/markets/live/stock-market-today-tuesday-october-27-dow-sp-500-nasdaq-081901995.html",
      "source": "Yahoo Finance",
      "reaction": "QQQ +1.27%, AI hardware groups +6% to +8%, Enterprise SaaS −2.9%"
+    },
+    {
+     "date": "2026-10-28",
+     "event": "Microsoft beats (EPS $4.89 vs $4.73, cloud $63.9B vs $61.62B; shares about +4% after hours); Alphabet misses on EPS ($2.12 vs $2.99; about −8.7% after hours). Earlier SK Hynix (+13%) said memory shortage runs into 2030 and Oracle (+10.7%) targeted at least $225B fiscal-2030 revenue.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-october-28-dow-sp-500-nasdaq-fed-meeting-decision-big-tech-earnings-130508769.html",
+     "source": "Yahoo Finance",
+     "reaction": "Memory +5.5%, Neoclouds +6.4%, Optical +4.6%, Enterprise SaaS slipped"
     }
    ],
    "groups": {
@@ -118,18 +125,6 @@
     ]
    },
    "catalysts": [
-    {
-     "date": "2026-10-28",
-     "time": "2:00 PM ET",
-     "name": "FOMC rate decision",
-     "why": "Rates are half of this story: a hawkish Fed keeps AI financing expensive."
-    },
-    {
-     "date": "2026-10-28",
-     "time": "After close",
-     "name": "Microsoft and Alphabet earnings",
-     "why": "Their capex plans and AI revenue decide whether the spending is paying off."
-    },
     {
      "date": "2026-10-29",
      "time": "8:30 AM ET",
@@ -239,6 +234,27 @@
       "Memory & Storage Media"
      ],
      "note": "Second day of the AI-hardware bounce (Custom Silicon +7.6%, AI Servers +6.8%, Neoclouds +8.4%) while Enterprise SaaS fell 2.9%: the seesaw again, with Microsoft and Alphabet after Wednesday's close as the test."
+    },
+    {
+     "date": "2026-10-28",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "Enterprise SaaS",
+      "Business Services & Data",
+      "Household & Personal Care",
+      "Packaged Foods"
+     ],
+     "short": [
+      "Semicap Equipment",
+      "Optical Components & Transceivers",
+      "AI Servers & Integrators",
+      "Custom Silicon & Networking Chips",
+      "Neoclouds & GPU Hosting",
+      "Data Center Power & Cooling",
+      "Memory & Storage Media"
+     ],
+     "note": "AI hardware bounced again on memory and Oracle news; Microsoft's cloud beat and Alphabet's miss landed after the close, so the mixed read is unpriced."
     }
    ]
   },
@@ -247,9 +263,9 @@
    "title": "Hot inflation keeps the 10-year near 5%",
    "status": "peaking",
    "started": "2026-10-14",
-   "updated": "2026-10-27",
+   "updated": "2026-10-28",
    "summary": "Hot CPI and PPI pushed the 10-year Treasury yield to 5.26%, hurting companies whose profits are years away; yields eased on Oct 22, but the Fed and PCE next week decide the next leg.",
-   "changed": "10-year steady near 4.99% into the Fed; markets focus on whether Wednesday's statement leans toward hikes (about 10% hike odds per CME data cited by Yahoo).",
+   "changed": "The Fed held but with two hike dissents; December hike odds near 85% keep the 10-year about 5%. PCE tomorrow is next.",
    "thesis": {
     "what": "Since the Oct 14 CPI the groups that need cheap money or are years from profits (small nuclear reactors, quantum, homebuilders, REITs, residential solar) fell about 13% vs SPY over 20 sessions.",
     "why": "September CPI came in at 3.7% vs 3.6% and PPI was hot the next day, reviving rate-hike bets; the 10-year hit 5.26% ([24/7 Wall St.](https://247wallst.com/investing/2026/10/14/nuscale-power-falls-7-as-10-year-treasury-yield-climbs-to-5-26-energy-fuels-drops-9-oklo-slides-5/)). Oil above $100 feeds inflation worries too (see the Gulf oil story).",
@@ -292,6 +308,13 @@
      "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-27-2026",
      "source": "TheStreet",
      "reaction": "TLT −0.06%, VIX −4.7%"
+    },
+    {
+     "date": "2026-10-28",
+     "event": "Fed holds at 3.75%–4% in a 10–2 vote; Hammack and Cook dissent in favor of a hike. Futures price about an 85% chance of a quarter-point hike Dec. 9; 10-year near 5.05%.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-october-28-dow-sp-500-nasdaq-fed-meeting-decision-big-tech-earnings-130508769.html",
+     "source": "Yahoo Finance",
+     "reaction": "SPY +0.34%, TLT −0.78%, VIX −3.5%"
     }
    ],
    "groups": {
@@ -314,12 +337,6 @@
     ]
    },
    "catalysts": [
-    {
-     "date": "2026-10-28",
-     "time": "2:00 PM ET",
-     "name": "FOMC rate decision",
-     "why": "Tone on hikes decides whether 5%+ holds."
-    },
     {
      "date": "2026-10-29",
      "time": "8:30 AM ET",
@@ -384,6 +401,19 @@
       "Residential Solar & Yieldcos"
      ],
      "note": "10-year steady near 4.99% into the Fed; markets focus on whether Wednesday's statement leans toward hikes (about 10% hike odds per CME data cited by Yahoo)."
+    },
+    {
+     "date": "2026-10-28",
+     "status": "peaking",
+     "long": [],
+     "short": [
+      "Nuclear Reactors (SMR)",
+      "Quantum Computing",
+      "Homebuilders",
+      "REITs",
+      "Residential Solar & Yieldcos"
+     ],
+     "note": "The Fed held but with two hike dissents; December hike odds near 85% keep the 10-year about 5%. PCE tomorrow is next."
     }
    ]
   },
@@ -392,9 +422,9 @@
    "title": "Gulf attacks keep oil above $100",
    "status": "peaking",
    "started": "2026-10-09",
-   "updated": "2026-10-27",
+   "updated": "2026-10-28",
    "summary": "Houthi attacks on Saudi sites and Hormuz shipping pushed Brent from about $98 to over $110 in two weeks; refiners and drillers lead, airlines lose.",
-   "changed": "Oil eased on tentative U.S.–Iran diplomacy (WTI about $100) and refiners fell about 8% (Valero −7.8% midday): price agrees on 20 days, but today is the first sharp crack in the leaders.",
+   "changed": "Oil bounced about 1.8% on a Saudi refinery attack after yesterday's dip.",
    "thesis": {
     "what": "Energy groups (refiners, shale, integrated oil, tankers, drillers) are up about 8% over 20 sessions while airlines fell 10%: an 18-point swing, though the last 5 days stalled.",
     "why": "Houthi attacks on Saudi sites (Oct 9, Oct 12, Oct 22) and reported attacks on ships in the Strait of Hormuz (Oct 14) put supply at risk; Brent went from $97.92 to $111.88 ([Nation Thailand](https://www.nationthailand.com/news/40070809), [Euronews](https://www.euronews.com/2026/10/14/oil-prices-rise-after-reported-attacks-on-ships-in-strait-of-hormuz), [Investrade](https://investrade.com/morning-preview-october-22-2026/)).",
@@ -458,6 +488,13 @@
      "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-27-2026",
      "source": "TheStreet",
      "reaction": "Refiners −8.2%, Integrated Oil −2.8%, USO −1.4%"
+    },
+    {
+     "date": "2026-10-28",
+     "event": "Crude rises about 1.8% to roughly $101.67 after an attack on a Saudi refinery.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-october-28-dow-sp-500-nasdaq-fed-meeting-decision-big-tech-earnings-130508769.html",
+     "source": "Yahoo Finance",
+     "reaction": "USO +1.64%; Natural Gas Producers −1.3%"
     }
    ],
    "groups": {
@@ -549,6 +586,21 @@
       "Airlines"
      ],
      "note": "Oil eased on tentative U.S.–Iran diplomacy (WTI about $100) and refiners fell about 8% (Valero −7.8% midday): price agrees on 20 days, but today is the first sharp crack in the leaders."
+    },
+    {
+     "date": "2026-10-28",
+     "status": "peaking",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Oil bounced about 1.8% on a Saudi refinery attack after yesterday's dip."
     }
    ]
   },
@@ -557,9 +609,9 @@
    "title": "IT services: from AI loser to AI implementer",
    "status": "building",
    "started": "2026-10-02",
-   "updated": "2026-10-27",
+   "updated": "2026-10-28",
    "summary": "After being sold as AI losers, IT services and consulting are being re-rated as the firms that will implement AI, and they're absorbing money leaving AI hardware.",
-   "changed": "IT Services slipped 0.8% as money returned to chips; still the 20-day leader, with Microsoft earnings Wednesday as the next test.",
+   "changed": "Microsoft's cloud beat arrived after the close; the group closed +1.0%. Watch tomorrow's reaction.",
    "thesis": {
     "what": "IT Services & Consulting is up about 20% over 20 sessions (+10% in 5) with every member above its 21-day EMA, the strongest dollar flow of any group (+0.76).",
     "why": "Accenture's outlook on Oct 1–2 eased fears that AI will eat consulting revenue ([The Star](https://www.thestar.com.my/tech/tech-news/2026/10/02/accenture039s-forecast-eases-ai-disruption-fears-lifts-battered-it-services-stocks)); in June the same fear had sent Accenture down 18% ([SentiSense](https://app.sentisense.ai/stories/accenture-shares-plummet-18-percent-it-stocks-crash-amid-weak-guidance-06192026)). Cognizant rose 7% in sympathy ([Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/cognizant-shares-rise-7-2-123306736.html)).",
@@ -602,6 +654,13 @@
      "url": "https://investrade.com/market-review-october-23-2026/",
      "source": "Investrade",
      "reaction": "IT Services & Consulting −2.4% (after +6.1% the prior session), Business Services & Data −1.5%"
+    },
+    {
+     "date": "2026-10-28",
+     "event": "Microsoft's quarter beat on cloud ($63.9B vs $61.62B expected), after hours.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-october-28-dow-sp-500-nasdaq-fed-meeting-decision-big-tech-earnings-130508769.html",
+     "source": "Yahoo Finance",
+     "reaction": "IT Services & Consulting +1.0% in the session"
     }
    ],
    "groups": {
@@ -620,14 +679,7 @@
     "short": [],
     "watch": []
    },
-   "catalysts": [
-    {
-     "date": "2026-10-28",
-     "time": "After close",
-     "name": "Microsoft earnings",
-     "why": "Its commentary on enterprise AI adoption speaks directly to implementation demand."
-    }
-   ],
+   "catalysts": [],
    "trade": "- **All three leaders are ~3 ADRs over their 21 EMA after Oct 22:** don't chase. Let them build a 1–2 week base, then buy the flag breakout.\n- **Stop:** the flag low.\n- **Test of the thesis:** watch how the group trades the next day AI hardware rallies hard; holding up = real buying, add on the next base.",
    "related": [
     "ai-spending-repriced"
@@ -672,6 +724,16 @@
      ],
      "short": [],
      "note": "IT Services slipped 0.8% as money returned to chips; still the 20-day leader, with Microsoft earnings Wednesday as the next test."
+    },
+    {
+     "date": "2026-10-28",
+     "status": "building",
+     "long": [
+      "IT Services & Consulting",
+      "India IT Services"
+     ],
+     "short": [],
+     "note": "Microsoft's cloud beat arrived after the close; the group closed +1.0%. Watch tomorrow's reaction."
     }
    ]
   },
@@ -680,7 +742,7 @@
    "title": "Managed care repairs on better Medicare ratings",
    "status": "building",
    "started": "2026-10-09",
-   "updated": "2026-10-27",
+   "updated": "2026-10-28",
    "summary": "Better Medicare star ratings and UnitedHealth's beat-and-raise are pulling managed care out of its slump.",
    "changed": "",
    "thesis": {
@@ -761,6 +823,15 @@
      ],
      "short": [],
      "note": ""
+    },
+    {
+     "date": "2026-10-28",
+     "status": "building",
+     "long": [
+      "Managed Care"
+     ],
+     "short": [],
+     "note": ""
     }
    ]
   },
@@ -769,7 +840,7 @@
    "title": "SpaceX eyes cell sites; towers up, carriers down",
    "status": "building",
    "started": "2026-10-23",
-   "updated": "2026-10-27",
+   "updated": "2026-10-28",
    "summary": "Reports that SpaceX wants about 80,000 US cell sites for a wireless network lift tower landlords and hit AT&T and T-Mobile.",
    "changed": "Verizon reported: no SpaceX mention in the coverage I found; subscriber growth was strong and guidance was raised.",
    "thesis": {
@@ -849,6 +920,18 @@
     },
     {
      "date": "2026-10-27",
+     "status": "building",
+     "long": [
+      "Tower REITs",
+      "Launch & Space Systems"
+     ],
+     "short": [
+      "Wireless Carriers"
+     ],
+     "note": "Verizon reported: no SpaceX mention in the coverage I found; subscriber growth was strong and guidance was raised."
+    },
+    {
+     "date": "2026-10-28",
      "status": "building",
      "long": [
       "Tower REITs",
