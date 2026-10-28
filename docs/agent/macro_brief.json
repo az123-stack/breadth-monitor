@@ -1,54 +1,54 @@
 {
- "for_date": "2026-10-26",
- "written": "2026-10-27T11:13Z",
- "headline": "Stocks are lifted by Anthropic's IPO filing, but Wednesday's FOMC decision, a Hormuz-driven $115 Brent and a 5% 10-year yield keep macro risk high.",
+ "for_date": "2026-10-27",
+ "written": "2026-10-28T11:05Z",
+ "headline": "Fed decision today at 2 PM ET (hold expected, December hike risk in focus) with Microsoft and Alphabet earnings after the close, then GDP and PCE tomorrow, while the 10-year sits near 5% and Brent holds above $110.",
  "risk": "high",
- "rates": "The 10-year Treasury yield is near 4.97-4.99%, and markets are looking past this week's hold toward a possible December hike.",
- "fed": "The FOMC decides Wednesday at 2:00 PM ET (about 90% priced for a hold at the 3.75-4.00% range after September's hike), with Powell's press conference at 2:30 PM and no new projections.",
- "oil": "Brent is just under $115-116 and WTI about $102, easing on Iran diplomacy but held up by Strait of Hormuz disruption (8 transits in 24 hours versus about 60 normally).",
- "geo": "Saudi, Pakistani and Turkish officials are meeting Iran to prevent further US-Israeli strikes, while Trump has hinted strikes could resume.",
+ "rates": "The 10-year Treasury yield is about 4.99%, just under 5% and near recent highs, with the 2-year near 4.73% and the 30-year near 5.31%.",
+ "fed": "The FOMC decides Oct 28 at 2:00 PM ET with Chair Warsh's press conference at 2:30 PM; a hold is widely expected, and some outlets report futures pricing a meaningful chance of another hike in December.",
+ "oil": "Brent settled near $113.88 and WTI near $99.90 on Oct 27, down about 1.7% on reports Iranian officials discussed conditions for ending hostilities, which eased Strait of Hormuz supply fears.",
+ "geo": "The Middle East conflict (Iran, Hormuz talks, Houthi attacks in the Red Sea) is the main oil driver and can reverse quickly.",
  "events": [
-  {
-   "date": "2026-10-27",
-   "time": "1:00 PM ET",
-   "name": "Treasury 5-year note auction",
-   "impact": "medium"
-  },
   {
    "date": "2026-10-28",
    "time": "2:00 PM ET",
-   "name": "FOMC rate decision (presser 2:30 PM)",
+   "name": "FOMC rate decision (Warsh press conference 2:30 PM)",
    "impact": "high"
   },
   {
    "date": "2026-10-28",
    "time": "After close",
-   "name": "Alphabet and Microsoft earnings",
+   "name": "Microsoft and Alphabet earnings",
    "impact": "high"
   },
   {
    "date": "2026-10-29",
    "time": "8:30 AM ET",
-   "name": "Q3 GDP (preliminary) and September PCE",
+   "name": "Q3 GDP (advance) and September PCE",
    "impact": "high"
   },
   {
    "date": "2026-10-29",
    "time": "After close",
-   "name": "Amazon earnings",
+   "name": "Amazon and Intel earnings",
    "impact": "high"
   },
   {
-   "date": "2026-10-29",
-   "time": "9:15 AM ET",
-   "name": "ECB rate decision",
+   "date": "2026-10-30",
+   "time": "8:30 AM ET",
+   "name": "Q3 Employment Cost Index",
    "impact": "medium"
+  },
+  {
+   "date": "2026-11-02",
+   "time": "After close",
+   "name": "Apple earnings",
+   "impact": "high"
   }
  ],
  "sources": [
-  "https://www.tradingkey.com/analysis/stocks/us-stocks/262237761-weekly-fed-microsoft-alphabet-amazon-earnings-tradingkey",
-  "https://www.home.saxo/en-mena/content/articles/macro/market-quick-take---anthropic-files-ipo-paperwork---27-october-2026-27102026",
-  "https://www.dtnpf.com/agriculture/web/ag/news/world-policy/article/2026/10/26/wti-brent-crude-fall-mideast-talks",
-  "https://www.marketalleys.com/post/calendar-preview-fomc-pce-and-gdp-headline-the-next-three-days-2026-10-27"
+  "https://hdfcsky.com/news/nasdaq-jumps-1-2percent-as-chip-stocks-rally-oil-slides-and-fed-meeting-begins-october-28-2026",
+  "https://www.stocktitan.net/articles/earnings-calendar-week-of-october-26-2026",
+  "https://www.heygotrade.com/en/news/weekly-economic-outlook-2026-10-26/",
+  "https://vanderbiltreport.com/week-ahead-october-26-november-1-2026/"
  ]
 }
