@@ -510,6 +510,9 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   group state, 1-ADR stop, 20 sessions). Oct 27: BUY +2.7% vs avg group 20d (t 3.5, halves +2.8/+2.9), 40d +3.9%; weak breadth ≈ 0;
   WATCH ≈ 0, 53% turn BUY in 30 sessions; pullbacks in BUY groups +0.74R vs +0.27R (edge +0.31R, t 2.2); stage alone: blossom +3.0%
   (t 3.6), push −0.8%, forgotten −0.65%. Test `test_theme_lifecycle` (gating + no look-ahead).
+  `lifecycle.all` (Oct 28, Adam: "a stage column like the stair-step table") = every modelled sub-theme →
+  [stage name, n, days, last stage, sessions ago, signal buy/ready/watch/""]; no stage today → "Between stages" + the last stage held
+  within 60 sessions. Page helper `lcStageOf(g)` → "Lifecycle stage" column (sortable, Blossom first) in both stair-step views.
   **Lined-up buys · live** (Oct 27, Adam: "stock buys when everything lines up and tickers are into their EMAs", top of Intraday):
   `lifecycle.live` = every liquid RS 70+ uptrend member (`P["base"]`) of a BUY / ready group (WATCH groups left out: their dips lost
   −0.15R) with c, hi, lo, e9, e21, adr, t3/t0 (ribbon touch in 3 sessions / last), earn. Browser `lineupState` (live EMAs as `dipLive`:

@@ -413,11 +413,28 @@ def build(adjusted, theme_data, history, evidence_on=True, ledger=False):
                        "f0": bool(P["touch"][t].iat[i]) and not bool(P["touch"][t].iloc[max(0, i - 5):i].any()),
                        "earn": earn.get(t)}
     rows.sort(key=lambda r: (not r["ready"], not r["watch"], not r["new"], -(r["strength"] or 0)))
-    counts = {k: int((G["stage"].iloc[i] == NUM[k]).sum()) for _, k, _ in STAGES}
+    # Compact stage map for EVERY sub-theme (Adam, Oct 28 2026: a "Stage" column on the stair-step table). Groups that fit no
+    # stage today get "Between stages" plus the last stage they held (within 60 sessions) and how long ago, so a leader that
+    # pulled back off its high (e.g. genomics mid-Oct) still reads e.g. "Between · was Blossom 6 sessions ago".
+    by_g = {r["g"]: r for r in rows}
+    all_st = {}
+    for g in G["stage"].columns:
+        col = G["stage"][g].to_numpy()
+        st = int(col[i])
+        r = by_g.get(g)
+        sig = (("buy" if r["buy"] else "ready") if r["ready"] else "watch" if r["watch"] else "") if r else ""
+        if st >= 0:
+            all_st[g] = [BY_NUM[st], st, _run(G["stage"][g]), "", None, sig]
+        else:
+            back = col[max(0, i - 60):i][::-1]
+            hit = np.flatnonzero(back >= 0)
+            last, ago = (BY_NUM[int(back[hit[0]])], int(hit[0]) + 1) if len(hit) else ("", None)
+            all_st[g] = ["Between stages", -1, _run(G["stage"][g]), last, ago, sig]
+    counts ={k: int((G["stage"].iloc[i] == NUM[k]).sum()) for _, k, _ in STAGES}
     alerts = [{"g": r["g"], "kind": ("buy" if r["buy"] else "ready") if r["ready"] else "watch", "days": r["on_days"], "stage": r["stage"]}
               for r in rows if r["new"]]
     out = {"date": dates[i].strftime("%Y-%m-%d"), "cfg": CFG, "stages": [{"n": n, "k": k, "name": nm} for n, k, nm in STAGES],
-           "rows": rows, "counts": counts, "alerts": alerts, "act": act, "weak": weak, "size": size,
+           "rows": rows, "all": all_st, "counts": counts, "alerts": alerts, "act": act, "weak": weak, "size": size,
            "ratio10": _r(G["r10"].iat[i], 2), "regime": str(G["regime"].iat[i]),
            "live": sorted(live.values(), key=lambda x: (rank[x["kind"]], -(x["rs"] or 0)))}
     if ledger:

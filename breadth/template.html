@@ -1515,6 +1515,25 @@ function stairSpark(r) {
   }).join("");
   return `<svg width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" role="img" aria-label="last ${n} sessions"><title>Last ${n} sessions, oldest left. Blue = share of members nuzzled in the last 5 sessions; green = share lifting or breaking a step in the last 3; top dot green = stepping up together, blue = setting up together.</title><line x1="0" x2="${w}" y1="${H - 0.5}" y2="${H - 0.5}" stroke="var(--grid)"/>${bars}</svg>`;
 }
+/* Lifecycle stage of a sub-theme (lifecycle.py `all`: [name, n, days, last, ago, signal]) as a table cell + sort key
+   (Adam, Oct 28 2026: "a column showing what stage it's in in our blossoming evolution"). */
+const LC_ORD = { "Blossom": 0, "Quiet build": 1, "Ignition": 2, "First push": 3, "Between stages": 4, "Fading": 5, "Forgotten": 6 };
+const LC_CLS = { "Forgotten": "unproven", "First push": "selective", "Ignition": "selective", "Quiet build": "focus", "Blossom": "focus", "Fading": "avoid", "Between stages": "unproven" };
+const LC_TIP = { "Forgotten": "Bottom 20% of groups on 60-day return vs SPY", "First push": "RS rank jumping from the bottom half, or 3 of 4 ignition checks",
+  "Ignition": "An ignition day in the last 10 sessions", "Quiet build": "Top 40% on 60 days, within 15% of its 60-day high, money flowing in or trending",
+  "Blossom": "Top 20% on 60 days, within 3% of its 60-day high, ignition or confirmed money flow (tested: +3.0% vs the average group over 20 days)",
+  "Fading": "Was top 20% in the last 40 sessions, now money leaving and under 50% of members above the 21 EMA",
+  "Between stages": "Fits no stage today (often a leader pulled back off its high)" };
+function lcStageOf(g) {
+  const A = ((DATA.themes || {}).lifecycle || {}).all;
+  const a = A && A[g];
+  if (!a) return { k: 9, html: '<span class="meta">–</span>' };
+  const [nm, , days, last, ago, sig] = a;
+  const sigTag = sig ? ` <span class="tg ${sig === "watch" ? "sow-riding" : "sow-breakout"}">${sig === "buy" ? "BUY" : sig === "ready" ? "READY" : "WATCH"}</span>` : "";
+  const sub = nm === "Between stages" ? (last ? `was ${esc(last)} ${ago} session${ago === 1 ? "" : "s"} ago` : "no stage in 60 sessions") : `day ${days}`;
+  return { k: (LC_ORD[nm] ?? 8) * 10 + (sig === "buy" ? 0 : sig === "ready" ? 1 : sig === "watch" ? 2 : 3),
+    html: `<span class="pbv ${LC_CLS[nm] || "unproven"}" title="${esc(LC_TIP[nm] || "")}">${esc(nm === "Between stages" ? "Between" : nm)}</span>${sigTag}<small class="meta" style="display:block">${sub}</small>` };
+}
 function stairsCard(T) {
   const X = T.stairs;
   if (!X || !X.rows) return $('<div></div>');
@@ -1548,17 +1567,17 @@ function stairsCard(T) {
   let shown = [];
   const draw = () => {
     if (U.view === "groups") {
-      const cols = [{ k: "g", h: "Sub-theme", l: true, asc: true }, { k: "_o", h: "Group state", l: true, asc: true }, { k: "r60", h: "Leading?<small>60-day rank</small>" },
+      const cols = [{ k: "g", h: "Sub-theme", l: true, asc: true }, { k: "_lc", h: "Lifecycle stage<small>blossoming evolution</small>", l: true, asc: true }, { k: "_o", h: "Group state", l: true, asc: true }, { k: "r60", h: "Leading?<small>60-day rank</small>" },
         { k: null, h: `Last ${(X.dates || []).length} sessions<small>blue nuzzled · green lifting</small>` }, { k: "nuz5", h: "Nuzzled<small>last 5 sessions</small>" },
         { k: "lifted", h: "Lifting / broke<small>last 3 sessions</small>" }, { k: "up", h: "In uptrend" }, { k: "rel5", h: "vs SPY<small>5 days</small>" }, { k: "rel20", h: "vs SPY<small>20 days</small>" },
         { k: null, h: "Stocks<small>▲ break · ↗ lifting · ◆ nuzzled</small>", l: true }];
-      const rows = () => X.rows.filter(r => U.show === "all" || (U.show === "lead" ? r.leader : r.status !== "none")).map(r => Object.assign(r, { _o: ({ stepping: 0, setting: 1, none: 2 })[r.status] * 10 - (r.leader ? 1 : 0) }));
+      const rows = () => X.rows.filter(r => U.show === "all" || (U.show === "lead" ? r.leader : r.status !== "none")).map(r => Object.assign(r, { _o: ({ stepping: 0, setting: 1, none: 2 })[r.status] * 10 - (r.leader ? 1 : 0), _lc: lcStageOf(r.g).k }));
       body.innerHTML = `<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta stempty" style="display:none">No groups in this view today.</p>`;
       const tb = body.querySelector("tbody");
       const fill = (rs) => {
         shown = rs.flatMap(r => r.members.filter(m => ["break", "lift", "nuzzle"].includes(m.state)).map(m => m.t));
         body.querySelector(".stempty").style.display = rs.length ? "none" : "";
-        tb.innerHTML = rs.map(r => `<tr><td class="l">${esc(r.g)}<small class="meta" style="display:block">${esc(r.theme || "")} · ${r.n} stocks</small></td><td class="l">${statusTag(r)}</td>${leadCell(r)}<td>${stairSpark(r)}</td>
+        tb.innerHTML = rs.map(r => `<tr><td class="l">${esc(r.g)}<small class="meta" style="display:block">${esc(r.theme || "")} · ${r.n} stocks</small></td><td class="l">${lcStageOf(r.g).html}</td><td class="l">${statusTag(r)}</td>${leadCell(r)}<td>${stairSpark(r)}</td>
           <td class="num">${shr(r.nuz5)}</td><td class="num">${shr(r.lifted)}</td><td class="num">${shr(r.up)}</td>${retCell(r.rel5, "d5")}${retCell(r.rel20, "d20")}
           <td class="l" style="min-width:220px">${r.members.filter(m => m.state !== "down").map(chip).join("") || '<span class="meta">–</span>'}</td></tr>`).join("");
       };
@@ -1571,10 +1590,10 @@ function stairsCard(T) {
         const pri = ({ stepping: 0, setting: 1, none: 2 })[r.status] - (r.leader ? 0.5 : 0);
         if (!best[m.t] || pri < best[m.t]._pri) best[m.t] = Object.assign({}, m, { sub: r.g, gstatus: r.status, leader: r.leader, _pri: pri, gr: r });
       }));
-      const cols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "_o", h: "State", l: true, asc: true }, { k: "_pri", h: "Group", l: true, asc: true },
+      const cols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "_o", h: "State", l: true, asc: true }, { k: "_pri", h: "Group", l: true, asc: true }, { k: "_lc", h: "Group's lifecycle stage", l: true, asc: true },
         { k: "d9", h: "vs 9 EMA<small>in ADRs</small>", asc: true }, { k: "d21", h: "vs 21 EMA<small>in ADRs</small>", asc: true }, { k: "to_step", h: "To step high", asc: true },
         { k: "rsr", h: "RS" }, { k: "adr", h: "ADR %" }, { k: null, h: "Plan", l: true }];
-      const rows = () => Object.values(best).filter(m => U.show === "all" || (U.show === "lead" ? m.leader : m.gstatus !== "none")).map(m => Object.assign(m, { _o: STAIR_ORD[m.state] * 100 + m._pri * 10 - (m.rsr || 0) / 100 }));
+      const rows = () => Object.values(best).filter(m => U.show === "all" || (U.show === "lead" ? m.leader : m.gstatus !== "none")).map(m => Object.assign(m, { _o: STAIR_ORD[m.state] * 100 + m._pri * 10 - (m.rsr || 0) / 100, _lc: lcStageOf(m.sub).k }));
       body.innerHTML = `<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta stempty" style="display:none">No stocks in this view today.</p><button class="xopen stmore" style="margin-top:6px"></button>`;
       const tb = body.querySelector("tbody"), mb = body.querySelector(".stmore");
       const fill = (all) => {
@@ -1585,6 +1604,7 @@ function stairsCard(T) {
         body.querySelector(".stempty").style.display = ms.length ? "none" : "";
         tb.innerHTML = ms.map(m => `<tr>${nameCell(m)}<td class="l"><span class="tg st-${m.state}" title="${esc(STAIR[m.state][1])}">${STAIR[m.state][0]}</span></td>
           <td class="l">${m.leader ? "★ " : ""}${esc(m.sub)}<small class="meta" style="display:block">${m.gstatus === "stepping" ? "stepping up together" : m.gstatus === "setting" ? "setting up together" : "group not positioned"}</small></td>
+          <td class="l">${lcStageOf(m.sub).html}</td>
           <td class="num">${m.d9 ?? "–"}<small class="meta" style="display:block">$${m.e9}</small></td><td class="num">${m.d21 ?? "–"}<small class="meta" style="display:block">$${m.e21}</small></td>
           <td class="num">${m.step ? pct(m.to_step) : "–"}<small class="meta" style="display:block">${m.step ? "$" + m.step : ""}</small></td>
           <td class="num ${rsTint(m.rsr)}">${m.rsr ?? "–"}</td><td class="num">${m.adr ?? "–"}</td><td class="l" style="min-width:200px">${plan(m)}</td></tr>`).join("");
