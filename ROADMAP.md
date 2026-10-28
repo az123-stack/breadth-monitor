@@ -13,28 +13,41 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
 2. **"My positions" card** (Adam, Oct 27, to-do): Adam's own real trades with his exit rules live — sell part after 3–5 days, trail
    the 10 / 20 EMA, stop alerts. Ask how he wants to enter positions (paste, a Google Sheet tab, or the page itself).
 
+## New data layers (Adam, Oct 27: "add order flow, and abnormal option volume in either direction")
+3. **Order flow.** What we already have is end-of-day and indirect: FINRA off-exchange short share ("Hidden buying", Breadth tab,
+   info), who won the close, volume tilt, dollar flow. Next: (a) per-STOCK order-flow reads, not just the market — FINRA short
+   share per ticker is already stored in `data/finra/` (start here, free): unusual dark-pool buying/selling in a stock vs its own
+   normal, tested on our setups (Launch picks, lined-up dips, box longs) like any layer; (b) block trades / dark-pool prints and
+   intraday buy/sell imbalance need a paid feed (e.g. a Massive plan with trades/quotes, Unusual Whales, Cheddar Flow, FlowAlgo) —
+   price it and check what's reachable from GitHub Actions before building.
+4. **Abnormal option volume, both directions** (bullish call sweeps AND bearish put buying). Needs an options feed: check the Massive
+   options add-on first (same API key), else a flow service. Measure per stock: today's call / put volume vs its own 20-day
+   normal, call/put ratio change, big out-of-the-money short-dated buying, open-interest change next day. Then the usual test:
+   does abnormal call (or put) volume ahead of a setup change its R, both halves, before anything shows as more than "info".
+   Show it as tags on Launch picks / lined-up buys and a "Unusual options" list on the Read-out.
+
 ## When data allows
-3. **Longer price history** (Massive Starter ~$29 for one month, reaches 5 years; Adam will buy it later, not now). Then re-test
+5. **Longer price history** (Massive Starter ~$29 for one month, reaches 5 years; Adam will buy it later, not now). Then re-test
    everything stuck at "only ~1 year testable": Strength on Weakness, Launch list stages, weekly dips, R stacking.
-4. **Finish the 15-minute bar download** (`.github/workflows/orb_study.yml`, branch `orb-data`; stopped at ~700 of ~1,040 tickers,
+6. **Finish the 15-minute bar download** (`.github/workflows/orb_study.yml`, branch `orb-data`; stopped at ~700 of ~1,040 tickers,
    A–PBR) and re-test the top late mover (card R-2026-10-27-late-mover) on all stocks, plus: only when the theme is in BUY, only in
    strong breadth, and as an entry for names already on the Launch / Lined-up lists.
-5. **Earnings clusters** (card R-2026-10-27-earnings-clusters): after this earnings season, test "UP cluster + group in BUY" for the
+7. **Earnings clusters** (card R-2026-10-27-earnings-clusters): after this earnings season, test "UP cluster + group in BUY" for the
    not-yet-reported members, and whether writer-confirmed clusters (the reports really agreed) beat price-only ones.
 
 ## Review dates (just watch)
-6. **Live track records** — Lined-up buys (`data/lineup_ledger.csv`) and Launch picks (`data/launch_ledger.csv`): first honest read
+8. **Live track records** — Lined-up buys (`data/lineup_ledger.csv`) and Launch picks (`data/launch_ledger.csv`): first honest read
    around late November (lined-up needs ~30+ closed trades; Launch picks hold 13 weeks).
-7. **Agent layers** (catalyst, macro brief, calendar): first real read of the forward log in late November (Integrator).
-8. **Retired from the page Oct 27** (old Top 2 swing picks, Decision Cards, pick scoreboard): Python still logs them quietly. Around
+9. **Agent layers** (catalyst, macro brief, calendar): first real read of the forward log in late November (Integrator).
+10. **Retired from the page Oct 27** (old Top 2 swing picks, Decision Cards, pick scoreboard): Python still logs them quietly. Around
    December decide whether to delete that code for good (it costs build time) — the macro brief stays (Read-out card).
 
 ## Housekeeping
-9. **Build time** ~5½ minutes per rebuild: profile it (`python -m cProfile -m breadth.update --rebuild-only`) and speed up the slowest
+11. **Build time** ~5½ minutes per rebuild: profile it (`python -m cProfile -m breadth.update --rebuild-only`) and speed up the slowest
    parts (box study ~85 s, SoW ~40 s, market health ~40 s are known).
-10. **Headless check of the Intraday tab** hangs in Claude's sandbox (it waits on the blocked live feeds; the live page is fine).
+12. **Headless check of the Intraday tab** hangs in Claude's sandbox (it waits on the blocked live feeds; the live page is fine).
     Make the tab render without network so it can be checked before pushing.
-11. **Integrator plan (Oct 24) items still open**: market filters on setups (volume tilt, hidden buying), "the trade" as pick
+13. **Integrator plan (Oct 24) items still open**: market filters on setups (volume tilt, hidden buying), "the trade" as pick
     context, in-vogue groups as long confluence, a position-ideas list. Its #1 (Top 2 stop rule) is moot now the Top 2 is retired.
 
 ## Done (recent)
