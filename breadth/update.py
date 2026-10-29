@@ -293,6 +293,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["lifecycle"] = lifecycle.build(adjusted, theme_data, history, ledger=True)
         except Exception as e:  # optional panel; never block the page
             log.exception("theme lifecycle failed: %s", e)
+        try:   # Biotech tab: the drug value chain, price + dollar flow per stage (Adam, Oct 29 2026; info only)
+            from . import valuechain
+            theme_data["valuechain"] = valuechain.build(adjusted, theme_data)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("value chain failed: %s", e)
         try:   # top picks: re-rank with group / money-flow context now that rotation + ignition exist
             from . import playbook
             playbook.rerank(theme_data, history)

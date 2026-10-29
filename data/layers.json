@@ -524,6 +524,18 @@
     "R-2026-10-29-group-runs"
    ],
    "notes": "Daily follow-through passed (next day +0.34% t 2.25, 5d +0.90% t 2.47); intraday continuation forward-logged in data/runner_log.csv"
+  },
+  {
+   "id": "valuechain",
+   "name": "Biotech value chain (Biotech tab)",
+   "kind": "code",
+   "owner": "daily update + page (live)",
+   "status": "info",
+   "where": "breadth/valuechain.py, data/valuechain.json, template.html renderBiotech",
+   "what": "9 drug-pipeline stages scored on price vs SPY (5d/1m/3m, above 50 EMA, off high, RS) and dollar flow (net flow, volume vs normal, share of the chain's $) + entry spots per stock",
+   "affects_picks": false,
+   "evidence": [],
+   "notes": "Untested as a signal: descriptive. Test idea: does the top-ranked stage beat the chain over the next 20 sessions?"
   }
  ]
 }

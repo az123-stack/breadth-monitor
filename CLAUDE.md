@@ -536,6 +536,18 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   gate buy/half/hold, rows, events}; events = first time today a BUY-group name (gate not hold) reaches zone or over; optional instant
   ntfy.sh post when repo secret NTFY_TOPIC is set. Claude scheduled task "Market Monitor · lined-up alerts" (every 15 min in the session)
   reads `python -m breadth.lineup events --since 15` and pushes a phone notification for new events. Test `test_lineup_live_and_ledger`.
+  **Biotech tab · drug value chain** (Oct 29, Adam: "biotech is the only thing moving; track it in detail so we can invest in the exact
+  right places"; layer `valuechain`, info only, untested as a signal): `breadth/valuechain.py` `build(adjusted, theme_data)` →
+  `DATA.themes.valuechain`, stages + tickers in data/valuechain.json (editable; a ticker may sit in 2 stages; `demand` = XBI/IBB
+  gauges; `store.theme_tickers()` includes them so missing ones get bars). Per stage: equal-weight vs SPY r1/r5/r20/r60, above50, off
+  (median off 1y high), rs (dashboard RS, else rated from `rs_bp`), rv5/rv20 ($ volume vs the 50 sessions before the last 20),
+  net5/net20 (signed $ volume ÷ normal), up20, share / share_chg of the chain's $, `line` (61 sessions vs SPY), spots counts;
+  composite rank = price rank + flow rank → read "Leading, money confirming" / "Leading on price, money lagging" / "Money moving in,
+  price catching up" / "Being sold" / "Middle of the pack". Per stock: same + x10/x21 (ADRs over the EMA), v50, net20_usd, `spot`
+  (pullback = uptrend and −0.5..+0.3 ADR from the 21 EMA; buy = ≤ 1.25 ADR; stretched 1.25–2; extended ≥ 2; basing; broken < 50
+  EMA). Page `renderBiotech` (tab "Biotech", after Rotation): header + XBI/IBB tiles, sortable stage scorecard (click a row → its
+  stocks), stock table with Stage / Spot chips and ⬇ TradingView; live "Today" columns when the sheet is a newer session than the
+  build. Test `test_value_chain`.
   **Runners · groups running together** (Oct 29, Adam: "AI drug discovery all ran together — I'd have liked an alert to day trade it";
   card R-2026-10-29-group-runs, layer `runners`, info only): `breadth/runners.py` `scan(rows, subthemes, stocks, mins, profile)` per
   sub-theme from the live sheet (needs the sheet's volume column): liquid members ($3+, $10M+/day, 4+), RUNNING = 75%+ up AND avg move

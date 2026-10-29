@@ -1857,6 +1857,41 @@ def test_group_runners():
     return "running / heating / quiet, alert once + widen, job + page agree"
 
 
+def test_value_chain():
+    """Biotech tab (breadth/valuechain.py): stages ranked by price + dollar flow, entry spots from the EMAs, missing tickers listed."""
+    import json as _json, tempfile
+    from breadth import valuechain as VC
+    days = pd.bdate_range("2026-01-01", periods=120)
+    rows = []
+    def add(t, path, vol):
+        for i, d in enumerate(days):
+            c = path(i); rows.append(dict(date=d, ticker=t, o=c, h=c * 1.02, l=c * 0.98, c=c, v=vol(i)))
+    add("SPY", lambda i: 100 + 0.05 * i, lambda i: 1e7)
+    add("UP1", lambda i: 50 * 1.008 ** i, lambda i: 2e6 * (2 if i > 100 else 1))       # strong, steady trend: near its 21 EMA? no: grinding
+    add("UP2", lambda i: 30 * 1.01 ** i if i < 110 else 30 * 1.01 ** 110 * 1.06 ** (i - 110), lambda i: 3e6 * (2 if i > 100 else 1))   # late surge -> extended
+    add("DN1", lambda i: 80 * 0.996 ** i, lambda i: 2e6)
+    add("DN2", lambda i: 60 * 0.997 ** i, lambda i: 2e6)
+    add("XBI", lambda i: 90 + 0.02 * i, lambda i: 5e6)
+    adj = pd.DataFrame(rows)
+    cfg = {"demand": ["XBI"], "stages": [{"k": "a", "name": "Hot", "desc": "", "tickers": ["UP1", "UP2", "NOPE"]},
+                                         {"k": "b", "name": "Cold", "desc": "", "tickers": ["DN1", "DN2"]}]}
+    tmp = Path(tempfile.mkdtemp()) / "vc.json"; tmp.write_text(_json.dumps(cfg))
+    old, old_bench, config.BENCHMARK = VC.PATH, config.BENCHMARK, "SPY"     # an earlier test points the benchmark at a fake ticker
+    try:
+        VC.PATH = tmp
+        X = VC.build(adj, {"stocks": [{"t": "UP1", "rsr": 95, "name": "Up One"}]})
+    finally:
+        VC.PATH, config.BENCHMARK = old, old_bench
+    st = {s["k"]: s for s in X["stages"]}
+    assert X["stages"][0]["k"] == "a" and st["a"]["rank"] == 1 and st["a"]["missing"] == ["NOPE"], X["stages"]
+    assert st["a"]["r20"] > 0 > st["b"]["r20"] and st["a"]["above50"] == 1 and st["b"]["above50"] == 0
+    assert st["a"]["net20"] > 0 > st["b"]["net20"] and st["a"]["share_chg"] > 0 and len(st["a"]["line"]) == 61
+    assert X["stocks"]["UP2"]["spot"] == "extended" and X["stocks"]["DN1"]["spot"] == "broken", {t: s["spot"] for t, s in X["stocks"].items()}
+    assert X["stocks"]["UP1"]["rs"] == 95 and X["demand"][0]["t"] == "XBI"
+    assert VC.spot(99.5, 99.8, 99.0, 95, 98.5, 0.03) == "pullback" and VC.spot(102, 100, 99, 95, 98.5, 0.03) == "buy"
+    return f"{len(X['stocks'])} stocks, hot stage first, spots ok"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

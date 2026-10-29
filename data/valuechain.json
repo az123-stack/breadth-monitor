@@ -1,0 +1,24 @@
+{
+ "about": "Biotech / drug value chain tracked on the Biotech tab (Adam, Oct 29 2026). Edit the ticker lists freely; a ticker may sit in more than one stage. demand = the biotech-spending gauges shown on top.",
+ "demand": ["XBI", "IBB"],
+ "stages": [
+  {"k": "s1", "name": "Target & molecular design", "desc": "Physics simulation, quantum mechanics, generative AI and target identification",
+   "tickers": ["SDGR", "RXRX", "ABSI", "ABCL", "CERT", "DNA", "SLP"]},
+  {"k": "s2", "name": "Lab automation & instruments", "desc": "Liquid handlers, mass spectrometry, flow cytometry, sequencers and screeners",
+   "tickers": ["TMO", "DHR", "A", "WAT", "MTD", "BRKR", "BIO", "ILMN", "PACB", "TXG", "RVTY", "AZTA", "QTRX", "CTKB", "NAUT", "SEER"]},
+  {"k": "s3", "name": "Reagents & consumables", "desc": "Antibodies, cell culture media, assay kits, DNA/RNA building blocks and animal models",
+   "tickers": ["TECH", "MRVI", "TWST", "AVTR", "CDXS", "TKNO", "BLFS"]},
+  {"k": "s4", "name": "CROs (preclinical & clinical)", "desc": "Phase I-III trials, patient recruitment, site management and preclinical testing",
+   "tickers": ["IQV", "CRL", "MEDP", "ICLR", "FTRE"]},
+  {"k": "s5", "name": "Biomanufacturing & CDMO", "desc": "Process engineering, bioreactors and filtration, drug packaging, API synthesis and batch scaling",
+   "tickers": ["RGEN", "WST", "STVN", "MXCT"]},
+  {"k": "s6", "name": "Clinical, regulatory & quality software", "desc": "eTMF, clinical data management (CDMS), quality management (QMS), regulatory submissions",
+   "tickers": ["VEEV", "CERT", "SLP"]},
+  {"k": "s7", "name": "Cold chain & distribution", "desc": "Cryogenic shipping, ultra-low-temperature storage and specialty wholesalers",
+   "tickers": ["CYRX", "MCK", "COR", "CAH", "OMI"]},
+  {"k": "s8a", "name": "Healthcare data & real-world evidence", "desc": "Rx claims data, provider analytics, real-world evidence and AI on clinical data",
+   "tickers": ["TEM", "DOCS", "DH", "HCAT", "IQV"]},
+  {"k": "s8b", "name": "Brand & generic drug owners", "desc": "The commercial owners of the drugs: big pharma, big biotech and generics",
+   "tickers": ["LLY", "MRK", "PFE", "ABBV", "JNJ", "BMY", "AMGN", "GILD", "REGN", "VRTX", "AZN", "NVO", "TEVA", "VTRS"]}
+ ]
+}

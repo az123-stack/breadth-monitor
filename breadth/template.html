@@ -594,7 +594,7 @@ const TONES = {
 };
 
 let TAB = "readout";
-try { const h = location.hash.slice(1); if (["readout", "stories", "breadth", "premarket", "intraday", "trades", "themes", "rotation", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
+try { const h = location.hash.slice(1); if (["readout", "stories", "breadth", "premarket", "intraday", "trades", "themes", "rotation", "biotech", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
 
 function render() {
   const app = document.getElementById("app");
@@ -643,6 +643,7 @@ function render() {
     <button role="tab" data-tab="launch">Launch list</button>
     <button role="tab" data-tab="themes">Themes</button>
     <button role="tab" data-tab="rotation">Rotation</button>
+    <button role="tab" data-tab="biotech">Biotech</button>
     <button role="tab" data-tab="browse">Browse</button>
     <button role="tab" data-tab="setups">Setups</button>
     <button role="tab" data-tab="stocks">Stocks</button></nav>`);
@@ -1623,6 +1624,95 @@ function stairsCard(T) {
   card.querySelector(".stdl").addEventListener("click", () => tsDownload("stair-steps", [{ name: "Stair steps " + (U.view === "groups" ? "groups" : "stocks"), ticks: [...new Set(shown)] }]));
   draw();
   return card;
+}
+/* =================== Biotech tab: the drug value chain (breadth/valuechain.py; Adam, Oct 29 2026) =================== */
+const VC_SPOT = { buy: ["Buy zone", "sow-breakout", "Uptrend (21 EMA over a rising 50) and within 1.25 ADRs of the rising 21 EMA"],
+  pullback: ["Pullback", "sow-breakout", "Uptrend and pulled into (or just under) the 9/21 EMA ribbon: the lined-up-buy spot"],
+  stretched: ["Stretched", "sow-riding", "1.25–2 ADRs over the 21 EMA: wait for a pause or a pullback"],
+  extended: ["Extended", "pspike", "2+ ADRs over the 21 EMA: don't chase; wait for the 9/21 EMAs"],
+  basing: ["Basing", "", "Over the 50 EMA but the 21 isn't rising over the 50 yet"], broken: ["Under the 50", "", "Below the 50-day EMA"], na: ["–", "", ""] };
+function vcSpark(line) {
+  const v = (line || []).filter(x => x != null); if (v.length < 2) return "";
+  const W = 90, H = 24, lo = Math.min(...v, 1), hi = Math.max(...v, 1), y = (x) => H - 2 - (x - lo) / ((hi - lo) || 1) * (H - 4);
+  const pts = v.map((x, i) => `${(i / (v.length - 1) * W).toFixed(1)},${y(x).toFixed(1)}`).join(" ");
+  const up = v[v.length - 1] >= 1;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-label="Stage vs SPY, 60 sessions"><line x1="0" x2="${W}" y1="${y(1).toFixed(1)}" y2="${y(1).toFixed(1)}" stroke="var(--border, #8884)" stroke-dasharray="2 2"/><polyline points="${pts}" fill="none" stroke="var(${up ? "--good" : "--critical"})" stroke-width="1.6"/></svg>`;
+}
+function renderBiotech(app) {
+  const X = (DATA.themes || {}).valuechain;
+  if (!X || !X.stages) { app.append($('<div class="card empty">The biotech value chain appears after the next data build.</div>')); return; }
+  UI.vc = UI.vc || { stage: "all", spot: "all", ssort: ["rank", 1], ksort: ["_o", 1] };
+  const U = UI.vc, pc = (v, d = 1) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
+  const liveOn = !!(LIVE && LIVE.rows && LIVE.spyDate && X.date && LIVE.spyDate > X.date);
+  const liveChg = (t) => { const r = liveOn ? liveRow(t) : null; return r ? r.chg : null; };
+  const spyLive = liveChg("SPY");
+  const stName = Object.fromEntries(X.stages.map(s => [s.k, s.name]));
+  const lead = X.stages.filter(s => s.read === "Leading, money confirming").map(s => s.name);
+  const inflow = X.stages.filter(s => s.read === "Money moving in, price catching up").map(s => s.name);
+  const sold = X.stages.filter(s => s.read === "Being sold").map(s => s.name);
+  const dm = (X.demand || []).map(d => `<div class="itile"><small>${d.t} vs SPY <span class="meta">(biotech spending gauge)</span></small><b class="${(d.r20 || 0) >= 0 ? "up" : "dn"}">${pc(d.r20)} <span class="meta" style="font-size:12px">1 month</span></b><span class="meta">5d ${pc(d.r5)} · 3m ${pc(d.r60)} · ${pc(d.off)} off high${liveOn && liveChg(d.t) != null ? ` · today ${pc(liveChg(d.t) - (spyLive || 0))}` : ""}</span></div>`).join("");
+  app.append($(`<section class="card regcard"><div class="kicker">🧬 Biotech value chain · ${shortDate(X.date)} close${liveOn ? " + live prices" : ""}</div>
+    <p style="margin:6px 0 4px"><b>Leading with money behind it:</b> ${lead.length ? lead.map(esc).join(", ") : "none"}.${inflow.length ? ` <b>Money moving in first:</b> ${inflow.map(esc).join(", ")}.` : ""}${sold.length ? ` <b>Being sold:</b> ${sold.map(esc).join(", ")}.` : ""}</p>
+    <div class="igrid" style="margin-top:6px">${dm}</div>
+    <p class="note" style="padding:6px 0 0">Every stage of the drug pipeline, from the software that designs a molecule to the companies that sell the drug, scored two ways: <b>price</b> (equal-weight vs SPY over 5 days, 1 and 3 months, share above the 50 EMA, distance from highs) and <b>money</b> (net dollar flow and volume vs normal, and the stage's share of all the chain's dollars now vs the 50 sessions before). Information only: never changes the picks. Edit the stage lists in data/valuechain.json.</p></section>`));
+  // ---- stage scorecard ----
+  const sc = $(`<section class="card regcard"><div class="kicker">Which stages the market is paying for</div><div class="vcs"></div></section>`);
+  const scols = [{ k: "rank", h: "#" }, { k: "name", h: "Stage", l: true, asc: true }, { k: "read", h: "Read", l: true, asc: true },
+    ...(liveOn ? [{ k: "_live", h: "Today<small>vs SPY, live</small>" }] : []),
+    { k: "r5", h: "5 days<small>vs SPY</small>" }, { k: "r20", h: "1 month<small>vs SPY</small>" }, { k: "r60", h: "3 months<small>vs SPY</small>" },
+    { k: null, h: "Line vs SPY<small>60 sessions</small>" }, { k: "above50", h: "Above 50 EMA" }, { k: "off", h: "Off high<small>median</small>" }, { k: "rs", h: "RS<small>median</small>" },
+    { k: "net20", h: "Net $ flow<small>20d, × normal</small>" }, { k: "rv5", h: "Volume<small>5d vs normal</small>" }, { k: "share_chg", h: "Share of $<small>change</small>" },
+    { k: null, h: "Entry spots<small>buy zone · pullback · extended</small>", l: true }];
+  sc.querySelector(".vcs").innerHTML = `<div class="scroll"><table class="grid"><thead><tr>${scols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>`;
+  const stb = sc.querySelector("tbody");
+  const readCls = (r) => r === "Leading, money confirming" ? "sow-breakout" : r === "Money moving in, price catching up" ? "sow-riding" : r === "Being sold" ? "pspike" : "";
+  const sfill = (rows) => { stb.innerHTML = rows.map(s => `<tr class="vcrow" data-k="${s.k}" style="cursor:pointer" title="Show this stage's stocks below"><td class="num">${s.rank}</td>
+    <td class="l" style="white-space:normal;min-width:220px;max-width:300px"><b>${esc(s.name)}</b><small class="meta" style="display:block;white-space:normal">${esc(s.desc)} · ${s.n} stocks</small></td>
+    <td class="l" style="white-space:normal;min-width:150px"><span class="tg ${readCls(s.read)}">${esc(s.read)}</span><small class="meta" style="display:block;white-space:nowrap">price #${s.price_rank} · money #${s.flow_rank}</small></td>
+    ${liveOn ? retCell(s._live, "today") : ""}${retCell(s.r5, "d5")}${retCell(s.r20, "d20")}${retCell(s.r60, "d60")}<td>${vcSpark(s.line)}</td>
+    <td class="num">${s.above50 == null ? "–" : Math.round(s.above50 * 100) + "%"}</td><td class="num">${pc(s.off)}</td><td class="num ${rsTint(s.rs)}">${s.rs ?? "–"}</td>
+    <td class="num ${(s.net20 || 0) > 0.1 ? "up" : (s.net20 || 0) < 0 ? "dn" : ""}">${pc(s.net20, 0)}</td><td class="num">${s.rv5 == null ? "–" : s.rv5.toFixed(2) + "×"}</td>
+    <td class="num ${(s.share_chg || 0) > 0 ? "up" : (s.share_chg || 0) < 0 ? "dn" : ""}">${s.share_chg == null ? "–" : (s.share_chg > 0 ? "+" : "") + (s.share_chg * 100).toFixed(1) + " pts"}<small class="meta" style="display:block">${s.share == null ? "" : (s.share * 100).toFixed(1) + "% of $"}</small></td>
+    <td class="l meta">${s.spots.buy || 0} · ${s.spots.pullback || 0} · ${s.spots.extended || 0}</td></tr>`).join("");
+    stb.querySelectorAll(".vcrow").forEach(tr => tr.addEventListener("click", () => { U.stage = tr.dataset.k; drawStocks(); kc.scrollIntoView({ behavior: "smooth", block: "start" }); })); };
+  X.stages.forEach(s => { const v = s.tickers.map(liveChg).filter(x => x != null); s._live = v.length ? v.reduce((a, b) => a + b, 0) / v.length - (spyLive || 0) : null; });
+  const scur = sortable(sc.querySelector("table"), scols, () => X.stages, sfill, U.ssort);
+  sfill(scur());
+  sc.append($(`<p class="meta" style="margin:6px 0 0">Net $ flow = each day's dollar volume counted as buying on an up close and selling on a down close, summed over 20 sessions and divided by normal volume (a rough proxy, not real order flow; big caps dominate the dollars). Click a stage to see its stocks.</p>`));
+  app.append(sc);
+  // ---- stocks ----
+  const kc = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><div class="kicker">Stocks by stage · where to enter</div><div class="tsbtns"><button class="vcdl" title="Download the stocks shown as a TradingView watchlist">⬇ TradingView</button></div></div><div class="filters" style="margin:6px 0 4px"></div><div class="vck"></div></section>`);
+  const kcols = [{ k: "t", h: "Stock", l: true, asc: true }, { k: "_st", h: "Stage", l: true, asc: true }, { k: "_o", h: "Entry spot", l: true, asc: true },
+    ...(liveOn ? [{ k: "_live", h: "Today<small>live</small>" }] : []),
+    { k: "d5", h: "5 days" }, { k: "d20", h: "1 month" }, { k: "d60", h: "3 months" }, { k: "rs", h: "RS" }, { k: "adr", h: "ADR" },
+    { k: "x21", h: "Over 21 EMA<small>in ADRs</small>", asc: true }, { k: "v50", h: "vs 50 EMA" }, { k: "off", h: "Off high" },
+    { k: "net20_usd", h: "Net $ flow<small>20d, $M</small>" }, { k: "rv5", h: "Volume<small>5d vs normal</small>" }];
+  kc.querySelector(".vck").innerHTML = `<div class="scroll"><table class="grid"><thead><tr>${kcols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div><p class="meta vcempty" style="display:none">No stocks in this view.</p>`;
+  const ktb = kc.querySelector("tbody"); let shown = [];
+  const SPOT_O = { pullback: 0, buy: 1, stretched: 2, extended: 3, basing: 4, broken: 5, na: 6 };
+  const stRank = Object.fromEntries(X.stages.map(s => [s.k, s.rank]));
+  const krows = () => Object.values(X.stocks).filter(r => (U.stage === "all" || r.stages.includes(U.stage)) && (U.spot === "all" || (U.spot === "entry" ? ["buy", "pullback"].includes(r.spot) : r.spot === U.spot)))
+    .map(r => Object.assign(r, { _st: Math.min(...r.stages.map(k => stRank[k] || 99)), _o: SPOT_O[r.spot] * 1000 + Math.min(...r.stages.map(k => stRank[k] || 99)) * 10 - (r.rs || 0) / 100, _live: liveChg(r.t) }));
+  const kfill = (rows) => { shown = rows.map(r => r.t); kc.querySelector(".vcempty").style.display = rows.length ? "none" : "";
+    ktb.innerHTML = rows.map(r => { const sp = VC_SPOT[r.spot] || VC_SPOT.na;
+      return `<tr>${nameCell(r)}<td class="l meta">${r.stages.map(k => esc(stName[k] || k)).join("<br>")}</td>
+      <td class="l">${sp[1] ? `<span class="tg ${sp[1]}" title="${esc(sp[2])}">${sp[0]}</span>` : `<span class="meta" title="${esc(sp[2])}">${sp[0]}</span>`}<small class="meta" style="display:block">9 EMA $${r.e9} · 21 EMA $${r.e21}</small></td>
+      ${liveOn ? (r._live == null ? '<td class="num meta">–</td>' : retCell(r._live, "today")) : ""}${retCell(r.d5, "d5")}${retCell(r.d20, "d20")}${retCell(r.d60, "d60")}
+      <td class="num ${rsTint(r.rs)}">${r.rs ?? "–"}</td><td class="num">${r.adr == null ? "–" : (r.adr * 100).toFixed(1) + "%"}</td>
+      <td class="num ${r.x21 == null ? "" : r.x21 >= 2 ? "r1" : r.x21 <= 1.25 && r.x21 >= -0.5 ? "g2" : ""}">${r.x21 ?? "–"}</td><td class="num">${pc(r.v50)}</td><td class="num">${pc(r.off)}</td>
+      <td class="num ${(r.net20_usd || 0) > 0 ? "up" : (r.net20_usd || 0) < 0 ? "dn" : ""}">${r.net20_usd == null ? "–" : (r.net20_usd > 0 ? "+" : "") + Math.round(r.net20_usd).toLocaleString()}</td>
+      <td class="num">${r.rv5 == null ? "–" : r.rv5.toFixed(2) + "×"}</td></tr>`; }).join(""); };
+  const kcur = sortable(kc.querySelector("table"), kcols, krows, kfill, U.ksort);
+  const drawStocks = () => { fl.innerHTML = ""; addChips(); kfill(kcur()); };
+  const fl = kc.querySelector(".filters");
+  const addChips = () => {
+    fl.append(chips("Stage", [["all", "All stages"], ...X.stages.map(s => [s.k, `${s.rank}. ${s.name.split(" ")[0]}${s.name.includes("&") ? "…" : ""}`])], U, "stage", drawStocks));
+    fl.append(chips("Spot", [["all", "Any spot"], ["entry", "Buy zone + pullback"], ["stretched", "Stretched"], ["extended", "Extended"], ["broken", "Under the 50"]], U, "spot", drawStocks));
+  };
+  addChips(); kfill(kcur());
+  kc.querySelector(".vcdl").addEventListener("click", () => tsDownload("biotech-" + U.stage + "-" + U.spot, [{ name: "Biotech " + (U.stage === "all" ? "all stages" : stName[U.stage]) + (U.spot === "all" ? "" : " - " + U.spot), ticks: shown }]));
+  kc.append($(`<p class="meta" style="margin:6px 0 0">Entry spots (daily close): <b>Pullback</b> = uptrend and in or just under the 9/21 EMA ribbon (the lined-up-buy spot, +0.74R in BUY groups) · <b>Buy zone</b> = riding the rising 21 EMA within 1.25 ADRs · <b>Stretched</b> 1.25–2 ADRs over the 21 · <b>Extended</b> 2+ ADRs over the 21 (wait) · <b>Under the 50</b>. Your 3-month study: don't penalise extended leaders, but buy them on the pullback.</p>`));
+  app.append(kc);
 }
 function renderRotation(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
@@ -2615,7 +2705,7 @@ function liveBar() {
 // Launch list, so a live price refresh on those tabs re-drew the Breadth tab).
 function renderTab(panel) {
   const R = { themes: renderThemes, stocks: renderStocks, browse: renderBrowse, setups: renderSetups, trades: renderTrades, launch: renderLaunch,
-    best: renderBest, intraday: renderIntraday, premarket: renderPremarket, rotation: renderRotation, readout: renderReadout, stories: renderStories };
+    best: renderBest, intraday: renderIntraday, premarket: renderPremarket, rotation: renderRotation, biotech: renderBiotech, readout: renderReadout, stories: renderStories };
   (R[TAB] || renderBreadth)(panel);
 }
 function rerenderPanel() {

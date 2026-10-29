@@ -159,7 +159,12 @@ def load_themes():
 
 def theme_tickers():
     t = load_themes()
-    return set(t["ticker"]) | set(load_subthemes()["ticker"]) | {config.BENCHMARK}
+    try:   # Biotech tab's value-chain tickers (data/valuechain.json) get bars too
+        from . import valuechain
+        vc = valuechain.tickers()
+    except Exception:
+        vc = set()
+    return set(t["ticker"]) | set(load_subthemes()["ticker"]) | vc | {config.BENCHMARK}
 
 
 def load_names():
