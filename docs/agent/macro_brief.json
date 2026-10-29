@@ -1,54 +1,62 @@
 {
- "for_date": "2026-10-27",
- "written": "2026-10-28T11:05Z",
- "headline": "Fed decision today at 2 PM ET (hold expected, December hike risk in focus) with Microsoft and Alphabet earnings after the close, then GDP and PCE tomorrow, while the 10-year sits near 5% and Brent holds above $110.",
+ "for_date": "2026-10-28",
+ "written": "2026-10-29T11:13Z",
+ "headline": "Hot PCE and GDP at 8:30 AM plus Amazon after the close land with the 10-year near 5% and Brent above $110, as the Fed holds at 3.75-4.00% with a December hike priced in.",
  "risk": "high",
- "rates": "The 10-year Treasury yield is about 4.99%, just under 5% and near recent highs, with the 2-year near 4.73% and the 30-year near 5.31%.",
- "fed": "The FOMC decides Oct 28 at 2:00 PM ET with Chair Warsh's press conference at 2:30 PM; a hold is widely expected, and some outlets report futures pricing a meaningful chance of another hike in December.",
- "oil": "Brent settled near $113.88 and WTI near $99.90 on Oct 27, down about 1.7% on reports Iranian officials discussed conditions for ending hostilities, which eased Strait of Hormuz supply fears.",
- "geo": "The Middle East conflict (Iran, Hormuz talks, Houthi attacks in the Red Sea) is the main oil driver and can reverse quickly.",
+ "rates": "The 10-year Treasury yield closed near 5.04% and December hike odds have risen to as high as 83% after the Fed held in a 10-2 vote.",
+ "fed": "The Fed held at 3.75%-4.00% on Oct 28 with Cook and Hammack dissenting in favor of a hike; Chair Warsh gave no forward guidance and the next FOMC is Dec 8-9.",
+ "oil": "Brent is about $110-116 (WTI about $101) on Strait of Hormuz shipping attacks and Houthi strikes on Saudi sites, easing slightly as Saudi, Pakistani and Turkish officials opened talks with Iran.",
+ "geo": "Middle East escalation (Hormuz, Houthi strikes on Saudi Arabia) is the active shock, with the OPEC+ meeting and Iran's planned action against Sinokor vessels on Nov 1 and US midterm elections on Nov 3.",
  "events": [
   {
-   "date": "2026-10-28",
-   "time": "2:00 PM ET",
-   "name": "FOMC rate decision (Warsh press conference 2:30 PM)",
-   "impact": "high"
-  },
-  {
-   "date": "2026-10-28",
-   "time": "After close",
-   "name": "Microsoft and Alphabet earnings",
+   "date": "2026-10-29",
+   "time": "8:30 AM ET",
+   "name": "Q3 GDP advance and September PCE inflation",
    "impact": "high"
   },
   {
    "date": "2026-10-29",
-   "time": "8:30 AM ET",
-   "name": "Q3 GDP (advance) and September PCE",
+   "time": "After the close",
+   "name": "Amazon earnings",
    "impact": "high"
   },
   {
    "date": "2026-10-29",
-   "time": "After close",
-   "name": "Amazon and Intel earnings",
-   "impact": "high"
-  },
-  {
-   "date": "2026-10-30",
-   "time": "8:30 AM ET",
-   "name": "Q3 Employment Cost Index",
+   "time": "After the close",
+   "name": "Intel earnings",
    "impact": "medium"
   },
   {
-   "date": "2026-11-02",
-   "time": "After close",
-   "name": "Apple earnings",
+   "date": "2026-10-29",
+   "time": "Before the open",
+   "name": "Eli Lilly, Mastercard, Caterpillar earnings",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-10-30",
+   "time": "Before the open",
+   "name": "Exxon Mobil and Chevron earnings",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-01",
+   "time": "TBD",
+   "name": "OPEC+ meeting",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-03",
+   "time": "All day",
+   "name": "US midterm elections",
    "impact": "high"
   }
  ],
  "sources": [
-  "https://hdfcsky.com/news/nasdaq-jumps-1-2percent-as-chip-stocks-rally-oil-slides-and-fed-meeting-begins-october-28-2026",
-  "https://www.stocktitan.net/articles/earnings-calendar-week-of-october-26-2026",
-  "https://www.heygotrade.com/en/news/weekly-economic-outlook-2026-10-26/",
-  "https://vanderbiltreport.com/week-ahead-october-26-november-1-2026/"
+  "https://nordfx.com/market-news/market-pulse-october-29-2026",
+  "https://tradersagency.com/blog/fed-holds-rates-at-375percent-4percent-as-cook-and-hammack-dissent-warsh-unveils-fewer-rate-setting-meetings-starting-2027",
+  "https://www.stocktitan.net/articles/september-2026-pce-inflation-report",
+  "https://sentisense.ai/blog/big-tech-earnings-this-week/",
+  "https://www.oilandgasmiddleeast.com/news/brent-crude-price-drivers",
+  "https://cryptodaily.co.uk/2026/10/fed-rate-decision-october-2026-why-another-rate-hike-is-still-on-the-table"
  ]
 }
