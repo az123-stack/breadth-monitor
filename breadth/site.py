@@ -58,6 +58,7 @@ def payload(history, theme_data=None, kq_data=None, macro_data=None):
         "kq": kq_data,
         "repo": config.REPO_URL,
         "live_url": config.LIVE_CSV_URL,
+        "pos_url": config.POSITIONS_CSV_URL, "pos_edit": config.POSITIONS_EDIT_URL,
         "intraday": _intraday(),
         "macro": macro_data,
     }
@@ -80,10 +81,7 @@ def embed(data):
 def build(history, theme_data=None, kq_data=None, macro_data=None):
     config.DOCS_DIR.mkdir(parents=True, exist_ok=True)
     data = payload(history, theme_data, kq_data, macro_data)
-    v1 = data
-    if isinstance(data.get("themes"), dict) and "posrefs" in data["themes"]:   # v2-only (My positions); keeps the v1 page lighter
-        v1 = {**data, "themes": {k: v for k, v in data["themes"].items() if k != "posrefs"}}
-    blob = embed(v1)
+    blob = embed(data)
     html = TEMPLATE.read_text().replace("/*__DATA__*/null", blob)
     (config.DOCS_DIR / "index.html").write_text(html)
     (config.DOCS_DIR / "data.json").write_text(json.dumps(data, separators=(",", ":")))

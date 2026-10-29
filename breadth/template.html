@@ -300,6 +300,55 @@ td.d1 { background: color-mix(in srgb, var(--down) var(--tint-light), transparen
 /* ---------- tabs ---------- */
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin: 0 0 16px; overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
+/* Oct 29 layout */
+.tabs { position: sticky; top: 0; z-index: 30; background: var(--surface-0); }
+.jumpbar { position: sticky; top: 41px; z-index: 29; background: var(--surface-0); display: flex; gap: 4px; align-items: center; overflow-x: auto;
+  scrollbar-width: none; padding: 6px 0 8px; margin: -10px 0 12px; border-bottom: 1px solid var(--grid); }
+.jumpbar::-webkit-scrollbar { display: none; }
+.jumpbar .jl { flex: none; font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-right: 4px; }
+.jumpbar a { flex: none; font-size: 12.5px; color: var(--text-secondary); text-decoration: none; padding: 3px 9px; border: 1px solid var(--border);
+  border-radius: 999px; white-space: nowrap; }
+.jumpbar a:hover { color: var(--text-primary); border-color: var(--s1); }
+.jumpbar a.jp { font-weight: 600; color: var(--text-primary); background: var(--surface-1); }
+.card, .partdiv { scroll-margin-top: 92px; }
+.foldbtn { background: none; border: 0; padding: 0 6px 0 0; margin: 0; cursor: pointer; color: var(--text-muted); font-size: 12px; line-height: 1; vertical-align: 1px; }
+.foldbtn:hover { color: var(--text-primary); }
+.card.folded > :not(.fold-keep) { display: none !important; }
+.card.folded { padding-bottom: 4px; }
+.partdiv { display: flex; gap: 12px; align-items: center; margin: 26px 0 12px; padding: 12px 0 10px; border-top: 2px solid var(--text-primary); }
+.partdiv:first-of-type { margin-top: 6px; }
+.partdiv h2 { margin: 0; font-size: 19px; letter-spacing: -.01em; }
+.partdiv .pn { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--text-primary); color: var(--surface-0); }
+.themebtn { min-width: 0; }
+.modebar .chips { flex-wrap: wrap; }
+.tsearch { position: relative; }
+.tqres[hidden] { display: none; }
+.tsearch input { height: 32px; width: 190px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-1); color: var(--text-primary); font: inherit; font-size: 13px; }
+.tqres { position: absolute; top: 36px; right: 0; width: 290px; background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.18); z-index: 60; padding: 4px; display: flex; flex-direction: column; }
+.tqres button { display: flex; gap: 10px; justify-content: space-between; align-items: baseline; text-align: left; border: 0; background: none; color: var(--text-primary); font: inherit; padding: 7px 10px; border-radius: 6px; cursor: pointer; }
+.tqres button:hover { background: var(--surface-0); }
+.tqres .meta { font-size: 12px; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#scrim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.28); z-index: 70; }
+#drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100vw); background: var(--surface-1); border-left: 1px solid var(--border); z-index: 80; transform: translateX(100%); transition: transform .18s ease; overflow-y: auto; padding: 16px 18px 60px; }
+body.dr-open #drawer { transform: none; } body.dr-open #scrim { display: block; }
+.dr-h { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.dr-t { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 22px; font-weight: 700; }
+.dr-px { display: flex; gap: 10px; align-items: baseline; margin: 10px 0 12px; }
+#drawer h4 { margin: 18px 0 6px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+.kvs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.kvs .kv { background: var(--surface-1); padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--text-muted); }
+.kvs .kv b { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 14.5px; font-weight: 500; color: var(--text-primary); }
+.dr-g { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; text-decoration: none; color: var(--text-primary); font-weight: 600; }
+.dr-g .meta { font-weight: 400; font-size: 12px; } .dr-g:hover { border-color: var(--s1); }
+.dr-l { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 1.5; display: flex; flex-direction: column; gap: 6px; }
+.poscard { margin-bottom: 14px; }
+@media (max-width: 520px) { .tsearch input { width: 150px; } .tqres { position: fixed; top: 60px; left: 8px; right: 8px; width: auto; }
+  #drawer { top: auto; left: 0; width: 100vw; height: 86vh; border-left: 0; border-top: 1px solid var(--border); border-radius: 14px 14px 0 0; transform: translateY(100%); } }
+@media (prefers-reduced-motion: reduce) { #drawer { transition: none; } }
+
+@media (max-width: 520px) { .filters, .chips { flex-wrap: wrap; } }
+@media (max-width: 520px) { .jumpbar { top: 37px; } .partdiv h2 { font-size: 17px; } }
+
 .tabs button { flex: none; }
 @media (max-width: 520px) { .tabs button { padding: 8px 10px; font-size: 13.5px; } }
 .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 8px 14px; font: inherit; font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer; }
@@ -593,8 +642,14 @@ const TONES = {
   neutral: { color: "var(--text-muted)", icon: '<path d="M4 12h16M4 7h10M4 17h13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>' },
 };
 
+// Oct 29, 2026 (Adam: "organization was the biggest flaw, not the content"): 10 tabs, every card kept. Best Setups + Trade Setups +
+// Launch list + old Setups → one Setups tab; Browse → a view on the Themes tab. Old links (#trades, #best, …) land on the new home.
+const TABS = [["readout", "Read-out"], ["breadth", "Breadth"], ["premarket", "Pre-market"], ["intraday", "Intraday"], ["themes", "Themes"],
+  ["rotation", "Rotation"], ["biotech", "Biotech"], ["setups", "Setups"], ["stocks", "Stocks"], ["stories", "Trade Stories"]];
+const TAB_ALIAS = { best: "setups", trades: "setups", launch: "setups", browse: "themes" };
+const tabOf = (k) => TAB_ALIAS[k] || k;
 let TAB = "readout";
-try { const h = location.hash.slice(1); if (["readout", "stories", "breadth", "premarket", "intraday", "trades", "themes", "rotation", "biotech", "browse", "setups", "stocks"].includes(h)) TAB = h; } catch (e) {}
+try { const h = tabOf(location.hash.slice(1)); if (TABS.some(t => t[0] === h)) TAB = h; } catch (e) {}
 
 function render() {
   const app = document.getElementById("app");
@@ -608,9 +663,15 @@ function render() {
     <div><h1>Market Monitor</h1>
     <div class="meta">Data through ${longDate(last.date)}</div></div>
     <div class="hright"><div class="meta">Updated ${gen.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })} · ${fmt(DATA.history_days)} days of history</div>
-    <div class="xopens">${DATA.themes && DATA.themes.setup_review && DATA.themes.setup_review.flag ? `<button class="xopen revflag" title="The market has shifted since the trade setups were chosen">${DATA.themes.setup_review.reasons.some(r => r.kind === "thrust") ? "⚡ Thrust · review setups" : "⚑ Review setups"} <span class="revn">${DATA.themes.setup_review.reasons.length}</span></button>` : ""}${DATA.themes && DATA.themes.trade_setups ? '<button class="xopen tsopen" title="All Trade Setups lists, one section per setup">⬇ Trade Setups</button>' : ""}${DATA.kq ? '<button class="xopen kqopen">⬇ KQ list</button>' : ""}${DATA.themes ? '<button class="xopen tvopen">⬇ TradingView list</button>' : ""}</div></div>
+    <div class="xopens"><div class="tsearch"><input id="tq" placeholder="Find a ticker or group" autocomplete="off" spellcheck="false" aria-label="Find a ticker or group"><div id="tqres" class="tqres" hidden></div></div>${DATA.themes && DATA.themes.setup_review && DATA.themes.setup_review.flag ? `<button class="xopen revflag" title="The market has shifted since the trade setups were chosen">${DATA.themes.setup_review.reasons.some(r => r.kind === "thrust") ? "⚡ Thrust · review setups" : "⚑ Review setups"} <span class="revn">${DATA.themes.setup_review.reasons.length}</span></button>` : ""}${DATA.themes && DATA.themes.trade_setups ? '<button class="xopen tsopen" title="All Trade Setups lists, one section per setup">⬇ Trade Setups</button>' : ""}${DATA.kq ? '<button class="xopen kqopen">⬇ KQ list</button>' : ""}${DATA.themes ? '<button class="xopen tvopen">⬇ TradingView list</button>' : ""}<button class="xopen themebtn" title="Light / dark / follow the device">Theme: <span class="themelbl"></span></button></div></div>
   </header>`));
   const xo = app.querySelector(".tvopen"); if (xo) xo.addEventListener("click", openExport);
+  wireSearch(app);
+  if (!document.getElementById("drawer")) document.body.insertAdjacentHTML("beforeend", '<div id="scrim"></div><aside id="drawer" aria-label="Ticker details"></aside>');
+  { const MODES = ["auto", "light", "dark"], lbl = app.querySelector(".themelbl");
+    const apply = (m) => { if (m === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", m); lbl.textContent = m[0].toUpperCase() + m.slice(1); };
+    let m = lsGet("theme", "auto"); apply(m);
+    app.querySelector(".themebtn").addEventListener("click", () => { m = MODES[(MODES.indexOf(m) + 1) % 3]; lsSet("theme", m); apply(m); }); }
   const ko = app.querySelector(".kqopen"); if (ko) ko.addEventListener("click", openKQ);
   const tso = app.querySelector(".tsopen"); if (tso) tso.addEventListener("click", () => {
     const X = DATA.themes.trade_setups, P = DATA.themes.playbook || {};
@@ -629,24 +690,10 @@ function render() {
       ...(DATA.themes.sow ? ["breakout", "pop", "nuzzle"].map(k => ({ name: "Strength on Weakness - " + (DATA.themes.sow.states.find(x => x.key === k) || {}).name, ticks: DATA.themes.sow.rows.filter(r => r.state === k).map(r => r.t) })) : [])]);
   });
   const rf = app.querySelector(".revflag"); if (rf) rf.addEventListener("click", () => {
-    const b = app.querySelector('nav.tabs button[data-tab="trades"]'); if (b) b.click();
+    const b = app.querySelector('nav.tabs button[data-tab="setups"]'); if (b) b.click();
     setTimeout(() => { const c = document.querySelector(".revcard"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); }, 50);
   });
-  const tabs = $(`<nav class="tabs" role="tablist">
-    <button role="tab" data-tab="readout">Read-out</button>
-    <button role="tab" data-tab="stories">Trade Stories</button>
-    <button role="tab" data-tab="breadth">Breadth</button>
-    <button role="tab" data-tab="premarket">Pre-market</button>
-    <button role="tab" data-tab="intraday">Intraday</button>
-    <button role="tab" data-tab="best">Best Setups</button>
-    <button role="tab" data-tab="trades">Trade Setups</button>
-    <button role="tab" data-tab="launch">Launch list</button>
-    <button role="tab" data-tab="themes">Themes</button>
-    <button role="tab" data-tab="rotation">Rotation</button>
-    <button role="tab" data-tab="biotech">Biotech</button>
-    <button role="tab" data-tab="browse">Browse</button>
-    <button role="tab" data-tab="setups">Setups</button>
-    <button role="tab" data-tab="stocks">Stocks</button></nav>`);
+  const tabs = $(`<nav class="tabs" role="tablist">${TABS.map(([k, l]) => `<button role="tab" data-tab="${k}">${l}</button>`).join("")}</nav>`);
   app.append(tabs);
   const panel = $('<div class="panel"></div>');
   app.append(panel);
@@ -659,7 +706,7 @@ function render() {
   tabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
     TAB = b.dataset.tab;
     try { history.replaceState(null, "", "#" + TAB); } catch (e) {}
-    show();
+    show(); window.scrollTo(0, 0);
   }));
   show();
 }
@@ -2688,7 +2735,10 @@ function computeLive(T, prices, spyDate) {
     live: { priced: Object.keys(M).length, total: Object.keys(T.refs).length, bad } };
 }
 
+let ONCE = null;   // merged Setups tab: cards several old tabs drew (live bar, Launch picks) appear once
+const once = (k) => { if (!ONCE) return false; if (ONCE.has(k)) return true; ONCE.add(k); return false; };
 function liveBar() {
+  if (once("liveBar")) return $('<div hidden></div>');
   const T = DATA.themes;
   if (!DATA.live_url) return $(`<div class="livebar"><span class="dot off"></span><span>End of day · ${longDate(T.date)} close. <span class="meta">Live prices aren't connected yet.</span></span></div>`);
   let dot = "off", text;
@@ -2704,9 +2754,80 @@ function liveBar() {
 // One tab → renderer table, shared by tab clicks and live refreshes (before Oct 27 the refresh copy was missing Best Setups and
 // Launch list, so a live price refresh on those tabs re-drew the Breadth tab).
 function renderTab(panel) {
-  const R = { themes: renderThemes, stocks: renderStocks, browse: renderBrowse, setups: renderSetups, trades: renderTrades, launch: renderLaunch,
-    best: renderBest, intraday: renderIntraday, premarket: renderPremarket, rotation: renderRotation, biotech: renderBiotech, readout: renderReadout, stories: renderStories };
+  const R = { themes: renderThemesTab, stocks: renderStocks, setups: renderSetupsAll,
+    intraday: renderIntraday, premarket: renderPremarket, rotation: renderRotation, biotech: renderBiotech, readout: renderReadout, stories: renderStories };
   (R[TAB] || renderBreadth)(panel);
+  try { decoratePanel(panel); } catch (e) { console.error(e); }
+}
+
+/* ---------- Oct 29 layout: merged tabs, "On this page" bar, fold-up cards ---------- */
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storage off */ } };
+function partDiv(n, title, sub) {
+  return $(`<div class="partdiv"><span class="pn">${n}</span><div><h2>${esc(title)}</h2><div class="meta">${esc(sub)}</div></div></div>`);
+}
+function renderSetupsAll(app) {
+  ONCE = new Set();
+  try {
+    app.append(partDiv(1, "Best setups", "Launch picks, theme lifecycle, lined-up buys, leading groups, EMA pullbacks, high tight flags"));
+    renderBest(app);
+    app.append(partDiv(2, "Trade setups", "Playbook, dip buys, the setup lists, box trades, strength on weakness, record volume"));
+    renderTrades(app);
+    app.append(partDiv(3, "Launch list", "Fresh base breakouts and curls, graded by what separated the stocks that went"));
+    renderLaunch(app);
+    app.append(partDiv(4, "Leaders & momentum lists", "Leaders, 2LYNCH bursts, anticipation coils, episodic pivots"));
+    renderSetups(app);
+  } finally { ONCE = null; }
+}
+UI.tmode = lsGet("themesMode", "table");
+function renderThemesTab(app) {
+  const bar = $('<section class="card browsebar modebar"><div class="filters"></div></section>');
+  bar.querySelector(".filters").append(chips("View", [["table", "Themes & sub-themes table"], ["browse", "Browse groups and their stocks"]], UI, "tmode",
+    () => { lsSet("themesMode", UI.tmode); rerenderPanel(); }));
+  app.append(bar);
+  (UI.tmode === "browse" ? renderBrowse : renderThemes)(app);
+}
+let FOLDS = {}; try { FOLDS = JSON.parse(localStorage.getItem("folds") || "{}"); } catch (e) { FOLDS = {}; }
+function cardTitle(c) {
+  const el = c.querySelector(":scope > .head h2, :scope > .head .kicker, :scope > .head h3, :scope > .kicker, :scope > h2, :scope > h3, :scope > summary .rot, :scope > summary b, :scope > summary, :scope > .head > div > .kicker");
+  if (!el) return [null, null];
+  const k = el.cloneNode(true); k.querySelectorAll(".meta, small, button, .foldbtn, .badge, .tg, .pbv, input, select").forEach(x => x.remove());
+  let t = k.textContent.replace(/\s+/g, " ").trim().replace(/^\d+\s*·\s*/, "").split(" · ")[0].split(" — ")[0].replace(/^[^A-Za-z0-9$%]+/, "").trim();
+  if (t.length > 38) t = t.slice(0, 36).replace(/\s+\S*$/, "") + "…";
+  return [el, t || null];
+}
+function decoratePanel(panel) {
+  panel.querySelectorAll(":scope > .jumpbar").forEach(x => x.remove());
+  const cards = [...panel.querySelectorAll(".card, .partdiv")].filter(c => !(c.parentElement && c.parentElement.closest(".card")) && !c.hidden
+    && !c.classList.contains("empty") && !c.classList.contains("browsebar") && !c.classList.contains("livebar"));
+  const items = [], seen = {};
+  cards.forEach(c => {
+    let el = null, t;
+    if (c.classList.contains("partdiv")) t = c.querySelector("h2").textContent;
+    else if (c.classList.contains("rocard")) t = { pre: "Pre-market read", live: "During the market", post: "After the close" }[c.dataset.k] || "Read-out";
+    else [el, t] = cardTitle(c);
+    if (!t) return;
+    let id = "s-" + t.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
+    seen[id] = (seen[id] || 0) + 1; if (seen[id] > 1) id += "-" + seen[id];
+    c.id = id; items.push({ id, t, part: c.classList.contains("partdiv") });
+    if (!el || c.tagName === "DETAILS") return;
+    let hold = el; while (hold.parentElement && hold.parentElement !== c) hold = hold.parentElement;
+    if (hold.parentElement !== c || c.children.length < 2) return;
+    hold.classList.add("fold-keep");
+    const key = TAB + "|" + t;
+    const btn = $(`<button class="foldbtn" title="Fold this card up / open it" aria-label="Fold or open ${esc(t)}">▾</button>`);
+    const set = (f) => { c.classList.toggle("folded", f); btn.setAttribute("aria-expanded", !f); btn.textContent = f ? "▸" : "▾"; };
+    btn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); const f = !c.classList.contains("folded"); set(f);
+      if (f) FOLDS[key] = 1; else delete FOLDS[key]; try { localStorage.setItem("folds", JSON.stringify(FOLDS)); } catch (er) { /* off */ } });
+    el.prepend(btn); set(!!FOLDS[key]);
+  });
+  if (items.length < 3) return;
+  const nav = $(`<nav class="jumpbar" aria-label="On this page"><span class="jl">On this page</span>${items.map(i => `<a href="#${i.id}" class="${i.part ? "jp" : ""}">${esc(i.t)}</a>`).join("")}</nav>`);
+  nav.addEventListener("click", (e) => { const a = e.target.closest("a"); if (!a) return; e.preventDefault();
+    const c = document.getElementById(a.getAttribute("href").slice(1)); if (!c) return;
+    if (c.classList.contains("folded")) { const b = c.querySelector(".foldbtn"); if (b) b.click(); }
+    c.scrollIntoView({ behavior: "smooth", block: "start" }); });
+  panel.prepend(nav);
 }
 function rerenderPanel() {
   const panel = document.querySelector(".panel"); if (!panel) return;
@@ -3810,7 +3931,7 @@ function renderStories(app) {
   wrap.addEventListener("click", (e) => {
     const a = e.target.closest("[data-story]"); if (a) { e.preventDefault(); const el = document.getElementById("story-" + a.dataset.story); if (el) { el.open = true; el.scrollIntoView({ behavior: "smooth" }); } return; }
   });
-  head.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); const b = document.querySelector(`nav.tabs button[data-tab="${a.dataset.go}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
+  head.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); const b = document.querySelector(`nav.tabs button[data-tab="${tabOf(a.dataset.go)}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
   app.append(wrap);
 }
 /* ---------- Earnings clusters (earnings.py): several members of one group reacting the same way in a week (Adam, Oct 27 2026) ---------- */
@@ -4026,6 +4147,7 @@ function renderReadout(app) {
   const T = DATA.themes, phase = roPhase();
   if (UIRO.phase !== phase) { UIRO.open = {}; UIRO.phase = phase; }
   if (!T) { app.append($('<div class="card empty">Theme data isn\'t available yet.</div>')); return; }
+  app.append(posCard());
   if (!PM && !PM_ERR && !PM_BUSY) fetchPM();
   if (!LIVE && !LIVE_BUSY && !LIVE_ERR) fetchLive();
   const R = DATA.regime || {}, P = T.playbook || {}, last = DATA.rows[DATA.rows.length - 1], clk = nyClock();
@@ -4085,7 +4207,7 @@ function renderReadout(app) {
   const wrap = $(`<div class="ro">${order.map(k => cards[k]).join("")}
     <div class="note" style="padding:8px 0 0">Each card opens on its own part of the day (Eastern time). Pre-market uses the official overnight numbers plus Yahoo pre-market quotes; during the market and at the close it uses your Google Sheet's live prices; the overnight update replaces the close estimates with official numbers. Links jump to the tab with the full detail.</div></div>`);
   wrap.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault();
-    const b = document.querySelector(`nav.tabs button[data-tab="${a.dataset.go}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
+    const b = document.querySelector(`nav.tabs button[data-tab="${tabOf(a.dataset.go)}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
   wrap.querySelectorAll("details.rocard").forEach(el => el.addEventListener("toggle", () => { UIRO.open[el.dataset.k] = el.open; }));
   app.append(wrap);
 }
@@ -4514,6 +4636,7 @@ function renderIntraday(app) {
     : !hasCols ? "The live sheet only has prices so far: the full Intraday view needs its extra columns." 
     : `<b>${clk.open ? "Session open" : "Market closed"}</b> · ${clk.label} · Google prices fetched ${LIVE.fetched.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} (Google runs up to ~20 min behind) · refreshes every 3 min`}</span><button>Refresh</button></div>`));
   app.querySelector(".livebar:last-child button").addEventListener("click", () => fetchLive());
+  app.append(posCard());
   if (!hasCols) { app.append(oilCard()); return; }   // the futures feed doesn't need the Google sheet
   const pc = (v, d = 2) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
   const cls = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "dn" : "";
@@ -5048,6 +5171,7 @@ function lifecycleCard(X) {
 }
 /* ---------- Launch picks (launch.select): the headline recommendations + live tracker (Adam, Oct 25 2026) ---------- */
 function launchPicksCard(L) {
+  if (once("launchPicks")) return $('<div hidden></div>');
   if (!L || !(L.picks || []).length && !(L.tracker || {}).n) return $('<div></div>');
   const B = L.pick_bt || {}, K = L.tracker || {}, P = L.picks || [];
   const pp = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
@@ -5680,6 +5804,165 @@ function openKQ() {
   document.body.append(m);
   refresh();
 }
+
+/* ---------- My positions (Oct 29, 2026; Adam's own trades from the sheet's Positions tab, synced phone ↔ computer) ----------
+   Rules from Adam's style: stop = low of the entry day; sell 1/3–1/2 after 3–5 days; trail the 10 EMA (part) and 20 EMA (rest), on the close.
+   Nothing about the positions is stored in the repo: the page reads the published tab (DATA.pos_url). EOD references: DATA.themes.posrefs. */
+let POS = null, POS_ERR = null, POS_BUSY = false;
+const $f = (x) => x == null || !isFinite(x) ? "–" : Number(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const $p = (x, d = 1) => x == null || !isFinite(x) ? "–" : (x > 0 ? "+" : "") + Number(x).toFixed(d) + "%";
+function posDate(v) { if (!v) return null; let m = String(v).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
+  m = String(v).match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/); if (m) return `${m[3].length === 2 ? "20" + m[3] : m[3]}-${m[1].padStart(2, "0")}-${m[2].padStart(2, "0")}`; return null; }
+function parsePos(text) {
+  let cols = null; const out = [];
+  text.split(/\r?\n/).forEach(line => { if (!line.trim()) return; const f = csvSplit(line);
+    if (!cols) { if ((f[0] || "").toLowerCase() === "ticker") cols = f.map(x => x.toLowerCase()); return; }
+    const r = {}; cols.forEach((c, i) => r[c] = f[i]); const t = (r.ticker || "").toUpperCase().replace(/^[A-Z]+:/, "").trim(); if (!t) return;
+    out.push({ t, bought: posDate(r.bought), entry: liveNum(r.entry), shares: liveNum(r.shares), stop: liveNum(r.stop), sold: liveNum(r.sold) || 0,
+      setup: r.setup || "", notes: r.notes || "", price: liveNum(r.price), prev: liveNum(r.closeyest), low: liveNum(r.low), high: liveNum(r.high) }); });
+  if (!cols) throw new Error("no header row in the Positions tab");
+  return out;
+}
+async function fetchPos() {
+  if (!DATA.pos_url || POS_BUSY) return; POS_BUSY = true;
+  try { const r = await fetch(DATA.pos_url + "&cb=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw new Error("HTTP " + r.status);
+    const txt = await r.text(); if (/^\s*</.test(txt)) throw new Error("the Positions tab isn't published");
+    POS = parsePos(txt); POS_ERR = null; }
+  catch (e) { POS_ERR = String(e.message || e); }
+  POS_BUSY = false;
+  if (TAB === "readout" || TAB === "intraday") rerenderPanel();
+}
+setInterval(() => { if (document.visibilityState === "visible" && (TAB === "readout" || TAB === "intraday")) fetchPos(); }, 2 * 60 * 1000);
+function posState(r) {
+  const P = (DATA.themes || {}).posrefs || {}, R = (P.rows || {})[r.t], open = nyClock().open;
+  const L = liveRow(r.t);
+  let p = r.price || (L && L.price) || (R && R[0]) || null;
+  const prev = r.prev || (L && L.closeyest);
+  /* the tab's previous close equals our last official close only once a new session has started → today's price is live */
+  const today = !!(R && p && prev && Math.abs(prev / R[0] - 1) < .005);
+  const a = R ? R[3] / 100 : null;
+  const x10 = R ? (today ? R[1] + (p - R[1]) * 2 / 11 : R[1]) : null, x20 = R ? (today ? R[2] + (p - R[2]) * 2 / 21 : R[2]) : null;
+  const days = r.bought ? (P.dates || []).filter(d => d > r.bought).length + (today && (!P.date || r.bought <= P.date) ? 1 : 0) : null;
+  const risk = r.entry && r.stop && r.stop < r.entry ? r.entry - r.stop : null;
+  const Rm = risk && p ? (p - r.entry) / risk : null, pnl = r.entry && p ? (p / r.entry - 1) * 100 : null;
+  const left = r.shares != null ? Math.max(r.shares - (r.sold || 0), 0) : null, usd = left != null && p && r.entry ? (p - r.entry) * left : null;
+  const chg = today && prev && p ? (p / prev - 1) * 100 : null, low = r.low || null;
+  const C = [];
+  if (!p) C.push(["warn", "No price for this ticker: check the spelling in the sheet"]);
+  else if (r.stop == null) C.push(["warn", "No stop in the sheet: add one (the low of the entry day)"]);
+  else if (p <= r.stop) C.push(["bad", `Stop hit: ${$f(p)} is at or under the ${$f(r.stop)} stop`]);
+  else if (today && low && low <= r.stop) C.push(["bad", `Traded through the stop today (low ${$f(low)}): check the fill`]);
+  else if (a && (p - r.stop) / (a * p) <= .5) C.push(["warn", `Within half an ADR of the stop (${$f(r.stop)})`]);
+  if (!p) { /* nothing to judge */ }
+  else if (x20 && p < x20) C.push(["bad", open && today ? `Under the 20 EMA now (${$f(x20)}): sell the rest if it closes here` : `Closed under the 20 EMA (${$f(x20)}): sell the rest`]);
+  else if (x10 && p < x10) C.push(["warn", open && today ? `Under the 10 EMA now (${$f(x10)}): sell part / tighten if it closes here` : `Closed under the 10 EMA (${$f(x10)}): sell part, tighten the stop`]);
+  if (days != null) {
+    if (days >= 3 && days <= 5 && !r.sold && pnl > 0) C.push(["info", `Day ${days}: sell 1/3 to 1/2 into strength`]);
+    else if (days > 5 && !r.sold) C.push(["warn", `Day ${days} and no partial taken yet`]);
+  }
+  if (r.sold > 0 && r.stop != null && r.entry && r.stop < r.entry) C.push(["info", `Partial taken: Kristjan moves the stop to break-even (${$f(r.entry)})`]);
+  if (!C.some(c => c[0] === "bad" || c[0] === "warn")) C.push(["good", days != null && days < 3 ? `Day ${days}: let it work, stop ${r.stop != null ? $f(r.stop) : "–"}` : "Holding over the 10 EMA: trail it"]);
+  const rank = { bad: 0, warn: 1, info: 2, good: 3 };
+  C.sort((x, y) => rank[x[0]] - rank[y[0]]);
+  return { ...r, p, chg, days, Rm, pnl, usd, left, x10, x20, a, today, checks: C, lvl: C[0][0], known: !!R };
+}
+const POS_C = { bad: "var(--neg)", warn: "var(--warning, #d97706)", info: "var(--s1)", good: "var(--pos)" };
+function posCard() {
+  if (!DATA.pos_url) return $('<div hidden></div>');
+  if (!POS && !POS_ERR && !POS_BUSY) fetchPos();
+  const edit = DATA.pos_edit ? `<a class="xopen" style="text-decoration:none" target="_blank" rel="noopener" href="${esc(DATA.pos_edit)}">Edit in Google Sheets ↗</a>` : "";
+  const head = (sub) => `<div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><h2>My positions <span class="meta">· ${sub}</span></h2>${edit}</div>`;
+  if (!POS) {
+    const how = `<ol class="meta" style="margin:6px 0 0 18px;padding:0;font-size:13px;line-height:1.6"><li>Tap <b>Edit in Google Sheets</b> and open the <b>Positions</b> tab at the bottom.</li><li>One row per trade: ticker, date bought, entry price, shares, stop (sold = shares you've already sold).</li><li>Leave the grey columns alone: they fill in prices by themselves.</li></ol>`;
+    return $(`<section class="card tcard poscard">${head("your trades vs your exit rules")}<div style="padding:4px 16px 14px">${POS_ERR ? `<div class="r2kwarn">Can't read the Positions tab yet (${esc(POS_ERR)}). In the sheet: <b>File → Share → Publish to web</b>, pick <b>Entire document</b>, then <b>Publish</b>.</div>` : '<div class="meta">Loading your positions…</div>'}${how}</div></section>`);
+  }
+  const rows = POS.map(posState).sort((a, b) => ({ bad: 0, warn: 1, info: 2, good: 3 }[a.lvl] - { bad: 0, warn: 1, info: 2, good: 3 }[b.lvl]));
+  if (!rows.length) return $(`<section class="card tcard poscard">${head("no open trades in the sheet")}<div class="meta" style="padding:4px 16px 14px">Add a row to the Positions tab (ticker, date bought, entry, shares, stop) and it shows up here on your phone and computer.</div></section>`);
+  const tot = rows.reduce((s, r) => s + (r.usd || 0), 0), alerts = rows.filter(r => r.lvl === "bad" || r.lvl === "warn").length;
+  const sub = `${rows.length} open · ${alerts ? `<b style="color:var(--neg)">${alerts} need attention</b>` : "all on plan"}${rows.some(r => r.usd != null) ? ` · open P&L <b class="${tot >= 0 ? "up" : "dn"}">${tot >= 0 ? "+" : "−"}$${Math.abs(tot).toLocaleString("en-US", { maximumFractionDigits: 0 })}</b>` : ""}`;
+  return $(`<section class="card tcard poscard">${head(sub)}
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Ticker</th><th>Day</th><th>Entry</th><th>Last</th><th>P&amp;L</th><th>Stop</th><th>10 / 20 EMA</th><th class="l">What to do</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td class="l"><a href="#" class="tkl" data-t="${esc(r.t)}"><b>${esc(r.t)}</b></a>${r.setup ? `<small class="meta" style="display:block">${esc(r.setup)}</small>` : ""}</td>
+      <td class="num">${r.days ?? "–"}</td><td class="num">${$f(r.entry)}${r.left != null ? `<small class="meta" style="display:block">${r.left} sh${r.sold ? ` (sold ${r.sold})` : ""}</small>` : ""}</td>
+      <td class="num">${$f(r.p)}${r.chg != null ? `<small style="display:block" class="${r.chg > 0 ? "up" : r.chg < 0 ? "dn" : ""}">${$p(r.chg, 2)}</small>` : ""}</td>
+      <td class="num"><span class="${r.pnl > 0 ? "up" : r.pnl < 0 ? "dn" : ""}">${$p(r.pnl)}</span>${r.Rm != null ? `<small class="meta" style="display:block">${r.Rm >= 0 ? "+" : ""}${r.Rm.toFixed(1)}R</small>` : ""}</td>
+      <td class="num">${r.stop != null ? $f(r.stop) + (r.p ? `<small class="meta" style="display:block">${$p((r.stop / r.p - 1) * 100)}</small>` : "") : "–"}</td>
+      <td class="num">${r.x10 ? $f(r.x10) + " / " + $f(r.x20) : '<span class="meta">not in our data</span>'}</td>
+      <td class="l" style="white-space:normal;min-width:240px"><b style="color:${POS_C[r.lvl]}">${esc(r.checks[0][1])}</b>${r.checks.slice(1).map(c => `<div style="color:${POS_C[c[0]]};font-size:12.5px">${esc(c[1])}</div>`).join("")}</td></tr>`).join("")}
+    </tbody></table></div><div class="note" style="padding:6px 16px 12px">Rules: stop = low of the entry day · sell 1/3–1/2 after 3–5 days · trail the 10 EMA (part) and 20 EMA (rest), on the close${nyClock().open ? " · EMAs include today's live price" : ""}</div></section>`);
+}
+
+/* ---------- Ticker search + drawer (Oct 29; from v2): every list a ticker is on, its groups, live price, plan lines ---------- */
+function tickerFacts(t) {
+  const T = DATA.themes || {}, out = [];
+  const S = (T.stocks || []).find(s => s.t === t);
+  const lc = T.lifecycle || {};
+  (((T.launch || {}).picks) || []).filter(p => p.t === t).forEach(p => out.push(`<b>Launch pick</b> (grade ${esc(p.grade)}, ${esc(p.stage)})${p.plan && p.plan.stop ? ` · stop ${esc(p.plan.stop)}` : ""}`));
+  (lc.live || []).filter(x => x.t === t).forEach(x => { let st = null; try { st = lineupState(x); } catch (e) { /* no live */ }
+    out.push(`<b>Lined-up buy</b> (${esc(x.g)}, ${x.kind === "buy" ? "group in BUY" : "group ready"})${st ? ` · ${st.st === "over" ? "over the trigger" : st.st === "zone" ? "in the zone" : st.st === "near" ? "near the ribbon" : "not lined up now"} · trigger ${$f(st.trig)}, stop ${$f(st.stop)}` : ""}`); });
+  const ts = T.trade_setups; if (ts) ts.setups.filter(s => (s.top || []).includes(t)).forEach(s => out.push(`<b>${esc(s.name)}</b> (top 5 today)`));
+  (((T.boxes || {}).live) || []).filter(r => r.t === t && /long/.test(r.type)).forEach(r => out.push(`<b>Box ${r.type === "trap_long" ? "spring" : "retest"}</b> grade ${esc(r.grade || "–")} · ${esc(r.tag || "")} · line ${$f(r.lvl)}, stop ${$f(r.stop)}, target ${$f(r.target)}`));
+  (((T.sow || {}).rows) || []).filter(r => r.t === t).forEach(r => out.push(`<b>Strength on weakness</b> · ${esc(r.state)}${r.prime ? " · ⭐ prime positioned" : ""}`));
+  (((T.launch || {}).rows) || []).filter(r => r.t === t).forEach(r => out.push(`<b>Launch list</b> grade ${esc(r.grade)} · ${esc(r.stage)}`));
+  (((T.polished || {}).nuzzle) || []).filter(r => r.t === t).forEach(r => out.push(`<b>EMA pullback</b> (leader) · ${esc(r.state)}`));
+  (((T.polished || {}).flags) || []).filter(r => r.t === t).forEach(r => out.push(`<b>High tight flag</b> · pivot ${$f(r.pivot)}, stop ${$f(r.stop)}`));
+  (((T.hve || {}).rows) || []).filter(r => r.t === t).forEach(r => out.push(`<b>Record volume</b> (${r.chg > 0 ? "up day: a warning, these lagged SPY" : "down day"})`));
+  return { S, plan: out };
+}
+function openTicker(t) {
+  t = String(t || "").toUpperCase().trim(); if (!t) return;
+  const T = DATA.themes || {}, { S, plan } = tickerFacts(t), L = liveRow(t);
+  const SUB = Object.fromEntries((T.subthemes || []).map(r => [r.theme, r])), TH = Object.fromEntries((T.themes || []).map(r => [r.theme, r]));
+  const lcAll = ((T.lifecycle || {}).all) || {};
+  (POS || []).filter(r => r.t === t).map(posState).forEach(r => plan.unshift(`<b style="color:${POS_C[r.lvl]}">You own it</b>${r.left != null ? ` (${r.left} sh)` : ""} since ${r.bought ? shortDate(r.bought) : "–"} at ${$f(r.entry)} · ${$p(r.pnl)} · ${esc(r.checks[0][1])}`));
+  const kv = (k, v) => `<div class="kv"><span>${k}</span><b>${v}</b></div>`;
+  const grp = (name, kind) => { const g = kind === "sub" ? SUB[name] : TH[name]; if (!g) return ""; const lc = kind === "sub" ? lcAll[name] : null;
+    return `<a class="dr-g" href="#themes" data-grp="${esc(name)}" data-kind="${kind}"><span>${esc(name)}</span><span class="meta">${kind === "sub" ? "Sub-theme" : "Theme"} · strength ${g.strength == null ? "–" : Math.round(g.strength)} · #${g.s_rank ?? "–"}${lc ? ` · ${esc(lc[0])}${lc[5] === "buy" ? " · BUY" : ""}` : ""}</span></a>`; };
+  const tv = (T.tv || {})[t] || t;
+  const d = document.getElementById("drawer");
+  d.innerHTML = `<div class="dr-h"><div><div class="dr-t">${esc(t)}${S && S.rsr >= 90 ? ` <span class="tg ppull">RS ${S.rsr}</span>` : ""}</div><div class="meta">${esc(S ? S.name : "")}</div></div><button class="xopen" id="drX" aria-label="Close">✕</button></div>
+    <div class="dr-px"><span class="num" style="font-size:26px">${$f(L ? L.price : S && S.price)}</span>${L ? `<b class="${L.chg > 0 ? "up" : "dn"}">${$p(L.chg * 100, 2)}</b>` : S && S.today != null ? `<b class="${S.today > 0 ? "up" : "dn"}">${$p(S.today * 100, 2)}</b>` : ""}<span class="meta">${L && liveActive() ? "live" : "last close"}</span></div>
+    ${S ? `<div class="kvs">${kv("RS Rating", S.rsr ?? "–")}${kv("5 days", $p(S.d5 * 100))}${kv("30 days", $p(S.d30 * 100))}${kv("Off 52-wk high", $p(S.off_hi * 100))}${kv("vs 21 EMA", $p(S.e21 * 100))}${kv("ADR", S.adr == null ? "–" : S.adr + "%")}</div>` : '<div class="meta" style="margin:8px 0">Not in our theme lists.</div>'}
+    ${S && (S.sub || (S.themes || []).length) ? `<h4>Groups</h4>${S.sub ? grp(S.sub, "sub") : ""}${(S.themes || []).map(n => grp(n, "theme")).join("")}` : ""}
+    ${plan.length ? `<h4>Setups &amp; plan</h4><ul class="dr-l">${plan.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
+    <div style="margin-top:16px"><a class="xopen" style="text-decoration:none" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tv)}">Open chart in TradingView ↗</a></div>`;
+  document.body.classList.add("dr-open");
+  d.querySelector("#drX").addEventListener("click", closeDrawer);
+  d.querySelectorAll(".dr-g").forEach(a => a.addEventListener("click", (e) => { e.preventDefault();
+    UI.themes.view = a.dataset.kind === "sub" ? "sub" : "theme"; UI.themes.q = a.dataset.grp; UI.tmode = "table"; closeDrawer();
+    const b = document.querySelector('nav.tabs button[data-tab="themes"]'); if (b) b.click(); }));
+}
+function closeDrawer() { document.body.classList.remove("dr-open"); }
+function searchHits(v) {
+  v = v.trim(); if (!v) return []; const V = v.toUpperCase(), lo = v.toLowerCase(), T = DATA.themes || {}, out = [];
+  const st = T.stocks || [];
+  const ex = st.find(s => s.t === V); if (ex || (T.tv || {})[V]) out.push(["t", V, ex ? ex.name : ""]);
+  st.filter(s => s.t !== V && s.t.startsWith(V)).slice(0, 5).forEach(s => out.push(["t", s.t, s.name]));
+  st.filter(s => !s.t.startsWith(V) && (s.name || "").toLowerCase().includes(lo)).slice(0, 3).forEach(s => out.push(["t", s.t, s.name]));
+  (T.subthemes || []).filter(g => g.theme.toLowerCase().includes(lo)).slice(0, 4).forEach(g => out.push(["sub", g.theme, "Sub-theme"]));
+  (T.themes || []).filter(g => g.theme.toLowerCase().includes(lo)).slice(0, 3).forEach(g => out.push(["theme", g.theme, "Theme"]));
+  return out.slice(0, 10);
+}
+function wireSearch(app) {
+  const q = app.querySelector("#tq"), box = app.querySelector("#tqres"); if (!q) return;
+  let hits = [];
+  const go = (h) => { box.hidden = true; q.value = ""; q.blur();
+    if (h[0] === "t") return openTicker(h[1]);
+    UI.themes.view = h[0] === "sub" ? "sub" : "theme"; UI.themes.q = h[1]; UI.tmode = "table";
+    const b = document.querySelector('nav.tabs button[data-tab="themes"]'); if (b) b.click(); };
+  q.addEventListener("input", () => { hits = searchHits(q.value);
+    box.innerHTML = hits.map((h, i) => `<button data-i="${i}"><b>${esc(h[1])}</b><span class="meta">${esc(h[2] || "")}</span></button>`).join("") || (q.value.trim() ? '<div class="meta" style="padding:8px 10px">No match</div>' : "");
+    box.hidden = !q.value.trim(); });
+  q.addEventListener("keydown", (e) => { if (e.key === "Enter") { const v = q.value.trim().toUpperCase(); if (hits.length) go(hits[0]); else if (v) go(["t", v]); } });
+  box.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(hits[+b.dataset.i]); });
+}
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a.tkl[data-t]"); if (a) { e.preventDefault(); openTicker(a.dataset.t); return; }
+  if (e.target.id === "scrim") closeDrawer();
+  const box = document.getElementById("tqres"); if (box && !e.target.closest(".tsearch")) box.hidden = true;
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer();
+  if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || "")) { const q = document.getElementById("tq"); if (q) { e.preventDefault(); q.focus(); } } });
 
 render();
 if (DATA && DATA.live_url) fetchLive();

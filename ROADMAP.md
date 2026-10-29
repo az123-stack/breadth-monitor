@@ -4,9 +4,10 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
 (move them to "Done" with the date) and add new ones as Adam asks for them.
 
 ## v2 redesign (started Oct 28, 2026; Adam approved Option B: new page at /v2/ beside v1)
-0. v2 pages, live prices and ticker search are built (Oct 28). Next: personal watchlist / "my positions" layer (Adam's own trades with
-   his exit rules), public track record page, plain-English explainers, neutral setup names, one page per story chapter, brand name
-   (Adam decides). Then decide when v2 replaces v1 as the landing page.
+0. Oct 29: Adam preferred v1's content over v2 ("organization was the biggest flaw"). v1 reorganized instead (10 tabs, merged Setups,
+   jump bar, fold-up cards, search drawer, My positions, theme toggle). v2 (/v2/) still builds; retire it (drop `v2site.build` from
+   `site.build`, delete docs/v2) once Adam confirms he's happy with the new v1 layout. Open: phone alerts for positions (needs a private
+   ntfy topic; repo is public so positions can't be committed).
 
 ## Theme upkeep (Oct 28)
 - First reclass agent run Sat Oct 31 8:37 AM ET; Adam answers "apply reclass N" / "reject reclass N". Worklist already flags ESS (REIT in

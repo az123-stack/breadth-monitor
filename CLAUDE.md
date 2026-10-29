@@ -637,7 +637,21 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   to the Themes table opened on it. Phone: drawer is a bottom sheet. Prototype history: branch `v2-prototype`. Test `test_v2_page_builds`.
   Local check: `python3 -c "import json; from breadth import v2site; v2site.build(json.load(open('docs/data.json')))"`, then
   `git checkout -- docs` before committing.
-- `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Trade Stories, Breadth, Pre-market, Intraday, Best Setups, Trade Setups, Launch list, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
+- `site.py` + `template.html` single self-contained page. **Layout since Oct 29, 2026** (Adam tried v2 and preferred v1's content: "organization
+  was the biggest flaw, not the content"; every card kept): 10 tabs `TABS` = Read-out (default), Breadth, Pre-market, Intraday, Themes, Rotation,
+  Biotech, Setups, Stocks, Trade Stories. Setups = `renderSetupsAll`: part 1 Best setups (`renderBest`), 2 Trade setups (`renderTrades`), 3 Launch
+  list (`renderLaunch`), 4 Leaders & momentum (`renderSetups`), with `partDiv` headers; `ONCE` / `once()` stops the live bar and Launch picks card
+  from repeating. Themes = `renderThemesTab`: View chips table (`renderThemes`) / browse (`renderBrowse`), localStorage themesMode. Old hashes
+  (#best #trades #launch #browse) map through `TAB_ALIAS` / `tabOf`. Every tab: `decoratePanel` (called by `renderTab`) adds a sticky "On this
+  page" jump bar (cards' titles via `cardTitle`: .head h2 / .kicker / summary, badges stripped) and a ▾ fold button on each card (state per
+  tab+title in localStorage "folds"); tabs bar is sticky. Header: ticker search (#tq, "/" focuses → `openTicker` drawer: live price, RS, groups
+  with Strength + lifecycle stage, every setup / list it's on with plan, positions, TradingView link) and a Theme: Auto/Light/Dark button.
+  **My positions** (`posCard` at the top of Read-out and Intraday; `posState` rules: stop / near stop, under 10 or 20 EMA (live EMAs during the
+  session, "decides at the close"), day 3–5 partial, break-even after a partial) read Adam's trades from the "Positions" tab of the live sheet
+  (gid 810220388; `config.POSITIONS_CSV_URL` / `POSITIONS_EDIT_URL` → payload `pos_url` / `pos_edit`; columns ticker | bought | entry | shares |
+  stop | sold | setup | notes + GOOGLEFINANCE price / closeyest / low / high). Nothing about positions is stored in the (public) repo.
+  EOD references `breadth/positions.py` `refs` → `DATA.themes.posrefs` {date, dates (40), rows t: [close, e10, e20, adr %, high, low]}
+  for every $3+/$2M+ ticker (test `test_position_refs`). TradingView export modal unchanged.
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
