@@ -1714,10 +1714,16 @@ function healthCard(X) {
   const cols = [{ k: "t", h: "Leader", l: true, asc: true }, { k: "rsr", h: "RS" }, { k: "d5", h: "5 days" }, { k: "vs50", h: "vs 50-day EMA" }, { k: "off", h: "Off 3-mo high" }, { k: "vx", h: "Volume<small>× 50-day, last session</small>" }];
   body.innerHTML = `<div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>`;
   const tb = body.querySelector("tbody");
-  const fill = (rows) => { tb.innerHTML = rows.slice(0, 20).map(r => `<tr>${nameCell(r)}<td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td>${retCell(r.d5, "d5")}${retCell(r.vs50, "d15")}${retCell(r.off, "d15")}<td class="num">${r.vx == null ? "–" : r.vx.toFixed(1) + "×"}${r.loud && (r.state === "crack" || r.state === "under50") ?  ' <span class="tg pspike" title="The break (20-day low or drop under the 50-day) came on 1.3×+ normal volume">broke on volume</span>' : ""}</td></tr>`).join("") + (rows.length > 20 ? `<tr><td class="l meta" colspan="${cols.length}">+ ${rows.length - 20} more (sorted by the column you pick)</td></tr>` : "") || `<tr><td class="l meta" colspan="${cols.length}">None today.</td></tr>`; };
+  let shownH = [];
+  const fill = (rows) => { shownH = rows.map(r => r.t); tb.innerHTML = rows.slice(0, U.all ? rows.length : 20).map(r => `<tr>${nameCell(r)}<td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td>${retCell(r.d5, "d5")}${retCell(r.vs50, "d15")}${retCell(r.off, "d15")}<td class="num">${r.vx == null ? "–" : r.vx.toFixed(1) + "×"}${r.loud && (r.state === "crack" || r.state === "under50") ?  ' <span class="tg pspike" title="The break (20-day low or drop under the 50-day) came on 1.3×+ normal volume">broke on volume</span>' : ""}</td></tr>`).join("") + (rows.length > 20 ? `<tr><td class="l meta" colspan="${cols.length}"><button class="xopen hmore">${U.all ? "Show the top 20 only" : `Show all ${rows.length} (+${rows.length - 20} more)`}</button></td></tr>` : "") || `<tr><td class="l meta" colspan="${cols.length}">None today.</td></tr>`; };
   const current = sortable(body.querySelector("table"), cols, () => X.rows.filter(r => r.state === U.st), fill, U.sort);
   fl.append(chips("Leaders", Object.entries(ST).map(([k, [nm]]) => [k, `${nm} (${X.counts[k] || 0})`]), U, "st", () => { try { localStorage.setItem("healthSt", U.st); } catch (e) { /* storage off */ } fill(current()); }));
   fl.append($(`<span class="meta">Leaders as of 5 sessions ago, so a stock that just cracked stays on the list.</span>`));
+  // Show all / TradingView download (Adam, Oct 28 2026: "there's not an expand button" on Holding (105))
+  const dl = $(`<button class="hdl" title="Download every stock in this list (all of them, not just the 20 shown) as a TradingView watchlist">⬇ TradingView</button>`);
+  dl.addEventListener("click", () => tsDownload("leaders-" + U.st, [{ name: "Leaders - " + ST[U.st][0], ticks: shownH }]));
+  fl.append(dl);
+  tb.addEventListener("click", (e) => { if (e.target.closest(".hmore")) { U.all = !U.all; fill(current()); } });
   fill(current());
   return card;
 }
