@@ -70,27 +70,27 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-10-19,NTSK,watch,round,thrust,Washed out,Focus,0.283,91.0,Cybersecurity Platforms,82.0,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,19.28,26.15,0.35633,0.00496,closed
 2026-10-19,PBF,watch,kq,thrust,Washed out,Focus,0.212,98.0,Refiners,95.4,neutral,,3.92,3.22,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,81.38,73.63,-0.09523,0.00496,closed
 2026-10-19,TENB,watch,round,thrust,Washed out,Focus,0.283,93.0,Identity & Security Tools,87.3,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,38.48,48.65,0.26429,0.00496,closed
-2026-10-20,DK,cand,pullback,thrust,Washed out,Focus,0.289,97.0,Refiners,98.4,confirmed,,2.31,2.27,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-20,HTFL,cand,ath,thrust,Washed out,Focus,0.236,98.0,Genomics & Diagnostics,87.2,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-20,ILMN,cand,vcp,thrust,Washed out,Focus,0.29,97.0,Genomics & Diagnostics,87.2,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-20,ITGR,cand,vcp,thrust,Washed out,Focus,0.29,88.0,Medical Devices,70.0,new,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,,,,,pending
-2026-10-20,LFST,cand,pullback,thrust,Washed out,Focus,0.289,95.0,Healthcare Providers,90.3,confirmed,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-20,MATX,cand,ath,thrust,Washed out,Focus,0.236,93.0,Tankers & Shipping,79.3,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-20,MPC,cand,vcp,thrust,Washed out,Focus,0.29,98.0,Refiners,98.4,confirmed,,2.68,2.63,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-20,NHC,cand,round,thrust,Washed out,Focus,0.284,93.0,Healthcare Providers,90.3,confirmed,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-20,NTRA,cand,vcp,thrust,Washed out,Focus,0.29,97.0,Genomics & Diagnostics,87.2,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-20,PACS,cand,round,thrust,Washed out,Focus,0.284,96.0,Healthcare Providers,90.3,confirmed,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-20,PARR,cand,pullback,thrust,Washed out,Focus,0.289,95.0,Refiners,98.4,confirmed,,3.0,2.94,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-20,PSX,cand,vcp,thrust,Washed out,Focus,0.29,97.0,Refiners,98.4,confirmed,,2.22,2.18,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-20,RVTY,cand,vcp,thrust,Washed out,Focus,0.29,92.0,Life Science Tools,88.9,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-20,SAIC,cand,rotation,thrust,Washed out,Focus,0.357,83.0,Defense IT & Services,61.2,bouncing,warming,1.16,1.14,+1% oil → +0.1%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,,,,,pending
-2026-10-20,SLDE,cand,ath,thrust,Washed out,Focus,0.236,93.0,P&C Insurers,76.7,confirmed,warming,1.92,-2.86,+10bp 10-yr yield → -1.9%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-20,SN,pick1,ath,thrust,Washed out,Focus,0.236,95.0,Consumer Brands,90.9,confirmed,ignition,0.11,-3.66,+10bp 10-yr yield → -1.5%; +1% oil → -0.2%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-20,TENB,pick2,kq,thrust,Washed out,Focus,0.212,92.0,Identity & Security Tools,86.1,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-20,NTSK,watch,round,thrust,Washed out,Focus,0.284,92.0,Cybersecurity Platforms,77.2,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,,,,,pending
-2026-10-20,PBF,watch,pullback,thrust,Washed out,Focus,0.289,98.0,Refiners,98.4,confirmed,,3.01,2.96,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
-2026-10-20,TLN,watch,kq,thrust,Washed out,Focus,0.212,38.0,Independent Power Producers,40.1,steady,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,1,,,,,pending
-2026-10-20,VLO,watch,vcp,thrust,Washed out,Focus,0.29,98.0,Refiners,98.4,confirmed,,2.53,2.48,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,,,,,pending
+2026-10-20,DK,cand,pullback,thrust,Washed out,Focus,0.289,97.0,Refiners,98.4,confirmed,,2.31,2.27,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,77.5,70.3,-0.0929,0.00148,closed
+2026-10-20,HTFL,cand,ath,thrust,Washed out,Focus,0.236,98.0,Genomics & Diagnostics,87.2,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,55.6,59.1,0.06295,0.00148,closed
+2026-10-20,ILMN,cand,vcp,thrust,Washed out,Focus,0.29,97.0,Genomics & Diagnostics,87.2,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,267.35,288.79,0.08019,0.00148,closed
+2026-10-20,ITGR,cand,vcp,thrust,Washed out,Focus,0.29,88.0,Medical Devices,70.0,new,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,126.73,126.55,-0.00142,0.00148,closed
+2026-10-20,LFST,cand,pullback,thrust,Washed out,Focus,0.289,95.0,Healthcare Providers,90.3,confirmed,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,12.13,13.39,0.10387,0.00148,closed
+2026-10-20,MATX,cand,ath,thrust,Washed out,Focus,0.236,93.0,Tankers & Shipping,79.3,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,239.19,228.9,-0.04302,0.00148,closed
+2026-10-20,MPC,cand,vcp,thrust,Washed out,Focus,0.29,98.0,Refiners,98.4,confirmed,,2.68,2.63,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,473.17,440.77,-0.06847,0.00148,closed
+2026-10-20,NHC,cand,round,thrust,Washed out,Focus,0.284,93.0,Healthcare Providers,90.3,confirmed,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,247.94,211.79,-0.1458,0.00148,closed
+2026-10-20,NTRA,cand,vcp,thrust,Washed out,Focus,0.29,97.0,Genomics & Diagnostics,87.2,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,404.84,424.42,0.04836,0.00148,closed
+2026-10-20,PACS,cand,round,thrust,Washed out,Focus,0.284,96.0,Healthcare Providers,90.3,confirmed,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,47.52,49.06,0.03241,0.00148,closed
+2026-10-20,PARR,cand,pullback,thrust,Washed out,Focus,0.289,95.0,Refiners,98.4,confirmed,,3.0,2.94,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,85.14,73.79,-0.13331,0.00148,closed
+2026-10-20,PSX,cand,vcp,thrust,Washed out,Focus,0.29,97.0,Refiners,98.4,confirmed,,2.22,2.18,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,289.97,273.76,-0.0559,0.00148,closed
+2026-10-20,RVTY,cand,vcp,thrust,Washed out,Focus,0.29,92.0,Life Science Tools,88.9,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,154.44,165.33,0.07051,0.00148,closed
+2026-10-20,SAIC,cand,rotation,thrust,Washed out,Focus,0.357,83.0,Defense IT & Services,61.2,bouncing,warming,1.16,1.14,+1% oil → +0.1%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,1,0,134.92,148.93,0.10384,0.00148,closed
+2026-10-20,SLDE,cand,ath,thrust,Washed out,Focus,0.236,93.0,P&C Insurers,76.7,confirmed,warming,1.92,-2.86,+10bp 10-yr yield → -1.9%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,27.36,27.19,-0.00621,0.00148,closed
+2026-10-20,SN,pick1,ath,thrust,Washed out,Focus,0.236,95.0,Consumer Brands,90.9,confirmed,ignition,0.11,-3.66,+10bp 10-yr yield → -1.5%; +1% oil → -0.2%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,199.34,198.17,-0.00587,0.00148,closed
+2026-10-20,TENB,pick2,kq,thrust,Washed out,Focus,0.212,92.0,Identity & Security Tools,86.1,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,39.3,48.72,0.23969,0.00148,closed
+2026-10-20,NTSK,watch,round,thrust,Washed out,Focus,0.284,92.0,Cybersecurity Platforms,77.2,fading,,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,0,19.97,26.52,0.32799,0.00148,closed
+2026-10-20,PBF,watch,pullback,thrust,Washed out,Focus,0.289,98.0,Refiners,98.4,confirmed,,3.01,2.96,+1% oil → +0.4%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,83.0,73.28,-0.11711,0.00148,closed
+2026-10-20,TLN,watch,kq,thrust,Washed out,Focus,0.212,38.0,Independent Power Producers,40.1,steady,warming,0.0,0.0,,,,Meta Platforms earnings 2026-10-21,,,,,,medium,2,1,357.83,347.75,-0.02817,0.00148,closed
+2026-10-20,VLO,watch,vcp,thrust,Washed out,Focus,0.29,98.0,Refiners,98.4,confirmed,,2.53,2.48,+1% oil → +0.3%,,,Meta Platforms earnings 2026-10-21,,,,,,medium,3,0,433.64,388.48,-0.10414,0.00148,closed
 2026-10-21,CDNA,cand,round,thrust,Choppy / mixed,Focus,0.284,99.0,Genomics & Diagnostics,89.8,fading,,0.0,0.0,,2026-10-29,6.0,FOMC rate decision 2026-10-28,No fresh company news found beyond earlier FY26 revenue guidance raise; reports Q3 on Oct 29.,full,none,real,Earnings inside the next 5 sessions,high,2,2,,,,,pending
 2026-10-21,CON,cand,round,thrust,Choppy / mixed,Focus,0.284,94.0,Healthcare Providers,85.5,neutral,warming,0.0,0.0,,2026-11-05,11.0,FOMC rate decision 2026-10-28,No clear catalyst found; Q3 results due Nov 5.,full,none,none,,high,3,1,,,,,pending
 2026-10-21,CVI,cand,vcp,thrust,Choppy / mixed,Focus,0.288,97.0,Refiners,93.8,fading,,1.05,2.56,+1% oil → +0.4%,2026-11-03,9.0,FOMC rate decision 2026-10-28,Refiner sector sympathy with Valero's strong Q3; no company news found. Reports Nov 3.,full,positive,weak,"Mizuho underperform, PT $52, below the share price (Oct 8)",high,2,1,,,,,pending
@@ -201,3 +201,27 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-10-27,SHOP,watch,vcp,thrust,Breadth thrust,Focus,0.291,79.0,E-Commerce Marketplaces,76.3,confirmed,,0.45,-3.24,+1% oil → -0.3%,,,FOMC rate decision (Warsh press conference 2:30 PM) 2026-10-28,,,,,,high,2,1,,,,,pending
 2026-10-27,VEEV,watch,vcp,thrust,Breadth thrust,Focus,0.291,92.0,Enterprise SaaS,90.6,confirmed,warming,0.0,0.0,,,,FOMC rate decision (Warsh press conference 2:30 PM) 2026-10-28,,,,,,high,3,1,,,,,pending
 2026-10-27,WING,watch,kq,thrust,Breadth thrust,Focus,0.192,7.0,Restaurants,47.6,neutral,,0.0,0.0,,,,FOMC rate decision (Warsh press conference 2:30 PM) 2026-10-28,,,,,,high,1,2,,,,,pending
+2026-10-28,AMGN,cand,vcp,thrust,Choppy / mixed,Focus,0.29,85.0,Large-cap Pharma,81.5,confirmed,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,CAI,cand,ath,thrust,Choppy / mixed,Focus,0.241,96.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,CBRL,cand,round,thrust,Choppy / mixed,Focus,0.292,97.0,Restaurants,55.6,neutral,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,FIVN,cand,round,thrust,Choppy / mixed,Focus,0.292,95.0,Cloud Communications,77.6,fading,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,FROG,cand,rotation,thrust,Choppy / mixed,Focus,0.381,95.0,Developer & DevOps Tools,77.4,,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,HAE,cand,pullback,thrust,Choppy / mixed,Focus,0.311,96.0,Medical Devices,76.0,neutral,warming,1.46,3.58,+10bp 10-yr yield → -1.4%,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,HTFL,cand,ath,thrust,Choppy / mixed,Focus,0.241,98.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,MATX,cand,pullback,thrust,Choppy / mixed,Focus,0.311,91.0,Tankers & Shipping,85.0,fading,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,NTAP,cand,rotation,thrust,Choppy / mixed,Focus,0.381,96.0,"Enterprise AI Infrastructure (Servers, Storage, HCI)",85.7,fading,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,NTNX,cand,pullback,thrust,Choppy / mixed,Focus,0.311,89.0,"Enterprise AI Infrastructure (Servers, Storage, HCI)",85.7,fading,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,1,1,,,,,pending
+2026-10-28,NTRA,cand,ath,thrust,Choppy / mixed,Focus,0.241,97.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,NTSK,cand,ath,thrust,Choppy / mixed,Focus,0.241,97.0,Cybersecurity Platforms,90.1,confirmed,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,PSNL,cand,pullback,thrust,Choppy / mixed,Focus,0.311,96.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,PTGX,cand,rotation,thrust,Choppy / mixed,Focus,0.381,90.0,Immunology & Inflammation,86.1,new,ignition,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,RBRK,cand,ath,thrust,Choppy / mixed,Focus,0.241,98.0,Cybersecurity Platforms,90.1,confirmed,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,SNOW,cand,rotation,thrust,Choppy / mixed,Focus,0.381,92.0,Data & Observability,90.7,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,TGTX,cand,rotation,thrust,Choppy / mixed,Focus,0.381,91.0,Immunology & Inflammation,86.1,new,ignition,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,VTRS,cand,vcp,thrust,Choppy / mixed,Focus,0.29,86.0,Large-cap Pharma,81.5,confirmed,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,WAT,cand,round,thrust,Choppy / mixed,Focus,0.292,86.0,Life Science Tools,91.5,neutral,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,ZIM,cand,pullback,thrust,Choppy / mixed,Focus,0.311,88.0,Tankers & Shipping,85.0,fading,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,1,1,,,,,pending
+2026-10-28,KNSA,pick1,round,thrust,Choppy / mixed,Focus,0.292,96.0,Immunology & Inflammation,86.1,new,ignition,1.76,4.33,+10bp 10-yr yield → -1.7%,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,CDNA,pick2,round,thrust,Choppy / mixed,Focus,0.292,99.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,CAH,watch,vcp,thrust,Choppy / mixed,Focus,0.29,77.0,Drug Distributors,63.8,steady,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,WSM,watch,vcp,thrust,Choppy / mixed,Focus,0.29,77.0,Home Improvement & Specialty Retail,67.5,neutral,warming,0.87,2.3,+10bp 10-yr yield → -1.9%; +1% oil → -0.2%,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,1,1,,,,,pending
