@@ -35,7 +35,13 @@ jobs:
             git add docs data
             if git diff --cached --quiet; then echo "no change"; exit 0; fi
             git commit -qm "Rebuild page"
-            if git push -q; then exit 0; fi
+            # During the session the lined-up job pushes every 5 minutes (docs/lineup_live.json, data/runner_log.csv), so a
+            # 6-minute rebuild always loses a plain push race: replay the rebuild commit on top of the newer main instead (those
+            # files don't overlap); rebuild from scratch only if that conflicts.
+            for j in 1 2 3 4 5; do
+              if git push -q; then exit 0; fi
+              git pull -q --rebase origin main || { git rebase --abort; break; }
+            done
             echo "main moved; rebuilding again"
           done
           echo "could not push the rebuild"; exit 1
