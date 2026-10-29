@@ -11,6 +11,8 @@ Optional instant push: if the repo secret NTFY_TOPIC is set, each new event is a
 
     python -m breadth.lineup live            # one pass (network: the sheet CSV)
     python -m breadth.lineup events --since 15   # print events from the last 15 minutes (what the alert task reads)
+
+Also scans every sub-theme for groups RUNNING together (breadth/runners.py): those events have type "group".
 """
 import csv
 import io
@@ -22,6 +24,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from . import config
+from . import runners as R
 
 ET = ZoneInfo("America/New_York")
 OUT = config.ROOT / "docs" / "lineup_live.json"
@@ -48,7 +51,7 @@ def read_rows(text):
             continue
         r = {}
         for i, c in enumerate(cols[1:], 1):
-            if i < len(f) and c in ("price", "closeyest", "open", "low"):
+            if i < len(f) and c in ("price", "closeyest", "open", "low", "volume"):
                 try:
                     r[c] = float(str(f[i]).replace(",", "").replace("$", ""))
                 except ValueError:
@@ -92,8 +95,9 @@ def state(x, L):
             "loc": loc, "precise": loc in PRECISE, "d9": round(d9, 2), "d21": round(d21, 2)}
 
 
-def run(text, lc, doc, now):
-    """One pass. Pure: returns (new doc, new events). doc = yesterday's / earlier today's docs/lineup_live.json."""
+def run(text, lc, doc, now, D=None):
+    """One pass. Pure: returns (new doc, new events). doc = yesterday's / earlier today's docs/lineup_live.json.
+    D = docs/data.json (for the "groups running together" scan, breadth/runners.py); without it only lined-up buys run."""
     rows, sdate = read_rows(text)
     today = now.strftime("%Y-%m-%d")
     doc = dict(doc or {})
@@ -106,7 +110,7 @@ def run(text, lc, doc, now):
     gate = "hold" if size == "hold off" else "half" if size == "half" else "buy"
     cur = [state(x, rows.get(x["t"])) for x in (lc or {}).get("live") or []]
     cur = [c for c in cur if c["st"]]
-    seen = {(e["t"], e["state"]) for e in doc.get("events") or []}
+    seen = {(e["t"], e["state"]) for e in doc.get("events") or [] if e.get("type") != "group"}
     new = []
     for c in cur:
         if c["st"] not in ("zone", "over") or c["kind"] != "buy" or gate == "hold" or not c["live"]:
@@ -117,10 +121,37 @@ def run(text, lc, doc, now):
             continue
         new.append({"time": now.strftime("%H:%M"), "t": c["t"], "g": c["g"], "state": c["st"], "price": c["price"],
                     "trigger": c["trigger"], "stop": c["stop"], "rs": c["rs"], "earn": c["earn"], "where": LOC_TEXT.get(c["loc"], f"{c['d9']:+.1f} ADR from the 9")})
+    # Groups running together (Oct 28, 2026): every sub-theme's live checks + alert events (once per group, again on +1 ADR)
+    gnew, groups = [], []
+    if D:
+        T = D.get("themes") or {}
+        mins = (now.hour * 60 + now.minute) - 570
+        groups = R.scan(rows, T.get("subthemes"), T.get("stocks"), mins, (D.get("intraday") or {}).get("volume_profile"))
+        gnew = R.alerts(groups, [e for e in doc.get("events") or [] if e.get("type") == "group"], mins)
+        for e in gnew:
+            e["time"] = now.strftime("%H:%M")
+        new = new + gnew
     doc.update({"time": now.strftime("%H:%M"), "gate": gate, "ratio10": (lc or {}).get("ratio10"), "built": (lc or {}).get("date"),
-                "rows": cur, "events": (doc.get("events") or []) + new})
+                "rows": cur, "groups": [g for g in groups if g["status"]], "events": (doc.get("events") or []) + new})
     doc.pop("note", None)
     return doc, new
+
+
+LOG = config.ROOT / "data" / "runner_log.csv"
+
+
+def log_groups(day, events):
+    """Forward log of group-running alerts (data/runner_log.csv) so the intraday edge can be tested after a few weeks."""
+    if not events:
+        return
+    new = not LOG.exists()
+    with LOG.open("a", newline="") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(["date", "time", "group", "again", "n", "up", "avg", "adrs", "rel", "pace", "top"])
+        for e in events:
+            w.writerow([day, e["time"], e["g"], int(e["again"]), e["n"], e["up"], e["avg"], e["adrs"], e["rel"], e["pace"],
+                        " ".join(m["t"] for m in e["top"])])
 
 
 def _ntfy(events):
@@ -128,6 +159,15 @@ def _ntfy(events):
     if not topic or not events:
         return
     for e in events:
+        if e.get("type") == "group":
+            title, body = R.text(e)
+            try:
+                req = urllib.request.Request(f"https://ntfy.sh/{topic}", data=body.encode(), headers={"Title": title, "Tags": "fire",
+                                             "Click": "https://az123-stack.github.io/breadth-monitor/#intraday"})
+                urllib.request.urlopen(req, timeout=20).read()
+            except Exception as ex:
+                print("ntfy failed:", ex)
+            continue
         title = f"{e['t']} {'BUY: over yesterday high' if e['state'] == 'over' else e.get('where') or 'in its 9/21 EMAs'}"
         body = f"{e['g']} · ${e['price']} · buy over ${e['trigger']}, stop ${e['stop']}"
         try:
@@ -155,13 +195,16 @@ def main(argv=None):
                           "events": [e for e in doc.get("events") or [] if e["time"] >= cut]}, indent=1))
         return
     from .anchors import fetch_csv
-    lc = (json.loads(DATA.read_text()).get("themes") or {}).get("lifecycle") or {}
+    D = json.loads(DATA.read_text())
+    lc = (D.get("themes") or {}).get("lifecycle") or {}
     doc = json.loads(OUT.read_text()) if OUT.exists() else {}
-    doc, new = run(fetch_csv(), lc, doc, now)
+    doc, new = run(fetch_csv(), lc, doc, now, D)
     OUT.write_text(json.dumps(doc, separators=(",", ":")))
+    log_groups(doc["date"], [e for e in new if e.get("type") == "group"])
     _ntfy(new)
-    print(f"{doc.get('time')} gate {doc.get('gate')} · {len(doc.get('rows') or [])} names in or near the EMAs · {len(new)} new alerts"
-          + (": " + ", ".join(f"{e['t']} {e['state']}" for e in new) if new else ""))
+    print(f"{doc.get('time')} gate {doc.get('gate')} · {len(doc.get('rows') or [])} names in or near the EMAs · "
+          f"{sum(1 for g in doc.get('groups') or [] if g['status'] == 'running')} groups running · {len(new)} new alerts"
+          + (": " + ", ".join(e['g'] if e.get('type') == 'group' else f"{e['t']} {e['state']}" for e in new) if new else ""))
 
 
 if __name__ == "__main__":

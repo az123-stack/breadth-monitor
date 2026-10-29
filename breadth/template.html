@@ -4367,6 +4367,54 @@ function lineupCard(T) {
     { name: "Lined-up buys - approaching", ticks: rows.filter(r => r.st === "near").map(r => r.t) }]));
   return sec;
 }
+/* ---------- Runners: sub-themes running hard together (breadth/runners.py twin; Adam, Oct 28 2026) ---------- */
+const RUN_CFG = { min_n: 4, up_share: 0.75, adr_avg: 1.25, rel: 0.03, pace: 1.2, strong_adr: 1.5, strong_pace: 1.5, top: 3, min_price: 3, min_dvol: 10e6 };
+function runnersScan(rows, subthemes, stocks, mins, profile, C = RUN_CFG) {
+  const S = Object.fromEntries((stocks || []).map(s => [s.t, s]));
+  const vp0 = (() => { const P = profile || [[0, 0], [390, 1]]; if (mins == null || mins <= 0) return null; if (mins >= 390) return 1;
+    for (let i = 1; i < P.length; i++) if (mins <= P[i][0]) { const [a, x] = P[i - 1], [b, y] = P[i]; return x + (y - x) * (mins - a) / (b - a); } return 1; })();
+  const chg = (r) => { if (!r || !r.price || !r.closeyest) return null; const c = r.price / r.closeyest - 1; return Math.abs(c) <= 0.6 ? c : null; };
+  const spy = chg(rows.SPY) || 0, out = [];
+  (subthemes || []).forEach(g => {
+    const mem = [];
+    (g.members || []).forEach(t => { const s = S[t], r = rows[t], ch = chg(r);
+      if (!s || !s.is_stock || ch == null || !s.adr) return;
+      const px = r.price; if (px < C.min_price || (s.v50 || 0) * px < C.min_dvol) return;
+      mem.push({ t, chg: ch, adrs: ch / (s.adr / 100), rs: s.rsr ?? null, px, open: r.open, dv: px * (r.volume || 0), nv: px * (s.v50 || 0) }); });
+    if (mem.length < C.min_n) return;
+    const n = mem.length, up = mem.filter(m => m.chg > 0).length, avg = mem.reduce((a, m) => a + m.chg, 0) / n, adrs = mem.reduce((a, m) => a + m.adrs, 0) / n;
+    const nv = mem.reduce((a, m) => a + m.nv, 0), vp = nv && vp0 ? mem.reduce((a, m) => a + m.dv, 0) / (nv * vp0) : null;
+    const ck = { up: up / n >= C.up_share, adr: adrs >= C.adr_avg, rel: avg - spy >= C.rel, vol: vp != null && vp >= C.pace };
+    const passed = Object.values(ck).filter(Boolean).length;
+    const status = passed === 4 ? "running" : passed === 3 && ck.up && (ck.adr || adrs >= 0.8 * C.adr_avg) ? "heating" : null;
+    const hold = mem.filter(m => m.adrs >= 0.75 && (!m.open || m.px >= m.open)).sort((a, b) => (b.rs || 0) - (a.rs || 0));
+    out.push({ g: g.theme, n, up, avg, adrs, rel: avg - spy, pace: vp, checks: ck, status, strong: status === "running" && adrs >= C.strong_adr && vp >= C.strong_pace,
+      strength: g.strength, top: hold.slice(0, C.top).map(m => ({ t: m.t, chg: m.chg, adrs: m.adrs, rs: m.rs })), movers: [...mem].sort((a, b) => b.chg - a.chg).slice(0, 6).map(m => m.t) });
+  });
+  const rank = { running: 0, heating: 1 };
+  return out.sort((a, b) => (rank[a.status] ?? 2) - (rank[b.status] ?? 2) || b.adrs - a.adrs);
+}
+function runnersCard(clk) {
+  const T = DATA.themes || {}, I = DATA.intraday || {};
+  const sec = $(`<section class="icard card regcard"><div class="kicker">🔥 Runners · sub-themes running hard together</div><div class="rbody"></div></section>`);
+  const body = sec.querySelector(".rbody");
+  if (!LIVE || !LIVE.rows || !Object.values(LIVE.rows).some(r => r.closeyest != null && r.volume)) { body.innerHTML = '<p class="meta">Needs live prices with volume from your Google Sheet.</p>'; return sec; }
+  const rows = {}; Object.entries(LIVE.rows).forEach(([t, r]) => { rows[t] = r; });
+  const G = runnersScan(rows, T.subthemes, T.stocks, clk.open ? clk.mins : 390, I.volume_profile).filter(x => x.status);
+  const pc = (v, d = 1) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
+  const C = RUN_CFG;
+  const ck = (ok, txt) => `<span class="${ok ? "up" : "meta"}" style="white-space:nowrap">${ok ? "✓" : "·"} ${txt}</span>`;
+  body.innerHTML = `<p class="note" style="padding:2px 0 6px">A sub-theme is <b>running</b> when ${Math.round(C.up_share * 100)}%+ of its liquid members are up, the average move is ${C.adr_avg}+ ADRs (each stock's move ÷ its own daily range) and ${C.rel * 100}+ pts better than SPY, on ${C.pace}× normal volume for the time of day. <b>Strong</b> = ${C.strong_adr}+ ADRs on ${C.strong_pace}× volume. Running groups also send a phone alert (once per group, again if it widens by another ADR). <b>Names to trade</b> = members up 0.75+ ADR and above today's open, best RS first.</p>
+    ${G.length ? `<div class="scroll"><table class="grid"><thead><tr><th class="l">Sub-theme</th><th class="l">Status</th><th>Up</th><th>Avg move</th><th>In ADRs</th><th>vs SPY</th><th>Volume<small>× normal pace</small></th><th class="l">Names to trade<small>holding over the open, by RS</small></th><th class="l">Biggest movers</th></tr></thead><tbody>
+    ${G.map(x => `<tr><td class="l">${esc(x.g)}${x.strength != null ? `<small class="meta" style="display:block">Strength ${Math.round(x.strength)}</small>` : ""}</td>
+      <td class="l">${x.status === "running" ? `<span class="tg ${x.strong ? "pspike" : "sow-breakout"}">${x.strong ? "🔥 Strong run" : "Running"}</span>` : '<span class="tg sow-riding">Heating up</span>'}<small class="meta" style="display:block">${ck(x.checks.up, "breadth")} ${ck(x.checks.adr, "size")} ${ck(x.checks.rel, "vs SPY")} ${ck(x.checks.vol, "volume")}</small></td>
+      <td class="num">${x.up}/${x.n}</td><td class="num ${x.avg > 0 ? "up" : "dn"}">${pc(x.avg)}</td><td class="num">${x.adrs.toFixed(2)}</td><td class="num">${pc(x.rel)}</td><td class="num">${x.pace == null ? "–" : x.pace.toFixed(1) + "×"}</td>
+      <td class="l">${x.top.length ? x.top.map(m => `<b>${m.t}</b> ${pc(m.chg)} <small class="meta">RS ${m.rs ?? "–"}</small>`).join("<br>") : '<span class="meta">none holding over the open</span>'}</td>
+      <td class="l meta">${x.movers.join(", ")}</td></tr>`).join("")}</tbody></table></div>`
+    : `<p class="meta">No sub-theme is running together right now. The strongest groups show here as "Heating up" once they pass 3 of the 4 checks.</p>`}
+    <p class="meta" style="margin:6px 0 0">Tested on ~2 years of daily closes (card R-2026-10-29-group-runs): running groups beat the average group the next day (open→close) by +0.34% (t 2.3) and over 5 days by +0.90% (t 2.5); strong runs +0.62% (t 2.6) and +1.47% (t 2.6), both halves positive. Same-day continuation can't be tested on daily bars: every alert is logged so it can be checked after a few weeks. Google prices run up to ~20 min behind.</p>`;
+  return sec;
+}
 function renderIntraday(app) {
   const I = DATA.intraday, T = DATA.themes;
   if (!I) { app.append($('<div class="icard card empty">Intraday data appears after the next build.</div>')); return; }
@@ -4396,6 +4444,8 @@ function renderIntraday(app) {
     <div class="ibars" style="margin-top:10px">${Object.entries(I.sector_etfs).map(([k, l]) => ({ k, l, r: liveRow(k) })).filter(x => x.r).sort((a, b) => b.r.chg - a.r.chg)
       .map(x => `<div class="ibar"><span>${esc(x.l)} <small class="meta">${x.k}</small></span><i class="${cls(x.r.chg)}" style="width:${Math.min(100, Math.abs(x.r.chg) * 2500)}%"></i><b class="${cls(x.r.chg)}">${pc(x.r.chg)}</b></div>`).join("")}</div></section>`));
   app.append(oilCard());
+  // 1b. Runners: sub-themes running hard together (above the index contribution card, Adam Oct 29 2026)
+  app.append(runnersCard(clk));
   // 2. Who's moving the index
   app.append(indexMoversCard({ kicker: "Who's moving the index", volHead: "Rel. volume<small>paced</small>", vol: (r) => r.volume && r.vavg && pace ? (r.volume / (r.vavg * pace)).toFixed(1) + "×" : "–" }));
   // 3. Live breadth on our stocks (vs the same stocks' last full session)

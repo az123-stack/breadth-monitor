@@ -43,7 +43,7 @@ jobs:
           while [ "$(date +%s)" -lt "$end" ]; do
             git pull -q --rebase -X theirs || git rebase --abort || true
             python -m breadth.lineup live || echo "pass failed, retrying next round"
-            git add docs/lineup_live.json
+            git add docs/lineup_live.json data/runner_log.csv 2>/dev/null || git add docs/lineup_live.json
             if ! git diff --cached --quiet; then
               git commit -qm "Lined-up $(TZ=America/New_York date +%H:%M) ET"
               for i in 1 2 3; do

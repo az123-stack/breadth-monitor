@@ -1800,6 +1800,63 @@ def test_position_refs():
     assert c > e10 > e20 and abs(adr - 4.08) < .01 and h > c > l
     return "ok"
 
+
+def test_group_runners():
+    """Groups running together (breadth/runners.py): running / heating / quiet, alerts once then again on +1 ADR (max 3),
+    the 5-minute job emits them without breaking lined-up dedupe, and the page's runnersScan (Node) agrees with Python."""
+    import shutil, subprocess, json as _json
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from breadth import runners as R, lineup
+    stocks = [{"t": t, "is_stock": True, "adr": 5.0, "rsr": rs, "v50": 1e6} for t, rs in
+              [("A1", 99), ("A2", 90), ("A3", 80), ("A4", 70), ("B1", 95), ("B2", 85), ("B3", 75), ("B4", 65), ("C1", 50), ("C2", 50), ("C3", 50), ("C4", 50)]]
+    subs = [{"theme": "Hot", "members": ["A1", "A2", "A3", "A4"], "strength": 90}, {"theme": "Warm", "members": ["B1", "B2", "B3", "B4"]},
+            {"theme": "Cold", "members": ["C1", "C2", "C3", "C4"]}]
+    def row(ch, vol, op=None):
+        return {"price": 20 * (1 + ch), "closeyest": 20.0, "open": op if op is not None else 20.0, "volume": vol}
+    rows = {"SPY": row(0.005, 1e6), "A1": row(0.09, 2e6), "A2": row(0.08, 2e6), "A3": row(0.08, 2e6), "A4": row(0.07, 2e6, op=22.0),
+            "B1": row(0.07, 5e4), "B2": row(0.07, 5e4), "B3": row(0.06, 5e4), "B4": row(0.06, 5e4),
+            "C1": row(0.01, 2e6), "C2": row(-0.01, 2e6), "C3": row(0.0, 2e6), "C4": row(0.02, 2e6)}
+    prof = [[0, 0], [390, 1]]
+    G = {g["g"]: g for g in R.scan(rows, subs, stocks, 390, prof)}
+    assert G["Hot"]["status"] == "running" and G["Hot"]["strong"] and G["Hot"]["up"] == 4, G["Hot"]           # 1.6 ADRs on 2x volume
+    assert [m["t"] for m in G["Hot"]["top"]] == ["A1", "A2", "A3"]                                             # A4 fell under its open
+    assert G["Warm"]["status"] == "heating" and not G["Warm"]["checks"]["vol"], G["Warm"]                     # big move, thin volume
+    assert G["Cold"]["status"] is None
+    e1 = R.alerts(list(G.values()), [], 60)
+    assert [e["g"] for e in e1] == ["Hot"] and not e1[0]["again"]
+    assert R.alerts(list(G.values()), e1, 60) == []                                                           # once
+    assert R.alerts(list(G.values()), [], 5) == []                                                            # not in the first minutes
+    wider = dict(G["Hot"], adrs=G["Hot"]["adrs"] + 1.05)
+    e2 = R.alerts([wider], e1, 60)
+    assert len(e2) == 1 and e2[0]["again"]                                                                    # widened by an ADR
+    assert R.alerts([dict(wider, adrs=99)], e1 + e2 + e2, 60) == []                                          # max 3 a day
+    title, body = R.text(e1[0])
+    assert "Hot" in title and "4/4 up" in body
+    # the 5-minute job: group events alongside lined-up events, logged once
+    now = datetime(2026, 10, 28, 11, 0, tzinfo=ZoneInfo("America/New_York"))
+    text = "ticker,index,symbol,price,closeyest,open,volume,marketcap,volumeavg,at10,at11,low\n_asof,x\n_spytime,10/28/2026 11:00:00\n" + \
+        "\n".join(f"{t},1,{t},{r['price']},{r['closeyest']},{r['open']},{r['volume']},1,1,,,{r['open']}" for t, r in rows.items())
+    D = {"themes": {"subthemes": subs, "stocks": stocks}, "intraday": {"volume_profile": prof}}
+    doc, new = lineup.run(text, {"size": "full", "live": []}, {}, now, D)
+    assert [e["g"] for e in new if e.get("type") == "group"] == ["Hot"] and any(g["g"] == "Hot" for g in doc["groups"])
+    doc2, new2 = lineup.run(text, {"size": "full", "live": []}, doc, now, D)
+    assert new2 == []
+    node = shutil.which("node")
+    if node:
+        src = (config.ROOT / "breadth" / "template.html").read_text()
+        i = src.index("const RUN_CFG")
+        j = src.index("function runnersCard(")
+        js = src[i:j] + f"\nconsole.log(JSON.stringify(runnersScan({_json.dumps(rows)}, {_json.dumps(subs)}, {_json.dumps(stocks)}, 150, [[0,0],[390,1]])" \
+             ".map(x => [x.g, x.status, x.strong, Math.round(x.adrs * 1000), x.pace == null ? null : Math.round(x.pace * 1000), x.top.map(m => m.t)])));"
+        r = subprocess.run([node, "-e", js], capture_output=True, text=True)
+        assert r.returncode == 0, r.stderr[-600:]
+        py = [[x["g"], x["status"], x["strong"], round(x["adrs"] * 1000), None if x["pace"] is None else round(x["pace"] * 1000), [m["t"] for m in x["top"]]]
+              for x in R.scan(rows, subs, stocks, 150, prof)]
+        assert _json.loads(r.stdout) == py, (r.stdout, py)
+    return "running / heating / quiet, alert once + widen, job + page agree"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

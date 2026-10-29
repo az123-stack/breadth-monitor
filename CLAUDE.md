@@ -536,6 +536,17 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   gate buy/half/hold, rows, events}; events = first time today a BUY-group name (gate not hold) reaches zone or over; optional instant
   ntfy.sh post when repo secret NTFY_TOPIC is set. Claude scheduled task "Market Monitor · lined-up alerts" (every 15 min in the session)
   reads `python -m breadth.lineup events --since 15` and pushes a phone notification for new events. Test `test_lineup_live_and_ledger`.
+  **Runners · groups running together** (Oct 29, Adam: "AI drug discovery all ran together — I'd have liked an alert to day trade it";
+  card R-2026-10-29-group-runs, layer `runners`, info only): `breadth/runners.py` `scan(rows, subthemes, stocks, mins, profile)` per
+  sub-theme from the live sheet (needs the sheet's volume column): liquid members ($3+, $10M+/day, 4+), RUNNING = 75%+ up AND avg move
+  1.25+ ADRs (move ÷ own ADR) AND +3 pts vs SPY AND dollar volume 1.2x the paced normal (`vol_pace` = intraday volume_profile);
+  strong = 1.5 ADRs on 1.5x; heating = 3 of 4 with breadth ok and ≥ 80% of the ADR bar (page only). Names to trade = members up 0.75+
+  ADR and ≥ today's open, best RS. `alerts` = first RUNNING of the day per group (after 9:45), again each +1 ADR wider, max 3/day.
+  Wired into `lineup.run(..., D=data.json)`: events with `type: "group"` in docs/lineup_live.json (+ `groups` = current running/heating),
+  ntfy (Tags fire, click → #intraday), forward log data/runner_log.csv (committed by lineup.yml); the hourly task "lined-up alerts"
+  formats group events. Page twin `runnersScan` / `runnersCard` (Intraday tab, right above "Who's moving the index"), parity tested in
+  Node (`test_group_runners`). Daily evidence (tools/runner_study/hist.py): running → next day open→close +0.34% vs avg group (t 2.25),
+  5d +0.90% (t 2.47); strong +0.62% / +1.47% (t 2.6), both halves. Re-test intraday continuation from the log after ~4 weeks.
   EMA LOCATION TAGS (Oct 27, Adam's OKTA chart: "In the EMAs" while 0.9 ADR above the 9): `loc` in `lineupState` / `lineup.state` (twins,
   parity tested) from live price vs live 9/21 EMAs in ADRs (`d9`, `d21`): reclaim21 / reclaim9 (low under the EMA today, price back over it
   and ≤ 0.5 ADR above) > on21 / on9 (within 0.3 ADR) > under21 / between (9–21) / above ("Over the 9 · x ADR"). `precise` = reclaim / on /
