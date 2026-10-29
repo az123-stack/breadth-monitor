@@ -201,27 +201,27 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-10-27,SHOP,watch,vcp,thrust,Breadth thrust,Focus,0.291,79.0,E-Commerce Marketplaces,76.3,confirmed,,0.45,-3.24,+1% oil → -0.3%,,,FOMC rate decision (Warsh press conference 2:30 PM) 2026-10-28,,,,,,high,2,1,,,,,pending
 2026-10-27,VEEV,watch,vcp,thrust,Breadth thrust,Focus,0.291,92.0,Enterprise SaaS,90.6,confirmed,warming,0.0,0.0,,,,FOMC rate decision (Warsh press conference 2:30 PM) 2026-10-28,,,,,,high,3,1,,,,,pending
 2026-10-27,WING,watch,kq,thrust,Breadth thrust,Focus,0.192,7.0,Restaurants,47.6,neutral,,0.0,0.0,,,,FOMC rate decision (Warsh press conference 2:30 PM) 2026-10-28,,,,,,high,1,2,,,,,pending
-2026-10-28,AMGN,cand,vcp,thrust,Choppy / mixed,Focus,0.29,85.0,Large-cap Pharma,81.5,confirmed,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
-2026-10-28,CAI,cand,ath,thrust,Choppy / mixed,Focus,0.229,96.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,CBRL,cand,round,thrust,Choppy / mixed,Focus,0.304,97.0,Restaurants,55.6,neutral,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
-2026-10-28,FIVN,cand,round,thrust,Choppy / mixed,Focus,0.304,95.0,Cloud Communications,77.6,fading,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
-2026-10-28,FROG,cand,rotation,thrust,Choppy / mixed,Focus,0.376,95.0,Developer & DevOps Tools,77.4,,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
-2026-10-28,HAE,cand,pullback,thrust,Choppy / mixed,Focus,0.311,96.0,Medical Devices,76.0,neutral,warming,1.46,3.58,+10bp 10-yr yield → -1.4%,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
-2026-10-28,HTFL,cand,ath,thrust,Choppy / mixed,Focus,0.229,98.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,MATX,cand,pullback,thrust,Choppy / mixed,Focus,0.311,91.0,Tankers & Shipping,85.0,fading,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
-2026-10-28,NTAP,cand,rotation,thrust,Choppy / mixed,Focus,0.376,96.0,"Enterprise AI Infrastructure (Servers, Storage, HCI)",85.7,fading,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
-2026-10-28,NTNX,cand,pullback,thrust,Choppy / mixed,Focus,0.311,89.0,"Enterprise AI Infrastructure (Servers, Storage, HCI)",85.7,fading,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,1,1,,,,,pending
-2026-10-28,NTRA,cand,ath,thrust,Choppy / mixed,Focus,0.229,97.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,NTSK,cand,ath,thrust,Choppy / mixed,Focus,0.229,97.0,Cybersecurity Platforms,90.1,confirmed,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,PSNL,cand,pullback,thrust,Choppy / mixed,Focus,0.311,96.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,PTGX,cand,rotation,thrust,Choppy / mixed,Focus,0.376,90.0,Immunology & Inflammation,86.1,new,ignition,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,RBRK,cand,ath,thrust,Choppy / mixed,Focus,0.229,98.0,Cybersecurity Platforms,90.1,confirmed,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,SNOW,cand,rotation,thrust,Choppy / mixed,Focus,0.376,92.0,Data & Observability,90.7,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,TGTX,cand,rotation,thrust,Choppy / mixed,Focus,0.376,91.0,Immunology & Inflammation,86.1,new,ignition,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,VTRS,cand,vcp,thrust,Choppy / mixed,Focus,0.29,86.0,Large-cap Pharma,81.5,confirmed,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
-2026-10-28,WAT,cand,round,thrust,Choppy / mixed,Focus,0.304,86.0,Life Science Tools,91.5,neutral,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
-2026-10-28,ZIM,cand,pullback,thrust,Choppy / mixed,Focus,0.311,88.0,Tankers & Shipping,85.0,fading,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,1,1,,,,,pending
-2026-10-28,KNSA,pick1,round,thrust,Choppy / mixed,Focus,0.304,96.0,Immunology & Inflammation,86.1,new,ignition,1.76,4.33,+10bp 10-yr yield → -1.7%,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,CDNA,pick2,round,thrust,Choppy / mixed,Focus,0.304,99.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,3,1,,,,,pending
-2026-10-28,CAH,watch,vcp,thrust,Choppy / mixed,Focus,0.29,77.0,Drug Distributors,63.8,steady,,0.0,0.0,,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,2,1,,,,,pending
-2026-10-28,WSM,watch,vcp,thrust,Choppy / mixed,Focus,0.29,77.0,Home Improvement & Specialty Retail,67.5,neutral,warming,0.87,2.3,+10bp 10-yr yield → -1.9%; +1% oil → -0.2%,,,Q3 GDP (advance) and September PCE 2026-10-29,,,,,,high,1,1,,,,,pending
+2026-10-28,AMGN,cand,vcp,thrust,Choppy / mixed,Focus,0.29,85.0,Large-cap Pharma,81.5,confirmed,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,CAI,cand,ath,thrust,Choppy / mixed,Focus,0.229,96.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,CBRL,cand,round,thrust,Choppy / mixed,Focus,0.304,97.0,Restaurants,55.6,neutral,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,FIVN,cand,round,thrust,Choppy / mixed,Focus,0.304,95.0,Cloud Communications,77.6,fading,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,FROG,cand,rotation,thrust,Choppy / mixed,Focus,0.376,95.0,Developer & DevOps Tools,77.4,,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,HAE,cand,pullback,thrust,Choppy / mixed,Focus,0.311,96.0,Medical Devices,76.0,neutral,warming,1.46,3.58,+10bp 10-yr yield → -1.4%,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,HTFL,cand,ath,thrust,Choppy / mixed,Focus,0.229,98.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,MATX,cand,pullback,thrust,Choppy / mixed,Focus,0.311,91.0,Tankers & Shipping,85.0,fading,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,NTAP,cand,rotation,thrust,Choppy / mixed,Focus,0.376,96.0,"Enterprise AI Infrastructure (Servers, Storage, HCI)",85.7,fading,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,NTNX,cand,pullback,thrust,Choppy / mixed,Focus,0.311,89.0,"Enterprise AI Infrastructure (Servers, Storage, HCI)",85.7,fading,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,1,1,,,,,pending
+2026-10-28,NTRA,cand,ath,thrust,Choppy / mixed,Focus,0.229,97.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,NTSK,cand,ath,thrust,Choppy / mixed,Focus,0.229,97.0,Cybersecurity Platforms,90.1,confirmed,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,PSNL,cand,pullback,thrust,Choppy / mixed,Focus,0.311,96.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,PTGX,cand,rotation,thrust,Choppy / mixed,Focus,0.376,90.0,Immunology & Inflammation,86.1,new,ignition,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,RBRK,cand,ath,thrust,Choppy / mixed,Focus,0.229,98.0,Cybersecurity Platforms,90.1,confirmed,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,"No clear catalyst found; next report listed Dec 3 after close, partly flagged as an estimate.",full,none,none,,high,3,1,,,,,pending
+2026-10-28,SNOW,cand,rotation,thrust,Choppy / mixed,Focus,0.376,92.0,Data & Observability,90.7,new,warming,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,TGTX,cand,rotation,thrust,Choppy / mixed,Focus,0.376,91.0,Immunology & Inflammation,86.1,new,ignition,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,VTRS,cand,vcp,thrust,Choppy / mixed,Focus,0.29,86.0,Large-cap Pharma,81.5,confirmed,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,WAT,cand,round,thrust,Choppy / mixed,Focus,0.304,86.0,Life Science Tools,91.5,neutral,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,ZIM,cand,pullback,thrust,Choppy / mixed,Focus,0.311,88.0,Tankers & Shipping,85.0,fading,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,1,1,,,,,pending
+2026-10-28,KNSA,pick1,round,thrust,Choppy / mixed,Focus,0.304,96.0,Immunology & Inflammation,86.1,new,ignition,1.76,4.33,+10bp 10-yr yield → -1.7%,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,CDNA,pick2,round,thrust,Choppy / mixed,Focus,0.304,99.0,Genomics & Diagnostics,95.0,new,warming,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,3,1,,,,,pending
+2026-10-28,CAH,watch,vcp,thrust,Choppy / mixed,Focus,0.29,77.0,Drug Distributors,63.8,steady,,0.0,0.0,,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,2,1,,,,,pending
+2026-10-28,WSM,watch,vcp,thrust,Choppy / mixed,Focus,0.29,77.0,Home Improvement & Specialty Retail,67.5,neutral,warming,0.87,2.3,+10bp 10-yr yield → -1.9%; +1% oil → -0.2%,,,Q3 GDP advance and September PCE inflation 2026-10-29,,,,,,high,1,1,,,,,pending
