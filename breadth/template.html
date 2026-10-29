@@ -679,6 +679,7 @@ function render() {
     const picks = [...launchPickSet()], lu = lineupNow();
     tsDownload("trade-setups", [...(picks.length ? [{ name: "Launch picks", ticks: picks }] : []),
       ...(lu.length ? [{ name: "Lined-up buys - triggered / in the EMAs", ticks: lu.map(r => r.t) }] : []),
+      ...(DATA.themes.rspull ? [{ name: "RS leaders pulling back - in the 9/21 dip", ticks: (DATA.themes.rspull.rows || []).filter(r => r.state === "dip").map(r => r.t) }] : []),
       ...X.setups.slice().sort((a, b) => (rank[a.key] || 9) - (rank[b.key] || 9)).map(s => ({ name: s.name, ticks: s.top })),
       ...(DATA.themes.hve ? [{ name: "Record volume - up days (warning list)", ticks: DATA.themes.hve.rows.filter(r => r.chg > 0).map(r => r.t) },
         { name: "Record volume - down days", ticks: DATA.themes.hve.rows.filter(r => r.chg < 0).map(r => r.t) },
@@ -5283,6 +5284,7 @@ function renderTrades(app) {
   app.append(liveBar());
   if (T.launch) app.append(launchPicksCard(T.launch));   // Adam, Oct 25: the headline picks come from the Launch list
   if (T.dips) app.append(dipCard(T, "trades"));      // Adam: dip buys at the very top of Trade Setups
+  if (T.rspull) app.append(rsPullCard(T));           // RS leaders pulling back (Oct 29)
   const live = !!LIVE_T, asOf = longDate(T.date), now = T.regime_now || "mixed";
   const REG = { strong: "Strong", mixed: "Mixed", weak: "Weak" };
   const head = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
@@ -5389,6 +5391,71 @@ function dipLive(r0, tf, X) {
 }
 const DIP_F = [["back", "Wicked under & back above"], ["under", "Under the 9 / 21 now"], ["all", "All names"]];   // multi-select: pick both for either
 const DIP_SRC = [["all", "Box + SoW"], ["box", "Box trades"], ["sow", "Strength on Weakness"], ["prime", "⭐ Prime"]];
+/* ---------- RS leaders pulling back (Oct 29, 2026; Adam: "finds tickers making new RS highs and waits for weakness") ----------
+   DATA.themes.rspull (breadth/rspull.py): names whose RS line (close ÷ SPY) hit a 1-year high in the last 30 sessions, in an uptrend,
+   with their state at the close; live state from `lineupState` (same 9/21 ribbon rule as Lined-up buys). Info only: the backtest
+   (evidence) found no reliable edge, so the card says so. */
+function rsPullCard(T) {
+  const X = T && T.rspull;
+  if (!X || !(X.rows || []).length) return $('<div></div>');
+  const E = X.evidence || {}, G = E.groups || {}, g = G.rs || {}, c0 = G.strong_no || {}, ed = E.edge || {}, ek = E.edge_k || {}, ah = G.rs_ahead || {};
+  UI.rsp = UI.rsp || { f: lsGet("rspF", "dip") };
+  const U = UI.rsp;
+  const Rv = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + Number(v).toFixed(2) + "R";
+  const P = (v, d = 0) => v == null ? "–" : Math.round(v * 100) + "%";
+  const rows0 = X.rows.map(x => { let s = null; try { s = lineupState(x); } catch (e) { /* no live */ }
+    const st = s && s.live ? (s.st === "over" ? "over" : s.st === "zone" ? "dip" : s.st === "near" ? "near" : "wait") : x.state;
+    return { ...x, s, st, p: s ? s.p : x.c, trig: s ? s.trig : x.hi, stop: s ? s.stop : Math.max(x.lo, x.hi * (1 - x.adr)), chg: s && s.live ? s.chg : null,
+      loc: s ? s.loc : null, d9v: s && s.d9 != null ? s.d9 : x.d9, live: !!(s && s.live) }; });
+  const inDip = (r) => r.st === "dip" || r.st === "over";
+  const F = { dip: ["In the dip (9/21 EMAs)", inDip], near: ["Near the EMAs", r => r.st === "near"], wait: ["Waiting for weakness", r => r.st === "wait"], all: ["All", () => true] };
+  const cnt = (k) => rows0.filter(F[k][1]).length;
+  const live = rows0.some(r => r.live);
+  const verdict = E.verdict === "proven" ? ["focus", "Tested · edge"] : ["unproven", "Unproven"];
+  const card = $(`<section class="card regcard rspcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv ${verdict[0]}" title="Information only: never changes the picks">${verdict[1]}</span> RS leaders pulling back <span class="meta">· RS line at a 1-year high in the last ${(X.cfg || {}).live_recent || 30} sessions, now waiting for weakness · ${live ? "live" : shortDate(X.date) + " close"}</span></h2>
+      <div class="tsbtns"><button class="rspdl" title="Download the names shown as a TradingView watchlist">⬇ TradingView</button></div></div>
+    <p class="note" style="padding:4px 0 0">The <b>RS line</b> is the stock divided by the S&P 500 (SPY). A new RS high (the blue dots on many charting tools) means it's beating the market by more than at any point in the past year, even if the price itself isn't at a high. The play: don't chase that strength, wait for the first dip into the daily <b>9 / 21 EMAs</b>, then buy the break of the dip day's high with a stop under the dip day's low. Uptrend names only ($${(X.cfg || {}).min_price || 5}+, $${Math.round(((X.cfg || {}).min_dvol || 20e6) / 1e6)}M+/day, 21 EMA over a rising 50 EMA). <b>RS leads</b> = the RS high came while the price was still 3%+ under its own 52-week high.</p>
+    ${E.groups ? `<div class="rbanner watch" style="margin-top:8px"><b>What the backtest said</b> (${shortDate(E.from)} – ${shortDate(E.to)}, every first dip into the 9/21 EMAs, traded exactly like this card, 20-session hold):
+      dips after an RS high made <b>${Rv(g.R)}</b> a trade (n ${g.n}, ${P(g.win)} winners, ${P(g.stop)} stopped out) vs <b>${Rv(c0.R)}</b> for equally strong stocks without a recent RS high (n ${c0.n}) and ${Rv((G.all || {}).R)} for any uptrend dip.
+      Day by day the RS-high dips were ${Rv(ed.edge)} better (t ${ed.t ?? "–"}, first half ${Rv(ed.h1)}, second half ${Rv(ed.h2)}), but with <b>your exit</b> (sell the first close under the 10 EMA) the edge was ${Rv(ek.edge)} (t ${ek.t ?? "–"}).
+      RS-leads-price names: ${Rv(ah.R)} (n ${ah.n}).
+      <b>Read:</b> ${E.verdict === "proven" ? "the RS high adds a tested edge to the dip." : "the RS high makes the dip a little less bad on a longer hold, not a money-maker on its own in this sample. Use it as a <b>watchlist of the strongest names to buy on weakness</b>, and let the group (Theme lifecycle, ★ leading group) and the market (post-thrust) decide when to act."}
+      <details class="kqsec" style="margin-top:6px"><summary><b>The full table</b></summary>
+      <div class="scroll"><table class="grid"><thead><tr><th class="l">Group</th><th>Trades</th><th>Avg R<small>20 sessions, capped 10R</small></th><th>Your exit<small>close under 10 EMA</small></th><th>Winners</th><th>Stopped</th><th>vs SPY<small>median</small></th><th>1st half</th><th>2nd half</th></tr></thead><tbody>
+      ${[["RS high in the last 25 sessions", g], ["· RS led price (price 3%+ under its high)", ah], ["· RS high with price at its high", G.rs_atprice || {}], ["Strong stocks, no RS high in 25 sessions", c0], ["Every uptrend dip", G.all || {}],
+         ...(E.buckets || []).map(b => ["RS high: " + b.label, b])].map(([l, o]) => `<tr><td class="l">${esc(l)}</td><td class="num">${o.n ?? "–"}</td><td class="num"><b>${Rv(o.R)}</b></td><td class="num">${Rv(o.Rk)}</td><td class="num">${P(o.win)}</td><td class="num">${P(o.stop)}</td><td class="num">${o.xs_med == null ? "–" : (o.xs_med * 100).toFixed(1) + "%"}</td><td class="num">${Rv(o.h1)}</td><td class="num">${Rv(o.h2)}</td></tr>`).join("")}
+      ${Object.entries(E.market || {}).map(([k, m]) => `<tr><td class="l">${esc(k)}: RS high / strong, no RS high</td><td class="num">${m.rs.n} / ${m.strong_no.n}</td><td class="num"><b>${Rv(m.rs.R)}</b> / ${Rv(m.strong_no.R)}</td><td class="num">${Rv(m.rs.Rk)} / ${Rv(m.strong_no.Rk)}</td><td class="num">${P(m.rs.win)} / ${P(m.strong_no.win)}</td><td class="num">–</td><td class="num">–</td><td class="num">${Rv(m.rs.h1)}</td><td class="num">${Rv(m.rs.h2)}</td></tr>`).join("")}
+      </tbody></table></div>
+      ${(E.recent || []).length ? `<div class="meta" style="margin-top:6px">Last ${E.recent.length} RS-high dip trades (newest first): ${E.recent.slice(0, 25).map(r => `${esc(r.t)} ${shortDate(r.entry_date)} <b class="${r.R > 0 ? "up" : "dn"}">${Rv(r.R)}</b>`).join(" · ")}</div>` : ""}
+      <div class="meta" style="margin-top:4px">Only about a year can be tested (an RS high needs a year of history first, and the free data plan reaches ~2 years). Re-tested every build.</div></details></div>` : ""}
+    <div class="filters" style="margin:8px 0 4px"></div><div class="rspbody"></div></section>`);
+  card.querySelector(".filters").append(chips("Show", Object.entries(F).map(([k, [l]]) => [k, `${l} (${cnt(k)})`]), U, "f", () => { lsSet("rspF", U.f); draw(); }));
+  const body = card.querySelector(".rspbody");
+  const LOC = { reclaim21: "Reclaimed the 21", reclaim9: "Reclaimed the 9", on21: "On the 21 EMA", on9: "On the 9 EMA", between: "Between the 9 and 21", under21: "Under the 21", above: "Over the 9" };
+  const ST = { over: ["Over the trigger", "ppull"], dip: ["In the dip", "ppull"], near: ["Near the EMAs", ""], wait: ["Waiting for weakness", ""] };
+  let shown = [];
+  function draw() {
+    const all = rows0.filter(F[U.f][1]);
+    shown = U.more ? all : all.slice(0, 30);
+    body.innerHTML = !shown.length ? `<div class="meta" style="padding:10px 0">None right now${U.f === "dip" ? ": no RS leader is in its 9/21 EMAs. Check “Near the EMAs”." : "."}</div>`
+      : `<div class="scroll"><table class="grid"><thead><tr><th class="l">Ticker</th><th class="l">RS high</th><th>RS</th><th class="l">State</th><th>Last</th><th>Trigger<small>dip-day high</small></th><th>Stop<small>dip-day low, ≤ 1 ADR</small></th><th>Risk</th><th>vs 9 EMA<small>ADRs</small></th><th>ADR %</th><th>Off high</th><th>$ vol<small>20d, $M</small></th></tr></thead><tbody>
+      ${shown.map(r => { const s = ST[r.st] || ["–", ""];
+        return `<tr><td class="l"><a href="#" class="tkl" data-t="${esc(r.t)}"><b>${esc(r.t)}</b></a><small class="meta" style="display:block">${esc(r.name)}${r.sub ? " · " + esc(r.sub) : ""}</small></td>
+        <td class="l" data-v="${r.since}">${r.today ? "<b>★ today</b>" : r.since + " session" + (r.since === 1 ? "" : "s") + " ago"}${r.ahead ? ' <span class="tg ppull" title="RS line hit its high while the price was still 3%+ under its own 52-week high">RS leads</span>' : ""}</td>
+        <td class="num">${r.rsr ?? (r.r63 != null ? "≈" + Math.round(r.r63 * 99) : "–")}</td>
+        <td class="l"><span class="tg ${s[1]}">${s[0]}</span>${r.loc ? `<small class="meta" style="display:block">${LOC[r.loc] || ""}</small>` : ""}</td>
+        <td class="num">${fmt(r.p, 2)}${r.chg != null ? `<small style="display:block" class="${r.chg > 0 ? "up" : "dn"}">${(r.chg > 0 ? "+" : "") + (r.chg * 100).toFixed(2)}%</small>` : ""}</td>
+        <td class="num">${fmt(r.trig, 2)}</td><td class="num">${fmt(r.stop, 2)}</td><td class="num">${r.trig && r.stop ? ((1 - r.stop / r.trig) * 100).toFixed(1) + "%" : "–"}</td>
+        <td class="num">${r.d9v == null ? "–" : (r.d9v > 0 ? "+" : "") + Number(r.d9v).toFixed(1)}</td><td class="num">${r.adr == null ? "–" : (r.adr * 100).toFixed(1)}</td>
+        <td class="num">${r.off == null ? "–" : (r.off * 100).toFixed(1) + "%"}</td><td class="num">${r.dvol ?? "–"}</td></tr>`; }).join("")}</tbody></table></div>${all.length > 30 ? `<button class="xopen rspmore" style="margin-top:8px">${U.more ? "Show the top 30" : `Show all ${all.length}`}</button>` : ""}`;
+    const mb = body.querySelector(".rspmore"); if (mb) mb.addEventListener("click", () => { U.more = !U.more; draw(); });
+  }
+  draw();
+  card.querySelector(".rspdl").addEventListener("click", () => tsDownload("rs-leaders-pullback", [{ name: "RS leaders - " + F[U.f][0], ticks: shown.map(r => r.t) }]));
+  return card;
+}
+
 function dipCard(T, where) {
   const X = T && T.dips;
   if (!X || !(X.rows || []).length) return $('<div></div>');
@@ -5906,6 +5973,7 @@ function tickerFacts(t) {
   (((T.launch || {}).rows) || []).filter(r => r.t === t).forEach(r => out.push(`<b>Launch list</b> grade ${esc(r.grade)} · ${esc(r.stage)}`));
   (((T.polished || {}).nuzzle) || []).filter(r => r.t === t).forEach(r => out.push(`<b>EMA pullback</b> (leader) · ${esc(r.state)}`));
   (((T.polished || {}).flags) || []).filter(r => r.t === t).forEach(r => out.push(`<b>High tight flag</b> · pivot ${$f(r.pivot)}, stop ${$f(r.stop)}`));
+  (((T.rspull || {}).rows) || []).filter(r => r.t === t).forEach(r => out.push(`<b>RS leader</b> · RS line high ${r.today ? "today" : r.since + " sessions ago"}${r.ahead ? " (RS led price)" : ""} · ${r.state === "dip" ? "in the 9/21 dip" : r.state === "near" ? "near the EMAs" : "waiting for weakness"}`));
   (((T.hve || {}).rows) || []).filter(r => r.t === t).forEach(r => out.push(`<b>Record volume</b> (${r.chg > 0 ? "up day: a warning, these lagged SPY" : "down day"})`));
   return { S, plan: out };
 }

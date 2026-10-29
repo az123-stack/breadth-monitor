@@ -1892,6 +1892,29 @@ def test_value_chain():
     return f"{len(X['stocks'])} stocks, hot stage first, spots ok"
 
 
+
+def test_rs_pullback():
+    """RS leaders pulling back: RS line (close / SPY) 1-year high, then the first dip into the 9/21 ribbon; live rows + backtest run."""
+    import numpy as np, pandas as pd
+    from breadth import rspull, config
+    old = config.BENCHMARK; config.BENCHMARK = "SPY"
+    try:
+        d = pd.bdate_range("2024-01-01", periods=420); rng = np.random.default_rng(3); rows = []
+        for t, drift in [("SPY", .0004), ("LEAD", .003), ("LAG", -.0005)]:
+            c = 100 * np.exp(np.cumsum(drift + rng.normal(0, .015, len(d))))
+            for i, x in enumerate(d):
+                rows.append(dict(date=x, ticker=t, o=c[i] * .998, h=c[i] * 1.02, l=c[i] * .98, c=c[i], v=5e6))
+        A = pd.DataFrame(rows)
+        F = rspull.frames(A)
+        assert bool(F["rs_hi"]["LEAD"].iloc[300:].any()) and int(F["since"]["LEAD"].iloc[-1]) >= 0
+        X = rspull.build(A, None, None)
+        assert X["date"] == d[-1].strftime("%Y-%m-%d") and all(r["t"] != "SPY" for r in X["rows"])
+        for r in X["rows"]:
+            assert r["since"] <= rspull.CFG["live_recent"] and r["state"] in ("dip", "near", "wait") and r["adr"] > 0
+    finally:
+        config.BENCHMARK = old
+    return f"{len(X['rows'])} live rows"
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

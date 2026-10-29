@@ -293,6 +293,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["lifecycle"] = lifecycle.build(adjusted, theme_data, history, ledger=True)
         except Exception as e:  # optional panel; never block the page
             log.exception("theme lifecycle failed: %s", e)
+        try:   # RS leaders pulling back: RS line at a 1-year high, then the first dip into the 9/21 EMAs (Adam, Oct 29 2026; info only)
+            from . import rspull
+            theme_data["rspull"] = rspull.build(adjusted, theme_data, history)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("RS pullback list failed: %s", e)
         try:   # Biotech tab: the drug value chain, price + dollar flow per stage (Adam, Oct 29 2026; info only)
             from . import valuechain
             theme_data["valuechain"] = valuechain.build(adjusted, theme_data)

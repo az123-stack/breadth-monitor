@@ -564,6 +564,15 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   and ≤ 0.5 ADR above) > on21 / on9 (within 0.3 ADR) > under21 / between (9–21) / above ("Over the 9 · x ADR"). `precise` = reclaim / on /
   between. Zone rows that aren't precise read "Bounced off the EMAs"; precise rows sort first; checklist chip "On / reclaiming the EMA
   now". Alerts: zone events fire only when precise (plus every "over"); ntfy title says where ("reclaimed the 9"). Untested as an edge.
+- `rspull.py` **RS leaders pulling back** (Oct 29, 2026; Adam: a trader "finds tickers making new RS highs and waits for weakness"; card
+  R-2026-10-29-rs-high-pullbacks, layer `rspull`, info) → `DATA.themes.rspull` (~50 s per build), `rsPullCard` on the Setups tab (part 2, after
+  Dip buys) + drawer line + header ⬇ Trade Setups section. RS line = close ÷ SPY at a 252-session high; live rows = liquid uptrend ($5+, $20M+/day,
+  21 EMA > rising 50 EMA) with an RS high within 30 sessions → state dip (9/21 ribbon touch in 3 sessions, lifecycle rule) / near / wait, same
+  fields as lifecycle.live so the page reuses `lineupState`; `ahead` = RS high while price 3%+ under its 52-wk high. `study` re-run each
+  build: first dips, buy the dip-day-high break within 3 sessions, stop dip-day low ≤ 1 ADR, 20 sessions (R capped 10) + Adam's exit (first
+  close under the 10 EMA). Oct 29 (Nov 2025–Sep 2026): RS-high dips −0.03R (n 1,764) vs equally strong without an RS high −0.06R (edge
+  +0.26R, t 2.03, halves +0.45/+0.14) but ≈ 0 with Adam's exit; RS-leads +0.13R (n 270). Verdict "proven" also needs own R > 0 and a positive
+  Adam-exit edge → currently "helps" (Unproven badge). Test `test_rs_pullback`.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

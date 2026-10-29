@@ -171,7 +171,7 @@
    "evidence": [
     "R-2026-10-15-pick-context"
    ],
-   "notes": " · Oct 27 2026: retired with the old Top 2 swing picks (Adam: headline picks = Launch picks + Lined-up buys); still logged quietly. It now only re-ranks the retired Top 2 list, which no longer shows on the page, so it no longer affects any headline pick."
+   "notes": " \u00b7 Oct 27 2026: retired with the old Top 2 swing picks (Adam: headline picks = Launch picks + Lined-up buys); still logged quietly. It now only re-ranks the retired Top 2 list, which no longer shows on the page, so it no longer affects any headline pick."
   },
   {
    "id": "rs_rating",
@@ -279,11 +279,11 @@
    "kind": "agent",
    "owner": "macro brief agent",
    "status": "info",
-   "where": "agent 7:02 AM ET → docs/agent/macro_brief.json → Read-out 'Macro & the week ahead' card (macroBriefCard); also still read by decision.py (quiet log)",
+   "where": "agent 7:02 AM ET \u2192 docs/agent/macro_brief.json \u2192 Read-out 'Macro & the week ahead' card (macroBriefCard); also still read by decision.py (quiet log)",
    "what": "rates, Fed, oil, geopolitics, event risk; forward-logged",
    "affects_picks": false,
    "evidence": [],
-   "notes": " · Oct 27 2026: kept (Adam: important); shown as the 'Macro & the week ahead' card on the Read-out since the Decision Cards were retired."
+   "notes": " \u00b7 Oct 27 2026: kept (Adam: important); shown as the 'Macro & the week ahead' card on the Read-out since the Decision Cards were retired."
   },
   {
    "id": "position_exits",
@@ -347,7 +347,7 @@
    "kind": "code",
    "owner": "daily update",
    "status": "info",
-   "where": "breadth/sow.py → DATA.themes.sow, Trade Setups tab sowCard",
+   "where": "breadth/sow.py \u2192 DATA.themes.sow, Trade Setups tab sowCard",
    "what": "weekly stage-1 base + 9/21 WEMA re-anchor; breakout / nuzzle / pop states for multi-month holds",
    "affects_picks": false,
    "evidence": [
@@ -361,7 +361,7 @@
    "kind": "code",
    "owner": "daily update",
    "status": "info",
-   "where": "breadth/leadership.py → DATA.themes.leadership, Breadth tab healthCard",
+   "where": "breadth/leadership.py \u2192 DATA.themes.leadership, Breadth tab healthCard",
    "what": "leaders' breakouts/breakdowns, 50-day recovery check, universe base breakouts vs breakdowns and follow-through",
    "affects_picks": false,
    "evidence": [
@@ -375,7 +375,7 @@
    "kind": "code",
    "owner": "daily update",
    "status": "info",
-   "where": "breadth/thetrade.py → DATA.themes.thetrade, Read-out tradeCard + story fact sheet",
+   "where": "breadth/thetrade.py \u2192 DATA.themes.thetrade, Read-out tradeCard + story fact sheet",
    "what": "names the top-fifth vs bottom-fifth sub-theme rotation (20 sessions), its state vs the ratio's 20-day avg, and whether the winners hold up on the losers' best days (real buying) or give back (seesaw)",
    "affects_picks": false,
    "evidence": [
@@ -387,9 +387,9 @@
    "id": "trade_stories",
    "name": "Trade Stories (running news/earnings narratives with a price check)",
    "kind": "agent",
-   "owner": "Market Monitor story · after the close",
+   "owner": "Market Monitor story \u00b7 after the close",
    "status": "info",
-   "where": "breadth/stories.py + stories_guide.md → docs/stories.json, Trade Stories tab (renderStories)",
+   "where": "breadth/stories.py + stories_guide.md \u2192 docs/stories.json, Trade Stories tab (renderStories)",
    "what": "max 6 open storylines: thesis, sourced timeline, favoured/hurt sub-themes, catalysts, how to trade; code price check + 5-session scorecard per story-day",
    "affects_picks": false,
    "evidence": [
@@ -403,29 +403,29 @@
    "kind": "code",
    "owner": "daily update",
    "status": "info",
-   "where": "breadth/stairs.py → DATA.themes.stairs, Rotation tab stairsCard",
+   "where": "breadth/stairs.py \u2192 DATA.themes.stairs, Rotation tab stairsCard",
    "what": "per stock: nuzzled / lifting / step break vs the 9/21 EMAs and the last 15-session step high; per sub-theme: setting up together (50%+ nuzzled) / stepping up together (40%+ lifting or breaking after nuzzling), 15-session strip",
    "affects_picks": false,
    "evidence": [
     "R-2026-10-24-stair-steps",
     "R-2026-10-24-box-leaders"
    ],
-   "notes": "alone ≈ average group; inside top-30% (60d) groups setting up +2.2% vs other leaders over 20 sessions (t 1.9, both halves), stepping up +1.7% (t 2.0); pure step breaks lagged"
+   "notes": "alone \u2248 average group; inside top-30% (60d) groups setting up +2.2% vs other leaders over 20 sessions (t 1.9, both halves), stepping up +1.7% (t 2.0); pure step breaks lagged"
   },
   {
    "id": "box_favorites",
-   "name": "Box trades: ★ My favorites (leading-group box longs)",
+   "name": "Box trades: \u2605 My favorites (leading-group box longs)",
    "kind": "code",
    "owner": "daily update",
    "status": "live",
-   "where": "template.html isBoxFav/boxFavRank → Box trades card (Trade Setups tab), from DATA.themes.boxes + DATA.themes.stairs",
-   "what": "long box trades actionable now (retest go/at, spring failed), grade A–B, in a ★ leading group (top 30% on 60-day), reward:risk ≥ 1.5 from the last close; top 5",
+   "where": "template.html isBoxFav/boxFavRank \u2192 Box trades card (Trade Setups tab), from DATA.themes.boxes + DATA.themes.stairs",
+   "what": "long box trades actionable now (retest go/at, spring failed), grade A\u2013B, in a \u2605 leading group (top 30% on 60-day), reward:risk \u2265 1.5 from the last close; top 5",
    "affects_picks": false,
    "evidence": [
     "R-2026-10-24-box-leaders",
     "R-2026-10-24-stair-steps"
    ],
-   "notes": "★ leading group on retest bounces +0.23R vs −0.02R (t 3.2, both halves) — passes the proven rule but NOT wired into box grades/playbook (needs Adam's approval) · Oct 27 2026: Adam approved; '★ Leading group' is a box-grade condition (expected R) and counts as group confluence for the Box Retest / Box Spring playbook setups."
+   "notes": "\u2605 leading group on retest bounces +0.23R vs \u22120.02R (t 3.2, both halves) \u2014 passes the proven rule but NOT wired into box grades/playbook (needs Adam's approval) \u00b7 Oct 27 2026: Adam approved; '\u2605 Leading group' is a box-grade condition (expected R) and counts as group confluence for the Box Retest / Box Spring playbook setups."
   },
   {
    "id": "dips",
@@ -433,7 +433,7 @@
    "kind": "code",
    "owner": "daily update + browser (live)",
    "status": "info",
-   "where": "breadth/dips.py → DATA.themes.dips → dipCard at the top of Trade Setups and on the Intraday tab (live from the Google Sheet price + column L low)",
+   "where": "breadth/dips.py \u2192 DATA.themes.dips \u2192 dipCard at the top of Trade Setups and on the Intraday tab (live from the Google Sheet price + column L low)",
    "what": "Box longs (retest_long, trap_long failed) + every SoW row; flags under 9/21, wick under and close back above, reclaim within 3 sessions; live EMA = last EMA + alpha x (price - last EMA)",
    "affects_picks": false,
    "evidence": [
@@ -447,7 +447,7 @@
    "kind": "code",
    "owner": "daily update",
    "status": "live",
-   "where": "breadth/launch.py → DATA.themes.launch (picks, pick_bt, tracker) → Launch list tab + top of Trade Setups + Read-out plan; data/launch_ledger.csv",
+   "where": "breadth/launch.py \u2192 DATA.themes.launch (picks, pick_bt, tracker) \u2192 Launch list tab + top of Trade Setups + Read-out plan; data/launch_ledger.csv",
    "what": "Fresh base breakouts (20+ of 40 weeks under the 50 WEMA, now 2-8 weekly closes over it, 9 > rising 21, within 3 weekly ATRs) + every SoW row; points: sub-theme top third on 13-wk return, RS 70+, RS line +15% in 13 wks, 6%+ gap day in 13 wks; grade A = group + 2-3 others, B = group + 0-1, C = no group",
    "affects_picks": true,
    "evidence": [
@@ -461,7 +461,7 @@
    "kind": "code",
    "owner": "daily update",
    "status": "info",
-   "where": "breadth/polished.py → DATA.themes.polished → Best Setups tab (renderBest)",
+   "where": "breadth/polished.py \u2192 DATA.themes.polished \u2192 Best Setups tab (renderBest)",
    "what": "Leading group = sub-theme top third on 13-wk return; nuzzle = leader (9+ wks over 50 WEMA) touching the daily 9/21 ribbon; flag = 30%+ leg, tight flag within 1 ADR of the high",
    "affects_picks": false,
    "evidence": [
@@ -475,13 +475,13 @@
    "kind": "code",
    "owner": "daily update",
    "status": "live",
-   "where": "breadth/lifecycle.py → DATA.themes.lifecycle → Best Setups tab (lifecycleCard) + Read-out group signals",
+   "where": "breadth/lifecycle.py \u2192 DATA.themes.lifecycle \u2192 Best Setups tab (lifecycleCard) + Read-out group signals",
    "what": "Stages forgotten / first push / ignition / quiet build / blossom / fading from 60-day rank, 60-day high, ignition, money-flow tiers; WATCH = push or ignition with leaders; BUY = build or blossom + leaders + confirmed/steady flow, breadth not weak (full size when the 10-day ratio hit 1.5 in 15 sessions); tickers = RS 70+ members at a pullback / flag / curl",
    "affects_picks": false,
    "evidence": [
     "R-2026-10-27-theme-lifecycle"
    ],
-   "notes": "BUY groups +2.7% vs avg group over 20 sessions (t 3.5, halves +2.8/+2.9), 40d +3.9%; same setup in weak breadth ~0 (t -0.5); WATCH ~0 but 53% turn BUY within 30 sessions; pullbacks in BUY groups +0.74R vs +0.27R elsewhere (edge +0.31R, t 2.2, both halves); recomputed each build · Oct 27 2026: Lined-up buys made a headline list (Adam), on the Best Setups tab; the catalyst agent researches them first."
+   "notes": "BUY groups +2.7% vs avg group over 20 sessions (t 3.5, halves +2.8/+2.9), 40d +3.9%; same setup in weak breadth ~0 (t -0.5); WATCH ~0 but 53% turn BUY within 30 sessions; pullbacks in BUY groups +0.74R vs +0.27R elsewhere (edge +0.31R, t 2.2, both halves); recomputed each build \u00b7 Oct 27 2026: Lined-up buys made a headline list (Adam), on the Best Setups tab; the catalyst agent researches them first."
   },
   {
    "id": "earnings_clusters",
@@ -489,13 +489,13 @@
    "kind": "code",
    "owner": "daily update",
    "status": "info",
-   "where": "breadth/earnings.py → DATA.themes.earnings → Trade Stories tab (earningsCard) + story fact sheet EARNINGS CLUSTERS → chapter 'What earnings said'",
-   "what": "Earnings-style day = gap ≥ max(3%, 1 ADR) on 2.5x 50-day volume; cluster = 2+ in a sub-theme within 5 sessions, 2/3 same way; read-through = members that didn't report; writer confirms what the reports said",
+   "where": "breadth/earnings.py \u2192 DATA.themes.earnings \u2192 Trade Stories tab (earningsCard) + story fact sheet EARNINGS CLUSTERS \u2192 chapter 'What earnings said'",
+   "what": "Earnings-style day = gap \u2265 max(3%, 1 ADR) on 2.5x 50-day volume; cluster = 2+ in a sub-theme within 5 sessions, 2/3 same way; read-through = members that didn't report; writer confirms what the reports said",
    "affects_picks": false,
    "evidence": [
     "R-2026-10-27-earnings-clusters"
    ],
-   "notes": "UP cluster → not-yet-reported members +1.9% vs avg group next 20 sessions (t 1.93, halves +1.9/+1.9); DOWN → ~0; recomputed each build"
+   "notes": "UP cluster \u2192 not-yet-reported members +1.9% vs avg group next 20 sessions (t 1.93, halves +1.9/+1.9); DOWN \u2192 ~0; recomputed each build"
   },
   {
    "id": "late_mover",
@@ -503,13 +503,13 @@
    "kind": "code",
    "owner": "page (live, Google sheet)",
    "status": "info",
-   "where": "template.html lateLeader → top of the Intraday tab's Second-half movers card",
-   "what": "At 12:00 ET: RS 80+, sub-theme top third on 13 weeks, up 1%+ since 10:00 and beating SPY, $20M+/day → highest RS",
+   "where": "template.html lateLeader \u2192 top of the Intraday tab's Second-half movers card",
+   "what": "At 12:00 ET: RS 80+, sub-theme top third on 13 weeks, up 1%+ since 10:00 and beating SPY, $20M+/day \u2192 highest RS",
    "affects_picks": false,
    "evidence": [
     "R-2026-10-27-late-mover"
    ],
-   "notes": "15-min bars Oct 2024–Oct 2026 (~700 stocks, 431 days): 5-day +0.21R, +0.15R vs avg stock (t 1.3, halves +0.15/+0.15); same-day/next-day ≈ 0R; biggest-mover ranking worse"
+   "notes": "15-min bars Oct 2024\u2013Oct 2026 (~700 stocks, 431 days): 5-day +0.21R, +0.15R vs avg stock (t 1.3, halves +0.15/+0.15); same-day/next-day \u2248 0R; biggest-mover ranking worse"
   },
   {
    "id": "runners",
@@ -536,6 +536,20 @@
    "affects_picks": false,
    "evidence": [],
    "notes": "Untested as a signal: descriptive. Test idea: does the top-ranked stage beat the chain over the next 20 sessions?"
+  },
+  {
+   "id": "rspull",
+   "name": "RS leaders pulling back (Setups tab)",
+   "kind": "code",
+   "owner": "daily update + page (live)",
+   "status": "info",
+   "where": "breadth/rspull.py, template.html rsPullCard",
+   "what": "RS line (close / SPY) 1-year high in the last 30 sessions + first dip into the daily 9/21 EMAs; buy the dip-day high break, stop the dip-day low",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-29-rs-high-pullbacks"
+   ],
+   "notes": "Backtest Nov 2025-Sep 2026: -0.03R vs -0.06R for equally strong stocks without an RS high (edge +0.26R, t 2.03, 20-session hold) but ~0 with Adam's 10-EMA exit. Re-test weekly RS highs with longer history."
   }
  ]
 }
