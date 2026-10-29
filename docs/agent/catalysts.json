@@ -1,59 +1,57 @@
 {
- "for_date": "2026-10-27",
- "written": "2026-10-28T11:33Z",
+ "for_date": "2026-10-28",
+ "written": "2026-10-29T11:24Z",
  "stocks": {
   "BMNR": {
-   "why": "No clear catalyst found in the snippets; recent items are Ethereum-treasury holdings updates, an NYSE uplisting notice and an SEC FWP filing (possible capital raising).",
+   "why": "No clear catalyst found; searches only showed older ETH-holdings and uplisting press items. Crypto-treasury stock, trades with ETH.",
    "direction": "none",
-   "quality": "unknown",
+   "quality": "none",
    "depth": "full",
    "earnings_date": null,
-   "red_flags": [
-    "SEC form FWP filed (possible equity offering)"
-   ],
+   "red_flags": [],
    "sources": [
-    "https://qnow.quantisnow.com/insight/sec-form-fwp-filed-by-bitmine-immersion-technologies-inc-6590386",
     "https://quantisnow.com/insight/bitmine-immersion-bmnr-announces-eth-holdings-reach-397-million-tokens-6315408"
    ]
   },
-  "SNPS": {
-   "why": "No clear catalyst found; next report is only a projected date, not company-confirmed.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": "2026-12-09",
-   "red_flags": [],
-   "sources": [
-    "https://therighttrader.com/earnings-calendar/snps"
-   ]
-  },
   "CTSH": {
-   "why": "No clear catalyst found; the stock reports earnings tomorrow (Oct 29, before the open), a binary event inside the swing window.",
-   "direction": "none",
-   "quality": "none",
+   "why": "Reports Q3 earnings today (Oct 29) before the open, expected move about \u00b110%; stock is up ~32% since its July beat-and-jump, so event risk is high. No other fresh catalyst confirmed.",
+   "direction": "mixed",
+   "quality": "real",
    "depth": "full",
    "earnings_date": "2026-10-29",
    "red_flags": [
-    "Earnings Oct 29 before open"
+    "earnings today before open; run-up into the print"
    ],
    "sources": [
-    "https://therighttrader.com/earnings-calendar/ctsh"
+    "https://unusualwhales.com/stock/CTSH/earnings"
+   ]
+  },
+  "ZS": {
+   "why": "Last report Sep 3 beat on EPS and revenue (rev +24.9%) with Q1 guide above consensus; no fresh news found since. Next report is only a projected date.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.marketbeat.com/stocks/NASDAQ/ZS/earnings/",
+    "https://therighttrader.com/earnings-calendar/zs"
    ]
   },
   "OKTA": {
-   "why": "No clear catalyst found; last report was Aug 26 and next date is not confirmed (one site estimates Nov 25).",
+   "why": "No fresh hard catalyst found; last reported Aug 26. Next report listed as Dec 2 but one page calls it an estimate, so not confirmed.",
    "direction": "none",
    "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.marketscreener.com/quote/stock/OKTA-INC-34515216/calendar/",
-    "https://beta.earningswhispers.com/go/w/OKTA"
+    "https://www.tipranks.com/stocks/ch:0ok/earnings",
+    "https://www.marketscreener.com/quote/stock/OKTA-INC-34515216/calendar/"
    ]
   },
   "RBRK": {
-   "why": "No clear catalyst found; next report estimated Dec 3 after close (not firmly confirmed).",
+   "why": "No clear catalyst found; next report listed Dec 3 after close, partly flagged as an estimate.",
    "direction": "none",
    "quality": "none",
    "depth": "full",
@@ -63,40 +61,62 @@
     "https://www.tipranks.com/stocks/rbrk/earnings"
    ]
   },
-  "QLYS": {
-   "why": "No clear catalyst found; last report in early Aug was strong with raised 2026 outlook (older news); next report expected Nov 3 (unconfirmed).",
+  "CRL": {
+   "why": "Last report Aug 5 beat (EPS 3.02 vs 2.72) and the stock jumped 11%; no fresher news confirmed. Next report Nov 4 before the open.",
    "direction": "positive",
    "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.earningswhispers.com/stocks/qlys",
-    "https://www.marketbeat.com/instant-alerts/qualys-nasdaqqlys-hits-new-12-month-high-following-strong-earnings-2026-08-05/"
-   ]
-  },
-  "TENB": {
-   "why": "Reports Q3 results tonight Oct 28 after the close; stock is up ~75% since its July beat-and-raise, so the report is a binary event.",
-   "direction": "mixed",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": "2026-10-28",
-   "red_flags": [
-    "Earnings Oct 28 after close"
-   ],
-   "sources": [
-    "https://www.earningswhispers.com/stocks/tenb"
-   ]
-  },
-  "RPD": {
-   "why": "No clear catalyst found; next report Nov 4 after close.",
-   "direction": "none",
-   "quality": "none",
    "depth": "full",
    "earnings_date": "2026-11-04",
    "red_flags": [],
    "sources": [
-    "https://www.earningswhispers.com/stocks/RPD"
+    "https://chartrow.com/quote/crl/earnings"
+   ]
+  },
+  "FTRE": {
+   "why": "Reports Q3 earnings today (Oct 29) before the open, expected move about \u00b118%; stock is up ~25% since the July report. High event risk.",
+   "direction": "mixed",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": "2026-10-29",
+   "red_flags": [
+    "earnings today before open; run-up into the print"
+   ],
+   "sources": [
+    "https://unusualwhales.com/stock/FTRE/earnings"
+   ]
+  },
+  "QLYS": {
+   "why": "Stock rose 13.8% after the Aug 4 report and is up ~39% since; no fresh catalyst confirmed. Next report Nov 9 after close.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": "2026-11-09",
+   "red_flags": [],
+   "sources": [
+    "https://unusualwhales.com/stock/QLYS/earnings"
+   ]
+  },
+  "CRWD": {
+   "why": "No clear catalyst found; next report projected Dec 1 (unconfirmed).",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://therighttrader.com/earnings-calendar/crwd"
+   ]
+  },
+  "TENB": {
+   "why": "No clear catalyst found; a source suggests a Q3 report around Oct 28 after close but it was not clearly confirmed, so the date is left blank.",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://therighttrader.com/earnings-calendar/tenb",
+    "https://finviz.com/news/402471/tenable-to-announce-fiscal-third-quarter-2026-earnings-results"
    ]
   }
  }
