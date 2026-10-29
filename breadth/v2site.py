@@ -492,10 +492,12 @@ def slim(D):
     put("stories", _stories)
     put("lab", _lab, D, T)
     put("story", _story)
+    if T.get("posrefs"):
+        out["prefs"] = T["posrefs"]
     try:
         I = D.get("intraday") or {}
         out["live"] = {"url": D.get("live_url"), "pulse": I.get("pulse") or {}, "etfs": I.get("sector_etfs") or {},
-                       "vp": I.get("volume_profile") or []}
+                       "vp": I.get("volume_profile") or [], "pos_url": config.POSITIONS_CSV_URL, "pos_edit": config.POSITIONS_EDIT_URL}
     except Exception:
         pass
     try:

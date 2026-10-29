@@ -1785,6 +1785,21 @@ def test_v2_page_builds():
     return f"{len(h) // 1024} KB page"
 
 
+
+def test_position_refs():
+    """My positions: EOD references (close, 10/20 EMA, ADR, high/low) for liquid tickers; illiquid / cheap names left out."""
+    import pandas as pd
+    from breadth import positions
+    d = pd.bdate_range("2026-01-01", periods=60); rows = []
+    for t, b, v in [("AAA", 50, 1e6), ("CHEAP", 1, 1e6), ("THIN", 50, 100)]:
+        for i, x in enumerate(d):
+            c = b * (1 + .01 * i); rows.append(dict(date=x, ticker=t, c=c, h=c * 1.02, l=c * .98, v=v))
+    R = positions.refs(pd.DataFrame(rows))
+    assert set(R["rows"]) == {"AAA"} and R["date"] == d[-1].strftime("%Y-%m-%d") and len(R["dates"]) == 40
+    c, e10, e20, adr, h, l = R["rows"]["AAA"]
+    assert c > e10 > e20 and abs(adr - 4.08) < .01 and h > c > l
+    return "ok"
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

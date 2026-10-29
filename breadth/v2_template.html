@@ -450,6 +450,7 @@ function pageToday(el){
       ${post ? `<div class="meter" aria-hidden="true">${Array.from({length:WIN},(_,i)=>`<b class="${i<pb.since?"on":""}"></b>`).join("")}</div>
       <div class="meter-l"><span>Thrust</span><span>${WIN-pb.since} sessions left</span><span>Window ends</span></div>` : ""}</div>
     <div class="play">${["Focus","Selective","Avoid"].map(v=>`<div><h4>${v}</h4><div class="plist">${pb.rows.filter(r=>r.verdict===v).map(r=>`<span class="${vb(v)}">${esc(r.name)} <span class="num" style="opacity:.8">${r.r>0?"+":""}${r.r.toFixed(2)}R</span></span>`).join("")||'<span class="muted">None</span>'}</div></div>`).join("")}</div></div>
+  <div style="margin:14px 0">${posPanel()}</div>
   <div class="today"><div class="stack">
     <div class="panel"><div class="ph"><h3>Your trades today</h3><span class="sub">Launch picks + lined-up buys${liveTxt?` · <b style="color:var(--ink-2)">${liveTxt}</b>`:""}</span><span class="right"><span class="toast" id="tToast"></span><button class="btn" id="tCopy">⬇ TradingView</button></span></div>
       <div class="tw"><table class="sticky1"><thead><tr><th>Ticker</th><th>Why</th><th class="n">Last</th><th class="n">Trigger</th><th class="n">Stop</th><th>Status</th></tr></thead><tbody>
@@ -1405,8 +1406,9 @@ function refreshLive(){
 async function liveTick(force){
   if (LV.busy) return; const c = nyNow();
   const wantSheet = force || (c.wk && c.mins >= -10 && c.mins <= 405), wantPm = force || (c.wk && c.mins >= -330 && c.mins <= 5);
-  if (!wantSheet && !wantPm) return;
-  LV.busy = true; await Promise.all([wantSheet ? fetchSheet() : null, wantPm ? fetchPre() : null]); LV.busy = false; LV.at = new Date();
+  const wantPos = force || (c.wk && c.mins >= -210 && c.mins <= 405);
+  if (!wantSheet && !wantPm && !wantPos) return;
+  LV.busy = true; await Promise.all([wantSheet ? fetchSheet() : null, wantPm ? fetchPre() : null, wantPos ? fetchPos() : null]); LV.busy = false; LV.at = new Date();
   refreshLive();
 }
 setInterval(() => { if (document.visibilityState === "visible") liveTick(false); }, 2*60*1000);
@@ -1484,6 +1486,8 @@ function openTicker(t){
   B.forEach(b => plan.push(`<b>Box ${b.type==="trap_long"?"spring":"retest"}</b> grade ${esc(b.grade||"–")}: ${esc(((BOX_TAG[b.type]||{})[b.tag]||[b.tag])[0])} · line ${f2(b.lvl)}, stop ${f2(b.stop)}, target ${f2(b.target)}${b.rr!=null?` (${b.rr}:1)`:""}`));
   if (LA) plan.push(`<b>Launch list</b> grade ${esc(LA.grade)} · ${esc(LA.stage)}`);
   if (SW) plan.push(`<b>Strength on weakness</b> · ${esc(SW.state)}${SW.prime?" · ⭐ prime positioned":""}`);
+  const MY = (LV.pos||[]).filter(r=>r.t===t).map(posState);
+  MY.forEach(r => plan.unshift(`<b style="color:${POS_C[r.lvl]}">You own it</b>${r.left!=null?` (${r.left} sh)`:""} since ${r.bought?day(r.bought):"–"} at ${f2(r.entry)} · ${pct(r.pnl)} · ${esc(r.checks[0][1])}`));
   if (H) plan.push(`<b>Record volume</b> (warning list): up days on record volume lagged SPY`);
   const tv = S.tv[t] || t;
   $("#drawer").innerHTML = `<div class="dr-h"><div><div class="dr-t">${esc(t)}${s&&s[5]>=90?' <span class="badge v-focus">RS '+s[5]+'</span>':""}</div><div class="muted" style="font-size:13px">${esc(s?s[0]:"")}</div></div><button class="iconbtn" id="drX" aria-label="Close">✕</button></div>
@@ -1521,6 +1525,85 @@ function wireSearch(){
   q.onkeydown = e => { if (e.key==="Enter"){ const v = q.value.trim().toUpperCase(); if (hits.length) go(hits[0]); else if (v) go(["t", v]); } };
   box.onclick = e => { const b = e.target.closest("button"); if (b) go(hits[+b.dataset.i]); };
 }
+/* ---------- My positions: Adam's own trades from the sheet's Positions tab, judged against his exit rules ---------- */
+LV.pos = null; LV.posErr = null;
+function posDate(v){ if (!v) return null; let m = String(v).match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+  m = String(v).match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/); if (m) return `${m[3].length===2?"20"+m[3]:m[3]}-${m[1].padStart(2,"0")}-${m[2].padStart(2,"0")}`; return null; }
+function parsePos(text){
+  let cols = null; const out = [];
+  text.split(/\r?\n/).forEach(line => { if (!line.trim()) return; const f = csvSplit(line);
+    if (!cols){ if ((f[0]||"").toLowerCase()==="ticker") cols = f.map(x=>x.toLowerCase()); return; }
+    const r = {}; cols.forEach((c,i)=>r[c]=f[i]); const t = (r.ticker||"").toUpperCase().replace(/^[A-Z]+:/,"").trim(); if (!t) return;
+    out.push({t, bought:posDate(r.bought), entry:liveNum(r.entry), shares:liveNum(r.shares), stop:liveNum(r.stop), sold:liveNum(r.sold)||0,
+      setup:r.setup||"", notes:r.notes||"", price:liveNum(r.price), prev:liveNum(r.closeyest), low:liveNum(r.low), high:liveNum(r.high)}); });
+  if (!cols) throw new Error("no header row in the Positions tab");
+  return out;
+}
+async function fetchPos(){
+  const u = (S.live||{}).pos_url; if (!u) return;
+  try { const r = await fetch(u+"&cb="+Date.now(), {cache:"no-store"}); if (!r.ok) throw new Error("HTTP "+r.status);
+    const txt = await r.text(); if (/^\s*</.test(txt)) throw new Error("the Positions tab isn't published");
+    LV.pos = parsePos(txt); LV.posErr = null; }
+  catch(e){ LV.posErr = String(e.message||e); }
+}
+/* Adam's rules: stop at the low of the entry day; sell 1/3–1/2 after 3–5 days; trail the 10 EMA (part) and the 20 EMA (rest), on the close */
+function posState(r){
+  const P = S.prefs || {}, R = (P.rows||{})[r.t], open = liveMode()==="live";
+  const Q = sheetQ(r.t) || (liveMode()==="pre" ? pmQ(r.t) : null);
+  let p = r.price || (Q && Q.p) || (R && R[0]) || null;
+  /* the tab's "closeyest" equals our last official close only once a new session has started → today's price is live */
+  const prev = r.prev || (Q && Q.prev);
+  const today = !!(R && p && prev && Math.abs(prev/R[0]-1) < .005 && Math.abs(p/R[0]-1) > 1e-9);
+  if (R && !today && !open) p = p || R[0];
+  const a = R ? R[3]/100 : null;
+  const x10 = R ? (today ? R[1]+(p-R[1])*2/11 : R[1]) : null, x20 = R ? (today ? R[2]+(p-R[2])*2/21 : R[2]) : null;
+  const days = r.bought ? (P.dates||[]).filter(d=>d>r.bought).length + (today && (!P.date || r.bought<=P.date) ? 1 : 0) : null;
+  const risk = r.entry && r.stop && r.stop < r.entry ? r.entry - r.stop : null;
+  const Rm = risk && p ? (p - r.entry)/risk : null, pnl = r.entry && p ? (p/r.entry-1)*100 : null;
+  const left = r.shares != null ? Math.max(r.shares - (r.sold||0), 0) : null, usd = left != null && p && r.entry ? (p - r.entry)*left : null;
+  const chg = prev && p ? (p/prev-1)*100 : null, low = r.low || (Q && Q.low) || null;
+  const C = [], when = open ? "now" : "at the close";
+  if (!p) C.push(["warn","No price for this ticker: check the spelling in the sheet"]);
+  else if (r.stop == null) C.push(["warn","No stop in the sheet: add one (the low of the entry day)"]);
+  else if (p <= r.stop) C.push(["bad",`Stop hit: ${f2(p)} is at or under the ${f2(r.stop)} stop`]);
+  else if (low && low <= r.stop) C.push(["bad",`Traded through the stop today (low ${f2(low)}): check the fill`]);
+  else if (a && (p - r.stop)/(a*p) <= .5) C.push(["warn",`Within half an ADR of the stop (${f2(r.stop)})`]);
+  if (!p) {}
+  else if (x20 && p < x20) C.push(["bad", open ? `Under the 20 EMA now (${f2(x20)}): sell the rest if it closes here` : `Closed under the 20 EMA (${f2(x20)}): sell the rest`]);
+  else if (x10 && p < x10) C.push(["warn", open ? `Under the 10 EMA now (${f2(x10)}): sell part / tighten if it closes here` : `Closed under the 10 EMA (${f2(x10)}): sell part, tighten the stop`]);
+  if (days != null){
+    if (days >= 3 && days <= 5 && !r.sold && pnl > 0) C.push(["info",`Day ${days}: sell 1/3 to 1/2 into strength`]);
+    else if (days > 5 && !r.sold) C.push(["warn",`Day ${days} and no partial taken yet`]);
+  }
+  if (r.sold > 0 && r.stop != null && r.entry && r.stop < r.entry) C.push(["info",`Partial taken: Kristjan moves the stop to break-even (${f2(r.entry)})`]);
+  if (!C.some(c=>c[0]==="bad"||c[0]==="warn")) C.push(["good", days != null && days < 3 ? `Day ${days}: let it work, stop ${r.stop!=null?f2(r.stop):"–"}` : `Holding over the 10 EMA: trail it ${when==="now"?"":"(checked on the close)"}`.trim()]);
+  const rank = {bad:0, warn:1, info:2, good:3};
+  C.sort((x,y)=>rank[x[0]]-rank[y[0]]);
+  return {...r, p, chg, days, Rm, pnl, usd, left, x10, x20, a, today, checks:C, lvl:C[0][0], known:!!R};
+}
+const POS_C = {bad:"var(--dn)", warn:"var(--warn)", info:"var(--accent)", good:"var(--up)"};
+function posPanel(){
+  const edit = (S.live||{}).pos_edit, link = edit ? `<a class="btn" target="_blank" rel="noopener" href="${esc(edit)}">Edit in Google Sheets ↗</a>` : "";
+  const head = sub => `<div class="ph"><h3>My positions</h3><span class="sub">${sub}</span><span class="right">${link}</span></div>`;
+  if (!LV.pos){
+    const how = `<ol class="dr-l" style="padding:4px 14px 14px 32px;margin:0"><li>Tap <b>Edit in Google Sheets</b> and open the <b>Positions</b> tab at the bottom.</li><li>One row per trade: ticker, date bought, entry price, shares, stop (sold = shares you've already sold).</li><li>Leave the grey columns alone: they fill in prices by themselves.</li></ol>`;
+    return `<div class="panel">${head("your trades vs your exit rules")}${LV.posErr ? `<div class="notice" style="margin:10px 14px">Can't read the Positions tab yet (${esc(LV.posErr)}). In the sheet: <b>File → Share → Publish to web</b>, choose <b>Entire document</b>, then <b>Publish</b>.</div>` : `<div class="muted" style="padding:12px 14px">Loading your positions…</div>`}${how}</div>`;
+  }
+  const rows = LV.pos.map(posState).sort((a,b)=>({bad:0,warn:1,info:2,good:3}[a.lvl]-{bad:0,warn:1,info:2,good:3}[b.lvl]));
+  if (!rows.length) return `<div class="panel">${head("no open trades in the sheet")}<div class="muted" style="padding:12px 14px">Add a row to the Positions tab (ticker, date bought, entry, shares, stop) and it shows up here on your phone and computer.</div></div>`;
+  const tot = rows.reduce((s,r)=>s+(r.usd||0),0), alerts = rows.filter(r=>r.lvl==="bad"||r.lvl==="warn").length;
+  return `<div class="panel">${head(`${rows.length} open · ${alerts?`<b style="color:var(--dn)">${alerts} need attention</b>`:"all on plan"}${rows.some(r=>r.usd!=null)?` · open P&L <b class="${tot>=0?"up":"dn"}">${tot>=0?"+":"−"}$${Math.abs(tot).toLocaleString("en-US",{maximumFractionDigits:0})}</b>`:""}`)}
+    <div class="tw"><table class="sticky1"><thead><tr><th>Ticker</th><th class="n">Day</th><th class="n">Entry</th><th class="n">Last</th><th class="n">P&L</th><th class="n">Stop</th><th class="n hide-sm">10 / 20 EMA</th><th>What to do</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td>${tk(r.t)}${r.setup?`<div class="gsub">${esc(r.setup)}</div>`:""}</td>
+      <td class="n">${r.days ?? "–"}</td><td class="n">${f2(r.entry)}${r.left!=null?`<div class="dist">${r.left} sh${r.sold?` (sold ${r.sold})`:""}</div>`:""}</td>
+      <td class="n">${f2(r.p)}${r.chg!=null?`<div class="dist ${r.chg>0?"up":r.chg<0?"dn":""}">${pct(r.chg,2)}</div>`:""}</td>
+      <td class="n"><span class="${r.pnl>0?"up":r.pnl<0?"dn":""}">${pct(r.pnl)}</span>${r.Rm!=null?`<div class="dist">${r.Rm>=0?"+":""}${r.Rm.toFixed(1)}R</div>`:""}</td>
+      <td class="n">${r.stop!=null?f2(r.stop)+(r.p?`<div class="dist">${pct((r.stop/r.p-1)*100)}</div>`:""):"–"}</td>
+      <td class="n hide-sm">${r.x10?f2(r.x10)+" / "+f2(r.x20):'<span class="muted">not in our data</span>'}</td>
+      <td style="white-space:normal;min-width:220px"><span class="status" style="color:${POS_C[r.lvl]}">${esc(r.checks[0][1])}</span>${r.checks.slice(1).map(c=>`<div class="gsub" style="color:${POS_C[c[0]]}">${esc(c[1])}</div>`).join("")}</td></tr>`).join("")}
+    </tbody></table></div><div class="more">Rules: stop = low of the entry day · sell 1/3–1/2 after 3–5 days · trail the 10 EMA (part) and 20 EMA (rest), on the close${liveMode()==="live"?" · EMAs include today's live price":""}</div></div>`;
+}
+
 wireSearch();
 applyLive(); setMode(); liveTick(true);
 

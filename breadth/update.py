@@ -343,6 +343,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["reclass"] = reclass.build(adjusted, set(universe), store.load_subthemes(), store.load_themes(), store.load_names())
         except Exception as e:  # optional panel; never block the page
             log.exception("theme upkeep check failed: %s", e)
+        try:   # My positions: end-of-day EMA / ADR references for every liquid ticker (v2 page judges Adam's exit rules live)
+            from . import positions
+            theme_data["posrefs"] = positions.refs(adjusted)
+        except Exception as e:
+            log.exception("position references failed: %s", e)
         try:
             from . import review
             theme_data["setup_review"] = review.evaluate(theme_data, history)

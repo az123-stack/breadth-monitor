@@ -31,6 +31,9 @@ UNIVERSE_REFRESH_DAYS = 7
 BENCHMARK = "SPY"
 # Published Google Sheet (CSV) with GOOGLEFINANCE prices for the live layer.
 LIVE_CSV_URL = os.environ.get("LIVE_CSV_URL", "https://docs.google.com/spreadsheets/d/e/2PACX-1vTtdx4lANR9e4jocUDpnxs36dGZCVpxMC7NA9rU53hXunXlzPZ4j2sHmKWKGvXjaR2dqbtgoZCJVxpn/pub?output=csv")
+# "Positions" tab of the same sheet (Adam's own trades, Oct 28 2026); sheet gid 810220388, read by the v2 page only
+POSITIONS_CSV_URL = os.environ.get("POSITIONS_CSV_URL", LIVE_CSV_URL.replace("pub?output=csv", "pub?gid=810220388&single=true&output=csv"))
+POSITIONS_EDIT_URL = "https://docs.google.com/spreadsheets/d/1_R08vZphNLMB4MUJSl_bNPx5DjVVy29tMV8WFaOQkSs/edit#gid=810220388"
 REPO_URL = os.environ.get("REPO_URL", "https://github.com/az123-stack/breadth-monitor")
 EXTRA_RETRY_DAYS = 7          # retry tickers that returned no data after this many days
 
