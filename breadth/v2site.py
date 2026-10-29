@@ -184,6 +184,120 @@ def _hve(T):
                      for r in hv.get("rows") or []]}
 
 
+STATE_ROW = {"thr05": "Thrust day to 5 sessions after", "thr625": "6-25 sessions after a thrust", "none": "No thrust in 25 sessions"}
+BOX_LONG = {"retest_long": "Retest bounce", "trap_long": "Spring (failed breakdown)"}
+
+
+def _stair_lookup(T):
+    S = T.get("stairs") or {}
+    subs = {r["g"]: r for r in S.get("rows") or []}
+    themes = S.get("themes") or {}
+    own = S.get("stocks") or {}
+    stk = {s["t"]: s for s in T.get("stocks") or []}
+
+    def group(t, sub=None, theme=None):
+        k = stk.get(t) or {}
+        sub = sub or k.get("sub")
+        theme = theme or (k.get("themes") or [None])[0]
+        return subs.get(sub) or themes.get(theme) or None
+    return group, own
+
+
+def _boxes(T):
+    X = T["boxes"]
+    group, own = _stair_lookup(T)
+    now = (X.get("now_state") or {}).get("state")
+    tiles = []
+    for typ, name in BOX_LONG.items():
+        rows = (X.get("study") or {}).get(typ, {}).get("rows") or []
+        r = next((x for x in rows if x.get("name") == STATE_ROW.get(now)), None)
+        if r and r.get("n", 0) >= 30 and r.get("R") is not None:
+            v = "Favored" if r["R"] >= 0.15 and r.get("t", 0) >= 2 and r.get("h1", 0) > 0 and r.get("h2", 0) > 0 else \
+                "Fights the tape" if r["R"] < 0 and r.get("t", 0) <= -2 else "No clear edge"
+        else:
+            v = "Not enough history"
+        tiles.append({"type": typ, "name": name, "verdict": v, "R": num((r or {}).get("R"), 2), "win": num((r or {}).get("win"), 3),
+                      "n": (r or {}).get("n"), "state": STATE_ROW.get(now)})
+    out = []
+    for r in X.get("live") or []:
+        if r.get("type") not in BOX_LONG:
+            continue
+        g = group(r["t"], r.get("sub"), r.get("theme")) or {}
+        o = own.get(r["t"])
+        p, st, tg = r.get("price"), r.get("stop"), r.get("target")
+        rr = (tg - p) / (p - st) if p and st is not None and tg is not None and st < p else None
+        act = (r["type"] == "retest_long" and r.get("tag") in ("go", "at")) or (r["type"] == "trap_long" and r.get("tag") == "failed")
+        fav = bool(act and r.get("grade") in ("A", "B") and rr is not None and rr >= 1.5 and g.get("leader")
+                   and not (r.get("tag") == "at" and not ((r.get("vs_lvl_adr") if r.get("vs_lvl_adr") is not None else 9) <= 1.5)))
+        out.append({"t": r["t"], "name": (r.get("name") or "")[:40], "price": p, "type": r["type"], "tag": r.get("tag"),
+                    "kind": r.get("kind"), "wks": r.get("wks"), "lvl": r.get("lvl"), "top": r.get("top"), "bot": r.get("bot"),
+                    "stop": st, "target": tg, "rr": num(rr, 2), "grade": r.get("grade"), "exp": num(r.get("exp"), 2),
+                    "win": num(r.get("exp_win"), 3), "en": r.get("exp_n"), "vs": r.get("vs_lvl_adr"), "adr": r.get("adr"),
+                    "rs": r.get("rsr"), "sub": r.get("sub") or r.get("theme"), "fav": fav, "glead": bool(g.get("leader")),
+                    "gst": g.get("status") or "none", "own": o[0] if o else None,
+                    "px": [num(x, 2) for x in (r.get("px") or [])[-80:]]})
+    idx = []
+    for t, s in (X.get("idx_status") or {}).items():
+        r = next((x for x in X.get("idx") or [] if x["t"] == t), None)
+        idx.append({"t": t, "type": (s or {}).get("type"), "tag": (s or {}).get("tag"), "lvl": (r or {}).get("lvl"),
+                    "farp": (r or {}).get("farp"), "price": (r or {}).get("price")})
+    return {"date": X.get("date"), "state": STATE_ROW.get(now), "tiles": tiles, "rows": out, "idx": idx,
+            "from": X.get("from"), "to": X.get("to")}
+
+
+def _lineup(T):
+    from . import lineup
+    lc = T["lifecycle"]
+    rows = []
+    for x in lc.get("live") or []:
+        try:
+            s = lineup.state(x, None)
+        except Exception:
+            continue
+        rows.append({"t": x["t"], "g": x.get("g"), "kind": x.get("kind"), "stage": x.get("stage"), "lead": bool(x.get("lead")),
+                     "rs": x.get("rs"), "price": s["price"], "trigger": s["trigger"], "stop": s["stop"], "st": s["st"],
+                     "loc": s["loc"], "precise": s["precise"], "d9": s["d9"], "d21": s["d21"], "earn": x.get("earn"),
+                     "adr": _pct(x.get("adr"))})
+    tr = lc.get("tracker") or {}
+    se = (lc.get("stock_evidence") or {}).get("trigger") or {}
+    P = T.get("polished") or {}
+    nz = [{"t": r["t"], "sub": r.get("sub"), "price": r.get("price"), "rs": r.get("rs"), "state": r.get("state"),
+           "ago": r.get("days_since"), "e9": r.get("e9"), "e21": r.get("e21"), "stop": r.get("stop"), "adr": r.get("adr"),
+           "lead": (r.get("grank") or 0) >= 2 / 3} for r in P.get("nuzzle") or []]
+    fl = [{"t": r["t"], "sub": r.get("sub"), "price": r.get("price"), "rs": r.get("rs"), "pivot": r.get("pivot"),
+           "to": r.get("to_pivot"), "stop": r.get("stop"), "risk": _pct(r.get("risk")), "leg": _pct(r.get("leg"), 0),
+           "depth": _pct(r.get("depth")), "days": r.get("days"), "lead": (r.get("grank") or 0) >= 2 / 3} for r in P.get("flags") or []]
+    D = T.get("dips") or {}
+    dips = [{"t": r["t"], "sub": r.get("sub") or r.get("theme"), "price": r.get("price"), "low": r.get("low"), "e9": num(r.get("e9")),
+             "e21": num(r.get("e21")), "adr": r.get("adr"), "rs": r.get("rsr"), "up": bool(r.get("up")),
+             "f": [k for k in ("wick9", "wick21", "reclaim9", "reclaim21", "under9", "under21") if r.get(k)],
+             "strip": r.get("strip") or []} for r in D.get("rows") or []]
+    ev = P.get("evidence") or {}
+    return {"size": lc.get("size"), "weak": lc.get("weak"), "act": lc.get("act"), "ratio10": lc.get("ratio10"),
+            "rows": rows, "tracker": {k: tr.get(k) for k in ("since", "sessions", "buy", "ready", "all")},
+            "trk": (tr.get("rows") or [])[:40],
+            "ev": {k: se.get(k) for k in ("buy", "watch", "other", "edge", "t", "filled")},
+            "nuzzle": nz, "flags": fl, "dips": dips,
+            "pev": {k: {kk: (ev.get(k) or {}).get(kk) for kk in ("lead", "other", "none", "edge", "t", "proven")} for k in ("nuzzle", "flag")}}
+
+
+def _lifepage(T):
+    lc = T["lifecycle"]
+    ev = lc.get("evidence") or {}
+    keep = ("forgotten", "push", "ignition", "build", "blossom", "fade", "watch", "buy", "buy_act", "buy_noact", "buy_weak")
+    return {"size": lc.get("size"), "weak": lc.get("weak"), "act": lc.get("act"), "ratio10": lc.get("ratio10"), "regime": lc.get("regime"),
+            "alerts": lc.get("alerts") or [], "all": lc.get("all") or {},
+            "rows": [{"g": r["g"], "sec": r.get("sector"), "stage": r.get("stage"), "days": r.get("stage_days"), "buy": bool(r.get("buy")),
+                      "ready": bool(r.get("ready")), "watch": bool(r.get("watch")), "hot": bool(r.get("hot")), "new": bool(r.get("new")),
+                      "str": num(r.get("strength"), 1), "rk": r.get("s_rank"), "tier": r.get("tier"), "lead": bool(r.get("lead")),
+                      "br": num(r.get("br"), 2), "why": r.get("why") or [],
+                      "picks": [{k: p.get(k) for k in ("t", "rs", "price", "entry", "trigger", "stop", "plan", "earn", "vs21")} for p in r.get("picks") or []],
+                      "wait": [{k: p.get(k) for k in ("t", "rs", "price", "plan", "earn", "vs21")} for p in r.get("wait") or []]}
+                     for r in lc.get("rows") or []],
+            "ev": {k: ev.get("d20", {}).get(k) for k in keep}, "ev40": {k: ev.get("d40", {}).get(k) for k in ("buy", "blossom")},
+            "w2b": ev.get("watch_to_buy"), "from": ev.get("from"), "to": ev.get("to")}
+
+
 def _story():
     f = config.DOCS_DIR / "story.json"
     try:
@@ -226,6 +340,9 @@ def slim(D):
     put("launch", _launch, T)
     put("sow", _sow, T)
     put("hve", _hve, T)
+    put("boxes", _boxes, T)
+    put("lineup", _lineup, T)
+    put("life", _lifepage, T)
     put("story", _story)
     try:
         tt = T.get("thetrade") or {}
@@ -233,8 +350,12 @@ def slim(D):
     except Exception:
         pass
     want = {p["t"] for p in out.get("picks") or []} | {x["t"] for x in out.get("lined") or []} | {s["t"] for s in out.get("setups") or []}
-    for k in ("launch", "sow", "hve"):
+    for k in ("launch", "sow", "hve", "boxes", "lineup"):
         want |= {r["t"] for r in (out.get(k) or {}).get("rows") or []}
+    for k in ("nuzzle", "flags", "dips"):
+        want |= {r["t"] for r in (out.get("lineup") or {}).get(k) or []}
+    for r in (out.get("life") or {}).get("rows") or []:
+        want |= {p["t"] for p in r["picks"] + r["wait"]}
     want |= {t for g in (out.get("themes") or []) + (out.get("subs") or []) for t in g["m"]}
     want |= {m[0] for r in (out.get("stairs") or {}).get("rows") or [] for m in r["m"]}
     tv = T.get("tv") or {}

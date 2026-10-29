@@ -292,9 +292,7 @@ const MAP = [
       ["In play and late movers","Relative volume, gap-and-go vs fading, second-half movers.","Intraday tab","info"]]}]},
   {id:"groups", name:"Groups", icon:"▦", subs:[
     {id:"groups-themes", name:"Themes", ev:"proven", render:pageThemes},
-    {id:"groups-lifecycle", name:"Lifecycle", ev:"proven", plan:[
-      ["Watch → Buy stages","Every sub-theme's stage (Forgotten, First push, Ignition, Quiet build, Blossom, Fading) and BUY signals.","Best Setups tab","proven"],
-      ["Track record","How BUY groups did vs the average group, live.","Best Setups tab","proven"]]},
+    {id:"groups-lifecycle", name:"Lifecycle", ev:"proven", render:pageLife},
     {id:"groups-lighting", name:"Lighting up", ev:"proven", render:pageLighting},
     {id:"groups-stairs", name:"Stair steps", ev:"info", render:pageStairs},
     {id:"groups-rotation", name:"Rotation", ev:"proven", plan:[
@@ -307,13 +305,8 @@ const MAP = [
   {id:"setups", name:"Setups", icon:"☰", subs:[
     {id:"setups-all", name:"All setups", ev:"proven", render:pageSetups},
     {id:"setups-launch", name:"Launch list", ev:"proven", render:pageLaunch},
-    {id:"setups-box", name:"Box trades", ev:"proven", plan:[
-      ["Box favorites","Retests and springs in leading groups, graded by past results.","Trade Setups tab","proven"],
-      ["All box trades","Retest, spring, failed breakout, index boxes (QQQ, SPY, IWM), stair-step tags.","Trade Setups tab","info"]]},
-    {id:"setups-dips", name:"Lined-up & dips", ev:"proven", plan:[
-      ["Lined-up buys, live","BUY-group leaders dipping into the 9/21 EMAs, with trigger, stop and EMA location, plus the track record.","Best Setups tab","proven"],
-      ["EMA pullbacks and high tight flags","Leaders nuzzling the daily 9/21 ribbon; tight flags near the high.","Best Setups tab","proven"],
-      ["Dip buys","Wicks under the 9 or 21 EMA and back, daily or weekly.","Trade Setups, Intraday","info"]]},
+    {id:"setups-box", name:"Box trades", ev:"proven", render:pageBox},
+    {id:"setups-dips", name:"Lined-up & dips", ev:"proven", render:pageDips},
     {id:"setups-sow", name:"Strength on weakness", ev:"info", render:pageSow},
     {id:"setups-hve", name:"Record volume", ev:"info", render:pageHve},
     {id:"setups-export", name:"Export lists", ev:"proven", plan:[
@@ -826,6 +819,168 @@ function pageHve(el){
       {k:"ever", l:"Record", html:r=>r.ever==="ever"?'<span class="badge v-avoid">All-time</span>':'<span class="muted">2-year</span>'},
       {k:"liq", l:"Liquidity", html:r=>esc(r.liq)}, {k:"rsr", l:"RS", n:1},
       {k:"sub", l:"Group", v:r=>r.sub||r.theme||"", html:r=>esc(r.sub||r.theme||"–"), style:()=>"white-space:normal;min-width:130px"}]});
+  }
+  draw();
+}
+
+/* ---------- shared: small price chart with level lines ---------- */
+function lvlChart(px, lines, W=120, H=30){
+  const v=(px||[]).filter(x=>x!=null); if (v.length<4) return '<span class="muted">–</span>';
+  const all=[...v, ...lines.map(l=>l[0]).filter(x=>x!=null)], lo=Math.min(...all), hi=Math.max(...all), n=px.length;
+  const Y=x=>(H-2-(x-lo)/((hi-lo)||1)*(H-4)).toFixed(1);
+  const d=px.map((x,i)=>x==null?"":(i?"L":"M")+(i/(n-1)*W).toFixed(1)+" "+Y(x)).join("");
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Price with box lines">${lines.filter(l=>l[0]!=null).map(([y,c,dash])=>`<line x1="0" x2="${W}" y1="${Y(y)}" y2="${Y(y)}" stroke="${c}" stroke-width="1" ${dash?'stroke-dasharray="3 2"':""}/>`).join("")}<path d="${d}" fill="none" stroke="var(--ink)" stroke-width="1.3"/></svg>`;
+}
+const Rv = x => x==null ? "–" : `${x>=0?"+":""}${Number(x).toFixed(2)}R`;
+const grade = g => `<span class="badge ${g==="A"?"v-focus":g==="B"?"v-selective":"ev-info"}">${g||"–"}</span>`;
+
+/* ---------- Setups · Box trades ---------- */
+const BOX_TAG = {
+  retest_long: {go:["Just bounced off the old top","s-go"], at:["At the old top (support)","s-zone"], inside:["Slipped back under the top","s-wait"], coming:["Coming back to the box","s-wait"]},
+  trap_long: {failed:["Just reclaimed the box (spring)","s-go"], far:["Broke through the ceiling","s-go"], falling:["Rising through the box","s-wait"]}};
+const BOX_PLAN = {
+  "retest_long:go":"Buy next open, stop under the retest low.", "retest_long:at":"Wait for the bounce: a close above the day's high and above the line.",
+  "retest_long:inside":"A bounce back over the line is still the entry.", "retest_long:coming":"Set an alert at the line.",
+  "trap_long:failed":"Buy next open, stop 0.5 ADR under the old bottom, target the box top.", "trap_long:far":"Buy next open, stop under the 5-day low.",
+  "trap_long:falling":"Watch for the ceiling break. Dead if it closes back under the old bottom."};
+function pageBox(el){
+  const X = S.boxes, U = UI2.box ||= {typ:"all", tag:"act", grade:"AB", star:false};
+  if (!X) throw new Error("no boxes");
+  const actNow = r => (r.type==="retest_long" && (r.tag==="go"||r.tag==="at")) || (r.type==="trap_long" && (r.tag==="failed"||r.tag==="far"));
+  const pass = r => (U.typ==="all"||r.type===U.typ) && (U.tag==="all" || (U.tag==="act" ? actNow(r) : !actNow(r))) &&
+    (U.grade==="all" || U.grade.includes(r.grade)) && (!U.star || r.glead);
+  const IXT = {trap_short:"failed breakout, falling back through the box", trap_long:"failed breakdown, rising back through the box", retest_long:"breakout retest", retest_short:"breakdown retest"};
+  const favs = X.rows.filter(r=>r.fav).sort((a,b)=>(b.tag==="at"?0:1)-(a.tag==="at"?0:1) || (b.exp??-9)-(a.exp??-9) || (b.rs||0)-(a.rs||0)).slice(0,5);
+  function draw(){
+    saveUI();
+    const rows = X.rows.filter(pass);
+    el.innerHTML = `<div class="page-h"><h1>Box trades</h1><p>Long side only: retests of a broken box top and springs back into a box (shorts tested badly; they're in the Lab) · ${day(X.date)} close</p></div>
+      <div class="gate go"><b>${esc(X.state||"")}</b><span class="evline">${X.tiles.map(x=>`${esc(x.name)}: <b>${esc(x.verdict)}</b> (${Rv(x.R)} a trade, ${Math.round((x.win||0)*100)}% win, n ${x.n})`).join(" · ")}. Indexes: ${X.idx.map(i=>i.type?`${i.t} ${IXT[i.type]||i.type}${i.lvl?` (line ${f2(i.lvl)})`:""}`:`${i.t} no box trade`).join(" · ")}.</span></div>
+      <div class="sect"><h2>Favorites</h2><span>acting now, grade A–B, in a ★ leading group, at least 1.5 : 1 reward to risk (retest bounce in ★ groups: +0.23R vs −0.02R, both halves)</span></div>
+      <div class="picks">${favs.map(r=>`<div class="pick"><div class="tkr"><b>${esc(r.t)}</b>${grade(r.grade)}<span class="status ${BOX_TAG[r.type][r.tag][1]}">${esc(BOX_TAG[r.type][r.tag][0])}</span></div>
+        <div class="muted" style="font-size:12.5px">${esc(r.sub||"")} · ${r.kind==="range"?"wide range":"tight box"}, ${r.wks} weeks</div>
+        <div>${lvlChart(r.px,[[r.top,"var(--up)",0],[r.bot,"var(--dn)",0],[r.stop,"var(--dn)",1]],230,44)}</div>
+        <div class="kv"><span>Price</span><span class="num">${f2(r.price)}</span><span>Line</span><span class="num">${f2(r.lvl)}</span><span>Stop / target</span><span class="num">${f2(r.stop)} / ${f2(r.target)}</span><span>Reward : risk</span><span class="num">${r.rr==null?"–":r.rr.toFixed(1)+" : 1"}</span><span>Past trades like it</span><span class="num">${Rv(r.exp)} · n ${r.en??"–"}</span></div>
+        <p>${esc(BOX_PLAN[r.type+":"+r.tag]||"")}</p></div>`).join("") || '<div class="notice">No favorites today.</div>'}</div>
+      <div class="sect"><h2>All long box trades</h2><span>${rows.length} shown of ${X.rows.length}</span></div>
+      <div class="panel">
+        ${chipRow("typ", [["all","Both trades"],["retest_long","Retest bounce"],["trap_long","Spring"]], U.typ, k=>X.rows.filter(r=>k==="all"||r.type===k).length)}
+        ${chipRow("tag", [["act","Acting now"],["wait","Setting up"],["all","All"]], U.tag)}
+        ${chipRow("grade", [["A","Grade A"],["AB","A + B"],["all","All grades"]], U.grade)}
+        <div class="controls"><label class="ink2" style="font-size:12.5px;display:flex;gap:6px;align-items:center"><input type="checkbox" class="ck" id="bxStar" ${U.star?"checked":""}> ★ leading group only</label>
+          <span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="toast" id="bxToast"></span><button class="btn" id="bxCopy">⬇ TradingView list</button></span></div>
+        <div id="bxT"></div>
+        <div class="legend"><span>Chart: price with the box top (green), bottom (red) and stop (dashed)</span><span>Past trades = average R of trades with the same type, market state and proven confluences</span></div></div>`;
+    ["typ","tag","grade"].forEach(k => el.querySelector(`[data-chips="${k}"]`).onclick = e => { const b=e.target.closest("button"); if(b){U[k]=b.dataset.v; draw();} });
+    $("#bxStar").onchange = e => { U.star = e.target.checked; draw(); };
+    let tbl; $("#bxCopy").onclick = () => copyTv(tvList([["Box favorites", favs.map(r=>r.t)], ["Box trades", tbl.shown.map(r=>r.t).filter(t=>!favs.some(f=>f.t===t))]]), $("#bxToast"), "box-trades");
+    tbl = sortTable($("#bxT"), {rows, sort:"exp", dir:-1, groupBy:r=>r.sub, gstore:U, cols:[
+      {k:"t", l:"Ticker", html:r=>`${tk(r.t)}${r.fav?' <span class="star" title="Favorite">★</span>':""}`},
+      {k:"tag", l:"Where it is", v:r=>(actNow(r)?0:1)+r.tag, html:r=>`<span class="status ${BOX_TAG[r.type][r.tag][1]}">${esc(BOX_TAG[r.type][r.tag][0])}</span><div class="gsub">${r.type==="trap_long"?"Spring":"Retest"} · ${r.kind==="range"?"wide range":"tight box"} · ${r.wks}w</div>`},
+      {k:"chart", l:"Box", nosort:1, html:r=>lvlChart(r.px,[[r.top,"var(--up)",0],[r.bot,"var(--dn)",0],[r.stop,"var(--dn)",1]])},
+      {k:"grade", l:"Grade", html:r=>grade(r.grade)},
+      {k:"exp", l:"Past trades", sub:"avg R", n:1, html:r=>`${Rv(r.exp)}<div class="dist">${r.win==null?"":Math.round(r.win*100)+"% win · "}n ${r.en??"–"}</div>`},
+      {k:"price", l:"Price", n:1, html:r=>f2(r.price)}, {k:"lvl", l:"Line", n:1, html:r=>f2(r.lvl)},
+      {k:"stop", l:"Stop", n:1, html:r=>f2(r.stop)}, {k:"target", l:"Target", n:1, html:r=>f2(r.target)},
+      {k:"rr", l:"Reward : risk", n:1, html:r=>r.rr==null?"–":r.rr.toFixed(1)},
+      {k:"sub", l:"Group", html:r=>`${esc(r.sub||"–")}${r.glead?' <span class="star">★</span>':""}${r.gst!=="none"?`<div class="gsub">group ${r.gst==="stepping"?"stepping up":"setting up"}${r.own?` · stock ${r.own==="nuzzle"?"nuzzled":r.own==="lift"?"lifting":"broke its step"}`:""}</div>`:r.own?`<div class="gsub">stock ${r.own==="nuzzle"?"nuzzled":r.own==="lift"?"lifting":"broke its step"}</div>`:""}`, style:()=>"white-space:normal;min-width:160px"},
+      {k:"rs", l:"RS", n:1}]});
+  }
+  draw();
+}
+
+/* ---------- Setups · Lined-up & dips ---------- */
+const LOC_TXT = {reclaim21:"Reclaimed the 21", reclaim9:"Reclaimed the 9", on21:"On the 21", on9:"On the 9", under21:"Under the 21", between:"Between the 9 and 21", above:"Over the 9"};
+function pageDips(el){
+  const X = S.lineup, U = UI2.dips ||= {lu:"zone", nz:"nuzzle", dp:"wick"};
+  if (!X) throw new Error("no lineup");
+  const gate = X.weak ? ["warn","Hold off: breadth is weak, lined-up dips lose here"] : X.size==="full" ? ["go","Full size: breadth is strong"] : ["wait",`${X.size==="half"?"Half":"Normal"} size: breadth is mixed (10-day ratio ${X.ratio10})`];
+  const E = X.ev || {}, TR = X.tracker || {}, PE = X.pev || {};
+  function draw(){
+    saveUI();
+    const lu = X.rows.filter(r => U.lu==="all" ? true : U.lu==="zone" ? r.st==="zone" : r.st==="zone"||r.st==="near");
+    const nz = X.nuzzle.filter(r => U.nz==="all" ? true : r.state===U.nz);
+    const dp = X.dips.filter(r => U.dp==="all" ? true : U.dp==="wick" ? r.f.some(f=>f.startsWith("wick")||f.startsWith("reclaim")) : r.f.some(f=>f.startsWith("under")));
+    el.innerHTML = `<div class="page-h"><h1>Lined-up & dips</h1><p>Leaders of BUY groups pulling into their 9 / 21 EMAs, plus the other EMA entries · ${day(S.asof)} close (live prices come in a later step; the current dashboard has them now)</p></div>
+      <div class="gate ${gate[0]}"><b>${esc(gate[1])}</b><span class="evline">Backtest: buying the break of a dip-day high in BUY groups ${Rv(E.buy&&E.buy.R)} a trade (n ${E.buy&&E.buy.n}, halves ${Rv(E.buy&&E.buy.h1)} / ${Rv(E.buy&&E.buy.h2)}) vs ${Rv(E.other&&E.other.R)} elsewhere; watch-only groups ${Rv(E.watch&&E.watch.R)}.</span></div>
+      <div class="sect"><h2>Lined-up buys</h2><span>trigger = the dip day's high, stop = the dip low (max 1 ADR) · ${X.rows.filter(r=>r.st==="zone").length} in the zone</span></div>
+      <div class="panel">${chipRow("lu", [["zone","In the zone"],["zn","Zone + near"],["all","All BUY-group leaders"]], U.lu, k=>X.rows.filter(r=>k==="all"?true:k==="zone"?r.st==="zone":r.st==="zone"||r.st==="near").length)}
+        <div class="controls"><span class="muted" style="font-size:12.5px">Live track record since ${TR.since?day(TR.since):"–"}: ${(TR.all||{}).n||0} signals, ${(TR.all||{}).filled||0} filled, ${(TR.all||{}).closed||0} closed${(TR.all||{}).R!=null?`, avg ${Rv(TR.all.R)}`:""}.</span>
+          <span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="toast" id="luToast"></span><button class="btn" id="luCopy">⬇ TradingView list</button></span></div>
+        <div id="luT"></div></div>
+      <div class="sect"><h2>EMA pullbacks in leading groups</h2><span>leaders nuzzling the daily 9 / 21 ribbon · ${PE.nuzzle&&PE.nuzzle.proven?"proven":"unproven"}: ${Rv(PE.nuzzle&&PE.nuzzle.lead&&PE.nuzzle.lead.R)} in leading groups vs ${Rv(PE.nuzzle&&PE.nuzzle.none&&PE.nuzzle.none.R)} elsewhere</span></div>
+      <div class="panel">${chipRow("nz", [["nuzzle","Nuzzling now"],["touched","Touched this week"],["close","Close above"],["all","All"]], U.nz, k=>X.nuzzle.filter(r=>k==="all"||r.state===k).length)}<div id="nzT"></div></div>
+      <div class="sect"><h2>High tight flags</h2><span>30%+ leg, tight flag near the high · unproven: ${Rv(PE.flag&&PE.flag.lead&&PE.flag.lead.R)} in leading groups, halves disagree</span></div>
+      <div class="panel" id="flT"></div>
+      <div class="sect"><h2>Dip buys · box and weekly names</h2><span>wicks under the 9 or 21 EMA and back · an entry location, no edge on its own</span></div>
+      <div class="panel">${chipRow("dp", [["wick","Wicked & back"],["under","Under now"],["all","All"]], U.dp)}<div id="dpT"></div></div>`;
+    ["lu","nz","dp"].forEach(k => el.querySelector(`[data-chips="${k}"]`).onclick = e => { const b=e.target.closest("button"); if(b){U[k]=b.dataset.v; draw();} });
+    let t1; $("#luCopy").onclick = () => copyTv(tvList([["Lined-up buys", t1.shown.map(r=>r.t)]]), $("#luToast"), "lined-up-buys");
+    t1 = sortTable($("#luT"), {rows:lu, sort:"st", dir:1, groupBy:r=>r.g, gstore:(U.g1 ||= {}), empty:"Nothing in the zone at the last close.", cols:[
+      {k:"t", l:"Ticker", html:r=>`${tk(r.t)}${r.earn?` <span class="badge v-selective">Earnings ${esc(r.earn.slice(5))}</span>`:""}`},
+      {k:"st", l:"State", v:r=>({zone:0,near:1}[r.st]??2)+(r.precise?0:.5), html:r=>`<span class="status ${r.st==="zone"?"s-zone":"s-wait"}">${r.st==="zone"?"In the zone":r.st==="near"?"Near the ribbon":"Not yet"}</span><div class="gsub">${esc(LOC_TXT[r.loc]||r.loc)}${r.loc==="above"?` · ${r.d9} ADR`:""}</div>`},
+      {k:"g", l:"Group", html:r=>`${esc(r.g)} <span class="st ${stCls(r.stage)}">${esc(r.stage||"")}</span><div class="gsub">${r.kind==="buy"?"BUY":"ready"}${r.lead?" · leaders":""}</div>`, style:()=>"white-space:normal;min-width:180px"},
+      {k:"price", l:"Last", n:1, html:r=>f2(r.price)},
+      {k:"trigger", l:"Trigger", n:1, html:r=>`${f2(r.trigger)}<div class="dist">${pct((r.trigger/r.price-1)*100)}</div>`},
+      {k:"stop", l:"Stop", n:1, html:r=>`${f2(r.stop)}<div class="dist">${pct((r.stop/r.price-1)*100)}</div>`},
+      {k:"rs", l:"RS", n:1}, {k:"adr", l:"ADR", n:1, html:r=>r.adr==null?"–":r.adr+"%"}]});
+    sortTable($("#nzT"), {rows:nz, sort:"rs", dir:-1, groupBy:r=>r.sub, gstore:(U.g2 ||= {}), cols:[
+      {k:"t", l:"Ticker", html:r=>tk(r.t)}, {k:"state", l:"State", html:r=>`${r.state==="nuzzle"?"Nuzzling":r.state==="touched"?"Touched":"Close above"}${r.ago?` <span class="muted">· ${r.ago}d ago</span>`:""}`},
+      {k:"sub", l:"Group", style:()=>"white-space:normal;min-width:160px"},
+      {k:"price", l:"Price", n:1, html:r=>f2(r.price)}, {k:"e9", l:"9 EMA", n:1, html:r=>f2(r.e9)}, {k:"e21", l:"21 EMA", n:1, html:r=>f2(r.e21)},
+      {k:"stop", l:"Stop", n:1, html:r=>r.stop?f2(r.stop):"–"}, {k:"rs", l:"RS", n:1}, {k:"adr", l:"ADR", n:1, html:r=>r.adr+"%"}]});
+    sortTable($("#flT"), {rows:X.flags, sort:"to", dir:1, empty:"No high tight flags today.", cols:[
+      {k:"t", l:"Ticker", html:r=>tk(r.t)}, {k:"sub", l:"Group", html:r=>`${esc(r.sub||"–")}${r.lead?' <span class="star">★</span>':""}`, style:()=>"white-space:normal;min-width:160px"},
+      {k:"price", l:"Price", n:1, html:r=>f2(r.price)}, {k:"pivot", l:"Pivot", n:1, html:r=>f2(r.pivot)}, {k:"to", l:"To pivot", sub:"ADRs", n:1},
+      {k:"stop", l:"Stop", n:1, html:r=>f2(r.stop)}, {k:"risk", l:"Risk", n:1, html:r=>r.risk+"%"}, {k:"leg", l:"Leg", n:1, html:r=>"+"+r.leg+"%"},
+      {k:"depth", l:"Flag depth", n:1, html:r=>r.depth+"%"}, {k:"days", l:"Days", n:1}, {k:"rs", l:"RS", n:1}]});
+    const FL = {wick9:"Wicked the 9", wick21:"Wicked the 21", reclaim9:"Reclaimed the 9", reclaim21:"Reclaimed the 21", under9:"Under the 9", under21:"Under the 21"};
+    sortTable($("#dpT"), {rows:dp, sort:"rs", dir:-1, groupBy:r=>r.sub, gstore:(U.g3 ||= {}), cols:[
+      {k:"t", l:"Ticker", html:r=>tk(r.t)}, {k:"f", l:"What it did", v:r=>r.f.join(), html:r=>r.f.map(f=>FL[f]).join(" · ")+(r.up?"":' <span class="muted">· 9 under 21</span>')},
+      {k:"strip", l:"Last 10 days", nosort:1, html:r=>`<span style="display:inline-flex;gap:2px">${r.strip.map(s=>`<i title="${["above","wick","under the 9","under the 21"][s]}" style="width:7px;height:12px;border-radius:2px;background:${["var(--up)","var(--warn)","var(--accent)","var(--dn)"][s]};opacity:${s?1:.35}"></i>`).join("")}</span>`},
+      {k:"sub", l:"Group", style:()=>"white-space:normal;min-width:150px"},
+      {k:"price", l:"Price", n:1, html:r=>f2(r.price)}, {k:"e9", l:"9 EMA", n:1, html:r=>f2(r.e9)}, {k:"e21", l:"21 EMA", n:1, html:r=>f2(r.e21)}, {k:"rs", l:"RS", n:1}]});
+  }
+  draw();
+}
+
+/* ---------- Groups · Lifecycle ---------- */
+function pageLife(el){
+  const X = S.life, U = UI2.life ||= {f:"signal"};
+  if (!X) throw new Error("no lifecycle");
+  const E = X.ev || {}, x = k => E[k] && E[k].xs!=null ? pct(E[k].xs*100) : "–";
+  const gate = X.weak ? ["warn","Hold off: weak breadth (BUY groups ≈ average there)"] : X.size==="full" ? ["go","BUY groups: full size"] : ["wait",`BUY groups: ${X.size||"half"} size (10-day ratio ${X.ratio10}, full size needs 1.5 in the last 15 sessions)`];
+  const STAGES = ["Forgotten","First push","Ignition","Quiet build","Blossom","Fading"];
+  const keyOf = {"Forgotten":"forgotten","First push":"push","Ignition":"ignition","Quiet build":"build","Blossom":"blossom","Fading":"fade"};
+  const all = Object.entries(X.all||{}).map(([g,a])=>({g, stage:a[0], days:a[2], last:a[3], ago:a[4], sig:a[5]}));
+  function draw(){
+    saveUI();
+    const rows = X.rows.filter(r => U.f==="signal" ? (r.buy||r.ready||r.watch) : U.f==="buy" ? r.buy : U.f==="watch" ? r.watch : true);
+    el.innerHTML = `<div class="page-h"><h1>Theme lifecycle</h1><p>Every sub-theme's stage on the way from forgotten to blossom, and when to act · ${day(S.asof)} close</p></div>
+      <div class="gate ${gate[0]}"><b>${esc(gate[1])}</b><span class="evline">BUY groups beat the average group by ${x("buy")} over 20 sessions (t ${E.buy&&E.buy.t}, halves ${E.buy?pct(E.buy.h1*100)+" / "+pct(E.buy.h2*100):"–"}); ${X.w2b?Math.round(X.w2b.rate*100)+"% of WATCH groups turned BUY within "+X.w2b.within+" sessions":""}.</span></div>
+      <div class="tiles" style="margin-bottom:14px">${STAGES.map(s=>{const n=all.filter(a=>a.stage===s).length;return `<div class="tile"><span class="l"><span class="st ${stCls(s)}">${s}</span></span><span class="v">${n}</span><span class="c">20 sessions after: ${x(keyOf[s])} vs avg group</span></div>`;}).join("")}</div>
+      ${X.alerts.length?`<div class="notice"><b>New in the last 3 sessions:</b> ${X.alerts.map(a=>`${esc(a.g)} → ${a.kind==="buy"?"BUY":a.kind} (${esc(a.stage)}, day ${a.days})`).join(" · ")}</div>`:""}
+      <div class="panel">${chipRow("f", [["signal","BUY, ready or watch"],["buy","BUY"],["watch","Watch"],["all","All staged groups"]], U.f, k=>X.rows.filter(r=>k==="signal"?(r.buy||r.ready||r.watch):k==="buy"?r.buy:k==="watch"?r.watch:true).length)}
+        <div class="controls"><span class="muted" style="font-size:12.5px">Click a group for its reasons and tickers</span><span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="toast" id="lfToast"></span><button class="btn" id="lfCopy">⬇ TradingView list</button></span></div>
+        <div id="lfT"></div></div>`;
+    el.querySelector('[data-chips="f"]').onclick = e => { const b=e.target.closest("button"); if(b){U.f=b.dataset.v; draw();} };
+    let open = U.open, tbl;
+    $("#lfCopy").onclick = () => copyTv(tvList(tbl.shown.map(r=>[r.g+" ("+(r.buy?"BUY":r.watch?"watch":r.stage)+")", r.picks.map(p=>p.t).concat(r.wait.map(p=>p.t))])), $("#lfToast"), "theme-lifecycle");
+    tbl = sortTable($("#lfT"), {rows, sort:"sig", dir:-1, groupBy:r=>r.sec, groupLabel:"Sector", gstore:U,
+      rowAttr:r=>`class="grp ${open===r.g?"open":""}" data-g="${esc(r.g)}"`,
+      after:r=> open!==r.g ? "" : `<tr class="drawer"><td colspan="9"><div class="drawer-in"><div class="mini" style="margin-bottom:8px">${r.why.map(w=>`<span>${esc(w)}</span>`).join("")}</div>
+        ${r.picks.length?`<div class="tw"><table><thead><tr><th>Buy candidates</th><th>Entry</th><th class="n">Price</th><th class="n">Trigger</th><th class="n">Stop</th><th class="n">RS</th><th>Plan</th></tr></thead><tbody>${r.picks.map(p=>`<tr><td>${tk(p.t)}${p.earn?` <span class="badge v-selective">Earnings ${esc(p.earn.slice(5))}</span>`:""}</td><td>${esc(p.entry||"")}</td><td class="n">${f2(p.price)}</td><td class="n">${p.trigger?f2(p.trigger):"–"}</td><td class="n">${p.stop?f2(p.stop):"–"}</td><td class="n">${p.rs??"–"}</td><td style="white-space:normal;min-width:220px">${esc(p.plan||"")}</td></tr>`).join("")}</tbody></table></div>`:'<div class="muted">No member at an entry right now.</div>'}
+        ${r.wait.length?`<div class="gsub" style="margin-top:8px">Too extended, wait for a pullback: ${r.wait.map(w=>esc(w.t)+(w.vs21!=null?` (${w.vs21} ADR over the 21)`:"")).join(", ")}</div>`:""}</div></td></tr>`,
+      onDraw:host=>{ host.querySelector("tbody").onclick = e => { if (e.target.closest(".drawer")) return; const tr=e.target.closest("tr.grp"); if(!tr) return; open = U.open = (open===tr.dataset.g?null:tr.dataset.g); saveUI(); tbl.redraw(); }; },
+      cols:[
+      {k:"g", l:"Group", html:r=>`<div class="gname"><span class="caret">▸</span>${esc(r.g)}${r.lead?'<span class="star" title="Leaders present">★</span>':""}</div><div class="gsub" style="padding-left:18px">${esc(r.sec||"")}</div>`, style:()=>"white-space:normal;min-width:200px"},
+      {k:"sig", l:"Signal", v:r=>r.buy?3:r.ready?2:r.watch?1:0, html:r=>r.buy?'<span class="badge v-focus">BUY</span>':r.ready?'<span class="badge v-selective">Ready</span>':r.watch?`<span class="badge ev-info">Watch${r.hot?" · igniting":""}</span>`:'<span class="muted">–</span>'},
+      {k:"stage", l:"Stage", v:r=>STAGES.indexOf(r.stage), html:r=>`<span class="st ${stCls(r.stage)}">${esc(r.stage)}</span> <span class="muted">day ${r.days}</span>`},
+      {k:"tier", l:"Money flow", html:r=>esc(r.tier||"–")},
+      {k:"br", l:"Breadth", sub:"above 21 EMA", n:1, html:r=>r.br==null?"–":Math.round(r.br*100)+"%"},
+      {k:"str", l:"Strength", n:1}, {k:"rk", l:"Rank", n:1},
+      {k:"picks", l:"At an entry", v:r=>r.picks.length, html:r=>r.picks.length?`<span class="mini">${r.picks.map(p=>`<span>${esc(p.t)}</span>`).join("")}</span>`:'<span class="muted">–</span>'},
+      {k:"wait", l:"Extended", v:r=>r.wait.length, n:1, html:r=>r.wait.length||"–"}]});
   }
   draw();
 }
