@@ -157,6 +157,7 @@ tr.open .caret{transform:rotate(90deg)}
 .chip:hover{border-color:var(--line-2);color:var(--ink)}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .chip .c{font-family:var(--num);font-size:11px;opacity:.75;margin-left:4px}
+.fsel{height:30px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--ink);padding:0 8px;font:inherit;font-size:13px;max-width:280px}
 .fsearch{height:30px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--ink);padding:0 10px;font:inherit;font-size:13px;width:180px}
 .btn{height:30px;padding:0 12px;border-radius:var(--r);border:1px solid var(--line-2);background:var(--panel);cursor:pointer;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .btn:hover{border-color:var(--ink-3)}
@@ -193,6 +194,29 @@ tr.open .caret{transform:rotate(90deg)}
 .prose{font-family:var(--read);font-size:18px;line-height:1.62;max-width:66ch}
 .prose p{margin:0 0 1em} .prose ul{margin:0 0 1em;padding-left:1.2em} .prose li{margin-bottom:.5em} .prose strong{font-weight:600}
 .aside{display:flex;flex-direction:column;gap:12px} .aside .panel{padding:14px}
+
+/* shared page pieces */
+.gate{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);margin-bottom:14px}
+.gate b{font-size:15px}
+.gate.go{border-left:4px solid var(--up);border-radius:0 8px 8px 0} .gate.wait{border-left:4px solid var(--warn);border-radius:0 8px 8px 0} .gate.warn{border-left:4px solid var(--dn);border-radius:0 8px 8px 0}
+.evline{font-size:12.5px;color:var(--ink-2)}
+.sect{margin:18px 0 8px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sect h2{font-size:15px;font-weight:600;margin:0}
+.sect span{font-size:12.5px;color:var(--ink-3)}
+.checks{display:inline-flex;gap:3px;vertical-align:middle}
+.checks i{width:10px;height:10px;border-radius:2px;background:var(--sunk);border:1px solid var(--line-2)}
+.checks i.on{background:var(--up);border-color:var(--up)}
+.mini{display:inline-flex;gap:4px;flex-wrap:wrap}
+.mini span{font-family:var(--num);font-size:11.5px;padding:0 5px;border-radius:3px;background:var(--sunk);color:var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--ink-3);padding:10px 14px;border-top:1px solid var(--line)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:5px}
+.picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:14px}
+.pick{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.pick .tkr{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pick .tkr b{font-family:var(--num);font-size:20px}
+.pick p{margin:0;font-size:12.5px;color:var(--ink-2)}
+.pick .kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:12.5px}
+.pick .kv span:nth-child(odd){color:var(--ink-3)}
 
 .tabbar{display:none}
 @media (max-width:900px){
@@ -261,27 +285,27 @@ const MAP = [
     {id:"groups-lifecycle", name:"Lifecycle", ev:"proven", plan:[
       ["Watch → Buy stages","Every sub-theme's stage (Forgotten, First push, Ignition, Quiet build, Blossom, Fading) and BUY signals.","Best Setups tab","proven"],
       ["Track record","How BUY groups did vs the average group, live.","Best Setups tab","proven"]]},
+    {id:"groups-lighting", name:"Lighting up", ev:"proven", render:pageLighting},
+    {id:"groups-stairs", name:"Stair steps", ev:"info", render:pageStairs},
     {id:"groups-rotation", name:"Rotation", ev:"proven", plan:[
       ["Rotation ideas","Leading and accelerating groups with stocks to buy.","Rotation tab","proven"],
-      ["Ignition and Day 1","Groups igniting, Day 1 breakouts waiting for follow-through.","Rotation tab","proven"],
-      ["Money flow map","Relative rotation graph by sub-theme.","Rotation tab","info"],
-      ["Pair chart","Two groups against each other, with starter pairs.","Rotation tab","info"]]},
+      ["Money flow map","Relative rotation graph by sub-theme, inflow and outflow tiers.","Rotation tab","proven"],
+      ["Where the money is going","By sub-theme over today / 3 / 5 / 15 / 30 / 90 days.","Rotation tab","info"],
+      ["Pair chart","Two groups against each other, with starter pairs and cousins pulling apart.","Rotation tab","info"]]},
     {id:"groups-timeline", name:"Timeline", ev:"info", plan:[
-      ["Strength timeline","90-day heatmap of every theme's Strength rank.","Rotation tab","info"],
-      ["Stair steps","Groups setting up and stepping up together.","Rotation tab","info"]]}]},
+      ["Strength timeline","90-day heatmap of every theme's Strength rank.","Rotation tab","info"]]}]},
   {id:"setups", name:"Setups", icon:"☰", subs:[
     {id:"setups-all", name:"All setups", ev:"proven", render:pageSetups},
-    {id:"setups-launch", name:"Launch list", ev:"proven", plan:[
-      ["Launch picks","Top 3 a week, with plan and the live tracker.","Best Setups, Trade Setups, Launch list","proven"],
-      ["Launch list","Curl, early and later stages, graded A / B / C.","Launch list tab","proven"]]},
+    {id:"setups-launch", name:"Launch list", ev:"proven", render:pageLaunch},
     {id:"setups-box", name:"Box trades", ev:"proven", plan:[
       ["Box favorites","Retests and springs in leading groups, graded by past results.","Trade Setups tab","proven"],
-      ["All box trades","Retest, spring, failed breakout, index boxes (QQQ, SPY, IWM).","Trade Setups tab","info"]]},
+      ["All box trades","Retest, spring, failed breakout, index boxes (QQQ, SPY, IWM), stair-step tags.","Trade Setups tab","info"]]},
     {id:"setups-dips", name:"Lined-up & dips", ev:"proven", plan:[
-      ["Lined-up buys, live","BUY-group leaders dipping into the 9/21 EMAs, with trigger and stop, plus the track record.","Best Setups tab","proven"],
+      ["Lined-up buys, live","BUY-group leaders dipping into the 9/21 EMAs, with trigger, stop and EMA location, plus the track record.","Best Setups tab","proven"],
+      ["EMA pullbacks and high tight flags","Leaders nuzzling the daily 9/21 ribbon; tight flags near the high.","Best Setups tab","proven"],
       ["Dip buys","Wicks under the 9 or 21 EMA and back, daily or weekly.","Trade Setups, Intraday","info"]]},
-    {id:"setups-weekly", name:"Weekly", ev:"info", plan:[
-      ["Strength on weakness","Weekly stage-2 setups, prime positioned names in the box.","Trade Setups tab","info"]]},
+    {id:"setups-sow", name:"Strength on weakness", ev:"info", render:pageSow},
+    {id:"setups-hve", name:"Record volume", ev:"info", render:pageHve},
     {id:"setups-export", name:"Export lists", ev:"proven", plan:[
       ["TradingView lists","Build one list from any setups, groups or picks, then copy or download in TradingView format.","Header buttons","proven"],
       ["KQ breakout screen","Basing, extended, failing.","Header button","info"]]}]},
@@ -298,7 +322,7 @@ const MAP = [
       ["Washout thrust","High-beta leaders after deep washouts. Only 2 cases.","Breadth tab","unproven"],
       ["Volume tilt, hidden buying","Context reads with some forward signal, not proven.","Breadth tab","info"],
       ["Long / short pulse","The old sheet's 0–10 scores. Today it says Caution while the proven posture says Press, which is why it moves here.","Themes tab","unproven"],
-      ["Who won the close, market health, record volume","Tested: no forward edge found.","Breadth, Trade Setups","noedge"]]},
+      ["Who won the close, market health","Tested: no forward edge found.","Breadth tab","noedge"]]},
     {id:"lab-evidence", name:"Evidence", ev:"proven", plan:[
       ["Layer registry","Every layer and where it sits: idea, tested, info, proven, approved, live.","New","proven"]]},
     {id:"lab-research", name:"Research log", ev:"info", plan:[
@@ -403,7 +427,7 @@ function pageToday(el){
 }
 
 /* ---------- Groups · Themes (the v1 Themes tab, rebuilt) ---------- */
-const TH = Object.assign({kind:"themes", rankBy:"str", cls:"all", stair:"all", horizon:"short", q:"", sort:null, dir:-1, open:null}, LS.get("v2themes", {}));
+const TH = Object.assign({kind:"themes", rankBy:"str", cls:"all", stair:"all", horizon:"short", q:"", sort:null, dir:-1, open:null, sec:""}, LS.get("v2themes", {}));
 const STAIRF = [["all","All"],["star_any","★ + setting/stepping"],["any","Setting or stepping"],["stepping","Stepping up"],["setting","Setting up"],["star","★ Leading"]];
 const stairPass = (g,k) => { const [s,, lead] = g.stair; return k==="all" || (k==="star_any"&&lead&&s!=="none") || (k==="any"&&s!=="none") || (k===s) || (k==="star"&&lead); };
 const clsPass = (g,k) => k==="all" || (k==="strong"&&g.sc>=7) || (k==="weak"&&g.sc<=2) || (k==="buy"&&g.stage&&g.stage[2]==="buy");
@@ -414,7 +438,7 @@ function trailSvg(v){
 function pageThemes(el){
   const rows = () => {
     const src = TH.kind==="themes" ? S.themes : S.subs, q = TH.q.trim().toLowerCase();
-    let r = src.filter(g => clsPass(g,TH.cls) && stairPass(g,TH.stair) && (!q || g.n.toLowerCase().includes(q) || g.m.some(t=>t.toLowerCase()===q)));
+    let r = src.filter(g => clsPass(g,TH.cls) && stairPass(g,TH.stair) && (TH.kind!=="subs" || !TH.sec || g.sec===TH.sec) && (!q || g.n.toLowerCase().includes(q) || g.m.some(t=>t.toLowerCase()===q)));
     const k = TH.sort || (TH.rankBy==="str" ? "rk" : "sc"), dir = TH.sort ? TH.dir : (TH.rankBy==="str" ? 1 : -1);
     return r.sort((a,b)=>{ const x=a[k], y=b[k]; if (x==null) return 1; if (y==null) return -1; return (typeof x==="string" ? x.localeCompare(y) : x-y)*dir || a.rk-b.rk; });
   };
@@ -422,7 +446,7 @@ function pageThemes(el){
   function draw(){
     cols = TH.horizon==="short" ? [["d1","Today",3],["d5","5D",8],["d15","15D",12],["d30","30D",18],["rs","RS",40,"3-mo %"]] : [["d30","30D",18],["d90","90D",50],["rs","RS",40,"3-mo %"]];
     isSub = TH.kind==="subs";
-    LS.set("v2themes", {kind:TH.kind, rankBy:TH.rankBy, cls:TH.cls, stair:TH.stair, horizon:TH.horizon});
+    LS.set("v2themes", {kind:TH.kind, rankBy:TH.rankBy, cls:TH.cls, stair:TH.stair, horizon:TH.horizon, sec:TH.sec});
     const src = TH.kind==="themes" ? S.themes : S.subs, R = rows();
     const seg = (name, val, opts) => `<span class="seg" data-g="${name}">${opts.map(([k,l])=>`<button data-v="${k}" aria-pressed="${val===k}">${l}</button>`).join("")}</span>`;
     const sh = (k,l,small,n) => `<th class="sortable ${n?"n":""}" data-k="${k}" aria-sort="${TH.sort===k?(TH.dir<0?"descending":"ascending"):"none"}">${l}${small?`<small>${small}</small>`:""}</th>`;
@@ -433,6 +457,7 @@ function pageThemes(el){
         ${seg("rankBy",TH.rankBy,[["str","Rank by Strength"],["sc","by Score /8"]])}
         ${seg("cls",TH.cls,[["all","All"],["strong","Strong"],["weak","Weak"]].concat(isSub?[["buy","In BUY"]]:[]))}
         ${seg("horizon",TH.horizon,[["short","Short-term"],["long","Long-term"]])}
+        ${isSub?`<select class="fsel" id="thSec" aria-label="Filter by sector"><option value="">All sectors</option>${[...new Set(S.subs.map(g=>g.sec).filter(Boolean))].sort().map(s=>`<option ${TH.sec===s?"selected":""}>${esc(s)}</option>`).join("")}</select>`:""}
         <input class="fsearch" id="thq" placeholder="Search name or ticker" value="${esc(TH.q)}" aria-label="Search themes">
         <span class="right" style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="toast" id="thToast"></span><button class="btn" id="thCopy">Copy shown for TradingView</button></span>
       </div>
@@ -473,6 +498,7 @@ function pageThemes(el){
     el.querySelectorAll(".seg[data-g]").forEach(sg => sg.onclick = e => { const b=e.target.closest("button"); if(!b) return;
       const g=sg.dataset.g; TH[g]=b.dataset.v; if (g==="kind"){ TH.open=null; TH.sort=null; if(TH.cls==="buy"&&TH.kind==="themes") TH.cls="all"; } if (g==="rankBy") TH.sort=null; draw(); });
     el.querySelector(".chips").onclick = e => { const b=e.target.closest("button"); if(b){TH.stair=b.dataset.stair; draw();} };
+    const ts = $("#thSec"); if (ts) ts.onchange = () => { TH.sec = ts.value; TH.open = null; draw(); };
     const q = $("#thq"); q.oninput = () => { TH.q=q.value; const pos=q.selectionStart; draw(); const n=$("#thq"); n.focus(); n.setSelectionRange(pos,pos); };
     $("#thT thead").onclick = e => { const th=e.target.closest("th.sortable"); if(!th) return; const k=th.dataset.k==="stageN"?"stageN":th.dataset.k;
       if (TH.sort===k) TH.dir*=-1; else { TH.sort=k; TH.dir = (k==="n"||k==="rk"||k==="rot")?1:-1; } draw(); };
@@ -485,9 +511,9 @@ function pageThemes(el){
 }
 
 /* ---------- Setups · All ---------- */
-const SU = {v:new Set(["Focus","Selective"]), s:new Set(), sort:"rs", dir:-1, off:new Set()};
+const SU = {v:new Set(["Focus","Selective"]), s:new Set(), sort:"rs", dir:-1, off:new Set(), grp:""};
 function pageSetups(el){
-  const shown = () => S.setups.filter(r=>SU.v.has(r.verdict)&&(!SU.s.size||SU.s.has(r.setup))).sort((a,b)=>{const x=a[SU.sort],y=b[SU.sort];return (typeof x==="string"?x.localeCompare(y):(x-y))*SU.dir;});
+  const shown = () => S.setups.filter(r=>SU.v.has(r.verdict)&&(!SU.s.size||SU.s.has(r.setup))&&(!SU.grp||(r.group||"No sub-theme")===SU.grp)).sort((a,b)=>{const x=a[SU.sort],y=b[SU.sort];return (typeof x==="string"?x.localeCompare(y):(x-y))*SU.dir;});
   function draw(){
     const rows = shown(), types=[...new Set(S.setups.filter(r=>SU.v.has(r.verdict)).map(r=>r.setup))];
     const sh=(k,l,n,cls="")=>`<th class="sortable ${n?"n":""} ${cls}" data-k="${k}" aria-sort="${SU.sort===k?(SU.dir<0?"descending":"ascending"):"none"}">${l}</th>`;
@@ -496,6 +522,9 @@ function pageSetups(el){
       <span class="right"><span class="toast" id="sToast"></span><button class="btn primary" id="sCopy">Copy for TradingView</button></span></div>
       <div class="chips">${["Focus","Selective","Avoid"].map(v=>`<button class="chip" data-v="${v}" aria-pressed="${SU.v.has(v)}">${v}<span class="c">${S.setups.filter(r=>r.verdict===v).length}</span></button>`).join("")}</div>
       <div class="chips"><button class="chip" data-s="" aria-pressed="${!SU.s.size}">All setups</button>${types.map(s=>`<button class="chip" data-s="${esc(s)}" aria-pressed="${SU.s.has(s)}">${esc(s)}<span class="c">${S.setups.filter(r=>r.setup===s).length}</span></button>`).join("")}</div>
+      ${(()=>{ const pool=S.setups.filter(r=>SU.v.has(r.verdict)&&(!SU.s.size||SU.s.has(r.setup))), cnt={}; pool.forEach(r=>{const g=r.group||"No sub-theme"; cnt[g]=(cnt[g]||0)+1;});
+        const names=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||a.localeCompare(b));
+        return `<div class="controls"><label class="ink2" style="font-size:12.5px;display:flex;align-items:center;gap:8px">Sub-theme <select class="fsel" id="suGrp" aria-label="Filter by sub-theme"><option value="">All (${pool.length})</option>${names.map(n=>`<option value="${esc(n)}" ${SU.grp===n?"selected":""}>${esc(n)} (${cnt[n]})</option>`).join("")}</select></label>${SU.grp?`<button class="chip" id="suClr" aria-pressed="true">${esc(SU.grp)} ✕</button>`:""}</div>`; })()}
       <div class="tw"><table class="sticky1"><thead><tr>${sh("t","Ticker")}<th><input type="checkbox" class="ck" id="ckAll" aria-label="Select all shown" checked></th>${sh("setup","Setup")}${sh("group","Group",0,"hide-sm")}${sh("rs","RS",1)}${sh("grp","Group str.",1)}${sh("off_hi","Off high",1)}${sh("e21","vs 21 EMA",1)}${sh("adr","ADR",1)}</tr></thead><tbody>
       ${rows.map(r=>`<tr><td><a class="tk" href="#">${r.t}</a></td><td><input type="checkbox" class="ck" data-id="${r.t+r.setup}" ${SU.off.has(r.t+r.setup)?"":"checked"} aria-label="Include ${r.t}"></td>
         <td><div class="cell2"><span>${esc(r.setup)}</span><small><span class="${vb(r.verdict)}" style="padding:0 5px">${r.verdict}</span></small></div></td>
@@ -505,6 +534,7 @@ function pageSetups(el){
     el.querySelectorAll(".chips")[1].onclick=e=>{const b=e.target.closest("button");if(!b)return;const s=b.dataset.s;if(!s)SU.s.clear();else SU.s.has(s)?SU.s.delete(s):SU.s.add(s);draw();};
     el.querySelector("thead").onclick=e=>{const th=e.target.closest("th.sortable");if(!th)return;if(SU.sort===th.dataset.k)SU.dir*=-1;else{SU.sort=th.dataset.k;SU.dir=["t","setup","group"].includes(th.dataset.k)?1:-1;}draw();};
     el.querySelector("tbody").onchange=e=>{const c=e.target;if(!c.dataset.id)return;c.checked?SU.off.delete(c.dataset.id):SU.off.add(c.dataset.id);draw();};
+    $("#suGrp").onchange=e=>{SU.grp=e.target.value;draw();}; const sc=$("#suClr"); if(sc) sc.onclick=()=>{SU.grp="";draw();};
     $("#ckAll").onchange=e=>{shown().forEach(r=>e.target.checked?SU.off.delete(r.t+r.setup):SU.off.add(r.t+r.setup));draw();};
     $("#sCopy").onclick=()=>{const by={};shown().filter(r=>!SU.off.has(r.t+r.setup)).forEach(r=>{(by[r.setup]||=[]).includes(r.t)||by[r.setup].push(r.t)});copyTv(tvList(Object.entries(by)),$("#sToast"));};
   }
@@ -527,6 +557,248 @@ function pageRead(el){
     <div class="prose">${mdLite(st.md.slice(0, cut>0?cut:2600))}</div></article>
     <aside class="aside"><div class="panel"><h4 class="mini-h">Groups in this story</h4><div class="plist"><span class="st st-other">Memory &amp; Storage</span><span class="st st-other">Neoclouds</span><span class="st st-blossom">Cybersecurity</span><span class="st st-ignition">Enterprise SaaS</span></div></div>
     <div class="panel"><h4 class="mini-h">Earlier</h4><div class="ink2" style="font-size:13px">Each chapter gets its own page and link in the Archive.</div></div></aside></div>`;
+}
+
+/* ---------- shared: sortable table ---------- */
+function sortTable(host, cfg){
+  /* cfg: {cols:[{k,l,sub,n,cls,html(r),v(r)}], rows, sort, dir, rowAttr(r), after(r)} */
+  const st = cfg.state || (cfg.state = {sort:cfg.sort, dir:cfg.dir ?? -1});
+  const G = cfg.groupBy, GS = cfg.gstore || st;
+  function draw(){
+    const col = cfg.cols.find(c=>c.k===st.sort), val = c => r => c.v ? c.v(r) : r[c.k];
+    let base = cfg.rows, gsel = "";
+    if (G){
+      const cnt = {}; cfg.rows.forEach(r=>{ const g=G(r)||"No sub-theme"; cnt[g]=(cnt[g]||0)+1; });
+      if (GS.grp && !cnt[GS.grp]) GS.grp = "";
+      if (GS.grp) base = cfg.rows.filter(r=>(G(r)||"No sub-theme")===GS.grp);
+      const names = Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]||a.localeCompare(b));
+      gsel = `<div class="controls gsel"><label class="ink2" style="font-size:12.5px;display:flex;align-items:center;gap:8px">${cfg.groupLabel||"Sub-theme"}
+        <select class="fsel" aria-label="Filter by ${cfg.groupLabel||"sub-theme"}"><option value="">All (${cfg.rows.length})</option>${names.map(n=>`<option value="${esc(n)}" ${GS.grp===n?"selected":""}>${esc(n)} (${cnt[n]})</option>`).join("")}</select></label>
+        ${GS.grp?`<button class="chip" data-clear aria-pressed="true">${esc(GS.grp)} ✕</button>`:""}<span class="muted" style="font-size:12px">${names.length} ${(cfg.groupLabel||"sub-theme").toLowerCase()}${names.length===1?"":"s"} in this list</span></div>`;
+    }
+    const rows = col ? [...base].sort((a,b)=>{ const x=val(col)(a), y=val(col)(b); if (x==null&&y==null) return 0; if (x==null) return 1; if (y==null) return -1;
+      return (typeof x==="string" ? x.localeCompare(y) : x-y) * st.dir; }) : base;
+    host.innerHTML = `${gsel}<div class="tw"><table class="sticky1"><thead><tr>${cfg.cols.map(c=>`<th class="${c.nosort?"":"sortable"} ${c.n?"n":""} ${c.cls||""}" data-k="${c.k}" ${c.nosort?"":`aria-sort="${st.sort===c.k?(st.dir<0?"descending":"ascending"):"none"}"`}>${c.l}${c.sub?`<small>${c.sub}</small>`:""}</th>`).join("")}</tr></thead>
+      <tbody>${rows.map(r=>`<tr ${cfg.rowAttr?cfg.rowAttr(r):""}>${cfg.cols.map(c=>`<td class="${c.n?"n":""} ${c.cls||""}" ${c.style?`style="${c.style(r)}"`:""}>${c.html?c.html(r):esc(r[c.k]??"–")}</td>`).join("")}</tr>${cfg.after?cfg.after(r):""}`).join("") ||
+      `<tr><td colspan="${cfg.cols.length}" class="muted" style="padding:18px 14px;white-space:normal">${cfg.empty||"Nothing matches these filters."}</td></tr>`}</tbody></table></div>`;
+    host.querySelector("thead").onclick = e => { const th=e.target.closest("th.sortable"); if(!th) return; const k=th.dataset.k;
+      if (st.sort===k) st.dir*=-1; else { st.sort=k; const c=cfg.cols.find(c=>c.k===k); st.dir = c.n || c.num ? -1 : 1; } draw(); };
+    if (G){ host.querySelector(".fsel").onchange = e => { GS.grp = e.target.value; saveUI(); draw(); };
+      const c = host.querySelector("[data-clear]"); if (c) c.onclick = () => { GS.grp = ""; saveUI(); draw(); }; }
+    cfg.shown = rows;
+    if (cfg.onDraw) cfg.onDraw(host, rows);
+  }
+  cfg.redraw = draw; draw(); return cfg;
+}
+const chipRow = (name, opts, cur, counts) => `<div class="chips" data-chips="${name}">${opts.map(([k,l])=>`<button class="chip" data-v="${k}" aria-pressed="${Array.isArray(cur)?cur.includes(k):cur===k}">${l}${counts?`<span class="c">${counts(k)}</span>`:""}</button>`).join("")}</div>`;
+const tk = t => `<a class="tk" href="#">${esc(t)}</a>`;
+const agoTxt = a => a===0 ? "today" : a===1 ? "1 session ago" : `${a} sessions ago`;
+const pp = (x,d=1) => x==null ? "–" : `<span class="${x>0?"up":x<0?"dn":""}">${pct(x,d)}</span>`;
+const UI2 = LS.get("v2ui", {});
+const saveUI = () => LS.set("v2ui", UI2);
+
+/* ---------- Groups · Lighting up ---------- */
+function pageLighting(el){
+  const X = S.lighting, bt = X.bt, ign = X.rows.filter(r=>r.status==="ignition"), warm = X.rows.filter(r=>r.status==="warming");
+  const lab = X.labels, keys = ["base","flow","breadth","jump"];
+  const checks = r => `<span class="checks" title="${keys.map(k=>(r.met[k]?"✓ ":"✗ ")+lab[k]).join("\n")}">${keys.map(k=>`<i class="${r.met[k]?"on":""}"></i>`).join("")}</span> <span class="muted num">${r.n}/4</span>`;
+  const grp = r => `<div class="gname">${esc(r.g)}${r.lead?'<span class="star" title="Has leaders">★</span>':""}</div><div class="gsub">${esc(r.sec||"")}${r.drivers&&r.drivers.length?" · driver: "+esc(r.drivers.join(", ")):""}</div>`;
+  const stocks = r => `<span class="mini">${r.stocks.map(s=>`<span title="RS ${s[1]}">${esc(s[0])}</span>`).join("")}</span>`;
+  const gradeOf = r => r.lead && X.act ? "A" : r.lead || X.act ? "B" : "C";
+  el.innerHTML = `<div class="page-h"><h1>Sub-themes lighting up</h1><p>Groups breaking out of their bases with money, breadth and RS rank behind them · ${day(S.asof)} close</p></div>
+    <div class="gate ${X.act?"go":"wait"}"><b>${X.act?"Act":"Watch only"}</b>
+      <span class="evline">10-day breadth ratio ${X.ratio10} (best of last 15 sessions ${X.peak15}). Ignitions paid when the ratio reached 1.5: ${pct(bt.strong.avg*100)} vs SPY over 20 sessions (n ${bt.strong.n}), versus ${pct(bt.other.avg*100)} otherwise. With leaders and strong breadth ${pct(bt.lead_strong.avg*100)}.</span></div>
+    <div class="sect"><h2>Ignition</h2><span>all 4 checks met on a day in the last 5 sessions (the boxes show the checks as of the last close) · ${ign.length} groups</span></div><div class="panel" id="lgI"></div>
+    <div class="sect"><h2>Day 1 · watch for follow-through</h2><span>a group's breakout day; it counts only if it holds for 3 sessions (held ${pct(X.d1bt.held.avg*100)} vs faded ${pct(X.d1bt.faded.avg*100)} over 20 sessions)</span></div><div class="panel" id="lgD"></div>
+    <div class="sect"><h2>Warming up</h2><span>3 of 4 checks, or a group breadth thrust with leadership · ${warm.length} groups</span></div><div class="panel" id="lgW"></div>
+    <div class="legend"><span>Checks, in order: ${keys.map(k=>esc(lab[k])).join(" · ")}</span><span><span class="star">★</span> has leaders (median RS 70+ or a quarter of members near highs)</span></div>`;
+  const igCols = extra => [
+    {k:"g", l:"Group", html:grp, style:()=>"white-space:normal;min-width:200px"},
+    {k:"grade", l:"Grade", v:gradeOf, html:r=>`<span class="badge ${gradeOf(r)==="A"?"v-focus":gradeOf(r)==="B"?"v-selective":"ev-info"}">${gradeOf(r)}</span>`},
+    ...extra,
+    {k:"n", l:"Checks", n:1, html:checks},
+    {k:"br", l:"Breadth", sub:"above 21 EMA", n:1, html:r=>Math.round(r.br*100)+"%"},
+    {k:"flow", l:"Flow", sub:"10-day net $", n:1, html:r=>`<span class="${r.flow>0?"up":"dn"}">${r.flow>0?"+":""}${r.flow.toFixed(2)}</span>`},
+    {k:"drk", l:"RS rank Δ", sub:"10 days", n:1, html:r=>`${r.drk>0?"+":""}${Math.round(r.drk*100)}`},
+    {k:"r20", l:"20D vs SPY", n:1, html:r=>pp(r.r20*100)},
+    {k:"str", l:"Strength", n:1},
+    {k:"stocks", l:"Top stocks", nosort:1, html:stocks}];
+  const LU = UI2.light ||= {};
+  sortTable($("#lgI"), {groupBy:r=>r.sec, groupLabel:"Sector", gstore:LU, cols:igCols([{k:"ago", l:"Fired", n:1, html:r=>agoTxt(r.ago)},{k:"since", l:"Since", n:1, html:r=>pp(r.since*100)}]), rows:ign, sort:"ago", dir:1, empty:"No ignitions in the last 5 sessions."});
+  sortTable($("#lgW"), {groupBy:r=>r.sec, groupLabel:"Sector", gstore:LU, cols:igCols([]), rows:warm, sort:"n", dir:-1});
+  sortTable($("#lgD"), {rows:X.day1, sort:"ago", dir:1, cols:[
+    {k:"g", l:"Group", html:r=>`<div class="gname">${esc(r.g)}</div><div class="gsub">${esc(r.sec||"")}</div>`, style:()=>"white-space:normal;min-width:200px"},
+    {k:"ago", l:"Day 1", n:1, html:r=>agoTxt(r.ago)},
+    {k:"r1", l:"Day 1 vs SPY", n:1, html:r=>pp(r.r1,1)},
+    {k:"rv", l:"Rel. volume", n:1, html:r=>r.rv+"×"},
+    {k:"brk", l:"Breaking out", sub:"members", n:1, html:r=>Math.round(r.brk*100)+"%"},
+    {k:"st", l:"Follow-through", v:r=>r.d3==null?0:r.d3>=0?1:-1, html:r=>r.d3==null?`<span class="status s-wait">Waiting (${3-r.ago} left)</span>`:r.d3>=0?'<span class="status s-go">Held</span>':'<span class="status" style="color:var(--dn)">Faded</span>'},
+    {k:"since", l:"Since", n:1, html:r=>pp(r.since)},
+    {k:"stocks", l:"Top stocks", nosort:1, html:r=>`<span class="mini">${r.stocks.map(s=>`<span>${esc(s[0])}</span>`).join("")}</span>`}]});
+}
+
+/* ---------- Groups · Stair steps ---------- */
+function stairStrip(r){
+  const n=r.h_nuz.length, W=8, H=26, w=n*W;
+  const bars = r.h_nuz.map((v,i)=>{ const a=Math.max(0,Math.min(1,v||0))*(H-6), b=Math.max(0,Math.min(1,r.h_lift[i]||0))*(H-6), s=r.h_st[i];
+    return `<rect x="${i*W}" y="${(H-a).toFixed(1)}" width="3.4" height="${a.toFixed(1)}" fill="var(--accent)" opacity=".45"/><rect x="${i*W+3.6}" y="${(H-b).toFixed(1)}" width="3.4" height="${b.toFixed(1)}" fill="var(--up)"/>${s?`<circle cx="${i*W+3.5}" cy="2.5" r="2" fill="var(${s==="S"?"--up":"--accent"})"/>`:""}`; }).join("");
+  return `<svg width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" role="img" aria-label="Last ${n} sessions"><line x1="0" x2="${w}" y1="${H-.5}" y2="${H-.5}" stroke="var(--line-2)"/>${bars}</svg>`;
+}
+const ST_OWN = {nuzzle:["Nuzzling","st-build"], lift:["Lifting","st-blossom"], "break":["Step break","st-blossom"], riding:["Riding","st-other"], none:["–","st-other"]};
+function pageStairs(el){
+  const X = S.stairs, U = UI2.stairs ||= {view:"groups", f:"any"};
+  const F = [["any","Setting or stepping"],["stepping","Stepping up"],["setting","Setting up"],["star_any","★ + setting/stepping"],["star","★ Leading"],["all","All groups"]];
+  const pass = (r,k) => k==="all" || (k==="any"&&r.status!=="none") || k===r.status || (k==="star"&&r.lead) || (k==="star_any"&&r.lead&&r.status!=="none");
+  let open = null;
+  function draw(){
+    saveUI();
+    const rows = X.rows.filter(r=>pass(r,U.f));
+    const stocks = X.rows.flatMap(r=>r.m.filter(m=>m[1]!=="none").map(m=>({t:m[0], st:m[1], d9:m[2], d21:m[3], rs:m[4], price:m[5], to:m[6], g:r.g, gst:r.status, lead:r.lead}))).filter(s=>pass({status:s.gst, lead:s.lead},U.f==="all"?"all":U.f));
+    el.innerHTML = `<div class="page-h"><h1>Stair steps</h1><p>Groups whose stocks pull into their 9/21 EMAs together, then lift off together · ${X.n_step} stepping up, ${X.n_set} setting up · ${day(X.date)} close</p></div>
+      <div class="panel"><div class="controls"><span class="seg" data-g="view"><button data-v="groups" aria-pressed="${U.view==="groups"}">Groups</button><button data-v="stocks" aria-pressed="${U.view==="stocks"}">Stocks</button></span>
+        <span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="toast" id="stToast"></span><button class="btn" id="stCopy">Copy shown for TradingView</button></span></div>
+        ${chipRow("f", F, U.f, k=>X.rows.filter(r=>pass(r,k)).length)}
+        <div id="stT"></div>
+        <div class="legend"><span><i style="background:var(--accent);opacity:.45"></i>share of stocks nuzzled into the 9/21 in the last 5 sessions</span><span><i style="background:var(--up)"></i>share lifting or breaking a step in the last 3</span><span>Dot on top: green = stepping up together, blue = setting up · oldest session on the left</span></div></div>`;
+    el.querySelector('.seg[data-g="view"]').onclick = e => { const b=e.target.closest("button"); if(b){U.view=b.dataset.v; draw();} };
+    el.querySelector('[data-chips="f"]').onclick = e => { const b=e.target.closest("button"); if(b){U.f=b.dataset.v; draw();} };
+    let tbl;
+    $("#stCopy").onclick = () => copyTv(U.view==="groups" ? tvList(tbl.shown.map(r=>[r.g, r.m.map(m=>m[0])])) : tvList([["Stair steps · stocks", tbl.shown.map(s=>s.t)]]), $("#stToast"));
+    if (U.view==="stocks") return tbl = sortTable($("#stT"), {rows:stocks, sort:"rs", dir:-1, groupBy:r=>r.g, gstore:U, cols:[
+      {k:"t", l:"Ticker", html:r=>tk(r.t)},
+      {k:"st", l:"Stock", html:r=>`<span class="st ${ST_OWN[r.st]?.[1]||"st-other"}">${ST_OWN[r.st]?.[0]||esc(r.st)}</span>`},
+      {k:"g", l:"Group", html:r=>`${esc(r.g)}${r.lead?' <span class="star">★</span>':""} <span class="muted">· ${r.gst==="none"?"quiet":r.gst==="stepping"?"stepping up":"setting up"}</span>`, style:()=>"white-space:normal;min-width:200px"},
+      {k:"d9", l:"vs 9 EMA", sub:"ADRs", n:1, html:r=>r.d9==null?"–":(r.d9>0?"+":"")+r.d9.toFixed(2)},
+      {k:"d21", l:"vs 21 EMA", sub:"ADRs", n:1, html:r=>r.d21==null?"–":(r.d21>0?"+":"")+r.d21.toFixed(2)},
+      {k:"to", l:"To step high", n:1, html:r=>pct(r.to)},
+      {k:"rs", l:"RS", n:1}, {k:"price", l:"Price", n:1, html:r=>f2(r.price)}]});
+    const cfg = tbl = sortTable($("#stT"), {rows, sort:"status", dir:-1, groupBy:r=>r.th, groupLabel:"Theme", gstore:(U.gt ||= {}),
+      rowAttr:r=>`class="grp ${open===r.g?"open":""}" data-g="${esc(r.g)}"`,
+      after:r=> open!==r.g ? "" : `<tr class="drawer"><td colspan="10"><div class="drawer-in"><div class="tw"><table><thead><tr><th>Ticker</th><th>State</th><th class="n">vs 9 EMA<small>ADRs</small></th><th class="n">vs 21 EMA<small>ADRs</small></th><th class="n">To step high</th><th class="n">RS</th><th class="n">Price</th></tr></thead><tbody>
+        ${[...r.m].sort((a,b)=>(b[4]??0)-(a[4]??0)).map(m=>`<tr><td>${tk(m[0])}</td><td><span class="st ${ST_OWN[m[1]]?.[1]||"st-other"}">${ST_OWN[m[1]]?.[0]||esc(m[1])}</span></td><td class="n">${m[2]==null?"–":(m[2]>0?"+":"")+m[2].toFixed(2)}</td><td class="n">${m[3]==null?"–":(m[3]>0?"+":"")+m[3].toFixed(2)}</td><td class="n">${pct(m[6])}</td><td class="n">${m[4]??"–"}</td><td class="n">${f2(m[5])}</td></tr>`).join("")}
+        </tbody></table></div></div></td></tr>`,
+      onDraw:host=>{ host.querySelector("tbody").onclick = e => { if (e.target.closest(".drawer")) return; const tr=e.target.closest("tr.grp"); if(!tr) return; open = open===tr.dataset.g?null:tr.dataset.g; cfg.redraw(); }; },
+      cols:[
+      {k:"g", l:"Group", html:r=>`<div class="gname"><span class="caret">▸</span>${esc(r.g)}${r.lead?'<span class="star" title="Top 30% on 60-day return">★</span>':""}</div><div class="gsub" style="padding-left:18px">${esc(r.th||"")} · ${r.n} stocks</div>`, style:()=>"white-space:normal;min-width:210px"},
+      {k:"status", l:"Status", v:r=>(r.status==="stepping"?200:r.status==="setting"?100:0)-r.since, html:r=>r.status==="stepping"?`<span class="tag tag-step">Stepping up · day ${r.since}</span>`:r.status==="setting"?`<span class="tag tag-set">Setting up · day ${r.since}</span>`:'<span class="muted">Quiet</span>'},
+      {k:"stage", l:"Lifecycle", sub:"stage", v:r=>({"Blossom":6,"Quiet build":5,"Ignition":4,"First push":3,"Between stages":2,"Fading":1}[r.stage]||0), html:r=>r.stage?`<span class="st ${stCls(r.stage)}">${esc(r.stage)}</span>`:'<span class="muted">–</span>'},
+      {k:"strip", l:"Last 15 sessions", nosort:1, html:stairStrip},
+      {k:"nuz5", l:"Nuzzled", sub:"5 sessions", n:1, html:r=>Math.round(r.nuz5*100)+"%"},
+      {k:"lifted", l:"Lifted", sub:"3 sessions", n:1, html:r=>Math.round(r.lifted*100)+"%"},
+      {k:"rel5", l:"5D vs SPY", n:1, html:r=>pp(r.rel5)},
+      {k:"rel20", l:"20D vs SPY", n:1, html:r=>pp(r.rel20)},
+      {k:"n", l:"Stocks", n:1}]});
+  }
+  draw();
+}
+
+/* ---------- Setups · Launch list ---------- */
+function pageLaunch(el){
+  const X = S.launch, U = UI2.launch ||= {grade:"AB", stage:"curl", loc:"all"}, B = X.picks_bt;
+  const LOCL = {at9:"At the 9", near:"Near the 9", up:"Up off it", far:"Extended"};
+  const PTS = [["group","Group top third"],["rs","RS 70+"],["rsline","RS line +15%"],["gap","Gap-up day"]];
+  function draw(){
+    saveUI();
+    const rows = X.rows.filter(r => (U.grade==="all" || U.grade.includes(r.grade)) && (U.stage==="all" || r.stage===U.stage) && (U.loc==="all" || r.loc===U.loc));
+    el.innerHTML = `<div class="page-h"><h1>Launch list</h1><p>Fresh weekly base breakouts and the flags just before them · week of ${day(S.asof)}</p></div>
+      <div class="gate go"><b>Launch picks</b><span class="evline">Top 3 each week. Replay of the same rule: ${B.n} picks, ${pct(B.xspy*100)} vs SPY over 13 weeks (t ${B.t.toFixed(1)}; halves ${pct(B.h1*100)} / ${pct(B.h2*100)}), ${Math.round(B.hit50*100)}% reached +50%, worst ${pct(B.worst*100,0)}.</span></div>
+      <div class="picks">${S.picks.map((p,i)=>`<div class="pick"><div class="tkr"><span class="muted num">#${i+1}</span><b>${esc(p.t)}</b><span class="badge v-focus">Grade ${p.grade}</span><span class="st st-build">${esc(p.stage)}</span></div>
+        <div class="muted" style="font-size:12.5px">${esc(p.name)} · ${esc(p.sub)}</div><p>${esc(p.why)}</p>
+        <div class="kv"><span>Price</span><span class="num">${f2(p.price)}</span><span>Stop</span><span>${esc(p.stop)}</span><span>Hold</span><span>13 weeks · weekly swing ≈ ${p.atr}%</span></div></div>`).join("")}</div>
+      <div class="sect"><h2>Tracker</h2><span>live picks, scored at 13 weeks · ${X.tracker.open} open · avg ${pct(X.tracker.live_avg*100)} (${pct(X.tracker.live_xspy*100)} vs SPY)</span></div><div class="panel" id="lnTrk"></div>
+      <div class="sect"><h2>All candidates</h2><span>${X.counts.A} grade A · ${X.counts.B} B · ${X.counts.C} C</span></div>
+      <div class="panel">
+        ${chipRow("grade", [["A","Grade A"],["AB","A + B"],["all","All grades"]], U.grade)}
+        ${chipRow("stage", [["curl","Curl (before the break)"],["early","Early"],["later","Later"],["all","All stages"]], U.stage, k=>X.rows.filter(r=>(U.grade==="all"||U.grade.includes(r.grade))&&(k==="all"||r.stage===k)).length)}
+        ${chipRow("loc", [["all","Anywhere"],["at9","At the 9-week EMA"],["near","Near"],["up","Up off it"],["far","Extended"]], U.loc)}
+        <div class="controls"><span class="muted" style="font-size:12.5px">${rows.length} names</span><span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="toast" id="lnToast"></span><button class="btn" id="lnCopy">Copy shown for TradingView</button></span></div>
+        <div id="lnT"></div></div>`;
+    ["grade","stage","loc"].forEach(k => el.querySelector(`[data-chips="${k}"]`).onclick = e => { const b=e.target.closest("button"); if(b){U[k]=b.dataset.v; draw();} });
+    let tbl; $("#lnCopy").onclick = () => copyTv(tvList([[`Launch ${U.grade} ${U.stage}`, tbl.shown.map(r=>r.t)]]), $("#lnToast"));
+    sortTable($("#lnTrk"), {rows:X.trk, sort:"rank", dir:1, cols:[
+      {k:"week", l:"Week", html:r=>day(r.week)}, {k:"rank", l:"#", n:1}, {k:"t", l:"Ticker", html:r=>tk(r.t)},
+      {k:"grade", l:"Grade"}, {k:"stage", l:"Stage"}, {k:"sub", l:"Sub-theme", style:()=>"white-space:normal"},
+      {k:"entry", l:"Entry", n:1, html:r=>f2(r.entry)}, {k:"last", l:"Last", n:1, html:r=>f2(r.last)},
+      {k:"ret", l:"Return", n:1, html:r=>pp(r.ret*100)}, {k:"xspy", l:"vs SPY", n:1, html:r=>pp(r.xspy*100)},
+      {k:"best", l:"Best", n:1, html:r=>pp(r.best*100)}, {k:"status", l:"Status", html:r=>`<span class="status s-${r.status==="open"?"go":"wait"}">${esc(r.status)}</span>`}]});
+    tbl = sortTable($("#lnT"), {rows, sort:"rs", dir:-1, groupBy:r=>r.sub, gstore:U, cols:[
+      {k:"t", l:"Ticker", html:r=>`${tk(r.t)}${r.prime?' <span class="badge ev-info" title="Prime positioned on Strength on weakness">Prime</span>':""}`},
+      {k:"grade", l:"Grade", html:r=>`<span class="badge ${r.grade==="A"?"v-focus":r.grade==="B"?"v-selective":"ev-info"}">${r.grade}</span>`},
+      {k:"stage", l:"Stage", html:r=>esc(r.stage)+(r.flag?' <span class="muted">· flag break</span>':"")},
+      {k:"vs9", l:"Where", sub:"weekly ATRs vs 9 EMA", n:1, html:r=>`${LOCL[r.loc]||r.loc} <span class="muted">${r.vs9>0?"+":""}${r.vs9.toFixed(1)}</span>`},
+      {k:"sub", l:"Sub-theme", style:()=>"white-space:normal;min-width:150px"},
+      {k:"pts", l:"Points", nosort:1, html:r=>`<span class="checks" title="${PTS.map(([k,l])=>(r.pts[k]?"✓ ":"✗ ")+l).join("\n")}">${PTS.map(([k])=>`<i class="${r.pts[k]?"on":""}"></i>`).join("")}</span>`},
+      {k:"rs", l:"RS", n:1}, {k:"price", l:"Price", n:1, html:r=>f2(r.price)},
+      {k:"atr", l:"Weekly ATR", n:1, html:r=>r.atr+"%"}, {k:"dvol", l:"$ vol / day", n:1, html:r=>r.dvol==null?"–":"$"+Math.round(r.dvol)+"M"}]});
+  }
+  draw();
+}
+
+/* ---------- Setups · Strength on weakness ---------- */
+function weekSpark(r){
+  if (!r.wk || r.wk.length < 4) return '<span class="muted">–</span>';
+  const all = [...r.wk, ...(r.w9||[]), ...(r.w21||[])].filter(x=>x!=null), lo=Math.min(...all), hi=Math.max(...all), W=110, H=28, n=r.wk.length;
+  const line = (v,c,w) => v&&v.length ? `<path d="${v.map((x,i)=>(i?"L":"M")+(i/(n-1)*W).toFixed(1)+" "+(H-2-(x-lo)/((hi-lo)||1)*(H-4)).toFixed(1)).join("")}" fill="none" stroke="${c}" stroke-width="${w}"/>` : "";
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="26 weeks: price, 9 and 21 week EMAs">${line(r.w21,"var(--warn)",1)}${line(r.w9,"var(--accent)",1)}${line(r.wk,"var(--ink)",1.4)}</svg>`;
+}
+function pageSow(el){
+  const X = S.sow, U = UI2.sow ||= {st:"prime"};
+  const SN = Object.fromEntries(X.states.map(s=>[s.key,s.name]));
+  const opts = [["prime","Prime positioned"],...X.states.map(s=>[s.key,s.name]),["all","All"]];
+  const pass = (r,k) => k==="all" || (k==="prime" ? r.prime : r.state===k);
+  function draw(){
+    saveUI();
+    const rows = X.rows.filter(r=>pass(r,U.st)), desc = (X.states.find(s=>s.key===U.st)||{}).desc;
+    el.innerHTML = `<div class="page-h"><h1>Strength on weakness</h1><p>Weekly stage-2 setups out of long bases · week of ${day(X.week)}${X.week_done?"":" (week still in progress)"}</p></div>
+      <div class="gate wait"><b>Info</b><span class="evline">Pops beat the average stock over 26 weeks, but only about as much as any RS 70+ stock. Only ~1 year is testable on our data; treat it as a list to review, not a signal.</span></div>
+      <div class="panel">${chipRow("st", opts, U.st, k=>X.rows.filter(r=>pass(r,k)).length)}
+        <div class="controls"><span class="muted" style="font-size:12.5px">${esc(U.st==="prime"?"In the box: base, 3–30 weekly closes over the 50-week EMA, RS line rising, not stretched.":desc||"")}</span>
+          <span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="toast" id="swToast"></span><button class="btn" id="swCopy">Copy shown for TradingView</button></span></div>
+        <div id="swT"></div>
+        <div class="legend"><span><i style="background:var(--ink)"></i>weekly close</span><span><i style="background:var(--accent)"></i>9-week EMA</span><span><i style="background:var(--warn)"></i>21-week EMA</span><span>last 26 weeks (chart shown for the top names in each state)</span></div></div>`;
+    el.querySelector('[data-chips="st"]').onclick = e => { const b=e.target.closest("button"); if(b){U.st=b.dataset.v; draw();} };
+    let tbl; $("#swCopy").onclick = () => copyTv(tvList([[U.st==="prime"?"SoW prime positioned":"SoW "+(SN[U.st]||U.st), tbl.shown.map(r=>r.t)]]), $("#swToast"));
+    tbl = sortTable($("#swT"), {rows, sort:"rk", dir:-1, groupBy:r=>r.sub, gstore:U, cols:[
+      {k:"t", l:"Ticker", html:r=>tk(r.t)},
+      {k:"state", l:"State", html:r=>`${esc(SN[r.state]||r.state)}${r.ago?` <span class="muted">· ${r.ago}w ago</span>`:""}<div class="mini" style="margin-top:2px">${r.prime?'<span>Prime</span>':""}${r.pnew?'<span>New</span>':""}${r.rslhi?'<span>RS line high</span>':""}</div>`},
+      {k:"chart", l:"26 weeks", nosort:1, html:weekSpark},
+      {k:"sub", l:"Group", style:()=>"white-space:normal;min-width:140px"},
+      {k:"price", l:"Price", n:1, html:r=>f2(r.price)},
+      {k:"vs9", l:"vs 9W", n:1, html:r=>pct(r.vs9)}, {k:"vs21", l:"vs 21W", n:1, html:r=>pct(r.vs21)},
+      {k:"trig", l:"Trigger", n:1, html:r=>r.trig?f2(r.trig):"–"}, {k:"stop", l:"Stop", n:1, html:r=>r.stop?f2(r.stop):"–"},
+      {k:"risk", l:"Risk", n:1, html:r=>r.risk?r.risk+"%":"–"},
+      {k:"rk", l:"RS", n:1, v:r=>(r.rslhi?1000:0)+r.rs, html:r=>r.rs}]});
+  }
+  draw();
+}
+
+/* ---------- Setups · Record volume ---------- */
+function pageHve(el){
+  const X = S.hve, U = UI2.hve ||= {p:"all"}, ev = X.ev;
+  const PROF = {spike:"Spike · short watch", pullback:"Pullback · watch", down:"Down day", other:"Up day"};
+  function draw(){
+    saveUI();
+    const rows = X.rows.filter(r=>U.p==="all"||r.profile===U.p);
+    el.innerHTML = `<div class="page-h"><h1>Record volume</h1><p>Biggest volume day in our 2-year history, in the last 5 sessions · a warning list, not a buy list</p></div>
+      <div class="gate warn"><b>Warning</b><span class="evline">Up days on record volume lagged SPY by ${pct(ev.up.ret*100)} over the next ${ev.hold} sessions (n ${ev.up.n}, ${Math.round(ev.up.win*100)}% beat SPY); RS 85+ names did no better (${pct(ev.up_rs85.ret*100)}).</span></div>
+      <div class="panel">${chipRow("p", [["all","All"],["spike","Spike · short watch"],["pullback","Pullback · watch"],["other","Up day"],["down","Down day"]], U.p, k=>X.rows.filter(r=>k==="all"||r.profile===k).length)}
+        <div class="controls"><span class="muted" style="font-size:12.5px">${rows.length} stocks</span><span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="toast" id="hvToast"></span><button class="btn" id="hvCopy">Copy shown for TradingView</button></span></div>
+        <div id="hvT"></div></div>`;
+    el.querySelector('[data-chips="p"]').onclick = e => { const b=e.target.closest("button"); if(b){U.p=b.dataset.v; draw();} };
+    let tbl; $("#hvCopy").onclick = () => copyTv(tvList([["Record volume", tbl.shown.map(r=>r.t)]]), $("#hvToast"));
+    tbl = sortTable($("#hvT"), {rows, sort:"x50", dir:-1, groupBy:r=>r.sub||r.theme, gstore:U, cols:[
+      {k:"t", l:"Ticker", html:r=>`${tk(r.t)}<div class="gsub" style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${esc(r.name||"")}</div>`},
+      {k:"profile", l:"Profile", html:r=>`<span class="st ${r.profile==="spike"?"st-fading":r.profile==="pullback"?"st-build":"st-other"}">${PROF[r.profile]||esc(r.profile)}</span>${r.short?`<div class="gsub">short: ${esc(r.short.state)}${r.short.state==="wait"?` until day ${r.short.from}`:""}</div>`:""}`},
+      {k:"date", l:"Record day", html:r=>`${esc(r.dow)} ${day(r.date).split(", ")[1]||""}<div class="gsub">${agoTxt(r.ago)}</div>`},
+      {k:"chg", l:"Move", n:1, html:r=>pp(r.chg*100)}, {k:"gap", l:"Gap", n:1, html:r=>pp(r.gap*100)},
+      {k:"x50", l:"× 50-day avg", n:1, html:r=>r.x50+"×"}, {k:"vs_prev", l:"× old record", n:1, html:r=>r.vs_prev+"×"},
+      {k:"loc", l:"Close in range", n:1, html:r=>Math.round(r.loc*100)+"%"},
+      {k:"since", l:"Since", n:1, html:r=>pp(r.since*100)},
+      {k:"ever", l:"Record", html:r=>r.ever==="ever"?'<span class="badge v-avoid">All-time</span>':'<span class="muted">2-year</span>'},
+      {k:"liq", l:"Liquidity", html:r=>esc(r.liq)}, {k:"rsr", l:"RS", n:1},
+      {k:"sub", l:"Group", v:r=>r.sub||r.theme||"", html:r=>esc(r.sub||r.theme||"–"), style:()=>"white-space:normal;min-width:130px"}]});
+  }
+  draw();
 }
 
 route();
