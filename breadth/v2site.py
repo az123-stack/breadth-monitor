@@ -359,6 +359,82 @@ def _timeline(T):
     return {"dates": d, "subs": pack(T.get("subthemes") or []), "themes": pack(T.get("themes") or [])}
 
 
+def _earnings(T):
+    E = T["earnings"]
+    return {"window": E.get("window"), "spy": E.get("spy"), "evidence": E.get("evidence") or {},
+            "rows": [{"g": r["g"], "sector": r.get("sector"), "dir": r.get("dir"), "n": r.get("n"), "members": r.get("members"),
+                      "grp": _pct(r.get("grp")), "quiet": _pct(r.get("quiet")), "next": r.get("next") or [],
+                      "reports": [{k: x.get(k) for k in ("t", "date", "dir", "gap", "move", "rvol", "since", "conf", "rs")} for x in r.get("reports") or []]}
+                     for r in E.get("rows") or []]}
+
+
+def _chapters():
+    try:
+        ch = json.loads((config.DOCS_DIR / "story.json").read_text()).get("chapters") or []
+    except Exception:
+        return []
+    return [{"date": c["date"], "slot": c.get("slot"), "title": c.get("title") or "", "branch": c.get("branch"), "md": c.get("md") or ""}
+            for c in ch if c.get("slot") != "data"][-30:]
+
+
+def _stories():
+    try:
+        return json.loads((config.DOCS_DIR / "stories.json").read_text())
+    except Exception:
+        return None
+
+
+def _cards():
+    import re
+    out = []
+    for f in sorted((config.ROOT / "research").glob("R-*.md")) if hasattr(config, "ROOT") else sorted((Path(__file__).resolve().parents[1] / "research").glob("R-*.md")):
+        txt = f.read_text()
+        m = re.match(r"---\n(.*?)\n---\n(.*)", txt, re.S)
+        if not m:
+            continue
+        meta = {}
+        for line in m.group(1).splitlines():
+            if ":" in line:
+                k, _, v = line.partition(":")
+                meta[k.strip()] = re.sub(r"\s+#.*$", "", v).strip()
+        body = m.group(2).strip()
+        out.append({"id": meta.get("id") or f.stem, "title": meta.get("title"), "date": meta.get("date"), "status": meta.get("status"),
+                    "kind": meta.get("kind"), "result": meta.get("result"), "integrated": meta.get("integrated"),
+                    "layers": [x.strip() for x in (meta.get("layers") or "").strip("[]").split(",") if x.strip()],
+                    "idea": body.split("\n\n")[0][:600]})
+    return sorted(out, key=lambda c: c["date"] or "", reverse=True)
+
+
+def _registry():
+    f = Path(__file__).resolve().parents[1] / "data" / "layers.json"
+    try:
+        L = json.loads(f.read_text())
+    except Exception:
+        return None
+    return [{k: x.get(k) for k in ("id", "name", "kind", "status", "where", "what", "affects_picks", "evidence")} for x in L.get("layers") or []]
+
+
+def _lab(D, T):
+    last = D["rows"][-1]
+    W = T.get("washout") or {}
+    cur = W.get("current") or {}
+    V = T.get("vtilt") or {}
+    X = T.get("dix") or {}
+    L = T.get("leadership") or {}
+    P = T.get("pulse") or {}
+    return {
+        "washout": {"state": W.get("state"), "date": cur.get("date"), "pullback": _pct(cur.get("pullback")), "t2108": cur.get("t2108_low"),
+                    "sessions": cur.get("sessions"), "basket": _pct(cur.get("basket")), "all": _pct(cur.get("all")),
+                    "picks": [p.get("t") for p in (cur.get("picks") or [])[:12]], "deep_n": W.get("deep_n"), "shallow_n": W.get("shallow_n")},
+        "tilt": {k: V.get(k) for k in ("v", "pct", "tier", "post", "since", "unconfirmed")},
+        "dix": {k: X.get(k) for k in ("s5", "norm", "dev", "dev_pct", "tier", "m5_pct")},
+        "close": {"clv": num(last.get("clv_all"), 2), "absorb": num(last.get("absorb"), 1), "fade": num(last.get("fade"), 1)},
+        "health": {"lead": L.get("lead"), "brk": L.get("brk"), "now": {k: (L.get("now") or {}).get(k) for k in ("net", "basket", "work", "bo", "bd")}},
+        "pulse": {"long": P.get("long"), "short": P.get("short"), "ll": P.get("long_label"), "sl": P.get("short_label")},
+        "registry": _registry(), "cards": _cards(),
+    }
+
+
 def _story():
     f = config.DOCS_DIR / "story.json"
     try:
@@ -407,6 +483,10 @@ def slim(D):
     put("market", _market, D, T)
     put("rotation", _rotation, T)
     put("timeline", _timeline, T)
+    put("earnings", _earnings, T)
+    put("chapters", _chapters)
+    put("stories", _stories)
+    put("lab", _lab, D, T)
     put("story", _story)
     try:
         tt = T.get("thetrade") or {}

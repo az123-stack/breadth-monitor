@@ -242,6 +242,17 @@ tr.open .caret{transform:rotate(90deg)}
 .hm td.nm{padding:0 8px 0 0;font-size:12px;white-space:nowrap;max-width:240px;overflow:hidden;text-overflow:ellipsis;background:var(--panel)}
 .hm td.c{width:7px;min-width:7px}
 
+.story{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin-bottom:14px}
+.story h3{font-family:var(--read);font-size:22px;font-weight:600;margin:4px 0 6px;line-height:1.2}
+.story .sum{font-family:var(--read);font-size:17px;color:var(--ink-2);margin:0 0 10px;max-width:70ch}
+.story details{margin-top:8px} .story summary{cursor:pointer;font-weight:500;font-size:13.5px}
+.tl{list-style:none;margin:8px 0 0;padding:0;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.tl li{padding-left:12px;font-size:13.5px} .tl .d{font-family:var(--num);font-size:12px;color:var(--ink-3)}
+.thesis{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:10px 0}
+.thesis div{background:var(--sunk);border-radius:6px;padding:10px 12px;font-size:13px} .thesis b{display:block;font-size:12px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.chk{display:flex;gap:8px;align-items:flex-start;padding:8px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
+.chk:last-child{border-bottom:0}
+
 .tabbar{display:none}
 @media (max-width:900px){
   .nav,.search,.hide-sm,.brand .muted,.xs-hide{display:none}
@@ -313,28 +324,16 @@ const MAP = [
     {id:"setups-dips", name:"Lined-up & dips", ev:"proven", render:pageDips},
     {id:"setups-sow", name:"Strength on weakness", ev:"info", render:pageSow},
     {id:"setups-hve", name:"Record volume", ev:"info", render:pageHve},
-    {id:"setups-export", name:"Export lists", ev:"proven", plan:[
-      ["TradingView lists","Build one list from any setups, groups or picks, then copy or download in TradingView format.","Header buttons","proven"],
-      ["KQ breakout screen","Basing, extended, failing.","Header button","info"]]}]},
+    {id:"setups-export", name:"Export lists", ev:"proven", render:pageExport}]},
   {id:"read", name:"Read", icon:"¶", subs:[
     {id:"read-latest", name:"Latest", ev:"info", render:pageRead},
-    {id:"read-stories", name:"Trade stories", ev:"info", plan:[
-      ["Open storylines","Up to 6 developing stories with timeline, thesis, groups and catalysts.","Trade Stories tab","info"]]},
-    {id:"read-earnings", name:"Earnings", ev:"info", plan:[
-      ["Earnings clusters","Reports that together point to a theme, and the members yet to report.","Trade Stories tab","info"]]},
-    {id:"read-archive", name:"Archive", ev:"info", plan:[
-      ["Every chapter","Morning, data and after-the-close chapters, each on its own page.","New","info"]]}]},
+    {id:"read-stories", name:"Trade stories", ev:"info", render:pageStories},
+    {id:"read-earnings", name:"Earnings", ev:"info", render:pageEarnings},
+    {id:"read-archive", name:"Archive", ev:"info", render:pageArchive}]},
   {id:"lab", name:"Lab", icon:"⚗", subs:[
-    {id:"lab-experiments", name:"Experiments", ev:"unproven", plan:[
-      ["Washout thrust","High-beta leaders after deep washouts. Only 2 cases.","Breadth tab","unproven"],
-      ["Volume tilt, hidden buying","Context reads with some forward signal, not proven.","Breadth tab","info"],
-      ["Long / short pulse","The old sheet's 0–10 scores. Today it says Caution while the proven posture says Press, which is why it moves here.","Themes tab","unproven"],
-      ["Who won the close, market health","Tested: no forward edge found.","Breadth tab","noedge"]]},
-    {id:"lab-evidence", name:"Evidence", ev:"proven", plan:[
-      ["Layer registry","Every layer and where it sits: idea, tested, info, proven, approved, live.","New","proven"]]},
-    {id:"lab-research", name:"Research log", ev:"info", plan:[
-      ["Finding cards","Every study, including the ones that failed.","New","info"],
-      ["Integrator plan","Saturday's ranked list of what to build next.","Decision cards (retired)","info"]]}]},
+    {id:"lab-experiments", name:"Experiments", ev:"unproven", render:pageExperiments},
+    {id:"lab-evidence", name:"Evidence", ev:"proven", render:pageEvidence},
+    {id:"lab-research", name:"Research log", ev:"info", render:pageResearch}]},
 ];
 const EVL = {proven:"Proven", info:"Info", unproven:"Unproven", noedge:"No edge"};
 const evb = k => `<span class="badge ev-${k}">${EVL[k]}</span>`;
@@ -1138,6 +1137,142 @@ function pageTimeline(el){
       <div class="legend"><span>Sorted by today's Strength · hover a cell for the date and value</span><span>${esc(d[0])} → ${esc(d[n-1])}</span></div></div>`;
   el.querySelectorAll(".seg[data-g]").forEach(sg => sg.onclick = e => { const b=e.target.closest("button"); if(b){U[sg.dataset.g]=b.dataset.v; if(sg.dataset.g==="kind") U.sec=""; saveUI(); pageTimeline(el);} });
   const s=$("#tlSec"); if (s) s.onchange = () => { U.sec=s.value; saveUI(); pageTimeline(el); };
+}
+
+/* ---------- Read · Trade stories ---------- */
+const ST_STATUS = {building:"st-build", peaking:"st-blossom", fading:"st-fading", resolved:"st-other"};
+function pageStories(el){
+  const draw = J => {
+    const list = (J && J.stories) || []; if (!list.length) throw new Error("no stories");
+    el.innerHTML = `<div class="page-h"><h1>Trade stories</h1><p>Developing news and earnings narratives and how to trade them · updated ${esc(J.updated||"")}</p></div>
+      ${list.map(s=>`<article class="story"><div class="kicker"><span class="st ${ST_STATUS[s.status]||"st-other"}">${esc(s.status)}</span><span>since ${esc(s.started||"")}</span></div>
+        <h3>${esc(s.title)}</h3><p class="sum">${esc(s.summary||"")}</p>
+        ${s.changed?`<div class="notice"><b>What changed:</b> ${esc(s.changed)}</div>`:""}
+        <div class="mini">${(s.groups.long||[]).map(g=>`<span class="up">▲ ${esc(g)}</span>`).join("")}${(s.groups.short||[]).map(g=>`<span class="dn">▼ ${esc(g)}</span>`).join("")}</div>
+        <details><summary>The thesis, the trade and the timeline</summary>
+          <div class="thesis">${["what","why","how","real","confirm"].filter(k=>s.thesis&&s.thesis[k]).map(k=>`<div><b>${{what:"What's happening",why:"Why",how:"How it works",real:"Real or seesaw",confirm:"What confirms or breaks it"}[k]}</b>${mdLite(s.thesis[k])}</div>`).join("")}</div>
+          ${s.trade?`<div class="prose" style="font-size:15.5px">${mdLite(s.trade)}</div>`:""}
+          <div class="mini" style="margin:6px 0">${(s.tickers.long||[]).map(t=>`<span>${esc(t)}</span>`).join("")}${(s.tickers.watch||[]).length?` · watch: ${(s.tickers.watch||[]).map(t=>`<span>${esc(t)}</span>`).join("")}`:""}</div>
+          ${(s.catalysts||[]).length?`<div class="gsub" style="margin:6px 0"><b>Coming up:</b> ${s.catalysts.map(c=>`${esc(c.date)} ${esc(c.time||"")} ${esc(c.name)}`).join(" · ")}</div>`:""}
+          <ul class="tl">${[...(s.timeline||[])].reverse().map(e=>`<li><span class="d">${esc(e.date)}</span> ${esc(e.event)}${e.url?` <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.source||"source")}</a>`:""}${e.reaction?`<div class="gsub">${esc(e.reaction)}</div>`:""}</li>`).join("")}</ul></details></article>`).join("")}`;
+  };
+  draw(S.stories);
+  if (!pageStories.f){ pageStories.f=1; fetch("../stories.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{ if (j.updated!==(S.stories||{}).updated){ S.stories=j; if(location.hash.slice(1)==="read-stories") draw(j);} }).catch(()=>{}); }
+}
+
+/* ---------- Read · Earnings ---------- */
+function pageEarnings(el){
+  const X = S.earnings; if (!X) throw new Error("no earnings");
+  const ev = (X.evidence||{}).up || {};
+  el.innerHTML = `<div class="page-h"><h1>Earnings clusters</h1><p>Two or more reports in one sub-theme within 5 sessions, mostly the same way · ${esc((X.window||[]).join(" to "))}</p></div>
+    <div class="gate wait"><b>Info</b><span class="evline">After an UP cluster, the group's members that hadn't reported beat the average group by ${pct((ev.mean||0)*100)} over 20 sessions (t ${ev.t??"–"}); down clusters showed nothing.</span></div>
+    ${X.rows.length?X.rows.map(r=>`<div class="panel" style="margin-bottom:12px"><div class="ph"><h3>${esc(r.g)}</h3><span class="sub">${esc(r.sector||"")} · ${r.n} of ${r.members} reported</span><span class="right"><span class="badge ${r.dir==="up"?"v-focus":r.dir==="down"?"v-avoid":"ev-info"}">${esc(r.dir)}</span></span></div>
+      <div class="tw"><table><thead><tr><th>Ticker</th><th>Date</th><th class="n">Gap</th><th class="n">Day</th><th class="n">Rel. volume</th><th class="n">Since</th><th class="n">RS</th></tr></thead><tbody>
+      ${r.reports.map(x=>`<tr><td>${tk(x.t)}${x.conf?' <span class="badge ev-info">confirmed earnings</span>':""}</td><td>${esc(x.date)}</td><td class="n">${pp(x.gap*100)}</td><td class="n">${pp(x.move*100)}</td><td class="n">${x.rvol}×</td><td class="n">${pp((x.since||0)*100)}</td><td class="n">${x.rs??"–"}</td></tr>`).join("")}</tbody></table></div>
+      <div class="legend"><span>Group ${pp(r.grp)} · non-reporters ${pp(r.quiet)}</span>${r.next.length?`<span>Reporting next: ${r.next.map(n=>esc(n.t||n)+(n.date?" "+esc(n.date):"")).join(", ")}</span>`:""}</div></div>`).join(""):'<div class="notice">No earnings clusters in the last 5 sessions.</div>'}`;
+}
+
+/* ---------- Read · Archive ---------- */
+function pageArchive(el){
+  const list = [...(S.chapters||[])].reverse(); if (!list.length) throw new Error("no chapters");
+  const U = UI2.arch ||= {open:null};
+  el.innerHTML = `<div class="page-h"><h1>Archive</h1><p>Every chapter of the daily story, newest first</p></div>
+    <div class="panel">${list.map((c,i)=>`<div class="chk" style="flex-direction:column"><button class="btn" style="border:0;padding:0;height:auto;background:none;text-align:left;font-weight:500;white-space:normal;line-height:1.4" data-i="${i}">${day(c.date)} · ${c.slot==="pm"?"After the close":"Morning"} — ${esc(c.title)}</button>
+      ${U.open===i?`<div class="prose" style="font-size:16px;margin-top:8px">${mdLite(c.md)}</div>`:""}</div>`).join("")}</div>`;
+  el.querySelectorAll("button[data-i]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.i; U.open = U.open===i?null:i; saveUI(); pageArchive(el); });
+}
+
+/* ---------- Lab · Experiments ---------- */
+function pageExperiments(el){
+  const X = S.lab; if (!X) throw new Error("no lab");
+  const W = X.washout, V = X.tilt, D = X.dix, C = X.close, H = X.health, P = X.pulse;
+  const tile = (title, ev, body, note) => `<div class="cbox"><h3>${title} ${evb(ev)}</h3><div style="font-size:13.5px;margin:6px 0">${body}</div><div class="gsub">${note}</div></div>`;
+  el.innerHTML = `<div class="page-h"><h1>Experiments</h1><p>Measured every day, but not proven enough to steer the picks. Kept here so they don't compete with the proven reads.</p></div>
+    <div class="cgrid">
+      ${tile("Washout thrust", "unproven", W.state==="deep"?`<b>Deep washout thrust</b> on ${esc(W.date)}: favor RS 80+ high-beta names for about a month.`:`Last thrust (${esc(W.date||"–")}) was <b>${esc(W.state||"–")}</b>: SPY pullback ${pct(W.pullback)}, T2108 low ${W.t2108??"–"}. High-beta list ${pct(W.basket)} vs all stocks ${pct(W.all)} so far.`, `Only ${W.deep_n} deep and ${W.shallow_n} shallow thrusts on record.`)}
+      ${tile("Volume tilt", "info", `Tilt ${V.v} (${V.pct}th percentile, ${esc(V.tier)})${V.post?`, ${V.since} sessions after a thrust`:""}${V.unconfirmed?" · thrust not confirmed":""}.`, "Low tilt after a thrust = sellers gone; low tilt without one = buyers tiring. About 4 episodes each side.")}
+      ${tile("Hidden buying (FINRA)", "info", `S&P 500 off-exchange short share ${D.s5}% vs normal ${D.norm}% (${D.dev>0?"+":""}${D.dev} pts, ${D.dev_pct}th percentile, ${esc(D.tier)}); typical stock ${D.m5_pct}th percentile.`, "Top fifth was followed by SPY +3.1% over 21 sessions vs +0.7% for the bottom fifth; two years, bull-heavy.")}
+      ${tile("Who won the close", "noedge", `Dollar-weighted close location ${C.clv} (−1 low, +1 high) · absorb ${C.absorb}% · fade ${C.fade}%.`, "Tested: no forward edge in either half. Descriptive only.")}
+      ${tile("Market health", "noedge", `${esc((H.lead||[])[1]||"–")} · ${esc((H.brk||[])[1]||"–")} · ${H.now.bo??"–"} breakouts vs ${H.now.bd??"–"} breakdowns.`, "Leaders and breakout counts showed no forward edge over 410 days.")}
+      ${tile("Long / short pulse", "unproven", `Long side <b>${P.long}/10</b> (${esc(P.ll||"")}) · short side <b>${P.short}/10</b> (${esc(P.sl||"")}).`, "The old sheet's scores. They can disagree with the proven posture on Today, which is why they live here.")}
+    </div>`;
+}
+
+/* ---------- Lab · Evidence ---------- */
+const LADDER = ["idea","tested","info","proven","approved","live","retired"];
+function pageEvidence(el){
+  const X = S.lab; if (!X || !X.registry) throw new Error("no registry");
+  const U = UI2.ev ||= {st:"all"};
+  const rows = X.registry.filter(r=>U.st==="all"||r.status===U.st);
+  el.innerHTML = `<div class="page-h"><h1>Evidence</h1><p>Every input the dashboard uses or has tried, and where it sits on the ladder: idea → tested → info → proven → approved → live. Only approved or live layers can move the picks.</p></div>
+    <div class="panel">${chipRow("st", [["all","All"]].concat(LADDER.map(s=>[s, s[0].toUpperCase()+s.slice(1)])), U.st, k=>k==="all"?X.registry.length:X.registry.filter(r=>r.status===k).length)}<div id="evT"></div></div>`;
+  el.querySelector('[data-chips="st"]').onclick = e => { const b=e.target.closest("button"); if(b){U.st=b.dataset.v; saveUI(); pageEvidence(el);} };
+  sortTable($("#evT"), {rows, sort:"status", dir:-1, cols:[
+    {k:"name", l:"Layer", html:r=>`<b>${esc(r.name||r.id)}</b><div class="gsub">${esc(r.where||"")}</div>`, style:()=>"white-space:normal;min-width:180px"},
+    {k:"status", l:"Status", v:r=>LADDER.indexOf(r.status), html:r=>`<span class="badge ${r.status==="live"||r.status==="approved"?"ev-proven":r.status==="proven"?"v-focus":r.status==="retired"?"ev-noedge":r.status==="info"?"ev-info":"ev-unproven"}">${esc(r.status)}</span>${r.affects_picks?'<div class="gsub">moves the picks</div>':""}`},
+    {k:"what", l:"What it measures", html:r=>esc(r.what||""), style:()=>"white-space:normal;min-width:300px"},
+    {k:"evidence", l:"Finding cards", nosort:1, html:r=>(r.evidence||[]).map(c=>`<a href="#lab-research" class="gsub">${esc(c)}</a>`).join("<br>"), style:()=>"white-space:normal"}]});
+}
+
+/* ---------- Lab · Research log ---------- */
+function pageResearch(el){
+  const X = S.lab; if (!X || !X.cards) throw new Error("no cards");
+  const U = UI2.rs ||= {st:"all"};
+  const STS = [["all","All"],["works","Works"],["mixed","Mixed"],["doesnt","Doesn't work"],["untested","Untested"],["process","Process"]];
+  el.innerHTML = `<div class="page-h"><h1>Research log</h1><p>Every study, including the ones that failed, so nothing gets tested twice · ${X.cards.length} cards</p></div>
+    <div class="panel">${chipRow("st", STS, U.st, k=>k==="all"?X.cards.length:X.cards.filter(c=>c.status===k).length)}<div id="rsT"></div></div>`;
+  el.querySelector('[data-chips="st"]').onclick = e => { const b=e.target.closest("button"); if(b){U.st=b.dataset.v; saveUI(); pageResearch(el);} };
+  sortTable($("#rsT"), {rows:X.cards.filter(c=>U.st==="all"||c.status===U.st), sort:"date", dir:-1, cols:[
+    {k:"date", l:"Date", html:r=>esc((r.date||"").slice(5))},
+    {k:"title", l:"Study", html:r=>`<b>${esc(r.title||r.id)}</b><div class="gsub">${esc(r.result||"")}</div>`, style:()=>"white-space:normal;min-width:320px"},
+    {k:"status", l:"Result", html:r=>`<span class="badge ${r.status==="works"?"v-focus":r.status==="doesnt"?"v-avoid":r.status==="mixed"?"v-selective":"ev-info"}">${esc(r.status||"")}</span>`},
+    {k:"integrated", l:"In the dashboard", html:r=>esc(r.integrated||"")}, {k:"kind", l:"Kind"}]});
+}
+
+/* ---------- Setups · Export lists ---------- */
+function exportSections(){
+  const top = (arr, n) => arr.slice(0, n);
+  const L = [];
+  L.push(["Launch picks", (S.picks||[]).map(p=>p.t)]);
+  L.push(["Lined-up buys (in the zone)", ((S.lineup||{}).rows||[]).filter(r=>r.st==="zone").map(r=>r.t)]);
+  L.push(["Box favorites", ((S.boxes||{}).rows||[]).filter(r=>r.fav).map(r=>r.t)]);
+  L.push(["Box trades acting now (A-B)", ((S.boxes||{}).rows||[]).filter(r=>(r.grade==="A"||r.grade==="B")&&((r.type==="retest_long"&&(r.tag==="go"||r.tag==="at"))||(r.type==="trap_long"&&r.tag==="failed"))).map(r=>r.t)]);
+  const byType = {}; (S.setups||[]).forEach(r=>{ (byType[r.setup] ||= []).push(r.t); });
+  Object.entries(byType).forEach(([k,v])=>L.push([k, v]));
+  L.push(["EMA pullbacks in leading groups", ((S.lineup||{}).nuzzle||[]).filter(r=>r.state==="nuzzle").map(r=>r.t)]);
+  L.push(["High tight flags", ((S.lineup||{}).flags||[]).map(r=>r.t)]);
+  L.push(["Launch list grade A (curl + early)", ((S.launch||{}).rows||[]).filter(r=>r.grade==="A"&&(r.stage==="curl"||r.stage==="early")).map(r=>r.t)]);
+  ["breakout","pop","nuzzle"].forEach(s=>L.push([`Strength on weakness: ${s}`, ((S.sow||{}).rows||[]).filter(r=>r.state===s).map(r=>r.t)]));
+  L.push(["Strength on weakness: prime positioned", ((S.sow||{}).rows||[]).filter(r=>r.prime).map(r=>r.t)]);
+  ((S.life||{}).rows||[]).filter(r=>r.buy).forEach(r=>L.push([`BUY group: ${r.g}`, r.picks.map(p=>p.t).concat(r.wait.map(p=>p.t))]));
+  L.push(["Top 2 themes (members)", top([...(S.themes||[])].sort((a,b)=>a.rk-b.rk),2).flatMap(g=>g.m)]);
+  L.push(["Top 3 sub-themes (members)", top([...(S.subs||[])].sort((a,b)=>a.rk-b.rk),3).flatMap(g=>g.m)]);
+  L.push(["Record volume (warning list)", ((S.hve||{}).rows||[]).map(r=>r.t)]);
+  return L.filter(s=>s[1].length);
+}
+function pageExport(el){
+  const secs = exportSections(), U = UI2.exp ||= {on:null, dedupe:true};
+  if (!U.on) U.on = secs.slice(0, 4).map(s=>s[0]);
+  function build(){
+    const seen = new Set(), out = [];
+    secs.filter(s=>U.on.includes(s[0])).forEach(([n, ts])=>{ const keep = U.dedupe ? ts.filter(t=>!seen.has(t)) : [...new Set(ts)]; keep.forEach(t=>seen.add(t)); if (keep.length) out.push([n, keep]); });
+    return out;
+  }
+  function draw(){
+    saveUI();
+    const out = build(), n = out.reduce((s,x)=>s+x[1].length,0);
+    el.innerHTML = `<div class="page-h"><h1>Export lists</h1><p>Pick the lists you want, then download one TradingView watchlist (sections become TradingView headers)</p></div>
+      <div class="cgrid"><div class="panel"><div class="ph"><h3>Lists</h3><span class="right"><button class="btn" id="exAll">All</button><button class="btn" id="exNone">None</button></span></div>
+        ${secs.map(([nm,ts])=>`<label class="chk"><input type="checkbox" class="ck" data-n="${esc(nm)}" ${U.on.includes(nm)?"checked":""}><span style="flex:1">${esc(nm)}</span><span class="num muted">${ts.length}</span></label>`).join("")}</div>
+      <div class="panel"><div class="ph"><h3>Your watchlist</h3><span class="sub">${n} tickers in ${out.length} sections</span><span class="right"><span class="toast" id="exToast"></span><button class="btn primary" id="exGo">⬇ Download for TradingView</button></span></div>
+        <div class="controls"><label class="ink2" style="font-size:12.5px;display:flex;gap:6px;align-items:center"><input type="checkbox" class="ck" id="exDd" ${U.dedupe?"checked":""}> Each ticker once (in its first section)</label></div>
+        <div style="padding:10px 14px;display:flex;flex-direction:column;gap:10px">${out.map(([nm,ts])=>`<div><b style="font-size:13px">${esc(nm)}</b><div class="mini" style="margin-top:4px">${ts.map(t=>`<span>${esc(t)}</span>`).join("")}</div></div>`).join("")||'<span class="muted">Pick at least one list.</span>'}</div></div></div>`;
+    el.querySelectorAll("input[data-n]").forEach(c=>c.onchange=()=>{ const nm=c.dataset.n; U.on = c.checked ? [...U.on, nm] : U.on.filter(x=>x!==nm); draw(); });
+    $("#exAll").onclick=()=>{U.on=secs.map(s=>s[0]); draw();}; $("#exNone").onclick=()=>{U.on=[]; draw();};
+    $("#exDd").onchange=e=>{U.dedupe=e.target.checked; draw();};
+    $("#exGo").onclick=()=>copyTv(tvList(build()), $("#exToast"), "market-monitor-watchlist");
+  }
+  draw();
 }
 
 route();
