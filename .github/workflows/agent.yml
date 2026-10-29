@@ -14,7 +14,7 @@ name: Agent input
 on:
   workflow_dispatch:
     inputs:
-      kind: { description: "catalysts, macro_brief or review", required: true }
+      kind: { description: "catalysts, macro_brief, review, plan or reclass", required: true }
       b64: { description: "Agent JSON, base64", required: true }
 
 permissions:

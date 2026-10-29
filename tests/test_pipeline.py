@@ -1689,6 +1689,102 @@ def test_earnings_clusters():
     return f"{len(L.splitlines())} fact lines"
 
 
+def test_theme_upkeep_reclass():
+    """Reclass check finds a misfiled stock, an unclassified leader and a dead ticker; agent proposals validate strictly
+    (worklist tickers, known sub-theme names, sources) and only an explicit apply changes the theme files."""
+    import json, tempfile
+    from breadth import reclass as RC, agentfiles as AF
+    rng = np.random.default_rng(7)
+    n = 160
+    fa, fb = rng.normal(0, 0.02, n), rng.normal(0, 0.02, n)          # two group factors
+    closes, vols = {"SPY": list(100 * np.cumprod(1 + rng.normal(0, 0.005, n)))}, {"SPY": [5e7] * n}
+    def stock(f, drift=0.0):
+        return list(50 * np.cumprod(1 + f + rng.normal(0, 0.004, n) + drift))
+    for k in range(4):
+        closes[f"A{k}"] = stock(fa); closes[f"B{k}"] = stock(fb)
+    closes["MIS"] = stock(fb)                    # filed in A, trades like B
+    closes["NEW"] = stock(fa, 0.004)             # strong, in no sub-theme
+    closes["DEAD"] = stock(fa)
+    for t in closes:
+        vols.setdefault(t, [2e6] * n)
+    bars = make_bars(closes, vols)
+    bars = bars[~((bars["ticker"] == "DEAD") & (bars["date"] > bars["date"].unique()[-8]))]
+    subs = pd.DataFrame([{"group": "G", "subtheme": "Alpha", "ticker": t} for t in ["A0", "A1", "A2", "A3", "MIS", "DEAD"]]
+                        + [{"group": "G", "subtheme": "Beta", "ticker": f"B{k}"} for k in range(4)])
+    themes = pd.DataFrame(columns=["theme", "ticker", "role"])
+    universe = set(closes) - {"SPY"}
+    old = RC.LOG_FILE, RC.PROPOSALS, RC.SUB_FILE, RC.THEME_FILE
+    old_bench, config.BENCHMARK = config.BENCHMARK, "SPY"     # an earlier test points the benchmark at a fake ticker
+    tmp = Path(tempfile.mkdtemp())
+    try:
+        RC.LOG_FILE, RC.PROPOSALS, RC.SUB_FILE, RC.THEME_FILE = tmp / "log.csv", tmp / "p.json", tmp / "s.csv", tmp / "t.csv"
+        subs.to_csv(RC.SUB_FILE, index=False)
+        pd.DataFrame([{"theme": "T1", "ticker": "A0", "role": "member"}]).to_csv(RC.THEME_FILE, index=False)
+        RC.CFG["rs_min"] = 50
+        W = RC.build(bars, universe, subs, themes, {})
+        RC.CFG["rs_min"] = 80
+        poor = {r["t"]: r for r in W["poor_fit"]}
+        assert "MIS" in poor and poor["MIS"]["best"][0][0] == "Beta", W["poor_fit"]
+        assert not any(r["t"].startswith(("A", "B")) for r in W["poor_fit"]), W["poor_fit"]
+        assert [u["t"] for u in W["unclassified"]] == ["NEW"] and W["unclassified"][0]["cand"][0][0] == "Alpha", W["unclassified"]
+        assert [s["t"] for s in W["stale"]] == ["DEAD"], W["stale"]
+        # validation: unknown sub-theme, off-worklist ticker and source-less moves are dropped; ids follow the order
+        raw = {"for_date": "2025-08-01", "summary": "Checked 3.", "checked": 3, "moves": [
+            {"t": "MIS", "action": "move", "from": "Alpha", "to": "Beta", "confidence": "high", "why": "Sells B things.", "sources": ["https://x.com/a"]},
+            {"t": "NEW", "action": "add", "to": "Nowhere", "confidence": "high", "why": "?", "sources": ["https://x.com/b"]},
+            {"t": "NEW", "action": "add", "to": "NEW: G / Gamma", "confidence": "medium", "why": "New niche.", "sources": ["https://x.com/c"]},
+            {"t": "ZZZ", "action": "add", "to": "Beta", "confidence": "high", "why": "not on worklist", "sources": ["https://x.com/d"]},
+            {"t": "DEAD", "action": "remove", "confidence": "high", "why": "Acquired.", "sources": []}]}
+        clean = AF.validate("reclass", raw, {"MIS", "NEW", "DEAD"})
+        got = [(m["t"], m["action"], m["to"]) for m in clean["moves"]]
+        assert got == [("MIS", "move", "Beta"), ("NEW", "add", "NEW: G / Gamma")], got
+        assert [m["id"] for m in clean["moves"]] == [1, 2]
+        RC.PROPOSALS.write_text(json.dumps(clean))
+        before = RC.SUB_FILE.read_text()
+        assert RC.proposals_status()["moves"][0]["status"] == "open"
+        assert RC.SUB_FILE.read_text() == before                      # proposals alone change nothing
+        lines = RC.apply_moves(["1"], today=date(2025, 8, 2))
+        s2 = pd.read_csv(RC.SUB_FILE)
+        assert s2.loc[s2["ticker"] == "MIS", "subtheme"].tolist() == ["Beta"] and len(s2) == len(subs), (lines, s2)
+        RC.reject(["2"], today=date(2025, 8, 2))
+        st = {m["t"]: m["status"] for m in RC.proposals_status()["moves"]}
+        assert st == {"MIS": "applied", "NEW": "rejected"}, st
+        assert RC.apply_moves(["1"])[0].endswith("already decided")
+        W2 = RC.build(bars, universe, pd.read_csv(RC.SUB_FILE), themes, {})   # decided tickers stay off the worklist
+        assert "MIS" not in {r["t"] for r in W2["poor_fit"]} and not W2["unclassified"]
+    finally:
+        RC.LOG_FILE, RC.PROPOSALS, RC.SUB_FILE, RC.THEME_FILE = old
+        RC.CFG["rs_min"] = 80
+        config.BENCHMARK = old_bench
+    return f"poor fit {poor['MIS']['own']} vs {poor['MIS']['best'][0][1]}; {len(lines)} applied"
+
+
+def test_v2_page_builds():
+    """v2 page: payload slims every section, a broken section is skipped (not fatal), and no text can break the script."""
+    from breadth import v2site
+    D = {"generated": "x", "regime": {"label": "Strong"}, "thresholds": {"oversold": 20, "overbought": 70},
+         "rows": [{"date": "2025-06-10", "up4": 300.0, "dn4": 40.0, "t2108": 55.0, "dn_share": 38.0}],
+         "themes": {"date": "2025-06-10", "tv": {"AAA": "NYSE:AAA"},
+                    "playbook": {"state": "strong", "label": "Strong breadth", "advice": "Press </script><b>", "since": None,
+                                 "rows": [{"name": "ATH Magnet", "verdict": "Focus", "avg_r": 0.2, "n": 50}]},
+                    "launch": {"picks": [{"t": "AAA", "plan": {"stop": "Weekly close under $9"}}]},
+                    "lifecycle": "broken"}}
+    S = v2site.slim(D)
+    assert S["playbook"]["state"] == "strong" and S["picks"][0]["t"] == "AAA" and "groups" not in S, S.keys()
+    assert S["tv"] == {"AAA": "NYSE:AAA"}
+    tmp = Path(__import__("tempfile").mkdtemp())
+    old = config.DOCS_DIR
+    try:
+        config.DOCS_DIR = tmp
+        v2site.build(D)
+        h = (tmp / "v2" / "index.html").read_text()
+    finally:
+        config.DOCS_DIR = old
+    assert h.startswith("<!doctype html>") and "/*__DATA__*/null" not in h and "</script><b>" not in h
+    assert h.count("</script>") == 1
+    return f"{len(h) // 1024} KB page"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

@@ -21,8 +21,8 @@ from datetime import datetime, timezone
 from . import config
 
 REPO = "az123-stack/breadth-monitor"
-KINDS = ("catalysts", "macro_brief", "review", "plan")
-WEEKLY = ("review", "plan")      # weekly agents: not tied to a card date / entry cutoff
+KINDS = ("catalysts", "macro_brief", "review", "plan", "reclass")
+WEEKLY = ("review", "plan", "reclass")      # weekly agents: not tied to a card date / entry cutoff
 FULL_RESEARCH = 15        # first N carded tickers get full catalyst research; the rest get an earnings-date check only
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 URL = re.compile(r"^https?://\S+$")
@@ -59,6 +59,22 @@ SCHEMA = {
         "retire": [{"target": "layer id or agent name", "why": "evidence"}],
         "registry_updates": [{"layer": "id", "to": "proposed status on the ladder", "why": "evidence"}],
         "card_updates": [{"card": "R-...", "integrated": "yes | partly | no | rejected", "why": "..."}],
+    },
+    "reclass": {
+        "for_date": "YYYY-MM-DD — copy `for_date` from `python -m breadth.reclass worklist`",
+        "summary": "2-4 plain sentences for Adam: how many tickers you checked and the moves that matter most",
+        "checked": "number of worklist tickers you researched",
+        "moves": [{
+            "t": "TICKER (must be on the worklist)",
+            "action": "add (unclassified → a sub-theme) | move (to a better sub-theme) | remove (dead / delisted / acquired) "
+                      "| rename (ticker changed; put the new ticker in `to`) | keep (checked: current home is right)",
+            "from": "current sub-theme exactly as in the worklist, or null",
+            "to": "an existing sub-theme name exactly as listed (without the [group]), or 'NEW: Group / Sub-theme name'; "
+                  "for rename the new ticker; null for remove / keep",
+            "theme_add": "optional: an existing theme name (from `themes`) to also add the stock to, else null",
+            "confidence": "high | medium | low",
+            "why": "one or two plain sentences: what the company actually does and why it belongs there",
+            "sources": ["https://... at least one URL you used (not needed for keep)"]}],
     },
     "review": {
         "for_date": "YYYY-MM-DD — the latest official date (worklist for_date)",
@@ -224,6 +240,57 @@ def validate(kind, js, allowed=None):
                                for a in _list(js.get("card_updates"))[:40] if isinstance(a, dict) and _s(a.get("card"))]
         if not items:
             raise ValueError("at least one item is required (use verdict 'watch' if nothing is ready)")
+    elif kind == "reclass":
+        out["summary"] = _s(js.get("summary"), 800)
+        if not out["summary"]:
+            raise ValueError("summary is required")
+        from . import reclass
+        subs = {r["subtheme"] for r in reclass._read_csv(reclass.SUB_FILE)[1]}
+        themes = {r["theme"] for r in reclass._read_csv(reclass.THEME_FILE)[1]}
+        moves, seen = [], set()
+        for m in _list(js.get("moves"))[:80]:
+            if not isinstance(m, dict):
+                continue
+            tk = str(m.get("t") or "").upper().strip()
+            act = str(m.get("action") or "").lower().strip()
+            if not tk or tk in seen or act not in ("add", "move", "remove", "rename", "keep"):
+                continue
+            if allowed is not None and tk not in allowed:
+                continue
+            to = _s(m.get("to"), 120) or ""
+            if act in ("add", "move"):
+                if to.upper().startswith("NEW:"):
+                    g, _, nm = to[4:].partition("/")
+                    if not g.strip() or not nm.strip():
+                        continue
+                    to = f"NEW: {g.strip()} / {nm.strip()}"
+                elif to not in subs:
+                    continue                                  # unknown sub-theme name: never guess
+            elif act == "rename":
+                to = to.upper()
+                if not re.match(r"^[A-Z][A-Z0-9.\-]{0,9}$", to):
+                    continue
+            else:
+                to = ""
+            src = _urls(m.get("sources"))
+            if act != "keep" and not src:
+                continue                                      # no source, no move
+            conf = str(m.get("confidence") or "").lower()
+            th = _s(m.get("theme_add"), 120)
+            seen.add(tk)
+            moves.append({"t": tk, "action": act, "from": _s(m.get("from"), 120) or None, "to": to or None,
+                          "theme_add": th if th in themes and act in ("add", "move") else None,
+                          "confidence": conf if conf in ("high", "medium", "low") else "low",
+                          "why": _s(m.get("why"), 300) or "", "sources": src})
+        order = {"remove": 0, "rename": 1, "move": 2, "add": 3, "keep": 4}
+        moves.sort(key=lambda x: (order[x["action"]], {"high": 0, "medium": 1, "low": 2}[x["confidence"]]))
+        for k, m in enumerate(moves, 1):
+            m["id"] = k
+        out["moves"] = moves
+        ck = js.get("checked")
+        out["checked"] = int(ck) if isinstance(ck, (int, float)) or (isinstance(ck, str) and ck.isdigit()) else len(moves)
+        if not moves:
+            raise ValueError("no valid moves (each needs a worklist ticker, a known sub-theme or 'NEW: Group / Name', and a source)")
     elif kind == "review":
         out["summary"] = _s(js.get("summary"), 700)
         out["findings"] = [_s(x, 300) for x in _list(js.get("findings")) if isinstance(x, str) and _s(x)][:10]
@@ -249,12 +316,20 @@ def validate(kind, js, allowed=None):
     return out
 
 
+def _allowed(kind):
+    if kind == "reclass":
+        from . import reclass
+        W = reclass.worklist()
+        return {r["t"] for k in ("unclassified", "poor_fit", "stale") for r in W.get(k) or []} or None
+    return {x["t"] for x in worklist()["tickers"]} or None
+
+
 def save(kind, js):
     agent_dir = config.DOCS_DIR / "agent"
     agent_dir.mkdir(parents=True, exist_ok=True)
     allowed = None
     try:
-        allowed = {x["t"] for x in worklist()["tickers"]} or None
+        allowed = _allowed(kind)
     except Exception:
         pass
     clean = validate(kind, js, allowed)
@@ -277,7 +352,7 @@ def publish(kind, path, push=False):
     if kind not in WEEKLY and wl.get("past_cutoff"):
         sys.exit(f"too late: ideas for {wl['for_date']} were bought at {wl['entry_cutoff']}; research done now can't be "
                  "logged as known beforehand. Not publishing (the overnight data is probably late; report it).")
-    clean = validate(kind, js, {x["t"] for x in wl["tickers"]} or None)   # same check the save job runs
+    clean = validate(kind, js, _allowed(kind))   # same check the save job runs
     if not push:
         print(json.dumps(clean, indent=1))
         return

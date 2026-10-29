@@ -517,6 +517,10 @@ table.grid.rtab td.tname small { max-width: 130px; overflow: hidden; text-overfl
 .favbox { margin: 10px 0 6px; padding: 10px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent); background: color-mix(in srgb, var(--warning) 7%, transparent); }
 .favrow { padding: 7px 0; border-top: 1px solid var(--grid); font-size: 13.5px; } .favrow:first-of-type { border-top: 0; } .favhead { display: flex; gap: 6px; flex-wrap: wrap; align-items: baseline; }
 .stairbits { margin-top: 3px; } .stairbits .tg { font-size: 10px; }
+.rccard .rcbody { padding: 4px 16px 14px; } .rcsum { margin: 4px 0 10px; } .rcwhy { white-space: normal; min-width: 260px; max-width: 460px; }
+.rccard details { margin-top: 10px; } .rccard summary { cursor: pointer; font-weight: 600; font-size: 13.5px; }
+.rcgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 10px; }
+.rcgrid h4 { margin: 0 0 2px; font-size: 13.5px; } .rclist { margin: 6px 0 0; padding-left: 18px; font-size: 13px; } .rclist li { margin-bottom: 3px; }
 .tg.lp-on { background: color-mix(in srgb, var(--good) 30%, transparent); } .tg.lp-off { background: transparent; color: var(--text-muted); text-decoration: line-through; opacity: .7; }
 .lgrade { display: inline-block; min-width: 22px; text-align: center; font-weight: 800; border-radius: 6px; padding: 1px 6px; margin-right: 4px; }
 .lgrade.A { background: color-mix(in srgb, var(--good) 45%, transparent); } .lgrade.B { background: color-mix(in srgb, var(--warning) 35%, transparent); } .lgrade.C { background: var(--grid); }
@@ -2879,6 +2883,43 @@ function renderThemes(app) {
   const current = sortable(card.querySelector("table"), cols, filtered, draw, U.sort);
   qi.addEventListener("input", (e) => { U.q = e.target.value.trim().toLowerCase(); draw(current()); });
   draw(current());
+  const rc = reclassCard(T);
+  if (rc) app.append(rc);
+}
+/* Theme upkeep (Oct 28 2026, Adam: "an agent checking whether tickers need reclassifying into our themes and sub-themes").
+   Code measures (reclass.py → DATA.themes.reclass), the weekly agent proposes (docs/agent/reclass.json), Adam decides:
+   "apply reclass 1, 3" in the project chat. Nothing on this card changes the theme files by itself. */
+function reclassCard(T) {
+  const W = T.reclass;
+  if (!W) return null;
+  const P = W.proposals, C = W.counts || {};
+  const ACT = { add: "Add", move: "Move", remove: "Remove", rename: "Rename", keep: "Keep" };
+  const STC = { open: "", applied: "tg-help", rejected: "tg-hurt", kept: "" };
+  const rows = P && P.moves ? P.moves.filter(m => m.action !== "keep") : [];
+  const kept = P && P.moves ? P.moves.filter(m => m.action === "keep").length : 0;
+  const list = (arr, f) => arr.length ? `<ul class="rclist">${arr.map(f).join("")}</ul>` : '<div class="meta">None.</div>';
+  const card = $(`<section class="card regcard rccard"><div class="kicker">Theme upkeep · tickers to classify or move <span class="tg">Proposals only</span></div>
+    <div class="rcbody">
+    ${P ? `<p class="rcsum">${esc(P.summary || "")} <span class="meta">Agent run for ${shortDate(P.for_date)} · ${P.checked} checked · ${kept} kept where they are.</span></p>
+      ${rows.length ? `<div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Ticker</th><th class="l">Change</th><th class="l">From → to</th><th class="l">Confidence</th><th class="l">Why</th><th class="l">Status</th></tr></thead><tbody>
+      ${rows.map(m => `<tr><td class="num">${m.id}</td><td class="l"><b>${esc(m.t)}</b></td><td class="l">${ACT[m.action] || esc(m.action)}</td>
+        <td class="l">${esc(m.from || "–")} → ${esc(m.to || (m.action === "remove" ? "removed" : "–"))}${m.theme_add ? `<div class="meta">+ theme ${esc(m.theme_add)}</div>` : ""}</td>
+        <td class="l">${esc(m.confidence)}</td><td class="l rcwhy">${esc(m.why)} ${(m.sources || []).slice(0, 2).map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener">source${i ? " " + (i + 1) : ""}</a>`).join(" ")}</td>
+        <td class="l"><span class="tg ${STC[m.status] || ""}">${esc(m.status)}</span></td></tr>`).join("")}</tbody></table></div>
+      <p class="meta">To accept: say <b>apply reclass ${rows.filter(m => m.status === "open").slice(0, 3).map(m => m.id).join(", ") || "N"}</b> in the project chat (or <b>reject reclass N</b>). Accepted and rejected tickers stay off the worklist for 90 days.</p>` : '<p class="meta">No changes proposed this week.</p>'}`
+      : `<p class="meta">The weekly agent (Saturday morning) hasn't written proposals yet. This week's worklist is below.</p>`}
+    <details><summary>This week's worklist · ${C.unclassified || 0} unclassified · ${C.poor_fit || 0} poor fits · ${C.stale || 0} stale · ${C.thin || 0} thin groups</summary>
+      <div class="rcgrid">
+        <div><h4>Not in any sub-theme</h4><div class="meta">liquid, RS 80+ or $100M+/day; nearest groups by how they trade</div>
+          ${list((W.unclassified || []).slice(0, 15), u => `<li><b>${esc(u.t)}</b> ${esc(u.name || "")} <span class="meta">RS ${u.rs ?? "–"} · $${u.dv}M/day · trades like ${u.cand.map(c => esc(c[0]) + " " + c[1].toFixed(2)).join(", ")}</span></li>`)}</div>
+        <div><h4>Doesn't trade with its group</h4><div class="meta">correlation to its own sub-theme vs the best other one (120 sessions, SPY removed)</div>
+          ${list((W.poor_fit || []).slice(0, 15), u => `<li><b>${esc(u.t)}</b> in ${esc(u.sub)} <span class="meta">${u.own.toFixed(2)} · fits ${esc(u.best[0][0])} ${u.best[0][1].toFixed(2)}</span></li>`)}</div>
+        <div><h4>No recent trading data</h4><div class="meta">delisted, renamed or acquired?</div>
+          ${list(W.stale || [], u => `<li><b>${esc(u.t)}</b> <span class="meta">last bar ${u.last ? shortDate(u.last) : "never"} · ${u.where.map(esc).join(", ")}</span></li>`)}</div>
+        <div><h4>Thin sub-themes</h4><div class="meta">fewer than 3 liquid members</div>
+          ${list((W.thin || []).slice(0, 15), u => `<li>${esc(u.sub)} <span class="meta">${u.liquid} liquid of ${u.n}: ${u.members.map(esc).join(", ")}</span></li>`)}</div>
+      </div></details></div></section>`);
+  return card;
 }
 function drillRow(r, span, sub) {
   const M = stockMap();

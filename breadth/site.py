@@ -86,3 +86,9 @@ def build(history, theme_data=None, kq_data=None, macro_data=None):
     (config.DOCS_DIR / "data.json").write_text(json.dumps(data, separators=(",", ":")))
     history.to_csv(config.DOCS_DIR / "breadth.csv", float_format="%.4f")
     (config.DOCS_DIR / ".nojekyll").touch()
+    try:   # v2 page at /v2/ from the same payload (Oct 28 2026); never blocks the v1 page
+        from . import v2site
+        v2site.build(data)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).exception("v2 page failed: %s", e)

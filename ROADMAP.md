@@ -3,6 +3,17 @@
 Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read this at the start of a work session; tick items off
 (move them to "Done" with the date) and add new ones as Adam asks for them.
 
+## v2 redesign (started Oct 28, 2026; Adam approved Option B: new page at /v2/ beside v1)
+0. **Fill the planned v2 pages**, one main tab at a time: Groups → Lifecycle, Rotation, Timeline; Setups → Box trades, Lined-up & dips
+   (live), Export lists; Market (Breadth, Money flow, Macro, Pre-market & live); Read → Trade stories, Earnings, Archive (one page per
+   chapter); Lab. Then live prices (clock mode from the Google sheet / pre-market file), ticker search drawer, and the subscription-ready
+   pieces Adam liked (personal watchlist layer, public track record, plain-English explainers, neutral setup names). Prototype history:
+   branch `v2-prototype`.
+
+## Theme upkeep (Oct 28)
+- First reclass agent run Sat Oct 31 8:37 AM ET; Adam answers "apply reclass N" / "reject reclass N". Worklist already flags ESS (REIT in
+  Batteries & Storage), CME, ISRG, stale WBD / PSKY / ATKR / BZH.
+
 ## Next up (Adam: "next week")
 1. **Trade warehouse + stacked R** (Adam, Oct 27: "this trade is 0.8R, that one 0.5R, but layered together 1.3R — keep making this
    smarter"). Card R-2026-10-27-r-stacking says how: (a) one table of every setup's past trades on the same yardstick (box, spring,

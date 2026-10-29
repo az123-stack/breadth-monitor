@@ -577,6 +577,34 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Launch list, so a live price refresh on those tabs drew the Breadth tab). Removed dead payload fields (stocks `rsraw`/`v1`, SoW
   `lo52`/`hi52`/`prime_wks`/`rs_up`, box live feature columns `g_r20`…`s_r126q`) and dead helpers (`fmtK`, `roPts`, `boxes._adr`,
   `lifecycle.build_safe`).
+- `reclass.py` **Theme upkeep · reclassification agent** (Oct 28, 2026; Adam: "an agent checking whether tickers need reclassifying into our
+  themes and sub-themes in case things change or tickers are missed"; proposals only, never moves anything by itself) → `DATA.themes.reclass`
+  (built in update.py, ~2 s), card `reclassCard` at the bottom of the v1 Themes tab. Worklist (code measures): **unclassified** = liquid
+  universe stocks ($5+, $10M+/day, 120 sessions) in no sub-theme with RS 80+ or $100M+/day, top 40 by RS, each with the 3 sub-themes it trades
+  most like (correlation of daily returns minus SPY, 120 sessions, vs equal-weight group indexes); **poor_fit** = members whose correlation to
+  their own group's OTHER members is < 0.25 while the best other group is ≥ 0.35 and 0.20 higher, or < 0.10 outright (ETF baskets like
+  Commodity ETFs skipped), top 30 by gap; **stale** = theme-file tickers with no bars in 5 sessions; **thin** = sub-themes with < 3 liquid
+  members. First run Oct 27: ESS (Essex, a REIT) filed in Batteries & Storage (ticker mix-up with ESS Tech), CME in Crypto Exchanges, ISRG in
+  Industrial & Surgical Robots; stale WBD / PSKY / ATKR / BZH. Agent (kind `reclass` in agentfiles, WEEKLY): "Market Monitor · reclass agent"
+  Sat 8:37 AM ET reads `python -m breadth.reclass worklist` (stdlib), researches each business, publishes docs/agent/reclass.json: moves
+  {id, t, action add/move/remove/rename/keep, from, to (exact sub-theme name or "NEW: Group / Name"; new ticker for rename), theme_add,
+  confidence, why, sources}; validation drops off-worklist tickers, unknown sub-theme names and source-less moves. **When Adam says "apply
+  reclass N, M"**: `python -m breadth.reclass apply --ids N,M` (edits data/subthemes.csv / themes.csv, one sub-theme per stock, logs to
+  data/reclass_log.csv), rebuild, commit, push; "reject reclass N" → `reclass reject --ids N`. Decided tickers stay off the worklist 90 days.
+  `python -m breadth.reclass list` shows proposals + status. Test `test_theme_upkeep_reclass`.
+- **v2 page** (Oct 28, 2026; Adam approved "Option B": a redesign beside v1, same data) → `v2site.py` + `v2_template.html` → docs/v2/index.html
+  (served at /breadth-monitor/v2/), built at the end of every `site.build` from the same payload (`slim` keeps only what v2 shows, ~1 MB;
+  each section built separately, a failing one shows "appears after the next data run"). 6 main tabs with sub-tabs, hash routes like
+  #groups-themes, last sub-tab per tab remembered (localStorage v2sub): Today (proven posture from the playbook, your trades = Launch picks +
+  lined-up buys, groups in BUY, key numbers) · Market (planned) · Groups: Themes (v1 Themes table rebuilt, Sub-themes view adds lifecycle
+  Stage + sector filter, click a row for its stocks), Lifecycle (planned), Lighting up (ignition / Day 1 / warming), Stair steps (15-session
+  strip, groups / stocks), Rotation + Timeline (planned) · Setups: All setups (playbook verdicts), Launch list, Box trades + Lined-up & dips
+  (planned), Strength on weakness, Record volume, Export lists (planned) · Read: latest chapter (fetches ../story.json live) · Lab (planned:
+  experiments incl. the long/short pulse, which contradicts the proven posture, evidence registry, research log). Every card carries an
+  evidence badge (Proven / Info / Unproven / No edge). Shared `sortTable` with a sub-theme (or theme / sector) dropdown filter; every
+  "⬇ TradingView" button downloads a .txt (###Section,EXCH:TICKER) and copies it. Light / dark / auto toggle (localStorage v2theme); phones
+  get a bottom tab bar. Design prototype history: branch `v2-prototype`. Test `test_v2_page_builds`. Next: fill the planned pages, live
+  Google-sheet prices (clock mode), ticker search drawer.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Trade Stories, Breadth, Pre-market, Intraday, Best Setups, Trade Setups, Launch list, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

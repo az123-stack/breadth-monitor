@@ -338,6 +338,11 @@ def recompute_and_publish(bars, splits, universe, state):
                 theme_data["decision"]["evidence"] = decision.load_evidence()   # cleaned, never raw
         except Exception as e:
             log.exception("decision log settle failed: %s", e)
+        try:   # Theme upkeep: tickers to classify / move / remove, for the weekly reclass agent (Adam, Oct 28 2026; proposals only)
+            from . import reclass
+            theme_data["reclass"] = reclass.build(adjusted, set(universe), store.load_subthemes(), store.load_themes(), store.load_names())
+        except Exception as e:  # optional panel; never block the page
+            log.exception("theme upkeep check failed: %s", e)
         try:
             from . import review
             theme_data["setup_review"] = review.evaluate(theme_data, history)
