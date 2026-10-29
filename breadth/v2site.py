@@ -298,6 +298,67 @@ def _lifepage(T):
             "w2b": ev.get("watch_to_buy"), "from": ev.get("from"), "to": ev.get("to")}
 
 
+def _market(D, T):
+    keys = ("up4", "dn4", "ratio5", "ratio10", "up25q", "dn25q", "up25m", "dn25m", "t2108", "nh", "nl", "dn_share", "dv_net", "dv_up", "dv_dn", "up4_avg40")
+    rows = [{"d": r["date"], **{k: num(r.get(k), 2) for k in keys}} for r in D["rows"][-120:]]
+    out = {"rows": rows, "events": (D.get("events") or [])[-12:], "regime": D.get("regime"), "pct": D.get("percentiles") or {}}
+    tt = T.get("thetrade") or {}
+    if tt:
+        ra = tt.get("ratio") or {}
+        out["trade"] = {"name": tt.get("name"), "state": tt.get("state"), "above": tt.get("above"), "below": tt.get("below"),
+                        "corr": tt.get("corr"), "ind": tt.get("ind"), "comeback": tt.get("comeback"), "dn_share": tt.get("dn_share"),
+                        "winners": [{k: w.get(k) for k in ("g", "sector", "r20", "r5", "strength")} for w in (tt.get("winners") or [])[:8]],
+                        "losers": [{k: w.get(k) for k in ("g", "sector", "r20", "r5", "strength")} for w in (tt.get("losers") or [])[:8]],
+                        "plays": [{k: w.get(k) for k in ("t", "sub", "price", "rsr", "d20", "ext", "chase", "on")} for w in (tt.get("plays") or [])[:10]],
+                        "counter": [{k: w.get(k) for k in ("t", "sub", "price", "rsr", "d20", "off_hi")} for w in (tt.get("counter") or [])[:8]],
+                        "ratio": {"d": (ra.get("dates") or [])[-90:], "r": [num(x, 4) for x in (ra.get("r") or [])[-90:]],
+                                  "ma": [num(x, 4) for x in (ra.get("ma") or [])[-90:]]}}
+    mac = []
+    for m in D.get("macro") or []:
+        mac.append({k: m.get(k) for k in ("key", "label", "unit", "src", "date", "last", "d1", "d5", "d30", "d90", "pos", "drives")}
+                   | {"spark": [num(x, 4) for x in (m.get("spark") or [])[-90:]]})
+    out["macro"] = mac
+    return out
+
+
+def _rotation(T):
+    R = T["rotation"]
+    F = R.get("flow") or {}
+    MH = R.get("mhist") or {}
+
+    def wins(series):
+        out = {}
+        for g, (net, vol, bp) in (series or {}).items():
+            row = {}
+            for w in (5, 15, 30, 90):
+                row[w] = [int(sum(net[-w:])), int(sum(vol[-w:])), round(sum(bp[-w:]) / 100, 2)]
+            out[g] = row
+        return out
+    spy = MH.get("spy") or []
+    return {
+        "state": R.get("state"), "lead_count": R.get("lead_count"), "more": R.get("more") or [],
+        "ideas": [{"g": i["group"], "sector": i.get("sector"), "strength": i.get("strength"), "rk": i.get("s_rank"), "days": i.get("days"),
+                   "r20": _pct(i.get("r20")), "why": [w.get("txt") for w in i.get("why") or []], "also": i.get("also") or [],
+                   "spark": [num(x, 2) for x in ((i.get("spark") or {}).get("rel") or [])],
+                   "stocks": [{k: s.get(k) for k in ("t", "price", "rsr", "zone", "ext", "trigger", "stop")} for s in (i.get("stocks") or [])[:6]]}
+                  for i in R.get("ideas") or []],
+        "avoid": [{"g": a["group"], "sector": a.get("sector"), "r20": _pct(a.get("r20")), "strength": a.get("strength"), "days": a.get("days")} for a in R.get("avoid") or []],
+        "turning": [{"g": a["group"], "sector": a.get("sector"), "r20": _pct(a.get("r20")), "strength": a.get("strength"), "days": a.get("days")} for a in R.get("turning") or []],
+        "bt": R.get("bt") or {},
+        "flow": [{"g": r["g"], "sector": r.get("sector"), "tier": r.get("tier"), "x": r.get("x"), "y": r.get("y"),
+                  "tail": r.get("tail") or [], "r20": _pct(r.get("r20")), "r5": _pct(r.get("r5")), "strength": r.get("strength")} for r in F.get("rows") or []],
+        "tiers": F.get("tiers") or [], "fev": F.get("evidence") or {},
+        "win": wins(MH.get("sub")), "spy": {w: round(sum(spy[-w:]) / 100, 2) for w in (5, 15, 30, 90)},
+    }
+
+
+def _timeline(T):
+    d = T.get("timeline_dates") or []
+    pack = lambda rows: [{"n": r["theme"], "sec": r.get("group"), "h": [None if x is None else int(round(x)) for x in (r.get("s_hist") or [])]}
+                         for r in rows if r.get("s_hist")]
+    return {"dates": d, "subs": pack(T.get("subthemes") or []), "themes": pack(T.get("themes") or [])}
+
+
 def _story():
     f = config.DOCS_DIR / "story.json"
     try:
@@ -343,6 +404,9 @@ def slim(D):
     put("boxes", _boxes, T)
     put("lineup", _lineup, T)
     put("life", _lifepage, T)
+    put("market", _market, D, T)
+    put("rotation", _rotation, T)
+    put("timeline", _timeline, T)
     put("story", _story)
     try:
         tt = T.get("thetrade") or {}

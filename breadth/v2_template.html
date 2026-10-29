@@ -226,6 +226,22 @@ tr.open .caret{transform:rotate(90deg)}
 .pick .kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:12.5px}
 .pick .kv span:nth-child(odd){color:var(--ink-3)}
 
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--ui);font-size:11px;fill:var(--ink-3)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:14px}
+.cbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+.cbox h3{margin:0 0 2px;font-size:14px;font-weight:600}
+.cbox .sub{font-size:12px;color:var(--ink-3);margin-bottom:6px}
+.evlist{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.evlist li{font-size:13px;display:flex;gap:10px;align-items:baseline}
+.evlist .d{font-family:var(--num);font-size:12px;color:var(--ink-3);min-width:56px}
+.mtile{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.mtile .v{font-family:var(--num);font-size:20px;font-weight:500}
+.mtile .chg{display:flex;gap:10px;font-family:var(--num);font-size:12px}
+.hm td{padding:0;border:0;height:16px}
+.hm td.nm{padding:0 8px 0 0;font-size:12px;white-space:nowrap;max-width:240px;overflow:hidden;text-overflow:ellipsis;background:var(--panel)}
+.hm td.c{width:7px;min-width:7px}
+
 .tabbar{display:none}
 @media (max-width:900px){
   .nav,.search,.hide-sm,.brand .muted,.xs-hide{display:none}
@@ -276,16 +292,9 @@ const LS = {get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.p
 const MAP = [
   {id:"today", name:"Today", icon:"◉", subs:[{id:"today", name:"Today", ev:"proven", render:pageToday}]},
   {id:"market", name:"Market", icon:"∿", subs:[
-    {id:"market-breadth", name:"Breadth", ev:"proven", plan:[
-      ["Breadth table and charts","Stockbee-style 4% counts, 5/10-day ratios, T2108, new highs and lows, 2 years of history.","Breadth tab","proven"],
-      ["Regime and thrust watch","Today's regime, thrust pace live during the day, thrust history.","Breadth tab, Intraday","proven"]]},
-    {id:"market-money", name:"Money flow", ev:"info", plan:[
-      ["Money in or out","Share of dollar volume in falling stocks, net $, 10-day trend.","Breadth tab","info"],
-      ["The trade","Which side is winning (now Software over AI Infrastructure), real or seesaw, kill switch.","Read-out","info"],
-      ["Where the money is going","By sub-theme over today / 3 / 5 / 15 / 30 / 90 days.","Rotation tab","info"]]},
-    {id:"market-macro", name:"Macro", ev:"info", plan:[
-      ["Macro drivers","Oil, crack spread, gas, gold, copper, 10-year, dollar, VIX, bitcoin, with the groups each one moves.","Breadth, Rotation","info"],
-      ["Macro and the week ahead","The agent's brief: Fed, rates, oil, events coming up.","Read-out","info"]]},
+    {id:"market-breadth", name:"Breadth", ev:"proven", render:pageBreadth},
+    {id:"market-money", name:"Money flow", ev:"info", render:pageMoney},
+    {id:"market-macro", name:"Macro", ev:"info", render:pageMacro},
     {id:"market-live", name:"Pre-market & live", ev:"info", plan:[
       ["Futures and gappers","Pre-market futures, gap breadth, gappers, possible EPs.","Pre-market tab","info"],
       ["Who's moving the index","S&P / Nasdaq / Russell contribution by stock, sector and sub-theme.","Pre-market, Intraday","info"],
@@ -295,13 +304,8 @@ const MAP = [
     {id:"groups-lifecycle", name:"Lifecycle", ev:"proven", render:pageLife},
     {id:"groups-lighting", name:"Lighting up", ev:"proven", render:pageLighting},
     {id:"groups-stairs", name:"Stair steps", ev:"info", render:pageStairs},
-    {id:"groups-rotation", name:"Rotation", ev:"proven", plan:[
-      ["Rotation ideas","Leading and accelerating groups with stocks to buy.","Rotation tab","proven"],
-      ["Money flow map","Relative rotation graph by sub-theme, inflow and outflow tiers.","Rotation tab","proven"],
-      ["Where the money is going","By sub-theme over today / 3 / 5 / 15 / 30 / 90 days.","Rotation tab","info"],
-      ["Pair chart","Two groups against each other, with starter pairs and cousins pulling apart.","Rotation tab","info"]]},
-    {id:"groups-timeline", name:"Timeline", ev:"info", plan:[
-      ["Strength timeline","90-day heatmap of every theme's Strength rank.","Rotation tab","info"]]}]},
+    {id:"groups-rotation", name:"Rotation", ev:"proven", render:pageRotation},
+    {id:"groups-timeline", name:"Timeline", ev:"info", render:pageTimeline}]},
   {id:"setups", name:"Setups", icon:"☰", subs:[
     {id:"setups-all", name:"All setups", ev:"proven", render:pageSetups},
     {id:"setups-launch", name:"Launch list", ev:"proven", render:pageLaunch},
@@ -983,6 +987,157 @@ function pageLife(el){
       {k:"wait", l:"Extended", v:r=>r.wait.length, n:1, html:r=>r.wait.length||"–"}]});
   }
   draw();
+}
+
+/* ---------- shared: SVG charts (viewBox scales to the box width) ---------- */
+function axisY(lo,hi,W,H,pad,fmt){ const ticks=[lo,(lo+hi)/2,hi]; return ticks.map(v=>{const y=pad+(H-2*pad)*(1-(v-lo)/((hi-lo)||1)); return `<line x1="34" x2="${W}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--line)"/><text x="30" y="${(y+4).toFixed(1)}" text-anchor="end">${fmt(v)}</text>`;}).join(""); }
+function lineChart(series, opts={}){
+  const W=opts.w||420, H=opts.h||170, pad=12, L=34, n=Math.max(...series.map(s=>s.v.length));
+  const all=series.flatMap(s=>s.v).concat(opts.bands?opts.bands.flatMap(b=>[b[0]]):[]).filter(x=>x!=null);
+  let lo=opts.lo??Math.min(...all), hi=opts.hi??Math.max(...all); if (lo===hi){lo-=1;hi+=1;}
+  const X=i=>L+(W-L-4)*(i/(n-1||1)), Y=v=>pad+(H-2*pad)*(1-(v-lo)/(hi-lo));
+  const band=(opts.bands||[]).map(([v,c])=>`<line x1="${L}" x2="${W}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="${c}" stroke-dasharray="4 3"/>`).join("");
+  const paths=series.map(s=>{const d=s.v.map((v,i)=>v==null?"":(i&&s.v[i-1]!=null?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)).join(""); return `<path d="${d}" fill="none" stroke="${s.c}" stroke-width="${s.w||1.6}" ${s.dash?'stroke-dasharray="4 3"':""}/>`;}).join("");
+  const xl=opts.dates?`<text x="${L}" y="${H-1}">${esc(opts.dates[0].slice(5))}</text><text x="${W-4}" y="${H-1}" text-anchor="end">${esc(opts.dates[opts.dates.length-1].slice(5))}</text>`:"";
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label||"chart")}">${axisY(lo,hi,W,H,pad,opts.fmt||(v=>Math.round(v)))}${band}${paths}${xl}</svg>`;
+}
+function mirrorBars(up, dn, opts={}){
+  const W=opts.w||420, H=opts.h||170, L=34, n=up.length, mx=Math.max(...up,...dn,1), mid=H/2, bw=(W-L-4)/n;
+  const bars=up.map((u,i)=>{const x=L+i*bw, hu=(u/mx)*(mid-8), hd=(dn[i]/mx)*(mid-8); return `<rect x="${x.toFixed(1)}" y="${(mid-hu).toFixed(1)}" width="${(bw*.75).toFixed(1)}" height="${hu.toFixed(1)}" fill="var(--up)"/><rect x="${x.toFixed(1)}" y="${mid}" width="${(bw*.75).toFixed(1)}" height="${hd.toFixed(1)}" fill="var(--dn)" opacity=".8"/>`;}).join("");
+  const xl=opts.dates?`<text x="${L}" y="${H-1}">${esc(opts.dates[0].slice(5))}</text><text x="${W-4}" y="${H-1}" text-anchor="end">${esc(opts.dates[opts.dates.length-1].slice(5))}</text>`:"";
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label||"bars")}"><line x1="${L}" x2="${W}" y1="${mid}" y2="${mid}" stroke="var(--line-2)"/><text x="30" y="14" text-anchor="end">${Math.round(mx)}</text><text x="30" y="${H-12}" text-anchor="end">${Math.round(mx)}</text>${bars}${xl}</svg>`;
+}
+const heatCell = (v, scale) => v==null ? "" : `style="${heatBg(v, scale)}"`;
+
+/* ---------- Market · Breadth ---------- */
+function pageBreadth(el){
+  const X = S.market; if (!X) throw new Error("no market");
+  const R = X.rows, last = R[R.length-1], r60 = R.slice(-60), dts = r60.map(r=>r.d), rg = X.regime || {};
+  const tone = {bull:"go", bear:"warn"}[rg.tone] || "wait";
+  const TH = S.thresholds || {};
+  const cols = [["up4","Up 4%",80],["dn4","Down 4%",80],["ratio5","5-day ratio",1.5],["ratio10","10-day ratio",1.5],["up25q","Up 25% qtr",150],["dn25q","Down 25% qtr",150],["up25m","Up 25% mo",50],["dn25m","Down 25% mo",50],["t2108","T2108",30],["nh","New highs",50],["nl","New lows",50],["dn_share","$ in falling",20]];
+  const sign = {dn4:-1, dn25q:-1, dn25m:-1, nl:-1, dn_share:-1};
+  const norm = Object.fromEntries(cols.map(([k])=>{ const v=R.map(r=>r[k]).filter(x=>x!=null).sort((a,b)=>a-b), q=f=>v[Math.min(v.length-1,Math.floor(f*v.length))]; return [k,[q(.5), Math.max((q(.9)-q(.1))/2, 1e-9)]]; }));
+  el.innerHTML = `<div class="page-h"><h1>Breadth</h1><p>Stockbee-style market monitor on US common stocks $3+ · ${day(last.d)} close</p></div>
+    <div class="gate ${tone}"><b>${esc(rg.label||"")}</b><span class="evline">${esc(rg.advice||"")} ${(rg.reasons||[]).map(esc).join(" · ")}</span></div>
+    <div class="cgrid">
+      <div class="cbox"><h3>Stocks up / down 4% a day</h3><div class="sub">last 60 sessions · green up, red down</div>${mirrorBars(r60.map(r=>r.up4||0), r60.map(r=>r.dn4||0), {dates:dts, label:"Up and down 4% counts"})}</div>
+      <div class="cbox"><h3>T2108 and the 10-day ratio</h3><div class="sub">% of stocks above their 40-day average (blue, left scale); dashed lines at ${TH.oversold??20}% and ${TH.overbought??70}%</div>${lineChart([{v:r60.map(r=>r.t2108), c:"var(--accent)"}], {dates:dts, lo:0, hi:100, bands:[[TH.oversold??20,"var(--dn)"],[TH.overbought??70,"var(--up)"]], label:"T2108"})}
+        ${lineChart([{v:r60.map(r=>r.ratio10), c:"var(--warn)"}], {dates:dts, h:110, bands:[[1,"var(--line-2)"],[TH.strong_ratio??1.5,"var(--up)"]], fmt:v=>v.toFixed(1), label:"10-day ratio"})}</div>
+      <div class="cbox"><h3>New highs vs new lows</h3><div class="sub">liquid stocks at a 1-year high (green) or low (red)</div>${mirrorBars(r60.map(r=>r.nh||0), r60.map(r=>r.nl||0), {dates:dts, label:"New highs and lows"})}</div>
+      <div class="cbox"><h3>Recent signals</h3><div class="sub">thrusts, follow-throughs and warnings the dashboard detected</div>
+        <ul class="evlist">${[...(X.events||[])].reverse().map(e=>`<li><span class="d">${esc(e.date.slice(5))}</span><span>${e.tier==="major"?'<span class="badge v-focus">Major</span> ':""}<b>${esc(e.label)}</b><div class="gsub">${esc(e.detail||"")}</div></span></li>`).join("")}</ul></div>
+    </div>
+    <div class="panel"><div class="ph"><h3>The monitor</h3><span class="sub">last 30 sessions · shaded against each column's 120-session normal: green = bullish, red = bearish</span></div>
+      <div class="tw"><table class="sticky1"><thead><tr><th>Date</th>${cols.map(c=>`<th class="n">${c[1]}</th>`).join("")}</tr></thead><tbody>
+      ${R.slice(-30).reverse().map(r=>`<tr><td class="num">${esc(r.d.slice(5))}</td>${cols.map(([k])=>{const v=r[k], [m,s]=norm[k]; const shade = v==null?null:(sign[k]||1)*(v-m); return `<td class="n" style="${shade==null?"":heatBg(shade, s*1.6)}">${v==null?"–":k.startsWith("ratio")?v.toFixed(2):k==="t2108"||k==="dn_share"?v.toFixed(1)+"%":Math.round(v)}</td>`;}).join("")}</tr>`).join("")}
+      </tbody></table></div></div>`;
+}
+
+/* ---------- Market · Money flow ---------- */
+function pageMoney(el){
+  const X = S.market; if (!X) throw new Error("no market");
+  const R = X.rows.slice(-90), dts = R.map(r=>r.d), tr = X.trade, last = R[R.length-1];
+  const ROT = S.rotation || {}, U = UI2.money ||= {w:"5"};
+  const verdict = last.dn_share>=60 ? ["warn","Money is leaving"] : last.dn_share<=40 ? ["go","Money is coming in"] : ["wait","Mixed: money is rotating"];
+  const ma = (a,n)=>a.map((_,i)=>i<n-1?null:a.slice(i-n+1,i+1).reduce((s,x)=>s+(x||0),0)/n);
+  el.innerHTML = `<div class="page-h"><h1>Money flow</h1><p>Where the dollars went: rising vs falling stocks, the market's main trade, and group by group · ${day(last.d)} close</p></div>
+    <div class="gate ${verdict[0]}"><b>${verdict[1]}</b><span class="evline">${last.dn_share.toFixed(1)}% of dollar volume was in falling stocks (net ${last.dv_net>0?"+":""}${Math.round(last.dv_net)}B). Above 60% = leaving, under 40% = coming in; the 2-year median is 47%.</span></div>
+    <div class="cgrid">
+      <div class="cbox"><h3>Share of dollar volume in falling stocks</h3><div class="sub">90 sessions · 10-day average dashed</div>${lineChart([{v:R.map(r=>r.dn_share), c:"var(--warn)", w:1.2},{v:ma(R.map(r=>r.dn_share),10), c:"var(--ink)", dash:1}], {dates:dts, lo:20, hi:80, bands:[[40,"var(--up)"],[60,"var(--dn)"]], label:"Share in falling stocks"})}</div>
+      ${tr?`<div class="cbox"><h3>The trade: ${esc(tr.name||"")}</h3><div class="sub">${esc(tr.state||"")} · ${tr.above??"–"} sessions above its 20-day average · ${tr.ind>=0?"winners hold up when the losers bounce":"a seesaw: winners give back when the losers bounce"} (correlation ${tr.corr!=null?tr.corr.toFixed(2):"–"})</div>
+        ${lineChart([{v:tr.ratio.r, c:"var(--accent)"},{v:tr.ratio.ma, c:"var(--ink-3)", dash:1}], {dates:tr.ratio.d, fmt:v=>v.toFixed(2), label:"Winners vs losers ratio"})}</div>`:""}
+    </div>
+    ${tr?`<div class="cgrid"><div class="panel"><div class="ph"><h3>Winning groups</h3><span class="sub">20 sessions</span></div><div id="mnW"></div></div><div class="panel"><div class="ph"><h3>Losing groups</h3><span class="sub">20 sessions</span></div><div id="mnL"></div></div></div>
+    <div class="cgrid"><div class="panel"><div class="ph"><h3>Plays in the winning groups</h3><span class="sub">RS 80+, setup names first; "chase" = over 2 ADRs above the 21 EMA</span></div><div id="mnP"></div></div>
+      <div class="panel"><div class="ph"><h3>Counter-trade watch</h3><span class="sub">RS 85+ in the losing groups${tr.comeback?" · comeback trigger met":""}</span></div><div id="mnC"></div></div></div>`:""}
+    <div class="panel"><div class="ph"><h3>Where the money went, by sub-theme</h3><span class="sub">net dollar flow (up-day minus down-day dollar volume) and the group's move, summed over the window · SPY ${pct(ROT.spy?ROT.spy[U.w]:null)}</span></div>
+      ${chipRow("w", [["5","5 days"],["15","15 days"],["30","30 days"],["90","90 days"]], U.w)}<div id="mnT"></div></div>`;
+  if (tr){
+    const gcols = [{k:"g", l:"Group", html:r=>`${esc(r.g)}<div class="gsub">${esc(r.sector||"")}</div>`, style:()=>"white-space:normal;min-width:170px"}, {k:"r20", l:"20D", n:1, html:r=>pp(r.r20*100)}, {k:"r5", l:"5D", n:1, html:r=>pp(r.r5*100)}, {k:"strength", l:"Strength", n:1}];
+    sortTable($("#mnW"), {rows:tr.winners, sort:"r20", dir:-1, cols:gcols}); sortTable($("#mnL"), {rows:tr.losers, sort:"r20", dir:1, cols:gcols});
+    sortTable($("#mnP"), {rows:tr.plays, sort:"rsr", dir:-1, cols:[{k:"t", l:"Ticker", html:r=>`${tk(r.t)}${r.chase?' <span class="badge v-avoid">chase</span>':""}`}, {k:"sub", l:"Group", style:()=>"white-space:normal"}, {k:"price", l:"Price", n:1, html:r=>f2(r.price)}, {k:"d20", l:"20D", n:1, html:r=>pp(r.d20*100)}, {k:"ext", l:"ADRs over 21", n:1}, {k:"rsr", l:"RS", n:1}]});
+    sortTable($("#mnC"), {rows:tr.counter, sort:"rsr", dir:-1, empty:"None.", cols:[{k:"t", l:"Ticker", html:r=>tk(r.t)}, {k:"sub", l:"Group", style:()=>"white-space:normal"}, {k:"price", l:"Price", n:1, html:r=>f2(r.price)}, {k:"d20", l:"20D", n:1, html:r=>pp(r.d20*100)}, {k:"rsr", l:"RS", n:1}]});
+  }
+  el.querySelector('[data-chips="w"]').onclick = e => { const b=e.target.closest("button"); if(b){U.w=b.dataset.v; saveUI(); pageMoney(el);} };
+  const secOf = Object.fromEntries((S.subs||[]).map(g=>[g.n,g.sec]));
+  const rows = Object.entries(ROT.win||{}).map(([g,w])=>({g, sec:secOf[g], net:w[U.w][0], vol:w[U.w][1], bp:w[U.w][2], vs:w[U.w][2]-((ROT.spy||{})[U.w]||0)}));
+  sortTable($("#mnT"), {rows, sort:"net", dir:-1, groupBy:r=>r.sec, groupLabel:"Sector", gstore:U, cols:[
+    {k:"g", l:"Sub-theme", html:r=>`${esc(r.g)}<div class="gsub">${esc(r.sec||"")}</div>`, style:()=>"white-space:normal;min-width:190px"},
+    {k:"net", l:"Net $ flow", n:1, html:r=>`<span class="${r.net>0?"up":"dn"}">${r.net>0?"+":""}${Math.abs(r.net)>=1000?(r.net/1000).toFixed(1)+"B":r.net+"M"}</span>`},
+    {k:"share", l:"Flow ÷ volume", n:1, v:r=>r.vol?r.net/r.vol:0, html:r=>r.vol?pct(r.net/r.vol*100,0):"–"},
+    {k:"bp", l:"Move", sub:"≈ summed daily", n:1, html:r=>pp(r.bp)}, {k:"vs", l:"vs SPY", n:1, html:r=>pp(r.vs)}]});
+}
+
+/* ---------- Market · Macro ---------- */
+function pageMacro(el){
+  const X = S.market; if (!X || !X.macro || !X.macro.length) throw new Error("no macro");
+  const strOf = Object.fromEntries((S.subs||[]).map(g=>[g.n,g.str]));
+  const fmt = m => m.unit==="%" ? m.last.toFixed(2)+"%" : m.unit==="$" ? "$"+(m.last>=1000?Math.round(m.last).toLocaleString():m.last.toFixed(m.last<10?3:2)) : m.last.toFixed(2);
+  const chg = (v, bp) => v==null ? "–" : `<span class="${v>0?"up":v<0?"dn":""}">${bp?(v>0?"+":"")+Math.round(v*100)+" bp":pct(v*100)}</span>`;
+  el.innerHTML = `<div class="page-h"><h1>Macro drivers</h1><p>The prices that move whole groups, with the sub-themes each one drives · closes through ${day(X.macro[0].date)}</p></div>
+    <div class="cgrid" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr))">${X.macro.map(m=>{ const bp = m.key==="tnx";
+      return `<div class="mtile"><span class="l muted" style="font-size:12.5px">${esc(m.label)}${m.src&&m.src!=="futures"&&m.src!=="index"?` <span class="badge ev-info">${esc(m.src)}</span>`:""}</span><span class="v">${fmt(m)}</span>
+        <span class="chg"><span>1D ${chg(m.d1,bp)}</span><span>5D ${chg(m.d5,bp)}</span><span>1M ${chg(m.d30,bp)}</span></span>
+        ${lineChart([{v:m.spark, c:"var(--accent)", w:1.4}], {h:70, w:300, fmt:v=>v>=10000?Math.round(v/1000)+"k":v>=100?Math.round(v):v.toFixed(1), label:m.label})}
+        ${(m.drives||[]).length?`<div class="gsub">Drives: ${m.drives.map(g=>`${esc(g)}${strOf[g]!=null?` <span class="num">${Math.round(strOf[g])}</span>`:""}`).join(" · ")}</div>`:""}</div>`; }).join("")}</div>
+    <div class="legend" style="border:0;padding:0">Numbers after each group are its Strength (0–100). Charts: last 90 sessions.</div>`;
+}
+
+/* ---------- Groups · Rotation ---------- */
+const TIER_C = {confirmed:"var(--up)", steady:"var(--accent)", new:"var(--warn)", fading:"var(--ink-3)", bouncing:"var(--warn)", outflow:"var(--dn)", neutral:"var(--line-2)"};
+function rrg(rows){
+  const W=560,H=380, xs=rows.map(r=>r.x).concat(rows.flatMap(r=>r.tail.map(t=>t[0]))), ys=rows.map(r=>r.y).concat(rows.flatMap(r=>r.tail.map(t=>t[1])));
+  const pad=(a)=>{const lo=Math.min(...a,99), hi=Math.max(...a,101), m=Math.max(100-lo,hi-100)*1.05; return [100-m,100+m];};
+  const [x0,x1]=pad(xs), [y0,y1]=pad(ys), X=v=>30+(W-40)*(v-x0)/(x1-x0), Y=v=>10+(H-40)*(1-(v-y0)/(y1-y0));
+  const q=(x,y,txt,a)=>`<text x="${x}" y="${y}" text-anchor="${a}" style="font-size:12px;fill:var(--ink-3)">${txt}</text>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Relative rotation graph">
+    <line x1="${X(100)}" x2="${X(100)}" y1="10" y2="${H-30}" stroke="var(--line-2)"/><line x1="30" x2="${W-10}" y1="${Y(100)}" y2="${Y(100)}" stroke="var(--line-2)"/>
+    ${q(W-14,24,"Leading","end")}${q(W-14,H-36,"Weakening","end")}${q(36,H-36,"Lagging","start")}${q(36,24,"Improving","start")}
+    ${rows.map(r=>`<path d="${r.tail.map((t,i)=>(i?"L":"M")+X(t[0]).toFixed(1)+" "+Y(t[1]).toFixed(1)).join("")}" fill="none" stroke="${TIER_C[r.tier]||"var(--line-2)"}" stroke-width="1" opacity=".5"/><circle cx="${X(r.x).toFixed(1)}" cy="${Y(r.y).toFixed(1)}" r="3.5" fill="${TIER_C[r.tier]||"var(--line-2)"}"><title>${esc(r.g)}: ${esc(r.tier)}</title></circle>`).join("")}
+    <text x="${W/2}" y="${H-8}" text-anchor="middle">relative strength vs SPY →</text></svg>`;
+}
+function pageRotation(el){
+  const X = S.rotation; if (!X) throw new Error("no rotation");
+  const U = UI2.rot ||= {tier:"confirmed"};
+  const bt = X.bt||{}, lead = bt.lead||{}, st = lead[(S.playbook||{}).state==="thrust"?"strong":"all"] || lead.all || {};
+  const tierN = k => X.flow.filter(r=>r.tier===k).length;
+  const ev = (k, sk="all") => { const e=(X.fev[k]||{})[sk]; return e?`${pct(e.edge*100)} vs avg group (t ${e.t})`:"–"; };
+  el.innerHTML = `<div class="page-h"><h1>Rotation</h1><p>Groups leading and accelerating vs SPY, the money-flow map, and groups to avoid · ${X.lead_count} leading groups</p></div>
+    <div class="gate ${lead.strong && lead.strong.t>=2 ? "go":"wait"}"><b>Leading & accelerating groups</b><span class="evline">Beat the average group by ${pct((lead.all||{}).edge*100)} over the next 10 sessions (t ${(lead.all||{}).t}); in strong breadth ${pct((lead.strong||{}).edge*100)} (t ${(lead.strong||{}).t}).</span></div>
+    <div class="picks">${X.ideas.map(i=>`<div class="pick"><div class="tkr"><b style="font-family:var(--ui);font-size:16px">${esc(i.g)}</b><span class="muted">${esc(i.sector||"")}</span></div>
+      <div class="muted" style="font-size:12.5px">20D vs SPY ${pp(i.r20)} · Strength ${i.strength} (#${i.rk}) · ${i.days} sessions in${i.also.length?` · with ${i.also.map(esc).join(", ")}`:""}</div>
+      ${i.spark.length?lineChart([{v:i.spark, c:"var(--accent)"}], {h:70, w:300, fmt:v=>Math.round(v), label:"Group vs SPY"}):""}
+      <ul style="margin:0;padding-left:16px;font-size:12.5px;color:var(--ink-2)">${i.why.slice(0,4).map(w=>`<li>${esc(w)}</li>`).join("")}</ul>
+      <div class="mini">${i.stocks.map(s=>`<span title="${esc(s.zone||"")} · RS ${s.rsr}">${esc(s.t)}${s.zone==="near"?" ●":""}</span>`).join("")}</div></div>`).join("")||'<div class="notice">No group is leading and accelerating today.</div>'}</div>
+    <div class="cgrid"><div class="cbox"><h3>Money-flow map</h3><div class="sub">each dot a sub-theme, tails = last 15 sessions; colors = tier below</div>${rrg(X.flow)}</div>
+      <div class="cbox"><h3>Turning and avoid</h3><div class="sub">fresh crosses (watch only, no edge yet) and groups near a 60-day relative low and falling (−0.4% vs avg group)</div>
+        <div class="mini" style="margin:6px 0 4px"><b style="font-size:12.5px">Turning:</b> ${X.turning.map(a=>`<span>${esc(a.g)} ${a.r20>0?"+":""}${a.r20}%</span>`).join("")||"none"}</div>
+        <div class="mini"><b style="font-size:12.5px">Avoid:</b> ${X.avoid.map(a=>`<span>${esc(a.g)} ${a.r20}%</span>`).join("")||"none"}</div></div></div>
+    <div class="panel"><div class="ph"><h3>Money-flow tiers</h3><span class="sub">${esc((X.tiers.find(t=>t.k===U.tier)||{}).desc||"")} · next 10 sessions: ${ev(U.tier)}</span></div>
+      ${chipRow("tier", X.tiers.map(t=>[t.k,t.label]).concat([["all","All"]]), U.tier, k=>k==="all"?X.flow.length:tierN(k))}<div id="rtT"></div></div>`;
+  el.querySelector('[data-chips="tier"]').onclick = e => { const b=e.target.closest("button"); if(b){U.tier=b.dataset.v; saveUI(); pageRotation(el);} };
+  sortTable($("#rtT"), {rows:X.flow.filter(r=>U.tier==="all"||r.tier===U.tier), sort:"r20", dir:-1, groupBy:r=>r.sector, groupLabel:"Sector", gstore:U, cols:[
+    {k:"g", l:"Sub-theme", html:r=>`${esc(r.g)}<div class="gsub">${esc(r.sector||"")}</div>`, style:()=>"white-space:normal;min-width:190px"},
+    {k:"tier", l:"Tier", html:r=>`<span class="status" style="color:${TIER_C[r.tier]||"var(--ink-3)"}">${esc((X.tiers.find(t=>t.k===r.tier)||{}).label||r.tier)}</span>`},
+    {k:"r20", l:"20D vs SPY", n:1, html:r=>pp(r.r20)}, {k:"r5", l:"5D vs SPY", n:1, html:r=>pp(r.r5)}, {k:"strength", l:"Strength", n:1}]});
+}
+
+/* ---------- Groups · Timeline ---------- */
+function pageTimeline(el){
+  const X = S.timeline; if (!X) throw new Error("no timeline");
+  const U = UI2.tl ||= {kind:"subs", top:"40", sec:""};
+  const src = X[U.kind] || [], d = X.dates, n = d.length;
+  const rows = src.filter(r=>!U.sec || r.sec===U.sec).sort((a,b)=>(b.h[b.h.length-1]??-1)-(a.h[a.h.length-1]??-1)).slice(0, U.top==="all"?999:+U.top);
+  const col = v => v==null ? "transparent" : `color-mix(in srgb, ${v>=50?"var(--up)":"var(--dn)"} ${Math.round(Math.abs(v-50)*1.6)}%, var(--panel))`;
+  el.innerHTML = `<div class="page-h"><h1>Strength timeline</h1><p>Each row a group, each cell a session (oldest left), colored by Strength: green strong, red weak · ${d.length} sessions to ${day(d[n-1])}</p></div>
+    <div class="panel"><div class="controls"><span class="seg" data-g="kind"><button data-v="subs" aria-pressed="${U.kind==="subs"}">Sub-themes</button><button data-v="themes" aria-pressed="${U.kind==="themes"}">Themes</button></span>
+      <span class="seg" data-g="top">${[["20","Top 20"],["40","Top 40"],["all","All"]].map(([k,l])=>`<button data-v="${k}" aria-pressed="${U.top===k}">${l}</button>`).join("")}</span>
+      ${U.kind==="subs"?`<select class="fsel" id="tlSec" aria-label="Filter by sector"><option value="">All sectors</option>${[...new Set(X.subs.map(r=>r.sec).filter(Boolean))].sort().map(s=>`<option ${U.sec===s?"selected":""}>${esc(s)}</option>`).join("")}</select>`:""}</div>
+      <div class="tw" style="padding:10px 14px"><table class="hm"><tbody>${rows.map(r=>`<tr><td class="nm" title="${esc(r.n)}">${esc(r.n)}</td>${r.h.map((v,i)=>`<td class="c" title="${esc(d[i])}: ${v??"–"}" style="background:${col(v)}"></td>`).join("")}<td class="nm num" style="padding-left:8px">${r.h[r.h.length-1]??"–"}</td></tr>`).join("")}</tbody></table></div>
+      <div class="legend"><span>Sorted by today's Strength · hover a cell for the date and value</span><span>${esc(d[0])} → ${esc(d[n-1])}</span></div></div>`;
+  el.querySelectorAll(".seg[data-g]").forEach(sg => sg.onclick = e => { const b=e.target.closest("button"); if(b){U[sg.dataset.g]=b.dataset.v; if(sg.dataset.g==="kind") U.sec=""; saveUI(); pageTimeline(el);} });
+  const s=$("#tlSec"); if (s) s.onchange = () => { U.sec=s.value; saveUI(); pageTimeline(el); };
 }
 
 route();
