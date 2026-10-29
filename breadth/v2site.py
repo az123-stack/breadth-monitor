@@ -68,7 +68,7 @@ def _lifecycle(T):
                "rank": r.get("s_rank"), "tier": r.get("tier")} for r in lc.get("rows") or []]
     live = sorted(lc.get("live") or [], key=lambda x: (-int(bool(x.get("t3"))), -(x.get("rs") or 0)))[:8]
     lined = [{"t": x["t"], "g": x.get("g"), "rs": x.get("rs"), "c": x.get("c"), "hi": x.get("hi"), "lo": x.get("lo"),
-              "e9": num(x.get("e9")), "e21": num(x.get("e21")), "adr": _pct(x.get("adr")), "t3": bool(x.get("t3")),
+              "e9": num(x.get("e9")), "e21": num(x.get("e21")), "adr": _pct(x.get("adr")), "a": x.get("adr"), "t3": bool(x.get("t3")),
               "earn": x.get("earn")} for x in live]
     return {"groups": groups, "lined": lined, "lc_size": lc.get("size"), "lc_all": lc.get("all") or {}}
 
@@ -112,7 +112,8 @@ def _groups(T, lc_all):
     for s in T.get("stocks") or []:
         if s["t"] in want:
             stocks[s["t"]] = [(s.get("name") or "")[:40], s.get("price"), _pct(s.get("today"), 2), _pct(s.get("d5")),
-                              _pct(s.get("d30")), s.get("rsr"), _pct(s.get("off_hi")), num(s.get("adr"), 1), _pct(s.get("e21"))]
+                              _pct(s.get("d30")), s.get("rsr"), _pct(s.get("off_hi")), num(s.get("adr"), 1), _pct(s.get("e21")),
+                              s.get("sub") or ""]
     return {"themes": themes, "subs": subs, "stocks": stocks}
 
 
@@ -257,7 +258,10 @@ def _lineup(T):
         rows.append({"t": x["t"], "g": x.get("g"), "kind": x.get("kind"), "stage": x.get("stage"), "lead": bool(x.get("lead")),
                      "rs": x.get("rs"), "price": s["price"], "trigger": s["trigger"], "stop": s["stop"], "st": s["st"],
                      "loc": s["loc"], "precise": s["precise"], "d9": s["d9"], "d21": s["d21"], "earn": x.get("earn"),
-                     "adr": _pct(x.get("adr"))})
+                     "adr": _pct(x.get("adr")),
+                     # raw inputs so the page can redo the state on live prices (same math as lineup.state)
+                     "c": x.get("c"), "hi": x.get("hi"), "lo": x.get("lo"), "e9": x.get("e9"), "e21": x.get("e21"),
+                     "a": x.get("adr"), "t3": bool(x.get("t3"))})
     tr = lc.get("tracker") or {}
     se = (lc.get("stock_evidence") or {}).get("trigger") or {}
     P = T.get("polished") or {}
@@ -488,6 +492,12 @@ def slim(D):
     put("stories", _stories)
     put("lab", _lab, D, T)
     put("story", _story)
+    try:
+        I = D.get("intraday") or {}
+        out["live"] = {"url": D.get("live_url"), "pulse": I.get("pulse") or {}, "etfs": I.get("sector_etfs") or {},
+                       "vp": I.get("volume_profile") or []}
+    except Exception:
+        pass
     try:
         tt = T.get("thetrade") or {}
         out["trade"] = {"name": tt.get("name"), "state": tt.get("state"), "above": tt.get("above"), "below": tt.get("below")}

@@ -593,18 +593,27 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   data/reclass_log.csv), rebuild, commit, push; "reject reclass N" → `reclass reject --ids N`. Decided tickers stay off the worklist 90 days.
   `python -m breadth.reclass list` shows proposals + status. Test `test_theme_upkeep_reclass`.
 - **v2 page** (Oct 28, 2026; Adam approved "Option B": a redesign beside v1, same data) → `v2site.py` + `v2_template.html` → docs/v2/index.html
-  (served at /breadth-monitor/v2/), built at the end of every `site.build` from the same payload (`slim` keeps only what v2 shows, ~1 MB;
-  each section built separately, a failing one shows "appears after the next data run"). 6 main tabs with sub-tabs, hash routes like
-  #groups-themes, last sub-tab per tab remembered (localStorage v2sub): Today (proven posture from the playbook, your trades = Launch picks +
-  lined-up buys, groups in BUY, key numbers) · Market (planned) · Groups: Themes (v1 Themes table rebuilt, Sub-themes view adds lifecycle
-  Stage + sector filter, click a row for its stocks), Lifecycle (planned), Lighting up (ignition / Day 1 / warming), Stair steps (15-session
-  strip, groups / stocks), Rotation + Timeline (planned) · Setups: All setups (playbook verdicts), Launch list, Box trades + Lined-up & dips
-  (planned), Strength on weakness, Record volume, Export lists (planned) · Read: latest chapter (fetches ../story.json live) · Lab (planned:
-  experiments incl. the long/short pulse, which contradicts the proven posture, evidence registry, research log). Every card carries an
-  evidence badge (Proven / Info / Unproven / No edge). Shared `sortTable` with a sub-theme (or theme / sector) dropdown filter; every
-  "⬇ TradingView" button downloads a .txt (###Section,EXCH:TICKER) and copies it. Light / dark / auto toggle (localStorage v2theme); phones
-  get a bottom tab bar. Design prototype history: branch `v2-prototype`. Test `test_v2_page_builds`. Next: fill the planned pages, live
-  Google-sheet prices (clock mode), ticker search drawer.
+  (served at /breadth-monitor/v2/), built at the end of every `site.build` from the same payload (`slim` keeps only what v2 shows, ~1.4 MB;
+  each section built separately (`put`), a failing one shows "appears after the next data run"). 6 main tabs with sub-tabs, hash routes like
+  #groups-themes, last sub-tab per tab remembered (localStorage v2sub). ALL pages built (Oct 28): Today (proven posture, your trades = Launch
+  picks + lined-up buys, groups in BUY, key numbers) · Market: Breadth, Money flow, Macro, Pre-market & live · Groups: Themes (v1 Themes table
+  rebuilt + lifecycle Stage + sector filter, click a row for its stocks), Lifecycle, Lighting up, Stair steps, Rotation, Timeline · Setups:
+  All setups, Launch list, Box trades, Lined-up & dips, Strength on weakness, Record volume, Export lists (pick lists → one TradingView file)
+  · Read: Latest (../story.json), Trade stories (../stories.json), Earnings, Archive · Lab: Experiments, Evidence (registry ladder), Research
+  log (research/R-*.md). Evidence badge on every page. Shared `sortTable` with a sub-theme dropdown filter; "⬇ TradingView" = .txt download +
+  copy. Light / dark / auto (localStorage v2theme); phones get a bottom tab bar.
+  LIVE (Oct 28): payload `live` {url = config.LIVE_CSV_URL, pulse, etfs}; the page fetches the Google sheet (same parser as v1, no anchors)
+  and ../premarket.json (every 2 min while relevant, `liveTick`). `liveMode()`: "live" / "closed" = sheet session newer than S.asof (open /
+  after the close), "pre" = today's Yahoo snapshot before 9:30, else official close; header badge (`setMode`). `applyLive` pushes quotes into
+  the data (originals kept): stock price/today, group Today column = avg of members with quotes (header reads Live / Pre-mkt), lined-up rows
+  redone by `luState` (same math as lineup.state / v1 lineupState: live 9/21 EMAs, sheet column L low; adds "over the trigger"), picks.
+  Live pages re-render in place (`LIVE_PAGES`, skipped while typing). Market → Pre-market & live (`pageLive`): futures/macro before the open or
+  index pulse after, theme-stock breadth, strongest/weakest sub-themes, sector ETFs, movers ≥ 1 ADR (gap + steady flag pre-market).
+  SEARCH (Oct 28): header box (#q, "/" focuses) → tickers / sub-themes / themes; any ticker link (a.tk) opens the drawer (`openTicker`: price
+  live, RS, 5/30d, off high, vs 21 EMA, ADR, its groups with stage, setups & plan lines, lists it's on, TradingView chart link); a group jumps
+  to the Themes table opened on it. Phone: drawer is a bottom sheet. Prototype history: branch `v2-prototype`. Test `test_v2_page_builds`.
+  Local check: `python3 -c "import json; from breadth import v2site; v2site.build(json.load(open('docs/data.json')))"`, then
+  `git checkout -- docs` before committing.
 - `site.py` + `template.html` single self-contained page (tabs: Read-out (default), Trade Stories, Breadth, Pre-market, Intraday, Best Setups, Trade Setups, Launch list, Themes, Rotation, Browse, Setups, Stocks; TradingView export modal)
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)

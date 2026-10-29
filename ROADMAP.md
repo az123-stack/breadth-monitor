@@ -4,11 +4,9 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
 (move them to "Done" with the date) and add new ones as Adam asks for them.
 
 ## v2 redesign (started Oct 28, 2026; Adam approved Option B: new page at /v2/ beside v1)
-0. **Fill the planned v2 pages**, one main tab at a time: Groups → Lifecycle, Rotation, Timeline; Setups → Box trades, Lined-up & dips
-   (live), Export lists; Market (Breadth, Money flow, Macro, Pre-market & live); Read → Trade stories, Earnings, Archive (one page per
-   chapter); Lab. Then live prices (clock mode from the Google sheet / pre-market file), ticker search drawer, and the subscription-ready
-   pieces Adam liked (personal watchlist layer, public track record, plain-English explainers, neutral setup names). Prototype history:
-   branch `v2-prototype`.
+0. v2 pages, live prices and ticker search are built (Oct 28). Next: personal watchlist / "my positions" layer (Adam's own trades with
+   his exit rules), public track record page, plain-English explainers, neutral setup names, one page per story chapter, brand name
+   (Adam decides). Then decide when v2 replaces v1 as the landing page.
 
 ## Theme upkeep (Oct 28)
 - First reclass agent run Sat Oct 31 8:37 AM ET; Adam answers "apply reclass N" / "reject reclass N". Worklist already flags ESS (REIT in
