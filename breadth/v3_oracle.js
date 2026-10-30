@@ -4,7 +4,8 @@
    c: last 181 closes}}, spy (181 closes), dates. Each chart rebases every line to 0% at its window start. Live: today's Google price is added as
    the last point (cohorts stay as of the last close). */
 const OR_COH = [["d180", "180D", 0], ["d60", "60D", 1], ["d15", "15 day", 2], ["d5", "5 day", 3]];
-const OR_PAL = ["#2f6fdf", "#e0702b", "#2e9d5b", "#c23b6e", "#7b5bd6", "#c49a1a", "#1f9bb0", "#8c564b", "#d64545", "#5a6b7d"];
+const OR_TOP = 15;   // Adam, Oct 30: top 7 → "lets try top 15"
+const OR_PAL = ["#2f6fdf", "#e0702b", "#2e9d5b", "#c23b6e", "#7b5bd6", "#c49a1a", "#1f9bb0", "#8c564b", "#d64545", "#5a6b7d", "#0f8a7e", "#b5568f", "#6b8e23", "#d4813a", "#4b6cb7"];
 function oracleLine(vals, w, h, lo, hi) {
   const n = vals.length - 1, span = hi - lo || 1;
   return vals.map((v, i) => v == null ? null : `${(i / n * w).toFixed(1)},${(h - (v - lo) / span * h).toFixed(1)}`).filter(Boolean).join(" ");
@@ -15,7 +16,7 @@ function renderOracle(app) {
   UI.or = UI.or || { coh: lsGet("orCoh", "d5"), view: lsGet("orView", "stocks"), hl: null, log: lsGet("orLog", "0") === "1" };
   const U = UI.or, live = liveActive(), subs = U.view === "subs" && O.subs;
   app.append(liveBar());
-  const SRC = subs ? O.subs : O.rows, list = ((subs ? O.scohorts : O.cohorts)[U.coh] || []).slice(0, 7).filter(t => SRC[t]);
+  const SRC = subs ? O.subs : O.rows, list = ((subs ? O.scohorts : O.cohorts)[U.coh] || []).slice(0, OR_TOP).filter(t => SRC[t]);
   const col = (i) => OR_PAL[i % OR_PAL.length];
   // live: a stock gets today's price; a sub-theme gets the average live move of its members on top of its last index value
   const liveMove = (g) => { const v = (O.subs[g].members || []).map(t => liveRow(t)).filter(L => L && L.chg != null).map(L => L.chg); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
@@ -24,7 +25,7 @@ function renderOracle(app) {
   const cname = (OR_COH.find(c => c[0] === U.coh) || OR_COH[3])[1];
   // ---- controls ----
   const what = subs ? "sub-themes" : "stocks";
-  const head = $(`<section class="card orhead"><div class="orttl"><h2>Oracle <span class="meta">· the 7 strongest ${what} of the ${esc(cname)} cohort, drawn over 180, 60 and 15 sessions</span></h2></div>
+  const head = $(`<section class="card orhead"><div class="orttl"><h2>Oracle <span class="meta">· the ${OR_TOP} strongest ${what} of the ${esc(cname)} cohort, drawn over 180, 60 and 15 sessions</span></h2></div>
     <div class="filters"></div>
     <div class="meta orsub">${subs ? "Cohort = sub-themes (3+ stocks with data) ranked by the return of their equal-weight index over that period" : `Cohort = our ${O.universe} liquid theme stocks ($5+, $10M+ a day, ADRs included) ranked by their return over that period`}, as of the ${shortDate(O.date)} close.
     Each chart starts every line at 0% at the left edge. <b>Bold</b> = the cohort's median, dashed = SPY. Hover or tap a ticker to follow it across all three charts.${live ? " Today's live price is the last point." : ""}</div></section>`);
@@ -34,7 +35,7 @@ function renderOracle(app) {
   const sst = { s: U.log ? "log" : "lin" }; f.append(chips("Scale", [["lin", "% scale"], ["log", "Log scale"]], sst, "s", () => { U.log = sst.s === "log"; save(); }));
   // overlap line
   const coh = subs ? O.scohorts : O.cohorts;
-  head.append($(`<div class="meta orov">Of these 7, also in the top 7 of: ${OR_COH.filter(c => c[0] !== U.coh).map(c => `<b>${c[1]}</b> ${(coh[c[0]] || []).filter(x => list.includes(x)).length}`).join(" · ")}</div>`));
+  head.append($(`<div class="meta orov">Of these ${OR_TOP}, also in the top ${OR_TOP} of: ${OR_COH.filter(c => c[0] !== U.coh).map(c => `<b>${c[1]}</b> ${(coh[c[0]] || []).filter(x => list.includes(x)).length}`).join(" · ")}</div>`));
   app.append(head);
   // ---- three charts ----
   const grid = $('<section class="orgrid"></section>');

@@ -14,7 +14,7 @@ from . import config
 
 COHORTS = {"d180": 180, "d60": 60, "d15": 15, "d5": 5}
 WINDOWS = [180, 60, 15]
-TOP = 7          # Adam, Oct 30: "only the top 7 from each cohort"
+TOP = 15         # Adam, Oct 30: top 7 first, then "lets try top 15"
 SUB_MIN = 3      # sub-themes need 3+ members with data
 MIN_PRICE, MIN_DV = 5.0, 10e6
 

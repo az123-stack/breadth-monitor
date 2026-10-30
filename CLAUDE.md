@@ -696,7 +696,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   % / log scale (localStorage orCoh / orN / orLog); 3 SVG charts, each line rebased to 0% at the window start, bold = cohort median, dashed =
   SPY, top-5 legend per chart; hover / tap a ticker (line, legend or table row) highlights it in all three; table with 180/60/15/5D returns,
   ⬇ TradingView. Live: today's Google price appended as the last point (cohorts stay as of the close). Descriptive only. Test `test_oracle_cohorts`.
-  Oct 30 evening (Adam): top 7 per cohort (`TOP` 7, no Show chips); View chip Stocks / Sub-themes (localStorage orView): `scohorts` + `subs`
+  Oct 30 evening (Adam): top 15 per cohort (`TOP` 15 + page `OR_TOP`; tried 7 first; no Show chips); View chip Stocks / Sub-themes (localStorage orView): `scohorts` + `subs`
   {name: n, group, strength, r, c = equal-weight index of members with data (mean daily return, clipped −50%/+100%), members (best 180D
   first, 12)}; live sub-theme point = last index × (1 + avg live move of its members). ADRs now included (is_stock is False for ADRs; only
   names with ETF / Fund / Trust or no name are dropped) — same filter on Theme Dash. Theme Dash: chart WEEKLY and on the RIGHT (phone: on
