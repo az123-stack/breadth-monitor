@@ -678,6 +678,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   EOD references `breadth/positions.py` `refs` → `DATA.themes.posrefs` {date, dates (40), rows t: [close, e10, e20, adr %, high, low]}
   for every $3+/$2M+ ticker (test `test_position_refs`). TradingView export modal unchanged.
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / Nasdaq-100 member now has one — 258 added, 29 new groups e.g. Mass Merchants & Grocers (WMT, COST), Beverages, Tobacco, Household & Personal Care, Packaged Foods, Home Improvement, Consumer Hardware (AAPL), Asset Managers, Exchanges & Financial Data, Insurance Brokers, Conglomerates (BRK.B), Drug Distributors, Railroads, Chemicals; UNH/ELV/CI/CVS into Managed Care; only dup classes GOOG/FOX/NWS left out. `themes.build` now lists sub-theme-only stocks too (themes = []), so stocks went 861 → 1,117); swept Oct 11: renames PSTG→P, BK→BNY, SATS→ECHO, ERJ→EMBJ; 21 dead tickers dropped; 154 strong names added
+- AI themes (Oct 29, 2026; Adam: "Box is what Wall Street wants: companies successfully monetizing AI"): themes.csv "AI & ROBOTICS - Enterprise
+  AI SaaS" (software selling AI to enterprises: BOX CRM NOW WDAY ADBE INTU HUBS TEAM SNOW DDOG MDB PATH AI PLTR MNDY ASAN BRZE IOT FIVN INTA)
+  and "AI & ROBOTICS - AI Monetizers" (software/platforms that DISCLOSE AI revenue or ARR and are profitable: MSFT GOOGL META AMZN ORCL IBM CRM
+  NOW WDAY ADBE PLTR APP ZS EPAM BOX FICO AXON IOT; sources: wiresift.com/ai-adoption/ai-revenue-disclosures Q1 2026, ortent.co outside-in Aug
+  2026; chips / AI hardware deliberately left to the AI Infrastructure groups). Themes allow overlap; sub-themes stay one per stock. Refresh the
+  Monetizers list each earnings season. BOX, MNDY, ASAN, BRZE, IOT added to Enterprise SaaS, EPAM to IT Services (were in no sub-theme).
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
 ## Definitions

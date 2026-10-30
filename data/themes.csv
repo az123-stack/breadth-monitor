@@ -1161,6 +1161,11 @@ TECH - Software,APPN,member
 TECH - Software,FRSH,member
 TECH - Software,INTA,member
 TECH - Software,PTC,member
+TECH - Software,BOX,member
+TECH - Software,MNDY,member
+TECH - Software,ASAN,member
+TECH - Software,BRZE,member
+TECH - Software,IOT,member
 TRANSPORT - Shipping,FRO,member
 TRANSPORT - Shipping,DHT,member
 TRANSPORT - Shipping,INSW,member
@@ -1173,3 +1178,41 @@ TRANSPORT - Shipping,DAC,member
 TRANSPORT - Shipping,ZIM,member
 TRANSPORT - Shipping,MATX,member
 TRANSPORT - Shipping,CMBT,member
+AI & ROBOTICS - Enterprise AI SaaS,BOX,member
+AI & ROBOTICS - Enterprise AI SaaS,CRM,member
+AI & ROBOTICS - Enterprise AI SaaS,NOW,member
+AI & ROBOTICS - Enterprise AI SaaS,WDAY,member
+AI & ROBOTICS - Enterprise AI SaaS,ADBE,member
+AI & ROBOTICS - Enterprise AI SaaS,INTU,member
+AI & ROBOTICS - Enterprise AI SaaS,HUBS,member
+AI & ROBOTICS - Enterprise AI SaaS,TEAM,member
+AI & ROBOTICS - Enterprise AI SaaS,SNOW,member
+AI & ROBOTICS - Enterprise AI SaaS,DDOG,member
+AI & ROBOTICS - Enterprise AI SaaS,MDB,member
+AI & ROBOTICS - Enterprise AI SaaS,PATH,member
+AI & ROBOTICS - Enterprise AI SaaS,AI,member
+AI & ROBOTICS - Enterprise AI SaaS,PLTR,member
+AI & ROBOTICS - Enterprise AI SaaS,MNDY,member
+AI & ROBOTICS - Enterprise AI SaaS,ASAN,member
+AI & ROBOTICS - Enterprise AI SaaS,BRZE,member
+AI & ROBOTICS - Enterprise AI SaaS,IOT,member
+AI & ROBOTICS - Enterprise AI SaaS,FIVN,member
+AI & ROBOTICS - Enterprise AI SaaS,INTA,member
+AI & ROBOTICS - AI Monetizers,MSFT,member
+AI & ROBOTICS - AI Monetizers,GOOGL,member
+AI & ROBOTICS - AI Monetizers,META,member
+AI & ROBOTICS - AI Monetizers,AMZN,member
+AI & ROBOTICS - AI Monetizers,ORCL,member
+AI & ROBOTICS - AI Monetizers,IBM,member
+AI & ROBOTICS - AI Monetizers,CRM,member
+AI & ROBOTICS - AI Monetizers,NOW,member
+AI & ROBOTICS - AI Monetizers,WDAY,member
+AI & ROBOTICS - AI Monetizers,ADBE,member
+AI & ROBOTICS - AI Monetizers,PLTR,member
+AI & ROBOTICS - AI Monetizers,APP,member
+AI & ROBOTICS - AI Monetizers,ZS,member
+AI & ROBOTICS - AI Monetizers,EPAM,member
+AI & ROBOTICS - AI Monetizers,BOX,member
+AI & ROBOTICS - AI Monetizers,FICO,member
+AI & ROBOTICS - AI Monetizers,AXON,member
+AI & ROBOTICS - AI Monetizers,IOT,member

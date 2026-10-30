@@ -1073,6 +1073,11 @@ Software,Enterprise SaaS,FRSH
 Software,Enterprise SaaS,INTA
 Software,Enterprise SaaS,ROP
 Software,Enterprise SaaS,TYL
+Software,Enterprise SaaS,BOX
+Software,Enterprise SaaS,MNDY
+Software,Enterprise SaaS,ASAN
+Software,Enterprise SaaS,BRZE
+Software,Enterprise SaaS,IOT
 Software,Hyperscalers,MSFT
 Software,Hyperscalers,AMZN
 Software,Hyperscalers,GOOGL
@@ -1082,6 +1087,7 @@ Software,IT Services & Consulting,ACN
 Software,IT Services & Consulting,CTSH
 Software,IT Services & Consulting,IT
 Software,IT Services & Consulting,CDW
+Software,IT Services & Consulting,EPAM
 Software,Identity & Security Tools,OKTA
 Software,Identity & Security Tools,S
 Software,Identity & Security Tools,QLYS
