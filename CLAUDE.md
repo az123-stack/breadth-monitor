@@ -684,7 +684,9 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   and "AI & ROBOTICS - AI Monetizers" (software/platforms that DISCLOSE AI revenue or ARR and are profitable: MSFT GOOGL META AMZN ORCL IBM CRM
   NOW WDAY ADBE PLTR APP ZS EPAM BOX FICO AXON IOT; sources: wiresift.com/ai-adoption/ai-revenue-disclosures Q1 2026, ortent.co outside-in Aug
   2026; chips / AI hardware deliberately left to the AI Infrastructure groups). Themes allow overlap; sub-themes stay one per stock. Refresh the
-  Monetizers list each earnings season. BOX, MNDY, ASAN, BRZE, IOT added to Enterprise SaaS, EPAM to IT Services (were in no sub-theme).
+  Monetizers list each earnings season. Oct 29 (Adam: "they're trying but it's not coming in yet"): NOW (−27%, AI-disruption fears despite a beat), GOOGL (−12%, AI
+  capex pushed free cash flow negative) and AMZN (−5% after hours, FCF −$42B) dropped; the market's test is AI revenue that outruns AI
+  spending, not disclosed AI revenue alone (MSFT: Azure +48%, FCF still positive). BOX, MNDY, ASAN, BRZE, IOT added to Enterprise SaaS, EPAM to IT Services (were in no sub-theme).
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
 ## Definitions
