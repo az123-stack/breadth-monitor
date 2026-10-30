@@ -276,6 +276,30 @@ def earnings_lines(T, slot, snap_rows=None):
     return L
 
 
+def aimon_lines(T):
+    """AI MONETIZERS block (breadth/aimon.py): names added / removed in the last 3 logged sessions + rewarded candidates to check."""
+    A = T.get("aimon") or {}
+    if not A:
+        return []
+    dates = sorted({r.get("date") for r in A.get("log") or [] if r.get("date")})[-3:]
+    ch = [r for r in A.get("log") or [] if r.get("date") in dates]
+    L = [f"\n## AI MONETIZERS (theme '{A.get('theme')}'; IN = the market rewarded the last big reaction / report)",
+         "Members now: " + " ".join(A.get("members") or []) + ". Out: " + ", ".join(
+             f"{t} ({(A.get('status') or {}).get(t, {}).get('why', '')})" for t in A.get("out") or [])]
+    if ch:
+        L.append("CHANGES (flag these in the chapter under **AI monetizers:**):")
+        for r in ch:
+            L.append(f"- {r['date']} {'ADDED' if r.get('action') == 'add' else 'REMOVED'} {r['t']}: {r.get('why', '')} · {r.get('note', '')}")
+    else:
+        L.append("No changes in the last sessions.")
+    cands = [c for c in A.get("candidates") or [] if not c.get("pinned")][:8]
+    if cands:
+        L.append("Candidates the market just rewarded (NOT in the pool yet; only mention one if you confirm AI drove the report, with a source):")
+        for c in cands:
+            L.append(f"- {c['t']} ({c.get('sub', '')}, RS {c.get('rsr') or '–'}): {c.get('why', '')}, {c.get('since', 0) * 100:+.0f}% since")
+    return L
+
+
 def facts(slot):
     if slot == "data":
         return facts_data()
@@ -496,6 +520,7 @@ def facts(slot):
         top = sorted(stocks_by.get(g, []), key=lambda x: -(x.get("rsr") or 0))[:4]
         lines.append(f"- {g} ({why}): biggest names {', '.join(x['t'] for x in top) or '–'}")
     out.extend(earnings_lines(T, slot, snap_rows if slot == "pm" else None))
+    out.extend(aimon_lines(T))
     if lines:
         P("\n## WHY research list: search the news for what is driving each of these (earnings, guidance, policy, macro, deals) and confirm with the price action above")
         out.extend(lines[:12])

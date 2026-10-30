@@ -192,6 +192,12 @@ def recompute_and_publish(bars, splits, universe, state):
     fresh = metrics.compute(stocks, bench=adjusted[adjusted["ticker"] == config.BENCHMARK])
     history = metrics.merge(store.load_breadth(), fresh)
     store.save_breadth(history)
+    aimon_x = None
+    try:   # AI Monetizers kept honest by the market's verdict on each name's last big reaction (Oct 29); rewrites its themes.csv rows
+        from . import aimon
+        aimon_x = aimon.apply(adjusted, write=config.LEVELS_ENABLED)
+    except Exception as e:
+        log.exception("AI monetizers failed: %s", e)
     try:
         theme_data = themes.build(adjusted, store.load_themes(), universe,
                                   names=store.load_names(), subthemes_df=store.load_subthemes(),
@@ -318,6 +324,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["thetrade"] = thetrade.build(adjusted, theme_data, history)
         except Exception as e:  # optional panel; never block the page
             log.exception("the trade failed: %s", e)
+        if aimon_x:
+            rs = {x["t"]: x.get("rsr") for x in theme_data.get("stocks") or []}
+            for c in aimon_x.get("candidates") or []:
+                c["rsr"] = rs.get(c["t"])
+            theme_data["aimon"] = aimon_x
         try:   # Earnings clusters: several members of one group reacting the same way in a week (Oct 27; info only)
             from . import earnings
             theme_data["earnings"] = earnings.build(adjusted, theme_data)

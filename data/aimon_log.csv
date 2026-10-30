@@ -1,0 +1,11 @@
+date,t,action,why,note
+2026-10-29,NOW,remove,"Oct 29 report: −27%, worst day ever on AI-disruption fears despite a beat",Now Assist ~$1.5B AI-related ACV (but stock fell 27% on Oct 29 report: AI disruption fears)
+2026-10-29,GOOGL,remove,"Oct 29 report: −12%, AI capex pushed free cash flow negative a 2nd quarter",Gen-AI model product revenue up ~800% y/y; Cloud +103% (but AI capex pushed FCF negative; −12% Oct 29)
+2026-10-29,AMZN,remove,"Oct 29 report: −5% after hours, free cash flow −$42B on AI capex",AWS AI run rate >$15B; AWS +39% (but FCF −$42B on AI capex; −5% after hours Oct 29)
+2026-10-29,TEAM,add,added by hand after research,"Atlassian: Rovo AI actions +50% q/q; FY Q4 2026 EPS +98%, cloud +31%; stock +35% on the report (Aug 7)"
+2026-10-29,TWLO,add,added by hand after research,"Twilio: voice AI driving fastest growth in 3 years, raised FY outlook; +25% on Q2 (Aug 6)"
+2026-10-29,OKTA,add,added by hand after research,"Okta: AI-agent identity demand, beat and raise; +29% on Q2 (Aug 27)"
+2026-10-28,ORCL,remove,"2026-09-11: gap +7.5%, day -1.7%, 3 sessions later -6.4%",AI infrastructure revenue +243% y/y (Q1 2026 disclosure)
+2026-10-28,APP,remove,"2026-08-06: gap -19.0%, day -19.7%, 3 sessions later -23.7%",AXON AI ad engine; AI product revenue +700% y/y
+2026-10-28,FICO,remove,"2026-10-26: gap -8.1%, day -13.2% (3-session check pending)",Platform ARR approaching $350M
+2026-10-28,AXON,remove,"2026-09-15: gap -4.6%, day -9.8%, 3 sessions later -8.6%",AI products (Draft One etc.) revenue +700% y/y

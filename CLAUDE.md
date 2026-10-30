@@ -687,6 +687,17 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Monetizers list each earnings season. Oct 29 (Adam: "they're trying but it's not coming in yet"): NOW (−27%, AI-disruption fears despite a beat), GOOGL (−12%, AI
   capex pushed free cash flow negative) and AMZN (−5% after hours, FCF −$42B) dropped; the market's test is AI revenue that outruns AI
   spending, not disclosed AI revenue alone (MSFT: Azure +48%, FCF still positive). BOX, MNDY, ASAN, BRZE, IOT added to Enterprise SaaS, EPAM to IT Services (were in no sub-theme).
+- `aimon.py` **AI Monetizers kept honest by the market** (Oct 29–30, 2026; Adam: "they're trying but it's not coming in yet" + "flag a new AI
+  monetizer in the read-out story") → rewrites the "AI & ROBOTICS - AI Monetizers" rows of data/themes.csv each daily run (before themes.build,
+  `write=config.LEVELS_ENABLED`) → `DATA.themes.aimon`. data/aimon.json: `pool` {t: note, source} = companies with a documented AI revenue
+  line; `status`; `manual` {t: in, date, why} = a hand call that holds until a NEWER big reaction; `exclude` = deal stocks (BRZE → Salesforce,
+  PTC → Schneider). Rule (`verdicts`): last big reaction (earnings.frames: gap ≥ max(3%, 1 ADR) on 2.5× volume) in 70 sessions → IN if up on
+  the day or above the pre-reaction close 3 sessions later; no reaction → keeps status. Changes → data/aimon_log.csv. `candidates` = rewarded
+  reactions (day ≥ 1 ADR, held 3 sessions) outside the pool in software / internet / AI groups, "PINNED" flag for takeover-like flat tapes.
+  Story fact sheet block AI MONETIZERS (`story.aimon_lines`: members, out + why, CHANGES of the last 3 logged dates, candidates) → chapter
+  section **AI monetizers:** (story_guide.md). To add a candidate: research its AI revenue, add to `pool` with note + source. Oct 29: IN BOX
+  MSFT META IBM CRM WDAY ADBE PLTR ZS EPAM IOT TEAM TWLO OKTA; OUT ORCL APP FICO AXON (rule), NOW GOOGL AMZN (manual, Oct 29 reports).
+  `python -m breadth.aimon` prints it. Test `test_ai_monetizers_verdict`.
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
 ## Definitions

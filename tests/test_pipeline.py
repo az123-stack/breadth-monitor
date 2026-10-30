@@ -1944,6 +1944,21 @@ def test_ema_test_odds():
         config.BENCHMARK = old
     return f"{X['long']['evidence']['n']} long touches"
 
+def test_ai_monetizers_verdict():
+    """AI Monetizers rule: IN when the last big reaction was up on the day or held above the pre-close 3 sessions later."""
+    import numpy as np, pandas as pd
+    from breadth import aimon
+    d = pd.bdate_range("2026-01-01", periods=40)
+    c = pd.DataFrame({"UP": 100.0, "DN": 100.0, "BACK": 100.0, "NONE": 100.0}, index=d)
+    c.loc[d[30]:, "UP"] = 120; c.loc[d[30]:, "DN"] = 80
+    c.loc[d[30]:, "BACK"] = 95; c.loc[d[33]:, "BACK"] = 104
+    R = pd.DataFrame(np.nan, index=d, columns=c.columns); R.loc[d[30], ["UP", "DN", "BACK"]] = [1, -1, -1]
+    F = {"react": R, "c": c, "move": c / c.shift() - 1, "gap": c / c.shift() - 1}
+    V = aimon.verdicts(F, list(c.columns))
+    assert V["UP"]["in"] and not V["DN"]["in"] and V["BACK"]["in"] and V["NONE"] is None
+    return "ok"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

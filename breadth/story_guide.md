@@ -33,6 +33,10 @@ story he can absorb in two minutes, and it must CONTINUE the story from the prev
   rotation / sympathy / unexplained), and the source link. Lead with the groups that matter most to the story and the trades.
 **What earnings said:** (only when the fact sheet has an EARNINGS CLUSTERS block; see "What earnings said" below) 1–4
   bullets, one per group where several companies reported the same thing this week.
+**AI monetizers:** (only when the fact sheet's AI MONETIZERS block lists CHANGES) one bullet per name ADDED or REMOVED: what the
+  market just said about its AI money (the report, the key AI number, the reaction) with a source. Adam watches this list: it is the
+  set of companies Wall Street believes are actually making money from AI. If a candidate on that block is clearly AI-driven, say so
+  in one line ("worth adding: X, because ...") so Claude can add it to the pool.
 **What it means:** 2–3 sentences tying it together (rotation vs leaving, leadership, thrust setup, regime), using the why.
 **Scenario A — money keeps leaving:** signs to watch (concrete thresholds from the scenario engine) and what to trade / avoid.
 **Scenario B — money comes back:** signs to watch, and WHERE it is likely to go and how to trade each case (snapback in the
