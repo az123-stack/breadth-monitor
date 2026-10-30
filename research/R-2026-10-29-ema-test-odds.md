@@ -35,3 +35,18 @@ the short side should be re-tested after a real downtrend.
 **How it is used.** Card "EMA test odds" on the Setups tab (part 2): tier table re-run each build (A/B = entry tiers when win ≥ 30% and
 both halves positive), live candidates in leading groups scored in the browser (`emaTier` = `emaprob.tier`), short side shown with a
 "no edge found" label. Info only, never touches picks.
+
+**Second pass, Adam's framing (Oct 29, same day; this replaced the tiers on the card).** Adam: "pick a time frame like 1 month; if the % of
+time over the 9/21 is ~80% and it's going into the 9/21 now it's likely to bounce ... 80/90% over 30 days and about to make its first touch,
+then measure the second touch." Measure: share of the prior 30 closes above the EMA (bands <50 / 50–70 / 70–80 / 80–90 / 90%+) × touch number
+in the prior 30 sessions (1st / 2nd / 3rd+); touch = low within 0.25 ADR after closing above, 3-session spacing, a 9 touch must not reach the
+21. Bounce = close 0.5 ADR over the touch-day high within 10 sessions before a close 0.5 ADR through the EMA; same R trade as above.
+Sample Nov 13, 2025 – Sep 25, 2026, 48,666 long touches.
+- % time above alone does NOT raise the bounce odds: 21 EMA ~40% bounce in every band, 9 EMA ~47%.
+- 3rd+ touches are the worst: 80%+ & 3rd+ 21 EMA −0.20R, 9 EMA −0.22R.
+- 80%+ & 1st touch: 21 EMA 40% / −0.03R; 9 EMA 43% / −0.01R. With a leading group: 21 EMA 47% / +0.13R (halves +0.18/+0.06, n 316),
+  9 EMA 50% / +0.60R (n 60).
+- 9 EMA, 80%+, 2nd touch, leading group, post-thrust: 55% / +0.54R (halves +0.55/+0.51, n 141).
+- Closing above the EMA on the touch day lifts bounce a little (~44–47%). Shorts: every combination lost.
+Read: Adam's idea is right about the touch count (fresh touches beat 3rd+) but the % above only helps together with a leading group.
+Card "EMA touch odds" shows the band × touch matrix per EMA, the 80%+ coupled table, and live names scored from the most specific cell.

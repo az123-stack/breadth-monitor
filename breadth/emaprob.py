@@ -1,39 +1,30 @@
-"""EMA test odds (Oct 29, 2026; Adam: "time spent above the 9 and/or 21 EMAs ... when it comes near them or goes under them, when the
-probability is high enough it results in an entry. Same thing on the short side.")
+"""EMA touch odds (Oct 29, 2026; Adam: "pick a time frame like 1 month; if the % of time spent over the 9/21 is like 80% and it's
+going into the 9/21 right now it's likely going to bounce ... 80/90% over 30 days and it's about to make its first touch ... then
+measure the second touch". Same thing on the short side.)
 
-A "test" = a liquid stock ($5+, $20M+/day) that closed on the right side of its 9 or 21 EMA for 3+ sessions comes back to it: the low
-gets within 0.25 ADR of the EMA (or through it). Shorts mirror it: a stock living under the EMA rallies up into it. First test in 5
-sessions per stock and EMA; a 9-EMA test that also reaches the 21 counts as a 21 test.
+For every liquid stock ($5+, $20M+/day) and each EMA (9, 21):
+  time above = share of the last 30 closes above that EMA (below, for shorts)
+  touch      = the low comes within 0.25 ADR of the EMA (or through it) after closing above it the day before; a new touch needs 3+
+               sessions since the last; a 9 touch that also reaches the 21 counts as a 21 touch
+  touch #    = 1 + touches of that EMA in the 30 sessions before (1st, 2nd, 3rd+)
+What happened next (first to happen within 10 sessions):
+  BOUNCE = a close above the touch-day high + 0.5 ADR;  FAIL = a close more than 0.5 ADR through the EMA;  else chop
+and the trade: buy the break of the touch-day high within 3 sessions, stop the touch-day low (max 1 ADR, risk floored at 0.3 ADR),
+win = +2R first within 20 sessions; R after 20 sessions (capped 10R) and Adam's exit (first close under the 10 EMA).
+Couplings: leading group (sub-theme top 30% on 60-day return; bottom 30% for shorts), post-thrust window.
 
-Every test is traded like the other dip cards: buy the break of the test-day high within 3 sessions (fill = max(open, trigger)), stop
-the test-day low (max 1 ADR under the entry, risk floored at 0.3 ADR); WIN = +2R before the stop within 20 sessions (2:1 breaks even at
-33%); also R after 20 sessions (capped 10R) and Adam's exit (first close under the 10 EMA). Shorts mirror.
-
-First pass (Oct 29): a logistic model on ~17 features (time above, share of closes above, depth, run-up, tests, slope, RS, market,
-group, thrust) had NO out-of-sample skill (AUC 0.50 long / 0.49 short), so the page doesn't show a model "probability". What did hold
-up in both halves was coupling: time above + leading group + post-thrust window. So the odds are an honest lookup table of tiers
-(`tier`, mirrored in the page as `emaTier`), recomputed every build with win rate, avg R and halves.
-
-  A  post-thrust window + leading group (sub-theme top 30% on 60 days) + 15+ sessions on the right side of the EMA
-  B  post-thrust window + leading group
-  C  leading group + (15+ sessions on the right side OR the test held 0.5+ ADR above the EMA)
-  D  leading group, short run, deep test
-  E  not in a leading group
-Shorts use the same tiers with "leading group" = the weakest 30% of sub-themes and time BELOW the EMA.
+The tables are re-run every build; the page (`emaTouchCard`) looks up today's names in them (`touchLabel` / `band` are the same
+rules as the page's `etBand` / `etTouch`).
 """
 import numpy as np
 import pandas as pd
 
 from . import config
 
-CFG = dict(min_price=5.0, min_dvol=20e6, touch=0.25, space=5, trig_days=3, hold=20, target=2.0, floor=0.3, warm=60, lead=0.7,
-           run=15, held=0.5, near=1.5, min_streak=3, n_live=120, recent=3)
-TIERS = ["A", "B", "C", "D", "E"]
-TIER_LABEL = {"A": "Post-thrust + leading group + 15+ sessions on the right side",
-              "B": "Post-thrust + leading group",
-              "C": "Leading group + 15+ sessions, or held 0.5+ ADR off the EMA",
-              "D": "Leading group, short run and a deep test",
-              "E": "Not in a leading group"}
+CFG = dict(min_price=5.0, min_dvol=20e6, touch=0.25, space=3, win=30, look=10, bounce=0.5, fail=0.5, trig_days=3, hold=20,
+           target=2.0, floor=0.3, warm=260, lead=0.7, hi=0.8, near=1.5, n_live=150)
+BANDS = [(-0.01, 0.5, "<50%"), (0.5, 0.7, "50–70%"), (0.7, 0.8, "70–80%"), (0.8, 0.9, "80–90%"), (0.9, 1.01, "90%+")]
+TOUCHES = ["1st", "2nd", "3rd+"]
 
 
 def _r(x, n=3):
@@ -44,22 +35,15 @@ def _r(x, n=3):
     return round(x, n) if np.isfinite(x) else None
 
 
-def tier(lead, thr, streak, depth):
-    """The odds tier of one test (the page has the same rule in `emaTier`)."""
-    if not lead:
-        return "E"
-    if thr and streak >= CFG["run"]:
-        return "A"
-    if thr:
-        return "B"
-    if streak >= CFG["run"] or depth >= CFG["held"]:
-        return "C"
-    return "D"
+def band(p):
+    for a, b, lab in BANDS:
+        if a < p <= b or (a == -0.01 and p <= b):
+            return lab
+    return BANDS[-1][2]
 
 
-def _streak(b):
-    s = b.cumsum()
-    return s - s.where(~b).ffill().fillna(0)
+def touch_label(prior):
+    return TOUCHES[min(int(prior), 2)]
 
 
 def frames(adjusted, subthemes=None, history=None, bench=None):
@@ -99,20 +83,22 @@ def frames(adjusted, subthemes=None, history=None, bench=None):
                 thr=pd.Series(thr, index=c.index))
 
 
-def _tests(F, side):
-    """Per EMA: first-test mask, the streak BEFORE the test day, and the test-day depth (ADRs, + = still on the right side)."""
+def _touches(F, side):
+    """Per EMA: spaced touch mask, share of the prior 30 closes on the right side, touches in the prior 30 sessions."""
     c, h, l, adr = F["c"], F["h"], F["l"], F["adr"]
     out = {}
-    for k, e in (("9", F["e9"]), ("21", F["e21"])):
+    for k in ("9", "21"):
+        e = F["e" + k]
         right = (c > e) if side > 0 else (c < e)
-        streak = _streak(right)
-        before = streak.shift(1)
         reach = (l <= e + CFG["touch"] * adr * c) if side > 0 else (h >= e - CFG["touch"] * adr * c)
-        test = F["liq"] & right.shift(1, fill_value=False) & reach & (before >= CFG["min_streak"])
         if k == "9":
-            test = test & ((l > F["e21"] + CFG["touch"] * adr * c) if side > 0 else (h < F["e21"] - CFG["touch"] * adr * c))
-        first = test & ~test.shift(1, fill_value=False).rolling(CFG["space"], min_periods=1).max().astype(bool)
-        out[k] = dict(first=first, before=before, streak=streak, depth=side * (c - e) / (adr * c))
+            reach = reach & ((l > F["e21"] + CFG["touch"] * adr * c) if side > 0 else (h < F["e21"] - CFG["touch"] * adr * c))
+        t = F["liq"] & right.shift(1, fill_value=False) & reach
+        sp = t & ~t.shift(1, fill_value=False).rolling(CFG["space"], min_periods=1).max().astype(bool)
+        pct_now = right.astype(float).rolling(CFG["win"], min_periods=CFG["win"]).mean()     # incl. today
+        cnt_now = sp.astype(float).rolling(CFG["win"], min_periods=1).sum()
+        out[k] = dict(sp=sp, right=right, pct=pct_now.shift(1), prior=cnt_now.shift(1).fillna(0), pct_now=pct_now, cnt_now=cnt_now,
+                      depth=side * (c - e) / (adr * c))
     return out
 
 
@@ -151,113 +137,121 @@ def _trade(F, i, j, side):
     return None
 
 
-def _tab(x):
-    return {"n": int(len(x)), "win": _r(x["win"].mean()), "R": _r(x["R"].mean()), "Rk": _r(x["Rk"].mean())} if len(x) else {"n": 0}
+def _outcome(F, i, j, side, e):
+    c, h, l, adr = F["_np"][0], F["_np"][2], F["_np"][3], F["_np"][4]
+    a = adr[i, j]
+    for m in range(i + 1, min(i + 1 + CFG["look"], c.shape[0])):
+        if side > 0:
+            if c[m, j] > h[i, j] + CFG["bounce"] * a * c[i, j]:
+                return "bounce"
+            if c[m, j] < e[m, j] - CFG["fail"] * a * c[m, j]:
+                return "fail"
+        else:
+            if c[m, j] < l[i, j] - CFG["bounce"] * a * c[i, j]:
+                return "bounce"
+            if c[m, j] > e[m, j] + CFG["fail"] * a * c[m, j]:
+                return "fail"
+    return "chop"
+
+
+def _events(F, side, P):
+    rows = []
+    n = len(F["c"])
+    grp, thr = F["grp"].to_numpy(), F["thr"].to_numpy()
+    for k in ("9", "21"):
+        D = P[k]
+        e = F["e" + k].to_numpy()
+        pct, prior, dep = D["pct"].to_numpy(), D["prior"].to_numpy(), D["depth"].to_numpy()
+        ii, jj = np.nonzero(D["sp"].to_numpy())
+        for i, j in zip(ii, jj):
+            if i < CFG["warm"] or i + CFG["trig_days"] + CFG["hold"] >= n or not np.isfinite(pct[i, j]):
+                continue
+            a = F["_np"][4][i, j]
+            if not (np.isfinite(a) and a > 0):
+                continue
+            tr = _trade(F, i, j, side)
+            g = grp[i, j]
+            rows.append((k, i, pct[i, j], int(prior[i, j]), _outcome(F, i, j, side, e), *(tr or (np.nan, np.nan, np.nan)),
+                         bool(np.isfinite(g) and ((g >= CFG["lead"]) if side > 0 else (g <= 1 - CFG["lead"]))), bool(thr[i]), dep[i, j]))
+    X = pd.DataFrame(rows, columns=["ema", "i", "pct", "prior", "res", "win", "R", "Rk", "lead", "thr", "depth"])
+    X["band"] = [band(p) for p in X["pct"]]
+    X["touch"] = [touch_label(p) for p in X["prior"]]
+    return X
+
+
+def _stat(x, half):
+    if not len(x):
+        return {"n": 0}
+    t = x.dropna(subset=["win"])
+    h1, h2 = x[half[x.index]], x[~half[x.index]]
+    return {"n": int(len(x)), "bounce": _r((x["res"] == "bounce").mean()), "fail": _r((x["res"] == "fail").mean()),
+            "traded": int(len(t)), "win": _r(t["win"].mean()), "R": _r(t["R"].mean()), "Rk": _r(t["Rk"].mean()),
+            "b1": _r((h1["res"] == "bounce").mean()), "b2": _r((h2["res"] == "bounce").mean()),
+            "R1": _r(h1["R"].mean()), "R2": _r(h2["R"].mean())}
 
 
 def study(F, side, P):
-    rows = []
-    thr = F["thr"].to_numpy()
-    grp = F["grp"].to_numpy()
-    for k in ("9", "21"):
-        D = P[k]
-        ii, jj = np.nonzero(D["first"].to_numpy())
-        bef, dep = D["before"].to_numpy(), D["depth"].to_numpy()
-        for i, j in zip(ii, jj):
-            if i < CFG["warm"]:
-                continue
-            res = _trade(F, i, j, side)
-            if res is None:
-                continue
-            g = grp[i, j]
-            lead = bool(np.isfinite(g) and ((g >= CFG["lead"]) if side > 0 else (g <= 1 - CFG["lead"])))
-            rows.append((i, k, bef[i, j], dep[i, j], lead, bool(thr[i]), *res))
-    X = pd.DataFrame(rows, columns=["i", "ema", "streak", "depth", "lead", "thr", "win", "R", "Rk"])
-    if len(X) < 100:
+    X = _events(F, side, P)
+    if len(X) < 200:
         return None
-    X["tier"] = [tier(a, b, s, d) for a, b, s, d in zip(X["lead"], X["thr"], X["streak"], X["depth"])]
     dates = F["c"].index
-    split = int(np.median(X["i"]))
+    split = int(X["i"].median())
     half = X["i"] < split
-    def tab2(m):
-        x = X[m]
-        return {**_tab(x), "h1": _r(x[half[m]]["R"].mean()), "h2": _r(x[~half[m]]["R"].mean()),
-                "w1": _r(x[half[m]]["win"].mean()), "w2": _r(x[~half[m]]["win"].mean())}
-    tiers = []
-    for t in TIERS:
-        o = tab2(X["tier"] == t)
-        o["entry"] = bool(o["n"] >= 100 and (o.get("h1") or -1) > 0 and (o.get("h2") or -1) > 0 and (o.get("win") or 0) >= 0.30)
-        tiers.append({"tier": t, "label": TIER_LABEL[t], **o})
-    def bucket(col, edges, labels):
-        return [{"label": lab, **tab2((X[col] >= a) & (X[col] < b))} for (a, b), lab in zip(zip(edges[:-1], edges[1:]), labels)]
-    return {"n": int(len(X)), "from": str(dates[int(X["i"].min())].date()), "to": str(dates[int(X["i"].max())].date()),
-            "split": str(dates[split].date()), "all": tab2(X["i"] >= 0), "tiers": tiers,
-            "by_streak": bucket("streak", [3, 6, 11, 21, 41, 1e9], ["3–5 sessions", "6–10", "11–20", "21–40", "41+"]),
-            "by_depth": bucket("depth", [-9, -0.5, 0, 0.5, 1, 9], ["closed 0.5+ ADR through", "closed just through",
-                                                                  "held, close within 0.5 ADR", "held 0.5–1 ADR off", "held 1+ ADR off (wick only)"]),
-            "by_ema": [{"label": "9 EMA test", **tab2(X["ema"] == "9")}, {"label": "21 EMA test", **tab2(X["ema"] == "21")}]}
+    out = {"n": int(len(X)), "from": str(dates[int(X["i"].min())].date()), "to": str(dates[int(X["i"].max())].date()),
+           "split": str(dates[split].date()), "ema": {}}
+    for k in ("21", "9"):
+        Y = X[X["ema"] == k]
+        cell = {b: {t: _stat(Y[(Y["band"] == b) & (Y["touch"] == t)], half) for t in TOUCHES} for _, _, b in BANDS}
+        rowall = {b: _stat(Y[Y["band"] == b], half) for _, _, b in BANDS}
+        hi = Y[Y["pct"] >= CFG["hi"]]
+        coupled = {t: {"all": _stat(hi[hi["touch"] == t], half), "lead": _stat(hi[(hi["touch"] == t) & hi["lead"]], half),
+                       "lead_thr": _stat(hi[(hi["touch"] == t) & hi["lead"] & hi["thr"]], half),
+                       "held": _stat(hi[(hi["touch"] == t) & (hi["depth"] >= 0)], half)} for t in TOUCHES}
+        out["ema"][k] = {"all": _stat(Y, half), "cell": cell, "band": rowall, "coupled": coupled}
+    return out
 
 
 def live(F, side, P, theme_data=None):
-    """Candidates for the page: leading-group stocks (weak-group for shorts) on the right side of the 9 or 21 EMA, within 1.5 ADR of
-    it, with the numbers the browser needs to score a live test; plus tests in the last 3 sessions not yet triggered."""
+    """Names on the right side of the 9 or 21 EMA with 70%+ of the last 30 closes there, touching at the last close or within 1.5 ADR
+    of the EMA; with what the page needs to score a live touch."""
     T = theme_data or {}
     stocks = {s["t"]: s for s in (T.get("stocks") or [])}
     i = len(F["c"]) - 1
-    c, h, l, adr = (F[k].iloc[i] for k in ("c", "h", "l", "adr"))
-    g = F["grp"].iloc[i]
-    lead = (g >= CFG["lead"]) if side > 0 else (g <= 1 - CFG["lead"])
-    thr = bool(F["thr"].iat[i])
-    rows = {}
-    for k, e in (("21", F["e21"].iloc[i]), ("9", F["e9"].iloc[i])):
-        D = P[k]
-        dist = side * (c - e) / (adr * c)
-        ok = F["liq"].iloc[i] & lead.fillna(False) & (dist > 0) & (dist <= CFG["near"]) & (D["streak"].iloc[i] >= CFG["min_streak"] - 1)
-        for t in ok[ok].index:
-            if t in rows or t == config.BENCHMARK:
-                continue
-            rows[t] = {"t": t, "ema": k, "streak": int(D["streak"][t].iat[i]), "dist": _r(dist[t], 2)}
-    # recent tests (official), not yet triggered
-    recent = {}
+    out = {}
     for k in ("21", "9"):
         D = P[k]
-        for back in range(CFG["recent"]):
-            ii = i - back
-            m = D["first"].iloc[ii]
-            for t in m[m].index:
-                if t in recent or t == config.BENCHMARK:
-                    continue
-                trig = F["h"][t].iat[ii] if side > 0 else F["l"][t].iat[ii]
-                later = F["h"][t].iloc[ii + 1:i + 1] if side > 0 else F["l"][t].iloc[ii + 1:i + 1]
-                if len(later) and ((later >= trig).any() if side > 0 else (later <= trig).any()):
-                    continue   # already triggered
-                gg = F["grp"][t].iat[ii]
-                ld = bool(np.isfinite(gg) and ((gg >= CFG["lead"]) if side > 0 else (gg <= 1 - CFG["lead"])))
-                st, dp = D["before"][t].iat[ii], D["depth"][t].iat[ii]
-                tr = tier(ld, bool(F["thr"].iat[ii]), st, dp)
-                if tr == "E":
-                    continue
-                a = F["adr"][t].iat[ii]
-                other = F["l"][t].iat[ii] if side > 0 else F["h"][t].iat[ii]
-                stop = max(other, trig * (1 - a)) if side > 0 else min(other, trig * (1 + a))
-                recent[t] = {"t": t, "ema": k, "ago": back, "date": str(F["c"].index[ii].date()), "streak": int(st), "depth": _r(dp, 2),
-                             "tier": tr, "trig": _r(trig, 2), "stop": _r(stop, 2)}
-    out = []
-    for t, r in list(rows.items()) + [(t, None) for t in recent if t not in rows]:
-        s = stocks.get(t) or {}
+        e = F["e" + k].iloc[i]
+        c, a = F["c"].iloc[i], F["adr"].iloc[i]
+        dist = side * (c - e) / (a * c)
+        touched = D["sp"].iloc[i]
+        pct_prior, prior = D["pct"].iloc[i], D["prior"].iloc[i]          # for a touch TODAY (at the last close)
+        pct_now, cnt_now = D["pct_now"].iloc[i], D["cnt_now"].iloc[i]    # for a touch NEXT session
+        ok_t = F["liq"].iloc[i] & touched & (pct_prior >= 0.7)
+        ok_n = F["liq"].iloc[i] & ~touched & (dist > 0) & (dist <= CFG["near"]) & (pct_now >= 0.7)
+        for t in list(ok_t[ok_t].index) + list(ok_n[ok_n].index):
+            if t == config.BENCHMARK or (t in out and out[t].get("state") == "touched"):
+                continue
+            tch = bool(touched.get(t, False))
+            r = {"ema": k, "state": "touched" if tch else "near", "pct": _r(pct_prior[t] if tch else pct_now[t], 3),
+                 "touch": touch_label(prior[t] if tch else cnt_now[t]), "dist": _r(dist[t], 2), "depth": _r(D["depth"][t].iat[i], 2)}
+            if t not in out or (tch and out[t].get("state") != "touched"):
+                out[t] = r
+    rows = []
+    for t, r in out.items():
         j = F["c"].columns.get_loc(t)
-        base = {"t": t, "name": (s.get("name") or "")[:40], "sub": s.get("sub") or F["sub_of"].get(t, ""), "rsr": s.get("rsr"),
-                "grp": _r(F["grp"].iat[i, j], 2), "c": _r(F["c"].iat[i, j], 2), "hi": _r(F["h"].iat[i, j], 2), "lo": _r(F["l"].iat[i, j], 2),
-                "e9": _r(F["e9"].iat[i, j], 3), "e21": _r(F["e21"].iat[i, j], 3), "adr": _r(F["adr"].iat[i, j], 4),
-                "s9": int(P["9"]["streak"].iat[i, j]), "s21": int(P["21"]["streak"].iat[i, j]),
-                "dvol": _r(F["dvol"].iat[i, j] / 1e6, 1)}
-        if r:
-            base.update({"near_ema": r["ema"], "dist": r["dist"]})
-        if t in recent:
-            base["test"] = recent[t]
-        out.append(base)
-    out.sort(key=lambda r: (0 if r.get("test") else 1, r.get("dist") if r.get("dist") is not None else 9))
-    return out[:CFG["n_live"]], thr
+        s = stocks.get(t) or {}
+        g = F["grp"].iat[i, j]
+        lead = bool(np.isfinite(g) and ((g >= CFG["lead"]) if side > 0 else (g <= 1 - CFG["lead"])))
+        a = F["adr"].iat[i, j]
+        hi, lo = F["h"].iat[i, j], F["l"].iat[i, j]
+        trig, stop = (hi, max(lo, hi * (1 - a))) if side > 0 else (lo, min(hi, lo * (1 + a)))
+        rows.append({"t": t, "name": (s.get("name") or "")[:40], "sub": s.get("sub") or F["sub_of"].get(t, ""), "rsr": s.get("rsr"),
+                     "lead": lead, "grp": _r(g, 2), **r, "c": _r(F["c"].iat[i, j], 2), "hi": _r(hi, 2), "lo": _r(lo, 2),
+                     "e9": _r(F["e9"].iat[i, j], 3), "e21": _r(F["e21"].iat[i, j], 3), "adr": _r(a, 4),
+                     "trig": _r(trig, 2) if r["state"] == "touched" else None, "stop": _r(stop, 2) if r["state"] == "touched" else None,
+                     "dvol": _r(F["dvol"].iat[i, j] / 1e6, 1)})
+    rows.sort(key=lambda r: (r["state"] != "touched", -(r["pct"] or 0), r["dist"] if r["dist"] is not None else 9))
+    return rows[:CFG["n_live"]]
 
 
 def build(adjusted, theme_data=None, history=None, subthemes=None):
@@ -271,16 +265,15 @@ def build(adjusted, theme_data=None, history=None, subthemes=None):
     if F is None:
         return None
     F["_np"] = tuple(F[k].to_numpy() for k in ("c", "o", "h", "l", "adr", "e10"))
-    out = {"date": str(F["c"].index[-1].date()), "cfg": {k: CFG[k] for k in ("touch", "lead", "run", "held", "near", "target", "hold",
-                                                                            "min_streak", "min_price", "min_dvol")},
-           "tier_label": TIER_LABEL}
+    out = {"date": str(F["c"].index[-1].date()), "cfg": {k: CFG[k] for k in ("touch", "win", "look", "bounce", "fail", "hi", "lead", "near",
+                                                                            "target", "hold", "min_price", "min_dvol")},
+           "bands": [b for _, _, b in BANDS], "touches": TOUCHES, "thr": bool(F["thr"].iat[-1])}
     for name, side in (("long", 1), ("short", -1)):
-        P = _tests(F, side)
+        P = _touches(F, side)
         ev = study(F, side, P)
         if ev is None:
             continue
-        rows, thr = live(F, side, P, theme_data)
-        out[name] = {"evidence": ev, "rows": rows, "thr": thr}
+        out[name] = {"evidence": ev, "rows": live(F, side, P, theme_data)}
     return out
 
 
@@ -293,11 +286,16 @@ if __name__ == "__main__":
     except Exception:
         hist = None
     X = build(a, None, hist)
+    f = lambda o: f"n {o.get('n')} bounce {o.get('bounce')} fail {o.get('fail')} win {o.get('win')} R {o.get('R')} b {o.get('b1')}/{o.get('b2')} R {o.get('R1')}/{o.get('R2')}"
     for side in ("long", "short"):
+        if side not in X:
+            continue
         E = X[side]["evidence"]
-        print("==", side, E["from"], E["to"], "n", E["n"], "split", E["split"], "all", E["all"])
-        for t in E["tiers"]:
-            print("  ", t)
-        for k in ("by_streak", "by_depth", "by_ema"):
-            print("  ", k, [(b["label"], b["n"], b["win"], b["R"], b["h1"], b["h2"]) for b in E[k]])
-        print("  live", len(X[side]["rows"]), "thr", X[side]["thr"], [(r["t"], r.get("test", {}).get("tier")) for r in X[side]["rows"][:12]])
+        print("=====", side, E["from"], E["to"], E["n"])
+        for k, V in E["ema"].items():
+            print(" EMA", k, "all:", f(V["all"]))
+            for bnd in X["bands"]:
+                print("   ", bnd, "|", " | ".join(t + " " + f(V["cell"][bnd][t]) for t in TOUCHES[:2]))
+            for t in TOUCHES:
+                print("   80%+", t, {kk: (v.get("n"), v.get("bounce"), v.get("R"), v.get("R1"), v.get("R2")) for kk, v in V["coupled"][t].items()})
+        print(" live", len(X[side]["rows"]), [(r["t"], r["ema"], r["state"], r["touch"], r["pct"]) for r in X[side]["rows"][:8]])

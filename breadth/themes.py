@@ -356,7 +356,7 @@ def build(adjusted, themes_df, universe, names=None, missing=(), subthemes_df=No
         "refs": refs, "ref_keys": list(offs) + ["ema8", "ema21", "ema50"],
         "hve": v2.get("hve") if v2 else None,
         "timeline_dates": v2.get("timeline_dates") if v2 else None, "px_dates": v2.get("px_dates") if v2 else None,
-        "rs_bp": v2["rs_bp"] if v2 else [], "rs2w_bp": v2.get("rs2w_bp") if v2 else [], "lists": v2["lists"] if v2 else None,
+        "rs_bp": v2["rs_bp"] if v2 else [], "rs_short_bp": v2.get("rs_short_bp") if v2 else {}, "lists": v2["lists"] if v2 else None,
         "leaders": leaders, "trade_bt": v2.get("trade_bt") if v2 else None, "vcp_live": v2.get("vcp") if v2 else None,
         "setup_stats": v2.get("setup_stats") if v2 else None, "regime_now": v2.get("regime_now") if v2 else None,
         "str_weights": {"rel": 0.5, "part": 0.25, "lead": 0.25},

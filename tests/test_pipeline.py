@@ -1917,11 +1917,11 @@ def test_rs_pullback():
 
 
 def test_ema_test_odds():
-    """EMA test odds: tier rule (page twin emaTier), and a build on synthetic bars returns tiers + rows for both sides."""
+    """EMA touch odds: bands / touch labels, and a build on synthetic bars returns the band x touch matrix + rows."""
     import numpy as np, pandas as pd
     from breadth import emaprob as E, config
-    assert E.tier(False, True, 30, 1) == "E" and E.tier(True, True, 20, 0) == "A" and E.tier(True, True, 5, -1) == "B"
-    assert E.tier(True, False, 20, -1) == "C" and E.tier(True, False, 5, 0.6) == "C" and E.tier(True, False, 5, 0.1) == "D"
+    assert E.band(0.85) == "80–90%" and E.band(0.95) == "90%+" and E.band(0.3) == "<50%"
+    assert E.touch_label(0) == "1st" and E.touch_label(1) == "2nd" and E.touch_label(4) == "3rd+"
     old = config.BENCHMARK; config.BENCHMARK = "SPY"
     try:
         d = pd.bdate_range("2024-01-01", periods=320); rng = np.random.default_rng(5); rows = []; subs = []
@@ -1936,11 +1936,13 @@ def test_ema_test_odds():
         E.CFG["warm"], warm = 30, E.CFG["warm"]
         X = E.build(pd.DataFrame(rows), None, None, pd.DataFrame(subs))
         E.CFG["warm"] = warm
-        assert X and "long" in X and [t["tier"] for t in X["long"]["evidence"]["tiers"]] == list("ABCDE")
-        assert all(r["t"] != "SPY" and r["adr"] > 0 for r in X["long"]["rows"])
+        V = X["long"]["evidence"]["ema"]["21"]
+        assert X and set(V["cell"]) == set(X["bands"]) and all(set(c) == set(E.TOUCHES) for c in V["cell"].values())
+        assert set(V["coupled"]["1st"]) == {"all", "lead", "lead_thr", "held"}
+        assert all(r["t"] != "SPY" and r["adr"] > 0 and r["pct"] >= 0.7 and r["touch"] in E.TOUCHES for r in X["long"]["rows"])
     finally:
         config.BENCHMARK = old
-    return f"{X['long']['evidence']['n']} long tests"
+    return f"{X['long']['evidence']['n']} long touches"
 
 if __name__ == "__main__":
     for name, fn in list(globals().items()):

@@ -24,6 +24,7 @@ import pandas as pd
 from . import config
 
 RS_W = [(63, 0.4), (126, 0.2), (189, 0.2), (252, 0.2)]
+RS_SHORT = {"rs2w": 10, "rs4w": 20, "rs6w": 30}   # short-term RS periods (sessions), Oct 29 2026
 STR_HORIZONS = [(5, 0.15), (15, 0.20), (30, 0.25), (60, 0.20), (90, 0.20)]
 STR_WEIGHTS = {"rel": 0.5, "part": 0.25, "lead": 0.25}
 
@@ -307,11 +308,16 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
 
     # ---- per-ticker fields for the tickers shown on the dashboard ----
     rlast = ratings.loc[dates[last]]
-    # Short-term RS (Oct 29, 2026; Adam: "a couple-week one"): 10-session return, percentile 1-99 vs liquid stocks that day
-    r10 = (c / c.shift(10) - 1)
-    bp10 = breakpoints(r10.iloc[last], liquid.iloc[last])
-    rs2w = pd.Series(rate(r10.iloc[last].to_numpy(), bp10), index=c.columns)
-    rs2w5 = pd.Series(rate(r10.iloc[last - 5].to_numpy(), breakpoints(r10.iloc[last - 5], liquid.iloc[last - 5])), index=c.columns) if last >= 15 else None
+    # Short-term RS (Oct 29, 2026; Adam: a toggle for 2 / 4 / 6 weeks next to the ~1-year RS Rating): N-session return, percentile 1-99
+    # vs liquid stocks that day; `<key>5` = change over 5 sessions
+    short_rs, short_bp = {}, {}
+    for key, nd in RS_SHORT.items():
+        rN = c / c.shift(nd) - 1
+        bpN = breakpoints(rN.iloc[last], liquid.iloc[last])
+        now = pd.Series(rate(rN.iloc[last].to_numpy(), bpN), index=c.columns)
+        ago = (pd.Series(rate(rN.iloc[last - 5].to_numpy(), breakpoints(rN.iloc[last - 5], liquid.iloc[last - 5])), index=c.columns)
+               if last >= nd + 5 else None)
+        short_rs[key], short_bp[key] = (now, ago), bpN
     r5 = ratings.loc[dates[last - 5]] if dates[last - 5] in ratings.index else None
     tick = {}
     for tk in focus:
@@ -319,7 +325,8 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
             continue
         tick[tk] = {
             "rsr": _r(rlast.get(tk), 0), "rsr5": (_r(rlast.get(tk) - r5.get(tk), 0) if r5 is not None else None),
-            "rs2w": _r(rs2w.get(tk), 0), "rs2w5": (_r(rs2w.get(tk) - rs2w5.get(tk), 0) if rs2w5 is not None else None),
+            **{k: _r(v[0].get(tk), 0) for k, v in short_rs.items()},
+            **{k + "5": (_r(v[0].get(tk) - v[1].get(tk), 0) if v[1] is not None else None) for k, v in short_rs.items()},
             "rs_nh": bool(nh.iloc[last][tk]) if nh is not None and not pd.isna(nh.iloc[last][tk]) else False,
             "rs_lead": bool(lead.iloc[last][tk]) if lead is not None and not pd.isna(lead.iloc[last][tk]) else False,
             "adr": _r(t["adr"].iloc[last][tk], 2), "tight": _r(t["tight5"].iloc[last][tk], 2),
@@ -453,6 +460,6 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
     px_dates = [d.strftime("%Y-%m-%d") for d in dates[-PAIR_DAYS:]]
     return {"hve": hve_out, "timeline_dates": tl_dates, "px_dates": px_dates, "tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt, "vcp": vcp_live,
             "rs_bp": [_r(x, 5) for x in (bps.get(last) if bps.get(last) is not None else [])],
-            "rs2w_bp": [_r(x, 5) for x in (bp10 if bp10 is not None else [])],
+            "rs_short_bp": {k: [_r(x, 5) for x in (bp if bp is not None else [])] for k, bp in short_bp.items()},
             "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60], "strongest": sl[:40], "mega": ml,
                       "counts": {"bursts": len(bl), "anticipation": len(al), "eps": len(el), "strongest": len(sl), "mega": len(ml)}}}

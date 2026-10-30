@@ -573,18 +573,21 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   close under the 10 EMA). Oct 29 (Nov 2025–Sep 2026): RS-high dips −0.03R (n 1,764) vs equally strong without an RS high −0.06R (edge
   +0.26R, t 2.03, halves +0.45/+0.14) but ≈ 0 with Adam's exit; RS-leads +0.13R (n 270). Verdict "proven" also needs own R > 0 and a positive
   Adam-exit edge → currently "helps" (Unproven badge). Test `test_rs_pullback`.
-- `emaprob.py` **EMA test odds** (Oct 29, 2026; Adam: "time spent above the 9/21 EMAs ... when the probability is high enough it's an entry;
-  same on the short side"; card R-2026-10-29-ema-test-odds, layer `emaprob`, info) → `DATA.themes.emaprob` {long, short: {evidence, rows, thr}}
-  (~60 s per build), `emaOddsCard` on the Setups tab after RS leaders. Test = 3+ closes on the right side of the 9 or 21 EMA then low within
-  0.25 ADR (or through); trade = break of the test-day high, stop test-day low ≤ 1 ADR, win = +2R first within 20 sessions. Tiers (`tier` =
-  page `emaTier`): A post-thrust + leading group (sub-theme top 30% on 60 days) + 15+ sessions, B post-thrust + leading group, C leading +
-  (15+ sessions or held 0.5+ ADR), D leading otherwise, E not leading; entry tier = win ≥ 30% + both halves positive (A, B on Oct 29). A
-  17-feature logistic model had no skill (AUC 0.50) so no model probability is shown. Live rows = leading-group stocks within 1.5 ADR of the
-  9/21 + tests in the last 3 sessions not yet triggered; the page scores live tests (live EMAs, sheet low). Shorts: every tier lost.
-  Test `test_ema_test_odds`.
-- **RS 2-week** (Oct 29, Adam: "a couple week one"): `strength` `rs2w` = 10-session return percentile 1–99 vs liquid stocks (`rs2w5` = change
-  over 5 sessions), `rs2w_bp` breakpoints, refs key `c10` → `liveRating2w` live; Stocks tab columns "RS 2-wk" / "2-wk Δ", drawer. The RS Rating
-  itself = 63/126/189/252-day returns weighted 40/20/20/20 (~1 year, mostly the last 3 months). Untested as a signal.
+- `emaprob.py` **EMA touch odds** (Oct 29, 2026; reworked same day to Adam's framing: "% of the last month above the 9/21, then the 1st /
+  2nd touch"; card R-2026-10-29-ema-test-odds, layer `emaprob`, info) → `DATA.themes.emaprob` {cfg, bands, touches, thr, long/short:
+  {evidence: {ema: {"21","9": {all, cell[band][touch], band, coupled[touch]{all, held, lead, lead_thr}}}}, rows}} (~60 s), `emaOddsCard` on
+  Setups after RS leaders. pct = share of the prior 30 closes above the EMA (bands <50 / 50–70 / 70–80 / 80–90 / 90%+); touch = low within
+  0.25 ADR after closing above (9-touch must not reach the 21; 3-session spacing); 1st / 2nd / 3rd+ = touches in the prior 30 sessions;
+  bounce = close 0.5 ADR over the touch-day high within 10 sessions before a close 0.5 ADR through the EMA; R = break of the touch-day high
+  within 3 sessions, stop touch-day low ≤ 1 ADR, 20 sessions. Page `emaOdds` picks the most specific coupled cell (n ≥ 30) for each live row
+  (touched at the last close / touching now from sheet low + live EMA / coming within 1.5 ADR); "tested +" = R > 0 in both halves.
+  Findings (Nov 2025–Sep 2026, 48,666 long touches): % time above alone does NOT raise bounce odds (21 EMA ~40% every band, 9 ~47%);
+  3rd+ touches worst (80%+: −0.20R / −0.22R); 80%+ 1st touch + leading group 21 EMA 47% / +0.13R (halves +0.18/+0.06), 9 EMA +0.60R (n 60);
+  9 EMA 80%+ 2nd touch + leading group + post-thrust 55% / +0.54R (n 141). Shorts: all lose. Test `test_ema_test_odds`.
+- **RS period toggle** (Oct 29, Adam: "toggle the RS period rather than extra columns"): `strength.RS_SHORT` rs2w / rs4w / rs6w = 10 / 20 / 30-
+  session return percentile vs liquid stocks (+ `…5` deltas), payload `rs_short_bp`, refs c10 / c20 / c30; page `RS_PER`, chips "RS period"
+  (Stocks + Themes tabs, localStorage rsPeriod) switch the one RS column, Δ, sort and RS 80+/90+ filter; `liveRatingShort` recomputes live.
+  Drawer shows all four. The RS Rating = 63/126/189/252-day returns weighted 40/20/20/20. Untested as a signal.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.
