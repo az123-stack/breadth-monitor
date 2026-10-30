@@ -252,7 +252,7 @@
    "date": "2026-07-30",
    "day": 0.1551,
    "hold3": 0.2619,
-   "since": 0.3597,
+   "since": 0.3575,
    "pending": false
   },
   "META": {
@@ -265,7 +265,7 @@
    "date": "2026-09-11",
    "day": -0.0174,
    "hold3": -0.0639,
-   "since": -0.0549,
+   "since": -0.0875,
    "pending": false
   },
   "IBM": {
@@ -278,7 +278,7 @@
    "date": "2026-08-27",
    "day": 0.2258,
    "hold3": 0.2553,
-   "since": 0.1775,
+   "since": 0.1229,
    "pending": false
   },
   "WDAY": {
@@ -295,7 +295,7 @@
    "date": "2026-08-04",
    "day": 0.2945,
    "hold3": 0.369,
-   "since": 0.5663,
+   "since": 0.5632,
    "pending": false
   },
   "APP": {
@@ -304,7 +304,7 @@
    "date": "2026-08-06",
    "day": -0.1966,
    "hold3": -0.2372,
-   "since": -0.3778,
+   "since": -0.3899,
    "pending": false
   },
   "ZS": {
@@ -313,7 +313,7 @@
    "date": "2026-09-14",
    "day": 0.1652,
    "hold3": 0.2001,
-   "since": 0.5546,
+   "since": 0.5061,
    "pending": false
   },
   "EPAM": {
@@ -322,12 +322,12 @@
   },
   "FICO": {
    "in": false,
-   "why": "2026-10-26: gap -8.1%, day -13.2% (3-session check pending)",
+   "why": "2026-10-26: gap -8.1%, day -13.2%, 3 sessions later -13.0%",
    "date": "2026-10-26",
    "day": -0.1315,
-   "hold3": null,
-   "since": -0.1437,
-   "pending": true
+   "hold3": -0.1302,
+   "since": -0.1302,
+   "pending": false
   },
   "AXON": {
    "in": false,
@@ -335,7 +335,7 @@
    "date": "2026-09-15",
    "day": -0.0981,
    "hold3": -0.0865,
-   "since": -0.1367,
+   "since": -0.1063,
    "pending": false
   },
   "IOT": {
@@ -344,7 +344,7 @@
    "date": "2026-09-04",
    "day": 0.0374,
    "hold3": -0.008,
-   "since": 0.1099,
+   "since": 0.0748,
    "pending": false
   },
   "NOW": {
@@ -365,7 +365,7 @@
    "date": "2026-08-07",
    "day": 0.3531,
    "hold3": 0.4091,
-   "since": 0.998,
+   "since": 0.8526,
    "pending": false
   },
   "TWLO": {
@@ -378,7 +378,7 @@
    "date": "2026-08-27",
    "day": 0.2863,
    "hold3": 0.2381,
-   "since": 0.6564,
+   "since": 0.6505,
    "pending": false
   },
   "ACN": {
@@ -387,7 +387,7 @@
    "date": "2026-10-01",
    "day": 0.1578,
    "hold3": 0.0547,
-   "since": 0.3274,
+   "since": 0.3482,
    "pending": false
   },
   "TEM": {
@@ -396,7 +396,7 @@
    "date": "2026-08-19",
    "day": 0.2409,
    "hold3": 0.3406,
-   "since": 0.5521,
+   "since": 0.577,
    "pending": false
   },
   "VEEV": {
@@ -405,7 +405,7 @@
    "date": "2026-08-27",
    "day": 0.152,
    "hold3": 0.1401,
-   "since": 0.2977,
+   "since": 0.2672,
    "pending": false
   }
  },
@@ -435,7 +435,7 @@
    "why": "Oct 29 report: −16% after hours; Q4 organic growth guided down to 11–12% (from 16%), margins squeezed; voice AI only ~1% of voice minutes"
   }
  },
- "updated": "2026-10-28",
+ "updated": "2026-10-29",
  "not_ai": {
   "CACI": "Aug 2026 jump = defense tech / EW contracts, not AI",
   "PTC": "takeover",
