@@ -120,7 +120,7 @@ CSS = """
 .oraxis span { position: absolute; left: 0; transform: translateY(-50%); font-size: 10.5px; color: var(--text-muted); background: var(--surface-1); padding: 0 3px; border-radius: 3px; }
 .orgridl { stroke: var(--grid); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .orzero { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; }
-.orl { fill: none; stroke-width: 1.4; opacity: .55; vector-effect: non-scaling-stroke; cursor: pointer; transition: opacity .12s; }
+.orl { fill: none; stroke-width: 1.6; opacity: .9; vector-effect: non-scaling-stroke; cursor: pointer; transition: opacity .12s; }
 .orl.dim { opacity: .12; } .orl.on { opacity: 1; stroke-width: 3; }
 .orspy { fill: none; stroke: var(--text-secondary); stroke-width: 1.6; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; pointer-events: none; }
 .ormed { fill: none; stroke: var(--text-primary); stroke-width: 2.6; vector-effect: non-scaling-stroke; pointer-events: none; }

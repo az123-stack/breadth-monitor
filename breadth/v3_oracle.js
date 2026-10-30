@@ -112,11 +112,14 @@ function renderOracle(app) {
   tbl.querySelector(".ortv").addEventListener("click", () => tsDownload("oracle-" + cname.replace(/\s+/g, "").toLowerCase(),
     subs ? list.map(g => ({ name: "Oracle - " + cname + " - " + g, ticks: O.subs[g].members })) : [{ name: "Oracle - " + cname + " cohort", ticks: list }]));
   // ---- highlight a ticker across all charts ----
-  const hl = (t) => { app.querySelectorAll(".orl").forEach(p => { p.classList.toggle("on", p.dataset.t === t); p.classList.toggle("dim", !!t && p.dataset.t !== t); });
-    app.querySelectorAll(".orrank span, .ortable tr[data-t]").forEach(e => e.classList.toggle("on", e.dataset.t === t));
-    app.querySelectorAll(".orl.on").forEach(p => p.parentNode.appendChild(p)); };
+  // dims only inside a chart grid that actually has the hovered / picked line, so the other grid stays fully drawn
+  const hl = (t) => { app.querySelectorAll(".orgrid").forEach(g => { const has = !!t && [...g.querySelectorAll(".orl")].some(p => p.dataset.t === t);
+      g.querySelectorAll(".orl").forEach(p => { p.classList.toggle("on", has && p.dataset.t === t); p.classList.toggle("dim", has && p.dataset.t !== t); });
+      g.querySelectorAll(".orl.on").forEach(p => p.parentNode.appendChild(p)); });
+    app.querySelectorAll(".orrank span, .ortable tr[data-t]").forEach(e => e.classList.toggle("on", !!t && e.dataset.t === t)); };
   app.querySelectorAll(".orl, .orrank span, .ortable tr[data-t]").forEach(e => {
     e.addEventListener("mouseenter", () => hl(e.dataset.t)); e.addEventListener("mouseleave", () => hl(U.hl));
+    if (subs && e.matches(".ortable:not(.orpicktable) tr[data-t]")) return;   // a sub-theme row click picks it (handled above)
     e.addEventListener("click", (ev) => { if (ev.target.closest("a.tkl")) return; U.hl = U.hl === e.dataset.t ? null : e.dataset.t; hl(U.hl); }); });
   if (U.hl) hl(U.hl);
 }
