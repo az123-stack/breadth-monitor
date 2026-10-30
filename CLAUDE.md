@@ -591,7 +591,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Drawer shows all four. The RS Rating = 63/126/189/252-day returns weighted 40/20/20/20. Untested as a signal.
 - Performance + futures fix (Oct 30, 2026; Adam: "crack spreads are no longer in the intraday tab" + "a delay when I click"):
   futures.yml crons didn't start until 14:33 ET, so the oil card said "no snapshot yet" all morning → futures.yml now also runs on
-  `workflow_run` of "Pre-market quotes" (ends 9:31 ET) and the "10/11 snapshot kick" task dispatches it when no run is active.
+  `workflow_run` of "Pre-market quotes" (ends 9:31 ET). (Adding a futures dispatch to the "10/11 snapshot kick" task was
+  blocked by the permission check; needs Adam's OK.)
   Setups tab = ~16k elements / 46k px: layout was ~250–300 ms of every click (more on a laptop) → `.panel > .card { content-visibility:
   auto; contain-intrinsic-size: auto 600px }`; the jump bar adds `.cvall` (lay everything out once, sizes remembered), jumps, re-aims.
   Measured headless: Setups tab click 490–620 → 220–380 ms wall, layout 230–300 → 30–60 ms.
