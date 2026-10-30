@@ -1,19 +1,19 @@
 {
- "updated": "2026-10-29T16:56",
+ "updated": "2026-10-30T17:00",
  "stories": [
   {
    "id": "ai-spending-repriced",
    "title": "AI spending gets repriced",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-10-29",
+   "updated": "2026-10-30",
    "summary": "Investors now want proof that AI spending pays back in cash, so money is leaving AI hardware and, as of Oct 29, software too.",
-   "changed": "The seesaw broke: Alphabet's cash-flow miss hit software and AI chips together, so both sides of the trade fell and money went to health care and small caps.",
+   "changed": "Oct 30: Intel (-29%) and Amazon (record cash burn) extended the AI-spending worry; the selloff spread to software-adjacent names and even the held-up groups fell, so the seesaw broke again.",
    "thesis": {
     "what": "Since early October the AI-hardware groups (chip equipment, optical, AI servers, custom chips, memory, neoclouds, data-center power) fell about 18% over 20 sessions while IT services, enterprise software and steady consumer names rose about 10%: a 28-point swing. On Oct 22 the S&P 500 fell 1.2% but the equal-weight S&P rose 0.7%: the money moved, it didn't leave.",
     "why": "Two worries feed each other. **Cost:** Meta announced non-voting shares to help fund its AI spending and fell 5%; Tesla cut capex; Lam Research guided below consensus ([Korea Times](https://www.koreatimes.co.kr/world/20261023/wall-street-sinks-as-nasdaq-falls-over-2-on-ai-cost-worries), [Investrade](https://investrade.com/market-review-october-22-2026/)). **Financing:** hot CPI pushed the 10-year to 5.26% and CoreWeave's credit spread past 1,000 bp, so borrowing to build data centers got expensive ([TradingKey](https://www.tradingkey.com/analysis/stocks/us-stocks/262218623-us-premarket-tsmc-record-profit-chip-stocks-fall-nvidia-micron-ppi-tradingkey)). Funding is the newest strain: Meta plans to raise up to $95B, starting with $35B in stock ([MarketScreener](https://www.marketscreener.com/news/wall-st-rises-as-anthropic-s-ipo-filing-sharpens-focus-on-ai-trade-ce785cdcdd8ff22d)), and Anthropic's filing adds a large new AI listing to the supply.",
     "how": "Funds were crowded in AI hardware after a huge run. When the spending story wobbles they trim those winners first and park the money in businesses that grow without AI capex (software, IT services, staples). The giants' weight drags the S&P down while the average stock holds up.",
-    "real": "A seesaw since Oct 16: the two sides move opposite each other and the winners give back whenever AI bounces (Oct 21 on Super Micro's raised forecast). Price still agrees on 5 and 20 days. In 5 of 5 past seesaw stretches the beaten-down side won the next 10 sessions, so this is mature and snapback-prone. Oct 26 was another swing: chips bounced on the Anthropic filing and software gave some back, with 38% of dollars in falling stocks (Google estimate; official data lands overnight). Still no breadth thrust (4%+ gainers 1.1× normal vs the 2.5× pace). Oct 27: AI hardware bounced again while Enterprise SaaS slipped, so the seesaw reading stands. Oct 29: both software and AI hardware sold off, so the seesaw is no longer clean; the price check wobbles (−5.2% today for the long groups).",
+    "real": "A seesaw since Oct 16: the two sides move opposite each other and the winners give back whenever AI bounces (Oct 21 on Super Micro's raised forecast). Price still agrees on 5 and 20 days. In 5 of 5 past seesaw stretches the beaten-down side won the next 10 sessions, so this is mature and snapback-prone. Oct 26 was another swing: chips bounced on the Anthropic filing and software gave some back, with 38% of dollars in falling stocks (Google estimate; official data lands overnight). Still no breadth thrust (4%+ gainers 1.1× normal vs the 2.5× pace). Oct 27: AI hardware bounced again while Enterprise SaaS slipped, so the seesaw reading stands. Oct 29: both software and AI hardware sold off, so the seesaw is no longer clean; the price check wobbles (−5.2% today for the long groups). Oct 30 update: both sides fell (77% of dollar volume in falling stocks), so it looks like a broad de-risking day rather than a clean rotation; the price check is still wobbling.",
     "confirm": "The verdict comes next week: Fed decision and Microsoft + Alphabet earnings on Oct 28, PCE inflation and Amazon on Oct 29, Apple on Nov 2. Capex still rising AND rewarded → AI hardware snaps back and this fades. Capex cut or punished → the rotation runs on. A day with ≤ 40% of dollars in falling stocks is the code's comeback trigger. Next: Amazon's reaction at the Oct 30 open and Apple on Nov 2."
    },
    "timeline": [
@@ -100,6 +100,20 @@
      "url": "https://finance.yahoo.com/markets/live/stock-market-today-thursday-october-29-dow-sp-500-nasdaq-alphabet-microsoft-earnings-130305714.html",
      "source": "Yahoo Finance",
      "reaction": "After-hours only; check tomorrow's open"
+    },
+    {
+     "date": "2026-10-30",
+     "event": "Intel closes down about 29% on a weak Q4 outlook and sluggish PC sales tied to higher memory prices. Amazon reports a record 12-month free cash outflow above $42B on roughly $77B of quarterly capex.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-october-30-dow-sp-500-nasdaq-amazon-intel-131609630.html",
+     "source": "Yahoo Finance",
+     "reaction": "QQQ -3.47%, SPY -1.77%, 77% of dollar volume in falling stocks; Memory & Storage Media -8.5%, Custom Silicon -8.4%, Hyperscalers -2.5%"
+    },
+    {
+     "date": "2026-10-30",
+     "event": "Social platforms hit too: Reddit about -24% on weak user numbers and forecast, Roblox about -16%, Pinterest about -6% on a revenue miss.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-october-30-dow-sp-500-nasdaq-amazon-intel-131609630.html",
+     "source": "Yahoo Finance",
+     "reaction": "Social & Ad Platforms -6.0%"
     }
    ],
    "groups": {
@@ -139,12 +153,6 @@
     ]
    },
    "catalysts": [
-    {
-     "date": "2026-10-29",
-     "time": "After close",
-     "name": "Amazon earnings",
-     "why": "AWS capex and growth: the other big AI spender."
-    },
     {
      "date": "2026-11-02",
      "time": "After close",
@@ -284,6 +292,27 @@
       "Memory & Storage Media"
      ],
      "note": "The seesaw broke: Alphabet's cash-flow miss hit software and AI chips together, so both sides of the trade fell and money went to health care and small caps."
+    },
+    {
+     "date": "2026-10-30",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "Enterprise SaaS",
+      "Business Services & Data",
+      "Household & Personal Care",
+      "Packaged Foods"
+     ],
+     "short": [
+      "Semicap Equipment",
+      "Optical Components & Transceivers",
+      "AI Servers & Integrators",
+      "Custom Silicon & Networking Chips",
+      "Neoclouds & GPU Hosting",
+      "Data Center Power & Cooling",
+      "Memory & Storage Media"
+     ],
+     "note": "Oct 30: Intel (-29%) and Amazon (record cash burn) extended the AI-spending worry; the selloff spread to software-adjacent names and even the held-up groups fell, so the seesaw broke again."
     }
    ]
   },
@@ -292,7 +321,7 @@
    "title": "Hot inflation keeps the 10-year near 5%",
    "status": "peaking",
    "started": "2026-10-14",
-   "updated": "2026-10-29",
+   "updated": "2026-10-30",
    "summary": "Hot CPI and PPI pushed the 10-year Treasury yield to 5.26%, hurting companies whose profits are years away; yields eased on Oct 22, but the Fed and PCE next week decide the next leg.",
    "changed": "PCE came in as expected and the 10-year slipped to about 4.99%; no relief, no new scare.",
    "thesis": {
@@ -463,6 +492,19 @@
       "Residential Solar & Yieldcos"
      ],
      "note": "PCE came in as expected and the 10-year slipped to about 4.99%; no relief, no new scare."
+    },
+    {
+     "date": "2026-10-30",
+     "status": "peaking",
+     "long": [],
+     "short": [
+      "Nuclear Reactors (SMR)",
+      "Quantum Computing",
+      "Homebuilders",
+      "REITs",
+      "Residential Solar & Yieldcos"
+     ],
+     "note": "PCE came in as expected and the 10-year slipped to about 4.99%; no relief, no new scare."
     }
    ]
   },
@@ -471,9 +513,9 @@
    "title": "Gulf attacks keep oil above $100",
    "status": "peaking",
    "started": "2026-10-09",
-   "updated": "2026-10-29",
+   "updated": "2026-10-30",
    "summary": "Houthi attacks on Saudi sites and Hormuz shipping pushed Brent from about $98 to over $110 in two weeks; refiners and drillers lead, airlines lose.",
-   "changed": "Oil steady near $103; refiners and gas producers slipped.",
+   "changed": "Oct 30: refiners and big oil rose on record refining profits while the market fell, so price agrees with the story again.",
    "thesis": {
     "what": "Energy groups (refiners, shale, integrated oil, tankers, drillers) are up about 8% over 20 sessions while airlines fell 10%: an 18-point swing, though the last 5 days stalled.",
     "why": "Houthi attacks on Saudi sites (Oct 9, Oct 12, Oct 22) and reported attacks on ships in the Strait of Hormuz (Oct 14) put supply at risk; Brent went from $97.92 to $111.88 ([Nation Thailand](https://www.nationthailand.com/news/40070809), [Euronews](https://www.euronews.com/2026/10/14/oil-prices-rise-after-reported-attacks-on-ships-in-strait-of-hormuz), [Investrade](https://investrade.com/morning-preview-october-22-2026/)).",
@@ -551,6 +593,13 @@
      "url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-29-134623155.html",
      "source": "Yahoo Finance",
      "reaction": "USO +0.97%; Natural Gas Producers −2.3%, Refiners −0.3%"
+    },
+    {
+     "date": "2026-10-30",
+     "event": "Exxon and Chevron report: Exxon refining is its top earner for the first time in at least five years, Chevron profit $9.9B on refining. WTI +2.3%; both stocks touch record highs.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-october-30-dow-sp-500-nasdaq-amazon-intel-131609630.html",
+     "source": "Yahoo Finance",
+     "reaction": "Refiners +3.2%, Integrated & Large-cap Oil +2.0% on a day SPY fell 1.77%"
     }
    ],
    "groups": {
@@ -672,6 +721,21 @@
       "Airlines"
      ],
      "note": "Oil steady near $103; refiners and gas producers slipped."
+    },
+    {
+     "date": "2026-10-30",
+     "status": "peaking",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Oct 30: refiners and big oil rose on record refining profits while the market fell, so price agrees with the story again."
     }
    ]
   },
@@ -680,7 +744,7 @@
    "title": "IT services: from AI loser to AI implementer",
    "status": "building",
    "started": "2026-10-02",
-   "updated": "2026-10-29",
+   "updated": "2026-10-30",
    "summary": "After being sold as AI losers, IT services and consulting are being re-rated as the firms that will implement AI, and they're absorbing money leaving AI hardware.",
    "changed": "IT Services flat (+0.0%) while software was hit; Microsoft's cloud strength supports the implementer story but ServiceNow's drop is a warning.",
    "thesis": {
@@ -815,6 +879,16 @@
      ],
      "short": [],
      "note": "IT Services flat (+0.0%) while software was hit; Microsoft's cloud strength supports the implementer story but ServiceNow's drop is a warning."
+    },
+    {
+     "date": "2026-10-30",
+     "status": "building",
+     "long": [
+      "IT Services & Consulting",
+      "India IT Services"
+     ],
+     "short": [],
+     "note": "IT Services flat (+0.0%) while software was hit; Microsoft's cloud strength supports the implementer story but ServiceNow's drop is a warning."
     }
    ]
   },
@@ -823,7 +897,7 @@
    "title": "Managed care repairs on better Medicare ratings",
    "status": "building",
    "started": "2026-10-09",
-   "updated": "2026-10-29",
+   "updated": "2026-10-30",
    "summary": "Better Medicare star ratings and UnitedHealth's beat-and-raise are pulling managed care out of its slump.",
    "changed": "",
    "thesis": {
@@ -922,6 +996,15 @@
      ],
      "short": [],
      "note": ""
+    },
+    {
+     "date": "2026-10-30",
+     "status": "building",
+     "long": [
+      "Managed Care"
+     ],
+     "short": [],
+     "note": ""
     }
    ]
   },
@@ -930,7 +1013,7 @@
    "title": "SpaceX eyes cell sites; towers up, carriers down",
    "status": "building",
    "started": "2026-10-23",
-   "updated": "2026-10-29",
+   "updated": "2026-10-30",
    "summary": "Reports that SpaceX wants about 80,000 US cell sites for a wireless network lift tower landlords and hit AT&T and T-Mobile.",
    "changed": "",
    "thesis": {
@@ -1034,6 +1117,18 @@
     },
     {
      "date": "2026-10-29",
+     "status": "building",
+     "long": [
+      "Tower REITs",
+      "Launch & Space Systems"
+     ],
+     "short": [
+      "Wireless Carriers"
+     ],
+     "note": ""
+    },
+    {
+     "date": "2026-10-30",
      "status": "building",
      "long": [
       "Tower REITs",
