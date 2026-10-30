@@ -111,6 +111,9 @@ def tightness(w):
         "inside": (h <= h.shift(1)) & (l >= l.shift(1)),
         "vdry": v.rolling(5).mean() / v.rolling(50, min_periods=30).mean(),
         "off_high": c / h.rolling(252, min_periods=60).max() - 1,
+        # Theme Dash (Oct 30 2026): 52-week high / low levels and "made a new one today" (high above / low below the prior 251 sessions)
+        "hi52": h.rolling(252, min_periods=60).max(), "lo52": l.rolling(252, min_periods=60).min(),
+        "nh52": h > h.shift(1).rolling(251, min_periods=60).max(), "nl52": l < l.shift(1).rolling(251, min_periods=60).min(),
         "ema10": c.ewm(span=10, adjust=False, min_periods=10).mean(),
         "ema20": c.ewm(span=20, adjust=False, min_periods=20).mean(),
         "ema50": c.ewm(span=50, adjust=False, min_periods=50).mean(),
@@ -333,6 +336,8 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
             "nr7": bool(t["nr7"].iloc[last][tk]), "inside": bool(t["inside"].iloc[last][tk]),
             "vdry": _r(t["vdry"].iloc[last][tk], 2), "off_hi": _r(t["off_high"].iloc[last][tk]),
             "v50": _r(t["vol50"].iloc[last][tk], 0),
+            "hi52": _r(t["hi52"].iloc[last][tk]), "lo52": _r(t["lo52"].iloc[last][tk]),
+            "nh52": bool(t["nh52"].iloc[last][tk]), "nl52": bool(t["nl52"].iloc[last][tk]),
         }
 
     # ---- setup lists (whole market, latest session; EPs over the last 5) ----

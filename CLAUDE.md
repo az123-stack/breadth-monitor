@@ -680,6 +680,14 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Oct 30 additions (v3 only): page width min(1760px, 96vw) (v1's 1180px looked narrow on Adam's wide screen); compact long / short
   side cards (`pulseCard` swapped, v1's kept as `pulseCardV1`: one header row score + label + meter + sparkline, parts as chips, notes
   on hover; ~115 px tall vs ~410); header "☀ Light / ☾ Dark" switch (localStorage "theme"; first visit follows the device).
+  **Theme Dash** (Groups → Theme Dash, Oct 30; Adam showed Deepvue's highs/lows-by-group panel: "click the ticker and the chart comes up"):
+  `breadth/v3_themedash.js` (injected before `renderTab`, `renderThemeDash`). Top: new 52-week highs vs lows bar among theme stocks; chips Group
+  by Sub-theme / Theme · Show New highs vs lows (two columns: groups making highs / lows, most first) / Within 5% of high / Every stock · Sort
+  (Strength / Today / 5D) · search. Ticker chips tinted by today's move, ▲/▼ = new high / low; click → left sticky chart panel = TradingView
+  `widgetembed` iframe (daily, EMA + volume; loads from TradingView only on click, nothing added to our payload) + Details (drawer) and
+  TradingView ↗. Live: high = Google price ≥ `hi52`, low ≤ `lo52`; official close: `nh52` / `nl52`. New stock fields (strength.py
+  `tightness` → `tick`): hi52 / lo52 (252-session max high / min low), nh52 / nl52 (today's high above / low below the prior 251 sessions).
+  localStorage tdBy / tdShow / tdSort / tdSel. Phone: chart stacks on top (420 px), clicking a chip scrolls to it.
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and

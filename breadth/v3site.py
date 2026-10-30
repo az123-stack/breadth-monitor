@@ -11,11 +11,15 @@ has been rebuilt and Adam has approved it.
 import json
 
 from . import config
+from pathlib import Path
+
 from .site import TEMPLATE, embed
+
+THEMEDASH_JS = Path(__file__).with_name("v3_themedash.js")
 
 # parent key, label, [(sub-tab key = v1 renderer key, label)]
 NAV = [
-    ("groups", "Groups", [("themes", "Themes")]),
+    ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash")]),
 ]
 
 NAV_JS = """const V3_NAV = %s;
@@ -69,6 +73,37 @@ CSS = """
 .p3chip b { font-family: "JetBrains Mono", ui-monospace, monospace; margin-right: 3px; color: var(--text-primary); }
 .p3chip.full { border-color: var(--good); } .p3chip.part { border-color: var(--warning); }
 .p3chip .meta { margin-left: 3px; }
+/* Theme Dash */
+.tdhead { padding: 12px 14px; margin-bottom: 12px; }
+.tdbar { display: flex; height: 26px; border-radius: 6px; overflow: hidden; font-size: 12.5px; font-weight: 600; }
+.tdbar > div { display: flex; align-items: center; padding: 0 10px; white-space: nowrap; min-width: 90px; color: #fff; }
+.tdbar .tdbh { background: var(--good); } .tdbar .tdbl { background: var(--critical); justify-content: flex-end; }
+.tdbar b { margin-right: 4px; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.tdsub { margin: 6px 0 8px; }
+.tdhead .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tdbody { display: grid; grid-template-columns: minmax(380px, 44%) 1fr; gap: 12px; align-items: start; }
+.tdchart { position: sticky; top: 52px; padding: 10px; display: flex; flex-direction: column; height: calc(100vh - 70px); min-height: 420px; }
+.tdch-h { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+.tdch-t { font-size: 18px; } .tdch-b { display: flex; gap: 6px; flex: none; } .tdch-b .xopen { text-decoration: none; }
+.tdtv { flex: 1; width: 100%; border: 0; border-radius: 8px; background: var(--surface-0); }
+.tdcols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tdcol-h { font-weight: 700; font-size: 13.5px; padding: 0 0 6px; margin-bottom: 6px; border-bottom: 2px solid var(--border); }
+.tdcol-h.hcol { border-color: var(--good); } .tdcol-h.lcol { border-color: var(--critical); }
+.tdgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px 14px; }
+.tdg { padding: 6px 0 8px; border-bottom: 1px solid var(--grid); }
+.tdg-h { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin-bottom: 4px; }
+.tdg-n { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tdg-h .meta { font-size: 11.5px; white-space: nowrap; }
+.tdchips { display: flex; flex-wrap: wrap; gap: 4px; }
+.tdchip { font: inherit; font-size: 12px; font-weight: 600; padding: 2px 7px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface-0);
+  color: var(--text-primary); cursor: pointer; display: inline-flex; gap: 4px; align-items: baseline; }
+.tdchip small { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 10.5px; font-weight: 500; color: var(--text-secondary); }
+.tdchip.u1 { background: color-mix(in srgb, var(--good) 12%, var(--surface-0)); } .tdchip.u2 { background: color-mix(in srgb, var(--good) 28%, var(--surface-0)); }
+.tdchip.d1 { background: color-mix(in srgb, var(--critical) 12%, var(--surface-0)); } .tdchip.d2 { background: color-mix(in srgb, var(--critical) 28%, var(--surface-0)); }
+.tdchip:hover { border-color: var(--text-muted); } .tdchip.on { outline: 2px solid var(--s1); outline-offset: 1px; }
+.tdnone { padding: 8px 0; }
+@media (max-width: 520px) { .tdch-h { flex-wrap: wrap; } }
+@media (max-width: 900px) { .tdbody { grid-template-columns: 1fr; } .tdchart { position: static; height: 420px; min-height: 0; } .tdcols { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .p3chip .meta { display: none; } .p3chip { font-size: 11.5px; padding: 1px 7px; } .pside3 .p3lbl { flex-basis: 100%; order: 5; } }
 </style>"""
 
@@ -118,6 +153,8 @@ SWAPS = [
     ('function pulseCard(T) {', PULSE_V3, "compact long / short cards (v1 version kept as pulseCardV1)"),
     (MODE_BTN_OLD, MODE_BTN_NEW, "Light / Dark switch in the header"),
     (MODE_JS_OLD, MODE_JS_NEW, "Light / Dark switch behaviour"),
+    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, themes: renderThemesTab,', "Theme Dash renderer"),
+    ('function renderTab(panel) {', None, "Theme Dash code (v3_themedash.js) before renderTab"),
     ('</style>', CSS, "v3 styles (first </style> only)"),
 ]
 
@@ -130,7 +167,9 @@ def page(template_text):
             n = 1 if n >= 1 else 0
         if n != 1:
             raise ValueError(f"v3 build: expected the v1 template to contain this exactly once ({why}); found {n}")
-        if new is None:
+        if new is None and old.startswith("function renderTab"):
+            new = THEMEDASH_JS.read_text() + "\n" + old
+        elif new is None:
             new = NAV_JS % json.dumps([[k, l, [list(s) for s in subs]] for k, l, subs in NAV])
         html = html.replace(old, new, 1)
     return html
