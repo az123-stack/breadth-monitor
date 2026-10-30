@@ -82,7 +82,7 @@ CSS = """
 .tdbar b { margin-right: 4px; font-family: "JetBrains Mono", ui-monospace, monospace; }
 .tdsub { margin: 6px 0 8px; }
 .tdhead .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.tdbody { display: grid; grid-template-columns: minmax(380px, 44%) 1fr; gap: 12px; align-items: start; }
+.tdbody { display: grid; grid-template-columns: 1fr minmax(380px, 44%); gap: 12px; align-items: start; }
 .tdchart { position: sticky; top: 52px; padding: 10px; display: flex; flex-direction: column; height: calc(100vh - 70px); min-height: 420px; }
 .tdch-h { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
 .tdch-t { font-size: 18px; } .tdch-b { display: flex; gap: 6px; flex: none; } .tdch-b .xopen { text-decoration: none; }
@@ -103,6 +103,9 @@ CSS = """
 .tdchip.d1 { background: color-mix(in srgb, var(--critical) 12%, var(--surface-0)); } .tdchip.d2 { background: color-mix(in srgb, var(--critical) 28%, var(--surface-0)); }
 .tdchip:hover { border-color: var(--text-muted); } .tdchip.on { outline: 2px solid var(--s1); outline-offset: 1px; }
 .tdnone { padding: 8px 0; }
+.tdmore { font: inherit; font-size: 11.5px; color: var(--text-muted); background: none; border: 1px dashed var(--border); border-radius: 6px; padding: 2px 7px; cursor: pointer; }
+.tdrest { display: contents; } .tdrest[hidden] { display: none; } .tdrest .tdchip { opacity: .8; }
+.orsubs a { margin-right: 4px; font-size: 12px; }
 @media (max-width: 520px) { .tdch-h { flex-wrap: wrap; } }
 /* Oracle */
 .orhead { padding: 12px 14px; margin-bottom: 12px; } .orhead h2 { font-size: 16px; margin: 0 0 8px; }
@@ -126,7 +129,7 @@ CSS = """
 .ortable .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .ortable td.orsel { font-weight: 700; } .ortable tr[data-t] { cursor: pointer; } .orspyrow td { border-top: 2px solid var(--border); }
 @media (max-width: 900px) { .orgrid { grid-template-columns: 1fr; } .orsvg, .oraxis { height: 200px; } }
-@media (max-width: 900px) { .tdbody { grid-template-columns: 1fr; } .tdchart { position: static; height: 420px; min-height: 0; } .tdcols { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .tdbody { grid-template-columns: 1fr; } .tdchart { position: static; height: 420px; min-height: 0; order: -1; } .tdcols { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .p3chip .meta { display: none; } .p3chip { font-size: 11.5px; padding: 1px 7px; } .pside3 .p3lbl { flex-basis: 100%; order: 5; } }
 </style>"""
 

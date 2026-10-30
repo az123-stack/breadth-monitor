@@ -1997,7 +1997,7 @@ def test_oracle_cohorts():
     finally:
         config.BENCHMARK = old
     assert O["cohorts"]["d5"][0] == "FAST" and "THIN" not in O["rows"] and len(O["rows"]["FAST"]["c"]) == 181 and len(O["spy"]) == 181
-    assert O["rows"]["FAST"]["r"][0] > O["rows"]["SLOW"]["r"][0] > 0
+    assert O["rows"]["FAST"]["r"][0] > O["rows"]["SLOW"]["r"][0] > 0 and len(O["cohorts"]["d5"]) <= 7
     return f"{O['universe']} liquid"
 
 

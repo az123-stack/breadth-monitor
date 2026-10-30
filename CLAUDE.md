@@ -696,6 +696,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   % / log scale (localStorage orCoh / orN / orLog); 3 SVG charts, each line rebased to 0% at the window start, bold = cohort median, dashed =
   SPY, top-5 legend per chart; hover / tap a ticker (line, legend or table row) highlights it in all three; table with 180/60/15/5D returns,
   ⬇ TradingView. Live: today's Google price appended as the last point (cohorts stay as of the close). Descriptive only. Test `test_oracle_cohorts`.
+  Oct 30 evening (Adam): top 7 per cohort (`TOP` 7, no Show chips); View chip Stocks / Sub-themes (localStorage orView): `scohorts` + `subs`
+  {name: n, group, strength, r, c = equal-weight index of members with data (mean daily return, clipped −50%/+100%), members (best 180D
+  first, 12)}; live sub-theme point = last index × (1 + avg live move of its members). ADRs now included (is_stock is False for ADRs; only
+  names with ETF / Fund / Trust or no name are dropped) — same filter on Theme Dash. Theme Dash: chart WEEKLY and on the RIGHT (phone: on
+  top); highs/lows view shows "+N more" per group to reveal the rest of its members.
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and

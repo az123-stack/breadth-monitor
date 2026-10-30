@@ -1,5 +1,5 @@
 /* ---------- v3 · Groups → Theme Dash (Oct 30, 2026; Adam: Deepvue-style "every ticker in its group, click it and the chart comes up") ----------
-   Left: a TradingView chart of the selected ticker (loaded only on click, from TradingView). Right: groups with their tickers as chips.
+   Right: a weekly TradingView chart of the selected ticker (loaded only on click, from TradingView). Left: groups with their tickers as chips.
    Default view = today's 52-week highs vs lows split by group, like Deepvue. Live: during the session a stock counts as a new high when
    the Google price is at or above its 52-week high (hi52), new low at or under lo52; otherwise the official close's flags (nh52 / nl52). */
 function tdState(s) {
@@ -11,7 +11,7 @@ function tdState(s) {
 function tdChart(box, t) {
   const S = (getT().stocks || []).find(x => x.t === t), tv = ((DATA.themes || {}).tv || {})[t] || t, st = S ? tdState(S) : null;
   const dark = (document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
-  const src = "https://s.tradingview.com/widgetembed/?" + new URLSearchParams({ frameElementId: "tdtv", symbol: tv, interval: "D", hidesidetoolbar: "1",
+  const src = "https://s.tradingview.com/widgetembed/?" + new URLSearchParams({ frameElementId: "tdtv", symbol: tv, interval: "W", hidesidetoolbar: "1",
     symboledit: "1", saveimage: "0", withdateranges: "1", theme: dark ? "dark" : "light", style: "1", timezone: "America/New_York", locale: "en",
     studies: JSON.stringify(["MAExp@tv-basicstudies", "Volume@tv-basicstudies"]) }).toString();
   box.innerHTML = `<div class="tdch-h"><div><b class="tdch-t">${esc(t)}</b> <span class="meta">${esc(S ? S.name : "")}</span>
@@ -24,7 +24,8 @@ function renderThemeDash(app) {
   UI.td = UI.td || { by: lsGet("tdBy", "sub"), show: lsGet("tdShow", "hl"), sort: lsGet("tdSort", "strength"), q: "", sel: lsGet("tdSel", "") };
   const T = getT(), U = UI.td, sub = U.by === "sub";
   app.append(liveBar());
-  const SM = Object.fromEntries((T.stocks || []).filter(s => s.is_stock !== false).map(s => [s.t, s]));
+  // every member incl. ADRs (is_stock is false for ADRs too); only ETFs left out (no name, or "ETF / Fund / Trust" in it)
+  const SM = Object.fromEntries((T.stocks || []).filter(s => s.name && !/\bETF\b|\bFund\b|\bTrust\b/.test(s.name)).map(s => [s.t, s]));
   const groups = (sub ? T.subthemes : T.themes) || [];
   const all = Object.values(SM).map(s => ({ s, st: tdState(s) }));
   const nH = all.filter(x => x.st.hi).length, nL = all.filter(x => x.st.lo).length;
@@ -41,7 +42,7 @@ function renderThemeDash(app) {
   const qi = $('<input type="search" placeholder="Find a group or ticker">'); qi.value = U.q; f.append(qi);
   app.append(head);
   // ---- body: chart left, groups right ----
-  const body = $('<section class="tdbody"><div class="card tdchart"></div><div class="tdgroups"></div></section>');
+  const body = $('<section class="tdbody"><div class="tdgroups"></div><div class="card tdchart"></div></section>');
   app.append(body);
   const chartBox = body.querySelector(".tdchart"), gbox = body.querySelector(".tdgroups");
   const chipHTML = (x) => { const c = x.st.chg, cls = c == null ? "" : c >= 0.03 ? "u2" : c > 0 ? "u1" : c <= -0.03 ? "d2" : c < 0 ? "d1" : "";
@@ -56,9 +57,10 @@ function renderThemeDash(app) {
     const avg = (mem, k) => { const v = mem.map(x => k === "today" ? x.st.chg : x.s[k]).filter(v => v != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
     const block = (r, list, kind) => {
       const n = r.mem.length, share = Math.round(list.length / n * 100), td = avg(r.mem, "today");
+      const rest = r.mem.filter(x => !list.includes(x)).sort((a, b) => (b.s.rsr ?? 0) - (a.s.rsr ?? 0));
       return `<div class="tdg"><div class="tdg-h"><span class="tdg-n" title="${esc(r.g.theme)}">${esc(r.g.theme)}</span>
         <span class="meta">${kind ? `${list.length} of ${n} · ${share}%` : `${n} stocks`} · str ${r.g.strength == null ? "–" : Math.round(r.g.strength)}${td == null ? "" : ` · <span class="${td > 0 ? "up" : "dn"}">${pct(td)}</span>`}</span></div>
-        <div class="tdchips">${list.map(chipHTML).join("")}</div></div>`;
+        <div class="tdchips">${list.map(chipHTML).join("")}${rest.length ? `<button class="tdmore" data-l="+${rest.length} more">+${rest.length} more</button><span class="tdrest" hidden>${rest.map(chipHTML).join("")}</span>` : ""}</div></div>`;
     };
     const byRb = (k) => (a, b) => (b[k].length - a[k].length) || (b[k].length / b.mem.length - a[k].length / a.mem.length);
     let html;
@@ -82,7 +84,9 @@ function renderThemeDash(app) {
     tdChart(chartBox, t);
     if (scroll && window.matchMedia("(max-width: 900px)").matches) chartBox.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-  gbox.addEventListener("click", (e) => { const b = e.target.closest(".tdchip"); if (b) pick(b.dataset.t, true); });
+  gbox.addEventListener("click", (e) => {
+    const m = e.target.closest(".tdmore"); if (m) { const r = m.nextElementSibling; r.hidden = !r.hidden; m.textContent = r.hidden ? m.dataset.l : "less"; return; }
+    const b = e.target.closest(".tdchip"); if (b) pick(b.dataset.t, true); });
   qi.addEventListener("input", (e) => { U.q = e.target.value.trim(); build(); });
   build();
   const first = U.sel && SM[U.sel] ? U.sel : (gbox.querySelector(".tdchip") || {}).dataset?.t;

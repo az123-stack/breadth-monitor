@@ -5,6 +5,8 @@ Cohort = the top theme stocks by return over N sessions (180 / 60 / 15 / 5), liq
 cohort the payload carries its last 181 closes, so the page can draw each cohort over the 180-, 60- and 15-session windows (each line
 rebased to 0% at the window start) next to SPY. Descriptive only; never touches picks.
 """
+import re
+
 import numpy as np
 import pandas as pd
 
@@ -12,7 +14,8 @@ from . import config
 
 COHORTS = {"d180": 180, "d60": 60, "d15": 15, "d5": 5}
 WINDOWS = [180, 60, 15]
-TOP = 30
+TOP = 7          # Adam, Oct 30: "only the top 7 from each cohort"
+SUB_MIN = 3      # sub-themes need 3+ members with data
 MIN_PRICE, MIN_DV = 5.0, 10e6
 
 
@@ -26,7 +29,8 @@ def _r(x, n=4):
 
 def build(adjusted, theme_data=None):
     T = theme_data or {}
-    stocks = [s for s in T.get("stocks") or [] if s.get("is_stock", True)]
+    # every theme / sub-theme stock incl. ADRs (is_stock is False for ADRs too); ETFs dropped by name
+    stocks = [s for s in T.get("stocks") or [] if s.get("name") and not re.search(r"\bETF\b|\bFund\b|\bTrust\b", s["name"])]
     meta = {s["t"]: s for s in stocks}
     want = sorted(set(meta) | {config.BENCHMARK})
     sub = adjusted[adjusted["ticker"].isin(want)]
@@ -55,8 +59,27 @@ def build(adjusted, theme_data=None):
                    "r": [_r(rets[k].get(t)) for k in (180, 60, 15, 5)],
                    "c": [_r(v, 2) for v in win[t].tolist()]}
     spy = [_r(v, 2) for v in win[config.BENCHMARK].tolist()]
-    overlap = {a: {b: len(set(cohorts[a][:20]) & set(cohorts[b][:20])) for b in COHORTS} for a in COHORTS}
+    overlap = {a: {b: len(set(cohorts[a]) & set(cohorts[b])) for b in COHORTS} for a in COHORTS}
+    # ---- sub-themes: equal-weight index of members with data (daily returns averaged, so late listings don't jump it) ----
+    subs, scoh = {}, {}
+    strength = {g["theme"]: g.get("strength") for g in T.get("subthemes") or []}
+    ret_d = C.pct_change(fill_method=None).clip(-0.5, 1.0)
+    for g in T.get("subthemes") or []:
+        mem = [t for t in (g.get("members") or []) if t in C.columns and t in meta and C[t].iloc[-(n + 1):].notna().sum() >= 150]
+        if len(mem) < SUB_MIN:
+            continue
+        idx = (1 + ret_d[mem].iloc[-n:].mean(axis=1).fillna(0)).cumprod()
+        series = [100.0] + (100 * idx).tolist()
+        full = (1 + ret_d[mem].mean(axis=1).fillna(0)).cumprod()
+        r = [_r(full.iloc[-1] / full.iloc[-(k + 1)] - 1) for k in (180, 60, 15, 5)]
+        subs[g["theme"]] = {"n": len(mem), "group": g.get("group"), "strength": _r(strength.get(g["theme"]), 1), "r": r,
+                            "c": [_r(v, 2) for v in series], "members": sorted(mem, key=lambda t: -(rets[180].get(t) or -9))[:12]}
+    for key, k in COHORTS.items():
+        j = list(COHORTS).index(key)
+        scoh[key] = [g for g, _ in sorted(subs.items(), key=lambda kv: -(kv[1]["r"][j] if kv[1]["r"][j] is not None else -9))[:TOP]]
+    keep = {g for v in scoh.values() for g in v}
+    subs = {g: v for g, v in subs.items() if g in keep}
     return {"date": C.index[-1].strftime("%Y-%m-%d"), "dates": [d.strftime("%Y-%m-%d") for d in win.index],
-            "windows": WINDOWS, "cohorts": cohorts, "rows": rows, "spy": spy, "overlap": overlap,
+            "windows": WINDOWS, "cohorts": cohorts, "scohorts": scoh, "subs": subs, "rows": rows, "spy": spy, "overlap": overlap,
             "spy_r": [_r(rets[k].get(config.BENCHMARK)) for k in (180, 60, 15, 5)], "universe": len(liquid),
             "rules": {"top": TOP, "min_price": MIN_PRICE, "min_dv": MIN_DV}}
