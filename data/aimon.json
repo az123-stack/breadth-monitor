@@ -213,13 +213,8 @@
    "pending": false
   },
   "TWLO": {
-   "in": true,
-   "why": "2026-08-07: gap +21.8%, day +24.9%, 3 sessions later +27.7%",
-   "date": "2026-08-07",
-   "day": 0.2489,
-   "hold3": 0.2765,
-   "since": 0.3135,
-   "pending": false
+   "in": false,
+   "why": "Oct 29 report: −16% after hours; Q4 organic growth guided down to 11–12% (from 16%), margins squeezed; voice AI only ~1% of voice minutes"
   },
   "OKTA": {
    "in": true,
@@ -250,6 +245,11 @@
    "in": false,
    "date": "2026-10-29",
    "why": "Oct 29 report: −5% after hours, free cash flow −$42B on AI capex"
+  },
+  "TWLO": {
+   "in": false,
+   "date": "2026-10-29",
+   "why": "Oct 29 report: −16% after hours; Q4 organic growth guided down to 11–12% (from 16%), margins squeezed; voice AI only ~1% of voice minutes"
   }
  },
  "updated": "2026-10-28"

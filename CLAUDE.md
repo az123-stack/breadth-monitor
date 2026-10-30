@@ -696,7 +696,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   reactions (day ≥ 1 ADR, held 3 sessions) outside the pool in software / internet / AI groups, "PINNED" flag for takeover-like flat tapes.
   Story fact sheet block AI MONETIZERS (`story.aimon_lines`: members, out + why, CHANGES of the last 3 logged dates, candidates) → chapter
   section **AI monetizers:** (story_guide.md). To add a candidate: research its AI revenue, add to `pool` with note + source. Oct 29: IN BOX
-  MSFT META IBM CRM WDAY ADBE PLTR ZS EPAM IOT TEAM TWLO OKTA; OUT ORCL APP FICO AXON (rule), NOW GOOGL AMZN (manual, Oct 29 reports).
+  MSFT META IBM CRM WDAY ADBE PLTR ZS EPAM IOT TEAM OKTA; OUT ORCL APP FICO AXON (rule), NOW GOOGL AMZN TWLO (manual, Oct 29 reports;
+  TWLO −16% after hours on a slower Q4 organic-growth guide).
   `python -m breadth.aimon` prints it. Test `test_ai_monetizers_verdict`.
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
