@@ -2714,6 +2714,9 @@ function computeLive(T, prices, spyDate) {
     const r = liveRating(T, M[t], T.refs[t], ix);
     const e = eod[t];
     M[t].rsr = r ?? (e ? e.rsr : null);
+    const r2 = liveRating2w(T, M[t], T.refs[t], ix);    // short-term (2-week) RS, live
+    M[t].rs2w = r2 ?? (e ? e.rs2w : null);
+    if (e && e.rs2w != null && e.rs2w5 != null && r2 != null) M[t].rs2w5 = r2 - (e.rs2w - e.rs2w5);
     if (e && e.rsr != null && e.rsr5 != null && r != null) M[t].rsr5 = r - (e.rsr - e.rsr5);
   }
   const rows = liveGroups(T.themes, M, T.theme_etfs, bench);
@@ -2985,7 +2988,8 @@ const stockMap = () => { const M = {}; (getT().stocks || []).forEach(s => { M[s.
 const stockCols = (ranks) => [
   { k: "t", h: "Ticker", l: true, asc: true },
   ...(ranks ? [{ k: "st_rk", h: "ST rank<small>in bucket</small>", asc: true }, { k: "lt_rk", h: "LT rank<small>in bucket</small>", asc: true }] : []),
-  { k: "rsr", h: "RS Rating<small>1–99</small>" }, { k: "rsr5", h: "RS Δ<small>5 days</small>" },
+  { k: "rsr", h: "RS Rating<small>1–99 · ~1 year</small>" }, { k: "rsr5", h: "RS Δ<small>5 days</small>" },
+  { k: "rs2w", h: "RS 2-wk<small>1–99 · 10 sessions</small>" }, { k: "rs2w5", h: "2-wk Δ<small>5 days</small>" },
   ...hz().map(k => ({ k, h: HZ_LABEL[k] })), { k: "st", h: "ST score<small>5D score</small>" }, { k: "lt", h: "LT score" },
   { k: "adr", h: "ADR %<small>20-day</small>" }, { k: "tight", h: "Tight<small>5d range ÷ ADR</small>", asc: true },
   { k: "vdry", h: "Vol dry<small>5d ÷ 50d</small>", asc: true }, { k: "off_hi", h: "Off high<small>52-week</small>" },
@@ -3004,7 +3008,7 @@ function stockCells(s, show, ranks) {
   const rk = (v, n) => `<td class="num"><b>${v ?? "–"}</b><span class="meta">/${n}</span></td>`;
   return `<td class="l tname">${s.t}<small>${esc((s.name || "").slice(0, 26))}${sub ? (s.name ? " · " : "") + esc(sub) : ""}</small></td>
     ${ranks ? rk(s.st_rk, s._n) + rk(s.lt_rk, s._n) : ""}
-    ${rsCell(s)}<td>${mvCell(s.rsr5)}</td>
+    ${rsCell(s)}<td>${mvCell(s.rsr5)}</td><td class="num ${rsTint(s.rs2w)}">${s.rs2w ?? "–"}</td><td>${mvCell(s.rs2w5)}</td>
     ${hz().map(k => retCell(s[k], k)).join("")}${retCell(s.st, "st")}${retCell(s.lt, "lt")}
     <td class="num">${s.adr == null ? "–" : s.adr.toFixed(1)}</td>${tightCell(s.tight)}${dryCell(s.vdry)}
     <td class="num">${pct(s.off_hi)}</td>
@@ -3200,6 +3204,13 @@ function renderBrowse(app) {
 }
 
 /* ---------- v2 live: RS Rating and Theme Strength ---------- */
+function liveRating2w(T, m, r, ix) {   // 10-session return vs last close's breakpoints (Oct 29)
+  const bp = T.rs2w_bp, c0 = ix.c10 != null ? r[ix.c10] : null; if (!bp || !bp.length || !c0) return null;
+  const raw = m.price / c0 - 1;
+  let lo = 0, hi = bp.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (bp[mid] <= raw) lo = mid + 1; else hi = mid; }
+  return Math.min(99, Math.max(1, lo));
+}
 function liveRating(T, m, r, ix) {
   const bp = T.rs_bp; if (!bp || !bp.length) return null;
   let num = 0, den = 0;
@@ -5285,6 +5296,7 @@ function renderTrades(app) {
   if (T.launch) app.append(launchPicksCard(T.launch));   // Adam, Oct 25: the headline picks come from the Launch list
   if (T.dips) app.append(dipCard(T, "trades"));      // Adam: dip buys at the very top of Trade Setups
   if (T.rspull) app.append(rsPullCard(T));           // RS leaders pulling back (Oct 29)
+  if (T.emaprob) app.append(emaOddsCard(T));         // EMA test odds (Oct 29)
   const live = !!LIVE_T, asOf = longDate(T.date), now = T.regime_now || "mixed";
   const REG = { strong: "Strong", mixed: "Mixed", weak: "Weak" };
   const head = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
@@ -5453,6 +5465,102 @@ function rsPullCard(T) {
   }
   draw();
   card.querySelector(".rspdl").addEventListener("click", () => tsDownload("rs-leaders-pullback", [{ name: "RS leaders - " + F[U.f][0], ticks: shown.map(r => r.t) }]));
+  return card;
+}
+
+/* ---------- EMA test odds (Oct 29, 2026; Adam: time spent above the 9 / 21 EMAs + "when the probability is high enough it's an entry") ----------
+   DATA.themes.emaprob (breadth/emaprob.py): tier odds from every past test (win = +2R before the stop), live candidates in leading groups.
+   `emaTier` = Python `emaprob.tier`. */
+function emaTier(lead, thr, streak, depth) {
+  const C = (DATA.themes.emaprob || {}).cfg || { run: 15, held: 0.5 };
+  if (!lead) return "E";
+  if (thr && streak >= C.run) return "A";
+  if (thr) return "B";
+  if (streak >= C.run || depth >= C.held) return "C";
+  return "D";
+}
+function emaLive(x, side, C) {
+  const L = liveActive() ? liveRow(x.t) : null, a = x.adr || 0;
+  if (!L || !(L.price > 0)) return null;
+  const p = L.price, low = side > 0 ? (L.low > 0 ? Math.min(L.low, p) : (L.open ? Math.min(L.open, p) : p)) : null;
+  const high = side < 0 ? Math.max(L.high || p, L.open || p, p) : null;
+  const e9 = x.e9 + (p - x.e9) * 0.2, e21 = x.e21 + (p - x.e21) * 2 / 22, t = C.touch;
+  const test = (e, k) => side > 0 ? (x.c > (k === "9" ? x.e9 : x.e21) && low <= e + t * a * p) : (x.c < (k === "9" ? x.e9 : x.e21) && high >= e - t * a * p);
+  let k = null;
+  if (test(e21, "21")) k = "21";
+  else if (test(e9, "9") && (side > 0 ? low > e21 + t * a * p : high < e21 - t * a * p)) k = "9";
+  return { p, chg: L.chg, k, depth: k ? side * (p - (k === "9" ? e9 : e21)) / (a * p) : null, low, high, e9, e21 };
+}
+function emaOddsCard(T) {
+  const X = T && T.emaprob;
+  if (!X || !X.long) return $('<div></div>');
+  const C = X.cfg || {};
+  UI.ema = UI.ema || { side: lsGet("emaSide", "long"), f: lsGet("emaF", "entry") };
+  const U = UI.ema, side = U.side === "short" ? -1 : 1, S = X[U.side] || X.long, E = S.evidence || {};
+  const TT = Object.fromEntries((E.tiers || []).map(t => [t.tier, t]));
+  const Rv = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + Number(v).toFixed(2) + "R";
+  const P = (v) => v == null ? "–" : Math.round(v * 100) + "%";
+  const anyEntry = (E.tiers || []).some(t => t.entry);
+  const rows0 = (S.rows || []).map(x => {
+    const lv = emaLive(x, side, C);
+    let st, k, depth, streak, tr, trig, stop, when;
+    if (lv && lv.k) {          // tested live today
+      k = lv.k; depth = lv.depth; streak = k === "9" ? x.s9 : x.s21; st = "live";
+      tr = emaTier(true, !!S.thr, streak, depth);
+      trig = side > 0 ? Math.max(x.hi, lv.p) : Math.min(x.lo, lv.p); when = "today";
+      stop = side > 0 ? Math.max(lv.low, trig * (1 - x.adr)) : Math.min(lv.high, trig * (1 + x.adr));
+    } else if (x.test) {       // tested at a recent close, not triggered yet
+      const q = x.test; k = q.ema; depth = q.depth; streak = q.streak; st = "tested"; tr = q.tier; trig = q.trig; stop = q.stop;
+      when = q.ago === 0 ? "last close" : q.ago + " sessions ago";
+    } else {                    // near: odds if it tests next
+      k = x.near_ema; streak = k === "9" ? x.s9 : x.s21; depth = 0; st = "near"; tr = emaTier(true, !!S.thr, streak + 1, 0);
+      trig = null; stop = null; when = null;
+    }
+    const o = TT[tr] || {};
+    return { ...x, lv, st, k, depth, streak, tier: tr, odds: o, entry: !!o.entry && st !== "near", trig, stop, when };
+  });
+  const F = { entry: ["Entry now (tested, odds high enough)", r => r.entry], tested: ["Tested", r => r.st !== "near"], near: ["Coming to the EMA", r => r.st === "near"], all: ["All", () => true] };
+  const live = rows0.some(r => r.lv);
+  const tierRows = (E.tiers || []).map(t => `<tr${t.entry ? ' style="background:color-mix(in srgb, var(--pos) 10%, transparent)"' : ""}><td class="l"><b>${t.tier}</b> ${esc(t.label)}${t.entry ? ' <span class="tg ppull">entry</span>' : ""}</td><td class="num">${t.n}</td><td class="num"><b>${P(t.win)}</b></td><td class="num"><b>${Rv(t.R)}</b></td><td class="num">${Rv(t.Rk)}</td><td class="num">${P(t.w1)} · ${Rv(t.h1)}</td><td class="num">${P(t.w2)} · ${Rv(t.h2)}</td></tr>`).join("");
+  const bk = (arr) => (arr || []).map(b => `<tr><td class="l">${esc(b.label)}</td><td class="num">${b.n}</td><td class="num">${P(b.win)}</td><td class="num">${Rv(b.R)}</td><td class="num">${Rv(b.Rk)}</td><td class="num">${Rv(b.h1)}</td><td class="num">${Rv(b.h2)}</td></tr>`).join("");
+  const card = $(`<section class="card regcard emacard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv ${anyEntry ? "focus" : "unproven"}" title="Information only: never changes the picks">${anyEntry ? "Tested" : "Unproven"}</span> EMA test odds <span class="meta">· time above the 9 / 21 EMAs, and the odds when price comes back to them · ${live ? "live" : shortDate(X.date) + " close"}${S.thr ? " · <b>post-thrust window</b>" : ""}</span></h2>
+      <div class="tsbtns"><button class="emadl" title="Download the names shown as a TradingView watchlist">⬇ TradingView</button></div></div>
+    <p class="note" style="padding:4px 0 0">A <b>test</b> = a stock that has closed ${side > 0 ? "above" : "below"} its 9 or 21 EMA for ${C.min_streak || 3}+ sessions comes back to it (within ${C.touch} ADR, or through it). Every past test was traded the same way: ${side > 0 ? "buy the break of the test-day high, stop under the test-day low" : "short the break of the test-day low, stop over the test-day high"} (max 1 ADR), target <b>2R</b> within ${C.hold} sessions. A 2:1 trade breaks even at a 33% win rate, so the <b>win %</b> below is the probability that matters. <b>Leading group</b> = its sub-theme is in the ${side > 0 ? "top" : "bottom"} 30% on 60-day return.</p>
+    <div class="rbanner watch" style="margin-top:8px"><b>What decides the odds</b> (${shortDate(E.from)} – ${shortDate(E.to)}, ${(E.n || 0).toLocaleString()} tests): ${side > 0
+      ? `time above the EMAs on its own barely moves them (3–5 sessions above ${P((E.by_streak || [])[0]?.win)} vs 21–40 sessions ${P((E.by_streak || [])[3]?.win)}), and a model of 17 measures together couldn't tell winners from losers. What did work, in both halves: <b>a leading group inside a post-thrust window</b> (${P((TT.B || {}).win)} win, ${Rv((TT.B || {}).R)} a trade), and <b>more so after a long run above the EMA</b> (${P((TT.A || {}).win)}, ${Rv((TT.A || {}).R)}). Outside a thrust window even leading groups were ~break-even (${Rv((TT.C || {}).R)}). Tests that held 0.5+ ADR above the EMA beat ones that closed through it (${P((E.by_depth || [])[3]?.win)} vs ${P((E.by_depth || [])[0]?.win)}).`
+      : `<b>no short tier made money</b> in these two mostly rising years: every tier lost (all tests ${Rv((E.all || {}).R)}), weak groups included. Shown for reference; don't take these as entries.`}
+      Entry tiers (green) = win ≥ 30% and positive in both halves.
+      <details class="kqsec" style="margin-top:6px"><summary><b>Odds by tier and the details</b></summary>
+      <div class="scroll"><table class="grid"><thead><tr><th class="l">Tier</th><th>Tests</th><th>Win %<small>+2R first</small></th><th>Avg R<small>20 sessions</small></th><th>Your exit<small>close under 10 EMA</small></th><th>1st half<small>win · R</small></th><th>2nd half<small>win · R</small></th></tr></thead><tbody>${tierRows}</tbody></table></div>
+      <div class="scroll" style="margin-top:8px"><table class="grid"><thead><tr><th class="l">Time ${side > 0 ? "above" : "below"} the EMA before the test</th><th>Tests</th><th>Win %</th><th>Avg R</th><th>Your exit</th><th>1st half R</th><th>2nd half R</th></tr></thead><tbody>${bk(E.by_streak)}</tbody></table></div>
+      <div class="scroll" style="margin-top:8px"><table class="grid"><thead><tr><th class="l">How deep the test went</th><th>Tests</th><th>Win %</th><th>Avg R</th><th>Your exit</th><th>1st half R</th><th>2nd half R</th></tr></thead><tbody>${bk(E.by_depth)}${bk(E.by_ema)}</tbody></table></div>
+      <div class="meta" style="margin-top:4px">Re-tested every build. Tiers: A post-thrust + leading group + ${C.run}+ sessions on the right side · B post-thrust + leading group · C leading group + ${C.run}+ sessions or held ${C.held}+ ADR · D leading group otherwise · E not in a leading group.</div></details></div>
+    <div class="filters" style="margin:8px 0 4px"></div><div class="emabody"></div></section>`);
+  const fl = card.querySelector(".filters");
+  fl.append(chips("Side", [["long", "Long: dips to the EMAs"], ["short", "Short: rallies into the EMAs (no edge found)"]], U, "side", () => { lsSet("emaSide", U.side); card.replaceWith(emaOddsCard(T)); }));
+  fl.append(chips("Show", Object.entries(F).map(([k, [l]]) => [k, `${l} (${rows0.filter(F[k][1]).length})`]), U, "f", () => { lsSet("emaF", U.f); draw(); }));
+  const body = card.querySelector(".emabody");
+  let shown = [];
+  function draw() {
+    const all = rows0.filter(F[U.f][1]).sort((a, b) => (b.entry - a.entry) || (a.st === "near") - (b.st === "near") || ((b.odds.R || -9) - (a.odds.R || -9)) || (b.streak - a.streak));
+    shown = U.more ? all : all.slice(0, 30);
+    body.innerHTML = !shown.length ? `<div class="meta" style="padding:10px 0">None right now${U.f === "entry" ? (S.thr || side < 0 ? ": no leading-group stock has tested its 9 / 21 EMA. Check “Coming to the EMA”." : ": outside a post-thrust window no tier has paid, so nothing qualifies as an entry.") : "."}</div>`
+      : `<div class="scroll"><table class="grid"><thead><tr><th class="l">Ticker</th><th class="l">Group</th><th>Time ${side > 0 ? "above" : "below"}<small>sessions on the right side of the tested EMA</small></th><th class="l">State</th><th class="l">Odds<small>tier · win % · avg R</small></th><th>Last</th><th>Trigger</th><th>Stop</th><th>Risk</th></tr></thead><tbody>
+      ${shown.map(r => { const o = r.odds || {}, last = r.lv ? r.lv.p : r.c;
+        const stTxt = r.st === "live" ? `Testing the ${r.k} EMA now` : r.st === "tested" ? `Tested the ${r.k} EMA · ${r.when}` : `Coming to the ${r.k} EMA · ${r.dist} ADR away`;
+        return `<tr><td class="l"><a href="#" class="tkl" data-t="${esc(r.t)}"><b>${esc(r.t)}</b></a><small class="meta" style="display:block">${esc(r.name)}</small></td>
+          <td class="l" style="white-space:normal;min-width:150px">${esc(r.sub || "–")}<small class="meta" style="display:block">${r.grp == null ? "" : (side > 0 ? "top " + Math.max(1, Math.round((1 - r.grp) * 100)) : "bottom " + Math.max(1, Math.round(r.grp * 100))) + "% on 60 days"}</small></td>
+          <td class="num" data-v="${r.streak}">${r.streak}<small class="meta" style="display:block">${r.st === "near" ? "so far" : "before the test"} · ${r.k} EMA</small></td>
+          <td class="l"><span class="tg ${r.entry ? "ppull" : ""}">${stTxt}</span>${r.depth != null && r.st !== "near" ? `<small class="meta" style="display:block">${r.depth >= 0 ? "held " + r.depth.toFixed(1) + " ADR " + (side > 0 ? "above" : "below") : "closed " + (-r.depth).toFixed(1) + " ADR through"}</small>` : ""}</td>
+          <td class="l" data-v="${o.R ?? -9}"><b>${r.tier}</b> · ${P(o.win)} · ${Rv(o.R)}${r.entry ? ' <span class="tg ppull">entry</span>' : r.st === "near" && o.entry ? ' <span class="meta">if it tests</span>' : ""}</td>
+          <td class="num">${fmt(last, 2)}${r.lv ? `<small style="display:block" class="${r.lv.chg > 0 ? "up" : "dn"}">${(r.lv.chg > 0 ? "+" : "") + (r.lv.chg * 100).toFixed(2)}%</small>` : ""}</td>
+          <td class="num">${r.trig ? fmt(r.trig, 2) : "–"}</td><td class="num">${r.stop ? fmt(r.stop, 2) : "–"}</td>
+          <td class="num">${r.trig && r.stop ? (Math.abs(1 - r.stop / r.trig) * 100).toFixed(1) + "%" : "–"}</td></tr>`; }).join("")}</tbody></table></div>${all.length > 30 ? `<button class="xopen emamore" style="margin-top:8px">${U.more ? "Show the top 30" : `Show all ${all.length}`}</button>` : ""}`;
+    const mb = body.querySelector(".emamore"); if (mb) mb.addEventListener("click", () => { U.more = !U.more; draw(); });
+  }
+  draw();
+  card.querySelector(".emadl").addEventListener("click", () => tsDownload("ema-test-odds", [{ name: `EMA tests (${side > 0 ? "long" : "short"}) - ${F[U.f][0]}`, ticks: shown.map(r => r.t) }]));
   return card;
 }
 
@@ -5990,7 +6098,7 @@ function openTicker(t) {
   const d = document.getElementById("drawer");
   d.innerHTML = `<div class="dr-h"><div><div class="dr-t">${esc(t)}${S && S.rsr >= 90 ? ` <span class="tg ppull">RS ${S.rsr}</span>` : ""}</div><div class="meta">${esc(S ? S.name : "")}</div></div><button class="xopen" id="drX" aria-label="Close">✕</button></div>
     <div class="dr-px"><span class="num" style="font-size:26px">${$f(L ? L.price : S && S.price)}</span>${L ? `<b class="${L.chg > 0 ? "up" : "dn"}">${$p(L.chg * 100, 2)}</b>` : S && S.today != null ? `<b class="${S.today > 0 ? "up" : "dn"}">${$p(S.today * 100, 2)}</b>` : ""}<span class="meta">${L && liveActive() ? "live" : "last close"}</span></div>
-    ${S ? `<div class="kvs">${kv("RS Rating", S.rsr ?? "–")}${kv("5 days", $p(S.d5 * 100))}${kv("30 days", $p(S.d30 * 100))}${kv("Off 52-wk high", $p(S.off_hi * 100))}${kv("vs 21 EMA", $p(S.e21 * 100))}${kv("ADR", S.adr == null ? "–" : S.adr + "%")}</div>` : '<div class="meta" style="margin:8px 0">Not in our theme lists.</div>'}
+    ${S ? `<div class="kvs">${kv("RS Rating · 2-wk", (S.rsr ?? "–") + " · " + (S.rs2w ?? "–"))}${kv("5 days", $p(S.d5 * 100))}${kv("30 days", $p(S.d30 * 100))}${kv("Off 52-wk high", $p(S.off_hi * 100))}${kv("vs 21 EMA", $p(S.e21 * 100))}${kv("ADR", S.adr == null ? "–" : S.adr + "%")}</div>` : '<div class="meta" style="margin:8px 0">Not in our theme lists.</div>'}
     ${S && (S.sub || (S.themes || []).length) ? `<h4>Groups</h4>${S.sub ? grp(S.sub, "sub") : ""}${(S.themes || []).map(n => grp(n, "theme")).join("")}` : ""}
     ${plan.length ? `<h4>Setups &amp; plan</h4><ul class="dr-l">${plan.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
     <div style="margin-top:16px"><a class="xopen" style="text-decoration:none" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tv)}">Open chart in TradingView ↗</a></div>`;

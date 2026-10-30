@@ -573,6 +573,18 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   close under the 10 EMA). Oct 29 (Nov 2025–Sep 2026): RS-high dips −0.03R (n 1,764) vs equally strong without an RS high −0.06R (edge
   +0.26R, t 2.03, halves +0.45/+0.14) but ≈ 0 with Adam's exit; RS-leads +0.13R (n 270). Verdict "proven" also needs own R > 0 and a positive
   Adam-exit edge → currently "helps" (Unproven badge). Test `test_rs_pullback`.
+- `emaprob.py` **EMA test odds** (Oct 29, 2026; Adam: "time spent above the 9/21 EMAs ... when the probability is high enough it's an entry;
+  same on the short side"; card R-2026-10-29-ema-test-odds, layer `emaprob`, info) → `DATA.themes.emaprob` {long, short: {evidence, rows, thr}}
+  (~60 s per build), `emaOddsCard` on the Setups tab after RS leaders. Test = 3+ closes on the right side of the 9 or 21 EMA then low within
+  0.25 ADR (or through); trade = break of the test-day high, stop test-day low ≤ 1 ADR, win = +2R first within 20 sessions. Tiers (`tier` =
+  page `emaTier`): A post-thrust + leading group (sub-theme top 30% on 60 days) + 15+ sessions, B post-thrust + leading group, C leading +
+  (15+ sessions or held 0.5+ ADR), D leading otherwise, E not leading; entry tier = win ≥ 30% + both halves positive (A, B on Oct 29). A
+  17-feature logistic model had no skill (AUC 0.50) so no model probability is shown. Live rows = leading-group stocks within 1.5 ADR of the
+  9/21 + tests in the last 3 sessions not yet triggered; the page scores live tests (live EMAs, sheet low). Shorts: every tier lost.
+  Test `test_ema_test_odds`.
+- **RS 2-week** (Oct 29, Adam: "a couple week one"): `strength` `rs2w` = 10-session return percentile 1–99 vs liquid stocks (`rs2w5` = change
+  over 5 sessions), `rs2w_bp` breakpoints, refs key `c10` → `liveRating2w` live; Stocks tab columns "RS 2-wk" / "2-wk Δ", drawer. The RS Rating
+  itself = 63/126/189/252-day returns weighted 40/20/20/20 (~1 year, mostly the last 3 months). Untested as a signal.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

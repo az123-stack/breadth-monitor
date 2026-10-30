@@ -1915,6 +1915,33 @@ def test_rs_pullback():
         config.BENCHMARK = old
     return f"{len(X['rows'])} live rows"
 
+
+def test_ema_test_odds():
+    """EMA test odds: tier rule (page twin emaTier), and a build on synthetic bars returns tiers + rows for both sides."""
+    import numpy as np, pandas as pd
+    from breadth import emaprob as E, config
+    assert E.tier(False, True, 30, 1) == "E" and E.tier(True, True, 20, 0) == "A" and E.tier(True, True, 5, -1) == "B"
+    assert E.tier(True, False, 20, -1) == "C" and E.tier(True, False, 5, 0.6) == "C" and E.tier(True, False, 5, 0.1) == "D"
+    old = config.BENCHMARK; config.BENCHMARK = "SPY"
+    try:
+        d = pd.bdate_range("2024-01-01", periods=320); rng = np.random.default_rng(5); rows = []; subs = []
+        for k in range(24):
+            t = f"S{k}"; drift = .002 if k < 12 else -.001
+            c = 50 * np.exp(np.cumsum(drift + rng.normal(0, .02, len(d))))
+            subs.append({"group": "G", "subtheme": "Up" if k < 12 else "Down", "ticker": t})
+            for i, x in enumerate(d):
+                rows.append(dict(date=x, ticker=t, o=c[i], h=c[i] * 1.025, l=c[i] * .975, c=c[i], v=2e6))
+        c = 400 * np.exp(np.cumsum(.0005 + rng.normal(0, .01, len(d))))
+        rows += [dict(date=x, ticker="SPY", o=c[i], h=c[i] * 1.01, l=c[i] * .99, c=c[i], v=5e7) for i, x in enumerate(d)]
+        E.CFG["warm"], warm = 30, E.CFG["warm"]
+        X = E.build(pd.DataFrame(rows), None, None, pd.DataFrame(subs))
+        E.CFG["warm"] = warm
+        assert X and "long" in X and [t["tier"] for t in X["long"]["evidence"]["tiers"]] == list("ABCDE")
+        assert all(r["t"] != "SPY" and r["adr"] > 0 for r in X["long"]["rows"])
+    finally:
+        config.BENCHMARK = old
+    return f"{X['long']['evidence']['n']} long tests"
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

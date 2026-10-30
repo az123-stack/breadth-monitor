@@ -298,6 +298,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["rspull"] = rspull.build(adjusted, theme_data, history)
         except Exception as e:  # optional panel; never block the page
             log.exception("RS pullback list failed: %s", e)
+        try:   # EMA test odds: time above the 9/21 EMAs, odds tiers when price comes back (Adam, Oct 29 2026; info only)
+            from . import emaprob
+            theme_data["emaprob"] = emaprob.build(adjusted, theme_data, history)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("EMA test odds failed: %s", e)
         try:   # Biotech tab: the drug value chain, price + dollar flow per stage (Adam, Oct 29 2026; info only)
             from . import valuechain
             theme_data["valuechain"] = valuechain.build(adjusted, theme_data)

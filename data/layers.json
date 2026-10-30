@@ -550,6 +550,32 @@
     "R-2026-10-29-rs-high-pullbacks"
    ],
    "notes": "Backtest Nov 2025-Sep 2026: -0.03R vs -0.06R for equally strong stocks without an RS high (edge +0.26R, t 2.03, 20-session hold) but ~0 with Adam's 10-EMA exit. Re-test weekly RS highs with longer history."
+  },
+  {
+   "id": "emaprob",
+   "name": "EMA test odds (Setups tab)",
+   "kind": "code",
+   "owner": "daily update + page (live)",
+   "status": "info",
+   "where": "breadth/emaprob.py, template.html emaOddsCard / emaTier",
+   "what": "time on the right side of the 9/21 EMA + test depth + leading group + post-thrust window \u2192 odds tier for a 2R dip trade; long and short",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-29-ema-test-odds"
+   ],
+   "notes": "Time above alone \u2248 no edge; model AUC 0.50. Post-thrust + leading group 34% / +0.38R, + 15 sessions above 35% / +0.48R (both halves). Shorts: no edge."
+  },
+  {
+   "id": "rs2w",
+   "name": "RS 2-week (Stocks tab, drawer)",
+   "kind": "code",
+   "owner": "daily update + page (live)",
+   "status": "idea",
+   "where": "breadth/strength.py rs2w, template.html liveRating2w",
+   "what": "10-session return percentile 1-99 vs liquid stocks, live from Google prices",
+   "affects_picks": false,
+   "evidence": [],
+   "notes": "Oct 29 Adam asked for a short-term RS next to the ~1-year RS Rating. Untested."
   }
  ]
 }
