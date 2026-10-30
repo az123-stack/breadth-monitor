@@ -670,6 +670,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   to the Themes table opened on it. Phone: drawer is a bottom sheet. Prototype history: branch `v2-prototype`. Test `test_v2_page_builds`.
   Local check: `python3 -c "import json; from breadth import v2site; v2site.build(json.load(open('docs/data.json')))"`, then
   `git checkout -- docs` before committing.
+- **v3 page** (Oct 30, 2026; Adam: "start over on the new dashboard ... go tab by tab and rebuild it; Themes first, as a sub under a
+  'Groups' parent; take out the AI scorecard") → `v3site.py` → docs/v3/index.html (served at /breadth-monitor/v3/), built at the end of
+  every `site.build`. NOT a copy: generated from the v1 `template.html` with checked text swaps (`SWAPS`, each must match exactly once or
+  the build fails), so v1 card fixes reach v3 automatically and v1 content is kept (v2's flaw was missing content). Navigation = parent
+  tabs (`.ptabs`) → sub-tabs (`nav.tabs`, sticky; buttons for other parents hidden; last sub per parent in localStorage `v3sub-<parent>`).
+  Only tabs in `NAV` exist on v3 — add one per rebuilt tab once Adam approves. Now: Groups → Themes (v1 Themes tab minus `aiScoreCard`).
+  The AI scorecard itself stays on v1 and in the story fact sheet. Test `test_v3_page_builds`.
 - `site.py` + `template.html` single self-contained page. **Layout since Oct 29, 2026** (Adam tried v2 and preferred v1's content: "organization
   was the biggest flaw, not the content"; every card kept): 10 tabs `TABS` = Read-out (default), Breadth, Pre-market, Intraday, Themes, Rotation,
   Biotech, Setups, Stocks, Trade Stories. Setups = `renderSetupsAll`: part 1 Best setups (`renderBest`), 2 Trade setups (`renderTrades`), 3 Launch

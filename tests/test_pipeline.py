@@ -1962,6 +1962,24 @@ def test_ai_monetizers_verdict():
     return "ok"
 
 
+def test_v3_page_builds():
+    """v3 page (Oct 30 2026): generated from the v1 template; every swap matches once, Groups > Themes only, no AI scorecard call."""
+    from breadth import v3site
+    from breadth.site import TEMPLATE
+    h = v3site.page(TEMPLATE.read_text())
+    assert "const V3_NAV" in h and '"groups", "Groups"' in h and "app.append(aiScoreCard" not in h
+    assert 'let TAB = "readout"' not in h and "Market Monitor v3" in h and h.count("/*__DATA__*/null") == 1
+    tmp = Path(__import__("tempfile").mkdtemp()); old = config.DOCS_DIR
+    try:
+        config.DOCS_DIR = tmp
+        v3site.build({"generated": "x", "rows": [], "themes": {"note": "</script><b>"}})
+        p = (tmp / "v3" / "index.html").read_text()
+    finally:
+        config.DOCS_DIR = old
+    assert "/*__DATA__*/null" not in p and "</script><b>" not in p
+    return f"{len(p) // 1024} KB page"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

@@ -93,3 +93,9 @@ def build(history, theme_data=None, kq_data=None, macro_data=None):
     except Exception as e:
         import logging
         logging.getLogger(__name__).exception("v2 page failed: %s", e)
+    try:   # v3 page at /v3/ (Oct 30 2026): v1 content rebuilt tab by tab; never blocks the v1 page
+        from . import v3site
+        v3site.build(data)
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).exception("v3 page failed: %s", e)
