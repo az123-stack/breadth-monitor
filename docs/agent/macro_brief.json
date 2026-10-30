@@ -1,62 +1,42 @@
 {
- "for_date": "2026-10-28",
- "written": "2026-10-29T11:13Z",
- "headline": "Hot PCE and GDP at 8:30 AM plus Amazon after the close land with the 10-year near 5% and Brent above $110, as the Fed holds at 3.75-4.00% with a December hike priced in.",
+ "for_date": "2026-10-29",
+ "written": "2026-10-30T11:05Z",
+ "headline": "Hot 3.6% PCE and a Fed with two hike dissents meet Brent near $115 over Hormuz risk, with the Nov 6 payrolls the next big test.",
  "risk": "high",
- "rates": "The 10-year Treasury yield closed near 5.04% and December hike odds have risen to as high as 83% after the Fed held in a 10-2 vote.",
- "fed": "The Fed held at 3.75%-4.00% on Oct 28 with Cook and Hammack dissenting in favor of a hike; Chair Warsh gave no forward guidance and the next FOMC is Dec 8-9.",
- "oil": "Brent is about $110-116 (WTI about $101) on Strait of Hormuz shipping attacks and Houthi strikes on Saudi sites, easing slightly as Saudi, Pakistani and Turkish officials opened talks with Iran.",
- "geo": "Middle East escalation (Hormuz, Houthi strikes on Saudi Arabia) is the active shock, with the OPEC+ meeting and Iran's planned action against Sinokor vessels on Nov 1 and US midterm elections on Nov 3.",
+ "rates": "The 10-year fell 7 bp to 4.98% on Oct 29 (2-year 4.61%, 30-year 5.32%) despite September PCE running 3.6% y/y.",
+ "fed": "The Fed held at 3.75%-4% on Oct 28 in a 10-2 vote with Cook and Hammack dissenting for a hike, and traders priced about an 84% chance of a hike at the Dec 8-9 meeting; Fed speakers return as the blackout ends.",
+ "oil": "Brent settled near $114.88 and WTI near $102 as hopes for Iran's proposed Hormuz reopening plan offset supply fears and Houthi missile attacks on Saudi Arabia.",
+ "geo": "The Strait of Hormuz remains disrupted, Trump denied peace talks are underway, and the Nasdaq fell 1.4% on Oct 29 after Alphabet and Amazon capex worries.",
  "events": [
   {
-   "date": "2026-10-29",
+   "date": "2026-10-30",
    "time": "8:30 AM ET",
-   "name": "Q3 GDP advance and September PCE inflation",
-   "impact": "high"
-  },
-  {
-   "date": "2026-10-29",
-   "time": "After the close",
-   "name": "Amazon earnings",
-   "impact": "high"
-  },
-  {
-   "date": "2026-10-29",
-   "time": "After the close",
-   "name": "Intel earnings",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-10-29",
-   "time": "Before the open",
-   "name": "Eli Lilly, Mastercard, Caterpillar earnings",
+   "name": "Q3 Employment Cost Index",
    "impact": "medium"
   },
   {
    "date": "2026-10-30",
-   "time": "Before the open",
-   "name": "Exxon Mobil and Chevron earnings",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-01",
-   "time": "TBD",
-   "name": "OPEC+ meeting",
+   "time": "9:45 AM ET",
+   "name": "Chicago PMI (October)",
    "impact": "medium"
   },
   {
    "date": "2026-11-03",
-   "time": "All day",
-   "name": "US midterm elections",
+   "time": "10:00 AM ET",
+   "name": "JOLTS job openings (September)",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-06",
+   "time": "8:30 AM ET",
+   "name": "October nonfarm payrolls",
    "impact": "high"
   }
  ],
  "sources": [
-  "https://nordfx.com/market-news/market-pulse-october-29-2026",
-  "https://tradersagency.com/blog/fed-holds-rates-at-375percent-4percent-as-cook-and-hammack-dissent-warsh-unveils-fewer-rate-setting-meetings-starting-2027",
-  "https://www.stocktitan.net/articles/september-2026-pce-inflation-report",
-  "https://sentisense.ai/blog/big-tech-earnings-this-week/",
-  "https://www.oilandgasmiddleeast.com/news/brent-crude-price-drivers",
-  "https://cryptodaily.co.uk/2026/10/fed-rate-decision-october-2026-why-another-rate-hike-is-still-on-the-table"
+  "https://cappnotes.substack.com/p/closing-look-thursday-october-29",
+  "https://finance.yahoo.com/economy/policy/live/fed-meeting-live-updates-federal-reserve-october-meeting-kevin-warsh-161129201.html",
+  "https://fedratecalc.com/us-economic-calendar/november-2026/",
+  "https://www.fool.com/coverage/stock-market-today/2026/10/29/stock-market-today-oct-29-amazon-falls-on-q3-earnings-report-and-capex-concerns/"
  ]
 }
