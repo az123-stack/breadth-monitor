@@ -639,7 +639,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   reclass N, M"**: `python -m breadth.reclass apply --ids N,M` (edits data/subthemes.csv / themes.csv, one sub-theme per stock, logs to
   data/reclass_log.csv), rebuild, commit, push; "reject reclass N" → `reclass reject --ids N`. Decided tickers stay off the worklist 90 days.
   `python -m breadth.reclass list` shows proposals + status. Test `test_theme_upkeep_reclass`.
-- **v2 page** (Oct 28, 2026; Adam approved "Option B": a redesign beside v1, same data) → `v2site.py` + `v2_template.html` → docs/v2/index.html
+- **v2 page** — ON HOLD since Oct 29, 2026 (Adam: "you don't need to update that anymore, we will come back to it"). It still builds
+  automatically from the shared payload; don't add new cards to it. (Oct 28, 2026; Adam approved "Option B": a redesign beside v1, same data) → `v2site.py` + `v2_template.html` → docs/v2/index.html
   (served at /breadth-monitor/v2/), built at the end of every `site.build` from the same payload (`slim` keeps only what v2 shows, ~1.4 MB;
   each section built separately (`put`), a failing one shows "appears after the next data run"). 6 main tabs with sub-tabs, hash routes like
   #groups-themes, last sub-tab per tab remembered (localStorage v2sub). ALL pages built (Oct 28): Today (proven posture, your trades = Launch
