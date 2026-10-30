@@ -701,6 +701,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   first, 12)}; live sub-theme point = last index × (1 + avg live move of its members). ADRs now included (is_stock is False for ADRs; only
   names with ETF / Fund / Trust or no name are dropped) — same filter on Theme Dash. Theme Dash: chart WEEKLY and on the RIGHT (phone: on
   top); highs/lows view shows "+N more" per group to reveal the rest of its members.
+  Oracle sub-theme picker (Oct 30, Adam: "select a sub-theme and have its stocks show below"): in Sub-themes view, clicking a table row
+  or the dropdown (all sub-themes in any cohort, localStorage orSub) shows "Stocks in X": the same 3 charts for its members + a table + ⬇
+  TradingView. `subs[g].members` = ALL members (best 180D first); every member of a listed sub-theme gets a `rows` entry (~300 rows, ~500 KB).
+  Chart code shared via `drawGrid(keys, seriesFn, label, short)`.
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and

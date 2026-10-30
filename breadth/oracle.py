@@ -73,12 +73,20 @@ def build(adjusted, theme_data=None):
         full = (1 + ret_d[mem].mean(axis=1).fillna(0)).cumprod()
         r = [_r(full.iloc[-1] / full.iloc[-(k + 1)] - 1) for k in (180, 60, 15, 5)]
         subs[g["theme"]] = {"n": len(mem), "group": g.get("group"), "strength": _r(strength.get(g["theme"]), 1), "r": r,
-                            "c": [_r(v, 2) for v in series], "members": sorted(mem, key=lambda t: -(rets[180].get(t) or -9))[:12]}
+                            "c": [_r(v, 2) for v in series],
+                            "members": sorted(mem, key=lambda t: -(rets[180].get(t) if pd.notna(rets[180].get(t)) else -9))}
     for key, k in COHORTS.items():
         j = list(COHORTS).index(key)
         scoh[key] = [g for g, _ in sorted(subs.items(), key=lambda kv: -(kv[1]["r"][j] if kv[1]["r"][j] is not None else -9))[:TOP]]
     keep = {g for v in scoh.values() for g in v}
     subs = {g: v for g, v in subs.items() if g in keep}
+    # Adam, Oct 30: "select a sub-theme and have its stocks show below" → every member of a listed sub-theme gets its closes too
+    for g in subs.values():
+        for t in g["members"]:
+            if t not in rows:
+                s = meta[t]
+                rows[t] = {"name": s.get("name"), "sub": s.get("sub") or ((s.get("themes") or [""])[0]), "rsr": s.get("rsr"),
+                           "r": [_r(rets[k].get(t)) for k in (180, 60, 15, 5)], "c": [_r(v, 2) for v in win[t].tolist()]}
     return {"date": C.index[-1].strftime("%Y-%m-%d"), "dates": [d.strftime("%Y-%m-%d") for d in win.index],
             "windows": WINDOWS, "cohorts": cohorts, "scohorts": scoh, "subs": subs, "rows": rows, "spy": spy, "overlap": overlap,
             "spy_r": [_r(rets[k].get(config.BENCHMARK)) for k in (180, 60, 15, 5)], "universe": len(liquid),

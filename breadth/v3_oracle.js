@@ -13,7 +13,7 @@ function oracleLine(vals, w, h, lo, hi) {
 function renderOracle(app) {
   const O = (DATA.themes || {}).oracle;
   if (!O) { app.append($('<div class="card empty">Oracle data appears after the next data run.</div>')); return; }
-  UI.or = UI.or || { coh: lsGet("orCoh", "d5"), view: lsGet("orView", "stocks"), hl: null, log: lsGet("orLog", "0") === "1" };
+  UI.or = UI.or || { coh: lsGet("orCoh", "d5"), view: lsGet("orView", "stocks"), hl: null, log: lsGet("orLog", "0") === "1", sub: lsGet("orSub", "") };
   const U = UI.or, live = liveActive(), subs = U.view === "subs" && O.subs;
   app.append(liveBar());
   const SRC = subs ? O.subs : O.rows, list = ((subs ? O.scohorts : O.cohorts)[U.coh] || []).slice(0, OR_TOP).filter(t => SRC[t]);
@@ -37,45 +37,47 @@ function renderOracle(app) {
   const coh = subs ? O.scohorts : O.cohorts;
   head.append($(`<div class="meta orov">Of these ${OR_TOP}, also in the top ${OR_TOP} of: ${OR_COH.filter(c => c[0] !== U.coh).map(c => `<b>${c[1]}</b> ${(coh[c[0]] || []).filter(x => list.includes(x)).length}`).join(" · ")}</div>`));
   app.append(head);
-  // ---- three charts ----
-  const grid = $('<section class="orgrid"></section>');
+  // ---- three charts (drawn for any list of keys: the cohort, or a picked sub-theme's stocks) ----
   const W = 400, H = 230;
-  O.windows.forEach((win) => {
-    const cut = (c) => c.slice(-(win + 1 + (c.length - O.spy.length)));
-    const base = (c) => { const s = cut(c), b = s.find(v => v != null); return s.map(v => v == null || !b ? null : (U.log ? Math.log(v / b) : v / b - 1)); };
-    const lines = list.map((t, i) => ({ t, i, v: base(series(t)) }));
-    const spy = base(spyS);
-    const med = spy.map((_, k) => { const xs = lines.map(l => l.v[k]).filter(v => v != null).sort((a, b) => a - b); return xs.length ? xs[Math.floor(xs.length / 2)] : null; });
-    const all = [...lines.flatMap(l => l.v), ...spy].filter(v => v != null);
-    const lo = Math.min(0, ...all), hi = Math.max(0, ...all), pad = (hi - lo) * 0.06; const L0 = lo - pad, H0 = hi + pad;
-    const y0 = H - (0 - L0) / (H0 - L0) * H;
-    const fmtY = (v) => U.log ? (Math.exp(v) - 1) : v;
-    const ticks = [L0 + (H0 - L0) * 0.1, (L0 + H0) / 2, H0 - (H0 - L0) * 0.1].map(v => ({ y: H - (v - L0) / (H0 - L0) * H, l: pct(fmtY(v), 0) }));
-    const end = (l) => l.v[l.v.length - 1];
-    const ranked = lines.slice().sort((a, b) => (end(b) ?? -9) - (end(a) ?? -9));
-    const d0 = O.dates[O.dates.length - 1 - win];
-    const card = $(`<div class="card orchart"><div class="orch-h"><b>${win} sessions</b><span class="meta">since ${shortDate(d0)} · median ${pct(fmtY(end({ v: med })))} · SPY ${pct(fmtY(end({ v: spy })))}</span></div>
-      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="orsvg" role="img" aria-label="${esc(cname)} cohort over ${win} sessions">
-        ${ticks.map(k => `<line x1="0" x2="${W}" y1="${k.y.toFixed(1)}" y2="${k.y.toFixed(1)}" class="orgridl"/>`).join("")}
-        <line x1="0" x2="${W}" y1="${y0.toFixed(1)}" y2="${y0.toFixed(1)}" class="orzero"/>
-        ${lines.map(l => `<polyline data-t="${esc(l.t)}" class="orl" points="${oracleLine(l.v, W, H, L0, H0)}" stroke="${col(l.i)}"/>`).join("")}
-        <polyline class="orspy" points="${oracleLine(spy, W, H, L0, H0)}"/>
-        <polyline class="ormed" points="${oracleLine(med, W, H, L0, H0)}"/>
-      </svg>
-      <div class="oraxis">${ticks.map(k => `<span style="top:${(k.y / H * 100).toFixed(1)}%">${k.l}</span>`).join("")}</div>
-      <div class="orrank">${ranked.map(l => `<span data-t="${esc(l.t)}"><i style="background:${col(l.i)}"></i>${esc(subs && l.t.length > 22 ? l.t.slice(0, 21) + "…" : l.t)} ${pct(fmtY(end(l)), 0)}</span>`).join("")}</div></div>`);
-    grid.append(card);
-  });
-  app.append(grid);
+  const drawGrid = (keys, seriesFn, label, short) => {
+    const grid = $('<section class="orgrid"></section>');
+    O.windows.forEach((win) => {
+      const cut = (c) => c.slice(-(win + 1 + (c.length - O.spy.length)));
+      const base = (c) => { const s = cut(c), b = s.find(v => v != null); return s.map(v => v == null || !b ? null : (U.log ? Math.log(v / b) : v / b - 1)); };
+      const lines = keys.map((t, i) => ({ t, i, v: base(seriesFn(t)) }));
+      const spy = base(spyS);
+      const med = spy.map((_, k) => { const xs = lines.map(l => l.v[k]).filter(v => v != null).sort((a, b) => a - b); return xs.length ? xs[Math.floor(xs.length / 2)] : null; });
+      const all = [...lines.flatMap(l => l.v), ...spy].filter(v => v != null);
+      const lo = Math.min(0, ...all), hi = Math.max(0, ...all), pad = (hi - lo) * 0.06; const L0 = lo - pad, H0 = hi + pad;
+      const y0 = H - (0 - L0) / (H0 - L0) * H;
+      const fmtY = (v) => U.log ? (Math.exp(v) - 1) : v;
+      const ticks = [L0 + (H0 - L0) * 0.1, (L0 + H0) / 2, H0 - (H0 - L0) * 0.1].map(v => ({ y: H - (v - L0) / (H0 - L0) * H, l: pct(fmtY(v), 0) }));
+      const end = (l) => l.v[l.v.length - 1];
+      const ranked = lines.slice().sort((a, b) => (end(b) ?? -9) - (end(a) ?? -9));
+      const d0 = O.dates[O.dates.length - 1 - win];
+      grid.append($(`<div class="card orchart"><div class="orch-h"><b>${win} sessions</b><span class="meta">since ${shortDate(d0)} · median ${pct(fmtY(end({ v: med })))} · SPY ${pct(fmtY(end({ v: spy })))}</span></div>
+        <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="orsvg" role="img" aria-label="${esc(label)} over ${win} sessions">
+          ${ticks.map(k => `<line x1="0" x2="${W}" y1="${k.y.toFixed(1)}" y2="${k.y.toFixed(1)}" class="orgridl"/>`).join("")}
+          <line x1="0" x2="${W}" y1="${y0.toFixed(1)}" y2="${y0.toFixed(1)}" class="orzero"/>
+          ${lines.map(l => `<polyline data-t="${esc(l.t)}" class="orl" points="${oracleLine(l.v, W, H, L0, H0)}" stroke="${col(l.i)}"/>`).join("")}
+          <polyline class="orspy" points="${oracleLine(spy, W, H, L0, H0)}"/>
+          <polyline class="ormed" points="${oracleLine(med, W, H, L0, H0)}"/>
+        </svg>
+        <div class="oraxis">${ticks.map(k => `<span style="top:${(k.y / H * 100).toFixed(1)}%">${k.l}</span>`).join("")}</div>
+        <div class="orrank">${ranked.map(l => `<span data-t="${esc(l.t)}"><i style="background:${col(l.i)}"></i>${esc(short && l.t.length > 22 ? l.t.slice(0, 21) + "…" : l.t)} ${pct(fmtY(end(l)), 0)}</span>`).join("")}</div></div>`));
+    });
+    return grid;
+  };
+  app.append(drawGrid(list, series, cname + " cohort", subs));
   // ---- table of the cohort ----
   const retCells = (r) => r.map((v, k) => `<td class="num ${tint(v, [0.6, 0.3, 0.12, 0.06][k])}${OR_COH[k][0] === U.coh ? " orsel" : ""}">${pct(v, 0)}</td>`).join("");
-  const tbl = $(`<section class="card ortable"><div class="head"><h2>${esc(cname)} cohort · ${what} <span class="meta">· strongest first${subs ? " · equal-weight index of each sub-theme" : " · click a ticker for details"}</span></h2>
+  const tbl = $(`<section class="card ortable"><div class="head"><h2>${esc(cname)} cohort · ${what} <span class="meta">· strongest first${subs ? " · equal-weight index of each sub-theme · click a row to see its stocks below" : " · click a ticker for details"}</span></h2>
       <button class="xopen ortv">⬇ TradingView</button></div>
     <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">${subs ? "Sub-theme" : "Ticker"}</th><th class="l">${subs ? "Stocks (best 180D first)" : "Sub-theme"}</th><th>${subs ? "Strength" : "RS"}</th><th>180D</th><th>60D</th><th>15D</th><th>5D</th>${live ? "<th>Today</th>" : ""}</tr></thead><tbody>
     ${list.map((t, i) => { const r = SRC[t];
       if (subs) { const m = live ? liveMove(t) : null;
         return `<tr data-t="${esc(t)}"><td class="num">${i + 1}</td><td class="l"><i class="orsw" style="background:${col(i)}"></i><b>${esc(t)}</b><small class="meta" style="display:block">${esc(r.group || "")} · ${r.n} stocks</small></td>
-          <td class="l orsubs">${r.members.map(x => `<a href="#" class="tkl" data-t="${esc(x)}">${esc(x)}</a>`).join(" ")}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td>${retCells(r.r)}
+          <td class="l orsubs">${r.members.slice(0, 12).map(x => `<a href="#" class="tkl" data-t="${esc(x)}">${esc(x)}</a>`).join(" ")}${r.members.length > 12 ? ` <span class="meta">+${r.members.length - 12}</span>` : ""}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td>${retCells(r.r)}
           ${live ? `<td class="num">${m == null ? "–" : `<span class="${m > 0 ? "up" : "dn"}">${pct(m)}</span>`}</td>` : ""}</tr>`; }
       const L = live ? liveRow(t) : null;
       return `<tr data-t="${esc(t)}"><td class="num">${i + 1}</td><td class="l"><i class="orsw" style="background:${col(i)}"></i><a href="#" class="tkl" data-t="${esc(t)}"><b>${esc(t)}</b></a><small class="meta" style="display:block">${esc(r.name || "")}</small></td>
@@ -84,6 +86,29 @@ function renderOracle(app) {
     <tr class="orspyrow"><td></td><td class="l"><b>SPY</b></td><td class="l meta">benchmark</td><td></td>${(O.spy_r || []).map(v => `<td class="num">${pct(v, 1)}</td>`).join("")}${live ? "<td></td>" : ""}</tr>
     </tbody></table></div></section>`);
   app.append(tbl);
+  // ---- a picked sub-theme's stocks (Adam, Oct 30: "select a sub-theme and have its stocks show below") ----
+  if (subs) {
+    const allSubs = Object.keys(O.subs).sort();
+    if (!U.sub || !O.subs[U.sub]) U.sub = list[0];
+    const g = O.subs[U.sub], mem = (g ? g.members : []).filter(t => O.rows[t]);
+    const stockSeries = (t) => { const c = O.rows[t].c.slice(); if (live) { const L = liveRow(t); if (L && L.price) c.push(L.price); } return c; };
+    const sec = $(`<section class="card orpick"><div class="head"><h2>Stocks in <span class="orpickname"></span> <span class="meta">· ${mem.length} stocks, best 180D first · pick another sub-theme from the list or click one in the table above</span></h2>
+        <div class="orpickctl"><select aria-label="Pick a sub-theme">${allSubs.map(x => `<option${x === U.sub ? " selected" : ""}>${esc(x)}</option>`).join("")}</select><button class="xopen orpicktv">⬇ TradingView</button></div></div></section>`);
+    sec.querySelector(".orpickname").textContent = U.sub || "";
+    app.append(sec);
+    if (mem.length) {
+      app.append(drawGrid(mem, stockSeries, U.sub + " stocks", false));
+      app.append($(`<section class="card ortable orpicktable"><div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Ticker</th><th>RS</th><th>180D</th><th>60D</th><th>15D</th><th>5D</th>${live ? "<th>Today</th>" : ""}</tr></thead><tbody>
+        ${mem.map((t, i) => { const r = O.rows[t], L = live ? liveRow(t) : null;
+          return `<tr data-t="${esc(t)}"><td class="num">${i + 1}</td><td class="l"><i class="orsw" style="background:${col(i)}"></i><a href="#" class="tkl" data-t="${esc(t)}"><b>${esc(t)}</b></a><small class="meta" style="display:block">${esc(r.name || "")}</small></td>
+            <td class="num">${r.rsr ?? "–"}</td>${retCells(r.r)}${live ? `<td class="num">${L && L.chg != null ? `<span class="${L.chg > 0 ? "up" : "dn"}">${pct(L.chg)}</span>` : "–"}</td>` : ""}</tr>`; }).join("")}
+        </tbody></table></div></section>`));
+    }
+    sec.querySelector("select").addEventListener("change", (e) => { U.sub = e.target.value; lsSet("orSub", U.sub); U.hl = null; rerenderPanel(); });
+    sec.querySelector(".orpicktv").addEventListener("click", () => tsDownload("oracle-" + (U.sub || "").replace(/[^a-z0-9]+/gi, "-").toLowerCase(), [{ name: "Oracle - " + U.sub, ticks: mem }]));
+    tbl.querySelectorAll("tr[data-t]").forEach(tr => tr.addEventListener("click", (ev) => { if (ev.target.closest("a.tkl")) return; U.sub = tr.dataset.t; lsSet("orSub", U.sub); U.hl = null; rerenderPanel();
+      setTimeout(() => { const c = document.querySelector(".orpick"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60); }));
+  }
   tbl.querySelector(".ortv").addEventListener("click", () => tsDownload("oracle-" + cname.replace(/\s+/g, "").toLowerCase(),
     subs ? list.map(g => ({ name: "Oracle - " + cname + " - " + g, ticks: O.subs[g].members })) : [{ name: "Oracle - " + cname + " cohort", ticks: list }]));
   // ---- highlight a ticker across all charts ----

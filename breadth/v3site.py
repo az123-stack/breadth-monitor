@@ -106,6 +106,8 @@ CSS = """
 .tdmore { font: inherit; font-size: 11.5px; color: var(--text-muted); background: none; border: 1px dashed var(--border); border-radius: 6px; padding: 2px 7px; cursor: pointer; }
 .tdrest { display: contents; } .tdrest[hidden] { display: none; } .tdrest .tdchip { opacity: .8; }
 .orsubs a { margin-right: 4px; font-size: 12px; }
+.orpick { margin: 16px 0 12px; padding: 10px 14px; } .orpick .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; } .orpick h2 { font-size: 16px; margin: 0; }
+.orpickctl { display: flex; gap: 8px; align-items: center; } .orpickctl select { font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-0); color: var(--text-primary); max-width: 320px; }
 @media (max-width: 520px) { .tdch-h { flex-wrap: wrap; } }
 /* Oracle */
 .orhead { padding: 12px 14px; margin-bottom: 12px; } .orhead h2 { font-size: 16px; margin: 0 0 8px; }
