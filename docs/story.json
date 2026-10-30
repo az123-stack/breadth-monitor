@@ -200,6 +200,14 @@
      "why": "regional factory read; secondary to the ECI"
     }
    ]
+  },
+  {
+   "date": "2026-10-30",
+   "slot": "data",
+   "title": "Wage costs in line; the selloff is earnings, not rates",
+   "branch": "W",
+   "md": "**The numbers:** Q3 Employment Cost Index, total compensation +0.8% vs +0.8% expected, prior +0.9%: in line, a touch cooler than last quarter. Wages and salaries +0.7% vs +0.9% prior: cooler (I could not find a consensus for wages). Sources: [investinglive](https://investinglive.com/news/us-employment-cost-index-for-q3-0-8-vs-0-8-expected/), [Newsquawk](https://www.newsquawk.com/headlines/us-employment-cost---wages-q3-qq-070-prev-090), [BLS](https://www.bls.gov/news.release/eci.htm).\n\n**How the market took it:** Barely at all. Since before 8:30, S&P futures are flat (+0.00%), Nasdaq-100 futures -0.05%, Russell 2000 futures -0.11%. The 10y yield is 4.94%, down 5 bp from the last close, though the note is slightly off its pre-8:30 level (-0.18%). The dollar is +0.13% since 8:30. The big moves (SPY -1.0%, QQQ -2.5%, SMH -5.1%, XLK -3.5%) happened before the release, on Amazon and Intel earnings.\n\n**What it means today:** Wage pressure did not get worse, so this is not a new reason to sell growth or rate-sensitive groups. The AI-hardware selloff is about earnings, not rates. Defensives (XLV +1.5%, XLU +0.9%) and energy (XLE +1.4%) are holding the bid, which fits the story's paused (W) branch.\n\n**Watch at the open:**\n- Do Nasdaq and semiconductor futures hold the -2.5% level or bounce? A 9:45 Chicago PMI (expected 54.6, prior 58.8) is the next print.\n- Do defensives stay green once the cash market opens, or does money start leaving them too?",
+   "written": "2026-10-30T09:09"
   }
  ]
 }
