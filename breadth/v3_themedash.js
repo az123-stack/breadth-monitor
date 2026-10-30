@@ -2,6 +2,8 @@
    Right: a weekly TradingView chart of the selected ticker (loaded only on click, from TradingView). Left: groups with their tickers as chips.
    Default view = today's 52-week highs vs lows split by group, like Deepvue. Live: during the session a stock counts as a new high when
    the Google price is at or above its 52-week high (hi52), new low at or under lo52; otherwise the official close's flags (nh52 / nl52). */
+// Adam, Oct 30: weekly chart opens on the same span as "back to Jan 2024" today = 34 months, kept as a rolling 34-month window
+const TD_RANGE = "34M";
 function tdState(s) {
   const L = liveActive() ? liveRow(s.t) : null, px = L ? L.price : s.price, chg = L ? L.chg : s.today;
   const hi = L ? (s.hi52 != null && px >= s.hi52) : !!s.nh52, lo = L ? (s.lo52 != null && px <= s.lo52) : !!s.nl52;
@@ -11,7 +13,7 @@ function tdState(s) {
 function tdChart(box, t) {
   const S = (getT().stocks || []).find(x => x.t === t), tv = ((DATA.themes || {}).tv || {})[t] || t, st = S ? tdState(S) : null;
   const dark = (document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
-  const src = "https://s.tradingview.com/widgetembed/?" + new URLSearchParams({ frameElementId: "tdtv", symbol: tv, interval: "W", hidesidetoolbar: "1",
+  const src = "https://s.tradingview.com/widgetembed/?" + new URLSearchParams({ frameElementId: "tdtv", symbol: tv, interval: "W", range: TD_RANGE, hidesidetoolbar: "1",
     symboledit: "1", saveimage: "0", withdateranges: "1", theme: dark ? "dark" : "light", style: "1", timezone: "America/New_York", locale: "en",
     studies: JSON.stringify(["MAExp@tv-basicstudies", "Volume@tv-basicstudies"]) }).toString();
   box.innerHTML = `<div class="tdch-h"><div><b class="tdch-t">${esc(t)}</b> <span class="meta">${esc(S ? S.name : "")}</span>

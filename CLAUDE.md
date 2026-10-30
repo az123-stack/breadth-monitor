@@ -699,7 +699,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Oct 30 evening (Adam): top 15 per cohort (`TOP` 15 + page `OR_TOP`; tried 7 first; no Show chips); View chip Stocks / Sub-themes (localStorage orView): `scohorts` + `subs`
   {name: n, group, strength, r, c = equal-weight index of members with data (mean daily return, clipped −50%/+100%), members (best 180D
   first, 12)}; live sub-theme point = last index × (1 + avg live move of its members). ADRs now included (is_stock is False for ADRs; only
-  names with ETF / Fund / Trust or no name are dropped) — same filter on Theme Dash. Theme Dash: chart WEEKLY and on the RIGHT (phone: on
+  names with ETF / Fund / Trust or no name are dropped) — same filter on Theme Dash. Theme Dash: chart WEEKLY (opens on a rolling 34-month span, `TD_RANGE`, = back to Jan 2024 as of Oct 30) and on the RIGHT (phone: on
   top); highs/lows view shows "+N more" per group to reveal the rest of its members.
   Oracle sub-theme picker (Oct 30, Adam: "select a sub-theme and have its stocks show below"): in Sub-themes view, clicking a table row
   or the dropdown (all sub-themes in any cohort, localStorage orSub) shows "Stocks in X": the same 3 charts for its members + a table + ⬇
