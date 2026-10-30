@@ -1956,6 +1956,9 @@ def test_ai_monetizers_verdict():
     F = {"react": R, "c": c, "move": c / c.shift() - 1, "gap": c / c.shift() - 1}
     V = aimon.verdicts(F, list(c.columns))
     assert V["UP"]["in"] and not V["DN"]["in"] and V["BACK"]["in"] and V["NONE"] is None
+    S = aimon.scorecard({"A": {"ai": {"usd": 10, "share": 0.5, "growth": 1.0}}, "B": {"ai": {"usd": 1, "share": 0.1, "growth": 0.2}},
+                         "C": {"ai": {"usd": 5}}})
+    assert [r["t"] for r in S] == ["A", "B", "C"] and S[0]["score"] > S[1]["score"] and S[2]["score"] is None and S[2]["rank"] is None
     return "ok"
 
 

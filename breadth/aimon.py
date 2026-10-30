@@ -100,6 +100,36 @@ def candidates(F, pool, subthemes, stocks=None, hold=CFG["hold"]):
     return out
 
 
+SCORE_W = dict(share=0.4, growth=0.4, usd=0.2)   # AI exposure (share of revenue), AI growth, AI $ size
+
+
+def scorecard(pool, status=None):
+    """Rank pool names on disclosed AI numbers (pool[t]["ai"] = {usd $B a year, share of revenue, growth y/y, basis, asof, src}).
+    Each component = percentile among names that disclose it; missing components are left out and the weights renormalised;
+    no growth figure or no size figure → no score ("not enough disclosed"). Size uses log($)."""
+    rows = []
+    for t, p in pool.items():
+        a = p.get("ai") or {}
+        rows.append({"t": t, "usd": a.get("usd"), "share": a.get("share"), "growth": a.get("growth"), "basis": a.get("basis", ""),
+                     "asof": a.get("asof", ""), "src": a.get("src") or p.get("source", ""), "note": p.get("note", ""),
+                     "in": bool((status or {}).get(t, {}).get("in", True)), "why": (status or {}).get(t, {}).get("why", "")})
+    def pct(k, f=lambda x: x):
+        v = sorted(f(r[k]) for r in rows if r[k] is not None)
+        for r in rows:
+            r["p_" + k] = None if r[k] is None else (sum(x <= f(r[k]) for x in v) - 0.5) / len(v) * 100
+    pct("share"); pct("growth"); pct("usd", lambda x: np.log(max(x, 1e-3)))
+    for r in rows:
+        parts = [(SCORE_W[k], r["p_" + k]) for k in SCORE_W if r["p_" + k] is not None]
+        r["n"] = len(parts)
+        ok = r["p_growth"] is not None and (r["p_share"] is not None or r["p_usd"] is not None)   # needs growth AND a size
+        r["score"] = round(sum(w * x for w, x in parts) / sum(w for w, _ in parts)) if ok else None
+        r["tier"] = (None if r["score"] is None else "leader" if r["score"] >= 60 else "contender" if r["score"] >= 45 else "early")
+    rows.sort(key=lambda r: (r["score"] is None, -(r["score"] or 0), -(r["p_growth"] or 0)))
+    for i, r in enumerate(rows):
+        r["rank"] = i + 1 if r["score"] is not None else None
+    return rows
+
+
 def apply(adjusted, theme_data=None, write=True, today=None):
     """Recompute who is IN, rewrite the theme rows in data/themes.csv and log changes. Returns the payload for the page/story."""
     P = load()
@@ -139,7 +169,7 @@ def apply(adjusted, theme_data=None, write=True, today=None):
             old = pd.read_csv(LOG, dtype=str) if LOG.exists() else pd.DataFrame()
             pd.concat([old, pd.DataFrame(changes)]).to_csv(LOG, index=False)
     log = pd.read_csv(LOG, dtype=str).fillna("").to_dict("records") if LOG.exists() else []
-    return {"date": date, "theme": THEME, "members": [t for t in pool if status[t]["in"]],
+    return {"date": date, "theme": THEME, "score": scorecard(pool, status), "weights": SCORE_W, "members": [t for t in pool if status[t]["in"]],
             "out": [t for t in pool if not status[t]["in"]], "status": status,
             "notes": {t: pool[t].get("note", "") for t in pool}, "changes": changes, "log": log[-30:], "candidates": cands[:15]}
 
@@ -149,6 +179,11 @@ if __name__ == "__main__":
     X = apply(store.apply_splits(b, store.load_splits()), write=False)
     print("IN:", " ".join(X["members"]))
     print("OUT:", " ".join(f"{t} ({X['status'][t]['why']})" for t in X["out"]))
+    print("AI scorecard:")
+    for r in X["score"]:
+        f = lambda v, m=100: "–" if v is None else f"{v * m:.0f}"
+        print(f"  {r['rank'] or '-':>3} {r['t']:6} score {r['score'] if r['score'] is not None else '–':>3} ({r['tier']}) $ {r['usd'] or '–'}B "
+              f"share {f(r['share'])}% growth {f(r['growth'])}% {'IN' if r['in'] else 'out'}  {r['basis'][:60]}")
     print("candidates:")
     for c in X["candidates"]:
         print(f"  {c['t']:6} {c['sub'][:28]:28} RS {c['rsr']}  {c['why']}  since {c['since'] * 100:+.0f}%")

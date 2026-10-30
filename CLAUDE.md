@@ -698,6 +698,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   section **AI monetizers:** (story_guide.md). To add a candidate: research its AI revenue, add to `pool` with note + source. Oct 29: IN BOX
   MSFT META IBM CRM WDAY ADBE PLTR ZS EPAM IOT TEAM OKTA ACN TEM VEEV; OUT ORCL APP FICO AXON (rule), NOW GOOGL AMZN TWLO (manual, Oct 29 reports;
   TWLO −16% after hours on a slower Q4 organic-growth guide).
+  AI SCORECARD (Oct 29, Adam: "rank the companies on their AI: size of exposure and growth"): pool[t]["ai"] = {usd ($B a year), share
+  (of revenue; 1.0 = AI-native, growth = total revenue growth), growth (y/y), basis, asof, src} filled BY HAND from company reports
+  (refresh each earnings season; the story fact sheet asks the writer to quote new AI numbers). `scorecard` = percentile of share 40% /
+  growth 40% / log $ 20% among disclosers; needs growth + a size figure, else "not enough disclosed"; tiers leader ≥ 60 / contender ≥ 45 /
+  early → payload `aimon.score`, card `aiScoreCard` at the top of the Themes tab (+ market verdict, RS, today / 5 days), story fact sheet
+  line AI SCORECARD. Oct 29: PLTR 63, CRM 59, MSFT 59, APP 54, TEM 50, META 48, NOW 48, WDAY 41, ADBE 39; 15 not enough disclosed.
   `python -m breadth.aimon` prints it. Test `test_ai_monetizers_verdict`.
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 

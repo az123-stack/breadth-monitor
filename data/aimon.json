@@ -6,47 +6,135 @@
   },
   "MSFT": {
    "note": "AI business >$37B annual run rate (Q1 2026); Azure +48% Q1 FY27 with positive free cash flow",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 37,
+    "share": 0.1,
+    "growth": 1.23,
+    "basis": "AI business annual run rate",
+    "asof": "2026-04",
+    "src": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   }
   },
   "META": {
    "note": "AI ad tools (Advantage+ value optimization) run rate >$20B, more than doubled y/y",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 20,
+    "share": 0.09,
+    "growth": 1.0,
+    "basis": "AI ad tools (value optimization) run rate, 'more than doubled'",
+    "asof": "2026-04",
+    "src": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   }
   },
   "ORCL": {
    "note": "AI infrastructure revenue +243% y/y (Q1 2026 disclosure)",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": null,
+    "share": null,
+    "growth": 2.43,
+    "basis": "AI infrastructure revenue growth (no $)",
+    "asof": "2026-04",
+    "src": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   }
   },
   "IBM": {
    "note": "Generative AI book of business >$4B ARR; AI agents >$1.5B",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 4,
+    "share": 0.06,
+    "growth": null,
+    "basis": "gen-AI book of business ARR",
+    "asof": "2026-04",
+    "src": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   }
   },
   "CRM": {
    "note": "Agentforce ARR >$1B; AI + Data ARR $3.4B",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 3.9,
+    "share": 0.095,
+    "growth": 2.1,
+    "basis": "AI portfolio ARR (Agentforce $1.5B, +240%)",
+    "asof": "2026-08",
+    "src": "https://www.fool.com/earnings/call-transcripts/2026/08/31/salesforce-crm-q2-2027-earnings-call-transcript/"
+   }
   },
   "WDAY": {
    "note": "Agentic AI ARR approaching $500M; new ACV +200% y/y",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 0.5,
+    "share": 0.05,
+    "growth": 2.0,
+    "basis": "agentic AI ARR; new ACV +200%",
+    "asof": "2026-04",
+    "src": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   }
   },
   "ADBE": {
    "note": "AI-first ARR >$500M, roughly tripled y/y (Q2 FY2026)",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 0.5,
+    "share": 0.02,
+    "growth": 2.0,
+    "basis": "AI-first ARR, roughly tripled",
+    "asof": "2026-06",
+    "src": "https://ortent.co/tools/ai-value-gap/outside-in/"
+   }
   },
   "PLTR": {
    "note": "AIP drove +149% US commercial revenue growth (Q2 2026)",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": null,
+    "share": 1.0,
+    "growth": 0.93,
+    "basis": "AI-native (AIP platform = the business); total revenue +93% (Q2)",
+    "asof": "2026-08",
+    "src": "https://letsdatascience.com/news/palantirs-q2-revenue-jumps-93-as-us-commercial-sales-rise-14-90b0812e"
+   }
   },
   "APP": {
    "note": "AXON AI ad engine; AI product revenue +700% y/y",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": null,
+    "share": 1.0,
+    "growth": 0.53,
+    "basis": "AI-native (AXON ad engine = the business); revenue +53% (Q2)",
+    "asof": "2026-08",
+    "src": "https://www.remio.ai/post/applovin-q2-2026-earnings-grew-53-but-investors-wanted-more"
+   }
   },
   "ZS": {
    "note": "AI Security ARR >$400M, heading past $500M",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 0.4,
+    "share": 0.11,
+    "growth": null,
+    "basis": "AI security ARR (bookings +50% q/q in Q4)",
+    "asof": "2026-08",
+    "src": "https://ortent.co/tools/ai-value-gap/outside-in/"
+   }
   },
   "EPAM": {
    "note": "AI-native revenue >$160M a quarter (~11% of revenue)",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 0.64,
+    "share": 0.11,
+    "growth": null,
+    "basis": "AI-native revenue (>$160M a quarter)",
+    "asof": "2026-08",
+    "src": "https://ortent.co/tools/ai-value-gap/outside-in/"
+   }
   },
   "FICO": {
    "note": "Platform ARR approaching $350M",
@@ -54,23 +142,63 @@
   },
   "AXON": {
    "note": "AI products (Draft One etc.) revenue +700% y/y",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": null,
+    "share": null,
+    "growth": 7.0,
+    "basis": "AI product revenue growth (no $)",
+    "asof": "2026-04",
+    "src": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   }
   },
   "IOT": {
    "note": "Samsara: emerging AI products passed $100M ARR",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 0.1,
+    "share": null,
+    "growth": null,
+    "basis": "emerging AI products ARR",
+    "asof": "2026-08",
+    "src": "https://ortent.co/tools/ai-value-gap/outside-in/"
+   }
   },
   "NOW": {
    "note": "Now Assist ~$1.5B AI-related ACV (but stock fell 27% on Oct 29 report: AI disruption fears)",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 1.7,
+    "share": 0.11,
+    "growth": 0.65,
+    "basis": "AI ACV (year-end target); AI net new ACV +65%",
+    "asof": "2026-10",
+    "src": "https://www.tradingkey.com/news/transcripts/262249602-tradingkey"
+   }
   },
   "GOOGL": {
    "note": "Gen-AI model product revenue up ~800% y/y; Cloud +103% (but AI capex pushed FCF negative; −12% Oct 29)",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": null,
+    "share": null,
+    "growth": 8.0,
+    "basis": "gen-AI model product revenue growth (no $)",
+    "asof": "2026-04",
+    "src": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   }
   },
   "AMZN": {
    "note": "AWS AI run rate >$15B; AWS +39% (but FCF −$42B on AI capex; −5% after hours Oct 29)",
-   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   "source": "https://wiresift.com/ai-adoption/ai-revenue-disclosures",
+   "ai": {
+    "usd": 15,
+    "share": 0.02,
+    "growth": null,
+    "basis": "AWS AI run rate",
+    "asof": "2026-04",
+    "src": "https://wiresift.com/ai-adoption/ai-revenue-disclosures"
+   }
   },
   "TEAM": {
    "note": "Atlassian: Rovo AI actions +50% q/q; FY Q4 2026 EPS +98%, cloud +31%; stock +35% on the report (Aug 7)",
@@ -78,7 +206,15 @@
   },
   "TWLO": {
    "note": "Twilio: voice AI driving fastest growth in 3 years, raised FY outlook; +25% on Q2 (Aug 6)",
-   "source": "https://siliconangle.com/2026/08/06/twilios-stock-jumps-solid-earnings-revenue-beat-strong-momentum-voice-ai/"
+   "source": "https://siliconangle.com/2026/08/06/twilios-stock-jumps-solid-earnings-revenue-beat-strong-momentum-voice-ai/",
+   "ai": {
+    "usd": null,
+    "share": 0.01,
+    "growth": null,
+    "basis": "voice AI ≈ 1% of voice minutes",
+    "asof": "2026-10",
+    "src": "https://ca.investing.com/news/stock-market-news/twilio-q3-2026-slides-record-profits-meet-cautious-outlook-93CH-4915895"
+   }
   },
   "OKTA": {
    "note": "Okta: AI-agent identity demand, beat and raise; +29% on Q2 (Aug 27)",
@@ -90,7 +226,15 @@
   },
   "TEM": {
    "note": "Tempus AI: AI-driven diagnostics + data licensing; first GAAP profit, Data & Applications +28% (Q2, Aug 2026)",
-   "source": "https://trading-treff.de/trading/tempus-ai-aktie-erster-gaap-gewinn-von-56-millionen"
+   "source": "https://trading-treff.de/trading/tempus-ai-aktie-erster-gaap-gewinn-von-56-millionen",
+   "ai": {
+    "usd": null,
+    "share": 1.0,
+    "growth": 0.22,
+    "basis": "AI-native diagnostics + data; revenue +22% (data & apps +28%)",
+    "asof": "2026-08",
+    "src": "https://trading-treff.de/trading/tempus-ai-aktie-erster-gaap-gewinn-von-56-millionen"
+   }
   },
   "VEEV": {
    "note": "Veeva: raised FY outlook on demand for its AI products (Vault CRM, AI agents); +8% on Q2 (Aug 26)",
@@ -234,7 +378,7 @@
    "date": "2026-08-27",
    "day": 0.2863,
    "hold3": 0.2381,
-   "since": 0.6564,
+   "since": 0.6565,
    "pending": false
   },
   "ACN": {

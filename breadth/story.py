@@ -292,6 +292,12 @@ def aimon_lines(T):
             L.append(f"- {r['date']} {'ADDED' if r.get('action') == 'add' else 'REMOVED'} {r['t']}: {r.get('why', '')} · {r.get('note', '')}")
     else:
         L.append("No changes in the last sessions.")
+    sc = [r for r in A.get("score") or [] if r.get("score") is not None][:8]
+    if sc:
+        f = lambda v: "–" if v is None else ("AI-native" if v >= 1 else f"{v * 100:.0f}%")
+        L.append("AI SCORECARD (disclosed AI size + growth; rank / score / $ a year / share of revenue / growth / verdict): " + "; ".join(
+            f"#{r['rank']} {r['t']} {r['score']} (${r['usd'] or '–'}B, {f(r['share'])}, +{(r['growth'] or 0) * 100:.0f}%, {'rewarded' if r['in'] else 'punished'})" for r in sc))
+        L.append("If a report today gives NEW AI numbers (AI revenue / ARR / growth) for any pool name, quote them in **AI monetizers:** with the source so Claude can update the scorecard.")
     cands = [c for c in A.get("candidates") or [] if not c.get("pinned")][:8]
     if cands:
         L.append("Candidates the market just rewarded (NOT in the pool yet; only mention one if you confirm AI drove the report, with a source):")

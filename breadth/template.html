@@ -2791,7 +2791,39 @@ function renderThemesTab(app) {
     () => { lsSet("themesMode", UI.tmode); rerenderPanel(); }));
   bar.querySelector(".filters").append(rsPeriodChips(rerenderPanel));
   app.append(bar);
+  app.append(aiScoreCard(getT()));
   (UI.tmode === "browse" ? renderBrowse : renderThemes)(app);
+}
+/* AI scorecard (Oct 29, 2026; Adam: "rank the companies on their AI: the size of their AI exposure and its growth").
+   DATA.themes.aimon.score from breadth/aimon.py `scorecard`: disclosed AI $ a year, share of revenue, growth y/y → percentile score
+   (share 40% · growth 40% · log $ 20%); market verdict = AI Monetizers rule (last big reaction rewarded or not). */
+function aiScoreCard(T) {
+  const A = T && T.aimon;
+  if (!A || !(A.score || []).length) return $('<div></div>');
+  const stocks = Object.fromEntries((T.stocks || []).map(x => [x.t, x]));
+  const pc = (v, plus) => v == null ? "–" : (plus && v > 0 ? "+" : "") + Math.round(v * 100) + "%";
+  const W = A.weights || {};
+  const scored = A.score.filter(r => r.score != null), gap = A.score.filter(r => r.score == null);
+  const tierTag = { leader: ["Leader", "ppull"], contender: ["Contender", ""], early: ["Early", ""] };
+  const row = (r) => { const S = stocks[r.t] || {}, L = liveActive() ? liveRow(r.t) : null, tt = tierTag[r.tier] || ["", ""];
+    return `<tr><td class="num">${r.rank ?? "–"}</td><td class="l"><a href="#" class="tkl" data-t="${esc(r.t)}"><b>${esc(r.t)}</b></a></td>
+      <td class="num" data-v="${r.score ?? -1}"><b>${r.score ?? "–"}</b>${tt[0] ? `<small style="display:block"><span class="tg ${tt[1]}">${tt[0]}</span></small>` : ""}</td>
+      <td class="num" data-v="${r.usd ?? -1}">${r.usd == null ? "–" : "$" + (r.usd >= 10 ? Math.round(r.usd) : r.usd) + "B"}</td>
+      <td class="num" data-v="${r.share ?? -1}">${r.share == null ? "–" : r.share >= 1 ? "AI-native" : pc(r.share)}</td>
+      <td class="num" data-v="${r.growth ?? -1}">${pc(r.growth, true)}</td>
+      <td class="l" style="white-space:normal;min-width:220px">${esc(r.basis || "")}<small class="meta" style="display:block">${esc(r.asof || "")}${r.src ? ` · <a href="${esc(r.src)}" target="_blank" rel="noopener">source</a>` : ""}</small></td>
+      <td class="l" style="white-space:normal;min-width:180px"><span class="tg ${r.in ? "ppull" : ""}" style="${r.in ? "" : "color:var(--neg)"}">${r.in ? "Rewarded" : "Punished"}</span><small class="meta" style="display:block">${esc(r.why || "")}</small></td>
+      <td class="num">${S.rsr ?? "–"}</td>
+      <td class="num">${L && L.chg != null ? `<span class="${L.chg > 0 ? "up" : "dn"}">${(L.chg > 0 ? "+" : "") + (L.chg * 100).toFixed(1)}%</span>` : S.d5 != null ? `${(S.d5 * 100).toFixed(1)}%` : "–"}</td></tr>`; };
+  const card = $(`<section class="card regcard aicard"><div class="head"><h2><span class="pbv unproven" title="Information only">Info</span> AI scorecard <span class="meta">· who makes the most AI money, and how fast it grows · ${A.score.length} companies</span></h2></div>
+    <p class="note" style="padding:4px 0 0"><b>Score</b> (0–100) ranks companies on what they have <b>disclosed</b>: AI as a share of revenue (${Math.round((W.share || 0) * 100)}%), AI growth year over year (${Math.round((W.growth || 0) * 100)}%) and the AI dollars themselves (${Math.round((W.usd || 0) * 100)}%), each as a percentile among the companies that report it. A company needs a growth number and a size number to get a score. <b>AI-native</b> = the whole business is the AI product (growth = total revenue growth). <b>Market verdict</b> = did the market reward its last report (the AI Monetizers rule). Numbers come from company reports, updated by hand each earnings season, so check the date.</p>
+    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Ticker</th><th>Score</th><th>AI $<small>a year</small></th><th>AI share<small>of revenue</small></th><th>AI growth<small>y/y</small></th><th class="l">What's counted</th><th class="l">Market verdict</th><th>RS</th><th>${liveActive() ? "Today" : "5 days"}</th></tr></thead>
+    <tbody>${scored.map(row).join("")}</tbody></table></div>
+    ${gap.length ? `<details class="kqsec" style="margin-top:8px"><summary><b>Not enough disclosed to score (${gap.length})</b> <span class="meta">· growth or size missing</span></summary>
+      <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Ticker</th><th>Score</th><th>AI $</th><th>AI share</th><th>AI growth</th><th class="l">What we know</th><th class="l">Market verdict</th><th>RS</th><th>${liveActive() ? "Today" : "5 days"}</th></tr></thead>
+      <tbody>${gap.map(r => row(Object.assign({}, r, { basis: r.basis || r.note || "no AI figures disclosed" }))).join("")}</tbody></table></div></details>` : ""}
+  </section>`);
+  return card;
 }
 let FOLDS = {}; try { FOLDS = JSON.parse(localStorage.getItem("folds") || "{}"); } catch (e) { FOLDS = {}; }
 function cardTitle(c) {
