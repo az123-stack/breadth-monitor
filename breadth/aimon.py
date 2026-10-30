@@ -78,9 +78,10 @@ def why(v):
 def candidates(F, pool, subthemes, stocks=None, hold=CFG["hold"]):
     """Rewarded reactions (day ≥ +1 ADR and held 3 sessions) outside the pool, in software / internet / AI groups."""
     sd = subthemes if subthemes is not None else store.load_subthemes()
-    ok = sd[sd["group"].isin(CFG["cand_groups"]) | sd["subtheme"].isin(CFG["cand_subs"])]
+    ok = sd if CFG.get("cand_all", True) else sd[sd["group"].isin(CFG["cand_groups"]) | sd["subtheme"].isin(CFG["cand_subs"])]
     sub_of = dict(zip(ok["ticker"], ok["subtheme"]))
-    skip = set(pool) | set((load().get("exclude") or {}))
+    L = load()
+    skip = set(pool) | set(L.get("exclude") or {}) | set(L.get("not_ai") or {})
     V = verdicts(F, [t for t in sub_of if t not in skip])
     rs = {s["t"]: s.get("rsr") for s in (stocks or [])}
     out = []

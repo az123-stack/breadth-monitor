@@ -83,6 +83,18 @@
   "OKTA": {
    "note": "Okta: AI-agent identity demand, beat and raise; +29% on Q2 (Aug 27)",
    "source": "https://www.insidermonkey.com/blog/okta-just-jumped-29-ai-agents-may-be-creating-a-new-bottleneck-1824545/"
+  },
+  "ACN": {
+   "note": "Accenture: record $84.5B bookings; CEO 'AI opportunities are greater than AI efficiencies'; +23% on Q4 (Oct 1) as AI-disruption fears faded",
+   "source": "https://247wallst.com/investing/2026/10/01/accenture-soars-23-as-record-bookings-dispel-ai-demand-fears-infosys-jumps-8-ibm-climbs-5/"
+  },
+  "TEM": {
+   "note": "Tempus AI: AI-driven diagnostics + data licensing; first GAAP profit, Data & Applications +28% (Q2, Aug 2026)",
+   "source": "https://trading-treff.de/trading/tempus-ai-aktie-erster-gaap-gewinn-von-56-millionen"
+  },
+  "VEEV": {
+   "note": "Veeva: raised FY outlook on demand for its AI products (Vault CRM, AI agents); +8% on Q2 (Aug 26)",
+   "source": "https://ts2.tech/en/veeva-stock-jumps-8-2-adding-3-3-billion-as-ai-sales-lift-outlook/"
   }
  },
  "status": {
@@ -224,6 +236,15 @@
    "hold3": 0.2381,
    "since": 0.6564,
    "pending": false
+  },
+  "ACN": {
+   "in": true
+  },
+  "TEM": {
+   "in": true
+  },
+  "VEEV": {
+   "in": true
   }
  },
  "exclude": {
@@ -252,5 +273,10 @@
    "why": "Oct 29 report: −16% after hours; Q4 organic growth guided down to 11–12% (from 16%), margins squeezed; voice AI only ~1% of voice minutes"
   }
  },
- "updated": "2026-10-28"
+ "updated": "2026-10-28",
+ "not_ai": {
+  "CACI": "Aug 2026 jump = defense tech / EW contracts, not AI",
+  "PTC": "takeover",
+  "BRZE": "takeover"
+ }
 }
