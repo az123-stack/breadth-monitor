@@ -50,3 +50,13 @@ Sample Nov 13, 2025 – Sep 25, 2026, 48,666 long touches.
 - Closing above the EMA on the touch day lifts bounce a little (~44–47%). Shorts: every combination lost.
 Read: Adam's idea is right about the touch count (fresh touches beat 3rd+) but the % above only helps together with a leading group.
 Card "EMA touch odds" shows the band × touch matrix per EMA, the 80%+ coupled table, and live names scored from the most specific cell.
+
+**Third pass: WEEKLY 9 / 21, time above over 90 days (Oct 29 evening, Adam; now what the card shows).** Weekly EMAs as they stand each day
+(this week's close = today's price), touches on daily lows, time above = share of the last 90 daily closes, touch # within 90 sessions,
+5-session spacing. Aug 20, 2025 – Sep 25, 2026, 32,464 long touches.
+- Any stock: ≈ −0.07R whatever the touch number; 90%+ above is the worst band (weekly 21: 1st −0.27R, 2nd −0.32R, both halves negative).
+- 80%+ above, leading group, post-thrust window: weekly 21 2nd touch 44% bounce / +0.57R (halves +0.61/+0.48, n 106), 3rd+ +0.36R (n 336),
+  1st −0.41R (n 42); weekly 9 1st +0.36R (n 62), 2nd 60% / +0.69R (halves +0.62/+0.90, n 126), 3rd+ +0.35R (n 198).
+- Leading group without the thrust window: weekly 9 1st +0.19R (both halves, n 125), 2nd +0.26R; weekly 21 2nd +0.11R, 3rd+ +0.15R.
+Read: on the weekly, the first pullback after a long stretch above is NOT the buy; the 2nd touch inside a leading group in good tape is.
+Shorts lose in every cell. Sample is 13 months (warm-up for the weekly 21 + 90-day window), so cells are small.

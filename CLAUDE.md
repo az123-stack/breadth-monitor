@@ -573,17 +573,18 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   close under the 10 EMA). Oct 29 (Nov 2025–Sep 2026): RS-high dips −0.03R (n 1,764) vs equally strong without an RS high −0.06R (edge
   +0.26R, t 2.03, halves +0.45/+0.14) but ≈ 0 with Adam's exit; RS-leads +0.13R (n 270). Verdict "proven" also needs own R > 0 and a positive
   Adam-exit edge → currently "helps" (Unproven badge). Test `test_rs_pullback`.
-- `emaprob.py` **EMA touch odds** (Oct 29, 2026; reworked same day to Adam's framing: "% of the last month above the 9/21, then the 1st /
-  2nd touch"; card R-2026-10-29-ema-test-odds, layer `emaprob`, info) → `DATA.themes.emaprob` {cfg, bands, touches, thr, long/short:
-  {evidence: {ema: {"21","9": {all, cell[band][touch], band, coupled[touch]{all, held, lead, lead_thr}}}}, rows}} (~60 s), `emaOddsCard` on
-  Setups after RS leaders. pct = share of the prior 30 closes above the EMA (bands <50 / 50–70 / 70–80 / 80–90 / 90%+); touch = low within
-  0.25 ADR after closing above (9-touch must not reach the 21; 3-session spacing); 1st / 2nd / 3rd+ = touches in the prior 30 sessions;
-  bounce = close 0.5 ADR over the touch-day high within 10 sessions before a close 0.5 ADR through the EMA; R = break of the touch-day high
-  within 3 sessions, stop touch-day low ≤ 1 ADR, 20 sessions. Page `emaOdds` picks the most specific coupled cell (n ≥ 30) for each live row
-  (touched at the last close / touching now from sheet low + live EMA / coming within 1.5 ADR); "tested +" = R > 0 in both halves.
-  Findings (Nov 2025–Sep 2026, 48,666 long touches): % time above alone does NOT raise bounce odds (21 EMA ~40% every band, 9 ~47%);
-  3rd+ touches worst (80%+: −0.20R / −0.22R); 80%+ 1st touch + leading group 21 EMA 47% / +0.13R (halves +0.18/+0.06), 9 EMA +0.60R (n 60);
-  9 EMA 80%+ 2nd touch + leading group + post-thrust 55% / +0.54R (n 141). Shorts: all lose. Test `test_ema_test_odds`.
+- `emaprob.py` **EMA touch odds** (Oct 29, 2026; Adam: "% of time above the 9/21, then the 1st / 2nd touch"; same evening: "WEEKLY 9/21, time
+  above over 90 days"; card R-2026-10-29-ema-test-odds, layer `emaprob`, info) → `DATA.themes.emaprob` {cfg, bands, touches, thr, tf "weekly",
+  long/short: {evidence: {ema: {"21","9": {all, cell[band][touch], band, coupled[touch]{all, held, lead, lead_thr}}}}, rows}} (~55 s), `emaOddsCard`
+  on Setups after RS leaders. EMAs = WEEKLY 9/21 as they stand each day (`weekly_ema`: base = last finished week's EMA, today = base + α(c − base));
+  daily bars for everything else. pct = share of the prior 90 daily closes above (bands <50 / 50–70 / 70–80 / 80–90 / 90%+); touch = daily low
+  within 0.25 ADR after closing above (9-touch must not reach the 21; 5-session spacing); 1st / 2nd / 3rd+ = touches in the prior 90 sessions;
+  bounce = close 0.5 ADR over the touch-day high within 10 sessions before a close 0.5 ADR through the EMA; R = break of the touch-day high within
+  3 sessions, stop touch-day low ≤ 1 ADR, 20 sessions; Adam's exit = daily 10 EMA. Live rows carry `b9`/`b21` = base for the next session (this
+  week's EMA if a new week starts, via nyse.next_session) → page `ex = b + α(p − b)`. Findings (weekly, Aug 2025–Sep 2026, 32,464 long touches):
+  any stock ≈ −0.07R at every touch #, 90%+ above worst (21: −0.27R / −0.32R); 80%+ + leading group + post-thrust: weekly 21 2nd touch +0.57R
+  (halves +0.61/+0.48, n 106), 3rd+ +0.36R; weekly 9 1st +0.36R (n 62), 2nd +0.69R (halves +0.62/+0.90, n 126); 1st touch of the weekly 21
+  −0.41R (n 42). Shorts lose. (Daily 30-session version, replaced: same shape, 9 EMA 2nd touch lead+thrust +0.54R.) Test `test_ema_test_odds`.
 - **RS period toggle** (Oct 29, Adam: "toggle the RS period rather than extra columns"): `strength.RS_SHORT` rs2w / rs4w / rs6w = 10 / 20 / 30-
   session return percentile vs liquid stocks (+ `…5` deltas), payload `rs_short_bp`, refs c10 / c20 / c30; page `RS_PER`, chips "RS period"
   (Stocks + Themes tabs, localStorage rsPeriod) switch the one RS column, Δ, sort and RS 80+/90+ filter; `liveRatingShort` recomputes live.

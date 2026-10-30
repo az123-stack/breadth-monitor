@@ -1,28 +1,26 @@
 """EMA touch odds (Oct 29, 2026; Adam: "pick a time frame like 1 month; if the % of time spent over the 9/21 is like 80% and it's
-going into the 9/21 right now it's likely going to bounce ... 80/90% over 30 days and it's about to make its first touch ... then
-measure the second touch". Same thing on the short side.)
+going into the 9/21 right now it's likely going to bounce ... 80/90% and it's about to make its first touch ... then measure the
+second touch". Same evening: "have it be the WEEKLY 9/21, not daily, and extend the time above to 90 days".) Same thing on the short side.
 
-For every liquid stock ($5+, $20M+/day) and each EMA (9, 21):
-  time above = share of the last 30 closes above that EMA (below, for shorts)
-  touch      = the low comes within 0.25 ADR of the EMA (or through it) after closing above it the day before; a new touch needs 3+
-               sessions since the last; a 9 touch that also reaches the 21 counts as a 21 touch
-  touch #    = 1 + touches of that EMA in the 30 sessions before (1st, 2nd, 3rd+)
+For every liquid stock ($5+, $20M+/day) and each WEEKLY EMA (9, 21), on daily bars (the weekly EMA as it stands that day = `weekly_ema`):
+  time above = share of the last 90 daily closes above that weekly EMA (below, for shorts)
+  touch      = the daily low comes within 0.25 ADR of the weekly EMA (or through it) after closing above it the day before; a new touch
+               needs 5+ sessions since the last; a 9 touch that also reaches the 21 counts as a 21 touch
+  touch #    = 1 + touches of that EMA in the 90 sessions before (1st, 2nd, 3rd+)
 What happened next (first to happen within 10 sessions):
   BOUNCE = a close above the touch-day high + 0.5 ADR;  FAIL = a close more than 0.5 ADR through the EMA;  else chop
 and the trade: buy the break of the touch-day high within 3 sessions, stop the touch-day low (max 1 ADR, risk floored at 0.3 ADR),
-win = +2R first within 20 sessions; R after 20 sessions (capped 10R) and Adam's exit (first close under the 10 EMA).
+win = +2R first within 20 sessions; R after 20 sessions (capped 10R) and Adam's exit (first close under the DAILY 10 EMA).
 Couplings: leading group (sub-theme top 30% on 60-day return; bottom 30% for shorts), post-thrust window.
-
-The tables are re-run every build; the page (`emaTouchCard`) looks up today's names in them (`touchLabel` / `band` are the same
-rules as the page's `etBand` / `etTouch`).
+The tables are re-run every build; the page (`emaOddsCard` / `emaOdds`) looks up today's names in them.
 """
 import numpy as np
 import pandas as pd
 
 from . import config
 
-CFG = dict(min_price=5.0, min_dvol=20e6, touch=0.25, space=3, win=30, look=10, bounce=0.5, fail=0.5, trig_days=3, hold=20,
-           target=2.0, floor=0.3, warm=260, lead=0.7, hi=0.8, near=1.5, n_live=150)
+CFG = dict(min_price=5.0, min_dvol=20e6, touch=0.25, space=5, win=90, look=10, bounce=0.5, fail=0.5, trig_days=3, hold=20,
+           target=2.0, floor=0.3, warm=200, lead=0.7, hi=0.8, near=1.5, n_live=150)
 BANDS = [(-0.01, 0.5, "<50%"), (0.5, 0.7, "50–70%"), (0.7, 0.8, "70–80%"), (0.8, 0.9, "80–90%"), (0.9, 1.01, "90%+")]
 TOUCHES = ["1st", "2nd", "3rd+"]
 
@@ -46,6 +44,19 @@ def touch_label(prior):
     return TOUCHES[min(int(prior), 2)]
 
 
+def weekly_ema(c, n):
+    """The weekly n-EMA as it stands on each day: EMA of weekly closes, with the current (unfinished) week's close = today's close.
+    Returns (value each day, base = last COMPLETED week's EMA each day). Live: today's weekly EMA = base + 2/(n+1) * (price - base),
+    where base for the next session is that week's EMA at the last close if the next session starts a new week, else the prior week's."""
+    wk = c.index.to_period("W-FRI")
+    wc = c.groupby(wk).last()
+    we = wc.ewm(span=n, adjust=False, min_periods=n).mean()
+    prev = we.shift(1)
+    base = prev.reindex(wk).set_axis(c.index)
+    a = 2 / (n + 1)
+    return [base + a * (c - base), base]
+
+
 def frames(adjusted, subthemes=None, history=None, bench=None):
     bench = bench or config.BENCHMARK
     piv = lambda k: adjusted.pivot_table(index="date", columns="ticker", values=k).sort_index()
@@ -55,7 +66,8 @@ def frames(adjusted, subthemes=None, history=None, bench=None):
     o, h, l, v = (piv(k).reindex_like(c).astype("float64") for k in ("o", "h", "l", "v"))
     adr = ((h / l) - 1).rolling(20, min_periods=15).mean()
     dvol = (c * v).rolling(20, min_periods=15).mean()
-    e9, e10, e21 = (c.ewm(span=n, adjust=False, min_periods=n).mean() for n in (9, 10, 21))
+    e10 = c.ewm(span=10, adjust=False, min_periods=10).mean()        # daily 10 EMA: Adam's exit
+    e9, e21, b9, b21 = weekly_ema(c, 9) + weekly_ema(c, 21)          # WEEKLY 9 / 21 EMA as they stand each day (Oct 29, Adam)
     liq = (c >= CFG["min_price"]) & (dvol >= CFG["min_dvol"])
     grp = pd.DataFrame(np.nan, index=c.index, columns=c.columns)   # sub-theme 60-day median return, ranked across sub-themes
     sub_of = {}
@@ -79,12 +91,12 @@ def frames(adjusted, subthemes=None, history=None, bench=None):
             thr = metrics.thrust_window(history, list(c.index))
         except Exception:
             pass
-    return dict(c=c, o=o, h=h, l=l, adr=adr, dvol=dvol, e9=e9, e10=e10, e21=e21, liq=liq, grp=grp, sub_of=sub_of,
+    return dict(c=c, o=o, h=h, l=l, adr=adr, dvol=dvol, e9=e9, e10=e10, e21=e21, b9=b9, b21=b21, liq=liq, grp=grp, sub_of=sub_of,
                 thr=pd.Series(thr, index=c.index))
 
 
 def _touches(F, side):
-    """Per EMA: spaced touch mask, share of the prior 30 closes on the right side, touches in the prior 30 sessions."""
+    """Per EMA: spaced touch mask, share of the prior 90 closes on the right side, touches in the prior 90 sessions."""
     c, h, l, adr = F["c"], F["h"], F["l"], F["adr"]
     out = {}
     for k in ("9", "21"):
@@ -212,7 +224,7 @@ def study(F, side, P):
 
 
 def live(F, side, P, theme_data=None):
-    """Names on the right side of the 9 or 21 EMA with 70%+ of the last 30 closes there, touching at the last close or within 1.5 ADR
+    """Names on the right side of the 9 or 21 EMA with 70%+ of the last 90 closes there, touching at the last close or within 1.5 ADR
     of the EMA; with what the page needs to score a live touch."""
     T = theme_data or {}
     stocks = {s["t"]: s for s in (T.get("stocks") or [])}
@@ -237,8 +249,16 @@ def live(F, side, P, theme_data=None):
             if t not in out or (tch and out[t].get("state") != "touched"):
                 out[t] = r
     rows = []
+    last = F["c"].index[i]
+    try:
+        from . import nyse
+        new_week = pd.Timestamp(nyse.next_session(last.date())).to_period("W-FRI") != last.to_period("W-FRI")
+    except Exception:
+        new_week = last.dayofweek >= 4
     for t, r in out.items():
         j = F["c"].columns.get_loc(t)
+        # base for the NEXT session's live weekly EMA: this week's EMA if a new week starts, else last week's
+        bk = {k: (F["e" + k] if new_week else F["b" + k]).iat[i, j] for k in ("9", "21")}
         s = stocks.get(t) or {}
         g = F["grp"].iat[i, j]
         lead = bool(np.isfinite(g) and ((g >= CFG["lead"]) if side > 0 else (g <= 1 - CFG["lead"])))
@@ -248,6 +268,7 @@ def live(F, side, P, theme_data=None):
         rows.append({"t": t, "name": (s.get("name") or "")[:40], "sub": s.get("sub") or F["sub_of"].get(t, ""), "rsr": s.get("rsr"),
                      "lead": lead, "grp": _r(g, 2), **r, "c": _r(F["c"].iat[i, j], 2), "hi": _r(hi, 2), "lo": _r(lo, 2),
                      "e9": _r(F["e9"].iat[i, j], 3), "e21": _r(F["e21"].iat[i, j], 3), "adr": _r(a, 4),
+                     "b9": _r(bk["9"], 3), "b21": _r(bk["21"], 3),
                      "trig": _r(trig, 2) if r["state"] == "touched" else None, "stop": _r(stop, 2) if r["state"] == "touched" else None,
                      "dvol": _r(F["dvol"].iat[i, j] / 1e6, 1)})
     rows.sort(key=lambda r: (r["state"] != "touched", -(r["pct"] or 0), r["dist"] if r["dist"] is not None else 9))
@@ -265,9 +286,9 @@ def build(adjusted, theme_data=None, history=None, subthemes=None):
     if F is None:
         return None
     F["_np"] = tuple(F[k].to_numpy() for k in ("c", "o", "h", "l", "adr", "e10"))
-    out = {"date": str(F["c"].index[-1].date()), "cfg": {k: CFG[k] for k in ("touch", "win", "look", "bounce", "fail", "hi", "lead", "near",
+    out = {"date": str(F["c"].index[-1].date()), "cfg": {k: CFG[k] for k in ("touch", "space", "win", "look", "bounce", "fail", "hi", "lead", "near",
                                                                             "target", "hold", "min_price", "min_dvol")},
-           "bands": [b for _, _, b in BANDS], "touches": TOUCHES, "thr": bool(F["thr"].iat[-1])}
+           "bands": [b for _, _, b in BANDS], "touches": TOUCHES, "thr": bool(F["thr"].iat[-1]), "tf": "weekly"}
     for name, side in (("long", 1), ("short", -1)):
         P = _touches(F, side)
         ev = study(F, side, P)
