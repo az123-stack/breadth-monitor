@@ -1,122 +1,516 @@
 {
- "for_date": "2026-10-28",
- "written": "2026-10-29T11:24Z",
+ "for_date": "2026-10-29",
+ "written": "2026-10-30T11:21Z",
  "stocks": {
   "BMNR": {
-   "why": "No clear catalyst found; searches only showed older ETH-holdings and uplisting press items. Crypto-treasury stock, trades with ETH.",
+   "why": "no clear catalyst found (searches returned headlines only)",
    "direction": "none",
    "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://quantisnow.com/insight/bitmine-immersion-bmnr-announces-eth-holdings-reach-397-million-tokens-6315408"
+    "https://www.marketbeat.com/stocks/AMEX/BMNR/news"
    ]
   },
-  "CTSH": {
-   "why": "Reports Q3 earnings today (Oct 29) before the open, expected move about \u00b110%; stock is up ~32% since its July beat-and-jump, so event risk is high. No other fresh catalyst confirmed.",
-   "direction": "mixed",
-   "quality": "real",
+  "ASAN": {
+   "why": "No clear catalyst found; next report listed Dec 3.",
+   "direction": "none",
+   "quality": "none",
    "depth": "full",
-   "earnings_date": "2026-10-29",
-   "red_flags": [
-    "earnings today before open; run-up into the print"
-   ],
+   "earnings_date": "2026-12-03",
+   "red_flags": [],
    "sources": [
-    "https://unusualwhales.com/stock/CTSH/earnings"
+    "https://beta.earningswhispers.com/go/x/ASAN"
    ]
   },
-  "ZS": {
-   "why": "Last report Sep 3 beat on EPS and revenue (rev +24.9%) with Q1 guide above consensus; no fresh news found since. Next report is only a projected date.",
-   "direction": "positive",
-   "quality": "real",
+  "FDS": {
+   "why": "no clear catalyst found (searches returned headlines only)",
+   "direction": "none",
+   "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.marketbeat.com/stocks/NASDAQ/ZS/earnings/",
-    "https://therighttrader.com/earnings-calendar/zs"
+    "https://www.nasdaq.com/articles/factset-research-boosts-fy26-outlook-stock-56-update"
    ]
   },
   "OKTA": {
-   "why": "No fresh hard catalyst found; last reported Aug 26. Next report listed as Dec 2 but one page calls it an estimate, so not confirmed.",
+   "why": "No clear catalyst found; next report listed Dec 2.",
    "direction": "none",
    "quality": "none",
    "depth": "full",
-   "earnings_date": null,
+   "earnings_date": "2026-12-02",
    "red_flags": [],
    "sources": [
-    "https://www.tipranks.com/stocks/ch:0ok/earnings",
-    "https://www.marketscreener.com/quote/stock/OKTA-INC-34515216/calendar/"
+    "https://www.tipranks.com/stocks/OKTA/earnings"
    ]
   },
-  "RBRK": {
-   "why": "No clear catalyst found; next report listed Dec 3 after close, partly flagged as an estimate.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.tipranks.com/stocks/rbrk/earnings"
-   ]
-  },
-  "CRL": {
-   "why": "Last report Aug 5 beat (EPS 3.02 vs 2.72) and the stock jumped 11%; no fresher news confirmed. Next report Nov 4 before the open.",
+  "FIGS": {
+   "why": "Steady 28-33% revenue growth, August guidance raise and a $100M buyback lifted shares ~84% YTD; Q3 due Nov 5.",
    "direction": "positive",
    "quality": "real",
    "depth": "full",
-   "earnings_date": "2026-11-04",
-   "red_flags": [],
-   "sources": [
-    "https://chartrow.com/quote/crl/earnings"
-   ]
-  },
-  "FTRE": {
-   "why": "Reports Q3 earnings today (Oct 29) before the open, expected move about \u00b118%; stock is up ~25% since the July report. High event risk.",
-   "direction": "mixed",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": "2026-10-29",
+   "earnings_date": "2026-11-05",
    "red_flags": [
-    "earnings today before open; run-up into the print"
+    "earnings inside 5 sessions"
    ],
    "sources": [
-    "https://unusualwhales.com/stock/FTRE/earnings"
+    "https://www.tikr.com/blog/figs-is-up-84-in-2026-take-profits-or-buy-more"
    ]
   },
   "QLYS": {
-   "why": "Stock rose 13.8% after the Aug 4 report and is up ~39% since; no fresh catalyst confirmed. Next report Nov 9 after close.",
+   "why": "Raised 2026 guidance in August after a Q2 beat; Q3 report listed Nov 9.",
    "direction": "positive",
    "quality": "real",
    "depth": "full",
    "earnings_date": "2026-11-09",
-   "red_flags": [],
+   "red_flags": [
+    "executive departures (CISO)",
+    "proposed share sale filing Oct 14"
+   ],
    "sources": [
-    "https://unusualwhales.com/stock/QLYS/earnings"
+    "https://equibles.com/stocks/QLYS"
    ]
   },
-  "CRWD": {
-   "why": "No clear catalyst found; next report projected Dec 1 (unconfirmed).",
+  "TENB": {
+   "why": "Reported Q3 on Oct 28: beat and guided above estimates; stock up about 13% since.",
+   "direction": "positive",
+   "quality": "strong",
+   "depth": "full",
+   "earnings_date": "2027-01-27",
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/tenb"
+   ]
+  },
+  "ANF": {
+   "why": "no clear catalyst found (searches returned headlines only)",
    "direction": "none",
    "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://therighttrader.com/earnings-calendar/crwd"
+    "https://www.earningswhispers.com/stocks/anf"
    ]
   },
-  "TENB": {
-   "why": "No clear catalyst found; a source suggests a Q3 report around Oct 28 after close but it was not clearly confirmed, so the date is left blank.",
+  "CRL": {
+   "why": "Reaffirmed 2026 guidance Sep 24 and set 2030 targets; Q3 report due Nov 4.",
+   "direction": "mixed",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": "2026-11-04",
+   "red_flags": [
+    "earnings inside 5 sessions",
+    "insider sale filing Oct 22 (~$8.4M)"
+   ],
+   "sources": [
+    "https://equibles.com/stocks/CRL"
+   ]
+  },
+  "RPD": {
+   "why": "No fresh hard news found; Q3 report due Nov 4 after the close (inside 5 sessions).",
    "direction": "none",
-   "quality": "unknown",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": "2026-11-04",
+   "red_flags": [
+    "earnings inside 5 sessions"
+   ],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/RPD"
+   ]
+  },
+  "RVTY": {
+   "why": "Raised 2026 guidance in August, launched a product Oct 20; Q3 report due Nov 3.",
+   "direction": "mixed",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": "2026-11-03",
+   "red_flags": [
+    "earnings inside 5 sessions"
+   ],
+   "sources": [
+    "https://equibles.com/stocks/RVTY"
+   ]
+  },
+  "SN": {
+   "why": "no clear catalyst found (searches returned headlines only)",
+   "direction": "none",
+   "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://therighttrader.com/earnings-calendar/tenb",
-    "https://finviz.com/news/402471/tenable-to-announce-fiscal-third-quarter-2026-earnings-results"
+    "https://www.earningswhispers.com/stocks/sn"
+   ]
+  },
+  "APA": {
+   "why": "No clear catalyst found; Q3 report listed for Nov 4 (aggregator, unconfirmed).",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": "2026-11-04",
+   "red_flags": [
+    "earnings inside 5 sessions (unconfirmed)"
+   ],
+   "sources": [
+    "https://www.digrin.com/stocks/detail/APA/earnings"
+   ]
+  },
+  "S": {
+   "why": "No clear catalyst found; next report listed Dec 8.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": "2026-12-08",
+   "red_flags": [],
+   "sources": [
+    "https://www.tipranks.com/stocks/S/earnings"
+   ]
+  },
+  "SM": {
+   "why": "No clear catalyst found; Q3 report due Nov 3 after the close.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": "2026-11-03",
+   "red_flags": [
+    "earnings inside 5 sessions"
+   ],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/SM"
+   ]
+  },
+  "FTRE": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/ftre"
+   ]
+  },
+  "AVTR": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/avtr"
+   ]
+  },
+  "SAIC": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/saic"
+   ]
+  },
+  "PR": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/pr"
+   ]
+  },
+  "OVV": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/ovv"
+   ]
+  },
+  "SAIL": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/sail"
+   ]
+  },
+  "AZTA": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/azta"
+   ]
+  },
+  "A": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/a"
+   ]
+  },
+  "WAT": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/wat"
+   ]
+  },
+  "TALO": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/talo"
+   ]
+  },
+  "VRNS": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/vrns"
+   ]
+  },
+  "ELF": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/elf"
+   ]
+  },
+  "HAS": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/has"
+   ]
+  },
+  "PTC": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/ptc"
+   ]
+  },
+  "IQV": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/iqv"
+   ]
+  },
+  "TMO": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/tmo"
+   ]
+  },
+  "EOG": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/eog"
+   ]
+  },
+  "MTD": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/mtd"
+   ]
+  },
+  "CACI": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/caci"
+   ]
+  },
+  "MEDP": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/medp"
+   ]
+  },
+  "OXY": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/oxy"
+   ]
+  },
+  "DVN": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/dvn"
+   ]
+  },
+  "DHR": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/dhr"
+   ]
+  },
+  "TEAM": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/team"
+   ]
+  },
+  "KNSA": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/knsa"
+   ]
+  },
+  "VEEV": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/veev"
+   ]
+  },
+  "ZIM": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/zim"
+   ]
+  },
+  "RBLX": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/rblx"
+   ]
+  },
+  "ABBV": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/abbv"
+   ]
+  },
+  "CAI": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/cai"
    ]
   }
  }
