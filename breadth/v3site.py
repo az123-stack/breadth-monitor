@@ -48,7 +48,57 @@ CSS = """
 .v3tag { font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 2px 7px; border-radius: 999px; vertical-align: middle;
   border: 1px solid var(--border); color: var(--text-secondary); margin-left: 6px; }
 .xopen.revflag { display: none; }
+/* wider on desktop (Adam, Oct 30: "the entire thing looks narrow") */
+.wrap { max-width: min(1760px, 96vw); }
+/* light / dark switch */
+.modesw { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+.modesw button { background: none; border: 0; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; }
+.modesw button[aria-pressed="true"] { background: var(--text-primary); color: var(--surface-0); }
+/* compact long / short side cards */
+.pulse.p3 { margin-bottom: 12px; }
+.pside3 { padding: 10px 14px; }
+.pside3 .head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pside3 .kicker { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+.pside3 .p3v { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 20px; font-weight: 800; }
+.pside3 .p3v small { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.pside3 .p3lbl { font-size: 13px; font-weight: 600; }
+.pside3 .p3m { flex: 1 1 80px; min-width: 60px; margin: 0; height: 6px; }
+.pside3 .p3spark { flex: none; }
+.p3parts { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 8px; }
+.p3chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-secondary); white-space: nowrap; cursor: help; }
+.p3chip b { font-family: "JetBrains Mono", ui-monospace, monospace; margin-right: 3px; color: var(--text-primary); }
+.p3chip.full { border-color: var(--good); } .p3chip.part { border-color: var(--warning); }
+.p3chip .meta { margin-left: 3px; }
+@media (max-width: 520px) { .p3chip .meta { display: none; } .p3chip { font-size: 11.5px; padding: 1px 7px; } .pside3 .p3lbl { flex-basis: 100%; order: 5; } }
 </style>"""
+
+PULSE_V3 = r"""function pulseCard(T) {   // v3: compact long / short sides (Adam, Oct 30: "take up much less space heightwise")
+  const P = T.pulse, H = T.pulse_hist || [];
+  const side = (kind) => {
+    const v = P[kind], label = P[kind + "_label"], parts = P[kind + "_parts"];
+    const col = kind === "long" ? (v >= 6 ? "var(--good)" : v >= 4 ? "var(--warning)" : "var(--critical)")
+                                : (v >= 6 ? "var(--critical)" : v >= 4 ? "var(--warning)" : "var(--text-muted)");
+    const vals = H.map(h => h[kind]), w = 110, h = 24, n = Math.max(vals.length - 1, 1);
+    const pts = vals.map((x, i) => `${(i / n * w).toFixed(1)},${(h - 2 - x / 10 * (h - 4)).toFixed(1)}`).join(" ");
+    const spark = vals.length > 2 ? `<svg class="p3spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-label="${kind} score, last ${vals.length} days"><title>Last ${vals.length} trading days</title><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.8"/></svg>` : "";
+    const chip = (p) => `<span class="p3chip ${p.pts >= p.max ? "full" : p.pts > 0 ? "part" : ""}" title="${esc(p.value)} · ${esc(p.note)}"><b>${p.pts}/${p.max}</b>${esc(p.name)}<span class="meta">${esc(p.value)}</span></span>`;
+    return `<div class="card pside3"><div class="head"><span class="kicker">${kind === "long" ? "Long side" : "Short side"}</span>
+      <b class="p3v" style="color:${col}">${v}<small>/10</small></b><span class="p3lbl">${esc(label)}</span>
+      <div class="meter p3m"><i style="width:${v * 10}%;background:${col}"></i></div>${spark}</div>
+      <div class="p3parts">${parts.map(chip).join("")}</div></div>`;
+  };
+  return $(`<section class="pulse p3">${side("long")}${side("short")}</section>`);
+}
+function pulseCardV1(T) {"""
+
+MODE_BTN_OLD = '<button class="xopen themebtn" title="Light / dark / follow the device">Theme: <span class="themelbl"></span></button>'
+MODE_BTN_NEW = '<div class="modesw" role="group" aria-label="Light or dark mode"><button data-m="light">☀ Light</button><button data-m="dark">☾ Dark</button></div>'
+MODE_JS_OLD = '  { const MODES = ["auto", "light", "dark"], lbl = app.querySelector(".themelbl");\n    const apply = (m) => { if (m === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", m); lbl.textContent = m[0].toUpperCase() + m.slice(1); };\n    let m = lsGet("theme", "auto"); apply(m);\n    app.querySelector(".themebtn").addEventListener("click", () => { m = MODES[(MODES.indexOf(m) + 1) % 3]; lsSet("theme", m); apply(m); }); }'
+MODE_JS_NEW = r"""  { const sw = app.querySelector(".modesw");   // v3: plain Light / Dark switch; first visit follows the device
+    const apply = (m) => { document.documentElement.setAttribute("data-theme", m); sw.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.m === m)); };
+    let m = lsGet("theme", "auto"); if (m !== "light" && m !== "dark") { try { m = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } catch (e) { m = "light"; } }
+    apply(m);
+    sw.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; lsSet("theme", b.dataset.m); apply(b.dataset.m); }); }"""
 
 # (what v1 says, what v3 says instead, why)
 SWAPS = [
@@ -65,6 +115,9 @@ SWAPS = [
     ('  app.append(aiScoreCard(getT()));\n', '', "AI scorecard removed from the Themes tab (Adam, Oct 30)"),
     ('<title>Market Monitor</title>', '<title>Market Monitor v3</title>', "title"),
     ('<div><h1>Market Monitor</h1>', '<div><h1>Market Monitor <span class="v3tag">v3</span></h1>', "header badge"),
+    ('function pulseCard(T) {', PULSE_V3, "compact long / short cards (v1 version kept as pulseCardV1)"),
+    (MODE_BTN_OLD, MODE_BTN_NEW, "Light / Dark switch in the header"),
+    (MODE_JS_OLD, MODE_JS_NEW, "Light / Dark switch behaviour"),
     ('</style>', CSS, "v3 styles (first </style> only)"),
 ]
 

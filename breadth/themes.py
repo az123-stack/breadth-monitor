@@ -72,13 +72,24 @@ def tier(pts):
 # ---------------------------------------------------------------------------
 # Theme table for one date
 # ---------------------------------------------------------------------------
-def rotation(today, d5, d15, d30):
-    if d30 > 0.05 and today < 0 and d5 < 0:
-        return "Late / Cooling"
-    if today > 0 and d5 > 0.03 and d15 > 0.05 and d30 > 0.05:
+# Rotation stage (rewritten Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"). The sheet's
+# version only looked at today/5/15/30 days, so any up day in a year-long leader read "Early". Now the stage is judged by how
+# long and how far the group has run (90 and 180 days) and whether its 5/15-day momentum still holds; today's move is ignored.
+# Descriptive label only (feeds the Market pulse counts); not a backtested layer.
+ROT_RULES = {"est_d90": 0.10, "est_d180": 0.20, "late_d90": 0.30, "late_d180": 0.40, "early_d30": 0.05, "mid_d30": 0.03}
+
+
+def rotation(today, d5, d15, d30, d90=0.0, d180=0.0):
+    R = ROT_RULES
+    established = d90 >= R["est_d90"] or d180 >= R["est_d180"]       # it has already been running for months
+    if established and ((d5 < 0 and d15 < 0) or d30 < 0):
+        return "Late / Cooling"                                         # an old run losing momentum
+    if not established and d30 > R["early_d30"] and d15 > 0:
+        return "Early Rotation"                                         # a young move out of a quiet or falling stretch
+    if established and (d90 >= R["late_d90"] or d180 >= R["late_d180"]) and d30 > 0:
+        return "Late / Extended"                                        # still rising, but it has run a long way already
+    if established and d30 > R["mid_d30"]:
         return "Mid Rotation"
-    if today > 0 and d30 > 0.05:
-        return "Early Rotation"
     return "Neutral"
 
 
@@ -106,7 +117,7 @@ def theme_table(f, i, members):
         rows.append({
             "theme": theme, "n": n, "score": score,
             "class": "STRONG" if score >= 7 else "WATCHLIST" if score >= 4 else "WEAK",
-            "rotation": rotation(*(0 if pd.isna(avg[k]) else avg[k] for k in ("today", "d5", "d15", "d30"))),
+            "rotation": rotation(*(0 if pd.isna(avg[k]) else avg[k] for k in ("today", "d5", "d15", "d30", "d90", "d180"))),
             **{k: avg[k] for k in SHOW}, "rs": avg["rs"], "lt": avg["lt"], "st_b": st_b, "lt_b": lt_b,
             "st_label": breadth_label(st_b), "lt_label": breadth_label(lt_b),
         })

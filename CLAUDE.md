@@ -677,6 +677,15 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   tabs (`.ptabs`) → sub-tabs (`nav.tabs`, sticky; buttons for other parents hidden; last sub per parent in localStorage `v3sub-<parent>`).
   Only tabs in `NAV` exist on v3 — add one per rebuilt tab once Adam approves. Now: Groups → Themes (v1 Themes tab minus `aiScoreCard`).
   The AI scorecard itself stays on v1 and in the story fact sheet. Test `test_v3_page_builds`.
+  Oct 30 additions (v3 only): page width min(1760px, 96vw) (v1's 1180px looked narrow on Adam's wide screen); compact long / short
+  side cards (`pulseCard` swapped, v1's kept as `pulseCardV1`: one header row score + label + meter + sparkline, parts as chips, notes
+  on hover; ~115 px tall vs ~410); header "☀ Light / ☾ Dark" switch (localStorage "theme"; first visit follows the device).
+- **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
+  (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
+  (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and
+  (5D and 15D < 0, or 30D < 0); Early = NOT established, 30D > 5%, 15D > 0; Late / extended (new key "Late / Extended") = established,
+  90D ≥ 30% or 180D ≥ 40%, 30D > 0; Mid = established, 30D > 3%; else Neutral. Today's move ignored. Descriptive only (Market pulse
+  counts); not backtested. Oct 29 data: ENERGY - Oil Neutral/Early → Late / extended; Software, AI Monetizers cooling → Late / extended.
 - `site.py` + `template.html` single self-contained page. **Layout since Oct 29, 2026** (Adam tried v2 and preferred v1's content: "organization
   was the biggest flaw, not the content"; every card kept): 10 tabs `TABS` = Read-out (default), Breadth, Pre-market, Intraday, Themes, Rotation,
   Biotech, Setups, Stocks, Trade Stories. Setups = `renderSetupsAll`: part 1 Best setups (`renderBest`), 2 Trade setups (`renderTrades`), 3 Launch
