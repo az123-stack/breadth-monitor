@@ -16,10 +16,11 @@ from pathlib import Path
 from .site import TEMPLATE, embed
 
 THEMEDASH_JS = Path(__file__).with_name("v3_themedash.js")
+ORACLE_JS = Path(__file__).with_name("v3_oracle.js")
 
 # parent key, label, [(sub-tab key = v1 renderer key, label)]
 NAV = [
-    ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash")]),
+    ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle")]),
 ]
 
 NAV_JS = """const V3_NAV = %s;
@@ -103,6 +104,28 @@ CSS = """
 .tdchip:hover { border-color: var(--text-muted); } .tdchip.on { outline: 2px solid var(--s1); outline-offset: 1px; }
 .tdnone { padding: 8px 0; }
 @media (max-width: 520px) { .tdch-h { flex-wrap: wrap; } }
+/* Oracle */
+.orhead { padding: 12px 14px; margin-bottom: 12px; } .orhead h2 { font-size: 16px; margin: 0 0 8px; }
+.orhead .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; } .orsub, .orov { margin-top: 8px; }
+.orgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+.orchart { padding: 10px 12px; position: relative; }
+.orch-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; } .orch-h .meta { font-size: 11.5px; }
+.orsvg { width: 100%; height: 260px; display: block; overflow: visible; }
+.oraxis { position: absolute; left: 14px; right: 12px; top: 38px; height: 260px; pointer-events: none; }
+.oraxis span { position: absolute; left: 0; transform: translateY(-50%); font-size: 10.5px; color: var(--text-muted); background: var(--surface-1); padding: 0 3px; border-radius: 3px; }
+.orgridl { stroke: var(--grid); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.orzero { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; }
+.orl { fill: none; stroke-width: 1.4; opacity: .55; vector-effect: non-scaling-stroke; cursor: pointer; transition: opacity .12s; }
+.orl.dim { opacity: .12; } .orl.on { opacity: 1; stroke-width: 3; }
+.orspy { fill: none; stroke: var(--text-secondary); stroke-width: 1.6; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; pointer-events: none; }
+.ormed { fill: none; stroke: var(--text-primary); stroke-width: 2.6; vector-effect: non-scaling-stroke; pointer-events: none; }
+.orrank { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 8px; font-size: 12px; }
+.orrank span { cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 1px 4px; border-radius: 4px; }
+.orrank span.on, .ortable tr.on td { background: color-mix(in srgb, var(--s1) 14%, transparent); }
+.orrank i, .orsw { display: inline-block; width: 10px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.ortable .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ortable td.orsel { font-weight: 700; } .ortable tr[data-t] { cursor: pointer; } .orspyrow td { border-top: 2px solid var(--border); }
+@media (max-width: 900px) { .orgrid { grid-template-columns: 1fr; } .orsvg, .oraxis { height: 200px; } }
 @media (max-width: 900px) { .tdbody { grid-template-columns: 1fr; } .tdchart { position: static; height: 420px; min-height: 0; } .tdcols { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .p3chip .meta { display: none; } .p3chip { font-size: 11.5px; padding: 1px 7px; } .pside3 .p3lbl { flex-basis: 100%; order: 5; } }
 </style>"""
@@ -153,7 +176,7 @@ SWAPS = [
     ('function pulseCard(T) {', PULSE_V3, "compact long / short cards (v1 version kept as pulseCardV1)"),
     (MODE_BTN_OLD, MODE_BTN_NEW, "Light / Dark switch in the header"),
     (MODE_JS_OLD, MODE_JS_NEW, "Light / Dark switch behaviour"),
-    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, themes: renderThemesTab,', "Theme Dash renderer"),
+    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, themes: renderThemesTab,', "Theme Dash renderer"),
     ('function renderTab(panel) {', None, "Theme Dash code (v3_themedash.js) before renderTab"),
     ('</style>', CSS, "v3 styles (first </style> only)"),
 ]
@@ -168,7 +191,7 @@ def page(template_text):
         if n != 1:
             raise ValueError(f"v3 build: expected the v1 template to contain this exactly once ({why}); found {n}")
         if new is None and old.startswith("function renderTab"):
-            new = THEMEDASH_JS.read_text() + "\n" + old
+            new = THEMEDASH_JS.read_text() + "\n" + ORACLE_JS.read_text() + "\n" + old
         elif new is None:
             new = NAV_JS % json.dumps([[k, l, [list(s) for s in subs]] for k, l, subs in NAV])
         html = html.replace(old, new, 1)

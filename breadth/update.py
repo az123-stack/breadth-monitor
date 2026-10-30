@@ -314,6 +314,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["valuechain"] = valuechain.build(adjusted, theme_data)
         except Exception as e:  # optional panel; never block the page
             log.exception("value chain failed: %s", e)
+        try:   # v3 Oracle tab: strongest stocks by 180 / 60 / 15 / 5 sessions + their last 181 closes (Oct 30 2026)
+            from . import oracle
+            theme_data["oracle"] = oracle.build(adjusted, theme_data)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("oracle failed: %s", e)
         try:   # top picks: re-rank with group / money-flow context now that rotation + ignition exist
             from . import playbook
             playbook.rerank(theme_data, history)

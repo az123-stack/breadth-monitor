@@ -688,6 +688,14 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   TradingView ↗. Live: high = Google price ≥ `hi52`, low ≤ `lo52`; official close: `nh52` / `nl52`. New stock fields (strength.py
   `tightness` → `tick`): hi52 / lo52 (252-session max high / min low), nh52 / nl52 (today's high above / low below the prior 251 sessions).
   localStorage tdBy / tdShow / tdSort / tdSel. Phone: chart stacks on top (420 px), clicking a chip scrolls to it.
+  **Oracle** (Groups → Oracle, Oct 30; Adam: "3 charts 180D / 60D / 15D side by side; Cohorts pills 180D / 60D / 15 day / 5 day = the
+  strongest stocks in that period, shown across all 3 charts"): `breadth/oracle.py` `build(adjusted, theme_data)` (update.py after valuechain,
+  ~15 s) → `DATA.themes.oracle` {date, dates (181), windows [180,60,15], cohorts {d180,d60,d15,d5: top 30 tickers}, rows {t: name, sub, rsr,
+  r [180,60,15,5 returns], c (181 closes)}, spy, spy_r, overlap (top-20 overlap between cohorts), universe}. Universe = theme stocks $5+,
+  $10M+/day (50-day avg $ volume), 150+ closes in the window. Page `breadth/v3_oracle.js` `renderOracle`: chips Cohorts · Show top 10/20/30 ·
+  % / log scale (localStorage orCoh / orN / orLog); 3 SVG charts, each line rebased to 0% at the window start, bold = cohort median, dashed =
+  SPY, top-5 legend per chart; hover / tap a ticker (line, legend or table row) highlights it in all three; table with 180/60/15/5D returns,
+  ⬇ TradingView. Live: today's Google price appended as the last point (cohorts stay as of the close). Descriptive only. Test `test_oracle_cohorts`.
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and

@@ -1969,6 +1969,7 @@ def test_v3_page_builds():
     h = v3site.page(TEMPLATE.read_text())
     assert "const V3_NAV" in h and '"groups", "Groups"' in h and "app.append(aiScoreCard" not in h
     assert "function renderThemeDash" in h and "themedash: renderThemeDash" in h
+    assert "function renderOracle" in h and "oracle: renderOracle" in h
     assert 'let TAB = "readout"' not in h and "Market Monitor v3" in h and h.count("/*__DATA__*/null") == 1
     tmp = Path(__import__("tempfile").mkdtemp()); old = config.DOCS_DIR
     try:
@@ -1979,6 +1980,25 @@ def test_v3_page_builds():
         config.DOCS_DIR = old
     assert "/*__DATA__*/null" not in p and "</script><b>" not in p
     return f"{len(p) // 1024} KB page"
+
+
+def test_oracle_cohorts():
+    """Oracle: cohorts = top liquid theme stocks by 180/60/15/5-session return; rows carry 181 closes; illiquid names left out."""
+    import numpy as np, pandas as pd
+    from breadth import oracle
+    d = pd.bdate_range("2025-01-01", periods=200); rows = []
+    for t, g, v in [("FAST", .010, 1e6), ("SLOW", .001, 1e6), ("THIN", .02, 100), ("SPY", .0005, 1e7)]:
+        for i, x in enumerate(d):
+            rows.append(dict(date=x, ticker=t, c=20 * (1 + g) ** i, v=v))
+    T = {"stocks": [{"t": t, "name": t, "sub": "G", "rsr": 90} for t in ("FAST", "SLOW", "THIN")]}
+    old = config.BENCHMARK; config.BENCHMARK = "SPY"
+    try:
+        O = oracle.build(pd.DataFrame(rows), T)
+    finally:
+        config.BENCHMARK = old
+    assert O["cohorts"]["d5"][0] == "FAST" and "THIN" not in O["rows"] and len(O["rows"]["FAST"]["c"]) == 181 and len(O["spy"]) == 181
+    assert O["rows"]["FAST"]["r"][0] > O["rows"]["SLOW"]["r"][0] > 0
+    return f"{O['universe']} liquid"
 
 
 if __name__ == "__main__":
