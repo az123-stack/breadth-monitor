@@ -5,9 +5,14 @@ name: Intraday futures
 # writes docs/futures.json. GitHub fires scheduled runs late on this repo, so there's one cron an hour 13–19 UTC:
 # the first to start loops until 4:15 PM ET (5 h cap per run, under GitHub's 6-hour limit); later ones queue and
 # carry on or exit.
+# Oct 30, 2026: the crons didn't start until 14:33 ET, so the Intraday crack spread was missing all morning. Now also
+# chained to the pre-market workflow (it ends at 9:31 ET) and kicked by the Claude "10/11 snapshot kick" task.
 on:
   schedule:
     - cron: "11 13-19 * * 1-5"
+  workflow_run:
+    workflows: ["Pre-market quotes"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:

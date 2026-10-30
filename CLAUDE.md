@@ -589,6 +589,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   session return percentile vs liquid stocks (+ `…5` deltas), payload `rs_short_bp`, refs c10 / c20 / c30; page `RS_PER`, chips "RS period"
   (Stocks + Themes tabs, localStorage rsPeriod) switch the one RS column, Δ, sort and RS 80+/90+ filter; `liveRatingShort` recomputes live.
   Drawer shows all four. The RS Rating = 63/126/189/252-day returns weighted 40/20/20/20. Untested as a signal.
+- Performance + futures fix (Oct 30, 2026; Adam: "crack spreads are no longer in the intraday tab" + "a delay when I click"):
+  futures.yml crons didn't start until 14:33 ET, so the oil card said "no snapshot yet" all morning → futures.yml now also runs on
+  `workflow_run` of "Pre-market quotes" (ends 9:31 ET) and the "10/11 snapshot kick" task dispatches it when no run is active.
+  Setups tab = ~16k elements / 46k px: layout was ~250–300 ms of every click (more on a laptop) → `.panel > .card { content-visibility:
+  auto; contain-intrinsic-size: auto 600px }`; the jump bar adds `.cvall` (lay everything out once, sizes remembered), jumps, re-aims.
+  Measured headless: Setups tab click 490–620 → 220–380 ms wall, layout 230–300 → 30–60 ms.
 - `.github/workflows/rebuild.yml` (Oct 24): page-only rebuild (`--rebuild-only`, no Massive calls, queue `agent-rebuild`) so code changes
   reach the live page without waiting behind a data job in the `breadth-update` queue. Dispatch it after pushing page code:
   `gh api -X POST repos/az123-stack/breadth-monitor/actions/workflows/rebuild.yml/dispatches -f ref=main`.

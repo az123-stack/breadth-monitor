@@ -386,6 +386,10 @@ body.dr-open #drawer { transform: none; } body.dr-open #scrim { display: block; 
 .chips button[aria-pressed="true"] { background: var(--neutral-mid); color: var(--text-primary); font-weight: 600; }
 table.grid th { cursor: pointer; user-select: none; }
 table.grid th[aria-sort] { color: var(--text-primary); }
+/* Oct 30, 2026 (Adam: clicks feel slow): the Setups tab is ~16k elements and 46,000 px tall, and laying it all out on every
+   click / live refresh took most of the time. Off-screen cards now skip layout and paint until scrolled near. */
+.panel > .card, .panel > details.card { content-visibility: auto; contain-intrinsic-size: auto 600px; }
+.panel.cvall > .card, .panel.cvall > details.card { content-visibility: visible; }
 .panel table > thead th { cursor: pointer; user-select: none; }
 .panel table > thead th:hover { color: var(--text-primary); }
 .panel table > thead th[aria-sort="descending"]::after { content: " ▾"; }
@@ -2864,7 +2868,11 @@ function decoratePanel(panel) {
   nav.addEventListener("click", (e) => { const a = e.target.closest("a"); if (!a) return; e.preventDefault();
     const c = document.getElementById(a.getAttribute("href").slice(1)); if (!c) return;
     if (c.classList.contains("folded")) { const b = c.querySelector(".foldbtn"); if (b) b.click(); }
-    c.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    // Off-screen cards use content-visibility (estimated heights), so lay every card out once (their real sizes are then
+    // remembered via contain-intrinsic-size: auto), jump, and re-aim once on the next frame.
+    panel.classList.add("cvall"); void panel.offsetHeight;
+    const aim = () => { const off = nav.getBoundingClientRect().bottom + 8; window.scrollBy(0, c.getBoundingClientRect().top - off); };
+    aim(); requestAnimationFrame(() => { panel.classList.remove("cvall"); requestAnimationFrame(aim); }); });
   panel.prepend(nav);
 }
 function rerenderPanel() {
