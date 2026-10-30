@@ -657,6 +657,37 @@ table.grid.hvetab td.pcell { min-width: 170px; } table.grid.hvetab td.pcell smal
 .p3chip b { font-family: "JetBrains Mono", ui-monospace, monospace; margin-right: 3px; color: var(--text-primary); }
 .p3chip.full { border-color: var(--good); } .p3chip.part { border-color: var(--warning); }
 .p3chip .meta { margin-left: 3px; }
+/* Theme Dash */
+.tdhead { padding: 12px 14px; margin-bottom: 12px; }
+.tdbar { display: flex; height: 26px; border-radius: 6px; overflow: hidden; font-size: 12.5px; font-weight: 600; }
+.tdbar > div { display: flex; align-items: center; padding: 0 10px; white-space: nowrap; min-width: 90px; color: #fff; }
+.tdbar .tdbh { background: var(--good); } .tdbar .tdbl { background: var(--critical); justify-content: flex-end; }
+.tdbar b { margin-right: 4px; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.tdsub { margin: 6px 0 8px; }
+.tdhead .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tdbody { display: grid; grid-template-columns: minmax(380px, 44%) 1fr; gap: 12px; align-items: start; }
+.tdchart { position: sticky; top: 52px; padding: 10px; display: flex; flex-direction: column; height: calc(100vh - 70px); min-height: 420px; }
+.tdch-h { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+.tdch-t { font-size: 18px; } .tdch-b { display: flex; gap: 6px; flex: none; } .tdch-b .xopen { text-decoration: none; }
+.tdtv { flex: 1; width: 100%; border: 0; border-radius: 8px; background: var(--surface-0); }
+.tdcols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tdcol-h { font-weight: 700; font-size: 13.5px; padding: 0 0 6px; margin-bottom: 6px; border-bottom: 2px solid var(--border); }
+.tdcol-h.hcol { border-color: var(--good); } .tdcol-h.lcol { border-color: var(--critical); }
+.tdgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px 14px; }
+.tdg { padding: 6px 0 8px; border-bottom: 1px solid var(--grid); }
+.tdg-h { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin-bottom: 4px; }
+.tdg-n { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tdg-h .meta { font-size: 11.5px; white-space: nowrap; }
+.tdchips { display: flex; flex-wrap: wrap; gap: 4px; }
+.tdchip { font: inherit; font-size: 12px; font-weight: 600; padding: 2px 7px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface-0);
+  color: var(--text-primary); cursor: pointer; display: inline-flex; gap: 4px; align-items: baseline; }
+.tdchip small { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 10.5px; font-weight: 500; color: var(--text-secondary); }
+.tdchip.u1 { background: color-mix(in srgb, var(--good) 12%, var(--surface-0)); } .tdchip.u2 { background: color-mix(in srgb, var(--good) 28%, var(--surface-0)); }
+.tdchip.d1 { background: color-mix(in srgb, var(--critical) 12%, var(--surface-0)); } .tdchip.d2 { background: color-mix(in srgb, var(--critical) 28%, var(--surface-0)); }
+.tdchip:hover { border-color: var(--text-muted); } .tdchip.on { outline: 2px solid var(--s1); outline-offset: 1px; }
+.tdnone { padding: 8px 0; }
+@media (max-width: 520px) { .tdch-h { flex-wrap: wrap; } }
+@media (max-width: 900px) { .tdbody { grid-template-columns: 1fr; } .tdchart { position: static; height: 420px; min-height: 0; } .tdcols { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .p3chip .meta { display: none; } .p3chip { font-size: 11.5px; padding: 1px 7px; } .pside3 .p3lbl { flex-basis: 100%; order: 5; } }
 </style>
 </head>
@@ -680,7 +711,7 @@ const TONES = {
 
 // Oct 29, 2026 (Adam: "organization was the biggest flaw, not the content"): 10 tabs, every card kept. Best Setups + Trade Setups +
 // Launch list + old Setups → one Setups tab; Browse → a view on the Themes tab. Old links (#trades, #best, …) land on the new home.
-const V3_NAV = [["groups", "Groups", [["themes", "Themes"]]]];
+const V3_NAV = [["groups", "Groups", [["themes", "Themes"], ["themedash", "Theme Dash"]]]];
 const TABS = V3_NAV.flatMap(p => p[2]);
 const TAB_ALIAS = { browse: "themes" };
 const tabOf = (k) => TAB_ALIAS[k] || k;
@@ -2808,8 +2839,99 @@ function liveBar() {
 }
 // One tab → renderer table, shared by tab clicks and live refreshes (before Oct 27 the refresh copy was missing Best Setups and
 // Launch list, so a live price refresh on those tabs re-drew the Breadth tab).
+/* ---------- v3 · Groups → Theme Dash (Oct 30, 2026; Adam: Deepvue-style "every ticker in its group, click it and the chart comes up") ----------
+   Left: a TradingView chart of the selected ticker (loaded only on click, from TradingView). Right: groups with their tickers as chips.
+   Default view = today's 52-week highs vs lows split by group, like Deepvue. Live: during the session a stock counts as a new high when
+   the Google price is at or above its 52-week high (hi52), new low at or under lo52; otherwise the official close's flags (nh52 / nl52). */
+function tdState(s) {
+  const L = liveActive() ? liveRow(s.t) : null, px = L ? L.price : s.price, chg = L ? L.chg : s.today;
+  const hi = L ? (s.hi52 != null && px >= s.hi52) : !!s.nh52, lo = L ? (s.lo52 != null && px <= s.lo52) : !!s.nl52;
+  const off = s.hi52 && px ? px / s.hi52 - 1 : s.off_hi;
+  return { chg, hi, lo, off, px };
+}
+function tdChart(box, t) {
+  const S = (getT().stocks || []).find(x => x.t === t), tv = ((DATA.themes || {}).tv || {})[t] || t, st = S ? tdState(S) : null;
+  const dark = (document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
+  const src = "https://s.tradingview.com/widgetembed/?" + new URLSearchParams({ frameElementId: "tdtv", symbol: tv, interval: "D", hidesidetoolbar: "1",
+    symboledit: "1", saveimage: "0", withdateranges: "1", theme: dark ? "dark" : "light", style: "1", timezone: "America/New_York", locale: "en",
+    studies: JSON.stringify(["MAExp@tv-basicstudies", "Volume@tv-basicstudies"]) }).toString();
+  box.innerHTML = `<div class="tdch-h"><div><b class="tdch-t">${esc(t)}</b> <span class="meta">${esc(S ? S.name : "")}</span>
+      <div class="meta">${S ? `${esc(S.sub || (S.themes || [])[0] || "")} · RS ${S.rsr ?? "–"} · ${st.chg == null ? "" : `<span class="${st.chg > 0 ? "up" : "dn"}">${pct(st.chg)}</span> today · `}${pct(S.d5)} 5D · ${st.off == null ? "–" : (st.off * 100).toFixed(1) + "% off 52-wk high"}` : "Not in our theme lists"}</div></div>
+      <div class="tdch-b"><a href="#" class="xopen tkl" data-t="${esc(t)}">Details</a><a class="xopen" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tv)}">TradingView ↗</a></div></div>
+    <iframe class="tdtv" title="${esc(t)} chart" src="${src}" loading="lazy" allowtransparency="true" frameborder="0"></iframe>`;
+}
+function renderThemeDash(app) {
+  if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
+  UI.td = UI.td || { by: lsGet("tdBy", "sub"), show: lsGet("tdShow", "hl"), sort: lsGet("tdSort", "strength"), q: "", sel: lsGet("tdSel", "") };
+  const T = getT(), U = UI.td, sub = U.by === "sub";
+  app.append(liveBar());
+  const SM = Object.fromEntries((T.stocks || []).filter(s => s.is_stock !== false).map(s => [s.t, s]));
+  const groups = (sub ? T.subthemes : T.themes) || [];
+  const all = Object.values(SM).map(s => ({ s, st: tdState(s) }));
+  const nH = all.filter(x => x.st.hi).length, nL = all.filter(x => x.st.lo).length;
+  const asOf = liveActive() ? "live" : "at the " + shortDate(T.date) + " close";
+  // ---- header: highs vs lows bar + controls ----
+  const head = $(`<section class="card tdhead"><div class="tdbar" title="Theme stocks making a new 52-week high vs low ${asOf}">
+      <div class="tdbh" style="flex:${Math.max(nH, 1)}"><b>${nH}</b> new highs</div><div class="tdbl" style="flex:${Math.max(nL, 1)}"><b>${nL}</b> new lows</div></div>
+    <div class="meta tdsub">52-week highs and lows among our ${all.length} theme stocks, ${asOf}. Click any ticker to chart it.</div>
+    <div class="filters"></div></section>`);
+  const f = head.querySelector(".filters"), save = () => { ["by", "show", "sort"].forEach(k => lsSet("td" + k[0].toUpperCase() + k.slice(1), U[k])); rerenderPanel(); };
+  f.append(chips("Group by", [["sub", "Sub-theme"], ["theme", "Theme"]], U, "by", save));
+  f.append(chips("Show", [["hl", "New highs vs lows"], ["near", "Within 5% of high"], ["all", "Every stock"]], U, "show", save));
+  if (U.show !== "hl") f.append(chips("Sort", [["strength", "Strength"], ["today", "Today"], ["d5", "5D"]], U, "sort", save));
+  const qi = $('<input type="search" placeholder="Find a group or ticker">'); qi.value = U.q; f.append(qi);
+  app.append(head);
+  // ---- body: chart left, groups right ----
+  const body = $('<section class="tdbody"><div class="card tdchart"></div><div class="tdgroups"></div></section>');
+  app.append(body);
+  const chartBox = body.querySelector(".tdchart"), gbox = body.querySelector(".tdgroups");
+  const chipHTML = (x) => { const c = x.st.chg, cls = c == null ? "" : c >= 0.03 ? "u2" : c > 0 ? "u1" : c <= -0.03 ? "d2" : c < 0 ? "d1" : "";
+    return `<button class="tdchip ${cls}${U.sel === x.s.t ? " on" : ""}" data-t="${esc(x.s.t)}" title="${esc(x.s.name || "")} · ${c == null ? "–" : pct(c)} today · RS ${x.s.rsr ?? "–"}">${x.st.hi ? "▲" : x.st.lo ? "▼" : ""}${esc(x.s.t)}<small>${c == null ? "" : (c > 0 ? "+" : "") + (c * 100).toFixed(1)}</small></button>`; };
+  const build = () => {
+    const q = U.q.toLowerCase();
+    const rows = groups.map(g => {
+      let mem = (g.members || []).map(t => SM[t]).filter(Boolean).map(s => ({ s, st: tdState(s) }));
+      const hit = !q || g.theme.toLowerCase().includes(q) || mem.some(x => x.s.t.toLowerCase() === q);
+      return { g, mem, hit, hi: mem.filter(x => x.st.hi), lo: mem.filter(x => x.st.lo) };
+    }).filter(r => r.mem.length && r.hit);
+    const avg = (mem, k) => { const v = mem.map(x => k === "today" ? x.st.chg : x.s[k]).filter(v => v != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+    const block = (r, list, kind) => {
+      const n = r.mem.length, share = Math.round(list.length / n * 100), td = avg(r.mem, "today");
+      return `<div class="tdg"><div class="tdg-h"><span class="tdg-n" title="${esc(r.g.theme)}">${esc(r.g.theme)}</span>
+        <span class="meta">${kind ? `${list.length} of ${n} · ${share}%` : `${n} stocks`} · str ${r.g.strength == null ? "–" : Math.round(r.g.strength)}${td == null ? "" : ` · <span class="${td > 0 ? "up" : "dn"}">${pct(td)}</span>`}</span></div>
+        <div class="tdchips">${list.map(chipHTML).join("")}</div></div>`;
+    };
+    const byRb = (k) => (a, b) => (b[k].length - a[k].length) || (b[k].length / b.mem.length - a[k].length / a.mem.length);
+    let html;
+    if (U.show === "hl") {
+      const H = rows.filter(r => r.hi.length).sort(byRb("hi")), L = rows.filter(r => r.lo.length).sort(byRb("lo"));
+      const col = (title, cls, arr, k, n) => `<div class="tdcol"><div class="tdcol-h ${cls}">${title} <span class="meta">${n} stocks · ${arr.length} groups</span></div>
+        ${arr.length ? arr.map(r => block(r, r[k].sort((a, b) => (b.s.rsr ?? 0) - (a.s.rsr ?? 0)), k)).join("") : '<div class="meta tdnone">None today.</div>'}</div>`;
+      html = `<div class="tdcols">${col("Groups making new highs", "hcol", H, "hi", nH)}${col("Groups making new lows", "lcol", L, "lo", nL)}</div>`;
+    } else {
+      const key = U.sort === "strength" ? (r) => r.g.strength ?? -1 : (r) => avg(r.mem, U.sort) ?? -9;
+      const list = (r) => (U.show === "near" ? r.mem.filter(x => x.st.off != null && x.st.off >= -0.05) : r.mem)
+        .sort((a, b) => (b.s.rsr ?? 0) - (a.s.rsr ?? 0));
+      const out = rows.map(r => ({ r, l: list(r) })).filter(x => x.l.length).sort((a, b) => key(b.r) - key(a.r));
+      html = `<div class="tdgrid">${out.map(x => block(x.r, x.l, U.show === "near" ? "near" : "")).join("") || '<div class="meta tdnone">No groups match.</div>'}</div>`;
+    }
+    gbox.innerHTML = html;
+  };
+  const pick = (t, scroll) => {
+    U.sel = t; lsSet("tdSel", t);
+    gbox.querySelectorAll(".tdchip").forEach(b => b.classList.toggle("on", b.dataset.t === t));
+    tdChart(chartBox, t);
+    if (scroll && window.matchMedia("(max-width: 900px)").matches) chartBox.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  gbox.addEventListener("click", (e) => { const b = e.target.closest(".tdchip"); if (b) pick(b.dataset.t, true); });
+  qi.addEventListener("input", (e) => { U.q = e.target.value.trim(); build(); });
+  build();
+  const first = U.sel && SM[U.sel] ? U.sel : (gbox.querySelector(".tdchip") || {}).dataset?.t;
+  if (first) pick(first, false); else chartBox.innerHTML = '<div class="meta" style="padding:16px">Click a ticker to see its chart.</div>';
+}
+
 function renderTab(panel) {
-  const R = { themes: renderThemesTab, stocks: renderStocks, setups: renderSetupsAll,
+  const R = { themedash: renderThemeDash, themes: renderThemesTab, stocks: renderStocks, setups: renderSetupsAll,
     intraday: renderIntraday, premarket: renderPremarket, rotation: renderRotation, biotech: renderBiotech, readout: renderReadout, stories: renderStories };
   (R[TAB] || renderBreadth)(panel);
   try { decoratePanel(panel); } catch (e) { console.error(e); }
