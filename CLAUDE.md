@@ -743,6 +743,7 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Lined-up buys accelerating filter (Oct 31, Adam; shared template, v1 too): chips All / ▲ Group accelerating · early / ▲ Group accelerating /
   ▲ Stock accelerating · early (`LUF`, from oracle subs/rows `ac` by row `g` / `t`; localStorage luAcc), counts per chip, "▲ group accelerating ·
   stage · since" line under each name; empty-filter message. Oct 30: 35 lined up, 11 in early-accelerating groups.
+  Stocks → **Leadership** sub-tab (Oct 31, Adam; `sleaders`, `renderLeadership`) = v1 Market health card (`healthCard`, `DATA.themes.leadership`).
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and

@@ -23,3 +23,8 @@ function renderGroupRotation(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
   app.append(moneyTodayCard());
 }
+// Stocks → Leadership (Oct 31, Adam: "a tab for Leadership and add this" = the v1 Breadth tab's Market health card)
+function renderLeadership(app) {
+  const X = (DATA.themes || {}).leadership;
+  app.append(X ? healthCard(X) : $('<div class="card empty">Leadership data appears after the next data run.</div>'));
+}
