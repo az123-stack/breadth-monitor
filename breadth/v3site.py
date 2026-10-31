@@ -133,6 +133,11 @@ CSS = """
 .orrank span { cursor: pointer; display: inline-flex; align-items: center; gap: 4px; padding: 1px 4px; border-radius: 4px; }
 .orrank span.on, .ortable tr.on td { background: color-mix(in srgb, var(--s1) 14%, transparent); }
 .orrank i, .orsw { display: inline-block; width: 10px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+/* Oct 31 (Adam: "make this table scrollable, I can't see the graphs past ~17 names"): the table scrolls inside its own box with the
+   header pinned, so the charts above stay on screen while you hover rows */
+.ortable .scroll { max-height: max(280px, calc(100vh - 560px)); overflow: auto; overscroll-behavior: contain; }
+.ortable .scroll table { border-collapse: separate; border-spacing: 0; }
+.ortable .scroll thead th { position: sticky; top: 0; z-index: 2; background: var(--surface-1, var(--bg, #fff)); box-shadow: 0 1px 0 var(--border); }
 .ortable .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .ortable td.orsel { font-weight: 700; } .ortable tr[data-t] { cursor: pointer; } .orspyrow td { border-top: 2px solid var(--border); }
 @media (max-width: 900px) { .orgrid { grid-template-columns: 1fr; } .orsvg, .oraxis { height: 200px; } }

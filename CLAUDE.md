@@ -730,6 +730,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   sub-themes by name / group / a ticker they hold; stocks by ticker / company / sub-theme (3+ letters). A search looks through the full
   ranking (`sall` / `rall`) for the chosen side + cohort and ignores the Filter row; pager + picker follow it; tickers in < 3-stock
   sub-themes (e.g. NVDA, AI Accelerators & GPUs) get a "switch to Stocks" note.
+  Tables scroll in their own box (Oct 31, Adam: "can't see the graphs past ~17 names"): `.ortable .scroll` max-height max(280px, 100vh − 560px),
+  sticky header (border-collapse separate), so the charts above stay on screen while hovering rows.
   **Stocks parent** (Oct 31, Adam: "another parent for stocks, start with the stocks table like the original dash"): NAV ("stocks", "Stocks",
   [("stocks", "Stocks")]) = v1 `renderStocks`. Shared template (v1 too): chips "Accelerating vs SPY" All / ▲ Sub-theme accelerating · early /
   Sub-theme accelerating / Stock accelerating · early / Stock accelerating (`ACF`, from `DATA.themes.oracle` subs/rows `ac`; localStorage stAcc)
