@@ -4619,7 +4619,16 @@ function lineupCard(T) {
   const R = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + v.toFixed(2) + "R";
   const pc = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
   const onHold = LC.size === "hold off";
-  const rows = (LC.live || []).map(lineupState).filter(r => r.st);
+  const allRows = (LC.live || []).map(lineupState).filter(r => r.st);
+  // Oct 31 (Adam: "a filter in the lined-up buys for accelerating early themes"): accelerating vs SPY from the Oracle payload
+  // (oracle.acc_tag: 15-session pace > 60 > 180 vs SPY, 60D ≥ +10%; early = 180D vs SPY < +25%)
+  const OA = (DATA.themes || {}).oracle, gAc = (r) => OA && OA.subs && OA.subs[r.g] ? OA.subs[r.g].ac : null, sAc = (r) => OA && OA.rows && OA.rows[r.t] ? OA.rows[r.t].ac : null;
+  const LUF = { all: () => true, g_early: (r) => { const a = gAc(r); return !!a && a.a && a.stage === "early"; }, g: (r) => { const a = gAc(r); return !!a && a.a; },
+    s_early: (r) => { const a = sAc(r); return !!a && a.a && a.stage === "early"; } };
+  UI.lu = UI.lu || { acc: lsGet("luAcc", "all") };
+  if (!LUF[UI.lu.acc]) UI.lu.acc = "all";
+  const rows = allRows.filter(LUF[UI.lu.acc]);
+  const accTag = (r) => { const a = gAc(r); return a && a.a ? `<small class="meta" style="display:block;color:var(--s1)">▲ group accelerating · ${a.stage}${a.start ? " · since " + shortDate(a.start) : ""}</small>` : ""; };
   const ORD = { over: 0, zone: 1, near: 2 };
   rows.sort((a, b) => ORD[a.st] - ORD[b.st] || (b.precise ? 1 : 0) - (a.precise ? 1 : 0) || (a.kind === "buy" ? 0 : 1) - (b.kind === "buy" ? 0 : 1) || Math.abs(a.d9) - Math.abs(b.d9));
   const isLive = rows.some(r => r.live);
@@ -4628,7 +4637,7 @@ function lineupCard(T) {
   const row = (r) => { const go = r.kind === "buy" && !onHold;
     const lab = r.st === "over" && !go ? ["Triggered · on hold (breadth)", "sow-pop"] : LBL[r.st];
     return `<tr${r.st === "over" && go ? ' style="background:color-mix(in srgb, var(--good) 10%, transparent)"' : ""}>
-      <td class="l"><b>${r.t}</b><small class="meta" style="display:block">${esc(r.g)}</small>${r.earn ? `<small class="meta" style="display:block">earnings ${shortDate(r.earn)}</small>` : ""}</td>
+      <td class="l"><b>${r.t}</b><small class="meta" style="display:block">${esc(r.g)}</small>${accTag(r)}${r.earn ? `<small class="meta" style="display:block">earnings ${shortDate(r.earn)}</small>` : ""}</td>
       <td class="l"><span class="tg ${lab[1]}">${r.st === "zone" && !r.precise ? "Bounced off the EMAs" : lab[0]}</span><div style="margin-top:3px">${lineupLocTag(r)}</div></td>
       <td class="num">$${r.p.toFixed(2)}${r.chg != null ? `<small class="meta" style="display:block">${pc(r.chg)}</small>` : ""}</td>
       <td class="num"><b>$${(+r.trig).toFixed(2)}</b>${r.toTrig != null && r.st !== "over" ? `<small class="meta" style="display:block">${r.toTrig.toFixed(2)} ADR away</small>` : ""}</td>
@@ -4642,10 +4651,13 @@ function lineupCard(T) {
   const sec = $(`<section class="icard card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
       <h2><span class="pbv ${B.R > 0 && (SE.t || 0) >= 2 ? "focus" : "unproven"}">${B.R > 0 && (SE.t || 0) >= 2 ? "Tested" : "Unproven"}</span> Lined-up buys <span class="meta">· theme BUY + dip into the 9/21 EMAs · ${isLive ? "live" : "as of the " + shortDate(LC.date) + " close"}</span></h2>
       <div class="tsbtns"><button class="ludl">⬇ TradingView</button></div></div>
-    ${head}
+    ${head}<div class="filters luacc" style="margin-top:8px"></div>
     <div class="scroll"><table class="grid" style="margin-top:8px"><thead><tr><th class="l">Stock</th><th class="l">Now</th><th>Price</th><th>Buy over<small>yesterday's high</small></th><th>Stop<small>dip low, max 1 ADR</small></th><th>9 / 21 EMA<small>live</small></th><th>RS</th><th class="l">Lined up?</th></tr></thead><tbody>
-    ${rows.slice(0, 25).map(row).join("") || `<tr><td colspan="8" class="meta">No BUY-group leader is in or near its 9/21 EMAs ${isLive ? "right now" : "at the last close"}.</td></tr>`}</tbody></table></div>
+    ${rows.slice(0, 25).map(row).join("") || `<tr><td colspan="8" class="meta">${UI.lu.acc !== "all" && allRows.length ? `None of the ${allRows.length} lined-up names passes this filter. Pick "All" to see them.` : `No BUY-group leader is in or near its 9/21 EMAs ${isLive ? "right now" : "at the last close"}.`}</td></tr>`}</tbody></table></div>
     <p class="meta" style="margin:6px 0 0">What the test said (daily bars, ${esc((LC.stock_evidence || {}).from || "")} to ${esc((LC.stock_evidence || {}).to || "")}): a dip into the 9/21 EMAs, bought on the break of that day's high within 3 sessions, stop at the dip low (max 1 ADR), held 20 sessions: in BUY groups <b>${R(B.R)}</b> a trade (n ${B.n ?? "–"}, halves ${R(B.h1)} / ${R(B.h2)}, ${B.win == null ? "–" : Math.round(B.win * 100) + "%"} win) vs ${R(O.R)} in other groups and ${R(W.R)} in WATCH groups (edge ${R(SE.edge)}, t ${SE.t ?? "–"}). Most trades lose small and the winners pay: keep the stop. Google prices run up to ~20 min behind, and the sheet has no intraday high, so "over yesterday's high" uses the last price. Which groups are in BUY and why: the Theme lifecycle card just above.</p></section>`);
+  if (OA) sec.querySelector(".luacc").append(chips("Accelerating vs SPY", [["all", `All <small>${allRows.length}</small>`],
+    ["g_early", `▲ Group accelerating · early <small>${allRows.filter(LUF.g_early).length}</small>`], ["g", `▲ Group accelerating <small>${allRows.filter(LUF.g).length}</small>`],
+    ["s_early", `▲ Stock accelerating · early <small>${allRows.filter(LUF.s_early).length}</small>`]], UI.lu, "acc", () => { lsSet("luAcc", UI.lu.acc); rerenderPanel(); }));
   sec.append(lineupRecord(LC));
   sec.querySelector(".ludl").addEventListener("click", () => tsDownload("lined-up-buys", [
     { name: "Lined-up buys - triggered", ticks: rows.filter(r => r.st === "over").map(r => r.t) },
