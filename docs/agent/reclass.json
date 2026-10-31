@@ -1,0 +1,635 @@
+{
+ "for_date": "2026-10-30",
+ "written": "2026-10-31T12:41Z",
+ "summary": "Checked 50 tickers (4 dead, 20 poor fits, 26 unfiled; HZO skipped: MarineMax is being bought by Safe Harbor Marinas). Biggest fixes: ATKR, BZH and WBD were acquired and should be removed, PSKY became SKYD; ESS is an apartment REIT filed with battery makers, CME belongs with exchanges, ISRG/PRCT are medtech not industrial robots. 25 strong unfiled names (tankers NAT/TEN, GRAL, OSPN, REPX, SG...) get homes.",
+ "moves": [
+  {
+   "t": "ATKR",
+   "action": "remove",
+   "from": "Gas Turbines & Grid Equipment",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Atkore (conduit and electrical raceway) was bought by Prysmian for about $3.8B; the deal closed Oct 19, 2026 and the stock stopped trading.",
+   "sources": [
+    "https://www.prysmian.com/en/media/press-releases/prysmian-completes-atkore-acquisition-to-accelerate-growth-as-an-electrical-solutions-provider"
+   ],
+   "id": 1
+  },
+  {
+   "t": "BZH",
+   "action": "remove",
+   "from": "Homebuilders",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Beazer Homes was acquired by Dream Finders Homes (~$2.2B); closed Oct 20, 2026 and delisted. DFH itself is the surviving homebuilder.",
+   "sources": [
+    "https://www.housingwire.com/articles/dream-finders-closes-acquisition-beazer/",
+    "https://www.sec.gov/Archives/edgar/data/0001825088/000162828026066548/ex991closingpr.htm"
+   ],
+   "id": 2
+  },
+  {
+   "t": "WBD",
+   "action": "remove",
+   "from": "Streaming & Media",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Warner Bros. Discovery was acquired by Paramount Skydance (merger closed early Oct 2026); its shares no longer trade. The combined company is SKYD.",
+   "sources": [
+    "https://cordcuttersnews.com/its-done-paramount-completes-warner-bros-discovery-acquisition-launches-combined-company-as-skydance/"
+   ],
+   "id": 3
+  },
+  {
+   "t": "PSKY",
+   "action": "rename",
+   "from": "Streaming & Media",
+   "to": "SKYD",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Paramount Skydance closed its Warner Bros. Discovery merger in early October 2026 and the combined company, renamed Skydance, trades under the new ticker SKYD.",
+   "sources": [
+    "https://parameter.io/skydance-to-replace-psky-ticker-as-110b-warner-bros-discovery-merger-closes-tuesday/",
+    "https://www.shacknews.com/article/150919/paramount-warner-bros-discovery-wb-games-skydance-skyd"
+   ],
+   "id": 4
+  },
+  {
+   "t": "ESS",
+   "action": "move",
+   "from": "Batteries & Storage",
+   "to": "REITs",
+   "theme_add": "INFRASTRUCTURE - REITs",
+   "confidence": "high",
+   "why": "Essex Property Trust is a West Coast apartment REIT, not a battery maker (ticker mix-up with ESS Tech).",
+   "sources": [
+    "https://digital.fidelity.com/prgw/digital/research/quote/dashboard/summary?symbol=ESS"
+   ],
+   "id": 5
+  },
+  {
+   "t": "CME",
+   "action": "move",
+   "from": "Crypto Exchanges & Brokers",
+   "to": "Exchanges & Financial Data",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "CME Group is the largest futures and options exchange (rates, equity index, energy, ags); crypto futures are a small slice. It trades with ICE/Nasdaq/CBOE.",
+   "sources": [
+    "https://www.marketswiki.com/wiki/CME_Group"
+   ],
+   "id": 6
+  },
+  {
+   "t": "ISRG",
+   "action": "move",
+   "from": "Industrial & Surgical Robots",
+   "to": "Medical Devices",
+   "theme_add": "BIOTECH - Medical Devices",
+   "confidence": "high",
+   "why": "Intuitive Surgical sells da Vinci surgical systems and instruments to hospitals; it trades like a large medtech, not an industrial robot maker.",
+   "sources": [
+    "https://www.globaldata.com/company-profile/intuitive-surgical-inc/"
+   ],
+   "id": 7
+  },
+  {
+   "t": "PRCT",
+   "action": "move",
+   "from": "Industrial & Surgical Robots",
+   "to": "Medical Devices",
+   "theme_add": "BIOTECH - Medical Devices",
+   "confidence": "high",
+   "why": "PROCEPT BioRobotics sells the Aquablation robotic system for prostate (BPH) surgery to urologists: a medtech device company.",
+   "sources": [
+    "https://www.renaissancecapital.com/Profile/PRCT/PROCEPT-BioRobotics/IPO"
+   ],
+   "id": 8
+  },
+  {
+   "t": "NDSN",
+   "action": "move",
+   "from": "Industrial & Surgical Robots",
+   "to": "Diversified Industrials",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Nordson makes precision dispensing, fluid-management and test/inspection equipment for many industries; not a robotics company.",
+   "sources": [
+    "https://komo.ai/directory/nordson"
+   ],
+   "id": 9
+  },
+  {
+   "t": "ROK",
+   "action": "move",
+   "from": "Industrial & Surgical Robots",
+   "to": "Industrial Automation",
+   "theme_add": "AI & ROBOTICS - Robotics",
+   "confidence": "high",
+   "why": "Rockwell Automation sells factory automation controllers, drives and software (Allen-Bradley); its natural peers are the industrial-automation group.",
+   "sources": [
+    "https://www.sec.gov/Archives/edgar/data/1024478/000102447825000116/rok-20250930.htm"
+   ],
+   "id": 10
+  },
+  {
+   "t": "LW",
+   "action": "move",
+   "from": "Farm Equipment & Ag Processing",
+   "to": "Packaged Foods",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Lamb Weston makes frozen fries and potato products sold to restaurants and grocers; a food company, not farm equipment.",
+   "sources": [
+    "https://www.globaldata.com/company-profile/lamb-weston-holdings-inc/"
+   ],
+   "id": 11
+  },
+  {
+   "t": "AES",
+   "action": "move",
+   "from": "Residential Solar & Yieldcos",
+   "to": "Regulated Utilities",
+   "theme_add": "POWER & GRID - Utilities",
+   "confidence": "medium",
+   "why": "AES owns regulated utilities (AES Indiana, AES Ohio) plus a large contracted renewables/power business; it trades with defensive utilities, not rooftop solar names.",
+   "sources": [
+    "https://finance.yahoo.com/quote/AES/profile/"
+   ],
+   "id": 12
+  },
+  {
+   "t": "STRL",
+   "action": "move",
+   "from": "Engineering & Construction",
+   "to": "Grid & Electrical Contractors",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Sterling's growth engine is E-Infrastructure: site development for data centers and semiconductor fabs; it trades with the AI-buildout contractors (EME, IESC, PWR) far more than civil engineering firms.",
+   "sources": [
+    "https://www.nasdaq.com/articles/sterlings-e-infrastructure-segment-real-growth-star"
+   ],
+   "id": 13
+  },
+  {
+   "t": "DOCN",
+   "action": "move",
+   "from": "Data & Observability",
+   "to": "Neoclouds & GPU Hosting",
+   "theme_add": "TECH - Cloud",
+   "confidence": "medium",
+   "why": "DigitalOcean is a cloud provider for developers that now markets itself as an 'agentic inference cloud' with GPU Droplets (AMD MI350X, NVIDIA); it trades with AI-compute names.",
+   "sources": [
+    "https://www.businesswire.com/news/home/20260219844245/en/"
+   ],
+   "id": 14
+  },
+  {
+   "t": "WAB",
+   "action": "move",
+   "from": "Railroads",
+   "to": "Diversified Industrials",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Wabtec builds locomotives, rail equipment and transit components; it is an equipment maker, not a railroad carrier like UNP/CSX.",
+   "sources": [
+    "https://www.sec.gov/Archives/edgar/data/943452/000162828026008067/wab-20251231.htm"
+   ],
+   "id": 15
+  },
+  {
+   "t": "AROC",
+   "action": "move",
+   "from": "On-site Power & Fuel Cells",
+   "to": "LNG & Midstream",
+   "theme_add": "ENERGY - Natural Gas",
+   "confidence": "medium",
+   "why": "Archrock rents and operates natural-gas compression equipment for producers and midstream pipelines; it trades with midstream gas names.",
+   "sources": [
+    "https://www.archrock.com/downloads/Archrock_Company_Overview_2024.pdf"
+   ],
+   "id": 16
+  },
+  {
+   "t": "LEGN",
+   "action": "move",
+   "from": "Mid-cap Biotech",
+   "to": "Oncology Biotech",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Legend Biotech's business is Carvykti, a CAR-T therapy for multiple myeloma (with J&J); oncology is its core. Note: takeover chatter makes the chart noisy.",
+   "sources": [
+    "https://stocktwits.com/news-articles/markets/equity/legn-stock-clocks-best-day-in-three-years-whats-driving-the-rally/cZBdnyqRIzA"
+   ],
+   "id": 17
+  },
+  {
+   "t": "XP",
+   "action": "move",
+   "from": "Investment Banks & Brokers",
+   "to": "Global & EM Banks",
+   "theme_add": null,
+   "confidence": "low",
+   "why": "XP is Brazil's largest independent investment platform/broker; it trades with Brazilian/EM financials more than US brokers.",
+   "sources": [
+    "https://seekingalpha.com/symbol/XP"
+   ],
+   "id": 18
+  },
+  {
+   "t": "PAYS",
+   "action": "add",
+   "from": null,
+   "to": "Payments & Networks",
+   "theme_add": "TECH - Fintech",
+   "confidence": "high",
+   "why": "Paysign runs prepaid card programs and payment processing (pharma copay, plasma donor payments).",
+   "sources": [
+    "https://ycharts.com/companies/PAYS"
+   ],
+   "id": 19
+  },
+  {
+   "t": "GRAL",
+   "action": "add",
+   "from": null,
+   "to": "Genomics & Diagnostics",
+   "theme_add": "BIOTECH - Genomics",
+   "confidence": "high",
+   "why": "GRAIL sells Galleri, a blood test for multi-cancer early detection.",
+   "sources": [
+    "https://intuitionlabs.ai/companies/diagnostics/grail-inc"
+   ],
+   "id": 20
+  },
+  {
+   "t": "LIND",
+   "action": "add",
+   "from": null,
+   "to": "Hotels & Cruise Lines",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Lindblad Expeditions runs expedition cruises (with National Geographic) and adventure travel.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Lindblad_Expeditions"
+   ],
+   "id": 21
+  },
+  {
+   "t": "MRVI",
+   "action": "add",
+   "from": null,
+   "to": "Life Science Tools",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Maravai sells nucleic-acid (mRNA) production reagents and biologics safety testing to drug makers: a tools supplier.",
+   "sources": [
+    "https://pitchbook.com/profiles/company/61990-12"
+   ],
+   "id": 22
+  },
+  {
+   "t": "OSPN",
+   "action": "add",
+   "from": null,
+   "to": "Identity & Security Tools",
+   "theme_add": "TECH - Cybersecurity",
+   "confidence": "high",
+   "why": "OneSpan sells digital identity, authentication and e-signature security, mainly to banks.",
+   "sources": [
+    "https://komo.ai/directory/onespan"
+   ],
+   "id": 23
+  },
+  {
+   "t": "GDYN",
+   "action": "add",
+   "from": null,
+   "to": "IT Services & Consulting",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Grid Dynamics provides digital engineering and AI consulting services to enterprises.",
+   "sources": [
+    "https://stockanalysis.com/stocks/gdyn/company"
+   ],
+   "id": 24
+  },
+  {
+   "t": "NSIT",
+   "action": "add",
+   "from": null,
+   "to": "IT Services & Consulting",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Insight Enterprises is an IT solutions integrator (hardware/software resale, cloud and AI services).",
+   "sources": [
+    "https://stockanalysis.com/stocks/nsit/company/"
+   ],
+   "id": 25
+  },
+  {
+   "t": "SG",
+   "action": "add",
+   "from": null,
+   "to": "Restaurants",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Sweetgreen is a fast-casual salad restaurant chain.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Sweetgreen"
+   ],
+   "id": 26
+  },
+  {
+   "t": "FET",
+   "action": "add",
+   "from": null,
+   "to": "Oil Services & Drillers",
+   "theme_add": "ENERGY - Oil Services",
+   "confidence": "high",
+   "why": "Forum Energy Technologies makes drilling, completion and subsea equipment for oil and gas.",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Forum_Energy_Technologies"
+   ],
+   "id": 27
+  },
+  {
+   "t": "REPX",
+   "action": "add",
+   "from": null,
+   "to": "Shale E&P",
+   "theme_add": "ENERGY - Oil",
+   "confidence": "high",
+   "why": "Riley Exploration Permian is an oil-weighted Permian Basin producer.",
+   "sources": [
+    "https://stockanalysis.com/stocks/repx/company"
+   ],
+   "id": 28
+  },
+  {
+   "t": "NAT",
+   "action": "add",
+   "from": null,
+   "to": "Tankers & Shipping",
+   "theme_add": "TRANSPORT - Shipping",
+   "confidence": "high",
+   "why": "Nordic American Tankers owns Suezmax crude oil tankers.",
+   "sources": [
+    "https://www.globaldata.com/company-profile/tsakos-energy-navigation-ltd/"
+   ],
+   "id": 29
+  },
+  {
+   "t": "TEN",
+   "action": "add",
+   "from": null,
+   "to": "Tankers & Shipping",
+   "theme_add": "TRANSPORT - Shipping",
+   "confidence": "high",
+   "why": "TEN Ltd (Tsakos Energy Navigation) owns crude, product and LNG tankers.",
+   "sources": [
+    "https://www.globaldata.com/company-profile/tsakos-energy-navigation-ltd/"
+   ],
+   "id": 30
+  },
+  {
+   "t": "SLS",
+   "action": "add",
+   "from": null,
+   "to": "Oncology Biotech",
+   "theme_add": "BIOTECH - Biotech",
+   "confidence": "medium",
+   "why": "SELLAS develops galinpepimut-S (WT1 cancer immunotherapy, AML) and other cancer drugs.",
+   "sources": [
+    "https://ir.sellaslifesciences.com/"
+   ],
+   "id": 31
+  },
+  {
+   "t": "LIFE",
+   "action": "add",
+   "from": null,
+   "to": "Life Insurers",
+   "theme_add": "FINANCIALS - Insurance",
+   "confidence": "medium",
+   "why": "Ethos Technologies runs an online life-insurance platform (IPO'd 2026); closest existing group is life insurers.",
+   "sources": [
+    "https://www.dig-in.com/articles/insurance-platform-ethos-backers-raise-200m-in-us-ipo"
+   ],
+   "id": 32
+  },
+  {
+   "t": "ETON",
+   "action": "add",
+   "from": null,
+   "to": "Mid-cap Biotech",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Eton Pharmaceuticals sells and develops treatments for rare pediatric/endocrine diseases.",
+   "sources": [
+    "https://fundamentei.com/en-US/us/eton/about"
+   ],
+   "id": 33
+  },
+  {
+   "t": "AMN",
+   "action": "add",
+   "from": null,
+   "to": "Healthcare Providers",
+   "theme_add": "HEALTHCARE - Services",
+   "confidence": "medium",
+   "why": "AMN Healthcare is the largest US healthcare staffing company (travel nurses, locum doctors), selling to hospitals.",
+   "sources": [
+    "https://finance.yahoo.com/quote/AMN/profile/"
+   ],
+   "id": 34
+  },
+  {
+   "t": "ANDG",
+   "action": "add",
+   "from": null,
+   "to": "Business Services & Data",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Andersen Group is a tax and advisory firm that IPO'd in Dec 2025; professional services.",
+   "sources": [
+    "https://www.renaissancecapital.com/IPO-Center/News/113632/Tax-advisory-firm-Andersen-Group-files-for-a-$100-million-IPO"
+   ],
+   "id": 35
+  },
+  {
+   "t": "CLYM",
+   "action": "add",
+   "from": null,
+   "to": "Immunology & Inflammation",
+   "theme_add": "BIOTECH - Biotech",
+   "confidence": "medium",
+   "why": "Climb Bio develops budoprutug, an anti-CD19 antibody for immune-mediated kidney disease (membranous nephropathy).",
+   "sources": [
+    "https://www.biospace.com/press-releases/climb-bio-announces-fda-fast-track-designation-for-budoprutug-for-the-treatment-of-primary-membranous-nephropathy"
+   ],
+   "id": 36
+  },
+  {
+   "t": "VSTS",
+   "action": "add",
+   "from": null,
+   "to": "Waste & Facility Services",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Vestis rents uniforms and workplace supplies (Cintas/UniFirst peer), the facility-services group.",
+   "sources": [
+    "https://ir.vestis.com/company-information"
+   ],
+   "id": 37
+  },
+  {
+   "t": "RSKD",
+   "action": "add",
+   "from": null,
+   "to": "Identity & Security Tools",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Riskified sells AI fraud prevention and chargeback protection to e-commerce merchants.",
+   "sources": [
+    "https://bitscale.ai/directory/riskified"
+   ],
+   "id": 38
+  },
+  {
+   "t": "PRCH",
+   "action": "add",
+   "from": null,
+   "to": "P&C Insurers",
+   "theme_add": "FINANCIALS - Insurance",
+   "confidence": "medium",
+   "why": "Porch Group's main business is home insurance (reciprocal exchange) plus software for home inspectors and movers.",
+   "sources": [
+    "https://pitchbook.com/profiles/company/57322-81"
+   ],
+   "id": 39
+  },
+  {
+   "t": "SEPN",
+   "action": "add",
+   "from": null,
+   "to": "Obesity & Metabolic",
+   "theme_add": "BIOTECH - Biotech",
+   "confidence": "medium",
+   "why": "Septerna makes oral small-molecule GPCR drugs; its biggest program is an obesity/cardiometabolic deal with Novo Nordisk (up to $2.2B).",
+   "sources": [
+    "https://www.thepharmaletter.com/septerna-and-novo-nordisk-to-collaborate-on-oral-obesity-and-other-cardiometabolic-diseases"
+   ],
+   "id": 40
+  },
+  {
+   "t": "MBX",
+   "action": "add",
+   "from": null,
+   "to": "Obesity & Metabolic",
+   "theme_add": "BIOTECH - Biotech",
+   "confidence": "medium",
+   "why": "MBX Biosciences develops long-acting peptide drugs for endocrine and metabolic disease (canvuparatide for hypoparathyroidism, obesity programs).",
+   "sources": [
+    "https://investors.mbxbio.com/news-releases/news-release-details/mbx-biosciences-reports-fourth-quarter-and-full-year-2025"
+   ],
+   "id": 41
+  },
+  {
+   "t": "ATEX",
+   "action": "add",
+   "from": null,
+   "to": "Wireless Carriers",
+   "theme_add": "TECH - 5G & Telecom",
+   "confidence": "low",
+   "why": "Anterix owns 900 MHz spectrum it leases to utilities (Oncor, Ameren, Evergy) for private LTE networks; no exact group, wireless is closest.",
+   "sources": [
+    "https://www.nasdaq.com/articles/anterix-atex-spectrum-powers-oncors-private-wireless-network"
+   ],
+   "id": 42
+  },
+  {
+   "t": "PURR",
+   "action": "add",
+   "from": null,
+   "to": "Ethereum Treasury Companies",
+   "theme_add": null,
+   "confidence": "low",
+   "why": "Hyperliquid Strategies is a crypto-treasury company holding the HYPE token (~$1.9B); it trades with the ETH treasury names (BMNR, SBET). No altcoin-treasury group exists.",
+   "sources": [
+    "https://www.theblock.co/news/business/2026-08-27-purr-jumps-15-hyperliquid-strategies-1-9-billion-hype-treasury-fortress-balance-sheet-412926"
+   ],
+   "id": 43
+  },
+  {
+   "t": "MSI",
+   "action": "keep",
+   "from": "Telecom Equipment & Test",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Motorola Solutions makes public-safety radios, land-mobile networks and video security; no better existing group, it just trades like a steady compounder.",
+   "sources": [],
+   "id": 44
+  },
+  {
+   "t": "GSAT",
+   "action": "keep",
+   "from": "Satellite Connectivity & Imaging",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Amazon agreed to buy Globalstar at $90/share, so the stock is pinned to the deal price; business is still satellite connectivity. Remove when the deal closes.",
+   "sources": [],
+   "id": 45
+  },
+  {
+   "t": "NTNX",
+   "action": "keep",
+   "from": "Enterprise AI Infrastructure (Servers, Storage, HCI)",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Nutanix sells hyperconverged / hybrid-cloud infrastructure software, which is what this group is named for.",
+   "sources": [],
+   "id": 46
+  },
+  {
+   "t": "JCI",
+   "action": "keep",
+   "from": "HVAC & Building Systems",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Johnson Controls is an HVAC and building-systems company; the current home is exact.",
+   "sources": [],
+   "id": 47
+  },
+  {
+   "t": "ORCL",
+   "action": "keep",
+   "from": "Hyperscalers",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Oracle runs OCI, one of the big AI clouds; recent weakness is about its debt-funded capex, not a wrong group.",
+   "sources": [],
+   "id": 48
+  },
+  {
+   "t": "INFY",
+   "action": "keep",
+   "from": "India IT Services",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Infosys is the anchor of this group; moving it would empty the group.",
+   "sources": [],
+   "id": 49
+  }
+ ],
+ "checked": 50
+}
