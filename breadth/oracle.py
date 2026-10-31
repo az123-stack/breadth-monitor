@@ -83,8 +83,11 @@ def build(adjusted, theme_data=None):
         j = list(COHORTS).index(key)
         scoh[key] = [g for g, _ in sorted(subs.items(), key=lambda kv: -(kv[1]["r"][j] if kv[1]["r"][j] is not None else -9))[:TOP]]
         wscoh[key] = [g for g, _ in sorted(subs.items(), key=lambda kv: (kv[1]["r"][j] if kv[1]["r"][j] is not None else 9))[:TOP]]
-    keep = {g for v in list(scoh.values()) + list(wscoh.values()) for g in v}
-    subs = {g: v for g, v in subs.items() if g in keep}
+    # Adam, Oct 31: "run through all the sub-themes 15 at a time" → every sub-theme kept, full ranking per cohort (best first)
+    sall = {}
+    for key in COHORTS:
+        j = list(COHORTS).index(key)
+        sall[key] = [g for g, _ in sorted(subs.items(), key=lambda kv: -(kv[1]["r"][j] if kv[1]["r"][j] is not None else -9))]
     # Adam, Oct 30: "select a sub-theme and have its stocks show below" → every member of a listed sub-theme gets its closes too
     for g in subs.values():
         for t in g["members"]:
@@ -93,6 +96,6 @@ def build(adjusted, theme_data=None):
                 rows[t] = {"name": s.get("name"), "sub": s.get("sub") or ((s.get("themes") or [""])[0]), "rsr": s.get("rsr"),
                            "r": [_r(rets[k].get(t)) for k in (180, 60, 15, 5)], "c": [_r(v, 2) for v in win[t].tolist()]}
     return {"date": C.index[-1].strftime("%Y-%m-%d"), "dates": [d.strftime("%Y-%m-%d") for d in win.index],
-            "windows": WINDOWS, "cohorts": cohorts, "scohorts": scoh, "wcohorts": weak, "wscohorts": wscoh, "subs": subs, "rows": rows, "spy": spy, "overlap": overlap,
+            "windows": WINDOWS, "cohorts": cohorts, "scohorts": scoh, "wcohorts": weak, "wscohorts": wscoh, "sall": sall, "subs": subs, "rows": rows, "spy": spy, "overlap": overlap,
             "spy_r": [_r(rets[k].get(config.BENCHMARK)) for k in (180, 60, 15, 5)], "universe": len(liquid),
             "rules": {"top": TOP, "min_price": MIN_PRICE, "min_dv": MIN_DV}}

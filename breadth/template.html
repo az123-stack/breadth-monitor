@@ -2908,7 +2908,8 @@ const CLASS_COLOR = { STRONG: "var(--good)", WATCHLIST: "var(--warning)", WEAK: 
 const ROT = { "Early Rotation": "🌅 Early", "Mid Rotation": "🚀 Mid", "Late / Extended": "⛰ Late / extended", "Late / Cooling": "🔻 Cooling", "Neutral": "⏸ Neutral" };
 const mvCell = (v) => v == null ? '<span class="mv">–</span>' : v === 0 ? '<span class="mv">·</span>'
   : `<span class="mv ${v > 0 ? "up" : "dn"}">${v > 0 ? "▲" : "▼"}${Math.abs(Math.round(v))}${Math.abs(v) >= 10 ? (v > 0 ? " 🔥" : " ❄️") : ""}</span>`;
-const trailHTML = (tr) => `<span class="trail" title="Score over the last ${tr.length} days">${tr.map(v => v == null ? '<i style="height:2px;opacity:.3"></i>' : `<i style="height:${3 + v * 2}px;opacity:${0.35 + v * 0.08}"></i>`).join("")}</span>`;
+// Oct 31: tinted with color-mix, not opacity — 2,500 semi-transparent bars made every Themes click spend ~0.6 s building compositor layers
+const trailHTML = (tr) => `<span class="trail" title="Score over the last ${tr.length} days">${tr.map(v => v == null ? '<i style="height:2px;background:color-mix(in srgb,var(--s1) 30%,transparent)"></i>' : `<i style="height:${3 + v * 2}px;background:color-mix(in srgb,var(--s1) ${Math.round(35 + v * 8)}%,transparent)"></i>`).join("")}</span>`;
 const badge = (r) => `<span class="badge" title="${r.class.toLowerCase()}"><i style="background:${CLASS_COLOR[r.class]}"></i><span class="num">${r.score}</span></span>`;
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 

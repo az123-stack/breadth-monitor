@@ -112,6 +112,7 @@ CSS = """
 /* Oracle */
 .orhead { padding: 12px 14px; margin-bottom: 12px; } .orhead h2 { font-size: 16px; margin: 0 0 8px; }
 .orhead .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; } .orsub, .orov { margin-top: 8px; }
+.orpager { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; } .orpager button[disabled] { opacity: .4; cursor: default; }
 .orgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
 .orchart { padding: 10px 12px; position: relative; }
 .orch-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; } .orch-h .meta { font-size: 11.5px; }
@@ -165,6 +166,11 @@ MODE_JS_NEW = r"""  { const sw = app.querySelector(".modesw");   // v3: plain Li
 
 # (what v1 says, what v3 says instead, why)
 SWAPS = [
+    # Oct 31: on Theme Dash, live refreshes repaint the groups in place so the TradingView chart isn't reloaded
+    ('function rerenderPanel() {\n  const panel = document.querySelector(".panel"); if (!panel) return;\n',
+     'function rerenderPanel() {\n  const panel = document.querySelector(".panel"); if (!panel) return;\n'
+     '  if (TAB === "themedash" && TD_PAINT && TD_PAINT()) return;\n',
+     "Theme Dash repaints in place on live refresh"),
     ('const TABS = [["readout", "Read-out"], ["breadth", "Breadth"], ["premarket", "Pre-market"], ["intraday", "Intraday"], ["themes", "Themes"],\n'
      '  ["rotation", "Rotation"], ["biotech", "Biotech"], ["setups", "Setups"], ["stocks", "Stocks"], ["stories", "Trade Stories"]];\n'
      'const TAB_ALIAS = { best: "setups", trades: "setups", launch: "setups", browse: "themes" };\n'

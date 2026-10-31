@@ -708,6 +708,13 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Strongest / Weakest toggle (Oct 30, Adam): chip "Side" (localStorage orSide); payload `wcohorts` / `wscohorts` = bottom 15 by the same
   return, worst first; rows / subs include them (~520 rows, ~840 KB). Weakest lists surface unrecorded corporate actions (Oct 29: CTVA
   77.65 → 12.57 Oct 1 (spin-off?), PRIM 202.9 → 101.2 May 6, XP 30.4 → 15.7 Oct 26, RUN, AGX/STRL jumps) — check data/splits.csv.
+  Sub-theme pager (Oct 31, Adam: "run through all the sub-themes 15 at a time"): payload keeps EVERY sub-theme (3+ members, ~138) +
+  `sall` {cohort: all sub-themes best first}; page `ALL` / `U.pg` (not saved; resets on Side / View / Cohort): ◀ Prev 15 / rank chips
+  1–15, 16–30 … / Next 15 ▶, rank column continues (16, 17 …), overlap line on page 1 only. Oracle payload ~1.8 MB (1,071 rows).
+  Click speed (Oct 31, Adam: "a delay when I click"): v1 `trailHTML` bars use color-mix instead of opacity (2,500 semi-transparent
+  bars cost ~0.6 s of compositor "Layerize" per Themes click; 4×-throttled click 1.1 s → 0.2 s). Theme Dash repaints in place
+  (`paint`, `TD_PAINT`; v3 swap in `rerenderPanel`) so chip clicks and live refreshes don't reload the TradingView iframe.
+  Avoid inline `opacity` on repeated small elements — use color-mix / rgba colors.
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and
