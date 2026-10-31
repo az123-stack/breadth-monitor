@@ -35,7 +35,6 @@ ABTS,Abits Group Inc Ordinary Shares,XNAS
 ABUS,Arbutus Biopharma Corporation Common Stock,XNAS
 ABVC,"ABVC BioPharma, Inc. Common Stock",XNAS
 ABX,"Abacus Global Management, Inc.",XNYS
-ACA,"Arcosa, Inc. Common Stock",XNYS
 ACAA,Averin Capital Acquisition Corp. Class A Ordinary Shares,XNAS
 ACAD,Acadia Pharmaceuticals Inc.,XNAS
 ACB,Aurora Cannabis Inc. Common Shares,XNAS
@@ -93,7 +92,6 @@ ADEA,Adeia Inc. Common Stock,XNAS
 ADGM,"Adagio Medical Holdings, Inc Common Stock",XNAS
 ADI,"Analog Devices, Inc.",XNAS
 ADIG,ADI Global Distribution Inc.,XNYS
-ADIL,"Adial Pharmaceuticals, Inc",XNAS
 ADM,Archer Daniels Midland Company,XNYS
 ADMA,"ADMA Biologics, Inc.",XNAS
 ADNT,Adient plc Ordinary Shares,XNYS
@@ -128,6 +126,7 @@ AERT,"Aeries Technology, Inc. Class A Ordinary Share",XNAS
 AES,AES Corporation,XNYS
 AESI,Atlas Energy Solutions Inc.,XNYS
 AESP,Aeon Acquisition I Corp. Class A Ordinary Shares,XNAS
+AETR,Aetherion Technologies Inc. Common Shares,XNAS
 AEVA,"Aeva Technologies, Inc.",XNAS
 AEXA,American Exceptionalism Acquisition Corp. A,XNYS
 AEYE,"AudioEye, Inc. Common Stock",XNAS
@@ -524,6 +523,7 @@ AZI,Autozi Internet Technology (Global) Ltd. Class A Ordinary Shares,XNAS
 AZIO,"Azio AI Holdings, Inc. Common Stock",XNAS
 AZN,AstraZeneca PLC,XNYS
 AZO,"AutoZone, Inc.",XNYS
+AZR,"Azora Therapeutics, Inc. Common Stock",XNAS
 AZTA,"Azenta, Inc.",XNAS
 AZTR,Azitra Inc,XASE
 AZZ,AZZ Inc.,XNYS
@@ -1575,7 +1575,6 @@ ELE,Elemental Royalty Corporation Common Stock,XNAS
 ELF,"e.l.f. Beauty, Inc.",XNYS
 ELLO,Ellomay Capital LTD,XASE
 ELMD,"Electromed, Inc.",XASE
-ELME,Elme Communities,XNYS
 ELMT,The Elmet Group Co. Common Stock,XNAS
 ELOG,Eastern International Ltd. Ordinary Shares,XNAS
 ELOX,"Eloxx Pharmaceuticals, Inc. Common Stock",XNAS
@@ -1746,6 +1745,7 @@ FCAP,First Capital Inc,XNAS
 FCBC,"First Community Bankshares, Inc. (VA)",XNAS
 FCBM,"First Carolina Financial Services, Inc.",XNYS
 FCCO,First Community Corp,XNAS
+FCDH,Forcendra Holding Limited Class A Ordinary Shares,XNAS
 FCEL,FuelCell Energy Inc  NEW (DE),XNAS
 FCF,First Commonwealth Financial Corporation,XNYS
 FCFS,"FirstCash Holdings, Inc. Common Stock",XNAS
@@ -1782,6 +1782,7 @@ FFBC,First Financial Bancorp,XNAS
 FFIN,First Financial Bankshares Inc,XNAS
 FFIV,"F5, Inc. Common Stock",XNAS
 FFR,FF EAI Robotics Ecosystem Inc. Common Stock,XNAS
+FFTT,Masonglory Limited Ordinary Shares,XNAS
 FG,"F&G Annuities & Life, Inc.",XNYS
 FGBI,FIRST GUARANTY BANCSHARES INC,XNAS
 FGC,FG Communities Holdings Inc. Common Stock,XNAS
@@ -1963,6 +1964,7 @@ GASS,"StealthGas, Inc.",XNAS
 GATX,GATX Corporation,XNYS
 GAU,Galiano Gold Inc.,XASE
 GAUZ,Gauzy Ltd. Ordinary Shares,XNAS
+GBC,"Georgia Banking Company, Inc. Common Stock",XNAS
 GBCI,Glacier Bancorp Inc,XNYS
 GBDC,"Golub Capital BDC, Inc.",XNAS
 GBFH,GBank Financial Holdings Inc. Common Stock,XNAS
@@ -2597,7 +2599,7 @@ JOUT,Johnson Outdoors Inc,XNAS
 JPM,JPMorgan Chase & Co.,XNYS
 JRSH,"Jerash Holdings (US), Inc. Common Stock",XNAS
 JRVR,"James River Group Holdings, Inc. Common Stock",XNAS
-JSM,"Navient Corporation 6% Senior Notes due December 15, 2043",XNAS
+JSM,"Navient LLC 6% Senior Notes due December 15, 2043",XNAS
 JSPR,"Jasper Therapeutics, Inc. Common Stock",XNAS
 JTAI,Jet.AI Inc. Common Stock,XNAS
 JTTT,JATT III Acquisition Corp Ordinary Shares,XNAS
@@ -2906,6 +2908,7 @@ LXP,LXP Industrial Trust,XNYS
 LXRX,"Lexicon Pharmaceuticals, Inc.",XNAS
 LXU,LSB INDUSTRIES INC,XNYS
 LYB,LyondellBasell Industries N.V. Class A,XNYS
+LYCA,"Lycia Therapeutics, Inc. Common Stock",XNAS
 LYEL,"Lyell Immunopharma, Inc. Common Stock",XNAS
 LYFT,"Lyft, Inc. Class A Common Stock",XNAS
 LYNX,Lyntris Inc.,XNYS
@@ -3158,11 +3161,9 @@ MSDL,Morgan Stanley Direct Lending Fund,XNYS
 MSEX,Middlesex Water Co,XNAS
 MSFT,Microsoft Corp,XNAS
 MSGE,Madison Square Garden Entertainment Corp.,XNYS
-MSGKw,MSG Knickerbockers Corp.,XNYS
+MSGK,MSG Knickerbockers Corp.,XNYS
 MSGM,Motorsport Games Inc. Class A Common Stock,XNAS
-MSGRw,MSG Rangers Corp.,XNYS
-MSGS,Madison Square Garden Sports Corp.,XNYS
-MSGY,Masonglory Limited Ordinary Shares,XNAS
+MSGR,MSG Rangers Corp.,XNYS
 MSI,"Motorola Solutions, Inc. New",XNYS
 MSIF,"MSC Income Fund, Inc.",XNYS
 MSLE,Satellos Bioscience Inc. Common Stock,XNAS
@@ -3233,11 +3234,10 @@ NAMM,Namib Minerals Ordinary Shares,XNAS
 NAMS,NewAmsterdam Pharma Company N.V. Ordinary Shares,XNAS
 NANO,Forge Nano Holdings Inc. Common Stock,XNAS
 NAT,Nordic American Tanker,XNYS
-NATH,Nathan's Famous Inc,XNAS
 NATL,NCR Atleos Corporation,XNYS
 NATR,Nature's Sunshine Products Inc.,XNAS
 NAUT,"Nautilus Biotechnolgy, Inc. Common Stock",XNAS
-NAVI,Navient Corporation,XNAS
+NAVI,"Navient Holdings, Inc. Common Stock",XNAS
 NAVN,"Navan, Inc. Class A Common Stock",XNAS
 NB,NioCorp Developments Ltd. Common Stock,XNAS
 NBBK,"NB Bancorp, Inc. Common Stock",XNAS
@@ -3651,9 +3651,8 @@ PALO,Paloma Acquisition Corp I Class A Ordinary Shares,XNAS
 PAMT,PAMT CORP Common Stock,XNAS
 PANL,Pangaea Logistics Solutions Ltd.,XNAS
 PANW,"Palo Alto Networks, Inc. Common Stock",XNAS
-PAPL,Pineapple Financial Inc.,XASE
 PAR,PAR Technology Corp.,XNYS
-PARA,"Banzai International, Inc. Class A Common Stock",XNAS
+PARA,"Parabolic Technologies, Inc. Class A Common Stock",XNAS
 PARK,"Park Dental Partners, Inc. Common Stock",XNAS
 PARR,"Par Pacific Holdings, Inc. Common Stock",XNYS
 PASG,"Passage Bio, Inc. Common Stock",XNAS
@@ -3663,6 +3662,7 @@ PATK,Patrick Industries Inc,XNAS
 PAVM,PAVmed Inc. Common Stock,XNAS
 PAVS,Paranovus Entertainment Technology Ltd. Class A Ordinary Shares,XNAS
 PAX,Patria Investments Limited Class A Common Shares,XNAS
+PAXG,Pine Tree Acquisition Corp. Class A Ordinary Shares,XNAS
 PAY,"Paymentus Holdings, Inc.",XNYS
 PAYC,"PAYCOM SOFTWARE, INC.",XNYS
 PAYO,Payoneer Global Inc. Common Stock,XNAS
@@ -3715,7 +3715,6 @@ PENG,"Penguin Solutions, Inc. Ordinary Shares",XNAS
 PENN,"PENN Entertainment, Inc. Common Stock",XNAS
 PEP,"PepsiCo, Inc.",XNAS
 PEPG,PepGen Inc. Common Stock,XNAS
-PERF,Perfect Corp.,XNYS
 PERI,Perion Network Ltd.,XNAS
 PESI,"Perma-Fix Environmental Services, Inc.",XNAS
 PETS,"PetMed Express, Inc.",XNAS
@@ -3897,6 +3896,7 @@ PTCT,"PTC Therapeutics, Inc.",XNAS
 PTEN,Patterson-UTI Energy Inc,XNAS
 PTGX,"Protagonist Therapeutics, Inc",XNAS
 PTHS,Pelthos Therapeutics Inc.,XASE
+PTIV,Pineapple Financial Inc.,XASE
 PTLE,PTL LTD Class A Ordinary Shares,XNAS
 PTLO,Portillo's Inc. Class A Common Stock,XNAS
 PTN,"Palatin Technologies, Inc. Common Stock",XNAS
@@ -4252,7 +4252,6 @@ SDHI,Siddhi Acquisition Corp Class A Common stock,XNAS
 SDHY,PGIM Short Duration High Yield Opportunities Fund,XNYS
 SDOT,Sadot Group Inc. Common Stock,XNAS
 SDRL,Seadrill Limited,XNYS
-SDST,Stardust Power Inc. Common Stock,XNAS
 SEAT,Vivid Seats Inc. Class A Common Stock,XNAS
 SEB,Seaboard Corporation,XASE
 SECZ,Securitize Corp.,XNYS
@@ -4365,7 +4364,7 @@ SLGL,Sol-Gel Technologies Ltd. Ordinary Shares,XNAS
 SLGN,Silgan Holdings Inc,XNYS
 SLI,Standard Lithium Ltd.,XASE
 SLM,SLM Corporation,XNAS
-SLMT,Brera Holdings PLC Class B Ordinary Shares,XNAS
+SLMT,Solmate Infrastructure Public Limited Company Class B Ordinary Shares,XNAS
 SLND,"Southland Holdings, Inc.",XASE
 SLNG,"Stabilis Solutions, Inc. Common Stock",XNAS
 SLNH,"Soluna Holdings, Inc. Common Stock",XNAS
@@ -5050,7 +5049,6 @@ VS,Versus Systems Inc. Common Stock,XNAS
 VSAT,Viasat Inc,XNAS
 VSEC,VSE Corp,XNAS
 VSH,"Vishay Intertechnology, Inc.",XNYS
-VSME,VS Media Holdings Limited Class A Ordinary Shares,XNAS
 VSNT,"Versant Media Group, Inc. Class A Common Stock",XNAS
 VST,Vistra Corp.,XNYS
 VSTM,"Verastem, Inc.",XNAS
@@ -5099,7 +5097,6 @@ WD,"Walker & Dunlop, Inc.",XNYS
 WDAY,"Workday, Inc. Class A Common Stock",XNAS
 WDC,Western Digital Corp.,XNAS
 WDFC,Wd-40 Co,XNAS
-WEAV,"Weave Communications, Inc.",XNYS
 WEC,"WEC Energy Group, Inc.",XNYS
 WELL,Welltower Inc.,XNYS
 WEN,The Wendy's Company,XNAS
@@ -5164,7 +5161,6 @@ WORX,SCWorx Corp. Common Stock,XNAS
 WPAC,White Pearl Acquisition Corp.,XNYS
 WPC,W.P. Carey Inc. (REIT),XNYS
 WPM,Wheaton Precious Metals Corp. Common Stock,XNYS
-WPRT,Westport Fuel Systems Inc Common Shares,XNAS
 WQEY,WISeQey Corp Ordinary Shares,XNAS
 WRAP,"Wrap Technologies, Inc. Common Stock",XNAS
 WRB,W.R. Berkley Corporation,XNYS
