@@ -405,6 +405,7 @@ table.grid td.tname { font-weight: 600; white-space: nowrap; }
 table.grid td.tname small { display: block; font-weight: 400; color: var(--text-muted); font-size: 11.5px; }
 .badge { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
 .badge i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.accbox:not(:empty) { padding: 6px 14px 10px; line-height: 1.9; } .accbox .accsub { margin: 0 2px; }
 .trail { display: inline-flex; gap: 1px; vertical-align: middle; }
 .trail i { width: 4px; border-radius: 1px; background: var(--s1); display: inline-block; }
 .mv { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12px; }
@@ -3119,14 +3120,20 @@ function renderThemes(app) {
     const cnt = (k) => rowsAll.filter(r => stairPass(sub ? "sub" : "theme", r.theme, k)).length;
     f.append(chips("Stair steps", STAIR_FILTERS.map(([k, t]) => [k, k === "all" ? "All" : `${t} (${cnt(k)})`]), U, "stair", () => draw(current())));
   }
-  const qi = $('<input type="search" placeholder="Search">'); qi.value = U.q; f.append(qi);
+  const qi = $('<input type="search" placeholder="Search a group, ticker or company">'); qi.value = U.q; f.append(qi);
   app.append(card);
   const body = card.querySelector("tbody");
-  const filtered = () => rowsAll.filter(r => (U.cls === "All" || r.class === U.cls) && stairPass(sub ? "sub" : "theme", r.theme, U.stair) && (!U.q || r.theme.toLowerCase().includes(U.q) || (r.group || "").toLowerCase().includes(U.q)));
+  // Oct 31 (Adam: "search stocks in that search bar"): a ticker (exact) or company name (3+ letters) finds the groups that hold it,
+  // and those rows open to show their stocks
+  const SMq = stockMap();
+  const nameHit = (r) => r.theme.toLowerCase().includes(U.q) || (r.group || "").toLowerCase().includes(U.q);
+  const tickHits = (r) => !U.q ? [] : (r.members || []).filter(t => t.toLowerCase() === U.q || (U.q.length >= 3 && ((SMq[t] || {}).name || "").toLowerCase().includes(U.q)));
+  const filtered = () => rowsAll.filter(r => (U.cls === "All" || r.class === U.cls) && stairPass(sub ? "sub" : "theme", r.theme, U.stair) && (!U.q || nameHit(r) || tickHits(r).length));
   const draw = (rows) => {
     body.innerHTML = "";
     rows.forEach(r => {
-      const small = sub ? `${esc(r.group)} · ${r.n} stocks` : `${r.etf ? r.etf + " · " : ""}${r.n} stocks`;
+      const hits = U.q && !nameHit(r) ? tickHits(r) : [];
+      const small = (sub ? `${esc(r.group)} · ${r.n} stocks` : `${r.etf ? r.etf + " · " : ""}${r.n} stocks`) + (hits.length ? ` · <b>has ${hits.slice(0, 4).map(esc).join(", ")}</b>` : "");
       const tr = $(`<table><tr class="trow${U.open.has(r.theme) ? " open" : ""}">
         <td class="l tname">${esc(r.theme)}${stairTag(sub ? "sub" : "theme", r.theme)}<small>${small}</small></td><td class="num">${r[rkK] ?? "–"}</td>
         <td>${strengthBar(r.strength)}</td><td>${badge(r)}</td><td>${mvCell(r[mvK])}</td>
@@ -3137,7 +3144,7 @@ function renderThemes(app) {
         <td class="num">${Math.round(r.lt_b * 100)}% <span class="meta">${r.lt_label}</span></td>
         ${sub ? "" : retCell(r.etf_d5, "etf_d5")}<td class="num">${r.n}</td></tr></table>`).querySelector("tr");
       body.append(tr);
-      if (U.open.has(r.theme)) body.append(drillRow(r, cols.length, sub));
+      if (U.open.has(r.theme) || hits.length) body.append(drillRow(r, cols.length, sub));
       tr.addEventListener("click", () => { U.open.has(r.theme) ? U.open.delete(r.theme) : U.open.add(r.theme); draw(current()); });
     });
   };
@@ -5842,10 +5849,31 @@ function renderStocks(app) {
   const sel = $(`<select aria-label="Theme"><option value="">All themes</option>${themesList.map(t => `<option>${esc(t)}</option>`).join("")}</select>`); sel.value = U.theme; f.append(sel);
   const sel2 = $(`<select aria-label="Sub-theme"><option value="">All sub-themes</option>${subList.map(t => `<option>${esc(t)}</option>`).join("")}</select>`); sel2.value = U.sub || ""; f.append(sel2);
   const qi = $('<input type="search" placeholder="Search ticker or name">'); qi.value = U.q; f.append(qi);
+  // Oct 31 (Adam: "make sure the sub-theme accelerating early filter is in that"): accelerating vs SPY from the Oracle payload
+  // (oracle.acc_tag: 15-session pace > 60 > 180 vs SPY, 60D ≥ +10%; early = 180D vs SPY < +25%)
+  const OA = (DATA.themes || {}).oracle, subAc = (s) => OA && OA.subs[s.sub] ? OA.subs[s.sub].ac : null, stAc = (s) => OA && OA.rows[s.t] ? OA.rows[s.t].ac : null;
+  const ACF = { all: () => true, sub_early: (s) => { const a = subAc(s); return !!a && a.a && a.stage === "early"; }, sub: (s) => { const a = subAc(s); return !!a && a.a; },
+    st_early: (s) => { const a = stAc(s); return !!a && a.a && a.stage === "early"; }, st: (s) => { const a = stAc(s); return !!a && a.a; } };
+  U.acc = ACF[U.acc] ? U.acc : lsGet("stAcc", "all");
+  const accBox = $('<div class="accbox meta"></div>');
+  if (OA) {
+    const nAcc = (k) => T.stocks.filter(ACF[k]).length;
+    f.append(chips("Accelerating vs SPY", [["all", "All"], ["sub_early", `▲ Sub-theme accelerating · early <small>${nAcc("sub_early")}</small>`],
+      ["sub", `▲ Sub-theme accelerating <small>${nAcc("sub")}</small>`], ["st_early", `▲ Stock accelerating · early <small>${nAcc("st_early")}</small>`],
+      ["st", `▲ Stock accelerating <small>${nAcc("st")}</small>`]], U, "acc", () => { lsSet("stAcc", U.acc); U.limit = 100; showAcc(); draw(current()); }));
+  }
+  const showAcc = () => {
+    if (!OA || !U.acc.startsWith("sub")) { accBox.innerHTML = ""; return; }
+    const g = Object.entries(OA.subs).filter(([, v]) => v.ac && v.ac.a && (U.acc === "sub" || v.ac.stage === "early")).sort((a, b) => b[1].ac.v[1] - a[1].ac.v[1]);
+    accBox.innerHTML = `Sub-themes accelerating vs SPY${U.acc === "sub_early" ? " · early" : ""} (${g.length}): ` + g.map(([n, v]) => `<button class="xopen accsub" data-g="${esc(n)}" title="60 sessions ${pct(v.ac.v[1], 0)} vs SPY · 15 sessions ${pct(v.ac.v[2], 0)} · 180 sessions ${pct(v.ac.v[0], 0)}">${esc(n)} <small>since ${shortDate(v.ac.start)}${U.acc === "sub" ? " · " + v.ac.stage : ""}</small></button>`).join(" ")
+      + ` <span>· click one to show only its stocks. Tested on sub-themes Jul 2025–Oct 2026: +4.9% vs the average group over 40 sessions, about the same as any group up 10%+ vs SPY on 60D; a watch list, not a buy signal.</span>`;
+    accBox.querySelectorAll(".accsub").forEach(b => b.addEventListener("click", () => { U.sub = b.dataset.g; sel2.value = U.sub; U.limit = 100; draw(current()); }));
+  };
+  card.querySelector(".head").after(accBox); showAcc();
   app.append(card);
   const body = card.querySelector("tbody"), moreRow = card.querySelector(".more-row");
   const filtered = () => T.stocks.filter(s => (U.tier === "All" || (s[rsKey()] ?? 0) >= +U.tier) && (!U.theme || s.themes.includes(U.theme))
-    && (!U.sub || s.sub === U.sub) && (!U.q || s.t.toLowerCase().startsWith(U.q) || (s.name || "").toLowerCase().includes(U.q)));
+    && (!U.sub || s.sub === U.sub) && (!U.q || s.t.toLowerCase().startsWith(U.q) || (s.name || "").toLowerCase().includes(U.q)) && (ACF[U.acc] || ACF.all)(s));
   const draw = (rows) => {
     body.innerHTML = rows.slice(0, U.limit).map(s => `<tr>${stockCells(s, "both")}</tr>`).join("");
     moreRow.innerHTML = rows.length > U.limit ? `<button>Show ${Math.min(100, rows.length - U.limit)} more (${rows.length - U.limit} hidden)</button>` : "";

@@ -726,6 +726,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   strong on 60D without the speed-up did as well (−0.8 pts, n.s.) → the edge is plain 60D strength; median episode ≈ flat (fat tail:
   Memory, Custom Silicon, Cloud Comms fired Mar 6 2026). Oct 30: 13 groups on (IT Services early since Oct 15, Defense IT early since Oct 22).
   Oracle payload ~2 MB (1,099 rows).
+  **Stocks parent** (Oct 31, Adam: "another parent for stocks, start with the stocks table like the original dash"): NAV ("stocks", "Stocks",
+  [("stocks", "Stocks")]) = v1 `renderStocks`. Shared template (v1 too): chips "Accelerating vs SPY" All / ▲ Sub-theme accelerating · early /
+  Sub-theme accelerating / Stock accelerating · early / Stock accelerating (`ACF`, from `DATA.themes.oracle` subs/rows `ac`; localStorage stAcc)
+  + `.accbox` listing the sub-themes (click one = sub-theme dropdown). Themes table search (v1 too) now finds a ticker (exact) or company name
+  (3+ letters): groups holding it show "has NVDA" and open their stock list (`tickHits`).
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and

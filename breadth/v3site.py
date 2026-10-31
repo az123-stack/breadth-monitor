@@ -21,6 +21,7 @@ ORACLE_JS = Path(__file__).with_name("v3_oracle.js")
 # parent key, label, [(sub-tab key = v1 renderer key, label)]
 NAV = [
     ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle")]),
+    ("stocks", "Stocks", [("stocks", "Stocks")]),   # Oct 31 (Adam: "add another parent for stocks and start building that out")
 ]
 
 NAV_JS = """const V3_NAV = %s;
