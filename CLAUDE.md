@@ -715,6 +715,17 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   bars cost ~0.6 s of compositor "Layerize" per Themes click; 4×-throttled click 1.1 s → 0.2 s). Theme Dash repaints in place
   (`paint`, `TD_PAINT`; v3 swap in `rerenderPanel`) so chip clicks and live refreshes don't reload the TradingView iframe.
   Avoid inline `opacity` on repeated small elements — use color-mix / rgba colors.
+  30D cohort + ACCELERATING filter (Oct 31, Adam: "a 30-day cohort" + "filter for groups like Defense IT / IT Services starting to accelerate;
+  catch runners like Cloud Communications"; card R-2026-10-31-accelerating-groups, layer `oracle_accel`, info): `COHORTS` adds d30, returns
+  `RETS` = 180/60/30/15/5 (r arrays now 5 long). `acc_tag(rel)` (rel = price ÷ SPY; index ÷ SPY for sub-themes): accelerating = 15-session pace
+  > 60 > 180 pace, 15-session rel > 0, 60-session rel ≥ +10% (`ACC`); strong = 60D ≥ +10%; stage early (180D rel < +25%) / running; start =
+  first fire of the episode (30-day gap), on20, v [180, 60, 15]. Rows / subs carry `ac`; rows `lq` (liquid); every liquid stock gets a row;
+  `rall` = every liquid stock ranked per cohort. Page: chips Filter All / ▲ Accelerating vs SPY / · early / Strong 60D (counts; localStorage
+  orFlt), stocks page through `rall` when a filter is on (> 12 pages → "page x of y"), "Vs SPY" column (`orAccCell`) in every table, note with
+  the evidence. Study tools/oracle_study/accel.py: accel + 60D ≥ +10% → +4.9% vs avg group 40d (t 4.3, halves +5.5/+4.3), but groups equally
+  strong on 60D without the speed-up did as well (−0.8 pts, n.s.) → the edge is plain 60D strength; median episode ≈ flat (fat tail:
+  Memory, Custom Silicon, Cloud Comms fired Mar 6 2026). Oct 30: 13 groups on (IT Services early since Oct 15, Defense IT early since Oct 22).
+  Oracle payload ~2 MB (1,099 rows).
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and

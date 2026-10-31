@@ -1998,6 +1998,13 @@ def test_oracle_cohorts():
         config.BENCHMARK = old
     assert O["cohorts"]["d5"][0] == "FAST" and "THIN" not in O["rows"] and len(O["rows"]["FAST"]["c"]) == 181 and len(O["spy"]) == 181
     assert O["rows"]["FAST"]["r"][0] > O["rows"]["SLOW"]["r"][0] > 0 and len(O["cohorts"]["d5"]) <= 15
+    assert len(O["rows"]["FAST"]["r"]) == 5 and "d30" in O["cohorts"] and O["rall"]["d30"][0] == "FAST"
+    # accelerating vs SPY: flat for 130 sessions, then speeding up → on, early; a fading line → off
+    rel = pd.Series([1.0] * 130 + [float(np.exp(0.00005 * k * k)) for k in range(1, 71)], index=d)
+    tag = oracle.acc_tag(rel)
+    assert tag["a"] == 1 and tag["stage"] == "running" and tag["v"][1] > 0.10 and tag["start"]
+    tag2 = oracle.acc_tag(pd.Series([1.0 + 0.003 * k for k in range(140)] + [1.42] * 60, index=d))
+    assert tag2["a"] == 0
     return f"{O['universe']} liquid"
 
 

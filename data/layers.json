@@ -576,6 +576,20 @@
    "affects_picks": false,
    "evidence": [],
    "notes": "Oct 29 Adam asked for a short-term RS next to the ~1-year RS Rating. Untested."
+  },
+  {
+   "id": "oracle_accel",
+   "name": "Oracle: accelerating vs SPY filter",
+   "kind": "code",
+   "owner": "daily update + page",
+   "status": "info",
+   "where": "oracle.acc_tag + v3_oracle.js OR_FLT",
+   "what": "Relative line vs SPY speeding up: 15-session pace > 60 > 180, 60D >= +10% vs SPY; stage early (<+25% 180D) / running; filter + Vs SPY column on v3 Oracle",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-10-31-accelerating-groups"
+   ],
+   "notes": "edge = plain 60D strength; acceleration adds nothing on top (Oct 31)"
   }
  ]
 }

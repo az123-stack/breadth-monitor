@@ -112,6 +112,9 @@ CSS = """
 /* Oracle */
 .orhead { padding: 12px 14px; margin-bottom: 12px; } .orhead h2 { font-size: 16px; margin: 0 0 8px; }
 .orhead .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; } .orsub, .orov { margin-top: 8px; }
+.oracc { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; margin-right: 4px; background: color-mix(in srgb, var(--up) 18%, transparent); color: var(--up); white-space: nowrap; }
+.oracc.running { background: color-mix(in srgb, var(--s2, #d95926) 18%, transparent); color: var(--s2, #d95926); } .oracc.st { background: var(--surface-2, rgba(127,127,127,.15)); color: inherit; font-weight: 500; }
+.orvs small { display: block; } .oraccnote { margin-top: 8px; max-width: 1100px; }
 .orpager { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; } .orpager button[disabled] { opacity: .4; cursor: default; }
 .orgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
 .orchart { padding: 10px 12px; position: relative; }
