@@ -726,6 +726,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   strong on 60D without the speed-up did as well (−0.8 pts, n.s.) → the edge is plain 60D strength; median episode ≈ flat (fat tail:
   Memory, Custom Silicon, Cloud Comms fired Mar 6 2026). Oct 30: 13 groups on (IT Services early since Oct 15, Defense IT early since Oct 22).
   Oracle payload ~2 MB (1,099 rows).
+  Find box (Oct 31, Adam: "find a specific sub-theme in here"): `.orq` input (not saved, 250 ms debounce, refocused after the redraw) → `qHit`:
+  sub-themes by name / group / a ticker they hold; stocks by ticker / company / sub-theme (3+ letters). A search looks through the full
+  ranking (`sall` / `rall`) for the chosen side + cohort and ignores the Filter row; pager + picker follow it; tickers in < 3-stock
+  sub-themes (e.g. NVDA, AI Accelerators & GPUs) get a "switch to Stocks" note.
   **Stocks parent** (Oct 31, Adam: "another parent for stocks, start with the stocks table like the original dash"): NAV ("stocks", "Stocks",
   [("stocks", "Stocks")]) = v1 `renderStocks`. Shared template (v1 too): chips "Accelerating vs SPY" All / ▲ Sub-theme accelerating · early /
   Sub-theme accelerating / Stock accelerating · early / Stock accelerating (`ACF`, from `DATA.themes.oracle` subs/rows `ac`; localStorage stAcc)

@@ -29,12 +29,17 @@ function renderOracle(app) {
   const COH = subs ? (weakSide ? O.wscohorts : O.scohorts) : (weakSide ? O.wcohorts : O.cohorts);
   // Adam, Oct 31: "run through all the sub-themes 15 at a time" → sub-theme view pages through the full ranking (O.sall), 15 per page
   // stocks page too when a filter is on (O.rall = every liquid stock ranked); filters keep the cohort's order
-  const fl = OR_FLT.some(x => x[0] === U.flt) ? U.flt : "all", RK = subs ? O.sall : (fl !== "all" ? O.rall : null);
-  const ALL = RK && RK[U.coh] ? (weakSide ? RK[U.coh].slice().reverse() : RK[U.coh]).filter(g => (subs ? O.subs : O.rows)[g] && orPass((subs ? O.subs : O.rows)[g].ac, fl)) : null;
+  // Oct 31 (Adam: "I need the ability to find a specific sub-theme in here"): a search box finds sub-themes (name, group, or a ticker they hold)
+  // or stocks (ticker / company); a search looks through every name in the ranking and ignores the Filter row
+  const q = (U.q || "").trim().toLowerCase();
+  const qHit = (k) => { if (!q) return true; if (subs) { const g = O.subs[k]; return k.toLowerCase().includes(q) || (g.group || "").toLowerCase().includes(q) || (g.members || []).some(t => t.toLowerCase() === q); }
+    const r = O.rows[k]; return k.toLowerCase().startsWith(q) || (r.name || "").toLowerCase().includes(q) || (q.length >= 3 && (r.sub || "").toLowerCase().includes(q)); };
+  const fl = q ? "all" : (OR_FLT.some(x => x[0] === U.flt) ? U.flt : "all"), RK = subs ? O.sall : (fl !== "all" || q ? O.rall : null);
+  const ALL = RK && RK[U.coh] ? (weakSide ? RK[U.coh].slice().reverse() : RK[U.coh]).filter(g => (subs ? O.subs : O.rows)[g] && orPass((subs ? O.subs : O.rows)[g].ac, fl) && qHit(g)) : null;
   const npg = ALL ? Math.ceil(ALL.length / OR_TOP) : 1, pg = Math.min(U.pg || 0, npg - 1), off = pg * OR_TOP;
   const SRC = subs ? O.subs : O.rows, list = (ALL ? ALL.slice(off, off + OR_TOP) : (COH[U.coh] || []).slice(0, OR_TOP)).filter(t => SRC[t]);
   const fName = { acc: "accelerating vs SPY", acc_early: "accelerating vs SPY, early", strong: "strong 60D vs SPY" }[fl] || "";
-  const rankTxt = !ALL ? "" : fl !== "all" ? `${fName}: ${ALL.length ? `${off + 1}–${off + list.length} of ${ALL.length}` : "none today"}` : pg ? `ranked ${off + 1}–${off + list.length} of ${ALL.length}` : "";
+  const rankTxt = !ALL ? "" : q ? `matching “${esc(U.q.trim())}”: ${ALL.length ? `${off + 1}–${off + list.length} of ${ALL.length}` : "none"}` : fl !== "all" ? `${fName}: ${ALL.length ? `${off + 1}–${off + list.length} of ${ALL.length}` : "none today"}` : pg ? `ranked ${off + 1}–${off + list.length} of ${ALL.length}` : "";
   const col = (i) => OR_PAL[i % OR_PAL.length];
   // live: a stock gets today's price; a sub-theme gets the average live move of its members on top of its last index value
   const liveMove = (g) => { const v = (O.subs[g].members || []).map(t => liveRow(t)).filter(L => L && L.chg != null).map(L => L.chg); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
@@ -53,7 +58,15 @@ function renderOracle(app) {
   f.append(chips("Cohorts", OR_COH.map(c => [c[0], c[1]]), U, "coh", save));
   const cnt = (k) => Object.values(subs ? O.subs : O.rows).filter(r => (subs || r.lq) && orPass(r.ac, k)).length;
   f.append(chips("Filter", OR_FLT.map(([k, l]) => [k, k === "all" ? l : `${l} <small>${cnt(k)}</small>`]), U, "flt", () => { lsSet("orFlt", U.flt); save(); }));
+  const qi = $(`<input type="search" class="orq" placeholder="${subs ? "Find a sub-theme (or a ticker it holds)" : "Find a ticker or company"}" aria-label="Find">`); qi.value = U.q || "";
+  let qt = null;
+  qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; U.pg = 0; U.hl = null; U.sub = "";
+    rerenderPanel(); const n = document.querySelector(".orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
+  f.append(qi);
   const sst = { s: U.log ? "log" : "lin" }; f.append(chips("Scale", [["lin", "% scale"], ["log", "Log scale"]], sst, "s", () => { U.log = sst.s === "log"; save(); }));
+  if (q && !ALL.length) { const tk = subs && O.rows[U.q.trim().toUpperCase()];
+    head.append($(`<div class="meta oraccnote">${tk ? `${esc(U.q.trim().toUpperCase())}'s sub-theme (${esc(tk.sub || "none")}) has fewer than 3 stocks with data, so it isn't drawn as a group. Switch View to <b>Stocks</b> to find ${esc(U.q.trim().toUpperCase())} itself.`
+      : `Nothing matches “${esc(U.q.trim())}” in the ${subs ? "sub-themes" : "liquid theme stocks"}. Clear the box to see the full list.`}</div>`)); }
   if (fl !== "all") head.append($(`<div class="meta oraccnote"><b>Accelerating vs SPY</b> = its line against SPY is rising faster over the last 15 sessions than over 60,
     and faster over 60 than over 180, with 60 sessions at least +10% vs SPY. <b>Early</b> = less than +25% vs SPY over 180 sessions (the run is young), <b>running</b> = already more.
     <b>Strong 60D</b> = +10% vs SPY over 60 sessions, accelerating or not. Tested on sub-themes Jul 2025–Oct 2026: accelerating groups beat the average group by +4.9% over the next
@@ -72,7 +85,7 @@ function renderOracle(app) {
   }
   // overlap line
   const coh = COH;
-  if (!pg && fl === "all") head.append($(`<div class="meta orov">Of these ${OR_TOP}, also in the top ${OR_TOP} of: ${OR_COH.filter(c => c[0] !== U.coh).map(c => `<b>${c[1]}</b> ${(coh[c[0]] || []).filter(x => list.includes(x)).length}`).join(" · ")}</div>`));
+  if (!pg && fl === "all" && !q) head.append($(`<div class="meta orov">Of these ${OR_TOP}, also in the top ${OR_TOP} of: ${OR_COH.filter(c => c[0] !== U.coh).map(c => `<b>${c[1]}</b> ${(coh[c[0]] || []).filter(x => list.includes(x)).length}`).join(" · ")}</div>`));
   app.append(head);
   // ---- three charts (drawn for any list of keys: the cohort, or a picked sub-theme's stocks) ----
   const W = 400, H = 230;
