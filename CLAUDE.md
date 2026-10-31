@@ -732,6 +732,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   sub-themes (e.g. NVDA, AI Accelerators & GPUs) get a "switch to Stocks" note.
   Tables scroll in their own box (Oct 31, Adam: "can't see the graphs past ~17 names"): `.ortable .scroll` max-height max(280px, 100vh − 560px),
   sticky header (border-collapse separate), so the charts above stay on screen while hovering rows.
+  BUCKETS (Oct 31, Adam: "bucket a list of sub-themes, e.g. Emerging, show only those, then pick the ones I think are mature"): his own named
+  lists of sub-themes in localStorage `orBuckets` {order, m: {name: [sub-themes]}} (default empty Emerging + Mature; selected `orBk`). Bucket chip
+  row under the filters (All sub-themes / each bucket with count, + Add, Rename, Delete (click twice), Backup / restore = JSON copy-paste between
+  devices). A bucket narrows both views (stocks view = stocks whose sub-theme is in it) and combines with Filter; a search ignores it. Sub-theme
+  table "Buckets" column + the "Stocks in X" card carry toggle pills (`orBkPills`, a sub-theme can sit in several); stocks view tags the sub-theme.
+  Per browser only (nothing stored in the repo).
   **Stocks parent** (Oct 31, Adam: "another parent for stocks, start with the stocks table like the original dash"): NAV ("stocks", "Stocks",
   [("stocks", "Stocks")]) = v1 `renderStocks`. Shared template (v1 too): chips "Accelerating vs SPY" All / ▲ Sub-theme accelerating · early /
   Sub-theme accelerating / Stock accelerating · early / Stock accelerating (`ACF`, from `DATA.themes.oracle` subs/rows `ac`; localStorage stAcc)

@@ -13,6 +13,20 @@ function orAccCell(ac) {
   const v = ac.v || [], tag = ac.a ? `<span class="oracc ${ac.stage}">▲ Accelerating · ${ac.stage}${ac.start ? " · since " + shortDate(ac.start) : ""}</span>` : ac.st ? '<span class="oracc st">Strong 60D</span>' : "";
   return `<td class="l orvs" data-v="${ac.a ? 2 : ac.st ? 1 : 0}${(v[1] ?? 0).toFixed(3)}">${tag}<small class="meta">180 ${pct(v[0], 0)} · 60 ${pct(v[1], 0)} · 15 ${pct(v[2], 0)}</small></td>`;
 }
+// ---- buckets: Adam's own named lists of sub-themes (Oct 31). {order: [names], m: {name: [sub-themes]}}, saved in this browser ----
+const OR_BK_DEF = () => ({ order: ["Emerging", "Mature"], m: { Emerging: [], Mature: [] } });
+function orBuckets() {
+  try { const b = JSON.parse(lsGet("orBuckets", "") || "null"); if (b && Array.isArray(b.order) && b.m) { b.order = b.order.filter(n => Array.isArray(b.m[n])); return b; } } catch (e) {}
+  return OR_BK_DEF();
+}
+const orBucketsSave = (b) => lsSet("orBuckets", JSON.stringify(b));
+function orToggleBucket(name, g) {
+  const b = orBuckets(); if (!b.m[name]) return; const i = b.m[name].indexOf(g);
+  if (i >= 0) b.m[name].splice(i, 1); else b.m[name].push(g); orBucketsSave(b);
+}
+// pills that put a sub-theme in / out of each bucket (click doesn't select the row)
+const orBkPills = (g, B) => B.order.map(n => `<button class="orbkp${B.m[n].includes(g) ? " on" : ""}" data-g="${esc(g)}" data-b="${esc(n)}" title="${B.m[n].includes(g) ? "Take out of" : "Put in"} ${esc(n)}">${B.m[n].includes(g) ? "✓ " : "+ "}${esc(n)}</button>`).join("");
+const orBkTags = (g, B) => B.order.filter(n => B.m[n].includes(g)).map(n => `<span class="orbkt">${esc(n)}</span>`).join("");
 const OR_TOP = 15;   // Adam, Oct 30: top 7 → "lets try top 15"
 const OR_PAL = ["#2f6fdf", "#e0702b", "#2e9d5b", "#c23b6e", "#7b5bd6", "#c49a1a", "#1f9bb0", "#8c564b", "#d64545", "#5a6b7d", "#0f8a7e", "#b5568f", "#6b8e23", "#d4813a", "#4b6cb7"];
 function oracleLine(vals, w, h, lo, hi) {
@@ -22,7 +36,7 @@ function oracleLine(vals, w, h, lo, hi) {
 function renderOracle(app) {
   const O = (DATA.themes || {}).oracle;
   if (!O) { app.append($('<div class="card empty">Oracle data appears after the next data run.</div>')); return; }
-  UI.or = UI.or || { side: lsGet("orSide", "strong"), coh: lsGet("orCoh", "d5"), view: lsGet("orView", "stocks"), hl: null, log: lsGet("orLog", "0") === "1", sub: lsGet("orSub", ""), pg: 0, flt: lsGet("orFlt", "all") };
+  UI.or = UI.or || { side: lsGet("orSide", "strong"), coh: lsGet("orCoh", "d5"), view: lsGet("orView", "stocks"), hl: null, log: lsGet("orLog", "0") === "1", sub: lsGet("orSub", ""), pg: 0, flt: lsGet("orFlt", "all"), bk: lsGet("orBk", "") };
   const U = UI.or, live = liveActive(), subs = U.view === "subs" && O.subs;
   app.append(liveBar());
   const weakSide = U.side === "weak" && O.wcohorts;   // strongest (best return first) or weakest (worst return first)
@@ -34,12 +48,17 @@ function renderOracle(app) {
   const q = (U.q || "").trim().toLowerCase();
   const qHit = (k) => { if (!q) return true; if (subs) { const g = O.subs[k]; return k.toLowerCase().includes(q) || (g.group || "").toLowerCase().includes(q) || (g.members || []).some(t => t.toLowerCase() === q); }
     const r = O.rows[k]; return k.toLowerCase().startsWith(q) || (r.name || "").toLowerCase().includes(q) || (q.length >= 3 && (r.sub || "").toLowerCase().includes(q)); };
-  const fl = q ? "all" : (OR_FLT.some(x => x[0] === U.flt) ? U.flt : "all"), RK = subs ? O.sall : (fl !== "all" || q ? O.rall : null);
-  const ALL = RK && RK[U.coh] ? (weakSide ? RK[U.coh].slice().reverse() : RK[U.coh]).filter(g => (subs ? O.subs : O.rows)[g] && orPass((subs ? O.subs : O.rows)[g].ac, fl) && qHit(g)) : null;
+  // Oct 31 (Adam: "bucket a list of sub-themes … a list of emerging, show only those, then pick the ones I think are mature"): his own named
+  // lists of sub-themes, kept in this browser (localStorage orBuckets); a bucket narrows both views (stocks view = stocks whose sub-theme is in it)
+  const B = orBuckets(), bk = U.bk && B.m[U.bk] ? U.bk : "", bkSet = bk && !q ? new Set(B.m[bk]) : null;
+  const bkHit = (k) => !bkSet || bkSet.has(subs ? k : (O.rows[k] || {}).sub);
+  const fl = q ? "all" : (OR_FLT.some(x => x[0] === U.flt) ? U.flt : "all"), RK = subs ? O.sall : (fl !== "all" || q || bkSet ? O.rall : null);
+  const ALL = RK && RK[U.coh] ? (weakSide ? RK[U.coh].slice().reverse() : RK[U.coh]).filter(g => (subs ? O.subs : O.rows)[g] && orPass((subs ? O.subs : O.rows)[g].ac, fl) && qHit(g) && bkHit(g)) : null;
   const npg = ALL ? Math.ceil(ALL.length / OR_TOP) : 1, pg = Math.min(U.pg || 0, npg - 1), off = pg * OR_TOP;
   const SRC = subs ? O.subs : O.rows, list = (ALL ? ALL.slice(off, off + OR_TOP) : (COH[U.coh] || []).slice(0, OR_TOP)).filter(t => SRC[t]);
-  const fName = { acc: "accelerating vs SPY", acc_early: "accelerating vs SPY, early", strong: "strong 60D vs SPY" }[fl] || "";
-  const rankTxt = !ALL ? "" : q ? `matching “${esc(U.q.trim())}”: ${ALL.length ? `${off + 1}–${off + list.length} of ${ALL.length}` : "none"}` : fl !== "all" ? `${fName}: ${ALL.length ? `${off + 1}–${off + list.length} of ${ALL.length}` : "none today"}` : pg ? `ranked ${off + 1}–${off + list.length} of ${ALL.length}` : "";
+  const fName0 = { acc: "accelerating vs SPY", acc_early: "accelerating vs SPY, early", strong: "strong 60D vs SPY" }[fl] || "";
+  const fName = [bkSet ? `in your “${esc(bk)}” bucket` : "", fName0].filter(Boolean).join(", ");
+  const rankTxt = !ALL ? "" : q ? `matching “${esc(U.q.trim())}”: ${ALL.length ? `${off + 1}–${off + list.length} of ${ALL.length}` : "none"}` : (fl !== "all" || bkSet) ? `${fName}: ${ALL.length ? `${off + 1}–${off + list.length} of ${ALL.length}` : "none today"}` : pg ? `ranked ${off + 1}–${off + list.length} of ${ALL.length}` : "";
   const col = (i) => OR_PAL[i % OR_PAL.length];
   // live: a stock gets today's price; a sub-theme gets the average live move of its members on top of its last index value
   const liveMove = (g) => { const v = (O.subs[g].members || []).map(t => liveRow(t)).filter(L => L && L.chg != null).map(L => L.chg); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
@@ -58,11 +77,42 @@ function renderOracle(app) {
   f.append(chips("Cohorts", OR_COH.map(c => [c[0], c[1]]), U, "coh", save));
   const cnt = (k) => Object.values(subs ? O.subs : O.rows).filter(r => (subs || r.lq) && orPass(r.ac, k)).length;
   f.append(chips("Filter", OR_FLT.map(([k, l]) => [k, k === "all" ? l : `${l} <small>${cnt(k)}</small>`]), U, "flt", () => { lsSet("orFlt", U.flt); save(); }));
+  // ---- bucket bar ----
+  const bst = { bk };
+  const bkBar = $(`<div class="orbkbar"></div>`);
+  bkBar.append(chips("Bucket", [["", "All sub-themes"], ...B.order.map(n => [n, `${esc(n)} <small>${B.m[n].length}</small>`])], bst, "bk", () => { U.bk = bst.bk; lsSet("orBk", U.bk); save(); }));
+  const bkCtl = $(`<span class="orbkctl"><input type="text" class="orbknew" placeholder="New bucket name" maxlength="30" aria-label="New bucket name"><button class="xopen orbkadd">+ Add bucket</button>
+    ${bk ? `<button class="xopen orbkren">Rename “${esc(bk)}”</button><button class="xopen orbkdel">Delete “${esc(bk)}”</button>` : ""}<button class="xopen orbkbak">Backup / restore</button></span>`);
+  bkBar.append(bkCtl);
+  const nb = bkCtl.querySelector(".orbknew");
+  const addBk = () => { const n = nb.value.trim().replace(/\s+/g, " "); if (!n) { nb.focus(); return; } const b = orBuckets();
+    if (!b.m[n]) { b.m[n] = []; b.order.push(n); orBucketsSave(b); } U.bk = n; lsSet("orBk", n); save(); };
+  bkCtl.querySelector(".orbkadd").addEventListener("click", addBk);
+  nb.addEventListener("keydown", (e) => { if (e.key === "Enter") addBk(); });
+  if (bk) {
+    bkCtl.querySelector(".orbkren").addEventListener("click", () => { const n = nb.value.trim().replace(/\s+/g, " ");
+      if (!n) { nb.placeholder = "Type the new name here, then Rename"; nb.focus(); return; } const b = orBuckets(); if (b.m[n]) { nb.value = ""; nb.placeholder = "That name is taken"; return; }
+      b.m[n] = b.m[bk]; delete b.m[bk]; b.order = b.order.map(x => x === bk ? n : x); orBucketsSave(b); U.bk = n; lsSet("orBk", n); save(); });
+    const del = bkCtl.querySelector(".orbkdel");
+    del.addEventListener("click", () => { if (!del.dataset.sure) { del.dataset.sure = "1"; del.textContent = `Click again to delete “${bk}” (${B.m[bk].length} sub-themes)`; return; }
+      const b = orBuckets(); delete b.m[bk]; b.order = b.order.filter(x => x !== bk); orBucketsSave(b); U.bk = ""; lsSet("orBk", ""); save(); });
+  }
+  bkCtl.querySelector(".orbkbak").addEventListener("click", () => { if (bkBar.querySelector(".orbkbox")) { bkBar.querySelector(".orbkbox").remove(); return; }
+    const box = $(`<div class="orbkbox meta">Your buckets are saved in this browser only. To move them to another computer or phone: copy this text, open the page there,
+      click Backup / restore, paste it in and click Restore.<textarea rows="4" spellcheck="false"></textarea><button class="xopen orbkcopy">Copy</button> <button class="xopen orbkrest">Restore from the text above</button> <span class="orbkmsg"></span></div>`);
+    const ta = box.querySelector("textarea"), msg = box.querySelector(".orbkmsg"); ta.value = JSON.stringify(orBuckets());
+    box.querySelector(".orbkcopy").addEventListener("click", () => { ta.select(); try { navigator.clipboard.writeText(ta.value); } catch (e) { document.execCommand("copy"); } msg.textContent = "Copied."; });
+    box.querySelector(".orbkrest").addEventListener("click", () => { try { const b = JSON.parse(ta.value);
+        if (!b || !Array.isArray(b.order) || !b.m || b.order.some(n => !Array.isArray(b.m[n]))) throw 0;
+        orBucketsSave({ order: b.order, m: Object.fromEntries(b.order.map(n => [n, b.m[n].filter(x => typeof x === "string")])) }); U.bk = ""; lsSet("orBk", ""); save();
+      } catch (e) { msg.textContent = "That text isn't a bucket backup. Copy it again from the other device."; } });
+    bkBar.append(box); });
   const qi = $(`<input type="search" class="orq" placeholder="${subs ? "Find a sub-theme (or a ticker it holds)" : "Find a ticker or company"}" aria-label="Find">`); qi.value = U.q || "";
   let qt = null;
   qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; U.pg = 0; U.hl = null; U.sub = "";
     rerenderPanel(); const n = document.querySelector(".orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
   f.append(qi);
+  f.after(bkBar);
   const sst = { s: U.log ? "log" : "lin" }; f.append(chips("Scale", [["lin", "% scale"], ["log", "Log scale"]], sst, "s", () => { U.log = sst.s === "log"; save(); }));
   if (q && !ALL.length) { const tk = subs && O.rows[U.q.trim().toUpperCase()];
     head.append($(`<div class="meta oraccnote">${tk ? `${esc(U.q.trim().toUpperCase())}'s sub-theme (${esc(tk.sub || "none")}) has fewer than 3 stocks with data, so it isn't drawn as a group. Switch View to <b>Stocks</b> to find ${esc(U.q.trim().toUpperCase())} itself.`
@@ -72,6 +122,8 @@ function renderOracle(app) {
     <b>Strong 60D</b> = +10% vs SPY over 60 sessions, accelerating or not. Tested on sub-themes Jul 2025–Oct 2026: accelerating groups beat the average group by +4.9% over the next
     40 sessions (t 4.3, both halves), early +5.1%, running +6.7%. But groups simply strong on 60D did as well (+5.7%); the speed-up on top added nothing (−0.8 pts, not significant).
     The average is carried by a few big runners (Cloud Communications fired Mar 6 at the start of its run, Memory Aug 2025, Custom Silicon Apr 2026); the median episode ≈ flat. A watch list, not a buy signal.</div>`));
+  if (bkSet && !ALL.length) head.append($(`<div class="meta oraccnote">${B.m[bk].length ? `None of the ${B.m[bk].length} sub-themes in your “${esc(bk)}” bucket pass the Filter row. Set Filter to All.`
+    : `Your “${esc(bk)}” bucket is empty. Pick <b>All sub-themes</b> under Bucket, switch View to <b>Sub-themes</b>, and click <b>+ ${esc(bk)}</b> on the rows you want in it.`}</div>`));
   if (ALL && npg > 1) {   // page through every sub-theme, 15 at a time
     const goPg = (n) => { U.pg = Math.max(0, Math.min(npg - 1, n)); U.sub = ""; U.hl = null; rerenderPanel(); };
     const pst = { p: String(pg) };
@@ -85,7 +137,7 @@ function renderOracle(app) {
   }
   // overlap line
   const coh = COH;
-  if (!pg && fl === "all" && !q) head.append($(`<div class="meta orov">Of these ${OR_TOP}, also in the top ${OR_TOP} of: ${OR_COH.filter(c => c[0] !== U.coh).map(c => `<b>${c[1]}</b> ${(coh[c[0]] || []).filter(x => list.includes(x)).length}`).join(" · ")}</div>`));
+  if (!pg && fl === "all" && !q && !bkSet) head.append($(`<div class="meta orov">Of these ${OR_TOP}, also in the top ${OR_TOP} of: ${OR_COH.filter(c => c[0] !== U.coh).map(c => `<b>${c[1]}</b> ${(coh[c[0]] || []).filter(x => list.includes(x)).length}`).join(" · ")}</div>`));
   app.append(head);
   // ---- three charts (drawn for any list of keys: the cohort, or a picked sub-theme's stocks) ----
   const W = 400, H = 230;
@@ -123,17 +175,17 @@ function renderOracle(app) {
   const retCells = (r) => r.map((v, k) => `<td class="num ${tint(v, [0.6, 0.3, 0.2, 0.12, 0.06][k])}${OR_COH[k][0] === U.coh ? " orsel" : ""}">${pct(v, 0)}</td>`).join("");
   const tbl = $(`<section class="card ortable"><div class="head"><h2>${esc(cname)} cohort · ${what}${rankTxt ? " " + rankTxt : ""} <span class="meta">· ${weakSide ? "weakest" : "strongest"} first${subs ? " · equal-weight index of each sub-theme · click a row to see its stocks below" : " · click a ticker for details"}</span></h2>
       <button class="xopen ortv">⬇ TradingView</button></div>
-    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">${subs ? "Sub-theme" : "Ticker"}</th><th class="l">${subs ? "Stocks (best 180D first)" : "Sub-theme"}</th><th>${subs ? "Strength" : "RS"}</th><th>180D</th><th>60D</th><th>30D</th><th>15D</th><th>5D</th><th class="l">Vs SPY</th>${live ? "<th>Today</th>" : ""}</tr></thead><tbody>
+    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">${subs ? "Sub-theme" : "Ticker"}</th><th class="l">${subs ? "Stocks (best 180D first)" : "Sub-theme"}</th><th>${subs ? "Strength" : "RS"}</th><th>180D</th><th>60D</th><th>30D</th><th>15D</th><th>5D</th><th class="l">Vs SPY</th>${live ? "<th>Today</th>" : ""}${subs ? '<th class="l">Buckets</th>' : ""}</tr></thead><tbody>
     ${list.map((t, i) => { const r = SRC[t];
       if (subs) { const m = live ? liveMove(t) : null;
         return `<tr data-t="${esc(t)}"><td class="num">${off + i + 1}</td><td class="l"><i class="orsw" style="background:${col(i)}"></i><b>${esc(t)}</b><small class="meta" style="display:block">${esc(r.group || "")} · ${r.n} stocks</small></td>
           <td class="l orsubs">${r.members.slice(0, 12).map(x => `<a href="#" class="tkl" data-t="${esc(x)}">${esc(x)}</a>`).join(" ")}${r.members.length > 12 ? ` <span class="meta">+${r.members.length - 12}</span>` : ""}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td>${retCells(r.r)}${orAccCell(r.ac)}
-          ${live ? `<td class="num">${m == null ? "–" : `<span class="${m > 0 ? "up" : "dn"}">${pct(m)}</span>`}</td>` : ""}</tr>`; }
+          ${live ? `<td class="num">${m == null ? "–" : `<span class="${m > 0 ? "up" : "dn"}">${pct(m)}</span>`}</td>` : ""}<td class="l orbkc">${orBkPills(t, B)}</td></tr>`; }
       const L = live ? liveRow(t) : null;
       return `<tr data-t="${esc(t)}"><td class="num">${i + 1}</td><td class="l"><i class="orsw" style="background:${col(i)}"></i><a href="#" class="tkl" data-t="${esc(t)}"><b>${esc(t)}</b></a><small class="meta" style="display:block">${esc(r.name || "")}</small></td>
-        <td class="l">${esc(r.sub || "–")}</td><td class="num">${r.rsr ?? "–"}</td>${retCells(r.r)}${orAccCell(r.ac)}
+        <td class="l">${esc(r.sub || "–")}${r.sub ? orBkTags(r.sub, B) : ""}</td><td class="num">${r.rsr ?? "–"}</td>${retCells(r.r)}${orAccCell(r.ac)}
         ${live ? `<td class="num">${L && L.chg != null ? `<span class="${L.chg > 0 ? "up" : "dn"}">${pct(L.chg)}</span>` : "–"}</td>` : ""}</tr>`; }).join("")}
-    <tr class="orspyrow"><td></td><td class="l"><b>SPY</b></td><td class="l meta">benchmark</td><td></td>${(O.spy_r || []).map(v => `<td class="num">${pct(v, 1)}</td>`).join("")}<td></td>${live ? "<td></td>" : ""}</tr>
+    <tr class="orspyrow"><td></td><td class="l"><b>SPY</b></td><td class="l meta">benchmark</td><td></td>${(O.spy_r || []).map(v => `<td class="num">${pct(v, 1)}</td>`).join("")}<td></td>${live ? "<td></td>" : ""}${subs ? "<td></td>" : ""}</tr>
     </tbody></table></div></section>`);
   app.append(tbl);
   // ---- a picked sub-theme's stocks (Adam, Oct 30: "select a sub-theme and have its stocks show below") ----
@@ -143,7 +195,8 @@ function renderOracle(app) {
     const g = O.subs[U.sub], mem = (g ? g.members : []).filter(t => O.rows[t]);
     const stockSeries = (t) => { const c = O.rows[t].c.slice(); if (live) { const L = liveRow(t); if (L && L.price) c.push(L.price); } return c; };
     const sec = $(`<section class="card orpick"><div class="head"><h2>Stocks in <span class="orpickname"></span> <span class="meta">· ${mem.length} stocks, best 180D first · pick another sub-theme from the list or click one in the table above</span></h2>
-        <div class="orpickctl"><select aria-label="Pick a sub-theme">${allSubs.map(x => `<option${x === U.sub ? " selected" : ""}>${esc(x)}</option>`).join("")}</select><button class="xopen orpicktv">⬇ TradingView</button></div></div></section>`);
+        <div class="orpickctl"><select aria-label="Pick a sub-theme">${allSubs.map(x => `<option${x === U.sub ? " selected" : ""}>${esc(x)}</option>`).join("")}</select><button class="xopen orpicktv">⬇ TradingView</button></div></div>
+        ${U.sub ? `<div class="orbkc orpickbk"><span class="meta">Buckets:</span> ${orBkPills(U.sub, B)}</div>` : ""}</section>`);
     sec.querySelector(".orpickname").textContent = U.sub || "";
     app.append(sec);
     if (mem.length) {
@@ -159,6 +212,7 @@ function renderOracle(app) {
     tbl.querySelectorAll("tr[data-t]").forEach(tr => tr.addEventListener("click", (ev) => { if (ev.target.closest("a.tkl")) return; U.sub = tr.dataset.t; lsSet("orSub", U.sub); U.hl = null; rerenderPanel();
       setTimeout(() => { const c = document.querySelector(".orpick"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60); }));
   }
+  app.querySelectorAll(".orbkp").forEach(b => b.addEventListener("click", (ev) => { ev.stopPropagation(); orToggleBucket(b.dataset.b, b.dataset.g); rerenderPanel(); }));
   tbl.querySelector(".ortv").addEventListener("click", () => tsDownload("oracle-" + cname.replace(/\s+/g, "").toLowerCase(),
     subs ? list.map(g => ({ name: "Oracle - " + (weakSide ? "weakest " : "") + cname + " - " + g, ticks: O.subs[g].members })) : [{ name: "Oracle - " + (weakSide ? "weakest " : "") + cname + " cohort", ticks: list }]));
   // ---- highlight a ticker across all charts ----
