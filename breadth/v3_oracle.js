@@ -157,14 +157,25 @@ function renderOracle(app) {
       const end = (l) => l.v[l.v.length - 1];
       const ranked = lines.slice().sort((a, b) => (end(b) ?? -9) - (end(a) ?? -9));
       const d0 = O.dates[O.dates.length - 1 - win];
+      // time axis (Adam, Oct 31: "the months on the bottom axis, just a baseline of time"): the first session of each month on the
+      // 180-session chart, dates every 10 / 5 sessions on the 60 / 15-session ones; x matches oracleLine (index ÷ points − 1)
+      const wd = O.dates.slice(-(win + 1)), npts = Math.max(...lines.map(l => l.v.length), spy.length) - 1 || 1;
+      const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const step = win > 60 ? 0 : win > 30 ? 10 : 5;   // 180: months · 60: every 10 sessions · 15: every 5
+      const xt = !step
+        ? wd.map((d, i) => i && d.slice(5, 7) !== wd[i - 1].slice(5, 7) ? { i, l: MON[+d.slice(5, 7) - 1] + (d.slice(5, 7) === "01" ? " " + d.slice(2, 4) : "") } : null).filter(Boolean)
+        : wd.map((d, i) => i && i % step === 0 ? { i, l: shortDate(d) } : null).filter(Boolean);
+      const xpos = (i) => i / npts * W;
       grid.append($(`<div class="card orchart"><div class="orch-h"><b>${win} sessions</b><span class="meta">since ${shortDate(d0)} · median ${pct(fmtY(end({ v: med })))} · SPY ${pct(fmtY(end({ v: spy })))}</span></div>
         <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" class="orsvg" role="img" aria-label="${esc(label)} over ${win} sessions">
+          ${xt.map(k => `<line x1="${xpos(k.i).toFixed(1)}" x2="${xpos(k.i).toFixed(1)}" y1="0" y2="${H}" class="orgridl"/>`).join("")}
           ${ticks.map(k => `<line x1="0" x2="${W}" y1="${k.y.toFixed(1)}" y2="${k.y.toFixed(1)}" class="orgridl"/>`).join("")}
           <line x1="0" x2="${W}" y1="${y0.toFixed(1)}" y2="${y0.toFixed(1)}" class="orzero"/>
           ${lines.map(l => `<polyline data-t="${esc(l.t)}" class="orl" points="${oracleLine(l.v, W, H, L0, H0)}" stroke="${col(l.i)}"/>`).join("")}
           <polyline class="orspy" points="${oracleLine(spy, W, H, L0, H0)}"/>
           <polyline class="ormed" points="${oracleLine(med, W, H, L0, H0)}"/>
         </svg>
+        <div class="orxaxis">${xt.map(k => `<span style="left:${(xpos(k.i) / W * 100).toFixed(2)}%">${k.l}</span>`).join("")}</div>
         <div class="oraxis">${ticks.map(k => `<span style="top:${(k.y / H * 100).toFixed(1)}%">${k.l}</span>`).join("")}</div>
         <div class="orrank">${ranked.map(l => `<span data-t="${esc(l.t)}"><i style="background:${col(l.i)}"></i>${esc(short && l.t.length > 22 ? l.t.slice(0, 21) + "…" : l.t)} ${pct(fmtY(end(l)), 0)}</span>`).join("")}</div></div>`));
     });

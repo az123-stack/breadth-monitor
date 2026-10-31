@@ -135,6 +135,8 @@ CSS = """
 .orsvg { width: 100%; height: 260px; display: block; overflow: visible; }
 .oraxis { position: absolute; left: 14px; right: 12px; top: 38px; height: 260px; pointer-events: none; }
 .oraxis span { position: absolute; left: 0; transform: translateY(-50%); font-size: 10.5px; color: var(--text-muted); background: var(--surface-1); padding: 0 3px; border-radius: 3px; }
+.orxaxis { position: relative; height: 16px; margin-top: 3px; border-top: 1px solid var(--grid); }
+.orxaxis span { position: absolute; top: 2px; transform: translateX(-50%); font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
 .orgridl { stroke: var(--grid); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .orzero { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; }
 .orl { fill: none; stroke-width: 1.6; opacity: .9; vector-effect: non-scaling-stroke; cursor: pointer; transition: opacity .12s; }
