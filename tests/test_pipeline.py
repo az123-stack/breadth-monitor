@@ -1970,6 +1970,7 @@ def test_v3_page_builds():
     assert "const V3_NAV" in h and '"groups", "Groups"' in h and "app.append(aiScoreCard" not in h
     assert "function renderThemeDash" in h and "themedash: renderThemeDash" in h
     assert "function renderOracle" in h and "oracle: renderOracle" in h
+    assert "ssetups: renderStockSetups" in h and "grotation: renderGroupRotation" in h and "function renderStockSetups" in h
     assert 'let TAB = "readout"' not in h and "Market Monitor v3" in h and h.count("/*__DATA__*/null") == 1
     tmp = Path(__import__("tempfile").mkdtemp()); old = config.DOCS_DIR
     try:

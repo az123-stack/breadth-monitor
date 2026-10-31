@@ -17,11 +17,12 @@ from .site import TEMPLATE, embed
 
 THEMEDASH_JS = Path(__file__).with_name("v3_themedash.js")
 ORACLE_JS = Path(__file__).with_name("v3_oracle.js")
+TABS_JS = Path(__file__).with_name("v3_tabs.js")
 
 # parent key, label, [(sub-tab key = v1 renderer key, label)]
 NAV = [
-    ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle")]),
-    ("stocks", "Stocks", [("stocks", "Stocks")]),   # Oct 31 (Adam: "add another parent for stocks and start building that out")
+    ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle"), ("grotation", "Rotation")]),
+    ("stocks", "Stocks", [("stocks", "Stocks"), ("ssetups", "Setups")]),   # Oct 31: Setups (third row: Lined-up buys); Rotation = money card only   # Oct 31 (Adam: "add another parent for stocks and start building that out")
 ]
 
 NAV_JS = """const V3_NAV = %s;
@@ -51,6 +52,11 @@ CSS = """
 .ptabs button { flex: none; background: none; border: 1px solid var(--border); border-radius: 999px; padding: 6px 16px; font: inherit;
   font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; }
 .ptabs button[aria-selected="true"] { background: var(--text-primary); border-color: var(--text-primary); color: var(--surface-0); }
+/* third row (Stocks → Setups → Lined-up buys …) */
+.tabs3 { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 12px; }
+.tabs3 button { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font: inherit; font-size: 13px;
+  font-weight: 600; color: var(--text-secondary); cursor: pointer; }
+.tabs3 button[aria-selected="true"] { border-color: var(--s1); color: var(--s1); background: color-mix(in srgb, var(--s1) 10%, transparent); }
 .v3tag { font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 2px 7px; border-radius: 999px; vertical-align: middle;
   border: 1px solid var(--border); color: var(--text-secondary); margin-left: 6px; }
 .xopen.revflag { display: none; }
@@ -196,7 +202,7 @@ SWAPS = [
     ('function pulseCard(T) {', PULSE_V3, "compact long / short cards (v1 version kept as pulseCardV1)"),
     (MODE_BTN_OLD, MODE_BTN_NEW, "Light / Dark switch in the header"),
     (MODE_JS_OLD, MODE_JS_NEW, "Light / Dark switch behaviour"),
-    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, themes: renderThemesTab,', "Theme Dash renderer"),
+    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, themes: renderThemesTab,', "Theme Dash renderer"),
     ('function renderTab(panel) {', None, "Theme Dash code (v3_themedash.js) before renderTab"),
     ('</style>', CSS, "v3 styles (first </style> only)"),
 ]
@@ -211,7 +217,7 @@ def page(template_text):
         if n != 1:
             raise ValueError(f"v3 build: expected the v1 template to contain this exactly once ({why}); found {n}")
         if new is None and old.startswith("function renderTab"):
-            new = THEMEDASH_JS.read_text() + "\n" + ORACLE_JS.read_text() + "\n" + old
+            new = THEMEDASH_JS.read_text() + "\n" + ORACLE_JS.read_text() + "\n" + TABS_JS.read_text() + "\n" + old
         elif new is None:
             new = NAV_JS % json.dumps([[k, l, [list(s) for s in subs]] for k, l, subs in NAV])
         html = html.replace(old, new, 1)
