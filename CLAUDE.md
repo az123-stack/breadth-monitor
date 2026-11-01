@@ -757,6 +757,9 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   $5+, $20M+/day (size ranking $100M+/day), ETFs out. Page `moneyStocksCard` (v3_tabs.js): ONE table, chips Window (msWin, default 30) / Show
   coming in · going out (msDir1) / Rank by Dollars · For its size (msBy); columns change, vs SPY, up days, $ vol vs normal, net $, share, avg $,
   RS, "Also top 20 in" other windows; "deal" tag; ⬇ TradingView. ~25 s per build. Descriptive only.
+  Oct 31 fix (Adam: "still don't see Apple when sorted by flow" — he was on For its size, where header sorting only re-sorts those 20): each
+  side is now ONE list = top 20 by dollars ∪ top 20 by share (~35–40 rows); Rank by only sets the order (chip click clears AUTOSORT for the
+  card); rows need 20+ sessions of history before the window (new listing AIOK showed 7,141× normal volume); table scrolls with a sticky header.
   Stocks → **Leadership** sub-tab (Oct 31, Adam; `sleaders`, `renderLeadership`) = v1 Market health card (`healthCard`, `DATA.themes.leadership`).
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`

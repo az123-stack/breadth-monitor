@@ -137,7 +137,7 @@ CSS = """
 .oraxis span { position: absolute; left: 0; transform: translateY(-50%); font-size: 10.5px; color: var(--text-muted); background: var(--surface-1); padding: 0 3px; border-radius: 3px; }
 .msc .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
 .mst1 th small { display: block; font-weight: 400; color: var(--text-muted); font-size: 10.5px; } .mst1 .msn { display: block; font-size: 11px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mst1 td.msbig { font-weight: 700; }
+.mst1 td.msbig { font-weight: 700; } .msscroll { max-height: max(420px, calc(100vh - 260px)); overflow: auto; } .msscroll table { border-collapse: separate; border-spacing: 0; } .msscroll thead th { position: sticky; top: 0; background: var(--surface-1); z-index: 1; }
 .msdeal { font-size: 10px; padding: 0 4px; border-radius: 6px; background: color-mix(in srgb, #c49a1a 28%, transparent); }
 .orxaxis { position: relative; height: 16px; margin-top: 3px; border-top: 1px solid var(--grid); }
 .orxaxis span { position: absolute; top: 2px; transform: translateX(-50%); font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }

@@ -323,7 +323,9 @@ def money_stocks(adjusted, stocks, universe=None):
         k = min(k, len(c) - 1)
         net, tot, adv = f.iloc[-k:].sum(), dv.iloc[-k:].sum(), dv.iloc[-k:].mean()
         ret = last / c.iloc[-k - 1] - 1
-        ok = (last >= MSTOCK["min_px"]) & (adv >= MSTOCK["min_dv"]) & ret.notna() & (tot > 0)
+        # traded 20+ sessions before the window starts: new listings (Oct 31: AIOK, "7,141x normal volume") have no "normal"
+        seasoned = c.iloc[:len(c) - k].notna().sum() >= 20
+        ok = (last >= MSTOCK["min_px"]) & (adv >= MSTOCK["min_dv"]) & ret.notna() & (tot > 0) & seasoned
         share = (net / tot.where(tot > 0)) * 100
         big = ok & (adv >= MSTOCK["size_dv"])
         up = (ch.iloc[-k:] > 0).sum()
@@ -336,10 +338,12 @@ def money_stocks(adjusted, stocks, universe=None):
         n = MSTOCK["n"]
         out["windows"].append({"k": int(k), "since": pd.Timestamp(c.index[-k]).strftime("%Y-%m-%d"),
                                "spy": round(float(spy.iloc[-1] / spy.iloc[-k - 1] - 1) * 100, 2),
-                               "in": rows(list(net[ok].sort_values(ascending=False).index[:n])),
-                               "out": rows(list(net[ok].sort_values().index[:n])),
-                               "in_size": rows(list(share[big].sort_values(ascending=False).index[:n])),
-                               "out_size": rows(list(share[big].sort_values().index[:n]))})
+                               # one list per side = top n by dollars + top n by share ($100M+/day), so the page can sort either way
+                               # (Oct 31, Adam: "still don't see Apple when I'm sorted by flow" while ranked for its size)
+                               "in": rows(list(dict.fromkeys(list(net[ok & (net > 0)].sort_values(ascending=False).index[:n])
+                                                             + list(share[big & (net > 0)].sort_values(ascending=False).index[:n])))),
+                               "out": rows(list(dict.fromkeys(list(net[ok & (net < 0)].sort_values().index[:n])
+                                                              + list(share[big & (net < 0)].sort_values().index[:n]))))})
     try:
         from . import store
         nm = store.load_names()
