@@ -24,46 +24,46 @@ function renderGroupRotation(app) {
   app.append(moneyTodayCard());
   app.append(moneyStocksCard());
 }
-// Oct 31 (Adam: "scroll down and show inflow and outflow of dollars for the top 20 stocks in each of the periods"):
-// DATA.themes.rotation.mstocks (rotation.money_stocks) = every liquid US stock ($5+, $20M+/day), top 20 per window by net $ flow
-// (dollar volume + on up days, - on down days) or by share of its own trading ($100M+/day). Rows [t, net $M, share %, price %, avg $M/day].
+// Oct 31 (Adam: "show inflow and outflow of dollars for the top 20 stocks in each of the periods"; then: "a single table like the
+// sub-themes rotation table, with the ability to select the time frame"): DATA.themes.rotation.mstocks (rotation.money_stocks) = every
+// liquid US stock ($5+, $20M+/day), top 20 per window by net $ flow (dollar volume + on up days, − on down days) or by share of its own
+// trading ($100M+/day). Rows [t, net $M, share %, price %, avg $M/day, up days, $ volume vs the 50 sessions before]; window spy = SPY %.
 function moneyStocksCard() {
   const M = ((DATA.themes || {}).rotation || {}).mstocks;
   if (!M || !M.windows) return $('<section class="card empty">Stock-level dollar flows appear after the next data run.</section>');
-  UI.ms = UI.ms || { dir: lsGet("msDir", "both"), by: lsGet("msBy", "usd") };
+  UI.ms = UI.ms || { win: lsGet("msWin", "30"), dir: lsGet("msDir1", "in"), by: lsGet("msBy", "usd") };
   const U = UI.ms, sizeView = U.by === "size";
+  if (!M.windows.some(w => String(w.k) === U.win)) U.win = String(M.windows[M.windows.length - 1].k);
+  const W = M.windows.find(w => String(w.k) === U.win), key = U.dir + (sizeView ? "_size" : ""), rows = W[key] || [];
   const S = {}; (DATA.themes.stocks || []).forEach(r => { S[r.t] = r; });
+  const seen = {}; M.windows.forEach(w => (w[key] || []).forEach(r => { (seen[r[0]] = seen[r[0]] || []).push(w.k); }));
   const fm = (v) => `${v > 0 ? "+" : v < 0 ? "−" : ""}$${Math.abs(v) >= 1000 ? (Math.abs(v) / 1000).toFixed(1) + "B" : Math.round(Math.abs(v)) + "M"}`;
-  const lbl = (k) => k === 90 ? "90 days" : k === 30 ? "30 days" : k + " days";
-  const card = $(`<section class="card msc"><div class="head"><h2>Stocks: where the dollars went <span class="meta">· top ${M.rules.n} by net dollar flow in each window, as of the ${shortDate(M.date)} close</span></h2>
+  const sg = (v, d = 1) => v == null ? "–" : `${v > 0 ? "+" : ""}${v.toFixed(d)}`;
+  const inSide = U.dir === "in";
+  const card = $(`<section class="card msc"><div class="head"><h2>Stocks: where the dollars went · last ${W.k} sessions <span class="meta">· top ${M.rules.n} by net dollar ${inSide ? "inflow" : "outflow"}${sizeView ? " for their size" : ""}, ${shortDate(W.since)} – ${shortDate(M.date)} close</span></h2>
       <button class="xopen mstv">⬇ TradingView</button></div><div class="filters"></div>
     <p class="meta">Net $ flow = a stock's dollar volume counted <b>+</b> on days it closed up and <b>−</b> on days it closed down, added over the window.
       ${sizeView ? `<b>For its size</b> ranks by net flow as a share of everything the stock traded (stocks trading $${Math.round(M.rules.size_dv / 1e6)}M+ a day), so a mid cap being bought hard ranks next to a mega cap.`
-        : "<b>Dollars</b> favours the biggest companies (Apple, Microsoft): they trade so much that a small tilt is billions."}
-      Every US stock $${M.rules.min_px}+ trading $${Math.round(M.rules.min_dv / 1e6)}M+ a day. <b>×N</b> = in this top ${M.rules.n} in N of the 5 windows. Click a ticker for details. <b>deal</b> = being acquired, so its flow is the deal.
-      Descriptive: net flow alone hasn't tested as a forward signal.</p></section>`);
-  const f = card.querySelector(".filters"), save = () => { lsSet("msDir", U.dir); lsSet("msBy", U.by); rerenderPanel(); };
-  f.append(chips("Show", [["both", "Inflow and outflow"], ["in", "Inflow"], ["out", "Outflow"]], U, "dir", save));
+        : "<b>Dollars</b> favours the biggest companies (Apple, Microsoft): they trade so much that a small tilt is billions. Switch to <b>For its size</b> to compare fairly."}
+      Every US stock $${M.rules.min_px}+ trading $${Math.round(M.rules.min_dv / 1e6)}M+ a day, no ETFs. SPY ${sg(W.spy)}% over the window. Click a ticker for details; click a column header to sort.
+      <b>deal</b> = being acquired, so its flow is the deal. Describes where money went; net flow alone hasn't tested as a forward signal.</p>
+    <div class="scroll"><table class="grid mst1"><thead><tr><th>#</th><th class="l">Stock</th><th class="l">Sub-theme</th><th>Change<small>${W.k} sessions</small></th><th>vs SPY</th>
+      <th>Up days<small>of ${W.k}</small></th><th>$ volume<small>vs normal</small></th><th>Net $ flow<small>up − down $ volume</small></th><th>Share<small>of its trading</small></th>
+      <th>Avg $ a day</th><th>RS</th><th class="l">Also top ${M.rules.n} in</th></tr></thead><tbody>
+    ${rows.map((r, i) => { const [t, n, sh, rt, adv, up, vr] = r, st = S[t] || {}, nm = (M.names || {})[t] || st.name || "", deal = (M.deals || {})[t];
+      const also = (seen[t] || []).filter(k => k !== W.k);
+      return `<tr><td class="num meta">${i + 1}</td><td class="l"><a href="#" class="tkl" data-t="${esc(t)}"><b>${esc(t)}</b></a>${deal ? ` <span class="msdeal" title="${esc(deal)}">deal</span>` : ""}<small class="meta msn">${esc(nm)}</small></td>
+        <td class="l">${esc(st.sub || "–")}</td><td class="num ${rt > 0 ? "up" : rt < 0 ? "dn" : ""}">${sg(rt)}%</td><td class="num ${rt - W.spy > 0 ? "up" : "dn"}">${sg(rt - W.spy)} pts</td>
+        <td class="num">${up ?? "–"}/${W.k}</td><td class="num${vr != null && vr >= 1.25 ? " msbig" : ""}">${vr == null ? "–" : vr.toFixed(2) + "×"}</td>
+        <td class="num ${n > 0 ? "up" : "dn"}">${fm(n)}</td><td class="num ${sh > 0 ? "up" : "dn"}">${sg(sh, 0)}%</td><td class="num">${fm(adv).replace("+", "")}</td>
+        <td class="num">${st.rsr != null ? Math.round(st.rsr) : "–"}</td><td class="l meta">${also.length ? also.map(k => k + "d").join(" · ") : "–"}</td></tr>`; }).join("")}
+    </tbody></table></div></section>`);
+  const f = card.querySelector(".filters"), save = () => { lsSet("msWin", U.win); lsSet("msDir1", U.dir); lsSet("msBy", U.by); rerenderPanel(); };
+  f.append(chips("Window", M.windows.map(w => [String(w.k), w.k + " days"]), U, "win", save));
+  f.append(chips("Show", [["in", "Money coming in"], ["out", "Money going out"]], U, "dir", save));
   f.append(chips("Rank by", [["usd", "Dollars"], ["size", "For its size"]], U, "by", save));
-  const sides = U.dir === "both" ? ["in", "out"] : [U.dir];
-  sides.forEach(side => {
-    const key = side + (sizeView ? "_size" : "");
-    const seen = {}; M.windows.forEach(w => (w[key] || []).forEach(r => { seen[r[0]] = (seen[r[0]] || 0) + 1; }));
-    const sec = $(`<div class="mssec"><h3 class="${side === "in" ? "up" : "dn"}">${side === "in" ? "Money coming in" : "Money going out"} <span class="meta">· biggest net ${side === "in" ? "inflow" : "outflow"}${sizeView ? " for its size" : " in dollars"}</span></h3><div class="msgrid"></div></div>`);
-    const g = sec.querySelector(".msgrid");
-    M.windows.forEach(w => {
-      const rows = w[key] || [];
-      g.append($(`<div class="mscol"><div class="msh"><b>${lbl(w.k)}</b> <span class="meta">since ${shortDate(w.since)}</span></div>
-        <table class="grid mst"><thead><tr><th>#</th><th class="l">Stock</th><th>Net $</th><th>Share</th><th>Price</th></tr></thead><tbody>
-        ${rows.map((r, i) => { const s = S[r[0]] || {}, nm = (M.names || {})[r[0]] || s.name || "", tip = [nm, s.sub].filter(Boolean).join(" · ") + ` · avg $${Math.round(r[4])}M a day`;
-          return `<tr title="${esc(tip)}"><td class="num meta">${i + 1}</td><td class="l"><a href="#" class="tkl" data-t="${esc(r[0])}"><b>${esc(r[0])}</b></a>${(M.deals || {})[r[0]] ? ` <span class="msdeal" title="${esc(M.deals[r[0]])}">deal</span>` : ""}${seen[r[0]] >= 3 ? ` <span class="msx">×${seen[r[0]]}</span>` : ""}<small class="meta msn">${esc(s.sub || nm)}</small></td>
-            <td class="num ${r[1] > 0 ? "up" : "dn"}">${fm(r[1])}</td><td class="num">${r[2] > 0 ? "+" : ""}${r[2].toFixed(0)}%</td><td class="num ${r[3] > 0 ? "up" : r[3] < 0 ? "dn" : ""}">${r[3] > 0 ? "+" : ""}${r[3].toFixed(1)}%</td></tr>`; }).join("")}
-        </tbody></table></div>`));
-    });
-    card.append(sec);
-  });
-  card.querySelector(".mstv").addEventListener("click", () => tsDownload("money-flow-stocks", sides.flatMap(side => M.windows.map(w => ({
-    name: `${side === "in" ? "Inflow" : "Outflow"} ${sizeView ? "(for its size) " : ""}${lbl(w.k)}`, ticks: (w[side + (sizeView ? "_size" : "")] || []).map(r => r[0]) })))));
+  card.querySelector(".mstv").addEventListener("click", () => tsDownload("money-flow-stocks", [{
+    name: `${inSide ? "Money in" : "Money out"} ${W.k} days${sizeView ? " (for its size)" : ""}`, ticks: rows.map(r => r[0]) }]));
   return card;
 }
 // Stocks → Leadership (Oct 31, Adam: "a tab for Leadership and add this" = the v1 Breadth tab's Market health card)

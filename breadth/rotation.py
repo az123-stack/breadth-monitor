@@ -293,7 +293,8 @@ MSTOCK = {"windows": (3, 5, 15, 30, 90), "n": 20, "min_px": 5.0, "min_dv": 20e6,
 
 def money_stocks(adjusted, stocks, universe=None):
     """Top `n` net dollar inflow / outflow stocks per window, by dollars and by share of their own trading.
-    Rows: [ticker, net $M, share %, price change %, avg $M a day over the window]."""
+    Rows: [ticker, net $M, share %, price change %, avg $M a day over the window, up days, $ volume vs the 50 sessions before].
+    Window `spy` = SPY's change over the window (%) for the page's vs SPY column."""
     S = stocks or {}
     if universe is None:
         try:
@@ -302,14 +303,16 @@ def money_stocks(adjusted, stocks, universe=None):
         except Exception:
             universe = ()
     keep = set(universe or ()) | {t for t, r in S.items() if (r or {}).get("is_stock")}
-    keep.discard("SPY")
+    keep.add("SPY")
     sub = adjusted[adjusted["ticker"].isin(keep)]
-    dates = sorted(sub["date"].unique())[-(max(MSTOCK["windows"]) + 2):]
+    dates = sorted(sub["date"].unique())[-(max(MSTOCK["windows"]) + 52):]
     sub = sub[sub["date"].isin(dates)]
     c = sub.pivot_table(index="date", columns="ticker", values="c").sort_index()
     v = sub.pivot_table(index="date", columns="ticker", values="v").reindex_like(c)
-    if len(c) < 10:
+    if len(c) < 10 or "SPY" not in c.columns:
         return None
+    spy = c.pop("SPY")
+    v = v.drop(columns=["SPY"], errors="ignore")
     ch = c / c.shift(1) - 1
     dv = (c * v).fillna(0.0)
     f = dv * np.sign(ch).fillna(0.0)
@@ -323,11 +326,16 @@ def money_stocks(adjusted, stocks, universe=None):
         ok = (last >= MSTOCK["min_px"]) & (adv >= MSTOCK["min_dv"]) & ret.notna() & (tot > 0)
         share = (net / tot.where(tot > 0)) * 100
         big = ok & (adv >= MSTOCK["size_dv"])
+        up = (ch.iloc[-k:] > 0).sum()
+        pre = dv.iloc[max(0, len(dv) - k - 50):len(dv) - k].mean()
+        vrel = adv / pre.where(pre > 0)
         def rows(idx):
             used.update(idx)
-            return [[t, round(float(net[t]) / 1e6, 1), round(float(share[t]), 1), round(float(ret[t]) * 100, 1), round(float(adv[t]) / 1e6, 1)] for t in idx]
+            return [[t, round(float(net[t]) / 1e6, 1), round(float(share[t]), 1), round(float(ret[t]) * 100, 1), round(float(adv[t]) / 1e6, 1),
+                     int(up[t]), None if not np.isfinite(vrel[t]) else round(float(vrel[t]), 2)] for t in idx]
         n = MSTOCK["n"]
         out["windows"].append({"k": int(k), "since": pd.Timestamp(c.index[-k]).strftime("%Y-%m-%d"),
+                               "spy": round(float(spy.iloc[-1] / spy.iloc[-k - 1] - 1) * 100, 2),
                                "in": rows(list(net[ok].sort_values(ascending=False).index[:n])),
                                "out": rows(list(net[ok].sort_values().index[:n])),
                                "in_size": rows(list(share[big].sort_values(ascending=False).index[:n])),

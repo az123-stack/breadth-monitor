@@ -135,13 +135,10 @@ CSS = """
 .orsvg { width: 100%; height: 260px; display: block; overflow: visible; }
 .oraxis { position: absolute; left: 14px; right: 12px; top: 38px; height: 260px; pointer-events: none; }
 .oraxis span { position: absolute; left: 0; transform: translateY(-50%); font-size: 10.5px; color: var(--text-muted); background: var(--surface-1); padding: 0 3px; border-radius: 3px; }
-.msc .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; } .mssec h3 { margin: 14px 0 6px; font-size: 15px; }
-.msgrid { display: grid; grid-template-columns: repeat(5, minmax(230px, 1fr)); gap: 10px; overflow-x: auto; }
-.mscol { border: 1px solid var(--border); border-radius: 10px; padding: 6px 8px; min-width: 0; } .msh { margin: 2px 0 4px; }
-.mst { width: 100%; font-size: 12px; table-layout: auto; } .mst td, .mst th { padding: 3px 3px; white-space: nowrap; } .mst td.l { white-space: normal; } .mscol { overflow: hidden; } .msn { display: block; max-width: 105px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10.5px; }
+.msc .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
+.mst1 th small { display: block; font-weight: 400; color: var(--text-muted); font-size: 10.5px; } .mst1 .msn { display: block; font-size: 11px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mst1 td.msbig { font-weight: 700; }
 .msdeal { font-size: 10px; padding: 0 4px; border-radius: 6px; background: color-mix(in srgb, #c49a1a 28%, transparent); }
-.msx { font-size: 10px; padding: 0 4px; border-radius: 6px; background: color-mix(in srgb, #2f6fdf 15%, transparent); }
-@media (max-width: 900px) { .msgrid { grid-template-columns: repeat(5, 240px); } }
 .orxaxis { position: relative; height: 16px; margin-top: 3px; border-top: 1px solid var(--grid); }
 .orxaxis span { position: absolute; top: 2px; transform: translateX(-50%); font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
 .orgridl { stroke: var(--grid); stroke-width: 1; vector-effect: non-scaling-stroke; }
