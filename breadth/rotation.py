@@ -285,6 +285,78 @@ def money_hist(adjusted, groups, stocks, n=MHIST_DAYS):
     return out
 
 
+# Oct 31 (Adam: "show inflow and outflow of dollars for the top 20 stocks in each of the periods"): every liquid US stock, not
+# just theme stocks. Net $ flow = dollar volume counted + on up days and - on down days over the window (same as money_hist);
+# share = net / total dollar volume (the fair way to compare a mega cap with a mid cap). Descriptive only, not a tested signal.
+MSTOCK = {"windows": (3, 5, 15, 30, 90), "n": 20, "min_px": 5.0, "min_dv": 20e6, "size_dv": 100e6}
+
+
+def money_stocks(adjusted, stocks, universe=None):
+    """Top `n` net dollar inflow / outflow stocks per window, by dollars and by share of their own trading.
+    Rows: [ticker, net $M, share %, price change %, avg $M a day over the window]."""
+    S = stocks or {}
+    if universe is None:
+        try:
+            from . import store
+            universe = store.load_universe()
+        except Exception:
+            universe = ()
+    keep = set(universe or ()) | {t for t, r in S.items() if (r or {}).get("is_stock")}
+    keep.discard("SPY")
+    sub = adjusted[adjusted["ticker"].isin(keep)]
+    dates = sorted(sub["date"].unique())[-(max(MSTOCK["windows"]) + 2):]
+    sub = sub[sub["date"].isin(dates)]
+    c = sub.pivot_table(index="date", columns="ticker", values="c").sort_index()
+    v = sub.pivot_table(index="date", columns="ticker", values="v").reindex_like(c)
+    if len(c) < 10:
+        return None
+    ch = c / c.shift(1) - 1
+    dv = (c * v).fillna(0.0)
+    f = dv * np.sign(ch).fillna(0.0)
+    last = c.iloc[-1]
+    out = {"date": pd.Timestamp(c.index[-1]).strftime("%Y-%m-%d"), "windows": [], "rules": {k: v for k, v in MSTOCK.items() if k != "windows"}}
+    used = set()
+    for k in MSTOCK["windows"]:
+        k = min(k, len(c) - 1)
+        net, tot, adv = f.iloc[-k:].sum(), dv.iloc[-k:].sum(), dv.iloc[-k:].mean()
+        ret = last / c.iloc[-k - 1] - 1
+        ok = (last >= MSTOCK["min_px"]) & (adv >= MSTOCK["min_dv"]) & ret.notna() & (tot > 0)
+        share = (net / tot.where(tot > 0)) * 100
+        big = ok & (adv >= MSTOCK["size_dv"])
+        def rows(idx):
+            used.update(idx)
+            return [[t, round(float(net[t]) / 1e6, 1), round(float(share[t]), 1), round(float(ret[t]) * 100, 1), round(float(adv[t]) / 1e6, 1)] for t in idx]
+        n = MSTOCK["n"]
+        out["windows"].append({"k": int(k), "since": pd.Timestamp(c.index[-k]).strftime("%Y-%m-%d"),
+                               "in": rows(list(net[ok].sort_values(ascending=False).index[:n])),
+                               "out": rows(list(net[ok].sort_values().index[:n])),
+                               "in_size": rows(list(share[big].sort_values(ascending=False).index[:n])),
+                               "out_size": rows(list(share[big].sort_values().index[:n]))})
+    try:
+        from . import store
+        nm = store.load_names()
+    except Exception:
+        nm = {}
+    out["names"] = {t: (S.get(t) or {}).get("name") or nm.get(t) or "" for t in sorted(used)}
+    try:   # deal stocks (being acquired): their flow is the deal, flagged on the page
+        import json as _j
+        from . import config as _c
+        dl = _j.loads((_c.DATA_DIR / "aimon.json").read_text()).get("exclude") or {}
+        out["deals"] = {t: dl[t] for t in used if t in dl}
+    except Exception:
+        out["deals"] = {}
+    return out
+
+
+def money_stocks_safe(*a):
+    try:
+        return money_stocks(*a)
+    except Exception as e:  # never lose the rotation tab over this panel
+        import logging
+        logging.getLogger("breadth").exception("money stocks failed: %s", e)
+        return None
+
+
 def money_hist_safe(*a):
     try:
         return money_hist(*a)
@@ -294,7 +366,7 @@ def money_hist_safe(*a):
         return None
 
 
-def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub_members=None):
+def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub_members=None, universe=None):
     T = theme_data or {}
     subs = {r["theme"]: r for r in T.get("subthemes") or []}
     if sub_members is None:
@@ -402,6 +474,7 @@ def build(adjusted, theme_data, kq_data=None, macro_data=None, history=None, sub
             "turning": [{**brief(g), "days": int(len(F["cross"][g]) - 1 - np.flatnonzero(F["cross"][g].to_numpy())[-1])} for g in turning],
             "bt": ev, "spark_dates": [d.strftime("%Y-%m-%d") for d in dates[-60:]],
             "flow": flow_safe(close, vol, sub_members, F, regimes, subs, stocks),
+            "mstocks": money_stocks_safe(adjusted, stocks, universe),
             "mhist": money_hist_safe(adjusted, {"sub": sub_members, "theme": {r["theme"]: r.get("members") or [] for r in T.get("themes") or []}}, stocks),
             "ignition": ignition_safe(close, sub_members, F, flow_frames(close, vol, sub_members, F), history, subs, stocks, in_setups, drives, vol)}
 

@@ -750,6 +750,11 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   Lined-up buys accelerating filter (Oct 31, Adam; shared template, v1 too): chips All / ▲ Group accelerating · early / ▲ Group accelerating /
   ▲ Stock accelerating · early (`LUF`, from oracle subs/rows `ac` by row `g` / `t`; localStorage luAcc), counts per chip, "▲ group accelerating ·
   stage · since" line under each name; empty-filter message. Oct 30: 35 lined up, 11 in early-accelerating groups.
+  Groups → Rotation also has **Stocks: where the dollars went** (Oct 31, Adam: "inflow and outflow of dollars for the top 20 stocks in each
+  of the periods"): `rotation.money_stocks` → `rotation.mstocks` {date, windows [{k 3/5/15/30/90, since, in, out, in_size, out_size: rows
+  [t, net $M, share %, price %, avg $M/day]}], names, deals (data/aimon.json exclude = being acquired), rules}; every universe + theme stock
+  $5+, $20M+/day (size ranking $100M+/day), ETFs out. Page `moneyStocksCard` (v3_tabs.js): chips Show in/out/both (msDir), Rank by Dollars /
+  For its size (msBy), 5 window columns per side, ×N = in N windows, "deal" tag, ⬇ TradingView. ~25 s per build. Descriptive only.
   Stocks → **Leadership** sub-tab (Oct 31, Adam; `sleaders`, `renderLeadership`) = v1 Market health card (`healthCard`, `DATA.themes.leadership`).
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
