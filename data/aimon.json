@@ -416,7 +416,8 @@
  },
  "exclude": {
   "BRZE": "being acquired by Salesforce (Oct 20, 2026)",
-  "PTC": "being acquired by Schneider Electric (Oct 5, 2026)"
+  "PTC": "being acquired by Schneider Electric (Oct 5, 2026)",
+  "MKTX": "being acquired by Intercontinental Exchange (announced Aug 2026)"
  },
  "manual": {
   "NOW": {
