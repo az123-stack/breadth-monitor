@@ -189,10 +189,11 @@ function renderOracle(app) {
   const oneDay = (c) => c && c.length > 1 && c[c.length - 2] ? c[c.length - 1] / c[c.length - 2] - 1 : null;
   const todayOf = (t, sub) => { if (live) { if (sub) { const m = liveMove(t); if (m != null) return m; } else { const L = liveRow(t); if (L && L.chg != null) return L.chg; } }
     return oneDay((sub ? O.subs : O.rows)[t].c); };
-  const todayCell = (v) => `<td class="num ${tint(v, 0.03)}">${v == null ? "–" : `<span class="${v > 0 ? "up" : v < 0 ? "dn" : ""}">${pct(v, 1)}</span>`}</td>`;
-  const todayTh = `<th>Today<small class="meta" style="display:block;font-weight:400">${live ? "live" : shortDate(O.date) + " close"}</small></th>`;
+  // same look as the period columns (plain number, shaded cell, one-line header); the date sits in the header's tooltip
+  const todayCell = (v) => `<td class="num ${tint(v, 0.03)}">${pct(v, 1)}</td>`;
+  const todayTh = `<th title="${live ? "Live move from the Google sheet" : "Move on the " + shortDate(O.date) + " close (last session)"}">Today</th>`;
   const adrCell = (r) => `<td class="num">${r.adr == null ? "–" : r.adr.toFixed(1) + "%"}</td>`;
-  const adrTh = '<th>ADR<small class="meta" style="display:block;font-weight:400">20 day</small></th>';
+  const adrTh = '<th title="Average daily range over the last 20 sessions">ADR 20D</th>';
   const retCells = (r) => r.map((v, k) => `<td class="num ${tint(v, [0.6, 0.3, 0.2, 0.12, 0.06][k])}${OR_COH[k][0] === U.coh ? " orsel" : ""}">${pct(v, 0)}</td>`).join("");
   const tbl = $(`<section class="card ortable"><div class="head"><h2>${esc(cname)} cohort · ${what}${rankTxt ? " " + rankTxt : ""} <span class="meta">· ${weakSide ? "weakest" : "strongest"} first${subs ? " · equal-weight index of each sub-theme · click a row to see its stocks below" : " · click a ticker for details"}</span></h2>
       <button class="xopen ortv">⬇ TradingView</button></div>
