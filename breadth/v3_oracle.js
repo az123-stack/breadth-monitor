@@ -183,20 +183,28 @@ function renderOracle(app) {
   };
   app.append(drawGrid(list, series, cname + " cohort", subs));
   // ---- table of the cohort ----
+  // Today (Adam, Oct 31: "make sure today is one of the periods"): the live move while the sheet is newer than our close, else the last
+  // session's move from the closes; ADR = 20-day average daily range % (stock tables)
+  const spyToday = () => { if (live) { const L = liveRow("SPY"); if (L && L.chg != null) return L.chg; } return oneDay(O.spy); };
+  const oneDay = (c) => c && c.length > 1 && c[c.length - 2] ? c[c.length - 1] / c[c.length - 2] - 1 : null;
+  const todayOf = (t, sub) => { if (live) { if (sub) { const m = liveMove(t); if (m != null) return m; } else { const L = liveRow(t); if (L && L.chg != null) return L.chg; } }
+    return oneDay((sub ? O.subs : O.rows)[t].c); };
+  const todayCell = (v) => `<td class="num ${tint(v, 0.03)}">${v == null ? "–" : `<span class="${v > 0 ? "up" : v < 0 ? "dn" : ""}">${pct(v, 1)}</span>`}</td>`;
+  const todayTh = `<th>Today<small class="meta" style="display:block;font-weight:400">${live ? "live" : shortDate(O.date) + " close"}</small></th>`;
+  const adrCell = (r) => `<td class="num">${r.adr == null ? "–" : r.adr.toFixed(1) + "%"}</td>`;
+  const adrTh = '<th>ADR<small class="meta" style="display:block;font-weight:400">20 day</small></th>';
   const retCells = (r) => r.map((v, k) => `<td class="num ${tint(v, [0.6, 0.3, 0.2, 0.12, 0.06][k])}${OR_COH[k][0] === U.coh ? " orsel" : ""}">${pct(v, 0)}</td>`).join("");
   const tbl = $(`<section class="card ortable"><div class="head"><h2>${esc(cname)} cohort · ${what}${rankTxt ? " " + rankTxt : ""} <span class="meta">· ${weakSide ? "weakest" : "strongest"} first${subs ? " · equal-weight index of each sub-theme · click a row to see its stocks below" : " · click a ticker for details"}</span></h2>
       <button class="xopen ortv">⬇ TradingView</button></div>
-    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">${subs ? "Sub-theme" : "Ticker"}</th><th class="l">${subs ? "Stocks (best 180D first)" : "Sub-theme"}</th><th>${subs ? "Strength" : "RS"}</th><th>180D</th><th>60D</th><th>30D</th><th>15D</th><th>5D</th><th class="l">Vs SPY</th>${live ? "<th>Today</th>" : ""}${subs ? '<th class="l">Buckets</th>' : ""}</tr></thead><tbody>
+    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">${subs ? "Sub-theme" : "Ticker"}</th><th class="l">${subs ? "Stocks (best 180D first)" : "Sub-theme"}</th><th>${subs ? "Strength" : "RS"}</th>${subs ? "" : adrTh}<th>180D</th><th>60D</th><th>30D</th><th>15D</th><th>5D</th>${todayTh}<th class="l">Vs SPY</th>${subs ? '<th class="l">Buckets</th>' : ""}</tr></thead><tbody>
     ${list.map((t, i) => { const r = SRC[t];
-      if (subs) { const m = live ? liveMove(t) : null;
+      if (subs) {
         return `<tr data-t="${esc(t)}"><td class="num">${off + i + 1}</td><td class="l"><i class="orsw" style="background:${col(i)}"></i><b>${esc(t)}</b><small class="meta" style="display:block">${esc(r.group || "")} · ${r.n} stocks</small></td>
-          <td class="l orsubs">${r.members.slice(0, 12).map(x => `<a href="#" class="tkl" data-t="${esc(x)}">${esc(x)}</a>`).join(" ")}${r.members.length > 12 ? ` <span class="meta">+${r.members.length - 12}</span>` : ""}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td>${retCells(r.r)}${orAccCell(r.ac)}
-          ${live ? `<td class="num">${m == null ? "–" : `<span class="${m > 0 ? "up" : "dn"}">${pct(m)}</span>`}</td>` : ""}<td class="l orbkc">${orBkPills(t, B)}</td></tr>`; }
-      const L = live ? liveRow(t) : null;
-      return `<tr data-t="${esc(t)}"><td class="num">${i + 1}</td><td class="l"><i class="orsw" style="background:${col(i)}"></i><a href="#" class="tkl" data-t="${esc(t)}"><b>${esc(t)}</b></a><small class="meta" style="display:block">${esc(r.name || "")}</small></td>
-        <td class="l">${esc(r.sub || "–")}${r.sub ? orBkTags(r.sub, B) : ""}</td><td class="num">${r.rsr ?? "–"}</td>${retCells(r.r)}${orAccCell(r.ac)}
-        ${live ? `<td class="num">${L && L.chg != null ? `<span class="${L.chg > 0 ? "up" : "dn"}">${pct(L.chg)}</span>` : "–"}</td>` : ""}</tr>`; }).join("")}
-    <tr class="orspyrow"><td></td><td class="l"><b>SPY</b></td><td class="l meta">benchmark</td><td></td>${(O.spy_r || []).map(v => `<td class="num">${pct(v, 1)}</td>`).join("")}<td></td>${live ? "<td></td>" : ""}${subs ? "<td></td>" : ""}</tr>
+          <td class="l orsubs">${r.members.slice(0, 12).map(x => `<a href="#" class="tkl" data-t="${esc(x)}">${esc(x)}</a>`).join(" ")}${r.members.length > 12 ? ` <span class="meta">+${r.members.length - 12}</span>` : ""}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td>${retCells(r.r)}${todayCell(todayOf(t, true))}${orAccCell(r.ac)}
+          <td class="l orbkc">${orBkPills(t, B)}</td></tr>`; }
+      return `<tr data-t="${esc(t)}"><td class="num">${off + i + 1}</td><td class="l"><i class="orsw" style="background:${col(i)}"></i><a href="#" class="tkl" data-t="${esc(t)}"><b>${esc(t)}</b></a><small class="meta" style="display:block">${esc(r.name || "")}</small></td>
+        <td class="l">${esc(r.sub || "–")}${r.sub ? orBkTags(r.sub, B) : ""}</td><td class="num">${r.rsr ?? "–"}</td>${adrCell(r)}${retCells(r.r)}${todayCell(todayOf(t, false))}${orAccCell(r.ac)}</tr>`; }).join("")}
+    <tr class="orspyrow"><td></td><td class="l"><b>SPY</b></td><td class="l meta">benchmark</td><td></td>${subs ? "" : "<td></td>"}${(O.spy_r || []).map(v => `<td class="num">${pct(v, 1)}</td>`).join("")}${todayCell(spyToday())}<td></td>${subs ? "<td></td>" : ""}</tr>
     </tbody></table></div></section>`);
   app.append(tbl);
   // ---- a picked sub-theme's stocks (Adam, Oct 30: "select a sub-theme and have its stocks show below") ----
@@ -212,10 +220,10 @@ function renderOracle(app) {
     app.append(sec);
     if (mem.length) {
       app.append(drawGrid(mem, stockSeries, U.sub + " stocks", false));
-      app.append($(`<section class="card ortable orpicktable"><div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Ticker</th><th>RS</th><th>180D</th><th>60D</th><th>30D</th><th>15D</th><th>5D</th><th class="l">Vs SPY</th>${live ? "<th>Today</th>" : ""}</tr></thead><tbody>
-        ${mem.map((t, i) => { const r = O.rows[t], L = live ? liveRow(t) : null;
+      app.append($(`<section class="card ortable orpicktable"><div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Ticker</th><th>RS</th>${adrTh}<th>180D</th><th>60D</th><th>30D</th><th>15D</th><th>5D</th>${todayTh}<th class="l">Vs SPY</th></tr></thead><tbody>
+        ${mem.map((t, i) => { const r = O.rows[t];
           return `<tr data-t="${esc(t)}"><td class="num">${i + 1}</td><td class="l"><i class="orsw" style="background:${col(i)}"></i><a href="#" class="tkl" data-t="${esc(t)}"><b>${esc(t)}</b></a><small class="meta" style="display:block">${esc(r.name || "")}</small></td>
-            <td class="num">${r.rsr ?? "–"}</td>${retCells(r.r)}${orAccCell(r.ac)}${live ? `<td class="num">${L && L.chg != null ? `<span class="${L.chg > 0 ? "up" : "dn"}">${pct(L.chg)}</span>` : "–"}</td>` : ""}</tr>`; }).join("")}
+            <td class="num">${r.rsr ?? "–"}</td>${adrCell(r)}${retCells(r.r)}${todayCell(todayOf(t, false))}${orAccCell(r.ac)}</tr>`; }).join("")}
         </tbody></table></div></section>`));
     }
     sec.querySelector("select").addEventListener("change", (e) => { U.sub = e.target.value; lsSet("orSub", U.sub); U.hl = null; rerenderPanel(); });

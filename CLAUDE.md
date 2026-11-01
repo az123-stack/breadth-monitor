@@ -739,6 +739,8 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   table "Buckets" column + the "Stocks in X" card carry toggle pills (`orBkPills`, a sub-theme can sit in several); stocks view tags the sub-theme.
   Per browser only (nothing stored in the repo).
   Time axis (Oct 31, Adam): `.orxaxis` under each chart + faint vertical lines: months on 180, dates every 10 / 5 sessions on 60 / 15.
+  Today + ADR columns (Oct 31, Adam): every Oracle table has "Today" after 5D (live move when `liveActive()`, else the last session's move
+  from the closes, header says which; SPY row too); stock tables add "ADR · 20 day" (rows `adr` = stocks `adr` %). Stock rank # continues across pages.
   **Stocks parent** (Oct 31, Adam: "another parent for stocks, start with the stocks table like the original dash"): NAV ("stocks", "Stocks",
   [("stocks", "Stocks")]) = v1 `renderStocks`. Shared template (v1 too): chips "Accelerating vs SPY" All / ▲ Sub-theme accelerating · early /
   Sub-theme accelerating / Stock accelerating · early / Stock accelerating (`ACF`, from `DATA.themes.oracle` subs/rows `ac`; localStorage stAcc)

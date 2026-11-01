@@ -98,7 +98,7 @@ def build(adjusted, theme_data=None):
         s = meta[t]
         return {"name": s.get("name"), "sub": s.get("sub") or ((s.get("themes") or [""])[0]), "rsr": s.get("rsr"),
                 "r": [_r(rets[k].get(t)) for k in RETS], "c": [_r(v, 2) for v in win[t].tolist()],
-                "lq": int(t in liq), "ac": acc_tag(C[t] / spyC)}
+                "lq": int(t in liq), "ac": acc_tag(C[t] / spyC), "adr": s.get("adr")}
     rows = {}
     for t in sorted(need):
         rows[t] = row(t)
