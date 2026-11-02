@@ -1,42 +1,59 @@
 {
- "for_date": "2026-10-29",
- "written": "2026-10-30T11:05Z",
- "headline": "Hot 3.6% PCE and a Fed with two hike dissents meet Brent near $115 over Hormuz risk, with the Nov 6 payrolls the next big test.",
+ "for_date": "2026-10-30",
+ "written": "2026-11-02T12:09Z",
+ "headline": "Fed-hike fears and an AI-spending wobble hit tech Friday; oil is swinging on Hormuz tensions and Iran-US talks, with Apple earnings tonight, midterms Tuesday and payrolls Friday.",
  "risk": "high",
- "rates": "The 10-year fell 7 bp to 4.98% on Oct 29 (2-year 4.61%, 30-year 5.32%) despite September PCE running 3.6% y/y.",
- "fed": "The Fed held at 3.75%-4% on Oct 28 in a 10-2 vote with Cook and Hammack dissenting for a hike, and traders priced about an 84% chance of a hike at the Dec 8-9 meeting; Fed speakers return as the blackout ends.",
- "oil": "Brent settled near $114.88 and WTI near $102 as hopes for Iran's proposed Hormuz reopening plan offset supply fears and Houthi missile attacks on Saudi Arabia.",
- "geo": "The Strait of Hormuz remains disrupted, Trump denied peace talks are underway, and the Nasdaq fell 1.4% on Oct 29 after Alphabet and Amazon capex worries.",
+ "rates": "The 10-year yield is near 4.9-5.0% after the Fed held at 3.75-4.00% on Oct 28 with two dissents for a hike, and betting markets price a December hike as likely.",
+ "fed": "No FOMC decision until Dec 8-9; Goolsbee speaks today and regional presidents have said a hike may still be needed, so Friday's payrolls is the key input.",
+ "oil": "Oil is volatile near $100 (Brent reported higher, falling sharply Monday) on tanker attacks around the Strait of Hormuz and reports of Iran-US diplomacy.",
+ "geo": "Middle East escalation risk around Hormuz plus US midterm elections on Tuesday Nov 3, where Democrats are expected to regain Congress.",
  "events": [
   {
-   "date": "2026-10-30",
-   "time": "8:30 AM ET",
-   "name": "Q3 Employment Cost Index",
+   "date": "2026-11-02",
+   "time": "10:00 AM ET",
+   "name": "ISM manufacturing PMI",
    "impact": "medium"
   },
   {
-   "date": "2026-10-30",
-   "time": "9:45 AM ET",
-   "name": "Chicago PMI (October)",
-   "impact": "medium"
+   "date": "2026-11-02",
+   "time": "5:00 PM ET",
+   "name": "Apple earnings (after close)",
+   "impact": "high"
   },
   {
    "date": "2026-11-03",
+   "time": "All day",
+   "name": "US midterm elections",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-04",
    "time": "10:00 AM ET",
-   "name": "JOLTS job openings (September)",
+   "name": "ISM services PMI",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-05",
+   "time": "7:00 AM ET",
+   "name": "Bank of England decision",
    "impact": "medium"
   },
   {
    "date": "2026-11-06",
    "time": "8:30 AM ET",
-   "name": "October nonfarm payrolls",
+   "name": "October jobs report (payrolls)",
+   "impact": "high"
+  },
+  {
+   "date": "2026-11-10",
+   "time": "8:30 AM ET",
+   "name": "CPI (October)",
    "impact": "high"
   }
  ],
  "sources": [
-  "https://cappnotes.substack.com/p/closing-look-thursday-october-29",
-  "https://finance.yahoo.com/economy/policy/live/fed-meeting-live-updates-federal-reserve-october-meeting-kevin-warsh-161129201.html",
-  "https://fedratecalc.com/us-economic-calendar/november-2026/",
-  "https://www.fool.com/coverage/stock-market-today/2026/10/29/stock-market-today-oct-29-amazon-falls-on-q3-earnings-report-and-capex-concerns/"
+  "https://www.simianx.ai/stories/us-economic-calendar-this-month-in-your-time-zone",
+  "https://www.riotimesonline.com/global-economy-briefing-november-2-2026/",
+  "https://www.caixabankresearch.com/en/publications/financial-markets-daily-report/02-november-2026"
  ]
 }
