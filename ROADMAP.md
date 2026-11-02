@@ -22,6 +22,14 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
   compare the top lists (overlap, who each one finds), and backtest both (top 10% / 20% by each → next 20 / 60 sessions vs SPY and vs the
   average liquid stock, halves, by breadth regime; also the 3-month-only and blended versions, and the short RS periods rs2w/rs4w/rs6w).
   Answer which to keep (or offer it as another "RS period" chip), file a research card.
+- [ ] **"Golden eggs" that never show up** (Adam, Nov 1: "NTRA is super strong and not even in our universe … these can't get missed").
+  Checked Nov 1: NTRA IS in the data (Genomics & Diagnostics, RS 97, +99% 180D, +56% 60D, ~5% off its high, $580M/day) but no list
+  surfaces it: Oracle shows the top 15 only (NTRA #20 on 60D, #74 on 180D); Leaders "Any theme" (`lists.strongest`, top 40) is crowded by
+  pinned deal stocks (HZO #2 with a 0.29% ADR, sitting "at the high") so NTRA misses it; no setup fired. Fixes to build: (1) drop deal /
+  pinned stocks (ADR < ~0.8% or aimon.json exclude) from every leader list; (2) a "Strongest stocks" view (RS 90+, liquid, near highs,
+  sortable, one table, every name, not a top-N) on the v3 Stocks tab; (3) a weekly "new leaders you haven't seen" alert = names that just
+  entered RS 95+ / Oracle top 20 on 60D or 180D and aren't on any list; (4) widen the reclass worklist (busy names like TW, $100M+/day,
+  regardless of RS) so unfiled stocks get a sub-theme.
 
 ## Next up (Adam: "next week")
 1. **Trade warehouse + stacked R** (Adam, Oct 27: "this trade is 0.8R, that one 0.5R, but layered together 1.3R — keep making this
