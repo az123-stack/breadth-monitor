@@ -13,6 +13,16 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
 - First reclass agent run Sat Oct 31 8:37 AM ET; Adam answers "apply reclass N" / "reject reclass N". Worklist already flags ESS (REIT in
   Batteries & Storage), CME, ISRG, stale WBD / PSKY / ATKR / BZH.
 
+## Wednesday Nov 4, 2026 (Adam: "when my usage resets")
+- [ ] **RS formula check: sheet vs dashboard.** Adam's "Trading Dashboard v12" sheet uses
+  `=IFERROR(ROUND((googlefinance(A4,"price")/INDEX(googlefinance(A4,"price",TODAY()-90,TODAY()-63,1),2,2)-1)*100,2),"")`
+  = raw % change from the first close ~90 calendar days ago (≈ 62 sessions) to now, one period, not ranked.
+  Ours = RS Rating 1–99: 63/126/189/252-session returns weighted 40/20/20/20, percentile vs liquid stocks.
+  Adam: "it definitely comes up with different stocks, I just don't know which is better." Plan: rebuild the sheet's number from our bars,
+  compare the top lists (overlap, who each one finds), and backtest both (top 10% / 20% by each → next 20 / 60 sessions vs SPY and vs the
+  average liquid stock, halves, by breadth regime; also the 3-month-only and blended versions, and the short RS periods rs2w/rs4w/rs6w).
+  Answer which to keep (or offer it as another "RS period" chip), file a research card.
+
 ## Next up (Adam: "next week")
 1. **Trade warehouse + stacked R** (Adam, Oct 27: "this trade is 0.8R, that one 0.5R, but layered together 1.3R — keep making this
    smarter"). Card R-2026-10-27-r-stacking says how: (a) one table of every setup's past trades on the same yardstick (box, spring,
