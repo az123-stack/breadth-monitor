@@ -74,93 +74,96 @@
   }
  },
  "log": {
-  "asof": "2026-11-02",
-  "closed": 132,
-  "dates": 6,
+  "asof": "2026-11-03",
+  "closed": 151,
+  "dates": 7,
   "catalyst_positive": {
-   "n_good": 19,
-   "n_bad": 17,
-   "avg_good": 0.0274,
-   "avg_bad": -0.01113,
-   "dates": 3,
-   "diff": 0.03853,
-   "t": 0.6,
+   "n_good": 22,
+   "n_bad": 27,
+   "avg_good": 0.01665,
+   "avg_bad": -0.01987,
+   "dates": 4,
+   "diff": 0.03652,
+   "t": 0.49,
    "halves": [
-    0.10041,
-    -0.0053
+    0.0166,
+    0.01996
    ],
    "passed": false
   },
   "red_flags": {
-   "n_good": 26,
-   "n_bad": 19,
-   "avg_good": 0.00751,
-   "avg_bad": 0.01225,
-   "dates": 3,
-   "diff": -0.00474,
-   "t": 0.07,
+   "n_good": 37,
+   "n_bad": 23,
+   "avg_good": -0.00664,
+   "avg_bad": 0.00381,
+   "dates": 4,
+   "diff": -0.01045,
+   "t": 0.05,
    "halves": [
-    -0.07737,
-    0.04417
+    0.01091,
+    -0.00733
    ],
    "passed": false
   },
   "earnings_in_hold": {
-   "n_good": 25,
-   "n_bad": 13,
-   "avg_good": 0.02876,
-   "avg_bad": -0.0178,
-   "dates": 3,
-   "diff": 0.04656,
-   "t": 0.86,
+   "n_good": 30,
+   "n_bad": 15,
+   "avg_good": 0.01815,
+   "avg_bad": -0.01947,
+   "dates": 4,
+   "diff": 0.03762,
+   "t": 0.82,
    "halves": [
-    0.08108,
-    0.00724
+    0.06804,
+    -0.02257
    ],
    "passed": false
   },
   "macro_tailwind": {
-   "n_good": 65,
-   "n_bad": 1,
-   "avg_good": -0.02587,
-   "avg_bad": -0.00038,
-   "dates": 1,
-   "diff": -0.02549,
+   "n_good": 71,
+   "n_bad": 2,
+   "avg_good": -0.02765,
+   "avg_bad": 0.00775,
+   "dates": 2,
+   "diff": -0.0354,
    "t": null,
-   "halves": [],
+   "halves": [
+    -0.05036,
+    -0.06283
+   ],
    "passed": false
   },
   "more_support": {
-   "n_good": 5,
-   "n_bad": 69,
-   "avg_good": -0.03872,
-   "avg_bad": 0.03087,
-   "dates": 2,
-   "diff": -0.06959,
-   "t": null,
+   "n_good": 6,
+   "n_bad": 82,
+   "avg_good": -0.03832,
+   "avg_bad": 0.01917,
+   "dates": 3,
+   "diff": -0.05749,
+   "t": -0.63,
    "halves": [
     -0.13187,
-    0.02942
+    0.018
    ],
    "passed": false
   },
   "no_warnings": {
    "n_good": 63,
-   "n_bad": 16,
+   "n_bad": 19,
    "avg_good": 0.03395,
-   "avg_bad": -0.01863,
+   "avg_bad": -0.02187,
    "dates": 0,
-   "diff": 0.05258,
+   "diff": 0.05582,
    "t": null,
    "halves": [],
    "passed": false
   },
   "brief_low_risk": {
    "n_good": 0,
-   "n_bad": 41,
-   "dates": 2,
+   "n_bad": 60,
+   "dates": 3,
    "avg_good": null,
-   "avg_bad": -0.00957,
+   "avg_bad": -0.01999,
    "test": "welch over dates",
    "diff": null,
    "t": null,
