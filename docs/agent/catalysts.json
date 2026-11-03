@@ -1,519 +1,191 @@
 {
- "for_date": "2026-10-30",
- "written": "2026-11-02T12:18Z",
+ "for_date": "2026-11-02",
+ "written": "2026-11-03T12:16Z",
  "stocks": {
-  "SNPS": {
-   "why": "Rallied ~9% on Oct 2 after Investor Day (GPT-Synopsys with OpenAI, multi-year Amazon custom-silicon IP deal, long-term model) on top of a fiscal Q3 beat and raised EPS guidance; $1B accelerated buyback started Oct 5.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://247wallst.com/investing/2026/10/02/synopsys-is-the-nasdaq-100s-top-stock-today-the-target-says-its-not-done/",
-    "https://news.synopsys.com/2026-10-05-Synopsys-Initiates-1-Billion-Accelerated-Share-Repurchase-Agreement"
-   ]
-  },
-  "CTSH": {
-   "why": "Q3 reported Oct 29: revenue +4.6%, adj EPS +7.2%, margin at 4-year high, but shares fell; full-year guidance trimmed to 4.0-4.4% growth.",
+  "CCI": {
+   "why": "Reported Q3 2026 on Oct 21 (after close); revenue expected down ~6% y/y but AFFO up ~7%; tower sale proceeds used for debt paydown and buybacks. Nothing fresh found since.",
    "direction": "mixed",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "Q3 bookings down 7% y/y",
-    "organic growth weaker than headline (acquisitions/pass-through)",
-    "Project Leap restructuring costs $180-250M"
+    "DISH/Sprint exits cut 2026 billings ~$240M",
+    "$17.1B debt"
    ],
    "sources": [
-    "https://news.cognizant.com/2026-10-29-Cognizant-Reports-Third-Quarter-2026-Results",
-    "https://www.investing.com/news/transcripts/earnings-call-transcript-cognizant-tops-q3-2026-estimates-but-shares-fall-93CH-4984372"
+    "https://site.financialmodelingprep.com/market-news/crown-castle-cci-q3-2026-earnings-preview"
    ]
   },
-  "ASAN": {
-   "why": "No clear catalyst found; last report Sep 3 beat but stock fell ~13%; revenue growth slowing to ~10%.",
+  "NTSK": {
+   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
    "direction": "none",
    "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.tipranks.com/stocks/asan/earnings",
-    "https://www.panabee.com/news/asana-earnings-q2-2026-report"
+    "https://www.tipranks.com/stocks/NTSK/earnings",
+    "https://www.barchart.com/story/news/4386160/netskope-s-growth-trajectory-holds-but-the-billing-shift-still-clouds-cash-visibility"
    ]
   },
-  "OKTA": {
-   "why": "No clear catalyst found in search; likely cybersecurity group strength. Next earnings estimated early Dec (unconfirmed).",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.tipranks.com/stocks/okta/earnings"
-   ]
-  },
-  "FIGS": {
-   "why": "No clear catalyst found; marketbeat noted a 4% rise Sep 25 and analyst price targets below price.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/instant-alerts/price-figs-nyse-figs-shares-climb-4-heres-why-2026-09-25/",
-    "https://www.nasdaq.com/articles/wall-street-loves-figs-why-do-price-targets-predict-pullback"
-   ]
-  },
-  "QLYS": {
-   "why": "No clear catalyst found; rose 3.9% Oct 26 with cybersecurity group. Q2 beat in August. Next earnings not confirmed (MarketBeat estimate Nov 3, a call listed Nov 9).",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/stocks/NASDAQ/QLYS/earnings/"
-   ]
-  },
-  "TENB": {
-   "why": "No clear catalyst found; Q2 reported Jul 29, next report likely early Nov but unconfirmed.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/instant-alerts/tenable-nasdaqtenb-announces-earnings-results-2026-07-29/"
-   ]
-  },
-  "APPN": {
-   "why": "No clear catalyst found; shares jumped ~14% after Aug 7 earnings, older news. Next report likely early Nov, unconfirmed.",
-   "direction": "none",
+  "SPOT": {
+   "why": "Reported Q3 2026 on Oct 22: EPS $2.54 missed $2.86 estimate, revenue $5.10B beat slightly. Stock reaction not confirmed.",
+   "direction": "mixed",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
-   "red_flags": [],
+   "red_flags": [
+    "EPS miss on Oct 22 report"
+   ],
    "sources": [
-    "https://www.marketbeat.com/instant-alerts/appian-nasdaqappn-shares-up-142-on-strong-earnings-2026-08-07/"
+    "https://www.quiverquant.com/news/SPOTIFY+TECHNOLOGY+SA+%28%24SPOT%29+Releases+Q3+2026+Earnings",
+    "https://finviz.com/news/395042/spotify-technology-sa-to-announce-results-for-third-quarter-2026"
+   ]
+  },
+  "FIGS": {
+   "why": "No fresh catalyst found; stock reportedly up strongly in 2026 and Q2 (Aug 6) beat with raised guidance. Next report Nov 5 after close.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": "2026-11-05",
+   "red_flags": [
+    "earnings inside 5 sessions"
+   ],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/FIGS"
    ]
   },
   "BRZE": {
-   "why": "Pending Salesforce cash takeover at $47.50/share (~$5.66B); upside is capped.",
+   "why": "Salesforce agreed Oct 20 to acquire Braze for $47.50/share cash (~$5.66B), closing in Salesforce fiscal 2028. Pending cash takeover caps upside.",
    "direction": "negative",
    "quality": "strong",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "pending cash takeover (Salesforce), upside capped"
+    "pending cash takeover (capped upside)",
+    "Loop Capital downgrade"
    ],
    "sources": [
-    "https://www.asktraders.com/?p=256739",
-    "https://www.quiverquant.com/news/Braze+Surges+as+Salesforce+Strikes+%245.66+Billion+Cash+Deal"
+    "https://www.nasdaq.com/articles/why-braze-stock-skyrocketed-today",
+    "https://letsdatascience.com/news/salesforce-agrees-to-acquire-braze-for-566-billion-9d3d8c86"
    ]
   },
   "ANF": {
-   "why": "No clear catalyst found; last big move was the May earnings gap-up. Next report (Q3) typically late Nov, unconfirmed.",
+   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
    "direction": "none",
    "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.marketbeat.com/instant-alerts/abercrombie-fitch-nyseanf-shares-gap-up-after-better-than-expected-earnings-2026-05-27/"
-   ]
-  },
-  "CRL": {
-   "why": "No clear catalyst found; reports Q3 before the open Nov 4.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": "2026-11-04",
-   "red_flags": [
-    "earnings Nov 4 (inside 5 sessions)"
-   ],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "APA": {
-   "why": "No clear catalyst found; reports Q3 after the close Nov 4.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": "2026-11-04",
-   "red_flags": [
-    "earnings Nov 4 (inside 5 sessions)"
-   ],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "TEAM": {
-   "why": "No clear catalyst found; shares surged ~35% after Aug 6 report (older). Next report listed Nov 5 by TipRanks but unconfirmed.",
-   "direction": "none",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.tipranks.com/stocks/team/earnings"
-   ]
-  },
-  "PAYC": {
-   "why": "No clear catalyst found; reports Q3 after the close Nov 4.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": "2026-11-04",
-   "red_flags": [
-    "earnings Nov 4 (inside 5 sessions)"
-   ],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "RPD": {
-   "why": "Jumped ~20% on Oct 26 with no cause stated in sources checked (possible group move or takeover chatter, unverified). Earnings estimated Nov 4, unconfirmed.",
-   "direction": "none",
-   "quality": "weak",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [
-    "unexplained +20% move Oct 26"
-   ],
-   "sources": [
-    "https://www.marketbeat.com/stocks/NASDAQ/RPD/earnings/"
+    "https://www.tipranks.com/stocks/ANF/earnings",
+    "https://www.earningswhispers.com/stocks/anf"
    ]
   },
   "SN": {
-   "why": "earnings date check only",
+   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
    "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
+   "quality": "none",
+   "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
+    "https://www.tipranks.com/stocks/sn",
+    "https://beta.earningswhispers.com/go/w/SN"
    ]
   },
-  "SM": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
+  "APPN": {
+   "why": "Strong Q2 (Aug 6): revenue +19% y/y to $203M beat, Q3 guidance above consensus; stock +14% then. Next report unconfirmed, MarketBeat estimates Nov 5 (not confirmed).",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
    "earnings_date": null,
-   "red_flags": [],
+   "red_flags": [
+    "earnings likely inside 5 sessions (date unconfirmed)"
+   ],
    "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
+    "https://www.marketbeat.com/instant-alerts/appian-nasdaqappn-shares-up-142-on-strong-earnings-2026-08-07/"
    ]
   },
-  "AMRX": {
-   "why": "earnings date check only",
+  "LFST": {
+   "why": "No fresh news found; Q3 2026 results due Nov 5 before the open (company announcement).",
    "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "BOX": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "PR": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "S": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "VRNS": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "VEEV": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "FTRE": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "SAIC": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "OVV": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "LLY": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "TALO": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "COP": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
+   "quality": "none",
+   "depth": "full",
    "earnings_date": "2026-11-05",
-   "red_flags": [],
+   "red_flags": [
+    "earnings inside 5 sessions"
+   ],
    "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
+    "https://www.biopharmawatch.com/news/LFST/lifestance-q3-2026-earnings-call"
    ]
   },
-  "SU": {
-   "why": "earnings date check only",
+  "TEAM": {
+   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
    "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
+   "quality": "none",
+   "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
+    "https://www.digrin.com/stocks/detail/TEAM/earnings"
    ]
   },
-  "TEVA": {
-   "why": "earnings date check only",
+  "PAYC": {
+   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
    "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
+   "quality": "none",
+   "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
+    "https://www.tipranks.com/stocks/payc/earnings"
    ]
   },
-  "CVE": {
-   "why": "earnings date check only",
+  "CON": {
+   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
    "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
+   "quality": "none",
+   "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
+    "https://www.digrin.com/stocks/detail/CON/earnings"
    ]
   },
-  "FRSH": {
-   "why": "earnings date check only",
+  "CRL": {
+   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
    "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
+   "quality": "none",
+   "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
+    "https://www.webull.com/news/15813160628662272"
    ]
   },
-  "MRK": {
-   "why": "earnings date check only",
+  "ARX": {
+   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
    "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
+   "quality": "none",
+   "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
+    "https://www.zacks.com/amp/stock/news/2230846/skyward-specialty-insurance-group-inc-skwd-hit-a-52-week-high-can-the-run-continue"
    ]
   },
-  "AMGN": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": "2026-11-03",
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "VTRS": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
+  "SLDE": {
+   "why": "Q3 2026 (Oct 27): revenue +35.9% to $361M, EPS $1.09 (+37%), full-year net income outlook raised to $500-520M, $1.50 special dividend payable Nov 30 (ex-date likely soon).",
+   "direction": "positive",
+   "quality": "strong",
+   "depth": "full",
    "earnings_date": null,
-   "red_flags": [],
+   "red_flags": [
+    "combined ratio rose to 59.3% from 48.5%"
+   ],
    "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "INTA": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "ELF": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "HAS": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "GILD": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "XOM": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "CVX": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "SAIL": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "ACN": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
-   ]
-  },
-  "IT": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": "2026-11-03",
-   "red_flags": [],
-   "sources": [
-    "https://portfolio-terminal.com/earnings-calendar/november-2026"
+    "https://www.quiverquant.com/news/Slide+Insurance+Q3+Revenue+Rises+35.9%25+to+%24361.1+Million"
    ]
   }
  }
