@@ -1,29 +1,29 @@
 {
- "for_date": "2026-10-30",
- "written": "2026-11-02T12:09Z",
- "headline": "Fed-hike fears and an AI-spending wobble hit tech Friday; oil is swinging on Hormuz tensions and Iran-US talks, with Apple earnings tonight, midterms Tuesday and payrolls Friday.",
+ "for_date": "2026-11-02",
+ "written": "2026-11-03T12:04Z",
+ "headline": "Midterm elections today and Iran peace hopes (oil -7% yesterday) set the tone ahead of Friday's jobs report, with rate-hike odds still elevated.",
  "risk": "high",
- "rates": "The 10-year yield is near 4.9-5.0% after the Fed held at 3.75-4.00% on Oct 28 with two dissents for a hike, and betting markets price a December hike as likely.",
- "fed": "No FOMC decision until Dec 8-9; Goolsbee speaks today and regional presidents have said a hike may still be needed, so Friday's payrolls is the key input.",
- "oil": "Oil is volatile near $100 (Brent reported higher, falling sharply Monday) on tanker attacks around the Strait of Hormuz and reports of Iran-US diplomacy.",
- "geo": "Middle East escalation risk around Hormuz plus US midterm elections on Tuesday Nov 3, where Democrats are expected to regain Congress.",
+ "rates": "10-year yield eased to about 4.89% and the 30-year to about 5.27% as lower oil softened the inflation outlook, while the 2-year held near 4.58%.",
+ "fed": "CME FedWatch priced roughly a 72% chance of a December hike as of Monday; the next FOMC decision is Dec 9 and the October minutes come Nov 18.",
+ "oil": "WTI settled at $96.46 (-7.4%) and Brent at $104.77 (-7.6%), the biggest daily drop since July 27, on hopes for a US-Iran deal via Qatari mediators.",
+ "geo": "US-Iran talks are active (Iran offered to reopen the Strait of Hormuz under conditions), and US midterm voting is today with polls favoring Democrats.",
  "events": [
-  {
-   "date": "2026-11-02",
-   "time": "10:00 AM ET",
-   "name": "ISM manufacturing PMI",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-02",
-   "time": "5:00 PM ET",
-   "name": "Apple earnings (after close)",
-   "impact": "high"
-  },
   {
    "date": "2026-11-03",
    "time": "All day",
    "name": "US midterm elections",
+   "impact": "high"
+  },
+  {
+   "date": "2026-11-03",
+   "time": "10:00 AM ET",
+   "name": "JOLTS and September factory orders",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-03",
+   "time": "After close",
+   "name": "AMD, Arista, Super Micro earnings",
    "impact": "medium"
   },
   {
@@ -33,27 +33,22 @@
    "impact": "medium"
   },
   {
-   "date": "2026-11-05",
-   "time": "7:00 AM ET",
-   "name": "Bank of England decision",
-   "impact": "medium"
-  },
-  {
    "date": "2026-11-06",
    "time": "8:30 AM ET",
-   "name": "October jobs report (payrolls)",
+   "name": "October jobs report",
    "impact": "high"
   },
   {
    "date": "2026-11-10",
    "time": "8:30 AM ET",
-   "name": "CPI (October)",
+   "name": "CPI",
    "impact": "high"
   }
  ],
  "sources": [
-  "https://www.simianx.ai/stories/us-economic-calendar-this-month-in-your-time-zone",
-  "https://www.riotimesonline.com/global-economy-briefing-november-2-2026/",
-  "https://www.caixabankresearch.com/en/publications/financial-markets-daily-report/02-november-2026"
+  "https://cappnotes.substack.com/p/closing-look-monday-november-2-2026",
+  "https://eurasiabusinessnews.com/2026/11/02/stock-market-today-oil-slides-on-middle-east-hopes-as-wall-street-rebounds-gold-price-gains-2/",
+  "https://www.fool.com/coverage/stock-market-today/2026/11/02/stock-market-midday-nov-2-stocks-rally-as-oil-prices-tumble-on-diplomatic-hopes/",
+  "https://www.simianx.ai/stories/us-economic-calendar-this-month-in-your-time-zone"
  ]
 }
