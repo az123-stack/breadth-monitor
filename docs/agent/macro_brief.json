@@ -1,29 +1,23 @@
 {
- "for_date": "2026-11-02",
- "written": "2026-11-03T12:04Z",
- "headline": "Midterm elections today and Iran peace hopes (oil -7% yesterday) set the tone ahead of Friday's jobs report, with rate-hike odds still elevated.",
+ "for_date": "2026-11-03",
+ "written": "2026-11-04T12:04Z",
+ "headline": "Post-midterm session with the 10-year near 4.95%, oil falling on Iran diplomacy hopes, and Friday's payrolls the next big test.",
  "risk": "high",
- "rates": "10-year yield eased to about 4.89% and the 30-year to about 5.27% as lower oil softened the inflation outlook, while the 2-year held near 4.58%.",
- "fed": "CME FedWatch priced roughly a 72% chance of a December hike as of Monday; the next FOMC decision is Dec 9 and the October minutes come Nov 18.",
- "oil": "WTI settled at $96.46 (-7.4%) and Brent at $104.77 (-7.6%), the biggest daily drop since July 27, on hopes for a US-Iran deal via Qatari mediators.",
- "geo": "US-Iran talks are active (Iran offered to reopen the Strait of Hormuz under conditions), and US midterm voting is today with polls favoring Democrats.",
+ "rates": "The 10-year Treasury yield closed near 4.95% Tuesday (above 5% as recently as Oct 28) as markets price rising odds of a Fed hike rather than cuts.",
+ "fed": "No FOMC decision in November (next is Dec 9); the Oct meeting minutes come Nov 18, and Cleveland Fed's Hammack is among the Fed voices traders are watching.",
+ "oil": "Oil dropped sharply (WTI roughly $97-100, Brent about $110) on hopes the US seeks a diplomatic solution to the Iran war after the midterms, though prices remain elevated.",
+ "geo": "The US-Iran war and high fuel prices remain the active shock; Democrats' midterm gains raise talk of Congress limiting the war.",
  "events": [
   {
-   "date": "2026-11-03",
-   "time": "All day",
-   "name": "US midterm elections",
-   "impact": "high"
-  },
-  {
-   "date": "2026-11-03",
-   "time": "10:00 AM ET",
-   "name": "JOLTS and September factory orders",
+   "date": "2026-11-04",
+   "time": "8:15 AM ET",
+   "name": "ADP private jobs",
    "impact": "medium"
   },
   {
-   "date": "2026-11-03",
-   "time": "After close",
-   "name": "AMD, Arista, Super Micro earnings",
+   "date": "2026-11-04",
+   "time": "8:30 AM ET",
+   "name": "Treasury quarterly refunding announcement",
    "impact": "medium"
   },
   {
@@ -35,20 +29,20 @@
   {
    "date": "2026-11-06",
    "time": "8:30 AM ET",
-   "name": "October jobs report",
+   "name": "October jobs report (nonfarm payrolls)",
    "impact": "high"
   },
   {
    "date": "2026-11-10",
    "time": "8:30 AM ET",
-   "name": "CPI",
+   "name": "CPI (October)",
    "impact": "high"
   }
  ],
  "sources": [
-  "https://cappnotes.substack.com/p/closing-look-monday-november-2-2026",
-  "https://eurasiabusinessnews.com/2026/11/02/stock-market-today-oil-slides-on-middle-east-hopes-as-wall-street-rebounds-gold-price-gains-2/",
-  "https://www.fool.com/coverage/stock-market-today/2026/11/02/stock-market-midday-nov-2-stocks-rally-as-oil-prices-tumble-on-diplomatic-hopes/",
-  "https://www.simianx.ai/stories/us-economic-calendar-this-month-in-your-time-zone"
+  "https://www.riotimesonline.com/us-markets-after-midterms-dollar-yields-stocks-2026/",
+  "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-dow-futures-130822524.html",
+  "https://www.simianx.ai/stories/us-economic-calendar-this-month-in-your-time-zone",
+  "https://www.heygotrade.com/en/news/fed-rate-cuts-priced-out-2026-treasury-yields-hammack-jolts/"
  ]
 }
