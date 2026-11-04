@@ -120,3 +120,22 @@ function renderStrongest(app) {
   card.querySelector(".sgtv").addEventListener("click", () => tsDownload("strongest-stocks", [{ name: "Strongest stocks", ticks: rows.map(r => r.t) }]));
   app.append(card);
 }
+// Nov 4 (Adam: "everywhere on the breadth page make it known it's a day behind"): breadth is end-of-day (Massive's free plan posts
+// each session after midnight ET), so v3 puts a banner on top and a "through <date> close" tag on every card and chart.
+// The macro strip is left untagged (it has its own "closes through" date from Yahoo).
+function renderBreadthV3(app) {
+  renderBreadth(app);
+  const rows = DATA.rows || [], last = rows[rows.length - 1]; if (!last) return;
+  const today = etToday(), clk = nyClock();
+  const behind = last.date < today;
+  const when = clk.open ? "Today's session is still trading; it gets added after midnight ET." : "Today's session gets added after midnight ET.";
+  const msg = behind ? `<b>A day behind:</b> every number and chart on this tab is through the <b>${longDate(last.date)} close</b>. ${when} For today, use <b>Intraday</b> (live) or <b>Pre-market</b>.`
+    : `<b>End of day:</b> numbers are through today's close (${longDate(last.date)}).`;
+  const ban = $(`<div class="eodban">${msg}</div>`);
+  const first = app.querySelector(".card"); if (first) first.before(ban); else app.prepend(ban);
+  const tag = `<small class="eodtag" title="Breadth is end-of-day: through the ${longDate(last.date)} close">${behind ? "⏱ " : ""}through ${shortDate(last.date)} close</small>`;
+  app.querySelectorAll(".card").forEach(c => {
+    if (c.classList.contains("mstrip")) return;
+    const el = cardTitle(c)[0] || c.querySelector(".kicker, h2, h3"); if (el && !el.querySelector(".eodtag")) el.insertAdjacentHTML("beforeend", " " + tag);
+  });
+}

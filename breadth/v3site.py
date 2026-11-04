@@ -158,6 +158,10 @@ CSS = """
 .ortable .scroll { max-height: max(280px, calc(100vh - 560px)); overflow: auto; overscroll-behavior: contain; }
 .ortable .scroll table { border-collapse: separate; border-spacing: 0; }
 .ortable .scroll thead th { position: sticky; top: 0; z-index: 2; background: var(--surface-1, var(--bg, #fff)); box-shadow: 0 1px 0 var(--border); }
+.eodban { margin: 0 0 12px; padding: 9px 14px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent);
+  background: color-mix(in srgb, var(--warning) 10%, transparent); font-size: 14px; }
+.eodtag { display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0; text-transform: none; padding: 1px 7px;
+  border-radius: 999px; color: var(--warning); border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent); vertical-align: middle; }
 .sgun td { background: color-mix(in srgb, var(--warning) 7%, transparent); } .sgno { color: var(--warning); font-size: 12px; }
 .ortable .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .ortable td.orsel { font-weight: 700; } .ortable tr[data-t] { cursor: pointer; } .orspyrow td { border-top: 2px solid var(--border); }
@@ -217,7 +221,7 @@ SWAPS = [
     ('function pulseCard(T) {', PULSE_V3, "compact long / short cards (v1 version kept as pulseCardV1)"),
     (MODE_BTN_OLD, MODE_BTN_NEW, "Light / Dark switch in the header"),
     (MODE_JS_OLD, MODE_JS_NEW, "Light / Dark switch behaviour"),
-    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, sstrong: renderStrongest, themes: renderThemesTab,', "Theme Dash renderer"),
+    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, sstrong: renderStrongest, breadth: renderBreadthV3, themes: renderThemesTab,', "Theme Dash renderer"),
     ('function renderTab(panel) {', None, "Theme Dash code (v3_themedash.js) before renderTab"),
     # Nov 4 (Adam): Market health lives on Stocks → Leadership, and the stat tiles aren't needed ("I just look at the charts") →
     # v3 Breadth = regime, macro strip, washout card, signals, charts, table. v1 keeps them.
