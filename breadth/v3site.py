@@ -219,6 +219,15 @@ SWAPS = [
     (MODE_JS_OLD, MODE_JS_NEW, "Light / Dark switch behaviour"),
     ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, sstrong: renderStrongest, themes: renderThemesTab,', "Theme Dash renderer"),
     ('function renderTab(panel) {', None, "Theme Dash code (v3_themedash.js) before renderTab"),
+    # Nov 4 (Adam): Market health lives on Stocks → Leadership, and the stat tiles aren't needed ("I just look at the charts") →
+    # v3 Breadth = regime, macro strip, washout card, signals, charts, table. v1 keeps them.
+    ('  if (DATA.themes && DATA.themes.leadership) app.append(healthCard(DATA.themes.leadership));\n', '', "Breadth: Market health card off (on Leadership)"),
+    ('  app.append(tl);\n  if (last.nh != null) {', '  if (last.nh != null) {', "Breadth: first tile row off"),
+    ('    app.append(tl2);\n  }', '  }', "Breadth: highs / lows tiles off"),
+    ('    app.append(tl3);\n  }', '  }', "Breadth: money tiles off"),
+    ('  if (VT && VT.v != null) app.append(tiltTiles(VT));\n', '', "Breadth: volume tilt tiles off"),
+    ('  if (last.clv_all != null) app.append(closeTiles(rows, last));\n', '', "Breadth: who-won-the-close tiles off"),
+    ('  if (DX && DX.dev != null) app.append(dixTiles(DX));\n', '', "Breadth: hidden buying tiles off"),
     ('</style>', CSS, "v3 styles (first </style> only)"),
 ]
 
