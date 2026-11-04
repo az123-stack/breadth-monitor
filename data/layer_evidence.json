@@ -74,58 +74,58 @@
   }
  },
  "log": {
-  "asof": "2026-11-03",
-  "closed": 151,
-  "dates": 7,
+  "asof": "2026-11-04",
+  "closed": 176,
+  "dates": 8,
   "catalyst_positive": {
-   "n_good": 22,
-   "n_bad": 27,
-   "avg_good": 0.01665,
-   "avg_bad": -0.01987,
-   "dates": 4,
-   "diff": 0.03652,
-   "t": 0.49,
+   "n_good": 26,
+   "n_bad": 34,
+   "avg_good": 0.00309,
+   "avg_bad": -0.01453,
+   "dates": 5,
+   "diff": 0.01762,
+   "t": -0.03,
    "halves": [
     0.0166,
-    0.01996
+    -0.01254
    ],
    "passed": false
   },
   "red_flags": {
-   "n_good": 37,
-   "n_bad": 23,
-   "avg_good": -0.00664,
-   "avg_bad": 0.00381,
-   "dates": 4,
-   "diff": -0.01045,
-   "t": 0.05,
+   "n_good": 46,
+   "n_bad": 29,
+   "avg_good": -0.01841,
+   "avg_bad": 0.01142,
+   "dates": 5,
+   "diff": -0.02983,
+   "t": -0.56,
    "halves": [
     0.01091,
-    -0.00733
+    -0.0407
    ],
    "passed": false
   },
   "earnings_in_hold": {
-   "n_good": 30,
-   "n_bad": 15,
-   "avg_good": 0.01815,
-   "avg_bad": -0.01947,
-   "dates": 4,
-   "diff": 0.03762,
-   "t": 0.82,
+   "n_good": 33,
+   "n_bad": 22,
+   "avg_good": 0.01383,
+   "avg_bad": -0.00112,
+   "dates": 5,
+   "diff": 0.01495,
+   "t": 0.17,
    "halves": [
     0.06804,
-    -0.02257
+    -0.03756
    ],
    "passed": false
   },
   "macro_tailwind": {
    "n_good": 71,
-   "n_bad": 2,
+   "n_bad": 9,
    "avg_good": -0.02765,
-   "avg_bad": 0.00775,
+   "avg_bad": -0.04998,
    "dates": 2,
-   "diff": -0.0354,
+   "diff": 0.02233,
    "t": null,
    "halves": [
     -0.05036,
@@ -135,11 +135,11 @@
   },
   "more_support": {
    "n_good": 6,
-   "n_bad": 82,
+   "n_bad": 96,
    "avg_good": -0.03832,
-   "avg_bad": 0.01917,
+   "avg_bad": 0.01773,
    "dates": 3,
-   "diff": -0.05749,
+   "diff": -0.05605,
    "t": -0.63,
    "halves": [
     -0.13187,
@@ -149,21 +149,21 @@
   },
   "no_warnings": {
    "n_good": 63,
-   "n_bad": 19,
+   "n_bad": 26,
    "avg_good": 0.03395,
-   "avg_bad": -0.02187,
+   "avg_bad": -0.0057,
    "dates": 0,
-   "diff": 0.05582,
+   "diff": 0.03965,
    "t": null,
    "halves": [],
    "passed": false
   },
   "brief_low_risk": {
    "n_good": 0,
-   "n_bad": 60,
-   "dates": 3,
+   "n_bad": 85,
+   "dates": 4,
    "avg_good": null,
-   "avg_bad": -0.01999,
+   "avg_bad": -0.02349,
    "test": "welch over dates",
    "diff": null,
    "t": null,

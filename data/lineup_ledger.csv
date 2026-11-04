@@ -1,7 +1,7 @@
 date,t,g,kind,stage,rs,trigger,stop_lo,adr,status,entry_date,entry,stop,exit_date,exit,R,ret,xspy,last_date,last,earn
 2026-10-26,VEEV,Enterprise SaaS,ready,Blossom,93.0,325.87,316.91,0.0329,nofill,,,,,,,,,,,
 2026-10-26,VRNS,Identity & Security Tools,ready,Blossom,83.0,49.265,48.87,0.0269,nofill,,,,,,,,,,,
-2026-10-27,FIGS,Consumer Brands,buy,Blossom,97.0,20.88,19.88,0.0578,open,2026-10-29,21.0,19.88,,,0.259,0.0138,0.0355,2026-11-02,21.29,
+2026-10-27,FIGS,Consumer Brands,buy,Blossom,97.0,20.88,19.88,0.0578,open,2026-10-29,21.0,19.88,,,-0.161,-0.0086,0.0102,2026-11-03,20.82,
 2026-10-27,FTRE,CROs,buy,Blossom,95.0,24.52,23.5,0.0535,stopped,2026-10-28,24.52,23.5,2026-10-29,23.5,-1.0,-0.0416,-0.0389,2026-10-29,23.5,
 2026-10-27,OXY,Shale E&P,buy,Blossom,80.0,64.145,62.58,0.025,nofill,,,,,,,,,,,
 2026-10-28,,,,,,,,,none,,,,,,,,,,,
@@ -10,7 +10,7 @@ date,t,g,kind,stage,rs,trigger,stop_lo,adr,status,entry_date,entry,stop,exit_dat
 2026-10-30,CRL,CROs,buy,Quiet build,97.0,374.56,351.98,0.0468,pending,,,,,,,,,,,2026-11-04
 2026-10-30,RPD,Identity & Security Tools,buy,Blossom,95.0,17.4,15.88,0.0778,pending,,,,,,,,,,,2026-11-04
 2026-10-30,MEDP,CROs,buy,Quiet build,79.0,677.85,648.1101,0.0358,pending,,,,,,,,,,,
-2026-11-02,LFST,Healthcare Providers,buy,Quiet build,97.0,13.6,13.175,0.033,pending,,,,,,,,,,,
+2026-11-02,LFST,Healthcare Providers,buy,Quiet build,97.0,13.6,13.175,0.033,open,2026-11-03,13.6,13.175,,,-0.541,-0.0169,-0.0191,2026-11-03,13.37,
 2026-11-02,CON,Healthcare Providers,buy,Quiet build,96.0,41.319,39.61,0.0243,pending,,,,,,,,,,,
 2026-11-02,AMRX,Large-cap Pharma,buy,Blossom,93.0,21.6811,20.3,0.033,pending,,,,,,,,,,,
 2026-11-02,COP,Integrated & Large-cap Oil,buy,Quiet build,89.0,152.6,146.54,0.0231,pending,,,,,,,,,,,2026-11-05
@@ -19,3 +19,7 @@ date,t,g,kind,stage,rs,trigger,stop_lo,adr,status,entry_date,entry,stop,exit_dat
 2026-11-02,TTE,Integrated & Large-cap Oil,buy,Quiet build,78.0,93.85,92.57,0.0164,pending,,,,,,,,,,,
 2026-11-02,JNJ,Large-cap Pharma,buy,Blossom,77.0,273.0141,267.435,0.0234,pending,,,,,,,,,,,
 2026-11-02,LYB,Chemicals,buy,Blossom,76.0,67.32,65.2,0.0292,pending,,,,,,,,,,,
+2026-11-03,SAIC,Defense IT & Services,buy,Blossom,92.0,155.11,146.1303,0.0337,pending,,,,,,,,,,,
+2026-11-03,VTRS,Large-cap Pharma,buy,Blossom,87.0,18.94,18.64,0.0251,pending,,,,,,,,,,,
+2026-11-03,CACI,Defense IT & Services,buy,Blossom,84.0,694.01,659.205,0.0323,pending,,,,,,,,,,,
+2026-11-03,DOW,Chemicals,buy,Blossom,70.0,34.218,33.19,0.0311,pending,,,,,,,,,,,
