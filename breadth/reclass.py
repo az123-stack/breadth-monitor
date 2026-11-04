@@ -33,7 +33,7 @@ LOG_FILE = ROOT / "data" / "reclass_log.csv"
 PROPOSALS = ROOT / "docs" / "agent" / "reclass.json"
 LOG_COLS = ["date", "id", "t", "action", "from", "to", "theme_add", "status", "why"]
 
-CFG = {"look": 120, "min_price": 5.0, "min_dv": 10e6, "rs_min": 80, "big_dv": 100e6, "n_unclass": 40, "n_poor": 30,
+CFG = {"look": 120, "min_price": 5.0, "min_dv": 10e6, "rs_min": 80, "big_dv": 100e6, "n_unclass": 40, "n_big": 60, "n_poor": 30,
        "own_low": 0.25, "gap": 0.20, "best_min": 0.35, "very_low": 0.10, "stale_days": 5, "quiet_days": 90, "min_liquid": 3}
 
 
@@ -138,7 +138,11 @@ def build(adjusted, universe, subthemes_df, themes_df, names=None):
                                     "dv": round(float(dv[t]) / 1e6, 1), "price": round(float(px[t]), 2),
                                     "cand": [[groups[k], round(float(cc[k]), 2)] for k in top]})
     out["unclassified"].sort(key=lambda x: (-(x["rs"] or 0), -x["dv"]))
-    out["unclassified"] = out["unclassified"][:CFG["n_unclass"]]
+    # Nov 4 (Adam, Nov 1: "these can't get missed"): busy names ($100M+/day) always make the worklist, whatever their RS
+    # (Tradeweb was cut at the top 40 by RS); the top n_unclass by RS on top of that, n_big cap so the agent's list stays readable
+    top = out["unclassified"][:CFG["n_unclass"]]
+    big = [x for x in out["unclassified"][CFG["n_unclass"]:] if x["dv"] >= CFG["big_dv"] / 1e6][:CFG["n_big"]]
+    out["unclassified"] = top + big
 
     # 2) members that barely trade with their own group while another group fits clearly better
     poor = []

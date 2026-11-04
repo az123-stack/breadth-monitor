@@ -1972,6 +1972,9 @@ def test_v3_page_builds():
     assert "function renderOracle" in h and "oracle: renderOracle" in h
     assert "sleaders: renderLeadership" in h and "ssetups: renderStockSetups" in h and "grotation: renderGroupRotation" in h and "function renderStockSetups" in h
     assert 'let TAB = "readout"' not in h and "Market Monitor v3" in h and h.count("/*__DATA__*/null") == 1
+    # Nov 4: Market parent (Breadth / Pre-market / Intraday); side files one folder up; Strongest sub-tab; Oracle reads pre-market
+    assert '"market", "Market"' in h and '["premarket", "Pre-market"]' in h and 'fetch("../premarket.json?cb=' in h and 'fetch("premarket.json' not in h
+    assert "sstrong: renderStrongest" in h and "function renderStrongest" in h and "function orSession" in h and '["d1", "Today", 5]' in h
     tmp = Path(__import__("tempfile").mkdtemp()); old = config.DOCS_DIR
     try:
         config.DOCS_DIR = tmp
@@ -2007,6 +2010,41 @@ def test_oracle_cohorts():
     tag2 = oracle.acc_tag(pd.Series([1.0 + 0.003 * k for k in range(140)] + [1.42] * 60, index=d))
     assert tag2["a"] == 0
     return f"{O['universe']} liquid"
+
+
+
+def test_unseen_and_deals():
+    """Nov 4: pinned buyout stocks are flagged as deals and kept out of the Oracle ranking; the strongest table tags the lists a stock
+    is on, and flags strong stocks on no list (NTRA case) + new leaders."""
+    import numpy as np, pandas as pd
+    from breadth import oracle, strength, unseen
+    d = pd.bdate_range("2025-01-01", periods=200)
+    h = pd.DataFrame({"PIN": [10.02] * 200, "RUN": np.linspace(10, 30, 200)}, index=d)
+    l = pd.DataFrame({"PIN": [10.0] * 200, "RUN": np.linspace(9.5, 28.5, 200)}, index=d)
+    t = strength.tightness({"o": l, "h": h, "l": l, "c": h, "v": h * 0 + 1e6})
+    why = strength.deal_reasons(t, len(d) - 1, h.columns)
+    assert "PIN" in why and "RUN" not in why
+    rows = []
+    for tk, g in [("JUMP", None), ("FAST", .010), ("SPY", .0005)]:
+        for i, x in enumerate(d):
+            px = (20 if i < 190 else 30) if g is None else 20 * (1 + g) ** i
+            rows.append(dict(date=x, ticker=tk, c=px, v=1e6))
+    T = {"stocks": [{"t": "JUMP", "name": "J", "rsr": 99, "deal": "pinned"}, {"t": "FAST", "name": "F", "rsr": 99}]}
+    old = config.BENCHMARK; config.BENCHMARK = "SPY"
+    try:
+        O = oracle.build(pd.DataFrame(rows), T)
+    finally:
+        config.BENCHMARK = old
+    assert "JUMP" not in O["cohorts"]["d15"] and "JUMP" not in O["rall"]["d15"] and O["rows"]["JUMP"]["deal"] == 1 and "prev20" in O
+    T2 = {"date": "2026-11-03", "oracle": {"rall": {"d60": ["NTRA"], "d180": []}, "prev20": {"d60": [], "d180": []}, "rows": {}, "cohorts": {}},
+          "stocks": [{"t": "NTRA", "name": "Natera", "sub": "Genomics", "rsr": 97, "rsr5": 4}, {"t": "BOX", "name": "Box", "rsr": 96, "rsr5": 0},
+                     {"t": "HZO", "name": "MarineMax", "rsr": 97, "deal": "pinned"}],
+          "lists": {"strong_all": [{"t": "NTRA", "rsr": 97}, {"t": "BOX", "rsr": 96}, {"t": "HZO", "rsr": 97}], "strongest": [{"t": "BOX"}]}}
+    X = unseen.build(T2)
+    by = {r["t"]: r for r in X["rows"]}
+    assert "HZO" not in by and by["BOX"]["on"] == ["Strongest (top 40)"] and by["NTRA"]["on"] == []
+    assert X["unseen"] == ["NTRA"] and X["new_unseen"] == ["NTRA"] and any("Oracle #1" in w for w in by["NTRA"]["why"])
+    return f"{len(X['rows'])} rows"
 
 
 if __name__ == "__main__":

@@ -3,7 +3,30 @@
    DATA.themes.oracle (breadth/oracle.py): cohorts {d180, d60, d15, d5: [tickers, best first]}, rows {t: {name, sub, rsr, r: [180,60,15,5 returns],
    c: last 181 closes}}, spy (181 closes), dates. Each chart rebases every line to 0% at its window start. Live: today's Google price is added as
    the last point (cohorts stay as of the last close). */
-const OR_COH = [["d180", "180D", 0], ["d60", "60D", 1], ["d30", "30D", 2], ["d15", "15 day", 3], ["d5", "5 day", 4]];   // 30D added Oct 31 (Adam)
+const OR_COH = [["d180", "180D", 0], ["d60", "60D", 1], ["d30", "30D", 2], ["d15", "15 day", 3], ["d5", "5 day", 4], ["d1", "Today", 5]];   // 30D added Oct 31 (Adam); Today Nov 4
+// Nov 4 (Adam: "get the intraday / premarket data into the oracle"): before the open the Oracle reads Yahoo pre-market quotes (docs/premarket.json,
+// same rows as the Pre-market tab, via ROWS_OVERRIDE); in the session it reads the live Google sheet. Today's price is the last point on every
+// chart, the Today column shows the move, and the "Today" cohort ranks stocks / sub-themes by it. Thin pre-market quotes (< 3 active 5-min bars)
+// stay out of the Today ranking. Outside both, "Today" = the last session's move.
+function orSession() {
+  if (liveActive()) return "live";
+  if (typeof PM !== "undefined" && PM && PM.date === etToday() && PM.rows && Object.keys(PM.rows).length) return "pre";   // before Google shows today's session
+  return null;
+}
+function renderOracle(app) {
+  const c = nyClock(); if (typeof PM !== "undefined" && !PM && !PM_ERR && c.mins < 0 && c.mins > -330) fetchPM();
+  const S = orSession();
+  if (S !== "pre") return renderOracleBody(app, S);
+  ROWS_OVERRIDE = pmRows();
+  try { return renderOracleBody(app, S); } finally { ROWS_OVERRIDE = null; }
+}
+function orSessionBar(S) {
+  if (S !== "pre") return liveBar();
+  const clk = nyClock(), asof = (PM.asof || "").slice(11, 16), n = Object.keys(PM.rows || {}).length;
+  const el = $(`<div class="livebar"><span class="dot ${clk.mins < 0 ? "on" : "off"}"></span><span><b>Pre-market</b> · Yahoo quotes as of <b>${asof} ET</b> (${n.toLocaleString()} tickers) · refreshed about every 10 min until the open${clk.mins >= 0 ? " · the live Google prices take over once the sheet shows today's session" : ""}</span><button>Refresh</button></div>`);
+  el.querySelector("button").addEventListener("click", () => fetchPM());
+  return el;
+}
 // Oct 31 (Adam: "a filter for groups like Defense IT / IT Services starting to accelerate … catch runners like Cloud Communications"):
 // rows / subs carry ac = {a accelerating, st strong 60D, stage early|running, start, on20, v [180, 60, 15] vs SPY} from oracle.acc_tag
 const OR_FLT = [["all", "All"], ["acc", "▲ Accelerating vs SPY"], ["acc_early", "▲ Accelerating · early"], ["strong", "Strong 60D vs SPY"]];
@@ -33,14 +56,24 @@ function oracleLine(vals, w, h, lo, hi) {
   const n = vals.length - 1, span = hi - lo || 1;
   return vals.map((v, i) => v == null ? null : `${(i / n * w).toFixed(1)},${(h - (v - lo) / span * h).toFixed(1)}`).filter(Boolean).join(" ");
 }
-function renderOracle(app) {
+function renderOracleBody(app, S) {
   const O = (DATA.themes || {}).oracle;
   if (!O) { app.append($('<div class="card empty">Oracle data appears after the next data run.</div>')); return; }
   UI.or = UI.or || { side: lsGet("orSide", "strong"), coh: lsGet("orCoh", "d5"), view: lsGet("orView", "stocks"), hl: null, log: lsGet("orLog", "0") === "1", sub: lsGet("orSub", ""), pg: 0, flt: lsGet("orFlt", "all"), bk: lsGet("orBk", "") };
-  const U = UI.or, live = liveActive(), subs = U.view === "subs" && O.subs;
-  app.append(liveBar());
+  const U = UI.or, live = !!S, subs = U.view === "subs" && O.subs;
+  app.append(orSessionBar(S));
   const weakSide = U.side === "weak" && O.wcohorts;   // strongest (best return first) or weakest (worst return first)
-  const COH = subs ? (weakSide ? O.wscohorts : O.scohorts) : (weakSide ? O.wcohorts : O.cohorts);
+  // ---- today's move (live / pre-market / last session) and the Today cohort ----
+  const oneDay = (c) => c && c.length > 1 && c[c.length - 2] ? c[c.length - 1] / c[c.length - 2] - 1 : null;
+  const sessRow = (t) => { const L = liveRow(t); return L && L.chg != null && (S !== "pre" || (L.bars || 0) >= 3) ? L : null; };
+  const liveMove = (g) => { const v = (O.subs[g].members || []).map(sessRow).filter(Boolean).map(L => L.chg); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const todayOf = (t, sub) => { if (live) { if (sub) { const m = liveMove(t); if (m != null) return m; } else { const L = sessRow(t); if (L) return L.chg; } return null; }
+    return oneDay((sub ? O.subs : O.rows)[t].c); };
+  const todayRank = (sub) => { const src = sub ? O.subs : O.rows;
+    return Object.keys(src).filter(t => sub || src[t].lq).map(t => [t, todayOf(t, sub)]).filter(x => x[1] != null).sort((a, b) => b[1] - a[1]).map(x => x[0]); };
+  const T1 = U.coh === "d1" ? todayRank(subs) : null;
+  const withToday = (C, rev) => T1 ? Object.assign({}, C, { d1: (rev ? T1.slice().reverse() : T1).slice(0, 30) }) : C;
+  const COH = withToday(subs ? (weakSide ? O.wscohorts : O.scohorts) : (weakSide ? O.wcohorts : O.cohorts), weakSide);
   // Adam, Oct 31: "run through all the sub-themes 15 at a time" → sub-theme view pages through the full ranking (O.sall), 15 per page
   // stocks page too when a filter is on (O.rall = every liquid stock ranked); filters keep the cohort's order
   // Oct 31 (Adam: "I need the ability to find a specific sub-theme in here"): a search box finds sub-themes (name, group, or a ticker they hold)
@@ -52,7 +85,8 @@ function renderOracle(app) {
   // lists of sub-themes, kept in this browser (localStorage orBuckets); a bucket narrows both views (stocks view = stocks whose sub-theme is in it)
   const B = orBuckets(), bk = U.bk && B.m[U.bk] ? U.bk : "", bkSet = bk && !q ? new Set(B.m[bk]) : null;
   const bkHit = (k) => !bkSet || bkSet.has(subs ? k : (O.rows[k] || {}).sub);
-  const fl = q ? "all" : (OR_FLT.some(x => x[0] === U.flt) ? U.flt : "all"), RK = subs ? O.sall : (fl !== "all" || q || bkSet ? O.rall : null);
+  const fl = q ? "all" : (OR_FLT.some(x => x[0] === U.flt) ? U.flt : "all"), RK0 = subs ? O.sall : (fl !== "all" || q || bkSet ? O.rall : null);
+  const RK = RK0 && T1 ? Object.assign({}, RK0, { d1: T1 }) : RK0;
   const ALL = RK && RK[U.coh] ? (weakSide ? RK[U.coh].slice().reverse() : RK[U.coh]).filter(g => (subs ? O.subs : O.rows)[g] && orPass((subs ? O.subs : O.rows)[g].ac, fl) && qHit(g) && bkHit(g)) : null;
   const npg = ALL ? Math.ceil(ALL.length / OR_TOP) : 1, pg = Math.min(U.pg || 0, npg - 1), off = pg * OR_TOP;
   const SRC = subs ? O.subs : O.rows, list = (ALL ? ALL.slice(off, off + OR_TOP) : (COH[U.coh] || []).slice(0, OR_TOP)).filter(t => SRC[t]);
@@ -61,16 +95,16 @@ function renderOracle(app) {
   const rankTxt = !ALL ? "" : q ? `matching “${esc(U.q.trim())}”: ${ALL.length ? `${off + 1}–${off + list.length} of ${ALL.length}` : "none"}` : (fl !== "all" || bkSet) ? `${fName}: ${ALL.length ? `${off + 1}–${off + list.length} of ${ALL.length}` : "none today"}` : pg ? `ranked ${off + 1}–${off + list.length} of ${ALL.length}` : "";
   const col = (i) => OR_PAL[i % OR_PAL.length];
   // live: a stock gets today's price; a sub-theme gets the average live move of its members on top of its last index value
-  const liveMove = (g) => { const v = (O.subs[g].members || []).map(t => liveRow(t)).filter(L => L && L.chg != null).map(L => L.chg); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
   const series = (t) => { const c = SRC[t].c.slice(); if (live) { if (subs) { const m = liveMove(t); if (m != null) c.push(c[c.length - 1] * (1 + m)); } else { const L = liveRow(t); if (L && L.price) c.push(L.price); } } return c; };
   const spyS = (() => { const c = O.spy.slice(); if (live) { const L = liveRow("SPY"); if (L && L.price) c.push(L.price); } return c; })();
   const cname = (OR_COH.find(c => c[0] === U.coh) || OR_COH[3])[1];
+  const srcName = S === "pre" ? `pre-market move (Yahoo, ${(PM.asof || "").slice(11, 16)} ET)` : S === "live" ? "live move today (Google sheet)" : `move on the ${shortDate(O.date)} close (last session)`;
   // ---- controls ----
   const what = subs ? "sub-themes" : "stocks";
   const head = $(`<section class="card orhead"><div class="orttl"><h2>Oracle <span class="meta">· ${rankTxt ? `${what} ${rankTxt} (${weakSide ? "weakest" : "strongest"} first)` : `the ${OR_TOP} ${weakSide ? "weakest" : "strongest"} ${what}`} of the ${esc(cname)} cohort, drawn over 180, 60 and 15 sessions</span></h2></div>
     <div class="filters"></div>
-    <div class="meta orsub">${subs ? "Cohort = sub-themes (3+ stocks with data) ranked by the return of their equal-weight index over that period" : `Cohort = our ${O.universe} liquid theme stocks ($5+, $10M+ a day, ADRs included) ranked by their return over that period`}${weakSide ? " (worst first)" : ""}, as of the ${shortDate(O.date)} close.
-    Each chart starts every line at 0% at the left edge. <b>Bold</b> = the cohort's median, dashed = SPY. Hover or tap a ticker to follow it across all three charts.${live ? " Today's live price is the last point." : ""}</div></section>`);
+    <div class="meta orsub">${subs ? "Cohort = sub-themes (3+ stocks with data) ranked by the return of their equal-weight index over that period" : `Cohort = our ${O.universe} liquid theme stocks ($5+, $10M+ a day, ADRs included) ranked by their return over that period`}${weakSide ? " (worst first)" : ""}, ${U.coh === "d1" ? `<b>Today</b> = ranked by the ${srcName}${subs ? " (average of the members)" : ""}${S === "pre" ? "; quotes with fewer than 3 active 5-minute bars are left out" : ""}` : `as of the ${shortDate(O.date)} close`}.
+    Each chart starts every line at 0% at the left edge. <b>Bold</b> = the cohort's median, dashed = SPY. Hover or tap a ticker to follow it across all three charts.${S === "pre" ? " Today's pre-market price is the last point." : live ? " Today's live price is the last point." : ""}</div></section>`);
   const f = head.querySelector(".filters"), save = () => { lsSet("orSide", U.side); lsSet("orCoh", U.coh); lsSet("orView", U.view); lsSet("orLog", U.log ? "1" : "0"); U.hl = null; U.pg = 0; rerenderPanel(); };
   f.append(chips("Side", [["strong", "Strongest"], ["weak", "Weakest"]], U, "side", save));
   f.append(chips("View", [["stocks", "Stocks"], ["subs", "Sub-themes"]], U, "view", save));
@@ -137,7 +171,7 @@ function renderOracle(app) {
   }
   // overlap line
   const coh = COH;
-  if (!pg && fl === "all" && !q && !bkSet) head.append($(`<div class="meta orov">Of these ${OR_TOP}, also in the top ${OR_TOP} of: ${OR_COH.filter(c => c[0] !== U.coh).map(c => `<b>${c[1]}</b> ${(coh[c[0]] || []).filter(x => list.includes(x)).length}`).join(" · ")}</div>`));
+  if (!pg && fl === "all" && !q && !bkSet) head.append($(`<div class="meta orov">Of these ${OR_TOP}, also in the top ${OR_TOP} of: ${OR_COH.filter(c => c[0] !== U.coh && coh[c[0]]).map(c => `<b>${c[1]}</b> ${(coh[c[0]] || []).filter(x => list.includes(x)).length}`).join(" · ")}</div>`));
   app.append(head);
   // ---- three charts (drawn for any list of keys: the cohort, or a picked sub-theme's stocks) ----
   const W = 400, H = 230;
@@ -186,12 +220,9 @@ function renderOracle(app) {
   // Today (Adam, Oct 31: "make sure today is one of the periods"): the live move while the sheet is newer than our close, else the last
   // session's move from the closes; ADR = 20-day average daily range % (stock tables)
   const spyToday = () => { if (live) { const L = liveRow("SPY"); if (L && L.chg != null) return L.chg; } return oneDay(O.spy); };
-  const oneDay = (c) => c && c.length > 1 && c[c.length - 2] ? c[c.length - 1] / c[c.length - 2] - 1 : null;
-  const todayOf = (t, sub) => { if (live) { if (sub) { const m = liveMove(t); if (m != null) return m; } else { const L = liveRow(t); if (L && L.chg != null) return L.chg; } }
-    return oneDay((sub ? O.subs : O.rows)[t].c); };
   // same look as the period columns (plain number, shaded cell, one-line header); the date sits in the header's tooltip
-  const todayCell = (v) => `<td class="num ${tint(v, 0.03)}">${pct(v, 1)}</td>`;
-  const todayTh = `<th title="${live ? "Live move from the Google sheet" : "Move on the " + shortDate(O.date) + " close (last session)"}">Today</th>`;
+  const todayCell = (v) => `<td class="num ${tint(v, 0.03)}${U.coh === "d1" ? " orsel" : ""}">${pct(v, 1)}</td>`;
+  const todayTh = `<th title="${S === "pre" ? "Pre-market move (Yahoo quotes)" : live ? "Live move from the Google sheet" : "Move on the " + shortDate(O.date) + " close (last session)"}">${S === "pre" ? "Pre-mkt" : "Today"}</th>`;
   const adrCell = (r) => `<td class="num">${r.adr == null ? "–" : r.adr.toFixed(1) + "%"}</td>`;
   const adrTh = '<th title="Average daily range over the last 20 sessions">ADR 20D</th>';
   const retCells = (r) => r.map((v, k) => `<td class="num ${tint(v, [0.6, 0.3, 0.2, 0.12, 0.06][k])}${OR_COH[k][0] === U.coh ? " orsel" : ""}">${pct(v, 0)}</td>`).join("");

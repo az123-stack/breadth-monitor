@@ -33,8 +33,8 @@ def score_one(s, ts, ss):
     return round(score, 1), best_theme, best, sub
 
 
-def eligible(s):
-    return bool(s.get("is_stock")) and s.get("rsr") is not None and (s.get("price") or 0) >= MIN_PRICE
+def eligible(s):   # Nov 4: deal / pinned stocks (strength.deal_reasons) aren't leaders
+    return bool(s.get("is_stock")) and s.get("rsr") is not None and (s.get("price") or 0) >= MIN_PRICE and not s.get("deal")
 
 
 def rank(stocks, themes, subthemes, n=TOP_N):

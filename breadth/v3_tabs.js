@@ -76,3 +76,47 @@ function renderLeadership(app) {
   const X = (DATA.themes || {}).leadership;
   app.append(X ? healthCard(X) : $('<div class="card empty">Leadership data appears after the next data run.</div>'));
 }
+// Nov 4 (Adam, Nov 1: "NTRA is super strong and not even in our universe … these can't get missed"): Stocks → Strongest =
+// DATA.themes.unseen (breadth/unseen.py): EVERY liquid RS 90+ stock (+ Oracle top 20 on 60D / 180D), not a top-N, deal / pinned buyout
+// stocks left out, each tagged with the lists it IS on. "On no list" = RS 95+ or Oracle top 20 and on none of the pick / setup lists;
+// "New this week" = RS crossed 95 or entered the Oracle top 20 in the last 5 sessions. Descriptive only.
+function renderStrongest(app) {
+  const X = (DATA.themes || {}).unseen;
+  if (!X || !X.rows) { app.append($('<div class="card empty">The strongest-stocks table appears after the next data run.</div>')); return; }
+  app.append(liveBar());
+  UI.sg = UI.sg || { show: lsGet("sgShow", "all"), hi: lsGet("sgHi", "any"), q: "" };
+  const U = UI.sg, live = liveActive(), uns = new Set(X.unseen || []);
+  const newUnseen = X.rows.filter(r => (X.new_unseen || []).includes(r.t));
+  if (newUnseen.length || uns.size) {
+    app.append($(`<section class="card regcard"><div class="kicker">New leaders you haven't seen</div>
+      ${newUnseen.length ? `<p style="margin:6px 0">${newUnseen.map(r => `<a href="#" class="tkl" data-t="${esc(r.t)}"><b>${esc(r.t)}</b></a> <span class="meta">${esc(r.sub || r.name)} · ${esc(r.new.join("; "))}</span>`).join("<br>")}</p>`
+        : `<p class="meta" style="margin:6px 0">No new leader this week is missing from the lists.</p>`}
+      <p class="meta" style="margin:6px 0 0">${uns.size} strong stock${uns.size === 1 ? " is" : "s are"} on none of the pick or setup lists right now (RS 95+ or Oracle top 20 on 60D / 180D). Pick <b>On no list</b> below to see them all.</p></section>`));
+  }
+  const HI = { any: 9, h5: 0.05, h10: 0.10, h15: 0.15 };
+  const q = (U.q || "").trim().toLowerCase();
+  const rows = X.rows.filter(r => (U.show === "all" || (U.show === "rs95" && (r.rsr || 0) >= 95) || (U.show === "unseen" && uns.has(r.t)) || (U.show === "new" && r.new.length))
+    && (r.off_hi == null || -r.off_hi <= HI[U.hi]) && (!q || r.t.toLowerCase().startsWith(q) || (r.name || "").toLowerCase().includes(q) || (q.length >= 3 && (r.sub || "").toLowerCase().includes(q))));
+  const todayOf = (r) => { if (live) { const L = liveRow(r.t); if (L && L.chg != null) return L.chg; } return null; };
+  const card = $(`<section class="card ortable sgcard"><div class="head"><h2>Strongest stocks <span class="meta">· ${rows.length} of ${X.rows.length} · every liquid stock with RS 90+ ($10+, $20M+ a day) plus the Oracle top 20 on 60 / 180 sessions, no top-N cut · buyout stocks pinned at a deal price left out · ${shortDate(X.date)} close</span></h2>
+    <button class="xopen sgtv">⬇ TradingView</button></div><div class="filters" style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0"></div>
+    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Ticker</th><th class="l">Sub-theme</th><th title="RS Rating and its change over 5 sessions">RS</th><th title="Average daily range, 20 sessions">ADR</th><th>Off high</th>
+      ${live ? "<th>Today</th>" : ""}<th>5D</th><th>20D</th><th>60D</th><th>180D</th><th title="Average dollar volume a day">$ / day</th><th class="l">Why it's here</th><th class="l">On these lists</th></tr></thead><tbody>
+    ${rows.map((r, i) => `<tr${uns.has(r.t) ? ' class="sgun"' : ""}><td class="num">${i + 1}</td><td class="l"><a href="#" class="tkl" data-t="${esc(r.t)}"><b>${esc(r.t)}</b></a>${r.star ? ' <span title="RS line at a 1-year high">★</span>' : ""}${r.new.length ? ' <span class="oracc" title="' + esc(r.new.join("; ")) + '">new</span>' : ""}<small class="meta" style="display:block">${esc(r.name || "")}</small></td>
+      <td class="l">${esc(r.sub || "–")}</td><td class="num" data-v="${r.rsr ?? 0}">${r.rsr ?? "–"}${r.rsr5 ? `<small class="meta"> ${r.rsr5 > 0 ? "+" : ""}${r.rsr5}</small>` : ""}</td>
+      <td class="num">${r.adr == null ? "–" : r.adr.toFixed(1) + "%"}</td><td class="num">${pct(r.off_hi, 1)}</td>${live ? `<td class="num ${tint(todayOf(r), 0.03)}">${pct(todayOf(r), 1)}</td>` : ""}
+      <td class="num ${tint(r.d5, 0.06)}">${pct(r.d5, 0)}</td><td class="num ${tint(r.d20, 0.12)}">${pct(r.d20, 0)}</td><td class="num ${tint(r.d60, 0.3)}">${pct(r.d60, 0)}</td><td class="num ${tint(r.r180, 0.6)}">${pct(r.r180, 0)}</td>
+      <td class="num">${r.dvol == null ? "–" : "$" + Math.round(r.dvol) + "M"}</td><td class="l meta">${esc(r.why.join(" · ") || "RS 90+")}</td>
+      <td class="l">${r.on.length ? r.on.map(x => `<span class="p3chip">${esc(x)}</span>`).join(" ") : '<b class="sgno">on no list</b>'}</td></tr>`).join("")}
+    </tbody></table></div>
+    <p class="meta" style="margin:8px 0 0">Lists checked: ${esc((X.rules.lists || []).join(", "))}. A row with <b>on no list</b> is strong but no list on the page shows it. Descriptive only: strength isn't a buy point, check the chart.</p></section>`);
+  const f = card.querySelector(".filters"), save = () => { lsSet("sgShow", U.show); lsSet("sgHi", U.hi); rerenderPanel(); };
+  const cnt = (k) => X.rows.filter(r => k === "rs95" ? (r.rsr || 0) >= 95 : k === "unseen" ? uns.has(r.t) : r.new.length).length;
+  f.append(chips("Show", [["all", "All"], ["rs95", `RS 95+ <small>${cnt("rs95")}</small>`], ["unseen", `On no list <small>${cnt("unseen")}</small>`], ["new", `New this week <small>${cnt("new")}</small>`]], U, "show", save));
+  f.append(chips("Near the high", [["any", "Any"], ["h5", "Within 5%"], ["h10", "Within 10%"], ["h15", "Within 15%"]], U, "hi", save));
+  const qi = $(`<input type="search" class="orq" placeholder="Find a ticker, company or sub-theme" aria-label="Find">`); qi.value = U.q || ""; let qt = null;
+  qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; rerenderPanel(); const n = document.querySelector(".sgcard .orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
+  f.append(qi);
+  card.querySelector(".sgtv").addEventListener("click", () => tsDownload("strongest-stocks", [{ name: "Strongest stocks", ticks: rows.map(r => r.t) }]));
+  app.append(card);
+}

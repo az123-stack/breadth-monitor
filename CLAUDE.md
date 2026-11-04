@@ -763,6 +763,18 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   side is now ONE list = top 20 by dollars ∪ top 20 by share (~35–40 rows); Rank by only sets the order (chip click clears AUTOSORT for the
   card); rows need 20+ sessions of history before the window (new listing AIOK showed 7,141× normal volume); table scrolls with a sticky header.
   Stocks → **Leadership** sub-tab (Oct 31, Adam; `sleaders`, `renderLeadership`) = v1 Market health card (`healthCard`, `DATA.themes.leadership`).
+- **v3 Nov 4, 2026** (Adam): **Market parent** = Breadth / Pre-market / Intraday (v1 renderers). v3 lives in docs/v3/, so v3site rewrites the
+  side-file fetches (`REL_FILES`: premarket / futures / story / stories / anchors / agent macro brief) to `../` (each must match once). v3
+  opens on the last tab used (localStorage v3tab; first visit Themes). **Oracle gets pre-market + intraday** (`orSession`): live Google rows
+  while `liveActive()`, else Yahoo pre-market rows (`ROWS_OVERRIDE = pmRows()`) when `PM.date` is today; last chart point, Today / "Pre-mkt"
+  column and a new **Today cohort** (`d1`, ranked client-side by the session move, liquid rows; pre-market quotes with < 3 active 5-min bars
+  left out). fetchPM refreshes on the Oracle before the open. **Deals / pinned stocks** (`strength.deal_reasons`: aimon.json exclude or
+  10-session ADR < `config.DEAL_ADR10` 0.8%; stock field `deal`) are out of lists.strongest, Leaders and Oracle rankings (rows keep `deal: 1`).
+  **Stocks → Strongest** (`renderStrongest`, `breadth/unseen.py` → `DATA.themes.unseen`): every liquid RS 90+ stock (`lists.strong_all`,
+  uncapped) + Oracle top 20 on 60D / 180D, "On these lists" (trade setups, boxes, SoW, Launch, Best setups, dips, lifecycle, Leaders, bursts /
+  anticipation / EPs / strongest top 40, Oracle top 15), "on no list" + "New leaders you haven't seen" (RS crossed 95 or entered the Oracle
+  top 20 in 5 sessions; oracle `prev20`). Reclass worklist: top 40 unfiled by RS + every $100M+/day unfiled name (`n_big` 60).
+  RS formula check: card R-2026-11-04-rs-sheet-vs-dashboard (keep our RS). Test `test_unseen_and_deals`.
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and

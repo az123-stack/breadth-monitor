@@ -4341,9 +4341,9 @@ async function fetchPM() {
     PM = { ...(await r.json()), fetched: new Date() }; PM_ERR = null;
   } catch (e) { PM_ERR = String(e.message || e); }
   PM_BUSY = false;
-  if (TAB === "premarket" || TAB === "readout") rerenderPanel();
+  if (TAB === "premarket" || TAB === "readout" || TAB === "oracle") rerenderPanel();
 }
-setInterval(() => { if (document.visibilityState === "visible" && (TAB === "premarket" || (TAB === "readout" && roPhase() === "pre"))) fetchPM(); }, 2 * 60 * 1000);
+setInterval(() => { if (document.visibilityState === "visible" && (TAB === "premarket" || (TAB === "readout" && roPhase() === "pre") || (TAB === "oracle" && nyClock().mins < 0))) fetchPM(); }, 2 * 60 * 1000);
 
 // Yahoo pre-market rows in the same shape the live sheet rows have, so the shared Intraday cards work on them.
 function pmRows() {

@@ -106,3 +106,8 @@ TILT_UNCONFIRM_SHARE = 70   # experimental: thrust "unconfirmed" if a next-1-2-s
 # Unproven layers (macro_fit, ...) that Adam has approved to color the Decision Cards after passing their backtest.
 # Passing a backtest alone never changes anything; see DECISIONS.md.
 APPROVED_LAYERS = ("launch", "box_favorites", "lifecycle")   # Oct 25: Launch list = headline picks; Oct 27 (Adam): Lined-up buys (lifecycle) are the 2nd headline list, ★ leading group in box grades + playbook
+
+# Nov 4, 2026 (Adam, Nov 1: NTRA never showed up; pinned buyout stocks like HZO sat #2 on the leaders list): a stock is a "deal" / pinned
+# when its last 10 sessions averaged a daily range under DEAL_ADR10 % (cash buyouts trade in a tiny band) or it is in data/aimon.json
+# "exclude" (announced deals). Deals are left out of every leader ranking (strongest list, Leaders, Oracle cohorts, Strongest stocks).
+DEAL_ADR10 = 0.8

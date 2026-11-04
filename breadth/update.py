@@ -374,6 +374,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["reclass"] = reclass.build(adjusted, set(universe), store.load_subthemes(), store.load_themes(), store.load_names())
         except Exception as e:  # optional panel; never block the page
             log.exception("theme upkeep check failed: %s", e)
+        try:   # Strongest stocks + "new leaders you haven't seen" (Adam, Nov 1 2026: NTRA never surfaced; info only)
+            from . import unseen
+            theme_data["unseen"] = unseen.build(theme_data)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("strongest stocks failed: %s", e)
         try:   # My positions: end-of-day EMA / ADR references for every liquid ticker (v2 page judges Adam's exit rules live)
             from . import positions
             theme_data["posrefs"] = positions.refs(adjusted)

@@ -14,7 +14,7 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
   Batteries & Storage), CME, ISRG, stale WBD / PSKY / ATKR / BZH.
 
 ## Wednesday Nov 4, 2026 (Adam: "when my usage resets")
-- [ ] **RS formula check: sheet vs dashboard.** Adam's "Trading Dashboard v12" sheet uses
+- [x] **RS formula check: sheet vs dashboard.** DONE Nov 4 → card R-2026-11-04-rs-sheet-vs-dashboard: keep our RS (the names only the sheet finds did worse); neither has a proven edge this year. Adam's "Trading Dashboard v12" sheet uses
   `=IFERROR(ROUND((googlefinance(A4,"price")/INDEX(googlefinance(A4,"price",TODAY()-90,TODAY()-63,1),2,2)-1)*100,2),"")`
   = raw % change from the first close ~90 calendar days ago (≈ 62 sessions) to now, one period, not ranked.
   Ours = RS Rating 1–99: 63/126/189/252-session returns weighted 40/20/20/20, percentile vs liquid stocks.
@@ -22,7 +22,7 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
   compare the top lists (overlap, who each one finds), and backtest both (top 10% / 20% by each → next 20 / 60 sessions vs SPY and vs the
   average liquid stock, halves, by breadth regime; also the 3-month-only and blended versions, and the short RS periods rs2w/rs4w/rs6w).
   Answer which to keep (or offer it as another "RS period" chip), file a research card.
-- [ ] **"Golden eggs" that never show up** (Adam, Nov 1: "NTRA is super strong and not even in our universe … these can't get missed").
+- [x] **"Golden eggs" that never show up** DONE Nov 4: deals / pinned stocks (10-session ADR < 0.8% or aimon exclude) out of strongest / Leaders / Oracle; v3 Stocks → Strongest (breadth/unseen.py, every RS 90+ name + "on no list" + "new this week"); reclass worklist keeps every $100M+/day unfiled name. (Adam, Nov 1: "NTRA is super strong and not even in our universe … these can't get missed").
   Checked Nov 1: NTRA IS in the data (Genomics & Diagnostics, RS 97, +99% 180D, +56% 60D, ~5% off its high, $580M/day) but no list
   surfaces it: Oracle shows the top 15 only (NTRA #20 on 60D, #74 on 180D); Leaders "Any theme" (`lists.strongest`, top 40) is crowded by
   pinned deal stocks (HZO #2 with a 0.29% ADR, sitting "at the high") so NTRA misses it; no setup fired. Fixes to build: (1) drop deal /

@@ -21,8 +21,10 @@ TABS_JS = Path(__file__).with_name("v3_tabs.js")
 
 # parent key, label, [(sub-tab key = v1 renderer key, label)]
 NAV = [
+    # Nov 4 (Adam: "add intraday and premarket tabs … under their own parent tab where breadth will also reside")
+    ("market", "Market", [("breadth", "Breadth"), ("premarket", "Pre-market"), ("intraday", "Intraday")]),
     ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle"), ("grotation", "Rotation")]),
-    ("stocks", "Stocks", [("stocks", "Stocks"), ("ssetups", "Setups"), ("sleaders", "Leadership")]),   # Oct 31: Setups (third row: Lined-up buys); Rotation = money card only   # Oct 31 (Adam: "add another parent for stocks and start building that out")
+    ("stocks", "Stocks", [("stocks", "Stocks"), ("sstrong", "Strongest"), ("ssetups", "Setups"), ("sleaders", "Leadership")]),   # Nov 4: Strongest (every RS 90+ name, nothing missed)   # Oct 31: Setups (third row: Lined-up buys); Rotation = money card only   # Oct 31 (Adam: "add another parent for stocks and start building that out")
 ]
 
 NAV_JS = """const V3_NAV = %s;
@@ -41,7 +43,7 @@ NAV_RENDER = r"""  const ptabs = $(`<nav class="ptabs" role="tablist" aria-label
     tabs.querySelector(`button[data-tab="${s}"]`).click(); }));"""
 
 NAV_SHOW = """    tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === TAB));
-    const P = parentOf(TAB); lsSet("v3sub-" + P, TAB);
+    const P = parentOf(TAB); lsSet("v3sub-" + P, TAB); lsSet("v3tab", TAB);
     ptabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.p === P));
     tabs.querySelectorAll("button").forEach(b => { b.hidden = parentOf(b.dataset.tab) !== P; });"""
 
@@ -156,6 +158,7 @@ CSS = """
 .ortable .scroll { max-height: max(280px, calc(100vh - 560px)); overflow: auto; overscroll-behavior: contain; }
 .ortable .scroll table { border-collapse: separate; border-spacing: 0; }
 .ortable .scroll thead th { position: sticky; top: 0; z-index: 2; background: var(--surface-1, var(--bg, #fff)); box-shadow: 0 1px 0 var(--border); }
+.sgun td { background: color-mix(in srgb, var(--warning) 7%, transparent); } .sgno { color: var(--warning); font-size: 12px; }
 .ortable .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .ortable td.orsel { font-weight: 700; } .ortable tr[data-t] { cursor: pointer; } .orspyrow td { border-top: 2px solid var(--border); }
 @media (max-width: 900px) { .orgrid { grid-template-columns: 1fr; } .orsvg, .oraxis { height: 200px; } }
@@ -203,7 +206,7 @@ SWAPS = [
      'const TAB_ALIAS = { best: "setups", trades: "setups", launch: "setups", browse: "themes" };\n'
      'const tabOf = (k) => TAB_ALIAS[k] || k;',
      None, "v3 navigation (filled in by build)"),
-    ('let TAB = "readout";', 'let TAB = TABS[0][0];', "default tab = first rebuilt tab"),
+    ('let TAB = "readout";', 'let TAB = "themes"; try { const v = localStorage.getItem("v3tab"); if (v && TABS.some(t => t[0] === v)) TAB = v; } catch (e) {}', "opens on the last tab used (first visit: Themes)"),
     ('  const tabs = $(`<nav class="tabs" role="tablist">${TABS.map(([k, l]) => `<button role="tab" data-tab="${k}">${l}</button>`).join("")}</nav>`);\n'
      '  app.append(tabs);', NAV_RENDER, "parent row + sub-tab row"),
     ('    tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === TAB));',
@@ -214,10 +217,13 @@ SWAPS = [
     ('function pulseCard(T) {', PULSE_V3, "compact long / short cards (v1 version kept as pulseCardV1)"),
     (MODE_BTN_OLD, MODE_BTN_NEW, "Light / Dark switch in the header"),
     (MODE_JS_OLD, MODE_JS_NEW, "Light / Dark switch behaviour"),
-    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, themes: renderThemesTab,', "Theme Dash renderer"),
+    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, sstrong: renderStrongest, themes: renderThemesTab,', "Theme Dash renderer"),
     ('function renderTab(panel) {', None, "Theme Dash code (v3_themedash.js) before renderTab"),
     ('</style>', CSS, "v3 styles (first </style> only)"),
 ]
+
+
+REL_FILES = ["anchors.json", "agent/macro_brief.json", "story.json", "stories.json", "futures.json", "premarket.json"]
 
 
 def page(template_text):
@@ -233,6 +239,12 @@ def page(template_text):
         elif new is None:
             new = NAV_JS % json.dumps([[k, l, [list(s) for s in subs]] for k, l, subs in NAV])
         html = html.replace(old, new, 1)
+    # Nov 4: v3 lives in docs/v3/, the side files (pre-market quotes, futures, stories …) sit one folder up in docs/
+    for f in REL_FILES:
+        old = f'fetch("{f}?cb='
+        if html.count(old) != 1:
+            raise ValueError(f"v3 build: expected one fetch of {f} in the v1 template; found {html.count(old)}")
+        html = html.replace(old, f'fetch("../{f}?cb=', 1)
     return html
 
 

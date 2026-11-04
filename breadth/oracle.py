@@ -80,16 +80,25 @@ def build(adjusted, theme_data=None):
     dv = (C * V).iloc[-50:].mean()
     liquid = [t for t in meta if t in C.columns and last.get(t, 0) >= MIN_PRICE and dv.get(t, 0) >= MIN_DV
               and C[t].iloc[-(n + 1):].notna().sum() >= 150]
+    # Nov 4: deal / pinned stocks (strength.deal_reasons) stay out of the rankings (a buyout's one-day jump topped the 30D cohort)
+    deals = {t for t in liquid if meta[t].get("deal")}
+    ranked = [t for t in liquid if t not in deals]
     cohorts, need, rank_all = {}, set(), {}
     weak = {}    # Adam, Oct 30: "a toggle between strongest and weakest" → bottom TOP by the same return, worst first
     for key, k in COHORTS.items():
-        ret = (last[liquid] / C[liquid].iloc[-(k + 1)] - 1).dropna().sort_values(ascending=False)
+        ret = (last[ranked] / C[ranked].iloc[-(k + 1)] - 1).dropna().sort_values(ascending=False)
         weak[key] = list(ret.index[::-1][:TOP])
         rank_all[key] = list(ret.index)
         need.update(weak[key])
         top = list(ret.index[:TOP])
         cohorts[key] = top
         need.update(top)
+    # top 20 five sessions ago (60D / 180D), for the "new leaders you haven't seen" alert (breadth/unseen.py)
+    prev20 = {}
+    for key in ("d60", "d180"):
+        k = COHORTS[key]
+        p5 = (C[ranked].iloc[-6] / C[ranked].iloc[-(k + 6)] - 1).dropna().sort_values(ascending=False)
+        prev20[key] = list(p5.index[:20])
     win = C.iloc[-(n + 1):]
     rets = {k: last / C.iloc[-(k + 1)] - 1 for k in RETS}
     spyC = C[config.BENCHMARK]
@@ -98,7 +107,7 @@ def build(adjusted, theme_data=None):
         s = meta[t]
         return {"name": s.get("name"), "sub": s.get("sub") or ((s.get("themes") or [""])[0]), "rsr": s.get("rsr"),
                 "r": [_r(rets[k].get(t)) for k in RETS], "c": [_r(v, 2) for v in win[t].tolist()],
-                "lq": int(t in liq), "ac": acc_tag(C[t] / spyC), "adr": s.get("adr")}
+                "lq": int(t in liq), **({"deal": 1} if s.get("deal") else {}), "ac": acc_tag(C[t] / spyC), "adr": s.get("adr")}
     rows = {}
     for t in sorted(need):
         rows[t] = row(t)
@@ -138,6 +147,6 @@ def build(adjusted, theme_data=None):
         if t not in rows:
             rows[t] = row(t)
     return {"date": C.index[-1].strftime("%Y-%m-%d"), "dates": [d.strftime("%Y-%m-%d") for d in win.index],
-            "windows": WINDOWS, "cohorts": cohorts, "scohorts": scoh, "wcohorts": weak, "wscohorts": wscoh, "sall": sall, "rall": rank_all, "subs": subs, "rows": rows, "spy": spy, "overlap": overlap,
+            "windows": WINDOWS, "cohorts": cohorts, "scohorts": scoh, "wcohorts": weak, "wscohorts": wscoh, "sall": sall, "rall": rank_all, "prev20": prev20, "subs": subs, "rows": rows, "spy": spy, "overlap": overlap,
             "spy_r": [_r(rets[k].get(config.BENCHMARK)) for k in RETS], "universe": len(liquid),
             "rules": {"top": TOP, "min_price": MIN_PRICE, "min_dv": MIN_DV, "acc": ACC}}

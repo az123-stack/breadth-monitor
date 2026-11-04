@@ -106,6 +106,7 @@ def tightness(w):
     r5 = (h.rolling(5).max() / l.rolling(5).min() - 1) * 100
     t = {
         "adr": adr,
+        "adr10": rng.rolling(10, min_periods=8).mean(),     # Nov 4: pinned (deal) stocks
         "tight5": r5 / adr,                                   # 5-day range in ADRs (lower = tighter)
         "nr7": (h - l) <= (h - l).rolling(7).min() * 1.0001,
         "inside": (h <= h.shift(1)) & (l >= l.shift(1)),
@@ -231,6 +232,24 @@ def mega_caps():
     return {k: r["marketcap"] for k, r in rows.items() if r.get("marketcap")}
 
 
+def deal_reasons(t, last, cols):
+    """{ticker: why} for stocks to keep out of leader rankings: announced deals (data/aimon.json exclude) and pinned stocks
+    (10-session average daily range < config.DEAL_ADR10 %)."""
+    out = {}
+    try:
+        import json as _j
+        for k, why in (_j.loads((config.DATA_DIR / "aimon.json").read_text()).get("exclude") or {}).items():
+            out[k] = str(why)
+    except Exception:
+        pass
+    a10 = t["adr10"].iloc[last]
+    for tk in cols:
+        v = a10.get(tk)
+        if tk not in out and v is not None and not pd.isna(v) and float(v) < config.DEAL_ADR10:
+            out[tk] = f"pinned: {float(v):.2f}% average daily range over 10 sessions (likely a pending buyout)"
+    return out
+
+
 def _r(v, nd=4):
     try:
         v = float(v)
@@ -322,6 +341,7 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
                if last >= nd + 5 else None)
         short_rs[key], short_bp[key] = (now, ago), bpN
     r5 = ratings.loc[dates[last - 5]] if dates[last - 5] in ratings.index else None
+    deal_of = deal_reasons(t, last, c.columns)
     tick = {}
     for tk in focus:
         if tk not in c.columns or pd.isna(c.iloc[last][tk]):
@@ -339,6 +359,8 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
             "hi52": _r(t["hi52"].iloc[last][tk]), "lo52": _r(t["lo52"].iloc[last][tk]),
             "nh52": bool(t["nh52"].iloc[last][tk]), "nl52": bool(t["nl52"].iloc[last][tk]),
         }
+        if tk in deal_of:
+            tick[tk]["deal"] = deal_of[tk]
 
     # ---- setup lists (whole market, latest session; EPs over the last 5) ----
     burst, checks, lynch, ep = SU.masks(w, t, liquid)
@@ -380,6 +402,8 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
     rl = rating_full.iloc[last]
     okm = liquid.iloc[last] & (c.iloc[last] >= 10) & (dollar.iloc[last] >= 20e6) & (rl >= 90)
     for tk in c.columns[okm.fillna(False).values]:
+        if tk in deal_of:      # Nov 4: buyout stocks pinned at the deal price aren't leaders
+            continue
         offh = t["off_high"].iloc[last][tk]
         sc = 0.6 * float(rl[tk]) + 0.4 * _LD.high_score(None if pd.isna(offh) else float(offh))
         sl.append(row(tk, last, {"score": round(sc, 1), "d60": _r(t["d60"].iloc[last][tk]),
@@ -466,5 +490,5 @@ def build_v2(adjusted, universe, members, sub_members, names, focus, hist_days=3
     return {"hve": hve_out, "timeline_dates": tl_dates, "px_dates": px_dates, "tickers": tick, "themes": g_themes, "subthemes": g_subs, "setup_stats": stats, "regime_now": reg, "trade_bt": trade_bt, "vcp": vcp_live,
             "rs_bp": [_r(x, 5) for x in (bps.get(last) if bps.get(last) is not None else [])],
             "rs_short_bp": {k: [_r(x, 5) for x in (bp if bp is not None else [])] for k, bp in short_bp.items()},
-            "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60], "strongest": sl[:40], "mega": ml,
+            "lists": {"bursts": bl[:80], "anticipation": al[:60], "eps": el[:60], "strongest": sl[:40], "strong_all": sl, "mega": ml,
                       "counts": {"bursts": len(bl), "anticipation": len(al), "eps": len(el), "strongest": len(sl), "mega": len(ml)}}}
