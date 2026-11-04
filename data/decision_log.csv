@@ -296,25 +296,25 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-02,MTD,watch,vcp,thrust,Choppy / mixed,Focus,0.264,81.0,Life Science Tools,81.6,neutral,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,,,,,pending
 2026-11-02,PR,watch,round,thrust,Choppy / mixed,Focus,0.304,91.0,Shale E&P,74.7,steady,,-1.65,-4.33,+10bp 10-yr yield → +1.3%; +1% oil → +0.1%,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
 2026-11-02,VEEV,watch,pullback,thrust,Choppy / mixed,Focus,0.283,93.0,Enterprise SaaS,88.9,steady,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
-2026-11-03,ANF,cand,rotation,thrust,Choppy / mixed,Focus,0.412,97.0,Consumer Brands,88.5,confirmed,,0.0,0.0,,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,ATRC,cand,pullback,thrust,Choppy / mixed,Focus,0.277,96.0,Medical Devices,74.7,confirmed,warming,0.0,0.0,,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,CBRL,cand,rotation,thrust,Choppy / mixed,Focus,0.412,97.0,Restaurants,70.8,confirmed,,0.0,0.0,,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,CDNA,cand,ath,thrust,Choppy / mixed,Focus,0.206,99.0,Genomics & Diagnostics,84.1,new,,0.0,0.0,,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,ELF,cand,rotation,thrust,Choppy / mixed,Focus,0.412,88.0,Consumer Brands,88.5,confirmed,,0.0,0.0,,,,October jobs report 2026-11-06,,,,,,high,2,1,,,,,pending
-2026-11-03,EXEL,cand,round,thrust,Choppy / mixed,Focus,0.308,94.0,Mid-cap Biotech,56.6,fading,,0.62,4.76,+10bp 10-yr yield → -1.5%,,,October jobs report 2026-11-06,,,,,,high,2,1,,,,,pending
-2026-11-03,GKOS,cand,round,thrust,Choppy / mixed,Focus,0.308,97.0,Medical Devices,74.7,confirmed,warming,0.0,0.0,,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,HAFN,cand,pullback,thrust,Choppy / mixed,Focus,0.277,92.0,Tankers & Shipping,79.0,fading,,-0.64,-4.97,+10bp 10-yr yield → +1.6%,,,October jobs report 2026-11-06,,,,,,high,2,1,,,,,pending
-2026-11-03,LLY,cand,ath,thrust,Choppy / mixed,Focus,0.206,90.0,Large-cap Pharma,84.1,confirmed,,0.59,4.55,+10bp 10-yr yield → -1.4%,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,OSCR,cand,pullback,thrust,Choppy / mixed,Focus,0.277,95.0,Managed Care,71.6,steady,,0.0,0.0,,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,REGN,cand,round,thrust,Choppy / mixed,Focus,0.308,88.0,Large-cap Biotech,61.4,new,,0.59,4.58,+10bp 10-yr yield → -1.4%,,,October jobs report 2026-11-06,,,,,,high,1,1,,,,,pending
-2026-11-03,SAIC,cand,ath,thrust,Choppy / mixed,Focus,0.206,92.0,Defense IT & Services,91.7,confirmed,warming,-0.39,4.96,+10bp 10-yr yield → -1.2%; +1% oil → +0.1%,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,SN,cand,ath,thrust,Choppy / mixed,Focus,0.206,96.0,Consumer Brands,88.5,confirmed,,0.77,5.94,+10bp 10-yr yield → -1.9%,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,TRMD,cand,pullback,thrust,Choppy / mixed,Focus,0.277,93.0,Tankers & Shipping,79.0,fading,,-0.69,-5.3,+10bp 10-yr yield → +1.7%,,,October jobs report 2026-11-06,,,,,,high,2,1,,,,,pending
-2026-11-03,TRV,cand,rotation,thrust,Choppy / mixed,Focus,0.412,83.0,P&C Insurers,83.2,confirmed,,0.35,2.67,+10bp 10-yr yield → -0.8%,,,October jobs report 2026-11-06,,,,,,high,2,1,,,,,pending
-2026-11-03,KNSA,pick1,round,thrust,Choppy / mixed,Focus,0.308,97.0,Immunology & Inflammation,82.5,confirmed,ignition,0.0,0.0,,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,SLDE,pick2,rotation,thrust,Choppy / mixed,Focus,0.412,93.0,P&C Insurers,83.2,confirmed,,0.62,4.81,+10bp 10-yr yield → -1.5%,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,APPN,watch,round,thrust,Choppy / mixed,Focus,0.308,97.0,Enterprise SaaS,86.8,steady,,0.76,5.88,+10bp 10-yr yield → -1.9%,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,GTLB,watch,kq,thrust,Choppy / mixed,Focus,0.177,94.0,Developer & DevOps Tools,55.4,,,0.0,0.0,,,,October jobs report 2026-11-06,,,,,,high,2,1,,,,,pending
-2026-11-03,PR,watch,pullback,thrust,Choppy / mixed,Focus,0.277,90.0,Shale E&P,68.9,steady,,-1.41,-2.65,+10bp 10-yr yield → +1.2%; +1% oil → +0.1%,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,VEEV,watch,pullback,thrust,Choppy / mixed,Focus,0.277,92.0,Enterprise SaaS,86.8,steady,,0.0,0.0,,,,October jobs report 2026-11-06,,,,,,high,3,1,,,,,pending
-2026-11-03,WSM,watch,vcp,thrust,Choppy / mixed,Focus,0.268,78.0,Home Improvement & Specialty Retail,74.9,confirmed,,0.87,6.76,+10bp 10-yr yield → -2.1%,,,October jobs report 2026-11-06,,,,,,high,2,1,,,,,pending
+2026-11-03,ANF,cand,rotation,thrust,Choppy / mixed,Focus,0.371,97.0,Consumer Brands,88.5,confirmed,,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,ATRC,cand,pullback,thrust,Choppy / mixed,Focus,0.283,96.0,Medical Devices,74.7,confirmed,warming,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,CBRL,cand,rotation,thrust,Choppy / mixed,Focus,0.371,97.0,Restaurants,70.8,confirmed,,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,CDNA,cand,ath,thrust,Choppy / mixed,Focus,0.194,99.0,Genomics & Diagnostics,84.1,new,,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,ELF,cand,rotation,thrust,Choppy / mixed,Focus,0.371,88.0,Consumer Brands,88.5,confirmed,,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,2,1,,,,,pending
+2026-11-03,EXEL,cand,round,thrust,Choppy / mixed,Focus,0.315,94.0,Mid-cap Biotech,56.6,fading,,0.62,4.76,+10bp 10-yr yield → -1.5%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,2,1,,,,,pending
+2026-11-03,GKOS,cand,round,thrust,Choppy / mixed,Focus,0.315,97.0,Medical Devices,74.7,confirmed,warming,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,HAFN,cand,pullback,thrust,Choppy / mixed,Focus,0.283,92.0,Tankers & Shipping,79.0,fading,,-0.64,-4.97,+10bp 10-yr yield → +1.6%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,2,1,,,,,pending
+2026-11-03,LLY,cand,ath,thrust,Choppy / mixed,Focus,0.194,90.0,Large-cap Pharma,84.1,confirmed,,0.59,4.55,+10bp 10-yr yield → -1.4%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,OSCR,cand,pullback,thrust,Choppy / mixed,Focus,0.283,95.0,Managed Care,71.6,steady,,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,REGN,cand,round,thrust,Choppy / mixed,Focus,0.315,88.0,Large-cap Biotech,61.4,new,,0.59,4.58,+10bp 10-yr yield → -1.4%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,1,1,,,,,pending
+2026-11-03,SAIC,cand,ath,thrust,Choppy / mixed,Focus,0.194,92.0,Defense IT & Services,91.7,confirmed,warming,-0.39,4.96,+10bp 10-yr yield → -1.2%; +1% oil → +0.1%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,SN,cand,ath,thrust,Choppy / mixed,Focus,0.194,96.0,Consumer Brands,88.5,confirmed,,0.77,5.94,+10bp 10-yr yield → -1.9%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,TRMD,cand,pullback,thrust,Choppy / mixed,Focus,0.283,93.0,Tankers & Shipping,79.0,fading,,-0.69,-5.3,+10bp 10-yr yield → +1.7%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,2,1,,,,,pending
+2026-11-03,TRV,cand,rotation,thrust,Choppy / mixed,Focus,0.371,83.0,P&C Insurers,83.2,confirmed,,0.35,2.67,+10bp 10-yr yield → -0.8%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,2,1,,,,,pending
+2026-11-03,KNSA,pick1,round,thrust,Choppy / mixed,Focus,0.315,97.0,Immunology & Inflammation,82.5,confirmed,ignition,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,SLDE,pick2,rotation,thrust,Choppy / mixed,Focus,0.371,93.0,P&C Insurers,83.2,confirmed,,0.62,4.81,+10bp 10-yr yield → -1.5%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,APPN,watch,round,thrust,Choppy / mixed,Focus,0.315,97.0,Enterprise SaaS,86.8,steady,,0.76,5.88,+10bp 10-yr yield → -1.9%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,GTLB,watch,kq,thrust,Choppy / mixed,Focus,0.177,94.0,Developer & DevOps Tools,55.4,,,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,2,1,,,,,pending
+2026-11-03,PR,watch,pullback,thrust,Choppy / mixed,Focus,0.283,90.0,Shale E&P,68.9,steady,,-1.41,-2.65,+10bp 10-yr yield → +1.2%; +1% oil → +0.1%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,VEEV,watch,pullback,thrust,Choppy / mixed,Focus,0.283,92.0,Enterprise SaaS,86.8,steady,,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
+2026-11-03,WSM,watch,vcp,thrust,Choppy / mixed,Focus,0.268,78.0,Home Improvement & Specialty Retail,74.9,confirmed,,0.87,6.76,+10bp 10-yr yield → -2.1%,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,2,1,,,,,pending
