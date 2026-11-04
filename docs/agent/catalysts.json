@@ -1,191 +1,515 @@
 {
- "for_date": "2026-11-02",
- "written": "2026-11-03T12:16Z",
+ "for_date": "2026-11-03",
+ "written": "2026-11-04T12:18Z",
  "stocks": {
-  "CCI": {
-   "why": "Reported Q3 2026 on Oct 21 (after close); revenue expected down ~6% y/y but AFFO up ~7%; tower sale proceeds used for debt paydown and buybacks. Nothing fresh found since.",
-   "direction": "mixed",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [
-    "DISH/Sprint exits cut 2026 billings ~$240M",
-    "$17.1B debt"
-   ],
-   "sources": [
-    "https://site.financialmodelingprep.com/market-news/crown-castle-cci-q3-2026-earnings-preview"
-   ]
-  },
-  "NTSK": {
-   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
+  "CRM": {
+   "why": "No fresh hard news found; last catalyst was the Aug 26 beat-and-raise, and Salesforce agreed Oct 20 to buy Braze for $47.50 cash (~$5.7B, close fiscal 2028).",
    "direction": "none",
    "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.tipranks.com/stocks/NTSK/earnings",
-    "https://www.barchart.com/story/news/4386160/netskope-s-growth-trajectory-holds-but-the-billing-shift-still-clouds-cash-visibility"
+    "https://beta.earningswhispers.com/go/w/CRM",
+    "https://www.asktraders.com/?p=256739"
    ]
   },
-  "SPOT": {
-   "why": "Reported Q3 2026 on Oct 22: EPS $2.54 missed $2.86 estimate, revenue $5.10B beat slightly. Stock reaction not confirmed.",
-   "direction": "mixed",
-   "quality": "real",
+  "SAIL": {
+   "why": "No clear catalyst found; last report (Jun 9) missed estimates but stock drifted up since. Next report date only estimated (about Dec 15).",
+   "direction": "none",
+   "quality": "none",
    "depth": "full",
    "earnings_date": null,
-   "red_flags": [
-    "EPS miss on Oct 22 report"
-   ],
+   "red_flags": [],
    "sources": [
-    "https://www.quiverquant.com/news/SPOTIFY+TECHNOLOGY+SA+%28%24SPOT%29+Releases+Q3+2026+Earnings",
-    "https://finviz.com/news/395042/spotify-technology-sa-to-announce-results-for-third-quarter-2026"
+    "https://beta.earningswhispers.com/go/w/SAIL",
+    "https://www.tipranks.com/stocks/sail/earnings"
+   ]
+  },
+  "FDS": {
+   "why": "No clear catalyst found in searches (results were older stories).",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/257646/why-factset-fds-stock-is-falling-today"
    ]
   },
   "FIGS": {
-   "why": "No fresh catalyst found; stock reportedly up strongly in 2026 and Q2 (Aug 6) beat with raised guidance. Next report Nov 5 after close.",
-   "direction": "positive",
-   "quality": "real",
+   "why": "No clear catalyst found; stock up strongly in 2026, next earnings date not confirmed.",
+   "direction": "none",
+   "quality": "none",
    "depth": "full",
-   "earnings_date": "2026-11-05",
-   "red_flags": [
-    "earnings inside 5 sessions"
-   ],
+   "earnings_date": null,
+   "red_flags": [],
    "sources": [
-    "https://www.earningswhispers.com/stocks/FIGS"
+    "https://www.tikr.com/blog/figs-is-up-84-in-2026-take-profits-or-buy-more"
    ]
   },
   "BRZE": {
-   "why": "Salesforce agreed Oct 20 to acquire Braze for $47.50/share cash (~$5.66B), closing in Salesforce fiscal 2028. Pending cash takeover caps upside.",
+   "why": "Salesforce agreed Oct 20 to acquire Braze for $47.50 per share in cash (58% premium, ~$5.66B); shareholder vote and regulatory approvals needed, close expected fiscal 2028. Stock trades just under the offer, so upside is capped.",
    "direction": "negative",
    "quality": "strong",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "pending cash takeover (capped upside)",
-    "Loop Capital downgrade"
+    "pending cash takeover - upside capped near $47.50"
    ],
    "sources": [
-    "https://www.nasdaq.com/articles/why-braze-stock-skyrocketed-today",
-    "https://letsdatascience.com/news/salesforce-agrees-to-acquire-braze-for-566-billion-9d3d8c86"
+    "https://www.asktraders.com/?p=256739",
+    "https://site.financialmodelingprep.com/market-news/braze-stock-jumps-salesforce-acquisition-offer"
+   ]
+  },
+  "LFST": {
+   "why": "No fresh catalyst found; last big move was the Q1 beat in May 2026. Next earnings date not confirmed.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.marketbeat.com/earnings/reports/2026-5-7-lifestance-health-group-inc-stock/"
    ]
   },
   "ANF": {
-   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
+   "why": "No clear catalyst found; next earnings date not confirmed.",
    "direction": "none",
    "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.tipranks.com/stocks/ANF/earnings",
     "https://www.earningswhispers.com/stocks/anf"
    ]
   },
-  "SN": {
-   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.tipranks.com/stocks/sn",
-    "https://beta.earningswhispers.com/go/w/SN"
-   ]
-  },
   "APPN": {
-   "why": "Strong Q2 (Aug 6): revenue +19% y/y to $203M beat, Q3 guidance above consensus; stock +14% then. Next report unconfirmed, MarketBeat estimates Nov 5 (not confirmed).",
-   "direction": "positive",
+   "why": "No fresh catalyst found; stock jumped after Q2 results in Aug 2026. Next earnings date not confirmed.",
+   "direction": "none",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
-   "red_flags": [
-    "earnings likely inside 5 sessions (date unconfirmed)"
-   ],
+   "red_flags": [],
    "sources": [
     "https://www.marketbeat.com/instant-alerts/appian-nasdaqappn-shares-up-142-on-strong-earnings-2026-08-07/"
    ]
   },
-  "LFST": {
-   "why": "No fresh news found; Q3 2026 results due Nov 5 before the open (company announcement).",
-   "direction": "none",
-   "quality": "none",
+  "SN": {
+   "why": "SharkNinja reports Q3 2026 results today, Nov 4, before the open (call 8:30 ET), so a big gap is likely either way.",
+   "direction": "mixed",
+   "quality": "unknown",
    "depth": "full",
-   "earnings_date": "2026-11-05",
+   "earnings_date": "2026-11-04",
    "red_flags": [
-    "earnings inside 5 sessions"
+    "earnings today before the open"
    ],
    "sources": [
-    "https://www.biopharmawatch.com/news/LFST/lifestance-q3-2026-earnings-call"
-   ]
-  },
-  "TEAM": {
-   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.digrin.com/stocks/detail/TEAM/earnings"
-   ]
-  },
-  "PAYC": {
-   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.tipranks.com/stocks/payc/earnings"
-   ]
-  },
-  "CON": {
-   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.digrin.com/stocks/detail/CON/earnings"
+    "https://s202.q4cdn.com/977000893/files/doc_news/SharkNinja-Announces-Third-Quarter-2026-Earnings-Release-and-Conference-Call-Date-2026.pdf"
    ]
   },
   "CRL": {
-   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
-   "direction": "none",
-   "quality": "none",
+   "why": "Charles River reports Q3 2026 results today, Nov 4, before the open (call 9:00 ET).",
+   "direction": "mixed",
+   "quality": "unknown",
    "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
+   "earnings_date": "2026-11-04",
+   "red_flags": [
+    "earnings today before the open"
+   ],
    "sources": [
-    "https://www.webull.com/news/15813160628662272"
+    "https://finviz.com/news/400820/charles-river-laboratories-schedules-third-quarter-2026-earnings-release-and-conference-call"
    ]
   },
-  "ARX": {
-   "why": "no clear catalyst found; only generic earnings-calendar pages turned up",
-   "direction": "none",
-   "quality": "none",
+  "TEAM": {
+   "why": "Atlassian reports fiscal Q1 2027 after the close on Thursday Nov 5; no other fresh catalyst found.",
+   "direction": "mixed",
+   "quality": "unknown",
    "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
+   "earnings_date": "2026-11-05",
+   "red_flags": [
+    "earnings Nov 5 after close"
+   ],
    "sources": [
-    "https://www.zacks.com/amp/stock/news/2230846/skyward-specialty-insurance-group-inc-skwd-hit-a-52-week-high-can-the-run-continue"
+    "https://finviz.com/news/398890/atlassian-announces-date-for-first-quarter-of-fiscal-year-2027-financial-results"
    ]
   },
-  "SLDE": {
-   "why": "Q3 2026 (Oct 27): revenue +35.9% to $361M, EPS $1.09 (+37%), full-year net income outlook raised to $500-520M, $1.50 special dividend payable Nov 30 (ex-date likely soon).",
+  "PAYC": {
+   "why": "Paycom reports Q3 2026 after the close today, Nov 4 (call 5 PM ET).",
+   "direction": "mixed",
+   "quality": "unknown",
+   "depth": "full",
+   "earnings_date": "2026-11-04",
+   "red_flags": [
+    "earnings today after the close"
+   ],
+   "sources": [
+    "https://finviz.com/news/402626/paycom-software-inc-announces-third-quarter-2026-earnings-release-date-and-conference-call"
+   ]
+  },
+  "CON": {
+   "why": "Concentra reports Q3 2026 results Thursday Nov 5; no other fresh catalyst found.",
+   "direction": "mixed",
+   "quality": "unknown",
+   "depth": "full",
+   "earnings_date": "2026-11-05",
+   "red_flags": [
+    "earnings Nov 5"
+   ],
+   "sources": [
+    "https://finviz.com/news/400679/concentra-to-announce-third-quarter-2026-results-on-thursday-november-5-2026"
+   ]
+  },
+  "RVTY": {
+   "why": "Revvity reported Q3 on Nov 3: pro forma organic growth 7%, adjusted EPS $1.38, raised full-year guidance; CEO said results were meaningfully ahead of expectations. Investor Day Nov 13.",
    "direction": "positive",
    "quality": "strong",
    "depth": "full",
    "earnings_date": null,
-   "red_flags": [
-    "combined ratio rose to 59.3% from 48.5%"
-   ],
+   "red_flags": [],
    "sources": [
-    "https://www.quiverquant.com/news/Slide+Insurance+Q3+Revenue+Rises+35.9%25+to+%24361.1+Million"
+    "https://www.sec.gov/Archives/edgar/data/0000031791/000003179126000031/q32026pressrelease.htm"
+   ]
+  },
+  "ARX": {
+   "why": "No clear catalyst found in searches (results were about Arch Capital ACGL, not clearly this ticker).",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.royalgazette.com/?p=133639"
+   ]
+  },
+  "AVAH": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/AVAH"
+   ]
+  },
+  "BOX": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/BOX"
+   ]
+  },
+  "BTSG": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/BTSG"
+   ]
+  },
+  "SLDE": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/SLDE"
+   ]
+  },
+  "SAIC": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/SAIC"
+   ]
+  },
+  "VEEV": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/VEEV"
+   ]
+  },
+  "AVTR": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://s202.q4cdn.com/498171784/files/doc_news/Avantor-Reports-Third-Quarter-2026-Results-2026.pdf"
+   ]
+  },
+  "FTRE": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/FTRE"
+   ]
+  },
+  "AMRX": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/AMRX"
+   ]
+  },
+  "INTA": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/INTA"
+   ]
+  },
+  "LLY": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.sec.gov/Archives/edgar/data/0000059478/000005947826000104/q326lillysalesandearningsp.htm"
+   ]
+  },
+  "TEVA": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/TEVA"
+   ]
+  },
+  "FRSH": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/FRSH"
+   ]
+  },
+  "SU": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/SU"
+   ]
+  },
+  "ELF": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://investor.elfbeauty.com/stock-and-financial/press-releases/landing-news/2026/10-21-2026-213013959"
+   ]
+  },
+  "HAS": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/HAS"
+   ]
+  },
+  "COP": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/COP"
+   ]
+  },
+  "NEOG": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/NEOG"
+   ]
+  },
+  "A": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/A"
+   ]
+  },
+  "AMGN": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/AMGN"
+   ]
+  },
+  "VTRS": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/VTRS"
+   ]
+  },
+  "CVE": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/CVE"
+   ]
+  },
+  "MRK": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/MRK"
+   ]
+  },
+  "ACN": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/ACN"
+   ]
+  },
+  "PTC": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/PTC"
+   ]
+  },
+  "TMO": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.sec.gov/Archives/edgar/data/0000097745/000009774526000173/q32026earnings8kex99_1.htm"
+   ]
+  },
+  "GILD": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/412050/gilead-sciences-announces-third-quarter-2026-financial-results"
+   ]
+  },
+  "MAR": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/MAR"
+   ]
+  },
+  "CACI": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/CACI"
+   ]
+  },
+  "ABBV": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://news.abbvie.com/2026-10-30-AbbVie-Reports-Third-Quarter-2026-Financial-Results"
    ]
   }
  }
