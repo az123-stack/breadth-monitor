@@ -789,6 +789,14 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   "Today" (move ≥ 2 ADRs, or gap ≥ max(3%, 1 ADR) with paced vol ≥ 2x); before the open Yahoo pre-market (≥ 6 active bars). Chips Why
   (multi) / Direction / When / RS / search (localStorage ipWhy/ipDir/ipWhen/ipRs), ⬇ TradingView, "On these lists". Descriptive only;
   test "same setup, in play vs not" queued in ROADMAP. Test `test_in_play`.
+- **AI Revenue setups** (Nov 5, 2026; Adam: "a separate tab for AI Revenue Setups where we look for all these stocks coming back into EMAs")
+  → `breadth/airev.py` `build(adjusted, theme_data)` (~60 s, after lifecycle / aimon / popwatch) → `DATA.themes.airev`, v3 Stocks → **AI Revenue**
+  (`renderAIRev`). Names: aimon pool (verified AI revenue line, with the market's in / out verdict) + "Enterprise AI SaaS" / "AI Monetizers" theme
+  members + rewarded software / IT reports (earnings.frames reaction up) in 20 sessions. Rows carry the Lined-up fields (c, hi, lo, e9, e21, adr,
+  t3, t0) so the page runs `lineupState` live; plus up (21 > rising 50), RS, sub-theme lifecycle stage / signal, pop, last report, next earnings.
+  Chips Show (in the EMAs / + near / all) · Source · Trend · RS · Group (BUY groups). Live "gap today" tag for reporters. AI filter untested;
+  the BUY-group filter is the tested part. Open question (Adam, Nov 5): merge Pop watch pullbacks + Lined-up buys + AI Revenue into one
+  EMA-dip engine with "why this group" tags (pop adds nothing: +0.19R vs +0.18R; BUY groups +0.85R vs +0.11R).
 - **Trade warehouse · step 1** (Nov 4, 2026; Adam's VEEV weekly chart: "daily or weekly EMA pullback, and when?"; card
   R-2026-11-04-daily-vs-weekly-dips, status doesnt): `tools/warehouse/PLAN.md` (v3.1, pre-registered; independent reviewer 55% → 78% → 85%
   before building; Adam: build once the plan scores high enough), `monthly.py` + `.github/workflows/monthly_levels.yml` → data/warehouse/

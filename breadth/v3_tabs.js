@@ -319,3 +319,57 @@ function renderInPlayBody(app, S) {
   card.querySelector(".iptv").addEventListener("click", () => tsDownload("in-play", [{ name: "In play", ticks: shown.map(r => r.t) }]));
   app.append(card);
 }
+// Nov 5 (Adam: "a separate tab for AI Revenue Setups where we look for all these stocks coming back into EMAs"): Stocks → AI Revenue =
+// DATA.themes.airev (breadth/airev.py): AI Monetizers pool (verified AI revenue line) + the two AI software themes + rewarded software / IT
+// reports in the last 20 sessions, each run through the Lined-up buys test (`lineupState`: in the 9/21 EMAs → buy over yesterday's high,
+// stop the dip low, max 1 ADR), live from the Google sheet during the session.
+const AIR_SRC = { verified: ["Verified AI revenue", "sow-breakout"], theme: ["AI theme", "sow-riding"], report: ["Rewarded report", "sow-nuzzle"] };
+function renderAIRev(app) {
+  const X = (DATA.themes || {}).airev;
+  if (!X || !X.rows) { app.append($('<div class="card empty">The AI Revenue list appears after the next data run.</div>')); return; }
+  app.append(liveBar());
+  UI.air = UI.air || { show: lsGet("airShow", "ema"), src: lsGet("airSrc", "all"), trend: lsGet("airTrend", "up"), rs: lsGet("airRs", "any"), grp: lsGet("airGrp", "any") };
+  const U = UI.air, live = liveActive();
+  const RK = { over: 0, zone: 1, near: 2 };
+  const all = X.rows.map(r => {
+    const s = lineupState(r), L = live ? liveRow(r.t) : null;
+    const rep = L && L.gap != null && r.adr && Math.abs(L.gap) >= Math.max(0.03, r.adr) ? L.gap : null;
+    return { ...s, repToday: rep };
+  });
+  const srcSet = new Set(String(U.src).split(","));
+  const RSMIN = { any: 0, r70: 70, r80: 80 };
+  const pass = (r, skip) => (skip === "show" || U.show === "all" || (U.show === "ema" ? (r.st === "over" || r.st === "zone") : r.st != null))
+    && (srcSet.has("all") || r.src.some(k => srcSet.has(k)))
+    && (U.trend === "all" || r.up) && ((r.rs || 0) >= RSMIN[U.rs]) && (U.grp === "any" || r.signal === "buy");
+  const rows = all.filter(r => pass(r)).sort((a, b) => ((RK[a.st] ?? 9) - (RK[b.st] ?? 9)) || ((b.precise ? 1 : 0) - (a.precise ? 1 : 0)) || ((b.rs || 0) - (a.rs || 0)));
+  const cnt = (v) => all.filter(r => { const o = U.show; U.show = v; const ok = pass(r); U.show = o; return ok; }).length;
+  const stTag = (r) => r.st === "over" ? '<span class="tg sow-breakout"><b>Over the trigger</b></span>' : r.st === "zone" ? '<span class="tg sow-nuzzle">In the EMAs</span>'
+    : r.st === "near" ? '<span class="tg sow-riding">Near (1 ADR above)</span>' : '<span class="meta">not in the EMAs</span>';
+  const why = (r) => r.src.map(k => `<span class="tg ${AIR_SRC[k][1]}" title="${esc(k === "verified" ? r.ai_note : k === "report" && r.report ? "rewarded report " + r.report.date : "")}">${AIR_SRC[k][0]}</span>`).join(" ")
+    + (r.src.includes("verified") && r.ai_in === false ? ` <small class="meta" title="${esc(r.ai_why)}">market says not yet</small>` : "")
+    + (r.repToday != null ? ` <span class="tg ${r.repToday > 0 ? "sow-breakout" : "sow-extended"}">gap ${pct(r.repToday, 1)} today</span>` : "");
+  const card = $(`<section class="card ortable aircard"><div class="head"><h2>AI Revenue setups <span class="meta">· ${rows.length} of ${all.length} · companies showing AI revenue, pulling back into their 9 / 21 EMAs · ${live ? "live" : shortDate(X.date) + " close"}</span></h2>
+    <button class="xopen airtv">⬇ TradingView</button></div><div class="filters" style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0"></div>
+    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Ticker</th><th class="l">Why it's here</th><th class="l">Setup</th><th title="Buy over yesterday's high">Buy over</th><th title="Dip low, max 1 ADR under the trigger">Stop</th><th>Risk</th><th title="ADRs from price to the trigger">To trigger</th>
+      ${live ? "<th>Today</th>" : ""}<th>RS</th><th>5D</th><th>Off high</th><th class="l">Group (lifecycle)</th><th class="l">Last report</th><th class="l">Next earnings</th></tr></thead><tbody>
+    ${rows.map((r, i) => `<tr><td class="num">${i + 1}</td><td class="l"><a href="#" class="tkl" data-t="${esc(r.t)}"><b>${esc(r.t)}</b></a>${r.up ? "" : ' <small class="meta" title="21 EMA not above a rising 50">no uptrend</small>'}<small class="meta" style="display:block">${esc(r.name || "")}</small></td>
+      <td class="l">${why(r)}${r.ai_note ? `<small class="meta" style="display:block;max-width:340px">${esc(r.ai_note)}</small>` : ""}</td>
+      <td class="l">${stTag(r)}${r.d9 != null ? " " + lineupLocTag(r) : ""}</td>
+      <td class="num">${r.trig ? "$" + r.trig.toFixed(2) : "–"}</td><td class="num">${r.stop ? "$" + r.stop.toFixed(2) : "–"}</td><td class="num">${r.risk == null ? "–" : (r.risk * 100).toFixed(1) + "%"}</td>
+      <td class="num">${r.toTrig == null ? "–" : r.toTrig.toFixed(1)}</td>${live ? `<td class="num ${tint(r.chg, 0.03)}">${pct(r.chg, 1)}</td>` : ""}
+      <td class="num">${r.rs ?? "–"}</td><td class="num ${tint(r.d5, 0.06)}">${pct(r.d5, 1)}</td><td class="num">${pct(r.off_hi, 1)}</td>
+      <td class="l">${esc(r.g || "–")}<small class="meta" style="display:block">${r.signal === "buy" ? "<b>BUY</b> · " : ""}${esc(r.stage || "")}${r.pop ? ` · popped ${r.pop.ago} sessions ago` : ""}</small></td>
+      <td class="l">${r.report ? `${shortDate(r.report.date)} <span class="${r.report.move > 0 ? "up" : "dn"}">${pct(r.report.move, 1)}</span><small class="meta"> · since ${pct(r.report.since, 0)}</small>` : ""}</td>
+      <td class="l">${r.earn ? shortDate(r.earn) : ""}</td></tr>`).join("") || `<tr><td class="l meta" colspan="15">Nothing matches these filters.</td></tr>`}
+    </tbody></table></div>
+    <p class="meta" style="margin:8px 0 0"><b>Who's on it:</b> <b>Verified AI revenue</b> = the AI Monetizers pool (a company that reports an AI revenue number; "market says not yet" = its last big report was sold) · <b>AI theme</b> = Enterprise AI SaaS / AI Monetizers theme members · <b>Rewarded report</b> = a software or IT services stock that gapped up 3%+ on 2.5× volume after a report in the last 20 sessions (the AI angle isn't checked: read the report). <b>The setup</b> is the Lined-up buys rule: a dip into the 9 / 21 EMAs, buy over yesterday's high, stop at the dip low (max 1 ADR). Its tested edge comes from the GROUP filter: in lifecycle <b>BUY</b> groups +0.85R a trade vs +0.11R elsewhere; "AI revenue" on its own isn't tested yet. Today's reporters join the list after tonight's close.</p></section>`);
+  const f = card.querySelector(".filters");
+  const save = () => { ["show", "src", "trend", "rs", "grp"].forEach(k => lsSet("air" + k[0].toUpperCase() + k.slice(1), U[k])); rerenderPanel(); };
+  f.append(chips("Show", [["ema", `In the EMAs <small>${cnt("ema")}</small>`], ["near", `+ near <small>${cnt("near")}</small>`], ["all", `All <small>${cnt("all")}</small>`]], U, "show", save));
+  f.append(chipsMulti("Source", [["all", "All"], ["verified", "Verified AI revenue"], ["theme", "AI theme"], ["report", "Rewarded report"]], U, "src", save));
+  f.append(chips("Trend", [["up", "Uptrend only"], ["all", "Any"]], U, "trend", save));
+  f.append(chips("RS", [["any", "Any RS"], ["r70", "70+"], ["r80", "80+"]], U, "rs", save));
+  f.append(chips("Group", [["any", "Any group"], ["buy", "BUY groups (tested)"]], U, "grp", save));
+  card.querySelector(".airtv").addEventListener("click", () => tsDownload("ai-revenue-setups", [{ name: "AI revenue setups", ticks: rows.map(r => r.t) }]));
+  app.append(card);
+}

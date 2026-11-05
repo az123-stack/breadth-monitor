@@ -389,6 +389,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["inplay"] = inplay.build(adjusted, theme_data)
         except Exception as e:  # optional panel; never block the page
             log.exception("in play failed: %s", e)
+        try:   # AI Revenue setups: AI-revenue stocks coming back into their 9/21 EMAs (Adam, Nov 5 2026; v3 Stocks → AI Revenue; info only)
+            from . import airev
+            theme_data["airev"] = airev.build(adjusted, theme_data)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("AI revenue setups failed: %s", e)
         try:   # My positions: end-of-day EMA / ADR references for every liquid ticker (v2 page judges Adam's exit rules live)
             from . import positions
             theme_data["posrefs"] = positions.refs(adjusted)
