@@ -781,6 +781,15 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   `POP_DAYS` 25 sessions; state running (within 0.5 group ADR of the post-pop high) / pulling back / gave_back (under the pop-day open); rel = vs
   SPY since the pop close; names = lifecycle `stock_frames` base members with Lined-up fields → page `lineupState` tags live; `live_today` = groups in
   data/runner_log.csv today. Study: post-pop dips +0.19R ≈ no-pop dips +0.18R (t 1.27) → a memory, not an edge. Test `test_pop_watch`.
+- **Trade warehouse · step 1** (Nov 4, 2026; Adam's VEEV weekly chart: "daily or weekly EMA pullback, and when?"; card
+  R-2026-11-04-daily-vs-weekly-dips, status doesnt): `tools/warehouse/PLAN.md` (v3.1, pre-registered; independent reviewer 55% → 78% → 85%
+  before building; Adam: build once the plan scores high enough), `monthly.py` + `.github/workflows/monthly_levels.yml` → data/warehouse/
+  monthly.json (raw Yahoo monthly bars; range=max comes back quarterly / weekly for some tickers → `build.norm_monthly` puts each bar in its
+  END month), `build.py` → data/warehouse/episodes.parquet (one row per leader pullback episode: D / W / W2 trades under Adam's management +
+  20-session exit, P_D / P_W / P_DW, hit_supply, room, ext, market group), `study.py` (power gate before outcomes, H1, robustness,
+  exploratory) → results.txt. H1 (wait for weekly after a stretched run into supply) doesn't work (−0.03R); in that cell both entries lose.
+  Leads: extension at the leg high (top third ≥ 2.5 weekly ranges over the weekly 21) loses on both entries; room < 5% to the next old peak
+  daily −0.25R vs weekly +0.15R; strong breadth helps; fixed 20-session hold beat the 10-EMA trail on daily dips. Independent recompute 60/60.
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and

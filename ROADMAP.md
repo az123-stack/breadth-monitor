@@ -31,6 +31,13 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
   entered RS 95+ / Oracle top 20 on 60D or 180D and aren't on any list; (4) widen the reclass worklist (busy names like TW, $100M+/day,
   regardless of RS) so unfiled stocks get a sub-theme.
 
+## Trade scorecard (Adam, Nov 4: "rate the setup and recommend this stock or another with a better outlook")
+- [x] Step 1 (Nov 4): warehouse + daily vs weekly EMA dips → card R-2026-11-04-daily-vs-weekly-dips (H1 doesn't work).
+- [ ] Step 2: pre-registered tests of the leads (extension penalty at the leg high, room-to-supply, breadth state, exit choice), same
+  plan → independent grade ≥ 85% → build → independent recompute routine. Then add box / spring / HTF / SoW / EP entries to the warehouse.
+- [ ] Step 3: scorecard on live candidates (expected R from proven layers only, per-variable reasons, "daily now / wait / skip"), logged forward.
+- [ ] Skills: turn Adam's chart reads into a written checklist skill, logged per recommendation, tested after 20–30 outcomes.
+
 ## Next up (Adam: "next week")
 1. **Trade warehouse + stacked R** (Adam, Oct 27: "this trade is 0.8R, that one 0.5R, but layered together 1.3R — keep making this
    smarter"). Card R-2026-10-27-r-stacking says how: (a) one table of every setup's past trades on the same yardstick (box, spring,
