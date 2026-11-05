@@ -93,8 +93,9 @@ def main():
     print(f"{len(T)} tickers in {(len(T) + PART - 1) // PART} parts", flush=True)
     for p in range(0, len(T), PART):
         name = f"part_{p // PART:03d}"
-        if (out / "meta" / f"{name}.json").exists():
-            continue
+        mp = out / "meta" / f"{name}.json"
+        if mp.exists() and set(T[p:p + PART]) <= set(json.loads(mp.read_text())):
+            continue          # finished part (a --limit test run leaves a partial part that gets redone)
         if time.time() - t0 > a.budget:
             print("time budget reached; run again to resume"); break
         frames, meta, fails = [], {}, 0
