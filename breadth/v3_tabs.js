@@ -240,3 +240,82 @@ function renderRsRanks(app) {
   card.querySelector(".rrtv").addEventListener("click", () => tsDownload("rs-ranks-" + U.by, rows.slice(0, 15).map(r => ({ name: "RS " + lab(U.by) + " - " + r.name, ticks: r.members.slice().sort((a, b) => (SR[b][U.by] ?? -1) - (SR[a][U.by] ?? -1)) }))));
   app.append(card);
 }
+// Nov 5 (Adam, after a Lance Breitstein transcript on in-play stocks: "Let's have In Play under the stocks tab"): Stocks → In Play =
+// DATA.themes.inplay (breadth/inplay.py): every liquid stock with news (gap ≥ max(3%, 1 ADR) on 2.5x vol), a fresh breakout / breakdown
+// on 1.5x vol, a 2-ADR range day on 2x vol, or an IPO (< 120 sessions) in the last 5 sessions. Live session: adds "today" from the Google
+// sheet (move ≥ 2 ADRs, or gap ≥ max(3%, 1 ADR) with paced volume ≥ 2x) using `pool` [adr, v50, sub]; before the open: Yahoo gaps.
+const IP_KIND = { earnings: "Earnings", news: "News gap", breakout: "52-wk high", base: "Base breakout", breakdown: "Breakdown", range: "Range day", ipo: "IPO", today: "Today" };
+function renderInPlay(app) {
+  const c = nyClock(); if (typeof PM !== "undefined" && !PM && !PM_ERR && c.mins < 0 && c.mins > -330) fetchPM();
+  const S = liveActive() ? "live" : (typeof PM !== "undefined" && PM && PM.date === etToday() ? "pre" : null);
+  if (S !== "pre") return renderInPlayBody(app, S);
+  ROWS_OVERRIDE = pmRows();
+  try { return renderInPlayBody(app, S); } finally { ROWS_OVERRIDE = null; }
+}
+function renderInPlayBody(app, S) {
+  const X = (DATA.themes || {}).inplay;
+  if (!X || !X.rows) { app.append($('<div class="card empty">The In Play list appears after the next data run.</div>')); return; }
+  app.append(S === "pre" ? orSessionBar("pre") : liveBar());
+  UI.ip = UI.ip || { why: lsGet("ipWhy", "all"), dir: lsGet("ipDir", "all"), when: lsGet("ipWhen", "5"), rs: lsGet("ipRs", "any"), q: "" };
+  const U = UI.ip, clk = nyClock(), pace = S === "live" ? volPace(Math.min(390, clk.mins)) : null;
+  // today's read per stock (live: Google; pre: Yahoo)
+  const todayOf = (t) => {
+    if (!S) return null;
+    const L = liveRow(t), P = X.pool[t]; if (!L) return null;
+    const adr = P ? P[0] : null, v50 = P ? P[1] : null;
+    const rv = S === "live" && pace && v50 && L.volume ? L.volume / (v50 * pace) : null;
+    const gap = S === "pre" ? L.chg : L.gap;   // before the open the whole move is the gap
+    const mvA = adr ? Math.abs(L.chg) / adr : null, gapBig = gap != null && adr && Math.abs(gap) >= Math.max(0.03, adr);
+    const pmOk = S !== "pre" || (L.bars == null || L.bars >= 6);
+    const hot = pmOk && ((mvA != null && mvA >= 2) || (gapBig && (S === "pre" || (rv != null && rv >= 2))));
+    return { chg: L.chg, gap, rv, mvA, hot };
+  };
+  const byT = new Map(X.rows.map(r => [r.t, r]));
+  const live = [];
+  if (S) Object.keys(X.pool).forEach(t => {
+    const d = todayOf(t); if (!d || !d.hot) return;
+    const why = { k: "today", ago: -1, txt: `${pct(d.chg, 1)}${d.gap != null && S === "live" ? ` (gap ${pct(d.gap, 1)})` : ""}${d.mvA != null ? ` = ${d.mvA.toFixed(1)} ADRs` : ""}${d.rv ? ` on ${d.rv.toFixed(1)}x paced vol` : ""}` };
+    const r0 = byT.get(t);
+    if (r0) live.push({ ...r0, why: [why, ...r0.why], kinds: ["today", ...r0.kinds], ago: -1, _t: d });
+    else { const s = (DATA.themes.stocks || []).find(x => x.t === t) || {}; live.push({ t, name: s.name || "", sub: s.sub || X.pool[t][2], rs: s.rsr != null ? Math.round(s.rsr) : null, adr: X.pool[t][0] * 100, why: [why], kinds: ["today"], ago: -1, score: 0, on: [], _t: d, dir: d.chg > 0 ? "up" : "down" }); }
+  });
+  const liveSet = new Set(live.map(r => r.t));
+  let rows = [...live.sort((a, b) => Math.abs(b._t.mvA || 0) - Math.abs(a._t.mvA || 0)), ...X.rows.filter(r => !liveSet.has(r.t))];
+  const q = (U.q || "").trim().toLowerCase();
+  const whySet = new Set(String(U.why).split(","));
+  const RSMIN = { any: 0, r70: 70, r80: 80, r90: 90 };
+  const pass = (r, skip) => (skip === "why" || whySet.has("all") || r.kinds.some(k => whySet.has(k === "earnings" ? "news" : k)))
+    && (skip === "dir" || U.dir === "all" || (r._t ? (r._t.chg > 0 ? "up" : "down") : r.dir) === U.dir)
+    && (skip === "when" || U.when === "5" || r.ago <= (U.when === "today" ? -1 : 0))
+    && (r.rs == null ? U.rs === "any" : r.rs >= RSMIN[U.rs])
+    && (!q || r.t.toLowerCase().startsWith(q) || (r.name || "").toLowerCase().includes(q) || (q.length >= 3 && (r.sub || "").toLowerCase().includes(q)));
+  const shown = rows.filter(r => pass(r));
+  const cnt = (k) => rows.filter(r => pass(r, "why") && r.kinds.some(x => (x === "earnings" ? "news" : x) === k)).length;
+  const dayLbl = (w) => w.ago < 0 ? (S === "pre" ? "pre-mkt" : "today") : w.ago === 0 ? shortDate(X.date) : shortDate(w.date);
+  const whyCell = (r) => r.why.slice(0, 3).map(w => `<span class="p3chip ipk-${w.k}" title="${esc(w.txt)}">${esc(w.k === "today" && S === "pre" ? "Pre-market" : IP_KIND[w.k])}</span> <small class="meta">${esc(dayLbl(w))}: ${esc(w.txt)}</small>`).join("<br>") + (r.why.length > 3 ? `<br><small class="meta">+${r.why.length - 3} more</small>` : "");
+  const card = $(`<section class="card ortable ipcard"><div class="head"><h2>In Play <span class="meta">· ${shown.length} of ${rows.length} · something is happening: news, a breakout / breakdown, a big-range day or a new listing in the last 5 sessions${S ? (S === "pre" ? " + pre-market gaps" : " + today, live") : ""} · $5+, $10M+ a day · through ${shortDate(X.date)} close</span></h2>
+    <button class="xopen iptv">⬇ TradingView</button></div><div class="filters" style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0"></div>
+    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Ticker</th><th class="l">Sub-theme</th><th class="l">Why it's in play</th><th title="RS Rating">RS</th><th title="Average daily range, 20 sessions">ADR</th>
+      ${S ? `<th>${S === "pre" ? "Pre-mkt" : "Today"}</th>${S === "live" ? '<th title="Volume so far vs the 50-day average, paced for the time of day">Rel vol<small> paced</small></th>' : ""}` : ""}
+      <th title="Last official session">${shortDate(X.date)}</th><th>5D</th><th title="Biggest volume vs the 50-day average in the 5 sessions">Max rel vol</th><th>Off high</th><th title="Average dollar volume a day">$ / day</th><th class="l">Next earnings</th><th class="l">On these lists</th></tr></thead><tbody>
+    ${shown.map((r, i) => { const d = r._t || (S ? todayOf(r.t) : null); return `<tr><td class="num">${i + 1}</td><td class="l"><a href="#" class="tkl" data-t="${esc(r.t)}"><b>${esc(r.t)}</b></a><small class="meta" style="display:block">${esc(r.name || "")}</small></td>
+      <td class="l">${esc(r.sub || "–")}</td><td class="l">${whyCell(r)}</td><td class="num">${r.rs ?? "–"}</td><td class="num">${r.adr == null ? "–" : (+r.adr).toFixed(1) + "%"}</td>
+      ${S ? `<td class="num ${tint(d && d.chg, 0.04)}">${d ? pct(d.chg, 1) : "–"}</td>${S === "live" ? `<td class="num">${d && d.rv ? d.rv.toFixed(1) + "×" : "–"}</td>` : ""}` : ""}
+      <td class="num ${tint(r.d1, 0.04)}">${pct(r.d1, 1)}</td><td class="num ${tint(r.d5, 0.08)}">${pct(r.d5, 1)}</td><td class="num">${r.rvmax == null ? "–" : r.rvmax.toFixed(1) + "×"}</td>
+      <td class="num">${pct(r.off_hi, 1)}</td><td class="num">${r.dvol == null ? "–" : "$" + Math.round(r.dvol) + "M"}</td><td class="l">${r.earn_next ? shortDate(r.earn_next) : ""}</td>
+      <td class="l">${(r.on || []).map(x => `<span class="p3chip">${esc(x)}</span>`).join(" ")}</td></tr>`; }).join("") || `<tr><td class="l meta" colspan="14">Nothing matches these filters.</td></tr>`}
+    </tbody></table></div>
+    <p class="meta" style="margin:8px 0 0"><b>The three reasons</b> (Lance Breitstein's "broken slot machines"): <b>news</b> = a gap of at least 3% and 1 ADR on 2.5× normal volume (Earnings when the catalyst agent has a report that day); <b>technical</b> = a fresh close above the 52-week high, or out of a tight base (40 sessions within 6 ADRs), on 1.5× volume, breakdowns mirrored; <b>volatility</b> = a day's range of 2+ ADRs on 2× volume, or a listing under 120 sessions old.${S === "live" ? " <b>Today</b> = moving 2+ ADRs, or gapping ≥ 3% and 1 ADR with paced volume ≥ 2×." : S === "pre" ? " <b>Pre-market</b> = moving 2+ ADRs, or a gap ≥ 3% and 1 ADR, on steady trading (6+ active 5-minute bars)." : ""}
+    Sorted newest first, then by how many reasons stack. <b>Where to look, not a buy signal:</b> on our data, more action alone hasn't been a swing edge (record-volume up days lagged SPY about 5% over 10 sessions; EPs without a catalyst check lost). Use it to pick which charts to open, then apply your setups. A test of "same setup, in play vs not" is queued.</p></section>`);
+  const f = card.querySelector(".filters");
+  const save = () => { lsSet("ipWhy", U.why); lsSet("ipDir", U.dir); lsSet("ipWhen", U.when); lsSet("ipRs", U.rs); rerenderPanel(); };
+  f.append(chipsMulti("Why", [["all", "All"], ...(S ? [["today", `${S === "pre" ? "Pre-market" : "Today"} <small>${cnt("today")}</small>`]] : []), ["news", `News gap <small>${cnt("news")}</small>`], ["breakout", `52-wk high <small>${cnt("breakout")}</small>`], ["base", `Base breakout <small>${cnt("base")}</small>`], ["breakdown", `Breakdown <small>${cnt("breakdown")}</small>`], ["range", `Range day <small>${cnt("range")}</small>`], ["ipo", `IPO <small>${cnt("ipo")}</small>`]], U, "why", save));
+  f.append(chips("Direction", [["all", "Both"], ["up", "Up"], ["down", "Down"]], U, "dir", save));
+  f.append(chips("When", [["5", "Last 5 sessions"], ["last", `${shortDate(X.date)} or later`], ...(S ? [["today", S === "pre" ? "Pre-market only" : "Today only"]] : [])], U, "when", save));
+  f.append(chips("RS", [["any", "Any RS"], ["r70", "70+"], ["r80", "80+"], ["r90", "90+"]], U, "rs", save));
+  const qi = $(`<input type="search" class="orq" placeholder="Find a ticker, company or sub-theme" aria-label="Find">`); qi.value = U.q || ""; let qt = null;
+  qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; rerenderPanel(); const n = document.querySelector(".ipcard .orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
+  f.append(qi);
+  card.querySelector(".iptv").addEventListener("click", () => tsDownload("in-play", [{ name: "In play", ticks: shown.map(r => r.t) }]));
+  app.append(card);
+}

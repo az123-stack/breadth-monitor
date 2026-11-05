@@ -1974,7 +1974,7 @@ def test_v3_page_builds():
     assert 'let TAB = "readout"' not in h and "Market Monitor v3" in h and h.count("/*__DATA__*/null") == 1
     # Nov 4: Market parent (Breadth / Pre-market / Intraday); side files one folder up; Strongest sub-tab; Oracle reads pre-market
     assert '"market", "Market"' in h and '["premarket", "Pre-market"]' in h and 'fetch("../premarket.json?cb=' in h and 'fetch("premarket.json' not in h
-    assert "sstrong: renderStrongest" in h and "function renderStrongest" in h and "function orSession" in h and '["d1", "Today", 5]' in h and "breadth: renderBreadthV3" in h and "gpop: renderPopWatch" in h and "grsrank: renderRsRanks" in h and "Browse groups and their stocks" not in h and "app.append(healthCard(DATA.themes.leadership));" not in h
+    assert "sinplay: renderInPlay" in h and "function renderInPlay" in h and "sstrong: renderStrongest" in h and "function renderStrongest" in h and "function orSession" in h and '["d1", "Today", 5]' in h and "breadth: renderBreadthV3" in h and "gpop: renderPopWatch" in h and "grsrank: renderRsRanks" in h and "Browse groups and their stocks" not in h and "app.append(healthCard(DATA.themes.leadership));" not in h
     tmp = Path(__import__("tempfile").mkdtemp()); old = config.DOCS_DIR
     try:
         config.DOCS_DIR = tmp
@@ -2075,6 +2075,33 @@ def test_pop_watch():
     r = X["rows"][0]
     assert r["g"] == "G" and r["pop"] == d[190].strftime("%Y-%m-%d") and r["ago"] == 9 and r["state"] == "pulling_back" and r["off_pk"] < 0
     return r["state"]
+
+
+def test_in_play():
+    """Nov 5: In Play flags a news gap (≥ max(3%, 1 ADR) on 2.5x vol), a fresh 52-wk high on 1.5x vol and a 2-ADR range day on 2x vol
+    in the last 5 sessions, from data known at each close; a quiet stock is left out."""
+    import numpy as np, pandas as pd
+    from breadth import inplay
+    d = pd.bdate_range("2025-01-01", periods=300)
+    base = lambda: pd.DataFrame({"NEWS": 50.0, "BRK": 50.0, "RNG": 50.0, "QUIET": 50.0}, index=d)
+    c = base(); o = base(); v = base() * 0 + 1e6
+    h, l = c * 1.01, c * 0.99
+    c.loc[d[-2]:, "NEWS"] = 56.0; o.loc[d[-2], "NEWS"] = 55.0; v.loc[d[-2], "NEWS"] = 3e6          # +10% gap on 3x vol
+    c.loc[d[-1], "BRK"] = 52.0; o.loc[d[-1], "BRK"] = 50.5; v.loc[d[-1], "BRK"] = 1.6e6           # above every prior high on 1.6x
+    h.loc[d[-1], "BRK"] = 52.2
+    h.loc[d[-3], "RNG"] = 51.5; l.loc[d[-3], "RNG"] = 49.4; v.loc[d[-3], "RNG"] = 2.2e6           # ~4% range = 2 ADRs on 2.2x
+    h, l = h.where(h >= c, c), l.where(l <= c, c)
+    F = inplay.frames({"o": o, "h": h, "l": l, "c": c, "v": v})
+    win = slice(len(d) - 5, len(d))
+    hit = lambda k, t: bool(F[k][t].iloc[win].any())
+    assert hit("news", "NEWS") and not hit("news", "QUIET")
+    assert hit("brk", "BRK") or hit("base", "BRK")
+    assert hit("rng", "RNG") and not hit("rng", "QUIET")
+    assert not any(hit(k, "QUIET") for k in ("news", "brk", "base", "bdn", "rng"))
+    # no look-ahead: flags at a day don't change when later bars change
+    c2 = c.copy(); c2.iloc[-1] = c2.iloc[-1] * 1.5
+    F2 = inplay.frames({"o": o, "h": h.where(h >= c2, c2), "l": l, "c": c2, "v": v})
+    assert F2["news"]["NEWS"].iloc[-2] == F["news"]["NEWS"].iloc[-2]
 
 
 if __name__ == "__main__":
