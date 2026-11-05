@@ -1,31 +1,13 @@
 {
- "for_date": "2026-11-03",
- "written": "2026-11-04T12:04Z",
- "headline": "Post-midterm session with the 10-year near 4.95%, oil falling on Iran diplomacy hopes, and Friday's payrolls the next big test.",
+ "for_date": "2026-11-04",
+ "written": "2026-11-05T12:04Z",
+ "headline": "Oil and yields plunged on US-Iran settlement hopes and a Democratic sweep of Congress, with the October jobs report Friday setting up December Fed hike odds.",
  "risk": "high",
- "rates": "The 10-year Treasury yield closed near 4.95% Tuesday (above 5% as recently as Oct 28) as markets price rising odds of a Fed hike rather than cuts.",
- "fed": "No FOMC decision in November (next is Dec 9); the Oct meeting minutes come Nov 18, and Cleveland Fed's Hammack is among the Fed voices traders are watching.",
- "oil": "Oil dropped sharply (WTI roughly $97-100, Brent about $110) on hopes the US seeks a diplomatic solution to the Iran war after the midterms, though prices remain elevated.",
- "geo": "The US-Iran war and high fuel prices remain the active shock; Democrats' midterm gains raise talk of Congress limiting the war.",
+ "rates": "The 10-year yield fell to about 4.88% (near a two-month low) and the 2-year to about 4.55% as oil dropped and the dollar weakened.",
+ "fed": "CME FedWatch put a December hike at roughly 80%; the next FOMC is Dec 8-9, and the Friday payrolls print will heavily shape those odds.",
+ "oil": "Brent fell about 8.7% to roughly $94.6 and WTI to about $88 on bets that Washington and Tehran are near a settlement, though the Hormuz supply threat is not resolved.",
+ "geo": "US-Iran talks via Qatar continue with no binding deal, and Democrats won both the House and Senate in Tuesday's midterms.",
  "events": [
-  {
-   "date": "2026-11-04",
-   "time": "8:15 AM ET",
-   "name": "ADP private jobs",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-04",
-   "time": "8:30 AM ET",
-   "name": "Treasury quarterly refunding announcement",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-04",
-   "time": "10:00 AM ET",
-   "name": "ISM services PMI",
-   "impact": "medium"
-  },
   {
    "date": "2026-11-06",
    "time": "8:30 AM ET",
@@ -37,12 +19,17 @@
    "time": "8:30 AM ET",
    "name": "CPI (October)",
    "impact": "high"
+  },
+  {
+   "date": "2026-11-13",
+   "time": "8:30 AM ET",
+   "name": "PPI (October)",
+   "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.riotimesonline.com/us-markets-after-midterms-dollar-yields-stocks-2026/",
-  "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-dow-futures-130822524.html",
-  "https://www.simianx.ai/stories/us-economic-calendar-this-month-in-your-time-zone",
-  "https://www.heygotrade.com/en/news/fed-rate-cuts-priced-out-2026-treasury-yields-hammack-jolts/"
+  "https://www.kitco.com/news/article/2026-11-04/gold-climbs-above-4000-wall-street-rallies-dems-take-congress-kitco-pm",
+  "https://financefeeds.com/gold-price-today-4135-thursday-before-6-november-jobs-report-dollar-near-one-month-low-bull-4225-bear-4000",
+  "https://fedratecalc.com/us-economic-calendar/november-2026/"
  ]
 }
