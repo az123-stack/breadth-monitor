@@ -80,11 +80,17 @@ def bad_years(c, meta):
     return out
 
 
+def month_bars(meta, t):
+    """Yahoo's monthly series ends with an extra row stamped with the latest trade date (the current month so far, duplicating the
+    YYYY-MM-01 row); only true month bars (dated the 1st) are kept, so v9.1's 25–35-day spacing test sees the real series."""
+    return [x for x in (meta.get(t, {}).get("monthly") or []) if str(x[0]).endswith("-01")]
+
+
 def monthly_ok(t, meta, daily_first):
     """v9.1 rule 1: complete monthly history = first bar within 1 month of firstTradeDate and every gap 25–35 days.
     v7 rule 4 (weak recycling screen): daily first month vs monthly first month (only when the daily series starts after 2014-01),
     and month-end closes within 2% on overlapping months — checked in build()."""
-    m = meta.get(t, {}).get("monthly") or []
+    m = month_bars(meta, t)
     ft = meta.get(t, {}).get("first")
     if len(m) < 2 or ft is None:
         return False, "no monthly"
@@ -292,7 +298,7 @@ def build(data):
         first_bar = int(np.argmax(np.isfinite(C)))
         dfirst = dates[first_bar]
         ok_m, why = monthly_ok(t, meta, dfirst)
-        m_raw = meta.get(t, {}).get("monthly") or []
+        m_raw = month_bars(meta, t)
         mon = [(pd.Period(x[0][:7], "M"), x[1], x[3]) for x in m_raw if x[1] is not None]
         if ok_m:
             # month-end closes within 2% on overlapping months (weak recycling screen)

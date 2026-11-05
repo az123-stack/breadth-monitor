@@ -165,7 +165,7 @@ CSS = """
   border-radius: 999px; color: var(--warning); border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent); vertical-align: middle; }
 .sgun td { background: color-mix(in srgb, var(--warning) 7%, transparent); } .sgno { color: var(--warning); font-size: 12px; }
 .ipcard .p3chip.ipk-news, .ipcard .p3chip.ipk-earnings { border-color: var(--accent); } .ipcard .p3chip.ipk-breakdown { color: var(--critical); }
-.ipcard .p3chip.ipk-today { color: var(--good); font-weight: 600; } .ipcard td.l small.meta { white-space: nowrap; }
+.ipcard .p3chip.ipk-today { color: var(--good); font-weight: 600; } .aircard td small.meta { white-space: normal !important; } .aircard td:nth-child(3) { min-width: 300px; max-width: 380px; } .ipcard td.l small.meta { white-space: nowrap; }
 .ortable .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .ortable td.orsel { font-weight: 700; } .ortable tr[data-t] { cursor: pointer; } .orspyrow td { border-top: 2px solid var(--border); }
 @media (max-width: 900px) { .orgrid { grid-template-columns: 1fr; } .orsvg, .oraxis { height: 200px; } }
