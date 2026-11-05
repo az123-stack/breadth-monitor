@@ -113,7 +113,7 @@ def h1():
         "no top 1% R": D[(D[["D_R", "W_R"]].max(axis=1) < D[["D_R", "W_R"]].max(axis=1).quantile(0.99))],
         "strong breadth": D[D.strong], "not strong": D[~D.strong],
     }
-    for s in D.sub.value_counts().index[:3]:
+    for s in D["sub"].value_counts().index[:3]:
         rob[f"without {s}"] = D[D["sub"] != s]
     fails = 0
     print("robustness (effect, keeps sign & ≥ half size?):")

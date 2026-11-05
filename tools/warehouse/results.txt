@@ -1,0 +1,40 @@
+episodes 2075 · starts 2025-09-05 → 2026-07-06 · split at 2026-01-29 · ext top-third cut 2.53 weekly ATRs
+SPY 3%+ pullback groups: [['2024-12-06', '2025-01-23'], ['2025-02-19', '2025-06-27'], ['2025-10-29', '2025-12-10'], ['2026-02-09', '2026-04-14'], ['2026-06-02', '2026-08-04'], ['2026-10-06', '2026-11-03']]
+monthly levels: 1241 tickers, mismatches dropped 320; episodes with monthly data 100%
+first dip kind: {'D': 1838, 'both': 122, 'W': 112, nan: 3}
+hit_supply: 366 · ext top third: 638 · cell: 110
+cell informative episodes 84 (half 1 42, half 2 42); market groups [-1, 2, 3, 4] (−1 = no SPY pullback)
+POWER GATE: MET
+
+H1 effect -0.027R (cluster t -0.21) · in-cell P_W−P_D -0.039R (t -0.28) · bootstrap 95% [-0.100, +0.107] · perm p 0.6065
+halves (effect, in-cell diff): {1: (np.float64(-0.232), np.float64(-0.187)), 2: (np.float64(0.167), np.float64(0.099))}
+in-cell diff by market group: {-1: -0.214, 2: 0.068, 3: 0.219, 4: 0.165} share > 0: 75%
+robustness (effect, keeps sign & ≥ half size?):
+  starts ≥ 2025-11-07: +0.022 ok
+  no post-thrust: +0.024 ok
+  no top 1% R: -0.080 FAIL
+  strong breadth: -0.039 FAIL
+  not strong: -0.019 FAIL
+  without : -0.046 FAIL
+  without Semicap Equipment: -0.022 FAIL
+  without Mid-cap Biotech: -0.030 FAIL
+  excess vs SPY instead of R: -0.0118 FAIL
+LABEL: doesn't work (robustness failures 7)
+
+--- exploratory (no 'proven' claims) ---
+all: {'P_D': np.float64(0.002), 'P_W': np.float64(-0.012), 'P_DW': np.float64(-0.026), 'traded D/W': (np.float64(0.49), np.float64(0.35)), 'R/trade D/W': (np.float64(0.004), np.float64(-0.033)), 'P_DW per unit': np.float64(-0.032), 'n': 2075}
+hit supply: {'P_D': np.float64(-0.06), 'P_W': np.float64(-0.013), 'P_DW': np.float64(-0.078), 'traded D/W': (np.float64(0.46), np.float64(0.37)), 'R/trade D/W': (np.float64(-0.129), np.float64(-0.035)), 'P_DW per unit': np.float64(-0.096), 'n': 366}
+no supply hit: {'P_D': np.float64(0.015), 'P_W': np.float64(-0.011), 'P_DW': np.float64(-0.015), 'traded D/W': (np.float64(0.5), np.float64(0.35)), 'R/trade D/W': (np.float64(0.031), np.float64(-0.033)), 'P_DW per unit': np.float64(-0.019), 'n': 1709}
+ext top third: {'P_D': np.float64(-0.05), 'P_W': np.float64(-0.083), 'P_DW': np.float64(-0.136), 'traded D/W': (np.float64(0.49), np.float64(0.31)), 'R/trade D/W': (np.float64(-0.103), np.float64(-0.27)), 'P_DW per unit': np.float64(-0.171), 'n': 638}
+ext rest: {'P_D': np.float64(0.025), 'P_W': np.float64(0.02), 'P_DW': np.float64(0.022), 'traded D/W': (np.float64(0.49), np.float64(0.37)), 'R/trade D/W': (np.float64(0.051), np.float64(0.055)), 'P_DW per unit': np.float64(0.027), 'n': 1437}
+CELL: {'P_D': np.float64(-0.087), 'P_W': np.float64(-0.126), 'P_DW': np.float64(-0.223), 'traded D/W': (np.float64(0.47), np.float64(0.39)), 'R/trade D/W': (np.float64(-0.185), np.float64(-0.324)), 'P_DW per unit': np.float64(-0.255), 'n': 110}
+strong breadth: {'P_D': np.float64(0.047), 'P_W': np.float64(0.046), 'P_DW': np.float64(0.066), 'traded D/W': (np.float64(0.47), np.float64(0.29)), 'R/trade D/W': (np.float64(0.102), np.float64(0.16)), 'P_DW per unit': np.float64(0.091), 'n': 774}
+post-thrust: {'P_D': np.float64(0.074), 'P_W': np.float64(-0.014), 'P_DW': np.float64(0.049), 'traded D/W': (np.float64(0.52), np.float64(0.35)), 'R/trade D/W': (np.float64(0.141), np.float64(-0.041)), 'P_DW per unit': np.float64(0.059), 'n': 1103}
+half 1: {'P_D': np.float64(-0.036), 'P_W': np.float64(-0.003), 'P_DW': np.float64(-0.056), 'traded D/W': (np.float64(0.5), np.float64(0.32)), 'R/trade D/W': (np.float64(-0.073), np.float64(-0.011)), 'P_DW per unit': np.float64(-0.072), 'n': 1025}
+half 2: {'P_D': np.float64(0.04), 'P_W': np.float64(-0.02), 'P_DW': np.float64(0.003), 'traded D/W': (np.float64(0.48), np.float64(0.38)), 'R/trade D/W': (np.float64(0.082), np.float64(-0.052)), 'P_DW per unit': np.float64(0.004), 'n': 1050}
+room < 5%: {'P_D': np.float64(-0.122), 'P_W': np.float64(0.049), 'P_DW': np.float64(-0.083), 'traded D/W': (np.float64(0.49), np.float64(0.33)), 'R/trade D/W': (np.float64(-0.247), np.float64(0.146)), 'P_DW per unit': np.float64(-0.104), 'n': 233}
+room 5–15%: {'P_D': np.float64(0.055), 'P_W': np.float64(-0.003), 'P_DW': np.float64(0.003), 'traded D/W': (np.float64(0.49), np.float64(0.35)), 'R/trade D/W': (np.float64(0.11), np.float64(-0.008)), 'P_DW per unit': np.float64(0.003), 'n': 249}
+room ≥ 15% / none: {'P_D': np.float64(0.012), 'P_W': np.float64(-0.022), 'P_DW': np.float64(-0.022), 'traded D/W': (np.float64(0.49), np.float64(0.35)), 'R/trade D/W': (np.float64(0.024), np.float64(-0.062)), 'P_DW per unit': np.float64(-0.027), 'n': 1593}
+secondary exit (20 sessions) P_D / P_W: 0.078 0.007
+W's R after D was stopped (conditional): -0.111 206
+same-day stop-outs D/W: 254 141 · censored: 0

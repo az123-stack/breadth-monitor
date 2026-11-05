@@ -33,13 +33,32 @@ def weekly_atr(h, l, c):
     return atr.reindex(wk).set_axis(c.index)
 
 
+def norm_monthly(raw):
+    """Yahoo's range=max auto-coarsens long histories (AAPL comes back quarterly, new listings weekly). Each bar covers [its start month,
+    next bar's start month − 1]; it is placed in its END month (when the whole period's high is known, so no look-ahead), and bars ending
+    in the same month are merged (max high). Returns [[YYYY-MM end, high, start YYYY-MM]] oldest first."""
+    rows = [x for x in raw if x[1] is not None]
+    out = {}
+    for i, x in enumerate(rows):
+        st = pd.Period(x[0], "M")
+        nxt = pd.Period(rows[i + 1][0], "M") if i + 1 < len(rows) else st
+        en = max(st, nxt - 1)
+        k = str(en)
+        if k in out:
+            out[k] = [k, max(out[k][1], x[1]), min(out[k][2], x[0])]
+        else:
+            out[k] = [k, x[1], x[0]]
+    return [out[k] for k in sorted(out)]
+
+
 def supply_levels(t, month_S, leglow_date, monthly, h_daily, s_idx, leglow_idx, dates):
     """Known supply above, as of the episode start: monthly pivots (all 6 neighbours complete before month_S) and ATH from months
     before the current leg, plus daily swing highs (10 either side, complete before S) before the leg low. Returns [(level, source, age_yrs)]."""
     out = []
     rec = monthly.get(t)
     if rec:
-        m = [x for x in rec["m"] if x[0] < leglow_date.strftime("%Y-%m")]   # months before the current leg
+        # pivots on the normalised series: a period high above the 3 periods either side (on coarse quarterly history that is ±9 months)
+        m = [x for x in rec if x[0] < leglow_date.strftime("%Y-%m")]   # periods ending before the current leg
         mon = [x[0] for x in m]
         his = [x[1] for x in m]
         cut = (month_S - 1)
@@ -165,7 +184,7 @@ def main():
     monthly = {}
     mp = OUT / "monthly.json"
     if mp.exists():
-        monthly = json.loads(mp.read_text())
+        monthly = {k: norm_monthly(v["m"]) for k, v in json.loads(mp.read_text()).items()}
     print(f"{len(focus)} theme tickers, monthly levels for {len(monthly)}", flush=True)
     # spot check monthly vs our daily highs
     bad = set()
@@ -174,10 +193,13 @@ def main():
         if not rec:
             continue
         dm = h[t].groupby(dates.to_period("M")).max().dropna()
-        mm = {x[0]: x[1] for x in rec["m"]}
-        for p, val in dm.items():
-            ym = str(p)
-            if ym in mm and ym != dates[-1].strftime("%Y-%m") and val > 0 and abs(mm[ym] / val - 1) > 0.02:
+        first_m, last_m = dm.index.min(), dates[-1].to_period("M")
+        for en, hi, st in rec:
+            pe, ps = pd.Period(en, "M"), pd.Period(st, "M")
+            if ps < first_m or pe >= last_m:
+                continue          # only periods fully inside our bars, not the current month
+            ours = dm[(dm.index >= ps) & (dm.index <= pe)].max()
+            if ours > 0 and abs(hi / ours - 1) > 0.02:
                 bad.add(t)
                 break
     spy = c[config.BENCHMARK]
