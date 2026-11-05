@@ -3097,10 +3097,16 @@ function renderThemes(app) {
     { k: "strength", h: "Strength<small>0–100</small>" }, { k: "score", h: "Score<small>/ 8</small>" },
     { k: mvK, h: "Rank Δ<small>5 days</small>" }, { k: null, h: `Trail<small>${byS ? "strength" : "score"}, 30 days</small>` }, { k: "rotation", h: "Rotation", l: true, asc: true },
     ...H.map(k => ({ k, h: HZ_LABEL[k] })), { k: "rs", h: "RS<small>3-mo %</small>" },
+    { k: "_rsmed", h: `Med RS<small>${RS_PER[rsKey()][0].replace(" (RS Rating)", "")}</small>` },
     { k: vsK, h: `vs SPY<small>${UI.hz === "long" ? "90D" : "30D"}</small>` }, { k: "st_b", h: "ST breadth" }, { k: "lt_b", h: "LT breadth" },
     ...(sub ? [] : [{ k: "etf_d5", h: "ETF<small>5D</small>" }]), { k: "n", h: "Stocks" },
   ];
   const rowsAll = groupRows(T, U.view);
+  // Nov 4 (Adam: "when I change from 2 weeks to 1 yr nothing changes"): the RS period chips now drive a "Med RS" column = median RS (1–99)
+  // of the group's stocks for the chosen period (live during the session); the sheet's "RS 3-mo %" column stays as it was
+  { const SR = Object.fromEntries((T.stocks || []).map(s => [s.t, s])), k = rsKey();
+    rowsAll.forEach(r => { const v = (r.members || []).map(t => (SR[t] || {})[k]).filter(x => x != null).sort((a, b) => a - b);
+      r._rsmed = v.length ? (v.length % 2 ? v[(v.length - 1) / 2] : Math.round((v[v.length / 2 - 1] + v[v.length / 2]) / 2)) : null; }); }
   const card = $(`<section class="card tcard"><div class="head"><h2>${sub ? "Sub-themes" : "Themes"} <span class="meta">· ${rowsAll.length} ${sub ? "peer groups" : "themes"} · click a row for its stocks</span></h2>
     <div class="filters"></div></div>
     <div class="scroll"><table class="grid"><thead><tr>${cols.map(c => `<th class="${c.l ? "l" : ""}">${c.h}</th>`).join("")}</tr></thead><tbody></tbody></table></div>
@@ -3139,6 +3145,7 @@ function renderThemes(app) {
         <td>${strengthBar(r.strength)}</td><td>${badge(r)}</td><td>${mvCell(r[mvK])}</td>
         <td>${byS ? trailHTML((r.s_trail || []).map(v => v == null ? null : v / 12.5)) : trailHTML(r.trail)}</td><td class="l">${ROT[r.rotation] || r.rotation}</td>
         ${H.map(k => retCell(r[k], k)).join("")}<td class="num ${tint(r.rs, SCALE.rs)}">${num(r.rs)}</td>
+        <td class="num ${rsTint(r._rsmed)}">${r._rsmed ?? "–"}</td>
         <td class="num ${tint(r[vsK], SCALE[vsK])}">${r[vsK] == null ? "–" : (r[vsK] > 0 ? "+" : "") + (r[vsK] * 100).toFixed(1) + " pts"}</td>
         <td class="num">${Math.round(r.st_b * 100)}% <span class="meta">${r.st_label}</span></td>
         <td class="num">${Math.round(r.lt_b * 100)}% <span class="meta">${r.lt_label}</span></td>
@@ -3257,13 +3264,14 @@ function renderBrowse(app) {
 
 /* ---------- v2 live: RS Rating and Theme Strength ---------- */
 // RS period toggle (Oct 29, Adam: "toggle the RS period rather than extra columns"): key → [label, refs key for the live return]
-const RS_PER = { rsr: ["1 year (RS Rating)", null], rs2w: ["2 weeks", "c10"], rs4w: ["4 weeks", "c20"], rs6w: ["6 weeks", "c30"] };
+// Nov 4 (Adam: "give me 3 day, 5 day and 10 day"): rs3d / rs5d added (strength.RS_SHORT); 2 weeks relabelled "10 day"; shortest first
+const RS_PER = { rs3d: ["3 day", "c3"], rs5d: ["5 day", "c5"], rs2w: ["10 day", "c10"], rs4w: ["4 weeks", "c20"], rs6w: ["6 weeks", "c30"], rsr: ["1 year (RS Rating)", null] };
 UI.rsP = (() => { try { const v = localStorage.getItem("rsPeriod"); return RS_PER[v] ? v : "rsr"; } catch (e) { return "rsr"; } })();
 const rsKey = () => UI.rsP || "rsr";
 function rsPeriodChips(onChange) {
   return chips("RS period", Object.entries(RS_PER).map(([k, [l]]) => [k, "RS: " + l]), UI, "rsP", () => {
     try { localStorage.setItem("rsPeriod", UI.rsP); } catch (e) { /* off */ }
-    const S = UI.stocks; if (S && S.sort && /^(rsr|rs[246]w)5?$/.test(S.sort[0])) S.sort[0] = S.sort[0].endsWith("5") ? rsKey() + "5" : rsKey();
+    const S = UI.stocks; if (S && S.sort && /^(rsr|rs\d+[wd])5?$/.test(S.sort[0])) S.sort[0] = S.sort[0].endsWith("5") ? rsKey() + "5" : rsKey();
     onChange(); });
 }
 function liveRatingShort(T, m, r, ix, key, ref) {   // N-session return vs last close's breakpoints (Oct 29)
@@ -6193,7 +6201,7 @@ function openTicker(t) {
   const d = document.getElementById("drawer");
   d.innerHTML = `<div class="dr-h"><div><div class="dr-t">${esc(t)}${S && S.rsr >= 90 ? ` <span class="tg ppull">RS ${S.rsr}</span>` : ""}</div><div class="meta">${esc(S ? S.name : "")}</div></div><button class="xopen" id="drX" aria-label="Close">✕</button></div>
     <div class="dr-px"><span class="num" style="font-size:26px">${$f(L ? L.price : S && S.price)}</span>${L ? `<b class="${L.chg > 0 ? "up" : "dn"}">${$p(L.chg * 100, 2)}</b>` : S && S.today != null ? `<b class="${S.today > 0 ? "up" : "dn"}">${$p(S.today * 100, 2)}</b>` : ""}<span class="meta">${L && liveActive() ? "live" : "last close"}</span></div>
-    ${S ? `<div class="kvs">${kv("RS 1 yr · 2 · 4 · 6 wk", [S.rsr, S.rs2w, S.rs4w, S.rs6w].map(v => v ?? "–").join(" · "))}${kv("5 days", $p(S.d5 * 100))}${kv("30 days", $p(S.d30 * 100))}${kv("Off 52-wk high", $p(S.off_hi * 100))}${kv("vs 21 EMA", $p(S.e21 * 100))}${kv("ADR", S.adr == null ? "–" : S.adr + "%")}</div>` : '<div class="meta" style="margin:8px 0">Not in our theme lists.</div>'}
+    ${S ? `<div class="kvs">${kv("RS 1 yr · 6 wk · 4 wk · 10 d · 5 d · 3 d", [S.rsr, S.rs6w, S.rs4w, S.rs2w, S.rs5d, S.rs3d].map(v => v ?? "–").join(" · "))}${kv("5 days", $p(S.d5 * 100))}${kv("30 days", $p(S.d30 * 100))}${kv("Off 52-wk high", $p(S.off_hi * 100))}${kv("vs 21 EMA", $p(S.e21 * 100))}${kv("ADR", S.adr == null ? "–" : S.adr + "%")}</div>` : '<div class="meta" style="margin:8px 0">Not in our theme lists.</div>'}
     ${S && (S.sub || (S.themes || []).length) ? `<h4>Groups</h4>${S.sub ? grp(S.sub, "sub") : ""}${(S.themes || []).map(n => grp(n, "theme")).join("")}` : ""}
     ${plan.length ? `<h4>Setups &amp; plan</h4><ul class="dr-l">${plan.map(x => `<li>${x}</li>`).join("")}</ul>` : ""}
     <div style="margin-top:16px"><a class="xopen" style="text-decoration:none" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tv)}">Open chart in TradingView ↗</a></div>`;

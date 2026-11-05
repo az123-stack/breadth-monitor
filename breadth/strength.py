@@ -24,7 +24,7 @@ import pandas as pd
 from . import config
 
 RS_W = [(63, 0.4), (126, 0.2), (189, 0.2), (252, 0.2)]
-RS_SHORT = {"rs2w": 10, "rs4w": 20, "rs6w": 30}   # short-term RS periods (sessions), Oct 29 2026
+RS_SHORT = {"rs3d": 3, "rs5d": 5, "rs2w": 10, "rs4w": 20, "rs6w": 30}   # Nov 4: 3 / 5 day added (rs2w = 10 sessions)   # short-term RS periods (sessions), Oct 29 2026
 STR_HORIZONS = [(5, 0.15), (15, 0.20), (30, 0.25), (60, 0.20), (90, 0.20)]
 STR_WEIGHTS = {"rel": 0.5, "part": 0.25, "lead": 0.25}
 

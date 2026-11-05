@@ -154,12 +154,14 @@ function renderPopWatch(app) {
   const X = (DATA.themes || {}).popwatch;
   if (!X || !X.rows) { app.append($('<div class="card empty">Pop watch appears after the next data run.</div>')); return; }
   app.append(liveBar());
-  UI.pw = UI.pw || { st: lsGet("pwState", "pulling_back"), rs: lsGet("pwRs", "all") };
+  UI.pw = UI.pw || { st: lsGet("pwState", "pulling_back"), rs: lsGet("pwRs", "all"), by: lsGet("pwBy", "pull") };
   const U = UI.pw, live = liveActive(), E = X.evidence || {};
   const STN = { running: ["Still running", "sow-breakout"], pulling_back: ["Pulling back", "sow-nuzzle"], gave_back: ["Gave it back", "sow-extended"] };
   const liveMove = (g) => { const v = g.names.length ? g.names : []; const L = (((DATA.themes.oracle || {}).subs || {})[g.g] || {}).members || v.map(x => x.t);
     const ch = L.map(t => liveRow(t)).filter(r => r && r.chg != null).map(r => r.chg); return live && ch.length ? ch.reduce((a, b) => a + b, 0) / ch.length : null; };
-  const rows = X.rows.filter(r => (U.st === "all" || r.state === U.st) && (U.rs === "all" || (r.rel || 0) >= 0));
+  // Nov 4 (Adam's strategy: "sort by the greatest deviation from off post-pop high" — CROs hot two weeks ago, cooled, cheap now)
+  const SORTS = { pull: (a, b) => (a.off_adr ?? 0) - (b.off_adr ?? 0), rel: (a, b) => (b.rel ?? -9) - (a.rel ?? -9), new: (a, b) => a.ago - b.ago };
+  const rows = X.rows.filter(r => (U.st === "all" || r.state === U.st) && (U.rs === "all" || (r.rel || 0) >= 0)).sort(SORTS[U.by] || SORTS.pull);
   const cnt = (k) => X.rows.filter(r => k === "all" || r.state === k).length;
   const head = $(`<section class="card orhead"><h2>Pop watch <span class="meta">· sub-themes that popped in the last ${X.days} sessions, kept here while they cool off · ${shortDate(X.date)} close</span></h2>
     <div class="filters"></div>
@@ -171,19 +173,20 @@ function renderPopWatch(app) {
       groups still beating SPY since the pop ${num(E.held_rs.R, 2)}R vs ${num(E.lost_rs.R, 2)}R (t ${E.t_held ?? "–"}, not significant). So the pop doesn't add an edge of its own, but it doesn't hurt:
       this list is a memory so a strong group's pullback isn't missed, and the dip entry is the same tested setup as Lined-up buys. Both halves: ${num(E.after_pop.h1, 2)}R / ${num(E.after_pop.h2, 2)}R (2nd half lost, like every dip setup).</div>` : ""}
     ${(X.live_today || []).length ? `<div class="oraccnote"><b>Popping today (live alert, joins the list tonight):</b> ${X.live_today.map(r => `<b>${esc(r.g)}</b> <span class="meta">${pct(r.avg, 1)} · ${esc(r.top)}</span>`).join(" · ")}</div>` : ""}</section>`);
-  const f = head.querySelector(".filters"), save = () => { lsSet("pwState", U.st); lsSet("pwRs", U.rs); rerenderPanel(); };
+  const f = head.querySelector(".filters"), save = () => { lsSet("pwState", U.st); lsSet("pwRs", U.rs); lsSet("pwBy", U.by); try { delete AUTOSORT[Object.keys(AUTOSORT).find(k => k.includes("Pop watch")) || ""]; } catch (e) {} rerenderPanel(); };
   f.append(chips("State", [["pulling_back", `Pulling back <small>${cnt("pulling_back")}</small>`], ["running", `Still running <small>${cnt("running")}</small>`], ["gave_back", `Gave it back <small>${cnt("gave_back")}</small>`], ["all", `All <small>${cnt("all")}</small>`]], U, "st", save));
+  f.append(chips("Sort", [["pull", "Most pulled back (in ADRs)"], ["rel", "Best vs SPY since the pop"], ["new", "Newest pop"]], U, "by", save));
   f.append(chips("Relative strength", [["all", "Any"], ["held", "Still beating SPY since the pop"]], U, "rs", save));
   app.append(head);
   const tagFor = (n) => { const s = lineupState(n); return s.zone ? `${s.over ? '<span class="tg sow-breakout">Over the trigger</span>' : '<span class="tg sow-nuzzle">Into the 9/21</span>'} ${lineupLocTag(s)}` : s.near ? '<span class="tg">Near the EMAs</span>' : lineupLocTag(s); };
-  const card = $(`<section class="card ortable"><div class="head"><h2>${rows.length} group${rows.length === 1 ? "" : "s"} <span class="meta">· best vs SPY since the pop first · click a ticker for details</span></h2><button class="xopen pwtv">⬇ TradingView</button></div>
+  const card = $(`<section class="card ortable"><div class="head"><h2>${rows.length} group${rows.length === 1 ? "" : "s"} <span class="meta">· ${{ pull: "most pulled back first (distance off the post-pop high in the group's own daily ranges)", rel: "best vs SPY since the pop first", new: "newest pop first" }[U.by] || ""} · click a ticker for details</span></h2><button class="xopen pwtv">⬇ TradingView</button></div>
     <div class="scroll"><table class="grid"><thead><tr><th class="l">Sub-theme</th><th>Popped</th><th>Pop day</th><th class="l">State</th><th title="Group index vs its high since the pop">Off post-pop high</th><th>Vs SPY since</th>
     <th>Strength</th>${live ? "<th>Today</th>" : ""}<th class="l">Around the pop</th><th class="l">Its leaders (RS 70+ uptrend) · where they sit vs the 9/21 EMAs</th></tr></thead><tbody>
     ${rows.map(r => { const [sl, sc] = STN[r.state]; const lm = liveMove(r);
       return `<tr><td class="l"><b>${esc(r.g)}</b><small class="meta" style="display:block">${r.n} stocks${r.pops > 1 ? ` · popped ${r.pops}× in ${X.days} sessions` : ""}</small></td>
       <td class="num" data-v="${-r.ago}">${shortDate(r.pop)}<small class="meta" style="display:block">${r.ago ? r.ago + " sessions ago" : "last session"}</small></td>
       <td class="num g2">${pct(r.pop_r, 1)}</td><td class="l"><span class="tg ${sc}">${sl}</span></td>
-      <td class="num">${pct(r.off_pk, 1)}${r.off_adr != null ? `<small class="meta" style="display:block">${Math.abs(r.off_adr).toFixed(1)} ADR</small>` : ""}</td>
+      <td class="num" data-v="${r.off_adr ?? 0}">${pct(r.off_pk, 1)}${r.off_adr != null ? `<small class="meta" style="display:block">${Math.abs(r.off_adr).toFixed(1)} ADR</small>` : ""}</td>
       <td class="num ${tint(r.rel, 0.04)}">${pct(r.rel, 1)}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td>${live ? `<td class="num ${tint(lm, 0.02)}">${pct(lm, 1)}</td>` : ""}
       <td class="l">${popSpark(r)}</td>
       <td class="l">${r.names.length ? r.names.slice(0, 8).map(n => `<div class="pwn"><a href="#" class="tkl" data-t="${esc(n.t)}"><b>${esc(n.t)}</b></a> <small class="meta">RS ${n.rs ?? "–"} · ${pct(n.since, 0)} since</small> ${tagFor(n)}</div>`).join("") : '<span class="meta">no RS 70+ uptrend member right now</span>'}</td></tr>`; }).join("")}
