@@ -1,0 +1,55 @@
+name: Warehouse daily history (one-off)
+
+# Step-2 data for the trade scorecard (tools/warehouse/PLAN2.md): Yahoo daily bars from 2014 + monthly bars + meta for ~3,000
+# tickers into the separate branch `warehouse-data` (kept off main). Resumes from what that branch already has; run again if it stops.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Only the first N tickers (0 = all; use 5 for a quick check)"
+        required: false
+        default: "0"
+
+concurrency:
+  group: warehouse-daily
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Get the data branch (resume)
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          mkdir whdata && cd whdata
+          git init -q
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git fetch -q --depth 1 origin warehouse-data; then git checkout -q -b warehouse-data FETCH_HEAD; else git checkout -q --orphan warehouse-data; fi
+          ls | head
+      - name: Download
+        timeout-minutes: 335
+        env:
+          LIMIT: ${{ github.event.inputs.limit || '0' }}
+        run: python -m tools.warehouse.daily --outdir whdata --limit "$LIMIT"
+      - name: Push the data branch
+        if: always()
+        run: |
+          cd whdata
+          git add -A
+          if git diff --cached --quiet; then echo "No new data"; exit 0; fi
+          git commit -qm "Warehouse daily history $(date -u +%Y-%m-%dT%H:%M)"
+          git push -q origin warehouse-data
+          du -sh .
