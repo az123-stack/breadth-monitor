@@ -46,6 +46,8 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
     sample doesn't share dates with step 1. H2a = the pull (tag rate vs open-sky AND far baselines), H2b = priority in R vs open sky,
     "stopped short" (Adam's literal case) as a named row. Data: `.github/workflows/warehouse_daily.yml` → branch `warehouse-data`.
     Next: build (`build.py --source yahoo`, magnets.py), validation + power tables BEFORE outcomes, independent recompute.
+- [ ] In-play test (Adam, Nov 5): does the same setup (lined-up dip, Launch pick, box retest) do better when the stock is In Play
+  (breadth/inplay.py rules) than when it isn't? Same plan → grade ≥ 85% → build routine; reuse the warehouse 11-year Yahoo data.
 - [ ] Step 3: scorecard on live candidates (expected R from proven layers only, per-variable reasons, "daily now / wait / skip"), logged forward.
 - [ ] Skills: turn Adam's chart reads into a written checklist skill, logged per recommendation, tested after 20–30 outcomes.
 

@@ -781,6 +781,14 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   `POP_DAYS` 25 sessions; state running (within 0.5 group ADR of the post-pop high) / pulling back / gave_back (under the pop-day open); rel = vs
   SPY since the pop close; names = lifecycle `stock_frames` base members with Lined-up fields → page `lineupState` tags live; `live_today` = groups in
   data/runner_log.csv today. Study: post-pop dips +0.19R ≈ no-pop dips +0.18R (t 1.27) → a memory, not an edge. Test `test_pop_watch`.
+- **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
+  `build(adjusted, theme_data)` (~70 s) → `DATA.themes.inplay` {date, days, rows, n, counts, pool {t: [adr, v50, sub]}}, v3 Stocks → **In Play**
+  (`renderInPlay` in v3_tabs.js). Universe stocks $5+, $10M+/day (no deals), last 5 sessions: news = gap ≥ max(3%, 1 ADR) on 2.5x vol
+  ("Earnings" when catalysts.json has that date); technical = fresh 52-wk-high close (none in 20) or a 60-session high out of a 40-session
+  ≤ 6-ADR base, on 1.5x, breakdowns mirrored; volatility = range ≥ 2 ADRs on 2x vol, or < 120 sessions listed. Live: `pool` lets the page flag
+  "Today" (move ≥ 2 ADRs, or gap ≥ max(3%, 1 ADR) with paced vol ≥ 2x); before the open Yahoo pre-market (≥ 6 active bars). Chips Why
+  (multi) / Direction / When / RS / search (localStorage ipWhy/ipDir/ipWhen/ipRs), ⬇ TradingView, "On these lists". Descriptive only;
+  test "same setup, in play vs not" queued in ROADMAP. Test `test_in_play`.
 - **Trade warehouse · step 1** (Nov 4, 2026; Adam's VEEV weekly chart: "daily or weekly EMA pullback, and when?"; card
   R-2026-11-04-daily-vs-weekly-dips, status doesnt): `tools/warehouse/PLAN.md` (v3.1, pre-registered; independent reviewer 55% → 78% → 85%
   before building; Adam: build once the plan scores high enough), `monthly.py` + `.github/workflows/monthly_levels.yml` → data/warehouse/
