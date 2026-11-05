@@ -374,6 +374,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["reclass"] = reclass.build(adjusted, set(universe), store.load_subthemes(), store.load_themes(), store.load_names())
         except Exception as e:  # optional panel; never block the page
             log.exception("theme upkeep check failed: %s", e)
+        try:   # Pop watch: sub-themes that popped in the last 25 sessions, tracked while they pull back (Adam, Nov 4 2026; info only)
+            from . import popwatch
+            theme_data["popwatch"] = popwatch.build(adjusted, theme_data)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("pop watch failed: %s", e)
         try:   # Strongest stocks + "new leaders you haven't seen" (Adam, Nov 1 2026: NTRA never surfaced; info only)
             from . import unseen
             theme_data["unseen"] = unseen.build(theme_data)

@@ -139,3 +139,55 @@ function renderBreadthV3(app) {
     const el = cardTitle(c)[0] || c.querySelector(".kicker, h2, h3"); if (el && !el.querySelector(".eodtag")) el.insertAdjacentHTML("beforeend", " " + tag);
   });
 }
+// Nov 4 (Adam: "sub-themes pop and then I forget about them because they're not exploding anymore, but that's exactly when I need to be
+// grabbing them … had relative strength but then pulled back"): Groups → Pop watch = DATA.themes.popwatch (breadth/popwatch.py). Every
+// sub-theme that popped (the Runners rule on the official close) stays on the list for 25 sessions; state running / pulling back / gave it
+// back; its RS 70+ uptrend members carry Lined-up-style fields, so lineupState tags them live (into the 9/21 EMAs, near, over the trigger).
+function popSpark(r) {
+  const v = (r.line || []).filter(x => x != null); if (v.length < 3) return "";
+  const w = 120, h = 30, lo = Math.min(...v), hi = Math.max(...v), sp = hi - lo || 1, n = v.length - 1;
+  const pts = v.map((x, i) => `${(i / n * w).toFixed(1)},${(h - 2 - (x - lo) / sp * (h - 4)).toFixed(1)}`).join(" ");
+  const kx = (r.line_k / n * w).toFixed(1);
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-label="group index around the pop"><line x1="${kx}" x2="${kx}" y1="0" y2="${h}" class="orgridl"/><polyline points="${pts}" fill="none" stroke="var(--s1)" stroke-width="1.6"/></svg>`;
+}
+function renderPopWatch(app) {
+  const X = (DATA.themes || {}).popwatch;
+  if (!X || !X.rows) { app.append($('<div class="card empty">Pop watch appears after the next data run.</div>')); return; }
+  app.append(liveBar());
+  UI.pw = UI.pw || { st: lsGet("pwState", "pulling_back"), rs: lsGet("pwRs", "all") };
+  const U = UI.pw, live = liveActive(), E = X.evidence || {};
+  const STN = { running: ["Still running", "sow-breakout"], pulling_back: ["Pulling back", "sow-nuzzle"], gave_back: ["Gave it back", "sow-extended"] };
+  const liveMove = (g) => { const v = g.names.length ? g.names : []; const L = (((DATA.themes.oracle || {}).subs || {})[g.g] || {}).members || v.map(x => x.t);
+    const ch = L.map(t => liveRow(t)).filter(r => r && r.chg != null).map(r => r.chg); return live && ch.length ? ch.reduce((a, b) => a + b, 0) / ch.length : null; };
+  const rows = X.rows.filter(r => (U.st === "all" || r.state === U.st) && (U.rs === "all" || (r.rel || 0) >= 0));
+  const cnt = (k) => X.rows.filter(r => k === "all" || r.state === k).length;
+  const head = $(`<section class="card orhead"><h2>Pop watch <span class="meta">· sub-themes that popped in the last ${X.days} sessions, kept here while they cool off · ${shortDate(X.date)} close</span></h2>
+    <div class="filters"></div>
+    <div class="meta orsub"><b>Pop</b> = the same rule as the live Runners alert, on the close: 75%+ of the group up, the average member up 1.25+ of its own daily ranges,
+    3+ points better than SPY, on 1.2× normal dollar volume. <b>Pulling back</b> = off its post-pop high but still above the pop day's open. <b>Vs SPY since</b> = how the group did
+    against SPY after the pop day closed (above 0 = it held its relative strength). Names = its RS 70+ uptrend stocks; a tag shows when one is into the 9/21 EMAs, the Lined-up buys entry.</div>
+    ${E.after_pop ? `<div class="meta oraccnote"><b>What the test says</b> (${E.from} to ${E.to}, ${E.pops} pops, Lined-up trigger rule: buy the break of the dip-day high, stop the dip low ≤ 1 ADR, 20 sessions):
+      first 9/21 dips 3–${X.days} sessions after a pop made <b>${num(E.after_pop.R, 2)}R</b> a trade (n ${E.after_pop.n}), the same as dips in groups with no pop (${num(E.no_pop.R, 2)}R, n ${E.no_pop.n});
+      groups still beating SPY since the pop ${num(E.held_rs.R, 2)}R vs ${num(E.lost_rs.R, 2)}R (t ${E.t_held ?? "–"}, not significant). So the pop doesn't add an edge of its own, but it doesn't hurt:
+      this list is a memory so a strong group's pullback isn't missed, and the dip entry is the same tested setup as Lined-up buys. Both halves: ${num(E.after_pop.h1, 2)}R / ${num(E.after_pop.h2, 2)}R (2nd half lost, like every dip setup).</div>` : ""}
+    ${(X.live_today || []).length ? `<div class="oraccnote"><b>Popping today (live alert, joins the list tonight):</b> ${X.live_today.map(r => `<b>${esc(r.g)}</b> <span class="meta">${pct(r.avg, 1)} · ${esc(r.top)}</span>`).join(" · ")}</div>` : ""}</section>`);
+  const f = head.querySelector(".filters"), save = () => { lsSet("pwState", U.st); lsSet("pwRs", U.rs); rerenderPanel(); };
+  f.append(chips("State", [["pulling_back", `Pulling back <small>${cnt("pulling_back")}</small>`], ["running", `Still running <small>${cnt("running")}</small>`], ["gave_back", `Gave it back <small>${cnt("gave_back")}</small>`], ["all", `All <small>${cnt("all")}</small>`]], U, "st", save));
+  f.append(chips("Relative strength", [["all", "Any"], ["held", "Still beating SPY since the pop"]], U, "rs", save));
+  app.append(head);
+  const tagFor = (n) => { const s = lineupState(n); return s.zone ? `${s.over ? '<span class="tg sow-breakout">Over the trigger</span>' : '<span class="tg sow-nuzzle">Into the 9/21</span>'} ${lineupLocTag(s)}` : s.near ? '<span class="tg">Near the EMAs</span>' : lineupLocTag(s); };
+  const card = $(`<section class="card ortable"><div class="head"><h2>${rows.length} group${rows.length === 1 ? "" : "s"} <span class="meta">· best vs SPY since the pop first · click a ticker for details</span></h2><button class="xopen pwtv">⬇ TradingView</button></div>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Sub-theme</th><th>Popped</th><th>Pop day</th><th class="l">State</th><th title="Group index vs its high since the pop">Off post-pop high</th><th>Vs SPY since</th>
+    <th>Strength</th>${live ? "<th>Today</th>" : ""}<th class="l">Around the pop</th><th class="l">Its leaders (RS 70+ uptrend) · where they sit vs the 9/21 EMAs</th></tr></thead><tbody>
+    ${rows.map(r => { const [sl, sc] = STN[r.state]; const lm = liveMove(r);
+      return `<tr><td class="l"><b>${esc(r.g)}</b><small class="meta" style="display:block">${r.n} stocks${r.pops > 1 ? ` · popped ${r.pops}× in ${X.days} sessions` : ""}</small></td>
+      <td class="num" data-v="${-r.ago}">${shortDate(r.pop)}<small class="meta" style="display:block">${r.ago ? r.ago + " sessions ago" : "last session"}</small></td>
+      <td class="num g2">${pct(r.pop_r, 1)}</td><td class="l"><span class="tg ${sc}">${sl}</span></td>
+      <td class="num">${pct(r.off_pk, 1)}${r.off_adr != null ? `<small class="meta" style="display:block">${Math.abs(r.off_adr).toFixed(1)} ADR</small>` : ""}</td>
+      <td class="num ${tint(r.rel, 0.04)}">${pct(r.rel, 1)}</td><td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td>${live ? `<td class="num ${tint(lm, 0.02)}">${pct(lm, 1)}</td>` : ""}
+      <td class="l">${popSpark(r)}</td>
+      <td class="l">${r.names.length ? r.names.slice(0, 8).map(n => `<div class="pwn"><a href="#" class="tkl" data-t="${esc(n.t)}"><b>${esc(n.t)}</b></a> <small class="meta">RS ${n.rs ?? "–"} · ${pct(n.since, 0)} since</small> ${tagFor(n)}</div>`).join("") : '<span class="meta">no RS 70+ uptrend member right now</span>'}</td></tr>`; }).join("")}
+    </tbody></table></div></section>`);
+  card.querySelector(".pwtv").addEventListener("click", () => tsDownload("pop-watch", rows.map(r => ({ name: "Pop watch - " + r.g, ticks: r.names.map(n => n.t) }))));
+  app.append(card);
+}

@@ -1974,7 +1974,7 @@ def test_v3_page_builds():
     assert 'let TAB = "readout"' not in h and "Market Monitor v3" in h and h.count("/*__DATA__*/null") == 1
     # Nov 4: Market parent (Breadth / Pre-market / Intraday); side files one folder up; Strongest sub-tab; Oracle reads pre-market
     assert '"market", "Market"' in h and '["premarket", "Pre-market"]' in h and 'fetch("../premarket.json?cb=' in h and 'fetch("premarket.json' not in h
-    assert "sstrong: renderStrongest" in h and "function renderStrongest" in h and "function orSession" in h and '["d1", "Today", 5]' in h and "breadth: renderBreadthV3" in h and "app.append(healthCard(DATA.themes.leadership));" not in h
+    assert "sstrong: renderStrongest" in h and "function renderStrongest" in h and "function orSession" in h and '["d1", "Today", 5]' in h and "breadth: renderBreadthV3" in h and "gpop: renderPopWatch" in h and "app.append(healthCard(DATA.themes.leadership));" not in h
     tmp = Path(__import__("tempfile").mkdtemp()); old = config.DOCS_DIR
     try:
         config.DOCS_DIR = tmp
@@ -2045,6 +2045,36 @@ def test_unseen_and_deals():
     assert "HZO" not in by and by["BOX"]["on"] == ["Strongest (top 40)"] and by["NTRA"]["on"] == []
     assert X["unseen"] == ["NTRA"] and X["new_unseen"] == ["NTRA"] and any("Oracle #1" in w for w in by["NTRA"]["why"])
     return f"{len(X['rows'])} rows"
+
+
+
+def test_pop_watch():
+    """Nov 4: a group whose members all jump 1.25+ ADRs on 1.2x volume (and beat SPY by 3+ pts) is a pop; it stays on the watch list
+    and reads 'pulling back' when it later slips off its post-pop high while staying above the pop-day open."""
+    import numpy as np, pandas as pd
+    from breadth import popwatch
+    d = pd.bdate_range("2025-01-01", periods=200); rows = []
+    for t in ["A", "B", "C", "D", "SPY"]:
+        px = 50.0
+        for i, x in enumerate(d):
+            g = 0.002 if t != "SPY" else 0.0005
+            if t != "SPY" and i == 190:
+                g = 0.08                       # the pop
+            if t != "SPY" and i >= 194:
+                g = -0.004                     # cooling off
+            px *= 1 + g
+            vol = 3e6 if (t != "SPY" and i == 190) else 1e6
+            rows.append(dict(date=x, ticker=t, o=px / (1 + g / 2), h=px * 1.01, l=px * 0.99, c=px, v=vol))
+    T = {"subthemes": [{"theme": "G", "members": ["A", "B", "C", "D"], "strength": 70}],
+         "stocks": [{"t": t, "rsr": 90, "is_stock": True, "name": t} for t in "ABCD"]}
+    old = config.BENCHMARK; config.BENCHMARK = "SPY"
+    try:
+        X = popwatch.build(pd.DataFrame(rows), T, evidence_on=False)
+    finally:
+        config.BENCHMARK = old
+    r = X["rows"][0]
+    assert r["g"] == "G" and r["pop"] == d[190].strftime("%Y-%m-%d") and r["ago"] == 9 and r["state"] == "pulling_back" and r["off_pk"] < 0
+    return r["state"]
 
 
 if __name__ == "__main__":

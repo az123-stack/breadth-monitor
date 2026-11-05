@@ -775,6 +775,12 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   anticipation / EPs / strongest top 40, Oracle top 15), "on no list" + "New leaders you haven't seen" (RS crossed 95 or entered the Oracle
   top 20 in 5 sessions; oracle `prev20`). Reclass worklist: top 40 unfiled by RS + every $100M+/day unfiled name (`n_big` 60).
   RS formula check: card R-2026-11-04-rs-sheet-vs-dashboard (keep our RS). Test `test_unseen_and_deals`.
+- **Pop watch** (Nov 4, 2026; Adam: "sub-themes pop and then I forget them … that's exactly when I need to be grabbing them"; card
+  R-2026-11-04-pop-watch, info) → `breadth/popwatch.py` `build(adjusted, theme_data)` (update.py, ~70 s incl. the study) → `DATA.themes.popwatch`,
+  v3 Groups → **Pop watch** (`renderPopWatch` in v3_tabs.js). Pop = the Runners rule on the official close (`runners.CFG`); each sub-theme stays
+  `POP_DAYS` 25 sessions; state running (within 0.5 group ADR of the post-pop high) / pulling back / gave_back (under the pop-day open); rel = vs
+  SPY since the pop close; names = lifecycle `stock_frames` base members with Lined-up fields → page `lineupState` tags live; `live_today` = groups in
+  data/runner_log.csv today. Study: post-pop dips +0.19R ≈ no-pop dips +0.18R (t 1.27) → a memory, not an edge. Test `test_pop_watch`.
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule
   (today > 0 and 30D > 5% → Early) called any up day in a year-long leader "Early". `themes.rotation(today, d5, d15, d30, d90, d180)`
   (`ROT_RULES`) + page `rotationOf` (mirror): established = 90D ≥ 10% or 180D ≥ 20%; Cooling (key "Late / Cooling") = established and
