@@ -45,7 +45,9 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
     independent reviewers. Key change: tested on a different DECADE (Yahoo daily 2014–Aug 2025, ~3,000 tickers) so the confirmation
     sample doesn't share dates with step 1. H2a = the pull (tag rate vs open-sky AND far baselines), H2b = priority in R vs open sky,
     "stopped short" (Adam's literal case) as a named row. Data: `.github/workflows/warehouse_daily.yml` → branch `warehouse-data`.
-    Next: build (`build.py --source yahoo`, magnets.py), validation + power tables BEFORE outcomes, independent recompute.
+    Nov 5 result: data checks PASSED (RS corr 0.992, breadth 97.5%), but the pre-registered POWER GATES FAILED (H2a MDE 18.6 pts vs 6,
+    simulated pass 0%; H2b MDE 0.27R vs 0.15R, 18%) → both **inconclusive**; no approaching outcome opened (card R-2026-11-05-liquidity-magnets).
+    v10 option (Adam's call): Yahoo daily back to 2000, coarser matching, fix the 1985 monthly-start exclusion → re-grade → run.
 - [ ] In-play test (Adam, Nov 5): does the same setup (lined-up dip, Launch pick, box retest) do better when the stock is In Play
   (breadth/inplay.py rules) than when it isn't? Same plan → grade ≥ 85% → build routine; reuse the warehouse 11-year Yahoo data.
 - [ ] Step 3: scorecard on live candidates (expected R from proven layers only, per-variable reasons, "daily now / wait / skip"), logged forward.

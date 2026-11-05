@@ -1,0 +1,46 @@
+=== VALIDATION (before outcomes) ===
+yahoo_vs_massive: {'tickers': 2946, 'dropped': 57, 'sample': ['ACH', 'ANAB', 'ATRO', 'B', 'BALY', 'BDX', 'BH.A', 'BNY', 'CMCSA', 'CTVA', 'CZFS', 'ENVX', 'EYPT', 'FDX', 'FER', 'GOLD', 'HON', 'HRTX', 'IRWD', 'J', 'LCTX', 'LILA', 'LILAK', 'LODE', 'LXRX', 'METC', 'METCB', 'MPTI', 'NFE', 'NKTR', 'OPEN', 'OUT', 'PALI', 'PGEN', 'PLUG', 'PRTS', 'QGEN', 'RBKB', 'REI', 'REZI']}
+rs_rank_corr: {'median': 0.9920061190817234, 'n_dates': 24}
+rs_vs_monthly_2016_2019: 0.8337251927326919
+breadth_agree: 0.9749518304431599
+strong_share_overlap: 0.279383429672447
+strong_share_era: {'e1': 0.2047569803516029, 'e2': 0.30250990752972257, 'e3': 0.275599128540305}
+liquid_median_era: {'e1': 1287.0, 'e2': 1580.0, 'e3': 1905.0}
+state: breadth strong
+usd20m_share_overlap: 0.6149371258058394
+split_screen_ticker_years: 536
+monthly_completeness: {'ok': 2274, 'no monthly': 0, 'starts late': 371, 'not monthly': 0, 'recycled?': 0, 'close mismatch': 1}
+bad_bars_screened: 2019
+episodes: 10052
+fills: 6905
+
+=== CLASS MIX (fills) ===
+class    approach  excluded  far  open  stalled  too_close
+set era                                                   
+C   e1        133       467  136   558      252          7
+    e2        152       427  100   950      336          7
+    e3        326       574  280   770      580          5
+D              87       144   86   393      130          5
+stalled split: {('C', 'short'): 214, ('C', 'touched'): 954, ('D', 'short'): 45, ('D', 'touched'): 85}
+class by listing-age tercile (C):
+class  approach  excluded  far  open  stalled  too_close
+aget                                                    
+a1          276         0  236   998      502          9
+a2          275        24  238   946      528          8
+a3           60      1444   42   334      138          2
+excluded vs kept by era (C): {'e1': 0.301, 'e2': 0.217, 'e3': 0.226}
+d_up of approaching (C) quantiles: {0.1: 2.16, 0.25: 2.71, 0.5: 3.66, 0.75: 4.67, 0.9: 5.32}
+d_lh by class (C) median: {'approach': 0.83, 'excluded': 0.89, 'far': 1.21, 'open': 0.94, 'stalled': 0.9, 'too_close': 0.07}
+
+[A open sky] approaching 611 · matched 249 (dropped 362) · distinct baseline fills 677, at cap 26
+  matched per era: {'e1': 39, 'e2': 83, 'e3': 127} · per year: {2015: 13, 2016: 7, 2017: 8, 2018: 11, 2019: 24, 2020: 31, 2021: 28, 2022: 13, 2023: 34, 2024: 56, 2025: 24}
+
+[B far] approaching 611 · matched 60 (dropped 551) · distinct baseline fills 95, at cap 14
+  matched per era: {'e1': 2, 'e2': 2, 'e3': 56} · per year: {2016: 1, 2017: 1, 2020: 2, 2022: 1, 2023: 11, 2024: 35, 2025: 9}
+
+ρ month 0.263, ρ ticker 0.369, fills/month 5.3, fills/ticker 2.1 → design effect 2.53; tag rate at median d 0.30; MDE tag (t ≥ 2, 80%) 18.6 pts (gate ≤ 6)
+R: ρ month 0.125, ρ ticker 0.331, deff 1.90, SD 1.51, approaching 611, open 2278 → MDE 0.269R (gate ≤ 0.15)
+gates: {'H2a_counts': False, 'H2a_mde': np.False_, 'H2b_counts': True, 'H2b_mde': np.False_}
+simulated pass rate (+6 pts true): H2a 0% · near bucket 0% · stopped short 10%; H2b-1 (+0.15R true) 18%  (cap: < 50% → inconclusive)
+DEVIATION: the simulation applies the matched-effect, era, era-3, year, subset and dose rules; the model fit, permutation and jackknife are not re-run inside each simulation (cost) — the matched t ≥ 2 rule stands in for them.
+power done 528s
