@@ -33,7 +33,13 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
 
 ## Trade scorecard (Adam, Nov 4: "rate the setup and recommend this stock or another with a better outlook")
 - [x] Step 1 (Nov 4): warehouse + daily vs weekly EMA dips → card R-2026-11-04-daily-vs-weekly-dips (H1 doesn't work).
-- [ ] Step 2: pre-registered tests of the leads (extension penalty at the leg high, room-to-supply, breadth state, exit choice), same
+- [ ] Step 2: pre-registered tests of the leads (extension penalty at the leg high, room-to-supply, breadth state, exit choice, and
+  **liquidity magnets** — Adam, Nov 5: "price is magnetic to certain liquidity like the overhead supply or ATHs": distance in ADRs to the
+  nearest level above (ATH, old monthly peak, prior base top, big round number), split into (a) the pull: does a momentum entry below a
+  level tag it within 5 / 10 / 20 sessions more often than a matched entry with no level nearby, and (b) the reaction at the level:
+  break-and-hold vs reject; levels as a TARGET for exits too. Existing evidence to build on: ATH Magnet tags the high 81% vs 76% for any
+  near-high stock; Round Number Magnet fresh levels +0.30–0.42R after a thrust; any swing low within 1 ADR is taken ~70%; old pivots not
+  special (R-2026-10-28-old-pivots)), same
   plan → independent grade ≥ 85% → build → independent recompute routine. Then add box / spring / HTF / SoW / EP entries to the warehouse.
 - [ ] Step 3: scorecard on live candidates (expected R from proven layers only, per-variable reasons, "daily now / wait / skip"), logged forward.
 - [ ] Skills: turn Adam's chart reads into a written checklist skill, logged per recommendation, tested after 20–30 outcomes.
