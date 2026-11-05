@@ -21,6 +21,9 @@ from . import config, earnings, store
 THEMES = ("AI & ROBOTICS - Enterprise AI SaaS", "AI & ROBOTICS - AI Monetizers")
 SOFT = ("Software", "SaaS", "IT Services", "Cyber", "Identity", "Data & Observability", "AI Applications", "Cloud", "Analytics",
         "Defense IT", "Design & Engineering Software", "Business Services & Data", "Vertical", "Fintech Software", "HR", "Ad Tech")
+# Indirect AI revenue (Nov 5, Adam: "widen the scope … ACN is benefitting from AI revenue"): firms paid to BUILD and RUN AI for clients
+# (consulting / implementation / government IT). Every member of these sub-themes joins the list as "AI services".
+SERVICES = ("IT Services & Consulting", "India IT Services", "Defense IT & Services")
 CFG = dict(report_win=20, min_price=5.0, min_dvol=10e6, touch=0.25, hold21=0.5, max9=1.0, fresh=3)
 
 
@@ -46,6 +49,9 @@ def build(adjusted, theme_data):
         names.setdefault(t, {})["verified"] = note if isinstance(note, str) else (note or {}).get("note", "")
     for t in th[th["theme"].isin(THEMES)]["ticker"]:
         names.setdefault(t, {})["theme"] = True
+    for t, g in sub_of.items():
+        if g in SERVICES:
+            names.setdefault(t, {})["services"] = True
     # rewarded reports in software / IT sub-themes, last 20 sessions
     soft_subs = {g for g in set(sd["subtheme"]) if any(k in g for k in SOFT)}
     soft_t = [t for t, g in sub_of.items() if g in soft_subs]
@@ -107,7 +113,8 @@ def build(adjusted, theme_data):
             "up": bool(up[t].iat[i]), "liq": bool(c[t].iat[i] >= CFG["min_price"] and dvol[t].iat[i] >= CFG["min_dvol"]),
             "d5": _r(c[t].iat[i] / c[t].iat[i - 5] - 1), "d20": _r(c[t].iat[i] / c[t].iat[i - 20] - 1),
             "off_hi": _r(c[t].iat[i] / hi252[t].iat[i] - 1),
-            "src": [k for k in ("verified", "theme", "report") if k in why],
+            "src": [k for k in ("verified", "theme", "services", "report") if k in why],
+            "kind": "indirect" if g in SERVICES else "direct",
             "ai_note": why.get("verified") or "", "ai_in": st.get("in"), "ai_why": st.get("why", ""),
             "ai_score": _r((score.get(t) or {}).get("score"), 0),
             "report": why.get("report") or why.get("last_react"),
@@ -117,7 +124,7 @@ def build(adjusted, theme_data):
         })
     rows.sort(key=lambda r: (not r["t3"], -(r["rs"] or 0)))
     return {"date": str(days[i].date()), "cfg": CFG, "rows": rows, "themes": list(THEMES),
-            "counts": {k: sum(1 for r in rows if k in r["src"]) for k in ("verified", "theme", "report")}}
+            "counts": {k: sum(1 for r in rows if k in r["src"]) for k in ("verified", "theme", "services", "report")}, "services": list(SERVICES)}
 
 
 if __name__ == "__main__":

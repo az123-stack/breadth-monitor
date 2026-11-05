@@ -794,7 +794,10 @@ RS Ratings, Theme Strength, setups and a TradingView export.
   (`renderAIRev`). Names: aimon pool (verified AI revenue line, with the market's in / out verdict) + "Enterprise AI SaaS" / "AI Monetizers" theme
   members + rewarded software / IT reports (earnings.frames reaction up) in 20 sessions. Rows carry the Lined-up fields (c, hi, lo, e9, e21, adr,
   t3, t0) so the page runs `lineupState` live; plus up (21 > rising 50), RS, sub-theme lifecycle stage / signal, pop, last report, next earnings.
-  Chips Show (in the EMAs / + near / all) · Source · Trend · RS · Group (BUY groups). Live "gap today" tag for reporters. AI filter untested;
+  Chips Show (in the EMAs / + near / all) · AI revenue (direct / indirect) · Source · Trend · RS · Group (BUY groups). Live "gap today" tag.
+  Nov 5 (Adam: "widen the scope … ACN is benefitting"): INDIRECT = every member of `airev.SERVICES` (IT Services & Consulting, India IT
+  Services, Defense IT & Services) as "AI services (indirect)", row `kind` direct / indirect; a second card "On the list · waiting for a
+  pullback" lists every name not in the EMAs (closest to its 9 / 21 first) so nothing disappears (ACN was hidden 1 ADR over its 9). AI filter untested;
   the BUY-group filter is the tested part. Open question (Adam, Nov 5): merge Pop watch pullbacks + Lined-up buys + AI Revenue into one
   EMA-dip engine with "why this group" tags (pop adds nothing: +0.19R vs +0.18R; BUY groups +0.85R vs +0.11R).
 - **Trade warehouse · step 1** (Nov 4, 2026; Adam's VEEV weekly chart: "daily or weekly EMA pullback, and when?"; card
