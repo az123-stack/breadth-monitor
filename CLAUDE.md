@@ -957,6 +957,12 @@ and keep it current.
   first test bed `tools/rstack/box_stack.py` on Box trades (see Findings). Goal: a common trade warehouse across setups + a stacked
   expected R per live trade, with synergy pairs validated out of sample, refreshed weekly for the Integrator.
 
+## Strategy book (Nov 4, 2026)
+Adam's own trading strategies live in the Claude Doc **"Strategy Book"** https://claude.ai/artifact/JwswLXGDoFnF2X26hwF8g7 (one page per
+strategy: idea, where on the dashboard, buy checklist, entry/stop/size, evidence + research card, live trades, open questions; a strategy
+log table with status Idea / Testing / Trusted / Retired). When Adam describes a new strategy, add a page there (docs tools) and file a
+research card if it gets tested. Strategy 1 = Pop watch pullbacks (v3 Groups → Pop watch, Sort "Most pulled back").
+
 ## Working preferences
 - Start every answer with a TL;DR, then detail.
 - Ship working changes; verify with `--rebuild-only`, the tests, and a headless browser check before pushing.
