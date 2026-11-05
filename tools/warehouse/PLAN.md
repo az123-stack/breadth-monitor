@@ -1,9 +1,11 @@
-# Trade scorecard · step 1 plan · v2 (Nov 4, 2026)
+# Trade scorecard · step 1 plan · v3 (Nov 4, 2026)
 
 Adam (VEEV weekly chart): "VEEV is working off overhead supply it just hit. Should we trade the pullback into the daily EMAs or the
 weekly EMAs, and when to do either? Other variables should rate the setup and recommend this stock or another with a better outlook."
 v2 = revised after an independent review (v1 scored 55%: per-signal instead of per-pullback, biased paired test, supply measured as
-pullback depth, levels.json not point-in-time, H1 not a statistic, clustering too thin, no power check).
+pullback depth, levels.json not point-in-time, H1 not a statistic, clustering too thin, no power check). v3 = second review (78%):
+pin the leg high, require W to actually win in the cell, longer bootstrap blocks, 85-session buffer, power gate on informative episodes,
+D/W ordering, policy (c) risk, pre-declared labels, current-leg-only supply exclusion, "no market pullback" bucket, weekly ATR defined.
 
 ## The question, as a decision
 A leader has made a high and starts to pull back. Adam can (a) buy the first daily 9/21 dip, (b) skip it and wait for the weekly 9/21
@@ -11,20 +13,28 @@ dip, or (c) take the daily dip and, if stopped, re-enter at the weekly dip. **Wh
 flip when the leg just ran into old overhead supply after a big extension (the VEEV case)?** Nothing here changes a pick or card.
 
 ## Unit = the pullback episode (not the signal)
-- **Leg high / episode start (day S):** a close at a 20-session closing high where the leader filter holds AT S:
-  $10+, 20-day avg $20M+/day, dashboard RS ≥ 80 as of S, daily 21 EMA > 50 EMA and 50 rising over 10 sessions, weekly 9 > weekly 21.
-  The filter is checked once, at S, identical for both entries (no re-check at the dip).
-- **Episode end:** the first of: a new close above the leg high after any entry trigger; a close more than 1 weekly ATR(10) under the
-  weekly 21; 40 sessions after S. A new episode can start only after the previous one ends (no overlapping episodes per stock).
+- **Leg high / episode start (day S):** an episode OPENS on a close at a 20-session closing high where the leader filter holds that day:
+  $10+, 20-day avg $20M+/day, dashboard RS ≥ 80, daily 21 EMA > 50 EMA and 50 rising over 10 sessions, weekly 9 > weekly 21.
+  While no entry has qualified yet, every new higher close MOVES the leg high (S = the day of the highest close so far); the filter is
+  re-checked at each move and the episode is dropped if it fails at the final S. An entry bar counts only after a pullback of at least a
+  close 1 ADR under the leg-high close. All episode variables are measured at the final S (the day of the leg high before the first dip).
+  The filter is checked once (at the final S), identical for both entries, never at the dip.
+- **Episode end:** the first of: a new close above the leg high AFTER the first qualifying dip bar (the pullback is over); a close more
+  than 1 weekly ATR(10) under the weekly 21; 40 sessions after the final S. Entries not yet triggered die at the episode end; trades already
+  filled run to their own exits. A new episode can open only after the previous one ends (no overlapping episodes per stock).
+- **Weekly ATR(10):** mean of the last 10 weekly true ranges (completed weeks only, split-adjusted bars), as a % of the weekly close.
 - **Sample window:** episode starts from 2025-09-05 (weekly EMAs seeded from Nov 2024 need ~40 weeks to shed the seed, (20/22)^40 ≈ 2%)
-  to 70 sessions before the last bar (2026-11-03), so every primary exit completes. RS before ~Nov 2025 uses < 252 sessions (partial
+  to 85 sessions before the last bar (2026-11-03): 40-session episode + 3 to trigger + 40-session hold ≈ 83, so every exit under every
+  policy completes; any trade still cut off is censored and counted. RS before ~Nov 2025 uses < 252 sessions (partial
   formula) — reported, and the main result is re-run on starts ≥ 2025-11-07 only.
 
 ## Entries inside an episode (pre-registered, not tuned)
-- **D (daily dip):** first session after S with low ≤ max(daily 9, daily 21) + 0.25 ADR, close ≥ daily 21 − 0.5 ADR, close ≤ daily 9 + 1 ADR.
+- **D (daily dip):** first session after S (and after the 1-ADR pullback) BEFORE any W bar, with low ≤ max(daily 9, daily 21) + 0.25 ADR, close ≥ daily 21 − 0.5 ADR, close ≤ daily 9 + 1 ADR.
 - **W (weekly dip):** first session after S with low ≤ max(weekly 9, weekly 21) + 0.25 ADR, close ≥ weekly 21 − 0.5 ADR, close ≤ weekly 9 + 1 ADR,
   using the weekly EMAs AS THEY STAND that day (`emaprob.weekly_ema`: completed weeks + today's close as the current week's close).
-- A bar that qualifies as both is tagged "both" (counted; it is the same trade for policies a and b).
+- A bar that qualifies as both is tagged "both" (counted; it is the same trade for policies a and b, adds 0 to the difference). If the
+  first qualifying bar is a W bar (a fast drop straight to the weekly EMAs), the episode has NO D (P_D = 0R and P_W takes it); counts of
+  D-first / both / W-first episodes are reported.
 - **Trigger / fill / stop (identical):** trigger = a later session's high ≥ the dip-day high within 3 sessions; fill = max(open, trigger)
   (gap above = fill at the open). Initial stop = dip-day low, never more than 1 ADR under the fill; risk floored at 0.3 ADR. Daily-bar order
   rule: if the fill day's low ≤ stop, count it as stopped at the stop (conservative; share of such trades reported). A gap below the stop
@@ -35,17 +45,19 @@ flip when the leg just ran into old overhead supply after a big extension (the V
   No commissions / slippage (stated).
 
 ## Policies scored on EVERY episode
-- **P_D** take the first D (0R if no D or no fill). **P_W** skip D, take the first W (0R if none). **P_DW** take D; if it is stopped
-  out, take the next W in the same episode. Per policy: R per episode (main number), share of episodes traded, R per trade, win %.
+- **P_D** take the first D (0R if no D or no fill). **P_W** skip D, take the first W (0R if none). **P_DW** take D; if it hits its
+  INITIAL stop before the half sale, take the next W in the same episode. Per policy: R per episode (main number), share of episodes
+  traded, R per trade, win %; P_DW also as R per unit of risk taken (it can risk 2 units).
 - Separately labelled conditional stat (not a test): "W's R in episodes where D was stopped".
 
 ## Variables, measured at the episode start S (what the trader sees at the leg high), no look-ahead
 - **Overhead supply (point-in-time):** refetch Yahoo MONTHLY bars (full history, split-adjusted) for every candidate ticker once via a
   GitHub Actions job (the sandbox can't reach Yahoo; `levels.py` already has the fetcher) → `data/warehouse/monthly.json` (raw bars, not
   just peaks). For an episode starting in month M, use months ≤ M−1 only: old peaks = monthly highs above the 3 months on EACH side, all
-  6 neighbours complete before M; ATH as of M−1. Highs from the last 6 months before S never count (that's the current leg).
-  `hit_supply` = the leg high is within max(2%, 1 ADR) BELOW an old peak / ATH that is ≥ 6 months old, or pierced one by ≤ 3% and closed
-  back under it. `room` = % from the leg high to the next old peak above (∞ if none). Spot check: Yahoo vs our bars + data/splits.csv on
+  6 neighbours complete before M; ATH as of M−1. Plus swing highs from our daily bars (a high above the 10 sessions either side, both sides
+  complete before S). Only highs from the CURRENT leg never count: anything after the leg's 60-session low before S. So a prior top of the
+  same base (a double top 3–5 months back) does count. Each supply level is tagged with its source (monthly / daily) and age.
+  `hit_supply` = the leg high is within max(2%, 1 ADR) BELOW a known supply level (above), or pierced one by ≤ 3% and closed back under it. `room` = % from the leg high to the next old peak above (∞ if none). Spot check: Yahoo vs our bars + data/splits.csv on
   30 tickers incl. known spin-offs (CTVA); tickers that disagree > 2% are dropped and counted.
 - **Extension (ONE variable for H1):** `ext` = (leg-high close − weekly 21 EMA at S) ÷ weekly ATR(10) at S. Two buckets: top third vs the
   rest, cut-off fixed on episodes starting in the first half of the window, applied to all.
@@ -55,15 +67,22 @@ flip when the leg just ran into old overhead supply after a big extension (the V
 ## Primary hypothesis H1 (the only confirmatory test)
 Effect = (mean R per episode of P_W − P_D in the cell hit_supply = yes AND ext = top third) − (same difference in all other episodes).
 H1 says the effect > 0 (waiting for the weekly dip is relatively better after a stretched run into old supply).
-**Inference:** clusters = calendar week of S; cluster-robust t on the episode-level difference, plus a block bootstrap of 20-session
-blocks (2,000 draws) for the 95% interval; and the sign of the in-cell P_W − P_D must hold in ≥ 2/3 of the independent market pullback
-episodes (SPY 3%+ drawdowns from a 20-day high, merged within 10 sessions) that contain cell episodes.
-**Pass (proven):** effect ≥ +0.15R, cluster t ≥ 2, bootstrap interval > 0, same sign in both time halves, ≥ 2/3 of market episodes, AND
+**Inference:** clusters = calendar week of S; cluster-robust t on the episode-level difference, plus a bootstrap that resamples whole
+calendar MONTHS of S (≥ 80-session dependence covered by month blocks of starts + the ±1 month neighbours resampled together; 2,000 draws)
+for the 95% interval; and the sign of the in-cell P_W − P_D must hold in ≥ 2/3 of market groups: each independent market pullback
+(SPY 3%+ drawdown from a 20-day high, merged within 10 sessions) is one group, and all cell episodes outside any SPY pullback form ONE
+extra "no market pullback" group.
+**Pass (proven):** effect ≥ +0.15R, cluster t ≥ 2, bootstrap interval > 0, AND inside the cell W actually wins: in-cell mean(P_W − P_D)
+> 0 with cluster t ≥ 1.5, same sign in both time halves, ≥ 2/3 of market episodes, AND
 each robustness check keeps the same sign and ≥ half the size (zero failures allowed): (i) starts ≥ 2025-11-07, (ii) without post-thrust
 windows, (iii) without the top 1% of trades by R, (iv) leaving out each of the 3 sub-themes with the most episodes, (v) excess return vs
 SPY over the hold instead of R (same sign), (vi) within breadth regimes strong / not strong (same sign in both).
-**Power gate (checked BEFORE outcomes are computed):** count episodes per cell and market episodes. If the cell has < 40 episodes or < 4
-market episodes, H1 is reported **inconclusive** (not "doesn't work"), and only the overall policy comparison is reported.
+**Power gate (checked BEFORE R is computed):** count INFORMATIVE cell episodes = those where D or W at least triggered (fills only, no
+outcomes), overall and in each time half, and the market groups they fall in. If the cell has < 40 informative episodes, < 15 in either
+half, or < 4 market groups, H1 is reported **inconclusive** (not "doesn't work") and only the overall policy comparison is reported.
+**Labels, pre-declared:** proven = every rule above; **info / promising** = passes effect + t + bootstrap + in-cell win but fails at most
+one robustness check; **doesn't work** = effect ≤ 0 or bootstrap interval includes 0 with the gate met; **inconclusive** = gate not met.
+Re-run date: when 6 more months of bars exist (≈ May 2027) or after a longer-history purchase.
 
 ## Exploratory (labelled exploratory; no "proven" claims)
 Overall P_D vs P_W vs P_DW; the same split by hit_supply alone and ext alone; `room` buckets; regime / post-thrust strata; the secondary
