@@ -23,7 +23,7 @@ TABS_JS = Path(__file__).with_name("v3_tabs.js")
 NAV = [
     # Nov 4 (Adam: "add intraday and premarket tabs … under their own parent tab where breadth will also reside")
     ("market", "Market", [("breadth", "Breadth"), ("premarket", "Pre-market"), ("intraday", "Intraday")]),
-    ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle"), ("grotation", "Rotation"), ("gpop", "Pop watch")]),   # Nov 4: Pop watch
+    ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle"), ("grotation", "Rotation"), ("gpop", "Pop watch"), ("grsrank", "RS ranks")]),   # Nov 4: RS ranks   # Nov 4: Pop watch
     ("stocks", "Stocks", [("stocks", "Stocks"), ("sstrong", "Strongest"), ("ssetups", "Setups"), ("sleaders", "Leadership")]),   # Nov 4: Strongest (every RS 90+ name, nothing missed)   # Oct 31: Setups (third row: Lined-up buys); Rotation = money card only   # Oct 31 (Adam: "add another parent for stocks and start building that out")
 ]
 
@@ -217,12 +217,16 @@ SWAPS = [
     ('    tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === TAB));',
      NAV_SHOW, "highlight parent, show only its sub-tabs"),
     ('  app.append(aiScoreCard(getT()));\n', '', "AI scorecard removed from the Themes tab (Adam, Oct 30)"),
+    # Nov 4 (Adam: "take away 'browse groups and their stocks', it's duplicative"): v3 Themes = the table only
+    ('  bar.querySelector(".filters").append(chips("View", [["table", "Themes & sub-themes table"], ["browse", "Browse groups and their stocks"]], UI, "tmode",\n'
+     '    () => { lsSet("themesMode", UI.tmode); rerenderPanel(); }));\n', '', "Browse view chips removed"),
+    ('  (UI.tmode === "browse" ? renderBrowse : renderThemes)(app);', '  renderThemes(app);', "v3 Themes always shows the table"),
     ('<title>Market Monitor</title>', '<title>Market Monitor v3</title>', "title"),
     ('<div><h1>Market Monitor</h1>', '<div><h1>Market Monitor <span class="v3tag">v3</span></h1>', "header badge"),
     ('function pulseCard(T) {', PULSE_V3, "compact long / short cards (v1 version kept as pulseCardV1)"),
     (MODE_BTN_OLD, MODE_BTN_NEW, "Light / Dark switch in the header"),
     (MODE_JS_OLD, MODE_JS_NEW, "Light / Dark switch behaviour"),
-    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, sstrong: renderStrongest, breadth: renderBreadthV3, gpop: renderPopWatch, themes: renderThemesTab,', "Theme Dash renderer"),
+    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, sstrong: renderStrongest, breadth: renderBreadthV3, gpop: renderPopWatch, grsrank: renderRsRanks, themes: renderThemesTab,', "Theme Dash renderer"),
     ('function renderTab(panel) {', None, "Theme Dash code (v3_themedash.js) before renderTab"),
     # Nov 4 (Adam): Market health lives on Stocks → Leadership, and the stat tiles aren't needed ("I just look at the charts") →
     # v3 Breadth = regime, macro strip, washout card, signals, charts, table. v1 keeps them.

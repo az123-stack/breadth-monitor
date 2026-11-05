@@ -194,3 +194,49 @@ function renderPopWatch(app) {
   card.querySelector(".pwtv").addEventListener("click", () => tsDownload("pop-watch", rows.map(r => ({ name: "Pop watch - " + r.g, ticks: r.names.map(n => n.t) }))));
   app.append(card);
 }
+// Nov 4 (Adam: "a place to see just the best sub-themes by RS over different time periods"): Groups → RS ranks = every sub-theme (or theme)
+// with the median RS (1–99) of its stocks for each RS period side by side (live during the session), plus its rank on each period.
+// Click a period column (or the Rank by chip) to rank by it. Descriptive.
+function renderRsRanks(app) {
+  const T = getT();
+  if (!T || !T.stocks) { app.append($('<div class="card empty">Appears after the next data run.</div>')); return; }
+  app.append(liveBar());
+  UI.rr = UI.rr || { view: lsGet("rrView", "sub"), by: lsGet("rrBy", "rs5d"), min: lsGet("rrMin", "4"), q: "" };
+  const U = UI.rr, P = Object.keys(RS_PER), SR = Object.fromEntries(T.stocks.map(s => [s.t, s]));
+  if (!RS_PER[U.by]) U.by = "rs5d";
+  const med = (v) => { v = v.filter(x => x != null).sort((a, b) => a - b); if (!v.length) return null; const m = v.length >> 1; return v.length % 2 ? v[m] : Math.round((v[m - 1] + v[m]) / 2); };
+  const groups = (U.view === "sub" ? T.subthemes || [] : T.themes || []).map(g => {
+    const mem = (g.members || []).filter(t => SR[t] && SR[t].is_stock !== false);
+    const r = { name: g.theme, group: g.group || "", n: mem.length, strength: g.strength, members: mem };
+    P.forEach(k => { r[k] = med(mem.map(t => SR[t][k])); });
+    return r;
+  }).filter(r => r.n >= +U.min);
+  P.forEach(k => { const o = groups.filter(r => r[k] != null).sort((a, b) => b[k] - a[k]); o.forEach((r, i) => { r[k + "_rk"] = i + 1; }); });
+  const q = (U.q || "").trim().toLowerCase();
+  const rows = groups.filter(r => !q || r.name.toLowerCase().includes(q) || r.group.toLowerCase().includes(q) || r.members.some(t => t.toLowerCase() === q))
+    .sort((a, b) => (b[U.by] ?? -1) - (a[U.by] ?? -1));
+  const lab = (k) => RS_PER[k][0].replace(" (RS Rating)", "");
+  const card = $(`<section class="card ortable rrcard"><div class="head"><h2>RS ranks · ${U.view === "sub" ? "sub-themes" : "themes"} <span class="meta">· median RS (1–99) of each group's stocks for every period, ranked by <b>${esc(lab(U.by))}</b> · ${rows.length} groups${liveActive() ? " · live" : ` · ${shortDate(T.date)} close`}</span></h2>
+    <button class="xopen rrtv">⬇ TradingView</button></div>
+    <div class="filters" style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0"></div>
+    <div class="meta" style="margin:0 0 6px">RS for a period = where a stock's return over that period ranks against every liquid stock (99 = top 1%). The group number is the middle stock's,
+      so one runner can't carry it. The small number under each value is the group's rank on that period. Reading across a row shows whether a group is getting stronger (short periods higher than long) or fading.</div>
+    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">${U.view === "sub" ? "Sub-theme" : "Theme"}</th><th>Stocks</th><th>Strength</th>
+      ${P.map(k => `<th class="rrh${k === U.by ? " orsel" : ""}" data-k="${k}" style="cursor:pointer" title="Rank by ${esc(lab(k))}">RS<small>${esc(lab(k))}</small></th>`).join("")}<th class="l">Top stocks on ${esc(lab(U.by))}</th></tr></thead><tbody>
+    ${rows.map((r, i) => `<tr><td class="num">${i + 1}</td><td class="l"><b>${esc(r.name)}</b>${r.group ? `<small class="meta" style="display:block">${esc(r.group)}</small>` : ""}</td><td class="num">${r.n}</td>
+      <td class="num">${r.strength == null ? "–" : Math.round(r.strength)}</td>
+      ${P.map(k => `<td class="num ${rsTint(r[k])}${k === U.by ? " orsel" : ""}" data-v="${r[k] ?? -1}">${r[k] ?? "–"}<small class="meta" style="display:block">#${r[k + "_rk"] ?? "–"}</small></td>`).join("")}
+      <td class="l">${r.members.slice().sort((a, b) => (SR[b][U.by] ?? -1) - (SR[a][U.by] ?? -1)).slice(0, 5).map(t => `<a href="#" class="tkl" data-t="${esc(t)}">${esc(t)}</a> <small class="meta">${SR[t][U.by] ?? "–"}</small>`).join(" · ")}</td></tr>`).join("")}
+    </tbody></table></div></section>`);
+  const f = card.querySelector(".filters"), save = () => { lsSet("rrView", U.view); lsSet("rrBy", U.by); lsSet("rrMin", U.min); rerenderPanel(); };
+  f.append(chips("View", [["sub", "Sub-themes"], ["theme", "Themes"]], U, "view", save));
+  f.append(chips("Rank by", P.map(k => [k, esc(lab(k))]), U, "by", save));
+  f.append(chips("Size", [["3", "3+ stocks"], ["4", "4+ stocks"], ["6", "6+ stocks"]], U, "min", save));
+  const qi = $(`<input type="search" class="orq" placeholder="Find a group or ticker" aria-label="Find">`); qi.value = U.q || ""; let qt = null;
+  qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; rerenderPanel(); const n = document.querySelector(".rrcard .orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
+  f.append(qi);
+  card.querySelectorAll(".rrh").forEach(th => th.addEventListener("click", (e) => { e.stopPropagation(); U.by = th.dataset.k; save(); }));
+  card.querySelector("table").dataset.ownSort = "1";
+  card.querySelector(".rrtv").addEventListener("click", () => tsDownload("rs-ranks-" + U.by, rows.slice(0, 15).map(r => ({ name: "RS " + lab(U.by) + " - " + r.name, ticks: r.members.slice().sort((a, b) => (SR[b][U.by] ?? -1) - (SR[a][U.by] ?? -1)) }))));
+  app.append(card);
+}

@@ -2797,7 +2797,8 @@ function renderThemesTab(app) {
   const bar = $('<section class="card browsebar modebar"><div class="filters"></div></section>');
   bar.querySelector(".filters").append(chips("View", [["table", "Themes & sub-themes table"], ["browse", "Browse groups and their stocks"]], UI, "tmode",
     () => { lsSet("themesMode", UI.tmode); rerenderPanel(); }));
-  bar.querySelector(".filters").append(rsPeriodChips(rerenderPanel));
+  // Nov 4 (Adam: "when I change the period I'd like to see which sub-themes are strongest for it"): picking a period sorts by Med RS
+  bar.querySelector(".filters").append(rsPeriodChips(() => { if (UI.themes) UI.themes.sort = ["_rsmed", -1]; rerenderPanel(); }));
   app.append(bar);
   app.append(aiScoreCard(getT()));
   (UI.tmode === "browse" ? renderBrowse : renderThemes)(app);
