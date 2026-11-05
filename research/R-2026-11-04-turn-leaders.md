@@ -8,7 +8,7 @@ horizon: 21 / 63 sessions
 sample: 7 major thrusts Apr 2025 – Oct 2026 (2 deep: Apr 9 2025, Mar 31 2026), liquid $5+, $20M+/day; 4,360 fresh 52-wk-high breakouts (1,258 within 15 sessions after a thrust)
 result: near-high / held-up names AT the thrust lagged at both deep lows (near 10% −11% vs avg stock over 63d; held up −14%); high-beta RS 80+ won (+19% / +27%). Fresh breakouts in the 15 sessions AFTER a thrust beat ordinary breakouts (+1.7% shallow / +4.1% deep vs −0.8%, 21d, t 3.5 / 2.9); with 2+ sub-theme peers breaking out too +4.3% / +6.9% (t 4.1 / 2.5); RS 80+ together after a deep thrust +14.8% (n 24)
 halves: post-shallow +1.6 / +1.9; post-deep −8.0 (Apr 2025: early breakouts were defensives) / +6.6 (Mar 2026); ordinary +0.7 / −2.2
-layers: [washout]
+layers: [washout_thrust]
 integrated: no          # yes | partly | no | rejected
 source: chat Nov 4, 2026 (Adam: "at the April low the next leaders set up near highs and all broke out together, DELL, HPE … who's next?"); tools/turn_leaders/study.py + breakouts.py
 ---
