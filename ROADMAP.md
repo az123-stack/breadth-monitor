@@ -41,6 +41,11 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
   near-high stock; Round Number Magnet fresh levels +0.30–0.42R after a thrust; any swing low within 1 ADR is taken ~70%; old pivots not
   special (R-2026-10-28-old-pivots)), same
   plan → independent grade ≥ 85% → build → independent recompute routine. Then add box / spring / HTF / SoW / EP entries to the warehouse.
+  - Nov 5: magnets plan written — tools/warehouse/PLAN2.md v9.1, graded 60 → 72 → 68 → 78 → 82 → 84 → 84 → 80 → **86%** by fresh
+    independent reviewers. Key change: tested on a different DECADE (Yahoo daily 2014–Aug 2025, ~3,000 tickers) so the confirmation
+    sample doesn't share dates with step 1. H2a = the pull (tag rate vs open-sky AND far baselines), H2b = priority in R vs open sky,
+    "stopped short" (Adam's literal case) as a named row. Data: `.github/workflows/warehouse_daily.yml` → branch `warehouse-data`.
+    Next: build (`build.py --source yahoo`, magnets.py), validation + power tables BEFORE outcomes, independent recompute.
 - [ ] Step 3: scorecard on live candidates (expected R from proven layers only, per-variable reasons, "daily now / wait / skip"), logged forward.
 - [ ] Skills: turn Adam's chart reads into a written checklist skill, logged per recommendation, tested after 20–30 outcomes.
 
