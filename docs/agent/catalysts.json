@@ -1,46 +1,78 @@
 {
- "for_date": "2026-11-04",
- "written": "2026-11-05T12:16Z",
+ "for_date": "2026-11-05",
+ "written": "2026-11-06T12:18Z",
  "stocks": {
-  "DUOL": {
-   "why": "No fresh catalyst found; stock fell ~16% after its Aug 6 2026 earnings and the Q3 report date was not confirmed.",
+  "CRM": {
+   "why": "Acquiring Braze for $47.50/share cash (announced 2026-10-20); $25B accelerated buyback launched in May. No fresh hard news on CRM itself found.",
+   "direction": "none",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://letsdatascience.com/news/salesforce-agrees-to-acquire-braze-for-566-billion-9d3d8c86",
+    "https://www.tikr.com/zh/blog/salesforce-stock-is-down-30-in-2026-heres-what-the-25-billion-buyback-means-for-crm-investors"
+   ]
+  },
+  "SAIL": {
+   "why": "No clear catalyst found in this run's searches (only older items surfaced).",
    "direction": "none",
    "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.marketbeat.com/instant-alerts/duolingo-nasdaqduol-stock-price-down-165-heres-what-happened-2026-08-06/"
+    "https://www.earningswhispers.com/stocks/sail"
    ]
   },
-  "EPAM": {
-   "why": "Reports Q3 results on Nov 5 (today); it lowered its FY26 outlook in August, so the print is a binary event.",
-   "direction": "mixed",
-   "quality": "unknown",
+  "DUOL": {
+   "why": "No clear catalyst found in this run's searches (only older items surfaced). Latest result found was the Nov 2025 report.",
+   "direction": "none",
+   "quality": "none",
    "depth": "full",
-   "earnings_date": "2026-11-05",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.tipranks.com/news/duolingo-stock-duol-tanks-30-despite-strong-q3-earnings-heres-what-spooked-investors"
+   ]
+  },
+  "HAE": {
+   "why": "No clear catalyst found in this run's searches (only older items surfaced).",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/HAE"
+   ]
+  },
+  "APPN": {
+   "why": "Reported Q3 on 2026-11-05 before the open; a headline reads 'Appian Beat Expectations, Raises Guidance' but I could not open the release to confirm numbers or the stock reaction.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/appn"
+   ]
+  },
+  "BRZE": {
+   "why": "Pending $47.50/share all-cash takeover by Salesforce (announced 2026-10-20); stock at 45.81 so upside is capped.",
+   "direction": "negative",
+   "quality": "strong",
+   "depth": "full",
+   "earnings_date": null,
    "red_flags": [
-    "earnings today",
-    "FY26 outlook lowered in Aug"
+    "pending cash takeover"
    ],
    "sources": [
-    "https://www.mychesco.com/a/news/regional/epam-systems-sets-november-5-earnings-call-for-third-quarter/",
-    "https://www.rttnews.com/3676846/epam-systems-earnings-up-in-q2-guides-q3-lowers-fy26-outlook.aspx"
-   ]
-  },
-  "NTSK": {
-   "why": "No clear catalyst found; search shows only a billing-shift comment on cash visibility.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.barchart.com/story/news/4386160/netskope-s-growth-trajectory-holds-but-the-billing-shift-still-clouds-cash-visibility"
+    "https://letsdatascience.com/news/salesforce-agrees-to-acquire-braze-for-566-billion-9d3d8c86"
    ]
   },
   "ANF": {
-   "why": "No clear catalyst found; older results surge on Hollister growth, nothing fresh.",
+   "why": "No clear catalyst found in this run's searches (only older items surfaced). A headline suggests Q3 2026 results on Nov 24, 2026 but I could not confirm it.",
    "direction": "none",
    "quality": "none",
    "depth": "full",
@@ -50,90 +82,63 @@
     "https://www.earningswhispers.com/stocks/anf"
    ]
   },
-  "FIGS": {
-   "why": "Stock is up strongly in 2026 after Q3 beat-and-raise coverage; no fresh news found.",
-   "direction": "positive",
-   "quality": "real",
+  "SN": {
+   "why": "No clear catalyst found in this run's searches (only older items surfaced). Company announced a Q3 2026 earnings date; exact date not read.",
+   "direction": "none",
+   "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.tikr.com/zh/blog/figs-is-up-84-in-2026-take-profits-or-buy-more"
+    "https://s202.q4cdn.com/977000893/files/doc_news/SharkNinja-Announces-Third-Quarter-2026-Earnings-Release-and-Conference-Call-Date-2026.pdf"
+   ]
+  },
+  "FIGS": {
+   "why": "No clear catalyst found in this run's searches (only older items surfaced).",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.chartmill.com/stock/quote/FIGS/estimates"
    ]
   },
   "LFST": {
-   "why": "Q3 2026 results filed (8-K); headlines describe a big post-earnings jump (a Yahoo piece says +30%, year not confirmed).",
+   "why": "Reported Q3 2026 on 2026-11-05 and raised full-year 2026 outlook (revenue $1.741-1.761B, adj. EBITDA $242-250M).",
    "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.sec.gov/Archives/edgar/data/0001845257/000119312526447943/lfst-ex99_1.htm",
-    "https://finance.yahoo.com/news/lifestance-lfst-soars-30-q3-101126292.html"
-   ]
-  },
-  "HAE": {
-   "why": "No fresh catalyst found; last guidance update was May 2026 (FY27 revenue +4-7%).",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/instant-alerts/haemonetics-nysehae-updates-fy-2027-earnings-guidance-2026-05-07/"
-   ]
-  },
-  "ATRC": {
-   "why": "No clear catalyst found; Q2 report was July 23.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/instant-alerts/atricure-nasdaqatrc-posts-earnings-results-2026-07-23/"
-   ]
-  },
-  "GKOS": {
-   "why": "Q3 2026 results released ~Oct 29; headlines show a rally on record sales and a higher outlook (year of headlines not fully confirmed).",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://s206.q4cdn.com/223634169/files/doc_news/Glaukos-Announces-Third-Quarter-2026-Financial-Results-2026.pdf",
-    "https://timothysykes.com/news/glaukos-corporation-gkos-news-2026_10_29/"
-   ]
-  },
-  "BRZE": {
-   "why": "Salesforce agreed to acquire Braze for $5.66B; as a pending takeover, upside is capped.",
-   "direction": "negative",
    "quality": "strong",
    "depth": "full",
    "earnings_date": null,
-   "red_flags": [
-    "pending takeover (Salesforce)"
-   ],
+   "red_flags": [],
    "sources": [
-    "https://letsdatascience.com/news/salesforce-agrees-to-acquire-braze-for-566-billion-9d3d8c86",
-    "https://www.nasdaq.com/articles/why-braze-stock-soared-week"
+    "https://www.sec.gov/Archives/edgar/data/0001845257/000119312526447943/lfst-ex99_1.htm"
    ]
   },
-  "CON": {
-   "why": "No clear catalyst found.",
+  "ATRC": {
+   "why": "No clear catalyst found in this run's searches (only older items surfaced).",
    "direction": "none",
    "quality": "none",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.fxempire.com/stocks/con/earnings"
+    "https://www.benzinga.com/quote/ATRC/earnings-forecasts"
+   ]
+  },
+  "GKOS": {
+   "why": "No clear catalyst found in this run's searches (only older items surfaced).",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.benzinga.com/quote/GKOS/earnings-forecasts"
    ]
   },
   "OSCR": {
-   "why": "No clear catalyst found; nothing fresh in results.",
+   "why": "No clear catalyst found in this run's searches (only older items surfaced).",
    "direction": "none",
    "quality": "none",
    "depth": "full",
@@ -143,30 +148,19 @@
     "https://www.alphaquery.com/stock/OSCR/earnings-history"
    ]
   },
-  "APPN": {
-   "why": "Rose ~14% in August on a strong Q2 and raised outlook; older news, no fresh catalyst found; Q3 date not confirmed.",
+  "CON": {
+   "why": "Reported Q3 2026 on 2026-11-05 and raised FY2026 guidance (revenue $2.36-2.38B, adj. EBITDA $505-510M).",
    "direction": "positive",
-   "quality": "real",
+   "quality": "strong",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.marketbeat.com/instant-alerts/appian-nasdaqappn-shares-up-142-on-strong-earnings-2026-08-07/"
-   ]
-  },
-  "SN": {
-   "why": "No clear catalyst found; ADR reported (missed EPS) Aug 4.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/instant-alerts/smith-nephew-snats-nysesnn-announces-quarterly-earnings-results-misses-estimates-by-046-eps-2026-08-04/"
+    "https://www.sec.gov/Archives/edgar/data/0002014596/000201459626000070/cghpearningsrelease-9302026.htm"
    ]
   },
   "AVAH": {
-   "why": "No clear catalyst found; company announced its Q3 2026 earnings release and call (date not confirmed).",
+   "why": "No clear catalyst found in this run's searches (only older items surfaced). Company announced a Q3 2026 earnings release date; not read.",
    "direction": "none",
    "quality": "none",
    "depth": "full",
