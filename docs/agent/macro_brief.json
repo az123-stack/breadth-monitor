@@ -1,17 +1,17 @@
 {
- "for_date": "2026-11-04",
- "written": "2026-11-05T12:04Z",
- "headline": "Oil and yields plunged on US-Iran settlement hopes and a Democratic sweep of Congress, with the October jobs report Friday setting up December Fed hike odds.",
+ "for_date": "2026-11-05",
+ "written": "2026-11-06T12:06Z",
+ "headline": "AI-chip rout sent the S&P 500 down 4.4% Thursday, its worst day since April 2025, and the October jobs report lands at 8:30 AM ET today.",
  "risk": "high",
- "rates": "The 10-year yield fell to about 4.88% (near a two-month low) and the 2-year to about 4.55% as oil dropped and the dollar weakened.",
- "fed": "CME FedWatch put a December hike at roughly 80%; the next FOMC is Dec 8-9, and the Friday payrolls print will heavily shape those odds.",
- "oil": "Brent fell about 8.7% to roughly $94.6 and WTI to about $88 on bets that Washington and Tehran are near a settlement, though the Hormuz supply threat is not resolved.",
- "geo": "US-Iran talks via Qatar continue with no binding deal, and Democrats won both the House and Senate in Tuesday's midterms.",
+ "rates": "The 10-year Treasury yield fell to about 4.84% Thursday from 4.90%, as money moved to safety, after topping 5.30% last month.",
+ "fed": "The Fed held at 3.75%-4.00% on Oct 28 with two dissents favoring a hike, futures leaned toward a December 9 hike before the selloff, and no Fed speakers were confirmed.",
+ "oil": "Brent rose 3.9% to about $98.29 Thursday, recovering part of Wednesday's near-9% drop, on uncertainty over the Iran war and when energy markets normalize.",
+ "geo": "The Iran war keeps driving oil and inflation worries, and Democratic midterm wins raised the risk of government pauses on AI data-center construction.",
  "events": [
   {
    "date": "2026-11-06",
    "time": "8:30 AM ET",
-   "name": "October jobs report (nonfarm payrolls)",
+   "name": "October jobs report (payrolls, unemployment)",
    "impact": "high"
   },
   {
@@ -25,11 +25,29 @@
    "time": "8:30 AM ET",
    "name": "PPI (October)",
    "impact": "medium"
+  },
+  {
+   "date": "2026-11-17",
+   "time": "8:30 AM ET",
+   "name": "Retail sales (October)",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-17",
+   "time": "4:20 PM ET",
+   "name": "Nvidia earnings",
+   "impact": "high"
+  },
+  {
+   "date": "2026-11-18",
+   "time": "2:00 PM ET",
+   "name": "FOMC minutes (October meeting)",
+   "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.kitco.com/news/article/2026-11-04/gold-climbs-above-4000-wall-street-rallies-dems-take-congress-kitco-pm",
-  "https://financefeeds.com/gold-price-today-4135-thursday-before-6-november-jobs-report-dollar-near-one-month-low-bull-4225-bear-4000",
-  "https://fedratecalc.com/us-economic-calendar/november-2026/"
+  "https://www.wsaw.com/2026/11/05/brutal-sell-off-ai-stocks-sends-wall-street-reeling-sp-500-sees-worst-day-since-2025-liberation-day-tariffs/",
+  "https://www.regardsofwallstreet.com/news/stock-market-week-ahead-november-2-2026",
+  "https://www.simianx.ai/stories/us-economic-calendar-this-month-in-your-time-zone"
  ]
 }
