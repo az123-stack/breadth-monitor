@@ -1,14 +1,14 @@
 {
- "updated": "2026-11-05T16:56",
+ "updated": "2026-11-06T16:55",
  "stories": [
   {
    "id": "ai-spending-repriced",
    "title": "AI spending gets repriced",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-11-05",
+   "updated": "2026-11-06",
    "summary": "Investors now want proof that AI spending pays back in cash, so money is leaving AI hardware and, as of Oct 29, software too.",
-   "changed": "Nov 5: the seesaw broke. The losers fell hardest (SOX −12%) but the winners fell too (Building Products −3.6%); only 12 of 131 sub-themes rose. Forced selling, not rotation.",
+   "changed": "Nov 6: the seesaw swung to the losers. AI hardware bounced about a third of the crash while software (Atlassian −16%, Five9 −18%) kept falling on results; the bounce faded late. Forced selling paused; the story is not over.",
    "thesis": {
     "what": "Since early October the AI-hardware groups (chip equipment, optical, AI servers, custom chips, memory, neoclouds, data-center power) fell about 18% over 20 sessions while IT services, enterprise software and steady consumer names rose about 10%: a 28-point swing. On Oct 22 the S&P 500 fell 1.2% but the equal-weight S&P rose 0.7%: the money moved, it didn't leave.",
     "why": "Two worries feed each other. **Cost:** Meta announced non-voting shares to help fund its AI spending and fell 5%; Tesla cut capex; Lam Research guided below consensus ([Korea Times](https://www.koreatimes.co.kr/world/20261023/wall-street-sinks-as-nasdaq-falls-over-2-on-ai-cost-worries), [Investrade](https://investrade.com/market-review-october-22-2026/)). **Financing:** hot CPI pushed the 10-year to 5.26% and CoreWeave's credit spread past 1,000 bp, so borrowing to build data centers got expensive ([TradingKey](https://www.tradingkey.com/analysis/stocks/us-stocks/262218623-us-premarket-tsmc-record-profit-chip-stocks-fall-nvidia-micron-ppi-tradingkey)). Funding is the newest strain: Meta plans to raise up to $95B, starting with $35B in stock ([MarketScreener](https://www.marketscreener.com/news/wall-st-rises-as-anthropic-s-ipo-filing-sharpens-focus-on-ai-trade-ce785cdcdd8ff22d)), and Anthropic's filing adds a large new AI listing to the supply.",
@@ -163,6 +163,13 @@
      "url": "https://finance.yahoo.com/markets/live/stock-market-today-thursday-november-5-dow-sp-500-nasdaq-plunge-chip-stocks-melt-down-193726491.html",
      "source": "Yahoo Finance",
      "reaction": "IT Services +2.3% and Gaming +5.7% rose while almost everything else fell"
+    },
+    {
+     "date": "2026-11-06",
+     "event": "Chips win back about a third of Thursday's crash: the chip index bounced about 4% after its 12% plunge, Nvidia +2.8%, AMD +11%, Intel +7.7%; Jefferies called the selloff 'reactionary, not a fundamental reset'. Software kept falling on results: Atlassian −16.2%, Five9 −17.6%.",
+     "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-6-2026",
+     "source": "StockTitan",
+     "reaction": "Sold-hardest groups +6.8% vs held-up −0.6% (Google estimates); Custom Silicon +8.8%, Neoclouds +10.4%; Enterprise SaaS −3.4%"
     }
    ],
    "groups": {
@@ -203,13 +210,13 @@
    },
    "catalysts": [
     {
-     "date": "2026-11-06",
-     "time": "8:30 AM ET",
-     "name": "October jobs report",
-     "why": "Feeds the December Fed decision and long-duration growth stocks."
+     "date": "2026-12-09",
+     "time": "2:00 PM ET",
+     "name": "FOMC decision",
+     "why": "A December hike would hit long-duration growth; strong jobs on Nov 6 keep it in play."
     }
    ],
-   "trade": "- **Today's tape is forced selling:** no new longs into it; the long-group names (VEEV, APPN, TEAM, PAYC) are pullback candidates, not chases.\n- **Entries:** wait for the first calm day (share in falling stocks under 60%), then buy leaders on pullbacks to the 9/21 EMAs with the stop under the touch-day low.\n- **Counter-trade:** the comeback trigger is 40% or less in falling stocks; sold-hardest 60-day leaders (Enterprise AI Infrastructure, Cybersecurity Platforms, Data & Observability) have tended to snap back first.\n- **Into Friday's jobs report:** small size, no adds before 8:30 AM.\n- **Avoid:** catching chips and memory while the VIX is 28 and the Nasdaq is under its 200-day average.",
+   "trade": "- **Today's tape is forced selling:** no new longs into it; the long-group names (VEEV, APPN, TEAM, PAYC) are pullback candidates, not chases.\n- **Entries:** wait for the first calm day (share in falling stocks under 60%), then buy leaders on pullbacks to the 9/21 EMAs with the stop under the touch-day low.\n- **Counter-trade:** the comeback trigger is 40% or less in falling stocks; sold-hardest 60-day leaders (Enterprise AI Infrastructure, Cybersecurity Platforms, Data & Observability) have tended to snap back first.\n- **Into Friday's jobs report:** small size, no adds before 8:30 AM.\n- **Avoid:** catching chips and memory while the VIX is 28 and the Nasdaq is under its 200-day average.\n- **Nov 6 update:** the bounce is a snapback in what was sold, not proof of a bottom. Wait for a pullback that holds above the Nov 5 lows before touching AI hardware; software longs (TEAM −16% on results) need their own stop discipline.",
    "related": [
     "rates-near-5",
     "it-services-rerating",
@@ -446,6 +453,27 @@
       "Memory & Storage Media"
      ],
      "note": "Nov 5: the seesaw broke. The losers fell hardest (SOX −12%) but the winners fell too (Building Products −3.6%); only 12 of 131 sub-themes rose. Forced selling, not rotation."
+    },
+    {
+     "date": "2026-11-06",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "Enterprise SaaS",
+      "Business Services & Data",
+      "Household & Personal Care",
+      "Packaged Foods"
+     ],
+     "short": [
+      "Semicap Equipment",
+      "Optical Components & Transceivers",
+      "AI Servers & Integrators",
+      "Custom Silicon & Networking Chips",
+      "Neoclouds & GPU Hosting",
+      "Data Center Power & Cooling",
+      "Memory & Storage Media"
+     ],
+     "note": "Nov 6: the seesaw swung to the losers. AI hardware bounced about a third of the crash while software (Atlassian −16%, Five9 −18%) kept falling on results; the bounce faded late. Forced selling paused; the story is not over."
     }
    ]
   },
@@ -454,9 +482,9 @@
    "title": "Hot inflation keeps the 10-year near 5%",
    "status": "peaking",
    "started": "2026-10-14",
-   "updated": "2026-11-05",
+   "updated": "2026-11-06",
    "summary": "Hot CPI and PPI pushed the 10-year Treasury yield to 5.26%, hurting companies whose profits are years away; yields eased on Oct 22, but the Fed and PCE next week decide the next leg.",
-   "changed": "Nov 5: yields eased to 4.84% and December hike odds fell to 70.1% from 82.7% as stocks sold off; still above 4.8%.",
+   "changed": "Nov 6: a strong jobs report pushed the 10-year back to about 4.86% and kept a December hike above 65% odds; rate-sensitive groups lagged.",
    "thesis": {
     "what": "Since the Oct 14 CPI the groups that need cheap money or are years from profits (small nuclear reactors, quantum, homebuilders, REITs, residential solar) fell about 13% vs SPY over 20 sessions.",
     "why": "September CPI came in at 3.7% vs 3.6% and PPI was hot the next day, reviving rate-hike bets; the 10-year hit 5.26% ([24/7 Wall St.](https://247wallst.com/investing/2026/10/14/nuscale-power-falls-7-as-10-year-treasury-yield-climbs-to-5-26-energy-fuels-drops-9-oklo-slides-5/)). Oil above $100 feeds inflation worries too (see the Gulf oil story).",
@@ -534,6 +562,13 @@
      "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-5-2026",
      "source": "StockTitan",
      "reaction": "TLT +0.2%; Homebuilders −1.4%, Building Products −3.6%"
+    },
+    {
+     "date": "2026-11-06",
+     "event": "October payrolls +165K vs about 59K expected; unemployment 4.1% vs 4.2% expected. The 10-year yield rose to about 4.86% and traders priced above a 65% chance of a December hike.",
+     "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-6-2026",
+     "source": "StockTitan",
+     "reaction": "Homebuilders −2.5%, Insurance Brokers −2.6%; dollar (UUP) +0.7%, gold −0.8%; SPY +0.3%"
     }
    ],
    "groups": {
@@ -557,16 +592,10 @@
    },
    "catalysts": [
     {
-     "date": "2026-11-06",
-     "time": "8:30 AM ET",
-     "name": "October jobs report",
-     "why": "A hot print revives the December-hike debate and hits long-duration stocks."
-    },
-    {
      "date": "2026-12-09",
      "time": "2:00 PM ET",
      "name": "FOMC decision",
-     "why": "Futures priced about an 85% chance of a quarter-point hike on Oct 28."
+     "why": "Hike odds were above 65% after the strong October jobs report."
     }
    ],
    "trade": "- **Don't fight it with longs** in SMR, quantum or long-duration names while the 10-year is near 5%.\n- **Rate-relief bounce:** homebuilders and utilities lead when yields fall (Oct 22); trade it only after the Fed/PCE if yields break lower.\n- **Into Oct 28–29:** binary for these groups; stay small or flat.",
@@ -717,332 +746,19 @@
       "Residential Solar & Yieldcos"
      ],
      "note": "Nov 5: yields eased to 4.84% and December hike odds fell to 70.1% from 82.7% as stocks sold off; still above 4.8%."
-    }
-   ]
-  },
-  {
-   "id": "gulf-oil-shock",
-   "title": "Gulf attacks keep oil above $100",
-   "status": "fading",
-   "started": "2026-10-09",
-   "updated": "2026-11-05",
-   "summary": "Houthi attacks on Saudi sites and Hormuz shipping pushed Brent from about $98 to over $110 in two weeks; refiners and drillers lead, airlines lose.",
-   "changed": "Nov 5: oil bounced (USO +1.9%) but oil stocks still fell with the market; price still disagrees with the story.",
-   "thesis": {
-    "what": "Energy groups (refiners, shale, integrated oil, tankers, drillers) are up about 8% over 20 sessions while airlines fell 10%: an 18-point swing, though the last 5 days stalled.",
-    "why": "Houthi attacks on Saudi sites (Oct 9, Oct 12, Oct 22) and reported attacks on ships in the Strait of Hormuz (Oct 14) put supply at risk; Brent went from $97.92 to $111.88 ([Nation Thailand](https://www.nationthailand.com/news/40070809), [Euronews](https://www.euronews.com/2026/10/14/oil-prices-rise-after-reported-attacks-on-ships-in-strait-of-hormuz), [Investrade](https://investrade.com/morning-preview-october-22-2026/)).",
-    "how": "A supply scare lifts crude, and when fuel prices rise faster than crude (crack spread up) refiners earn the most; when crude outruns fuel, producers win. Airlines pay for the fuel. Higher oil also feeds inflation, which ties this story to rates.",
-    "real": "Wobbling: the 20-day call is right but the last 5 days went against it (refiners down on Valero's earnings day despite the crack +4%). That's crowding in a group that roughly doubled since June. Oct 23: oil jumped again and Integrated Oil rose, while refiners dipped, so crude is leading and the refining margin is not.",
-    "confirm": "Confirm: more attacks or supply losses keep Brent over $110 and refiners hold their gains through earnings. Break: a ceasefire or diplomatic progress drops Brent back under $100, or refiners keep falling while the crack rises (distribution). Oct 27: talks are the risk; a deal would take oil lower, new attacks would reverse today's drop."
-   },
-   "timeline": [
-    {
-     "date": "2026-10-09",
-     "event": "Oil hits a six-week high after Houthi attacks on Saudi sites (Brent $97.92)",
-     "url": "https://www.nationthailand.com/news/40070809",
-     "source": "Nation Thailand",
-     "reaction": ""
     },
-    {
-     "date": "2026-10-12",
-     "event": "Brent +1.8% after more attacks on Saudi Arabia",
-     "url": "https://www.nationthailand.com/news/world/40072180",
-     "source": "Nation Thailand",
-     "reaction": ""
-    },
-    {
-     "date": "2026-10-14",
-     "event": "Reported attacks on ships in the Strait of Hormuz lift crude",
-     "url": "https://www.euronews.com/2026/10/14/oil-prices-rise-after-reported-attacks-on-ships-in-strait-of-hormuz",
-     "source": "Euronews",
-     "reaction": "Integrated oil ignites"
-    },
-    {
-     "date": "2026-10-16",
-     "event": "Brent near $110; energy the best S&P sector",
-     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-16-2026",
-     "source": "TheStreet",
-     "reaction": "Energy +2.5%, USO +2.8%"
-    },
-    {
-     "date": "2026-10-22",
-     "event": "Houthi attacks in Saudi Arabia and a report of US-Israel plans against Iran push Brent to $111.88",
-     "url": "https://investrade.com/morning-preview-october-22-2026/",
-     "source": "Investrade",
-     "reaction": "WTI +2.8%, 3-2-1 crack +4%; refiners −1 to −2% on Valero's earnings day"
-    },
-    {
-     "date": "2026-10-23",
-     "event": "Brent rises to about $116.7 and WTI to $103.3 on Iran tension and another tanker strike near Hormuz; energy closes at a record",
-     "url": "https://investrade.com/market-review-october-23-2026/",
-     "source": "Investrade",
-     "reaction": "USO +4.3%, Integrated & Large-cap Oil +2.8%, Refiners −1.5%"
-    },
-    {
-     "date": "2026-10-26",
-     "event": "Crude eases from near six-month highs after Qatari mediators travel to Tehran; Brent about $110–112, WTI about $101",
-     "url": "https://www.marketscreener.com/news/wall-st-rises-as-anthropic-s-ipo-filing-sharpens-focus-on-ai-trade-ce785cdcdd8ff22d",
-     "source": "MarketScreener",
-     "reaction": "USO −1.95%, Refiners +4.6% and Shale E&P +3.8% (Google estimates / last official session)"
-    },
-    {
-     "date": "2026-10-27",
-     "event": "Crude slips on tentative U.S.–Iran diplomacy, though supply risks remain after a claimed Houthi attack on a Saudi refinery; Valero falls about 7.8% midday.",
-     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-27-2026",
-     "source": "TheStreet",
-     "reaction": "Refiners −8.2%, Integrated Oil −2.8%, USO −1.4%"
-    },
-    {
-     "date": "2026-10-28",
-     "event": "Crude rises about 1.8% to roughly $101.67 after an attack on a Saudi refinery.",
-     "url": "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-october-28-dow-sp-500-nasdaq-fed-meeting-decision-big-tech-earnings-130508769.html",
-     "source": "Yahoo Finance",
-     "reaction": "USO +1.64%; Natural Gas Producers −1.3%"
-    },
-    {
-     "date": "2026-10-29",
-     "event": "Crude holds near $102.80 (Dec contract), up slightly on the day.",
-     "url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-29-134623155.html",
-     "source": "Yahoo Finance",
-     "reaction": "USO +0.97%; Natural Gas Producers −2.3%, Refiners −0.3%"
-    },
-    {
-     "date": "2026-10-30",
-     "event": "Exxon and Chevron report: Exxon refining is its top earner for the first time in at least five years, Chevron profit $9.9B on refining. WTI +2.3%; both stocks touch record highs.",
-     "url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-october-30-dow-sp-500-nasdaq-amazon-intel-131609630.html",
-     "source": "Yahoo Finance",
-     "reaction": "Refiners +3.2%, Integrated & Large-cap Oil +2.0% on a day SPY fell 1.77%"
-    },
-    {
-     "date": "2026-11-02",
-     "event": "Brent falls 7.6% to $104.77 on hopes of renewed US-Iran peace talks, after reports that Iran's supreme leader gave the government some authority to negotiate; Exxon -4.0%, Occidental -5.1%, United +4.8%.",
-     "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-2-2026",
-     "source": "StockTitan",
-     "reaction": "USO -7.1%; Integrated Oil -4.3%, Refiners -4.1%, LNG & Midstream -4.7% (Google close)"
-    },
-    {
-     "date": "2026-11-03",
-     "event": "Oil rose early on a reported U.S. strike on Qeshm Island, then turned lower on deal rumors; Brent near $101.50 mid-morning, oil ended slightly lower.",
-     "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-3-2026",
-     "source": "StockTitan",
-     "reaction": "Shale E&P −1.8%, Refiners −0.8%, Integrated Oil −0.7%, Tankers +0.8%"
-    },
-    {
-     "date": "2026-11-04",
-     "event": "WTI falls more than 7.7% to under $90 and Brent about 8% to near $95 as traders bet on an end to the Iran war",
-     "url": "https://finance.yahoo.com/markets/live/stock-market-today-dow-rallies-1500-points-sp-500-nasdaq-midterm-elections-democrats-sweep-201207340.html",
-     "source": "Yahoo Finance",
-     "reaction": "USO −8.1%, Refiners −6.9%, Shale −7.3%, Tankers −5.4% (Google estimates)"
-    },
-    {
-     "date": "2026-11-05",
-     "event": "Crude rose on uncertainty over a US-Iran deal (WTI about $90, Brent about $98); Vance's remark that the war cost Republicans the midterms fed hopes for a resolution.",
-     "url": "https://finance.yahoo.com/markets/live/stock-market-today-thursday-november-5-dow-sp-500-nasdaq-plunge-chip-stocks-melt-down-193726491.html",
-     "source": "Yahoo Finance",
-     "reaction": "USO +1.9%; Shale E&P −3.4%, Refiners −4.3%, Integrated Oil −2.4% in the broad selloff"
-    }
-   ],
-   "groups": {
-    "long": [
-     "Refiners",
-     "Shale E&P",
-     "Integrated & Large-cap Oil",
-     "Tankers & Shipping",
-     "Oil Services & Drillers"
-    ],
-    "short": [
-     "Airlines"
-    ]
-   },
-   "tickers": {
-    "long": [
-     "PBF",
-     "VLO",
-     "PSX",
-     "DINO",
-     "CVI",
-     "MPC"
-    ],
-    "short": [],
-    "watch": []
-   },
-   "catalysts": [
     {
      "date": "2026-11-06",
-     "time": "8:30 AM ET",
-     "name": "October jobs report",
-     "why": "Macro swing day; oil rebounding on failed talks would revive the story."
-    }
-   ],
-   "trade": "- **Expression:** refiners on the dashboard's setups (PBF and PARR Leader Pullbacks, CVI Q-Flag, VLO VCP, DINO ATH Magnet, PSX Round Number Magnet).\n- **Read the crack daily** (Intraday oil card): oil up + crack up = refiners; oil up + crack down = shale.\n- **Warning sign:** refiners red while the crack is up (Oct 22) = distribution; don't add until the group stops falling.\n- **Stop:** setup stops (entry-day low / 1 ADR); this group can drop hard on any ceasefire headline.\n- Nov 2: a 7% oil drop on a talks headline. Take partials in oil/refiner longs that are extended; wait for talks to fail or oil to base before adding. Airlines (United +4.8%) are the beneficiaries if talks hold.",
-   "related": [
-    "rates-near-5"
-   ],
-   "history": [
-    {
-     "date": "2026-10-22",
-     "status": "building",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
-     "short": [
-      "Airlines"
-     ],
-     "note": "Brent reached about $112–113 on Oct 22 after new Houthi attacks in Saudi Arabia; the crack spread rose ~4%, but refiners slipped on Valero's earnings day."
-    },
-    {
-     "date": "2026-10-23",
-     "status": "building",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
-     "short": [
-      "Airlines"
-     ],
-     "note": "Brent hit about $116.7, the highest since late April; energy closed at a record, but refiners slipped 1.5%."
-    },
-    {
-     "date": "2026-10-26",
-     "status": "building",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
-     "short": [
-      "Airlines"
-     ],
-     "note": "Oil slipped about 2% as Qatari mediators went to Tehran, but Brent is still about $110; refiners and drillers held up."
-    },
-    {
-     "date": "2026-10-27",
      "status": "peaking",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
+     "long": [],
      "short": [
-      "Airlines"
+      "Nuclear Reactors (SMR)",
+      "Quantum Computing",
+      "Homebuilders",
+      "REITs",
+      "Residential Solar & Yieldcos"
      ],
-     "note": "Oil eased on tentative U.S.–Iran diplomacy (WTI about $100) and refiners fell about 8% (Valero −7.8% midday): price agrees on 20 days, but today is the first sharp crack in the leaders."
-    },
-    {
-     "date": "2026-10-28",
-     "status": "peaking",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
-     "short": [
-      "Airlines"
-     ],
-     "note": "Oil bounced about 1.8% on a Saudi refinery attack after yesterday's dip."
-    },
-    {
-     "date": "2026-10-29",
-     "status": "peaking",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
-     "short": [
-      "Airlines"
-     ],
-     "note": "Oil steady near $103; refiners and gas producers slipped."
-    },
-    {
-     "date": "2026-10-30",
-     "status": "peaking",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
-     "short": [
-      "Airlines"
-     ],
-     "note": "Oct 30: refiners and big oil rose on record refining profits while the market fell, so price agrees with the story again."
-    },
-    {
-     "date": "2026-11-02",
-     "status": "peaking",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
-     "short": [
-      "Airlines"
-     ],
-     "note": "Nov 2: Iran-talk hopes sent Brent down 7.6% and the oil groups with it; price disagreed with the story for the first day. Watch for a second day before calling it fading."
-    },
-    {
-     "date": "2026-11-03",
-     "status": "fading",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
-     "short": [
-      "Airlines"
-     ],
-     "note": "Nov 3: second day of oil groups slipping as Iran diplomacy hopes outweighed a reported strike; price still disagrees with the story (5 days −17.0%). A third lower day would confirm it is fading."
-    },
-    {
-     "date": "2026-11-04",
-     "status": "fading",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
-     "short": [
-      "Airlines"
-     ],
-     "note": "Nov 4: oil collapsed about 8% on bets the Iran war is ending; energy groups fell 5–7%. The story's key catalyst has turned against it. Fading; resolve if Brent stays under $100."
-    },
-    {
-     "date": "2026-11-05",
-     "status": "fading",
-     "long": [
-      "Refiners",
-      "Shale E&P",
-      "Integrated & Large-cap Oil",
-      "Tankers & Shipping",
-      "Oil Services & Drillers"
-     ],
-     "short": [
-      "Airlines"
-     ],
-     "note": "Nov 5: oil bounced (USO +1.9%) but oil stocks still fell with the market; price still disagrees with the story."
+     "note": "Nov 6: a strong jobs report pushed the 10-year back to about 4.86% and kept a December hike above 65% odds; rate-sensitive groups lagged."
     }
    ]
   },
@@ -1051,7 +767,7 @@
    "title": "IT services: from AI loser to AI implementer",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-11-05",
+   "updated": "2026-11-06",
    "summary": "After being sold as AI losers, IT services and consulting are being re-rated as the firms that will implement AI, and they're absorbing money leaving AI hardware.",
    "changed": "Nov 5: IT Services rose 2.3% on a −4.4% S&P day; relative strength intact.",
    "thesis": {
@@ -1250,6 +966,16 @@
      ],
      "short": [],
      "note": "Nov 5: IT Services rose 2.3% on a −4.4% S&P day; relative strength intact."
+    },
+    {
+     "date": "2026-11-06",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "India IT Services"
+     ],
+     "short": [],
+     "note": "Nov 5: IT Services rose 2.3% on a −4.4% S&P day; relative strength intact."
     }
    ]
   },
@@ -1258,7 +984,7 @@
    "title": "Managed care repairs on better Medicare ratings",
    "status": "building",
    "started": "2026-10-09",
-   "updated": "2026-11-05",
+   "updated": "2026-11-06",
    "summary": "Better Medicare star ratings and UnitedHealth's beat-and-raise are pulling managed care out of its slump.",
    "changed": "Nov 4: policy tailwind from the midterms (ACA subsidies, Medicaid) drove CNC and OSCR higher; CVS fell on its split plan, a company-specific drag.",
    "thesis": {
@@ -1409,6 +1135,15 @@
      ],
      "short": [],
      "note": "Nov 4: policy tailwind from the midterms (ACA subsidies, Medicaid) drove CNC and OSCR higher; CVS fell on its split plan, a company-specific drag."
+    },
+    {
+     "date": "2026-11-06",
+     "status": "building",
+     "long": [
+      "Managed Care"
+     ],
+     "short": [],
+     "note": "Nov 4: policy tailwind from the midterms (ACA subsidies, Medicaid) drove CNC and OSCR higher; CVS fell on its split plan, a company-specific drag."
     }
    ]
   },
@@ -1417,7 +1152,7 @@
    "title": "SpaceX eyes cell sites; towers up, carriers down",
    "status": "building",
    "started": "2026-10-23",
-   "updated": "2026-11-05",
+   "updated": "2026-11-06",
    "summary": "Reports that SpaceX wants about 80,000 US cell sites for a wireless network lift tower landlords and hit AT&T and T-Mobile.",
    "changed": "",
    "thesis": {
@@ -1590,8 +1325,362 @@
       "Wireless Carriers"
      ],
      "note": ""
+    },
+    {
+     "date": "2026-11-06",
+     "status": "building",
+     "long": [
+      "Tower REITs",
+      "Launch & Space Systems"
+     ],
+     "short": [
+      "Wireless Carriers"
+     ],
+     "note": ""
     }
    ]
+  },
+  {
+   "id": "gulf-oil-shock",
+   "title": "Gulf attacks keep oil above $100",
+   "status": "resolved",
+   "started": "2026-10-09",
+   "updated": "2026-11-06",
+   "summary": "Houthi attacks on Saudi sites and Hormuz shipping pushed Brent from about $98 to over $110 in two weeks; refiners and drillers lead, airlines lose.",
+   "changed": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it.",
+   "thesis": {
+    "what": "Energy groups (refiners, shale, integrated oil, tankers, drillers) are up about 8% over 20 sessions while airlines fell 10%: an 18-point swing, though the last 5 days stalled.",
+    "why": "Houthi attacks on Saudi sites (Oct 9, Oct 12, Oct 22) and reported attacks on ships in the Strait of Hormuz (Oct 14) put supply at risk; Brent went from $97.92 to $111.88 ([Nation Thailand](https://www.nationthailand.com/news/40070809), [Euronews](https://www.euronews.com/2026/10/14/oil-prices-rise-after-reported-attacks-on-ships-in-strait-of-hormuz), [Investrade](https://investrade.com/morning-preview-october-22-2026/)).",
+    "how": "A supply scare lifts crude, and when fuel prices rise faster than crude (crack spread up) refiners earn the most; when crude outruns fuel, producers win. Airlines pay for the fuel. Higher oil also feeds inflation, which ties this story to rates.",
+    "real": "Wobbling: the 20-day call is right but the last 5 days went against it (refiners down on Valero's earnings day despite the crack +4%). That's crowding in a group that roughly doubled since June. Oct 23: oil jumped again and Integrated Oil rose, while refiners dipped, so crude is leading and the refining margin is not.",
+    "confirm": "Confirm: more attacks or supply losses keep Brent over $110 and refiners hold their gains through earnings. Break: a ceasefire or diplomatic progress drops Brent back under $100, or refiners keep falling while the crack rises (distribution). Oct 27: talks are the risk; a deal would take oil lower, new attacks would reverse today's drop."
+   },
+   "timeline": [
+    {
+     "date": "2026-10-09",
+     "event": "Oil hits a six-week high after Houthi attacks on Saudi sites (Brent $97.92)",
+     "url": "https://www.nationthailand.com/news/40070809",
+     "source": "Nation Thailand",
+     "reaction": ""
+    },
+    {
+     "date": "2026-10-12",
+     "event": "Brent +1.8% after more attacks on Saudi Arabia",
+     "url": "https://www.nationthailand.com/news/world/40072180",
+     "source": "Nation Thailand",
+     "reaction": ""
+    },
+    {
+     "date": "2026-10-14",
+     "event": "Reported attacks on ships in the Strait of Hormuz lift crude",
+     "url": "https://www.euronews.com/2026/10/14/oil-prices-rise-after-reported-attacks-on-ships-in-strait-of-hormuz",
+     "source": "Euronews",
+     "reaction": "Integrated oil ignites"
+    },
+    {
+     "date": "2026-10-16",
+     "event": "Brent near $110; energy the best S&P sector",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-16-2026",
+     "source": "TheStreet",
+     "reaction": "Energy +2.5%, USO +2.8%"
+    },
+    {
+     "date": "2026-10-22",
+     "event": "Houthi attacks in Saudi Arabia and a report of US-Israel plans against Iran push Brent to $111.88",
+     "url": "https://investrade.com/morning-preview-october-22-2026/",
+     "source": "Investrade",
+     "reaction": "WTI +2.8%, 3-2-1 crack +4%; refiners −1 to −2% on Valero's earnings day"
+    },
+    {
+     "date": "2026-10-23",
+     "event": "Brent rises to about $116.7 and WTI to $103.3 on Iran tension and another tanker strike near Hormuz; energy closes at a record",
+     "url": "https://investrade.com/market-review-october-23-2026/",
+     "source": "Investrade",
+     "reaction": "USO +4.3%, Integrated & Large-cap Oil +2.8%, Refiners −1.5%"
+    },
+    {
+     "date": "2026-10-26",
+     "event": "Crude eases from near six-month highs after Qatari mediators travel to Tehran; Brent about $110–112, WTI about $101",
+     "url": "https://www.marketscreener.com/news/wall-st-rises-as-anthropic-s-ipo-filing-sharpens-focus-on-ai-trade-ce785cdcdd8ff22d",
+     "source": "MarketScreener",
+     "reaction": "USO −1.95%, Refiners +4.6% and Shale E&P +3.8% (Google estimates / last official session)"
+    },
+    {
+     "date": "2026-10-27",
+     "event": "Crude slips on tentative U.S.–Iran diplomacy, though supply risks remain after a claimed Houthi attack on a Saudi refinery; Valero falls about 7.8% midday.",
+     "url": "https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-27-2026",
+     "source": "TheStreet",
+     "reaction": "Refiners −8.2%, Integrated Oil −2.8%, USO −1.4%"
+    },
+    {
+     "date": "2026-10-28",
+     "event": "Crude rises about 1.8% to roughly $101.67 after an attack on a Saudi refinery.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-october-28-dow-sp-500-nasdaq-fed-meeting-decision-big-tech-earnings-130508769.html",
+     "source": "Yahoo Finance",
+     "reaction": "USO +1.64%; Natural Gas Producers −1.3%"
+    },
+    {
+     "date": "2026-10-29",
+     "event": "Crude holds near $102.80 (Dec contract), up slightly on the day.",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-29-134623155.html",
+     "source": "Yahoo Finance",
+     "reaction": "USO +0.97%; Natural Gas Producers −2.3%, Refiners −0.3%"
+    },
+    {
+     "date": "2026-10-30",
+     "event": "Exxon and Chevron report: Exxon refining is its top earner for the first time in at least five years, Chevron profit $9.9B on refining. WTI +2.3%; both stocks touch record highs.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-october-30-dow-sp-500-nasdaq-amazon-intel-131609630.html",
+     "source": "Yahoo Finance",
+     "reaction": "Refiners +3.2%, Integrated & Large-cap Oil +2.0% on a day SPY fell 1.77%"
+    },
+    {
+     "date": "2026-11-02",
+     "event": "Brent falls 7.6% to $104.77 on hopes of renewed US-Iran peace talks, after reports that Iran's supreme leader gave the government some authority to negotiate; Exxon -4.0%, Occidental -5.1%, United +4.8%.",
+     "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-2-2026",
+     "source": "StockTitan",
+     "reaction": "USO -7.1%; Integrated Oil -4.3%, Refiners -4.1%, LNG & Midstream -4.7% (Google close)"
+    },
+    {
+     "date": "2026-11-03",
+     "event": "Oil rose early on a reported U.S. strike on Qeshm Island, then turned lower on deal rumors; Brent near $101.50 mid-morning, oil ended slightly lower.",
+     "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-3-2026",
+     "source": "StockTitan",
+     "reaction": "Shale E&P −1.8%, Refiners −0.8%, Integrated Oil −0.7%, Tankers +0.8%"
+    },
+    {
+     "date": "2026-11-04",
+     "event": "WTI falls more than 7.7% to under $90 and Brent about 8% to near $95 as traders bet on an end to the Iran war",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-dow-rallies-1500-points-sp-500-nasdaq-midterm-elections-democrats-sweep-201207340.html",
+     "source": "Yahoo Finance",
+     "reaction": "USO −8.1%, Refiners −6.9%, Shale −7.3%, Tankers −5.4% (Google estimates)"
+    },
+    {
+     "date": "2026-11-05",
+     "event": "Crude rose on uncertainty over a US-Iran deal (WTI about $90, Brent about $98); Vance's remark that the war cost Republicans the midterms fed hopes for a resolution.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-thursday-november-5-dow-sp-500-nasdaq-plunge-chip-stocks-melt-down-193726491.html",
+     "source": "Yahoo Finance",
+     "reaction": "USO +1.9%; Shale E&P −3.4%, Refiners −4.3%, Integrated Oil −2.4% in the broad selloff"
+    },
+    {
+     "date": "2026-11-06",
+     "event": "Brent fell below $100 a barrel and WTI held near $90.5, with the 10-year near 4.86%; energy fell about 11% on the week while the group stayed far from the earlier $110 Brent peak.",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-friday-november-6-dow-sp-500-nasdaq-jobs-report-earnings-135953863.html",
+     "source": "Yahoo Finance",
+     "reaction": "Refiners −1.9%, Shale E&P +0.6%, Integrated Oil −0.2% (Google estimates)"
+    }
+   ],
+   "groups": {
+    "long": [
+     "Refiners",
+     "Shale E&P",
+     "Integrated & Large-cap Oil",
+     "Tankers & Shipping",
+     "Oil Services & Drillers"
+    ],
+    "short": [
+     "Airlines"
+    ]
+   },
+   "tickers": {
+    "long": [
+     "PBF",
+     "VLO",
+     "PSX",
+     "DINO",
+     "CVI",
+     "MPC"
+    ],
+    "short": [],
+    "watch": []
+   },
+   "catalysts": [],
+   "trade": "- **Expression:** refiners on the dashboard's setups (PBF and PARR Leader Pullbacks, CVI Q-Flag, VLO VCP, DINO ATH Magnet, PSX Round Number Magnet).\n- **Read the crack daily** (Intraday oil card): oil up + crack up = refiners; oil up + crack down = shale.\n- **Warning sign:** refiners red while the crack is up (Oct 22) = distribution; don't add until the group stops falling.\n- **Stop:** setup stops (entry-day low / 1 ADR); this group can drop hard on any ceasefire headline.\n- Nov 2: a 7% oil drop on a talks headline. Take partials in oil/refiner longs that are extended; wait for talks to fail or oil to base before adding. Airlines (United +4.8%) are the beneficiaries if talks hold.",
+   "related": [
+    "rates-near-5"
+   ],
+   "history": [
+    {
+     "date": "2026-10-22",
+     "status": "building",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Brent reached about $112–113 on Oct 22 after new Houthi attacks in Saudi Arabia; the crack spread rose ~4%, but refiners slipped on Valero's earnings day."
+    },
+    {
+     "date": "2026-10-23",
+     "status": "building",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Brent hit about $116.7, the highest since late April; energy closed at a record, but refiners slipped 1.5%."
+    },
+    {
+     "date": "2026-10-26",
+     "status": "building",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Oil slipped about 2% as Qatari mediators went to Tehran, but Brent is still about $110; refiners and drillers held up."
+    },
+    {
+     "date": "2026-10-27",
+     "status": "peaking",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Oil eased on tentative U.S.–Iran diplomacy (WTI about $100) and refiners fell about 8% (Valero −7.8% midday): price agrees on 20 days, but today is the first sharp crack in the leaders."
+    },
+    {
+     "date": "2026-10-28",
+     "status": "peaking",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Oil bounced about 1.8% on a Saudi refinery attack after yesterday's dip."
+    },
+    {
+     "date": "2026-10-29",
+     "status": "peaking",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Oil steady near $103; refiners and gas producers slipped."
+    },
+    {
+     "date": "2026-10-30",
+     "status": "peaking",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Oct 30: refiners and big oil rose on record refining profits while the market fell, so price agrees with the story again."
+    },
+    {
+     "date": "2026-11-02",
+     "status": "peaking",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Nov 2: Iran-talk hopes sent Brent down 7.6% and the oil groups with it; price disagreed with the story for the first day. Watch for a second day before calling it fading."
+    },
+    {
+     "date": "2026-11-03",
+     "status": "fading",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Nov 3: second day of oil groups slipping as Iran diplomacy hopes outweighed a reported strike; price still disagrees with the story (5 days −17.0%). A third lower day would confirm it is fading."
+    },
+    {
+     "date": "2026-11-04",
+     "status": "fading",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Nov 4: oil collapsed about 8% on bets the Iran war is ending; energy groups fell 5–7%. The story's key catalyst has turned against it. Fading; resolve if Brent stays under $100."
+    },
+    {
+     "date": "2026-11-05",
+     "status": "fading",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Nov 5: oil bounced (USO +1.9%) but oil stocks still fell with the market; price still disagrees with the story."
+    },
+    {
+     "date": "2026-11-06",
+     "status": "resolved",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it."
+    }
+   ],
+   "resolved": "2026-11-06"
   }
  ]
 }
