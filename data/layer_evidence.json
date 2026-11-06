@@ -74,16 +74,16 @@
   }
  },
  "log": {
-  "asof": "2026-11-05",
-  "closed": 201,
-  "dates": 9,
+  "asof": "2026-11-06",
+  "closed": 225,
+  "dates": 10,
   "catalyst_positive": {
    "n_good": 27,
-   "n_bad": 35,
+   "n_bad": 36,
    "avg_good": 0.00092,
-   "avg_bad": -0.01742,
+   "avg_bad": -0.02058,
    "dates": 6,
-   "diff": 0.01834,
+   "diff": 0.0215,
    "t": 0.31,
    "halves": [
     0.02994,
@@ -92,12 +92,12 @@
    "passed": false
   },
   "red_flags": {
-   "n_good": 48,
+   "n_good": 49,
    "n_bad": 30,
-   "avg_good": -0.02122,
+   "avg_good": -0.02346,
    "avg_bad": 0.01045,
    "dates": 6,
-   "diff": -0.03167,
+   "diff": -0.03391,
    "t": -0.93,
    "halves": [
     0.00366,
@@ -120,12 +120,12 @@
    "passed": false
   },
   "macro_tailwind": {
-   "n_good": 74,
+   "n_good": 77,
    "n_bad": 13,
-   "avg_good": -0.02659,
+   "avg_good": -0.02376,
    "avg_bad": -0.06613,
    "dates": 3,
-   "diff": 0.03954,
+   "diff": 0.04237,
    "t": -0.08,
    "halves": [
     -0.05036,
@@ -135,11 +135,11 @@
   },
   "more_support": {
    "n_good": 7,
-   "n_bad": 112,
+   "n_bad": 125,
    "avg_good": -0.0408,
-   "avg_bad": 0.01572,
+   "avg_bad": 0.01254,
    "dates": 4,
-   "diff": -0.05652,
+   "diff": -0.05334,
    "t": -1.07,
    "halves": [
     -0.05122,
@@ -160,10 +160,10 @@
   },
   "brief_low_risk": {
    "n_good": 0,
-   "n_bad": 110,
-   "dates": 5,
+   "n_bad": 134,
+   "dates": 6,
    "avg_good": null,
-   "avg_bad": -0.02178,
+   "avg_bad": -0.02366,
    "test": "welch over dates",
    "diff": null,
    "t": null,
