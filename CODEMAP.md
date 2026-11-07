@@ -712,6 +712,15 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   side is now ONE list = top 20 by dollars ∪ top 20 by share (~35–40 rows); Rank by only sets the order (chip click clears AUTOSORT for the
   card); rows need 20+ sessions of history before the window (new listing AIOK showed 7,141× normal volume); table scrolls with a sticky header.
   Stocks → **Leadership** sub-tab (Oct 31, Adam; `sleaders`, `renderLeadership`) = v1 Market health card (`healthCard`, `DATA.themes.leadership`).
+- **Tab speed (Nov 7, 2026; Adam: "v3 is pretty slow, a couple seconds per tab click")** (template.html, v1 + v3): each tab renders into
+  its own `.pane` inside `.panel`; leaving a tab only hides it (`.panel > .pane:not(.on) { content-visibility: hidden }`, which keeps the
+  browser's layout), so returning is a style flip. `PANES[tab] = {el, ver}` is reused only while `ver === VIEW_VER`; `bumpView()` (every
+  `rerenderPanel`, and when LIVE / PM / anchors / macro brief / story / stories / futures / positions data arrives) drops all hidden panes.
+  `warmTabs()` (v3 only) pre-renders the current section's other sub-tabs + each section's remembered sub-tab in idle time, laid out off
+  screen at full width (`.pane.warming`), skipping tabs that fetch side files when drawn (`WARM_SKIP`: premarket, intraday, readout).
+  In-pane lookups use `PQ(sel)` / `panel.querySelector`, never the whole document (hidden panes hold duplicates). In Play draws the top
+  120 rows (`IP_PAGE`) until "Show all". Measured headless (4× CPU throttle ≈ a laptop): In Play 2.1 s → 0.05 s, Themes 0.8 s → 0.02–0.2 s,
+  most tabs 10–50 ms unthrottled. Scripts: rebuild the page from docs/data.json + Playwright timing (see the Nov 7 chat).
 - **v3 Nov 4, 2026** (Adam): **Market parent** = Breadth / Pre-market / Intraday (v1 renderers). v3 lives in docs/v3/, so v3site rewrites the
   side-file fetches (`REL_FILES`: premarket / futures / story / stories / anchors / agent macro brief) to `../` (each must match once). v3
   opens on the last tab used (localStorage v3tab; first visit Themes). **Oracle gets pre-market + intraday** (`orSession`): live Google rows

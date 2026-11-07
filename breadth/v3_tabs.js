@@ -115,7 +115,7 @@ function renderStrongest(app) {
   f.append(chips("Show", [["all", "All"], ["rs95", `RS 95+ <small>${cnt("rs95")}</small>`], ["unseen", `On no list <small>${cnt("unseen")}</small>`], ["new", `New this week <small>${cnt("new")}</small>`]], U, "show", save));
   f.append(chips("Near the high", [["any", "Any"], ["h5", "Within 5%"], ["h10", "Within 10%"], ["h15", "Within 15%"]], U, "hi", save));
   const qi = $(`<input type="search" class="orq" placeholder="Find a ticker, company or sub-theme" aria-label="Find">`); qi.value = U.q || ""; let qt = null;
-  qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; rerenderPanel(); const n = document.querySelector(".sgcard .orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
+  qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; rerenderPanel(); const n = PQ(".sgcard .orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
   f.append(qi);
   card.querySelector(".sgtv").addEventListener("click", () => tsDownload("strongest-stocks", [{ name: "Strongest stocks", ticks: rows.map(r => r.t) }]));
   app.append(card);
@@ -233,7 +233,7 @@ function renderRsRanks(app) {
   f.append(chips("Rank by", P.map(k => [k, esc(lab(k))]), U, "by", save));
   f.append(chips("Size", [["3", "3+ stocks"], ["4", "4+ stocks"], ["6", "6+ stocks"]], U, "min", save));
   const qi = $(`<input type="search" class="orq" placeholder="Find a group or ticker" aria-label="Find">`); qi.value = U.q || ""; let qt = null;
-  qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; rerenderPanel(); const n = document.querySelector(".rrcard .orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
+  qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; rerenderPanel(); const n = PQ(".rrcard .orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
   f.append(qi);
   card.querySelectorAll(".rrh").forEach(th => th.addEventListener("click", (e) => { e.stopPropagation(); U.by = th.dataset.k; save(); }));
   card.querySelector("table").dataset.ownSort = "1";
@@ -271,13 +271,14 @@ function renderInPlayBody(app, S) {
     return { chg: L.chg, gap, rv, mvA, hot };
   };
   const byT = new Map(X.rows.map(r => [r.t, r]));
+  const stockBy = new Map((DATA.themes.stocks || []).map(x => [x.t, x]));
   const live = [];
   if (S) Object.keys(X.pool).forEach(t => {
     const d = todayOf(t); if (!d || !d.hot) return;
     const why = { k: "today", ago: -1, txt: `${pct(d.chg, 1)}${d.gap != null && S === "live" ? ` (gap ${pct(d.gap, 1)})` : ""}${d.mvA != null ? ` = ${d.mvA.toFixed(1)} ADRs` : ""}${d.rv ? ` on ${d.rv.toFixed(1)}x paced vol` : ""}` };
     const r0 = byT.get(t);
     if (r0) live.push({ ...r0, why: [why, ...r0.why], kinds: ["today", ...r0.kinds], ago: -1, _t: d });
-    else { const s = (DATA.themes.stocks || []).find(x => x.t === t) || {}; live.push({ t, name: s.name || "", sub: s.sub || X.pool[t][2], rs: s.rsr != null ? Math.round(s.rsr) : null, adr: X.pool[t][0] * 100, why: [why], kinds: ["today"], ago: -1, score: 0, on: [], _t: d, dir: d.chg > 0 ? "up" : "down" }); }
+    else { const s = stockBy.get(t) || {}; live.push({ t, name: s.name || "", sub: s.sub || X.pool[t][2], rs: s.rsr != null ? Math.round(s.rsr) : null, adr: X.pool[t][0] * 100, why: [why], kinds: ["today"], ago: -1, score: 0, on: [], _t: d, dir: d.chg > 0 ? "up" : "down" }); }
   });
   const liveSet = new Set(live.map(r => r.t));
   let rows = [...live.sort((a, b) => Math.abs(b._t.mvA || 0) - Math.abs(a._t.mvA || 0)), ...X.rows.filter(r => !liveSet.has(r.t))];
@@ -290,6 +291,8 @@ function renderInPlayBody(app, S) {
     && (r.rs == null ? U.rs === "any" : r.rs >= RSMIN[U.rs])
     && (!q || r.t.toLowerCase().startsWith(q) || (r.name || "").toLowerCase().includes(q) || (q.length >= 3 && (r.sub || "").toLowerCase().includes(q)));
   const shown = rows.filter(r => pass(r));
+  // Nov 7, 2026 (speed): draw the top IP_PAGE rows; "Show all" draws the rest (738 rows took ~1.5 s to lay out)
+  const IP_PAGE = 120, drawn = U.all || q ? shown : shown.slice(0, IP_PAGE);
   const cnt = (k) => rows.filter(r => pass(r, "why") && r.kinds.some(x => (x === "earnings" ? "news" : x) === k)).length;
   const dayLbl = (w) => w.ago < 0 ? (S === "pre" ? "pre-mkt" : "today") : w.ago === 0 ? shortDate(X.date) : shortDate(w.date);
   const whyCell = (r) => r.why.slice(0, 3).map(w => `<span class="p3chip ipk-${w.k}" title="${esc(w.txt)}">${esc(w.k === "today" && S === "pre" ? "Pre-market" : IP_KIND[w.k])}</span> <small class="meta">${esc(dayLbl(w))}: ${esc(w.txt)}</small>`).join("<br>") + (r.why.length > 3 ? `<br><small class="meta">+${r.why.length - 3} more</small>` : "");
@@ -298,23 +301,25 @@ function renderInPlayBody(app, S) {
     <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Ticker</th><th class="l">Sub-theme</th><th class="l">Why it's in play</th><th title="RS Rating">RS</th><th title="Average daily range, 20 sessions">ADR</th>
       ${S ? `<th>${S === "pre" ? "Pre-mkt" : "Today"}</th>${S === "live" ? '<th title="Volume so far vs the 50-day average, paced for the time of day">Rel vol<small> paced</small></th>' : ""}` : ""}
       <th title="Last official session">${shortDate(X.date)}</th><th>5D</th><th title="Biggest volume vs the 50-day average in the 5 sessions">Max rel vol</th><th>Off high</th><th title="Average dollar volume a day">$ / day</th><th class="l">Next earnings</th><th class="l">On these lists</th></tr></thead><tbody>
-    ${shown.map((r, i) => { const d = r._t || (S ? todayOf(r.t) : null); return `<tr><td class="num">${i + 1}</td><td class="l"><a href="#" class="tkl" data-t="${esc(r.t)}"><b>${esc(r.t)}</b></a><small class="meta" style="display:block">${esc(r.name || "")}</small></td>
+    ${drawn.map((r, i) => { const d = r._t || (S ? todayOf(r.t) : null); return `<tr><td class="num">${i + 1}</td><td class="l"><a href="#" class="tkl" data-t="${esc(r.t)}"><b>${esc(r.t)}</b></a><small class="meta" style="display:block">${esc(r.name || "")}</small></td>
       <td class="l">${esc(r.sub || "–")}</td><td class="l">${whyCell(r)}</td><td class="num">${r.rs ?? "–"}</td><td class="num">${r.adr == null ? "–" : (+r.adr).toFixed(1) + "%"}</td>
       ${S ? `<td class="num ${tint(d && d.chg, 0.04)}">${d ? pct(d.chg, 1) : "–"}</td>${S === "live" ? `<td class="num">${d && d.rv ? d.rv.toFixed(1) + "×" : "–"}</td>` : ""}` : ""}
       <td class="num ${tint(r.d1, 0.04)}">${pct(r.d1, 1)}</td><td class="num ${tint(r.d5, 0.08)}">${pct(r.d5, 1)}</td><td class="num">${r.rvmax == null ? "–" : r.rvmax.toFixed(1) + "×"}</td>
       <td class="num">${pct(r.off_hi, 1)}</td><td class="num">${r.dvol == null ? "–" : "$" + Math.round(r.dvol) + "M"}</td><td class="l">${r.earn_next ? shortDate(r.earn_next) : ""}</td>
       <td class="l">${(r.on || []).map(x => `<span class="p3chip">${esc(x)}</span>`).join(" ")}</td></tr>`; }).join("") || `<tr><td class="l meta" colspan="14">Nothing matches these filters.</td></tr>`}
     </tbody></table></div>
+    ${drawn.length < shown.length ? `<p style="margin:8px 0 0"><button class="xopen ipall">Show all ${shown.length} (top ${drawn.length} shown; sorting a column sorts the rows shown)</button></p>` : ""}
     <p class="meta" style="margin:8px 0 0"><b>The three reasons</b> (Lance Breitstein's "broken slot machines"): <b>news</b> = a gap of at least 3% and 1 ADR on 2.5× normal volume (Earnings when the catalyst agent has a report that day); <b>technical</b> = a fresh close above the 52-week high, or out of a tight base (40 sessions within 6 ADRs), on 1.5× volume, breakdowns mirrored; <b>volatility</b> = a day's range of 2+ ADRs on 2× volume, or a listing under 120 sessions old.${S === "live" ? " <b>Today</b> = moving 2+ ADRs, or gapping ≥ 3% and 1 ADR with paced volume ≥ 2×." : S === "pre" ? " <b>Pre-market</b> = moving 2+ ADRs, or a gap ≥ 3% and 1 ADR, on steady trading (6+ active 5-minute bars)." : ""}
     Sorted newest first, then by how many reasons stack. <b>Where to look, not a buy signal:</b> on our data, more action alone hasn't been a swing edge (record-volume up days lagged SPY about 5% over 10 sessions; EPs without a catalyst check lost). Use it to pick which charts to open, then apply your setups. A test of "same setup, in play vs not" is queued.</p></section>`);
   const f = card.querySelector(".filters");
+  const ipall = card.querySelector(".ipall"); if (ipall) ipall.addEventListener("click", () => { U.all = true; rerenderPanel(); });
   const save = () => { lsSet("ipWhy", U.why); lsSet("ipDir", U.dir); lsSet("ipWhen", U.when); lsSet("ipRs", U.rs); rerenderPanel(); };
   f.append(chipsMulti("Why", [["all", "All"], ...(S ? [["today", `${S === "pre" ? "Pre-market" : "Today"} <small>${cnt("today")}</small>`]] : []), ["news", `News gap <small>${cnt("news")}</small>`], ["breakout", `52-wk high <small>${cnt("breakout")}</small>`], ["base", `Base breakout <small>${cnt("base")}</small>`], ["breakdown", `Breakdown <small>${cnt("breakdown")}</small>`], ["range", `Range day <small>${cnt("range")}</small>`], ["ipo", `IPO <small>${cnt("ipo")}</small>`]], U, "why", save));
   f.append(chips("Direction", [["all", "Both"], ["up", "Up"], ["down", "Down"]], U, "dir", save));
   f.append(chips("When", [["5", "Last 5 sessions"], ["last", `${shortDate(X.date)} or later`], ...(S ? [["today", S === "pre" ? "Pre-market only" : "Today only"]] : [])], U, "when", save));
   f.append(chips("RS", [["any", "Any RS"], ["r70", "70+"], ["r80", "80+"], ["r90", "90+"]], U, "rs", save));
   const qi = $(`<input type="search" class="orq" placeholder="Find a ticker, company or sub-theme" aria-label="Find">`); qi.value = U.q || ""; let qt = null;
-  qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; rerenderPanel(); const n = document.querySelector(".ipcard .orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
+  qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; rerenderPanel(); const n = PQ(".ipcard .orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
   f.append(qi);
   card.querySelector(".iptv").addEventListener("click", () => tsDownload("in-play", [{ name: "In play", ticks: shown.map(r => r.t) }]));
   app.append(card);

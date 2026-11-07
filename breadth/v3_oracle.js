@@ -144,7 +144,7 @@ function renderOracleBody(app, S) {
   const qi = $(`<input type="search" class="orq" placeholder="${subs ? "Find a sub-theme (or a ticker it holds)" : "Find a ticker or company"}" aria-label="Find">`); qi.value = U.q || "";
   let qt = null;
   qi.addEventListener("input", () => { clearTimeout(qt); qt = setTimeout(() => { U.q = qi.value; U.pg = 0; U.hl = null; U.sub = "";
-    rerenderPanel(); const n = document.querySelector(".orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
+    rerenderPanel(); const n = PQ(".orq"); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 250); });
   f.append(qi);
   f.after(bkBar);
   const sst = { s: U.log ? "log" : "lin" }; f.append(chips("Scale", [["lin", "% scale"], ["log", "Log scale"]], sst, "s", () => { U.log = sst.s === "log"; save(); }));
@@ -261,7 +261,7 @@ function renderOracleBody(app, S) {
     sec.querySelector("select").addEventListener("change", (e) => { U.sub = e.target.value; lsSet("orSub", U.sub); U.hl = null; rerenderPanel(); });
     sec.querySelector(".orpicktv").addEventListener("click", () => tsDownload("oracle-" + (U.sub || "").replace(/[^a-z0-9]+/gi, "-").toLowerCase(), [{ name: "Oracle - " + U.sub, ticks: mem }]));
     tbl.querySelectorAll("tr[data-t]").forEach(tr => tr.addEventListener("click", (ev) => { if (ev.target.closest("a.tkl")) return; U.sub = tr.dataset.t; lsSet("orSub", U.sub); U.hl = null; rerenderPanel();
-      setTimeout(() => { const c = document.querySelector(".orpick"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60); }));
+      setTimeout(() => { const c = PQ(".orpick"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60); }));
   }
   app.querySelectorAll(".orbkp").forEach(b => b.addEventListener("click", (ev) => { ev.stopPropagation(); orToggleBucket(b.dataset.b, b.dataset.g); rerenderPanel(); }));
   tbl.querySelector(".ortv").addEventListener("click", () => tsDownload("oracle-" + cname.replace(/\s+/g, "").toLowerCase(),

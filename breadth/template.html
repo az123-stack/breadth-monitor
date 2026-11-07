@@ -388,8 +388,11 @@ table.grid th { cursor: pointer; user-select: none; }
 table.grid th[aria-sort] { color: var(--text-primary); }
 /* Oct 30, 2026 (Adam: clicks feel slow): the Setups tab is ~16k elements and 46,000 px tall, and laying it all out on every
    click / live refresh took most of the time. Off-screen cards now skip layout and paint until scrolled near. */
-.panel > .card, .panel > details.card { content-visibility: auto; contain-intrinsic-size: auto 600px; }
-.panel.cvall > .card, .panel.cvall > details.card { content-visibility: visible; }
+.pane > .card, .pane > details.card { content-visibility: auto; contain-intrinsic-size: auto 600px; }
+.pane.cvall > .card, .pane.cvall > details.card { content-visibility: visible; }
+.panel > .pane:not(.on) { content-visibility: hidden; }  /* kept alive, skipped (Nov 7) */
+.panel { position: relative; }
+.panel > .pane.warming { content-visibility: visible; position: absolute; top: 0; left: 0; right: 0; visibility: hidden; pointer-events: none; }
 .panel table > thead th { cursor: pointer; user-select: none; }
 .panel table > thead th:hover { color: var(--text-primary); }
 .panel table > thead th[aria-sort="descending"]::after { content: " ▾"; }
@@ -697,7 +700,7 @@ function render() {
   });
   const rf = app.querySelector(".revflag"); if (rf) rf.addEventListener("click", () => {
     const b = app.querySelector('nav.tabs button[data-tab="setups"]'); if (b) b.click();
-    setTimeout(() => { const c = document.querySelector(".revcard"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); }, 50);
+    setTimeout(() => { const c = PQ(".revcard"); if (c) c.scrollIntoView({ behavior: "smooth", block: "start" }); }, 50);
   });
   const tabs = $(`<nav class="tabs" role="tablist">${TABS.map(([k, l]) => `<button role="tab" data-tab="${k}">${l}</button>`).join("")}</nav>`);
   app.append(tabs);
@@ -705,9 +708,7 @@ function render() {
   app.append(panel);
   const show = () => {
     tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === TAB));
-    panel.innerHTML = "";
-    renderTab(panel);
-    reapplySorts(panel);
+    showTabPane(panel);
   };
   tabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
     TAB = b.dataset.tab;
@@ -1079,11 +1080,11 @@ function rotationIdeasCard() {
   card.querySelectorAll(".rpair").forEach(a => a.addEventListener("click", (e) => {
     e.preventDefault();
     UI.pair = UI.pair || {}; UI.pair.a = "s:" + a.dataset.a; UI.pair.b = "s:" + a.dataset.b;
-    rerenderPanel(); setTimeout(() => { const p = document.querySelector(".pairsel"); if (p) p.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
+    rerenderPanel(); setTimeout(() => { const p = PQ(".pairsel"); if (p) p.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
   }));
   card.querySelectorAll(".rchip").forEach(b => b.addEventListener("click", () => {
     UI.tl = UI.tl || { view: "sub", sort: "now", n: "40", q: "" }; UI.tl.view = "sub"; UI.tl.q = b.dataset.g.toLowerCase();
-    rerenderPanel(); setTimeout(() => { const t = document.querySelector(".tlcard"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
+    rerenderPanel(); setTimeout(() => { const t = PQ(".tlcard"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
   }));
   return card;
 }
@@ -2566,7 +2567,7 @@ let ANCH = null, ANCH_BUSY = false;
 async function fetchAnchors() {
   if (ANCH_BUSY) return; ANCH_BUSY = true;
   try { const r = await fetch("anchors.json?cb=" + Date.now(), { cache: "no-store" }); if (r.ok) ANCH = await r.json(); } catch (e) { /* optional backup */ }
-  ANCH_BUSY = false;
+  ANCH_BUSY = false; bumpView();
 }
 function resolveAnchors(L, B) {
   if (!L) return L;
@@ -2601,7 +2602,7 @@ async function fetchLive() {
     const parsed = parseLiveCSV(await r.text());
     if (!Object.keys(parsed.prices).length) throw new Error("no prices in sheet");
     await fetchAnchors();
-    LIVE = resolveAnchors({ ...parsed, fetched: new Date() }, ANCH); LIVE_ERR = null;
+    LIVE = resolveAnchors({ ...parsed, fetched: new Date() }, ANCH); LIVE_ERR = null; bumpView();
     LIVE_T = liveActive() ? computeLive(DATA.themes, LIVE.prices, LIVE.spyDate) : null;
   } catch (e) { LIVE_ERR = String(e.message || e); }
   LIVE_BUSY = false;
@@ -2766,6 +2767,61 @@ function liveBar() {
 }
 // One tab → renderer table, shared by tab clicks and live refreshes (before Oct 27 the refresh copy was missing Best Setups and
 // Launch list, so a live price refresh on those tabs re-drew the Breadth tab).
+/* Tab panes kept alive (Nov 7, 2026; Adam: "when I click a tab it takes a couple seconds"). Each tab renders into its own
+   <div class="pane"> inside .panel. Leaving a tab only hides its pane with content-visibility: hidden, which keeps the browser's
+   rendering work, so coming back is just a style flip (no rebuild, no re-layout). A pane is reused only while nothing changed:
+   VIEW_VER bumps on every rerenderPanel (chip clicks, live refreshes) and whenever new live / pre-market / side data arrives, and
+   a bump drops every hidden pane at once, so document-wide lookups right after a re-render only ever see the visible pane.
+   Clicks inside a pane look things up with PQ (the visible pane), never the whole document. */
+let VIEW_VER = 0;
+const PANES = {};
+function activePane() { return document.querySelector(".panel > .pane.on"); }
+const PQ = (sel) => (activePane() || document).querySelector(sel);
+function bumpView() {
+  VIEW_VER++;
+  Object.keys(PANES).forEach(k => { const P = PANES[k]; if (!P.el.classList.contains("on")) { P.el.remove(); delete PANES[k]; } });
+}
+/* Warm-up (v3 only): when the page is idle, render the tabs Adam is most likely to click next (the other sub-tabs of the current
+   section + the remembered sub-tab of each other section) into hidden panes, so a first click is instant too. Skipped: tabs that
+   fetch side files when drawn (Pre-market, Intraday, Read-out; warm panes are laid out off screen at full width, so charts size right); any data
+   change (bumpView) drops the warm panes and the warm-up runs again once the page is idle. */
+const WARM_SKIP = new Set(["premarket", "intraday", "readout"]);
+let WARM_T = null;
+function warmTabs() {
+  if (typeof V3_NAV === "undefined" || WARM_T) return;
+  const ric = window.requestIdleCallback || ((f) => setTimeout(() => f({ timeRemaining: () => 10 }), 200));
+  WARM_T = setTimeout(() => {
+    WARM_T = null;
+    const panel = document.querySelector(".panel"); if (!panel) return;
+    const P = parentOf(TAB), want = [];
+    V3_NAV.forEach(([k, , subs]) => { if (k === P) subs.forEach(s => want.push(s[0])); else want.push(lsGet("v3sub-" + k, subs[0][0])); });
+    const todo = want.filter(t => t !== TAB && !WARM_SKIP.has(t) && !PANES[t]), ver = VIEW_VER;
+    const step = () => {
+      if (!todo.length || ver !== VIEW_VER || document.visibilityState !== "visible") return;
+      const t = todo.shift(), keep = TAB;
+      if (!PANES[t] && t !== keep) {
+        const el = document.createElement("div"); el.className = "pane warming"; el.dataset.tab = t; panel.append(el);
+        TAB = t;
+        try { renderTab(el); reapplySorts(el); void el.offsetHeight; PANES[t] = { el, ver: VIEW_VER }; }   // lay it out once, off screen
+        catch (e) { el.remove(); console.error("warm-up", t, e); }
+        finally { TAB = keep; el.classList.remove("warming"); }
+        if (ver !== VIEW_VER) { const W = PANES[t]; if (W && !W.el.classList.contains("on")) { W.el.remove(); delete PANES[t]; } }
+      }
+      ric(step);
+    };
+    ric(step);
+  }, 1500);
+}
+function showTabPane(panel) {
+  const cur = activePane(); if (cur) cur.classList.remove("on");
+  let P = PANES[TAB];
+  if (P && (P.ver !== VIEW_VER || !P.el.isConnected)) { P.el.remove(); P = null; delete PANES[TAB]; }
+  if (P) { P.el.classList.add("on"); warmTabs(); return; }
+  const el = document.createElement("div"); el.className = "pane on"; el.dataset.tab = TAB; panel.append(el);
+  renderTab(el); reapplySorts(el);
+  PANES[TAB] = { el, ver: VIEW_VER };
+  warmTabs();
+}
 function renderTab(panel) {
   const R = { themes: renderThemesTab, stocks: renderStocks, setups: renderSetupsAll,
     intraday: renderIntraday, premarket: renderPremarket, rotation: renderRotation, biotech: renderBiotech, readout: renderReadout, stories: renderStories };
@@ -2871,7 +2927,7 @@ function decoratePanel(panel) {
   if (items.length < 3) return;
   const nav = $(`<nav class="jumpbar" aria-label="On this page"><span class="jl">On this page</span>${items.map(i => `<a href="#${i.id}" class="${i.part ? "jp" : ""}">${esc(i.t)}</a>`).join("")}</nav>`);
   nav.addEventListener("click", (e) => { const a = e.target.closest("a"); if (!a) return; e.preventDefault();
-    const c = document.getElementById(a.getAttribute("href").slice(1)); if (!c) return;
+    const c = panel.querySelector("#" + CSS.escape(a.getAttribute("href").slice(1))); if (!c) return;
     if (c.classList.contains("folded")) { const b = c.querySelector(".foldbtn"); if (b) b.click(); }
     // Off-screen cards use content-visibility (estimated heights), so lay every card out once (their real sizes are then
     // remembered via contain-intrinsic-size: auto), jump, and re-aim once on the next frame.
@@ -2882,10 +2938,16 @@ function decoratePanel(panel) {
 }
 function rerenderPanel() {
   const panel = document.querySelector(".panel"); if (!panel) return;
-  const y = window.scrollY; panel.innerHTML = "";
-  renderTab(panel);
-  reapplySorts(panel);
+  bumpView();
+  const y = window.scrollY;
+  let pane = activePane();
+  if (!pane) { showTabPane(panel); window.scrollTo(0, y); return; }
+  pane.innerHTML = "";
+  renderTab(pane);
+  reapplySorts(pane);
+  PANES[TAB] = { el: pane, ver: VIEW_VER };
   window.scrollTo(0, y);
+  warmTabs();
 }
 setInterval(() => { if (document.visibilityState === "visible" && (TAB !== "breadth")) fetchLive(); }, 3 * 60 * 1000);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && LIVE && Date.now() - LIVE.fetched > 60000) fetchLive(); });
@@ -3862,7 +3924,7 @@ async function fetchMacroBrief() {
   if (MB_BUSY) return; MB_BUSY = true;
   try { const r = await fetch("agent/macro_brief.json?cb=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw new Error("HTTP " + r.status); MBJ = await r.json(); MB_ERR = null; }
   catch (e) { MB_ERR = String(e.message || e); }
-  MB_BUSY = false; if (TAB === "readout") rerenderPanel();
+  MB_BUSY = false; bumpView(); if (TAB === "readout") rerenderPanel();
 }
 setInterval(() => { if (document.visibilityState === "visible" && TAB === "readout") fetchMacroBrief(); }, 15 * 60 * 1000);
 function macroBriefCard() {
@@ -3887,7 +3949,7 @@ async function fetchStory() {
   if (STORY_BUSY) return; STORY_BUSY = true;
   try { const r = await fetch("story.json?cb=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw new Error(r.status === 404 ? "no chapters yet" : "HTTP " + r.status); STORYJ = await r.json(); STORY_ERR = null; }
   catch (e) { STORY_ERR = String(e.message || e); }
-  STORY_BUSY = false; if (TAB === "readout") rerenderPanel();
+  STORY_BUSY = false; bumpView(); if (TAB === "readout") rerenderPanel();
 }
 setInterval(() => { if (document.visibilityState === "visible" && TAB === "readout") fetchStory(); }, 10 * 60 * 1000);
 const SR = { leave: 60, come: 40, streak5: 55, lookback: 10, basket: 0.2 };
@@ -3924,7 +3986,7 @@ async function fetchStories() {
   STORIES_BUSY = true;
   try { const r = await fetch("stories.json?cb=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw new Error(r.status === 404 ? "no stories yet" : "HTTP " + r.status); STORIESJ = await r.json(); STORIES_ERR = null; }
   catch (e) { STORIES_ERR = String(e.message || e); }
-  STORIES_BUSY = false; if (TAB === "stories") rerenderPanel();
+  STORIES_BUSY = false; bumpView(); if (TAB === "stories") rerenderPanel();
 }
 setInterval(() => { if (document.visibilityState === "visible" && TAB === "stories") fetchStories(); }, 15 * 60 * 1000);
 // mirrors stories.price_check / scorecard (rotation.mhist: per sub-theme [net $, $ vol, return bp], spy bp)
@@ -4012,7 +4074,7 @@ function renderStories(app) {
   const wrap = $(`<div>${open.map((s, i) => storyCardFull(s, i === 0)).join("")}
     ${closed.length ? `<details class="card"><summary><b>Closed stories</b> <span class="meta">${closed.length}</span></summary>${closed.map(s => storyCardFull(s, false)).join("")}</details>` : ""}</div>`);
   wrap.addEventListener("click", (e) => {
-    const a = e.target.closest("[data-story]"); if (a) { e.preventDefault(); const el = document.getElementById("story-" + a.dataset.story); if (el) { el.open = true; el.scrollIntoView({ behavior: "smooth" }); } return; }
+    const a = e.target.closest("[data-story]"); if (a) { e.preventDefault(); const el = PQ("#" + CSS.escape("story-" + a.dataset.story)); if (el) { el.open = true; el.scrollIntoView({ behavior: "smooth" }); } return; }
   });
   head.addEventListener("click", (e) => { const a = e.target.closest("[data-go]"); if (!a) return; e.preventDefault(); const b = document.querySelector(`nav.tabs button[data-tab="${tabOf(a.dataset.go)}"]`); if (b) { b.click(); window.scrollTo(0, 0); } });
   app.append(wrap);
@@ -4324,7 +4386,7 @@ let FUT = null, FUT_BUSY = false;
 async function fetchFut() {
   if (FUT_BUSY) return; FUT_BUSY = true;
   try { const r = await fetch("futures.json?cb=" + Date.now(), { cache: "no-store" }); if (r.ok) FUT = await r.json(); } catch (e) { /* optional */ }
-  FUT_BUSY = false;
+  FUT_BUSY = false; bumpView();
   if (TAB === "intraday") rerenderPanel();
 }
 setInterval(() => { if (document.visibilityState === "visible" && TAB === "intraday") fetchFut(); }, 3 * 60 * 1000);
@@ -4347,7 +4409,7 @@ async function fetchPM() {
   try {
     const r = await fetch("premarket.json?cb=" + Date.now(), { cache: "no-store" });
     if (!r.ok) throw new Error(r.status === 404 ? "no pre-market file yet" : "HTTP " + r.status);
-    PM = { ...(await r.json()), fetched: new Date() }; PM_ERR = null;
+    PM = { ...(await r.json()), fetched: new Date() }; PM_ERR = null; bumpView();
   } catch (e) { PM_ERR = String(e.message || e); }
   PM_BUSY = false;
   if (TAB === "premarket" || TAB === "readout" || TAB === "oracle") rerenderPanel();
@@ -5397,7 +5459,7 @@ function renderTrades(app) {
       : $(`<div class="note revcard" style="padding:0 2px 10px">✓ Setups still fit the market. Last reviewed ${b.date ? longDate(b.date) : "–"} in ${b.regime || "–"} breadth; checked daily for a breadth-regime change (${RV.checks.regime_days}+ sessions), a setup going dry (${RV.checks.dry_days} sessions with no names) or slumping (≤ ${RV.checks.slump_r}R over its last 30 sessions), 3+ new top-5 themes, or ${RV.checks.stale_days}+ days since review — and the same morning a major breadth thrust fires.</div>`));
   }
   if (T.playbook) app.append(playbookCard(T.playbook));
-  head.querySelector(".tsall").addEventListener("click", () => document.querySelector(".tsopen").click());
+  head.querySelector(".tsall").addEventListener("click", () => PQ(".tsopen").click());
   app.append(head);
   const mag = (r) => {
     if (r.mag == null) return '<td class="num meta">–</td>';
@@ -6108,7 +6170,7 @@ async function fetchPos() {
     const txt = await r.text(); if (/^\s*</.test(txt)) throw new Error("the Positions tab isn't published");
     POS = parsePos(txt); POS_ERR = null; }
   catch (e) { POS_ERR = String(e.message || e); }
-  POS_BUSY = false;
+  POS_BUSY = false; bumpView();
   if (TAB === "readout" || TAB === "intraday") rerenderPanel();
 }
 setInterval(() => { if (document.visibilityState === "visible" && (TAB === "readout" || TAB === "intraday")) fetchPos(); }, 2 * 60 * 1000);
