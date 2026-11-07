@@ -187,6 +187,11 @@ research card if it gets tested. Strategy 1 = Pop watch pullbacks (v3 Groups →
 - Start every answer with a TL;DR, then detail.
 - Ship working changes; verify with `--rebuild-only`, the tests, and a headless browser check before pushing.
 - Don't run long blocking polling loops.
+- **Usage budget (Adam, Nov 7, 2026: "make usage efficient without losing the data we need")**: at most 2 independent grader
+  reviews per plan (ship after round 2; list open concerns on the card); no subagents unless a task needs them; read CODEMAP.md entries
+  on demand instead of whole files; keep CLAUDE.md under ~25 KB. Agent models (Nov 7): Opus = Integrator, Librarian; Sonnet = review,
+  reclass, catalyst, macro brief, data card, story am/pm; Haiku = lined-up alerts, 10/11 snapshot kick, midnight + morning kicks.
+  "Daily Earnings Catalyst Tracker" email turned OFF (overlapped the morning story, macro brief and catalyst agent; re-enable in its settings).
 
 ## Decision Cards + agents (Oct 16–17, 2026) — read DECISIONS.md
 - Principle: code measures, agents read, only proven layers move the score. Nothing here re-ranks the Top 2 picks.
