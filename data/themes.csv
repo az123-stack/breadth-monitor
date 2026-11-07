@@ -291,7 +291,6 @@ CLEAN ENERGY - Battery,SLDP,member
 CLEAN ENERGY - Battery,AMPX,member
 CLEAN ENERGY - Battery,TSLA,member
 CLEAN ENERGY - Battery,ALB,member
-CLEAN ENERGY - Battery,ESS,member
 CLEAN ENERGY - Battery,TE,member
 CLEAN ENERGY - Battery,MVST,member
 CLEAN ENERGY - Broad,ICLN,etf
@@ -687,7 +686,6 @@ INFRASTRUCTURE - Homebuilders,FBIN,member
 INFRASTRUCTURE - Homebuilders,AWI,member
 INFRASTRUCTURE - Homebuilders,CSL,member
 INFRASTRUCTURE - Homebuilders,BLDR,member
-INFRASTRUCTURE - Homebuilders,BZH,member
 INFRASTRUCTURE - REITs,VNQ,etf
 INFRASTRUCTURE - REITs,PLD,member
 INFRASTRUCTURE - REITs,EQIX,member
@@ -905,7 +903,6 @@ POWER & GRID - Grid,NVT,member
 POWER & GRID - Grid,AYI,member
 POWER & GRID - Grid,ITRI,member
 POWER & GRID - Grid,ESE,member
-POWER & GRID - Grid,ATKR,member
 POWER & GRID - Grid Transmission,MTZ,member
 POWER & GRID - Grid Transmission,EME,member
 POWER & GRID - Grid Transmission,PRIM,member
@@ -1197,6 +1194,17 @@ AI & ROBOTICS - Enterprise AI SaaS,ASAN,member
 AI & ROBOTICS - Enterprise AI SaaS,IOT,member
 AI & ROBOTICS - Enterprise AI SaaS,FIVN,member
 AI & ROBOTICS - Enterprise AI SaaS,INTA,member
+INFRASTRUCTURE - REITs,ESS,member
+BIOTECH - Medical Devices,PRCT,member
+POWER & GRID - Utilities,AES,member
+TECH - Fintech,PAYS,member
+BIOTECH - Genomics,GRAL,member
+TECH - Cybersecurity,OSPN,member
+BIOTECH - Biotech,SLS,member
+BIOTECH - Biotech,CLYM,member
+FINANCIALS - Insurance,PRCH,member
+BIOTECH - Biotech,SEPN,member
+TECH - 5G & Telecom,ATEX,member
 AI & ROBOTICS - AI Monetizers,BOX,member
 AI & ROBOTICS - AI Monetizers,MSFT,member
 AI & ROBOTICS - AI Monetizers,META,member

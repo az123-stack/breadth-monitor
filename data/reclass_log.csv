@@ -1,0 +1,65 @@
+date,id,t,action,from,to,theme_add,status,why
+2026-11-07,1,ATKR,remove,Gas Turbines & Grid Equipment,,,applied,"Atkore (conduit and electrical raceway) was bought by Prysmian for about $3.8B; the deal closed Oct 19, 2026 and the stock stopped trading."
+2026-11-07,2,BZH,remove,Homebuilders,,,applied,"Beazer Homes was acquired by Dream Finders Homes (~$2.2B); closed Oct 20, 2026 and delisted. DFH itself is the surviving homebuilder."
+2026-11-07,3,WBD,remove,Streaming & Media,,,applied,Warner Bros. Discovery was acquired by Paramount Skydance (merger closed early Oct 2026); its shares no longer trade. The combined company is SKYD.
+2026-11-07,4,KVUE,remove,Household & Personal Care,,,applied,"Kenvue (Tylenol, Listerine, Neutrogena) was acquired by Kimberly-Clark in a ~$48.7B deal that has closed; KVUE no longer trades (last bar Oct 30)."
+2026-11-07,5,PSKY,rename,Streaming & Media,SKYD,,applied,"Paramount Skydance closed its Warner Bros. Discovery merger in early October 2026 and the combined company, renamed Skydance, trades under the new ticker SKYD."
+2026-11-07,6,ESS,move,Batteries & Storage,REITs,INFRASTRUCTURE - REITs,applied,"Essex Property Trust is a West Coast apartment REIT, not a battery maker (ticker mix-up with ESS Tech)."
+2026-11-07,7,CME,move,Crypto Exchanges & Brokers,Exchanges & Financial Data,,applied,"CME Group is the largest futures and options exchange (rates, equity index, energy, ags); crypto futures are a small slice. It trades with ICE/Nasdaq/CBOE."
+2026-11-07,8,ISRG,move,Industrial & Surgical Robots,Medical Devices,BIOTECH - Medical Devices,applied,"Intuitive Surgical sells da Vinci surgical systems and instruments to hospitals; it trades like a large medtech, not an industrial robot maker."
+2026-11-07,9,PRCT,move,Industrial & Surgical Robots,Medical Devices,BIOTECH - Medical Devices,applied,PROCEPT BioRobotics sells the Aquablation robotic system for prostate (BPH) surgery to urologists: a medtech device company.
+2026-11-07,10,NDSN,move,Industrial & Surgical Robots,Diversified Industrials,,applied,"Nordson makes precision dispensing, fluid-management and test/inspection equipment for many industries; not a robotics company."
+2026-11-07,11,ROK,move,Industrial & Surgical Robots,Industrial Automation,AI & ROBOTICS - Robotics,applied,"Rockwell Automation sells factory automation controllers, drives and software (Allen-Bradley); its natural peers are the industrial-automation group."
+2026-11-07,12,LW,move,Farm Equipment & Ag Processing,Packaged Foods,,applied,"Lamb Weston makes frozen fries and potato products sold to restaurants and grocers; a food company, not farm equipment."
+2026-11-07,13,KEP,move,Wireless Carriers,Regulated Utilities,,applied,"Korea Electric Power (KEPCO) is South Korea's state-controlled electric utility (generation, transmission, distribution), not a wireless carrier."
+2026-11-07,14,AES,move,Residential Solar & Yieldcos,Regulated Utilities,POWER & GRID - Utilities,applied,"AES owns regulated utilities (AES Indiana, AES Ohio) plus a large contracted renewables/power business; it trades with defensive utilities, not rooftop solar names."
+2026-11-07,15,STRL,move,Engineering & Construction,Grid & Electrical Contractors,,applied,"Sterling's growth engine is E-Infrastructure: site development for data centers and semiconductor fabs; it trades with the AI-buildout contractors (EME, IESC, PWR) far more than civil engineering firms."
+2026-11-07,16,DOCN,move,Data & Observability,Neoclouds & GPU Hosting,TECH - Cloud,applied,"DigitalOcean is a cloud provider for developers that now markets itself as an 'agentic inference cloud' with GPU Droplets (AMD MI350X, NVIDIA); it trades with AI-compute names."
+2026-11-07,17,WAB,move,Railroads,Diversified Industrials,,applied,"Wabtec builds locomotives, rail equipment and transit components; it is an equipment maker, not a railroad carrier like UNP/CSX."
+2026-11-07,18,LEGN,move,Mid-cap Biotech,Oncology Biotech,,applied,"Legend Biotech's business is Carvykti, a CAR-T therapy for multiple myeloma (with J&J); oncology is its core. Note: takeover chatter makes the chart noisy."
+2026-11-07,19,ZBRA,move,Industrial & Surgical Robots,Industrial Automation,,applied,"Zebra makes barcode scanners, rugged mobile computers and label printers for warehouses and retail (plus a small robotics unit); it is factory/warehouse automation, not surgical/industrial robots."
+2026-11-07,20,XP,move,Investment Banks & Brokers,Global & EM Banks,,applied,XP is Brazil's largest independent investment platform/broker; it trades with Brazilian/EM financials more than US brokers.
+2026-11-07,21,PAYS,add,,Payments & Networks,TECH - Fintech,applied,"Paysign runs prepaid card programs and payment processing (pharma copay, plasma donor payments)."
+2026-11-07,22,GRAL,add,,Genomics & Diagnostics,BIOTECH - Genomics,applied,"GRAIL sells Galleri, a blood test for multi-cancer early detection."
+2026-11-07,23,LIND,add,,Hotels & Cruise Lines,,applied,Lindblad Expeditions runs expedition cruises (with National Geographic) and adventure travel.
+2026-11-07,24,MRVI,add,,Life Science Tools,,applied,Maravai sells nucleic-acid (mRNA) production reagents and biologics safety testing to drug makers: a tools supplier.
+2026-11-07,25,OSPN,add,,Identity & Security Tools,TECH - Cybersecurity,applied,"OneSpan sells digital identity, authentication and e-signature security, mainly to banks."
+2026-11-07,26,GDYN,add,,IT Services & Consulting,,applied,Grid Dynamics provides digital engineering and AI consulting services to enterprises.
+2026-11-07,27,NSIT,add,,IT Services & Consulting,,applied,"Insight Enterprises is an IT solutions integrator (hardware/software resale, cloud and AI services)."
+2026-11-07,28,SG,add,,Restaurants,,applied,Sweetgreen is a fast-casual salad restaurant chain.
+2026-11-07,29,TBBB,add,,Mass Merchants & Grocers,,applied,"BBB Foods runs Tiendas 3B, Mexico's fast-growing hard-discount grocery chain (3,600+ stores)."
+2026-11-07,30,NIQ,add,,Business Services & Data,,applied,NIQ (NielsenIQ) sells consumer purchase data and retail analytics to brands and retailers.
+2026-11-07,31,STGW,add,,"Media, Live Events & Advertising",,applied,Stagwell is an advertising and marketing-services holding company (agencies plus marketing tech).
+2026-11-07,32,ACHC,add,,Healthcare Providers,,applied,Acadia Healthcare operates behavioral-health hospitals and addiction treatment centers.
+2026-11-07,33,ARHS,add,,Home Improvement & Specialty Retail,,applied,Arhaus is a premium home-furniture retailer.
+2026-11-07,34,HELE,add,,Household & Personal Care,,applied,"Helen of Troy sells household and beauty brands (OXO, Hydro Flask, Braun, Revlon tools)."
+2026-11-07,35,SIBN,add,,Medical Devices,,applied,SI-BONE makes implants for sacroiliac joint and pelvic surgery.
+2026-11-07,36,CBLL,add,,Medical Devices,,applied,Ceribell sells a point-of-care EEG system for detecting seizures in hospitals.
+2026-11-07,37,MANH,add,,Enterprise SaaS,,applied,Manhattan Associates sells supply-chain and warehouse-management software.
+2026-11-07,38,CROX,add,,Apparel & Footwear Brands,,applied,Crocs owns the Crocs and HEYDUDE footwear brands.
+2026-11-07,39,DOCU,add,,Enterprise SaaS,,applied,DocuSign sells e-signature and agreement-management software.
+2026-11-07,40,SLS,add,,Oncology Biotech,BIOTECH - Biotech,applied,"SELLAS develops galinpepimut-S (WT1 cancer immunotherapy, AML) and other cancer drugs."
+2026-11-07,41,ETON,add,,Mid-cap Biotech,,applied,Eton Pharmaceuticals sells and develops treatments for rare pediatric/endocrine diseases.
+2026-11-07,42,ANDG,add,,Business Services & Data,,applied,Andersen Group is a tax and advisory firm that IPO'd in Dec 2025; professional services.
+2026-11-07,43,CLYM,add,,Immunology & Inflammation,BIOTECH - Biotech,applied,"Climb Bio develops budoprutug, an anti-CD19 antibody for immune-mediated kidney disease (membranous nephropathy)."
+2026-11-07,44,VSTS,add,,Waste & Facility Services,,applied,"Vestis rents uniforms and workplace supplies (Cintas/UniFirst peer), the facility-services group."
+2026-11-07,45,RSKD,add,,Identity & Security Tools,,applied,Riskified sells AI fraud prevention and chargeback protection to e-commerce merchants.
+2026-11-07,46,PRCH,add,,P&C Insurers,FINANCIALS - Insurance,applied,Porch Group's main business is home insurance (reciprocal exchange) plus software for home inspectors and movers.
+2026-11-07,47,SEPN,add,,Obesity & Metabolic,BIOTECH - Biotech,applied,Septerna makes oral small-molecule GPCR drugs; its biggest program is an obesity/cardiometabolic deal with Novo Nordisk (up to $2.2B).
+2026-11-07,48,XERS,add,,Mid-cap Biotech,,applied,"Xeris Biopharma sells endocrine drugs (Recorlev for Cushing's, Gvoke glucagon, Keveyis) and is growing commercially."
+2026-11-07,49,IBTA,add,,Social & Ad Platforms,,applied,"Ibotta runs a performance-marketing network that pays consumers cash back on brand promotions through its app and retailer partners (Walmart, Kroger): an ad platform."
+2026-11-07,50,MANE,add,,Mid-cap Biotech,,applied,Veradermics is a clinical-stage biotech developing an oral non-hormonal treatment for hair loss.
+2026-11-07,51,PVLA,add,,Mid-cap Biotech,,applied,Palvella develops QTORIN topical rapamycin for rare skin diseases (microcystic lymphatic malformations); NDA submission in progress.
+2026-11-07,52,CYRX,add,,Life Science Tools,,applied,Cryoport provides temperature-controlled supply-chain services and equipment for cell and gene therapies: a supplier to drug makers.
+2026-11-07,53,PUBM,add,,Social & Ad Platforms,,applied,PubMatic runs a sell-side ad-tech platform that helps publishers sell digital ad inventory programmatically.
+2026-11-07,54,BB,add,,Auto Tech Suppliers,,applied,"BlackBerry is now mainly QNX embedded software for car systems (record QNX revenue, ~$950M backlog) plus a cybersecurity unit."
+2026-11-07,55,PCRX,add,,Mid-cap Biotech,,applied,"Pacira sells non-opioid pain drugs (Exparel, Zilretta, iovera) to hospitals and surgeons."
+2026-11-07,56,CERT,add,,CROs,,applied,Certara sells biosimulation software and regulatory consulting used in drug development; it sits with drug-development services.
+2026-11-07,57,VIR,add,,Mid-cap Biotech,,applied,Vir Biotechnology develops antibody drugs for hepatitis delta and masked T-cell engagers for cancer.
+2026-11-07,58,XMTR,add,,E-Commerce Marketplaces,,applied,Xometry runs an online marketplace that matches buyers with custom-manufacturing suppliers.
+2026-11-07,59,RPRX,add,,Large-cap Pharma,,applied,Royalty Pharma buys royalties on blockbuster drugs; it trades with large-cap pharma.
+2026-11-07,60,ATEX,add,,Wireless Carriers,TECH - 5G & Telecom,applied,"Anterix owns 900 MHz spectrum it leases to utilities (Oncor, Ameren, Evergy) for private LTE networks; no exact group, wireless is closest."
+2026-11-07,61,PURR,add,,Ethereum Treasury Companies,,applied,"Hyperliquid Strategies is a crypto-treasury company holding the HYPE token (~$1.9B); it trades with the ETH treasury names (BMNR, SBET). No altcoin-treasury group exists."
+2026-11-07,62,ECPG,add,,Digital Banks & Lenders,,applied,Encore Capital buys and collects defaulted consumer debt (US and Europe); consumer-credit lenders are the closest group.
+2026-11-07,63,CHPT,add,,EV Makers,,applied,"ChargePoint sells EV charging hardware and networked charging software; it trades with EV/clean-tech names, no exact charging group exists."
+2026-11-07,64,VIA,add,,Enterprise SaaS,,applied,"Via Transportation sells software and operations for public transit agencies (on-demand transit, routing, Citymapper); software is the closest group."
