@@ -1,7 +1,7 @@
 {
- "for_date": "2026-10-30",
- "written": "2026-10-31T12:41Z",
- "summary": "Checked 50 tickers (4 dead, 20 poor fits, 26 unfiled; HZO skipped: MarineMax is being bought by Safe Harbor Marinas). Biggest fixes: ATKR, BZH and WBD were acquired and should be removed, PSKY became SKYD; ESS is an apartment REIT filed with battery makers, CME belongs with exchanges, ISRG/PRCT are medtech not industrial robots. 25 strong unfiled names (tankers NAT/TEN, GRAL, OSPN, REPX, SG...) get homes.",
+ "for_date": "2026-11-06",
+ "written": "2026-11-07T13:40Z",
+ "summary": "Checked 79 tickers. None of last week's proposals were applied yet, so they are carried forward (ATKR, BZH, WBD acquired; PSKY is now SKYD; ESS, CME, ISRG/PRCT misfiled). New this week: Kenvue (KVUE) is gone after Kimberly-Clark closed its takeover, and Korea Electric Power (KEP) sits in Wireless Carriers but is an electric utility. About 40 strong unfiled names get homes (e.g. TBBB, NIQ, ACHC, MANH, DOCU, CROX).",
  "moves": [
   {
    "t": "ATKR",
@@ -44,6 +44,20 @@
    "id": 3
   },
   {
+   "t": "KVUE",
+   "action": "remove",
+   "from": "Household & Personal Care",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Kenvue (Tylenol, Listerine, Neutrogena) was acquired by Kimberly-Clark in a ~$48.7B deal that has closed; KVUE no longer trades (last bar Oct 30).",
+   "sources": [
+    "https://www.nonwovens-industry.com/kimberly-clark-completes-acquisition-of-kenvue/",
+    "https://cosmeticsbusiness.com/kimberly-clark-completes-48-7-billion-acquisition-of-kenvue"
+   ],
+   "id": 4
+  },
+  {
    "t": "PSKY",
    "action": "rename",
    "from": "Streaming & Media",
@@ -55,7 +69,7 @@
     "https://parameter.io/skydance-to-replace-psky-ticker-as-110b-warner-bros-discovery-merger-closes-tuesday/",
     "https://www.shacknews.com/article/150919/paramount-warner-bros-discovery-wb-games-skydance-skyd"
    ],
-   "id": 4
+   "id": 5
   },
   {
    "t": "ESS",
@@ -68,7 +82,7 @@
    "sources": [
     "https://digital.fidelity.com/prgw/digital/research/quote/dashboard/summary?symbol=ESS"
    ],
-   "id": 5
+   "id": 6
   },
   {
    "t": "CME",
@@ -81,7 +95,7 @@
    "sources": [
     "https://www.marketswiki.com/wiki/CME_Group"
    ],
-   "id": 6
+   "id": 7
   },
   {
    "t": "ISRG",
@@ -94,7 +108,7 @@
    "sources": [
     "https://www.globaldata.com/company-profile/intuitive-surgical-inc/"
    ],
-   "id": 7
+   "id": 8
   },
   {
    "t": "PRCT",
@@ -107,7 +121,7 @@
    "sources": [
     "https://www.renaissancecapital.com/Profile/PRCT/PROCEPT-BioRobotics/IPO"
    ],
-   "id": 8
+   "id": 9
   },
   {
    "t": "NDSN",
@@ -120,7 +134,7 @@
    "sources": [
     "https://komo.ai/directory/nordson"
    ],
-   "id": 9
+   "id": 10
   },
   {
    "t": "ROK",
@@ -133,7 +147,7 @@
    "sources": [
     "https://www.sec.gov/Archives/edgar/data/1024478/000102447825000116/rok-20250930.htm"
    ],
-   "id": 10
+   "id": 11
   },
   {
    "t": "LW",
@@ -146,7 +160,21 @@
    "sources": [
     "https://www.globaldata.com/company-profile/lamb-weston-holdings-inc/"
    ],
-   "id": 11
+   "id": 12
+  },
+  {
+   "t": "KEP",
+   "action": "move",
+   "from": "Wireless Carriers",
+   "to": "Regulated Utilities",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Korea Electric Power (KEPCO) is South Korea's state-controlled electric utility (generation, transmission, distribution), not a wireless carrier.",
+   "sources": [
+    "https://stockanalysis.com/stocks/kep/company",
+    "https://www.globaldata.com/company-profile/korea-electric-power-corp/"
+   ],
+   "id": 13
   },
   {
    "t": "AES",
@@ -159,7 +187,7 @@
    "sources": [
     "https://finance.yahoo.com/quote/AES/profile/"
    ],
-   "id": 12
+   "id": 14
   },
   {
    "t": "STRL",
@@ -172,7 +200,7 @@
    "sources": [
     "https://www.nasdaq.com/articles/sterlings-e-infrastructure-segment-real-growth-star"
    ],
-   "id": 13
+   "id": 15
   },
   {
    "t": "DOCN",
@@ -185,7 +213,7 @@
    "sources": [
     "https://www.businesswire.com/news/home/20260219844245/en/"
    ],
-   "id": 14
+   "id": 16
   },
   {
    "t": "WAB",
@@ -198,20 +226,7 @@
    "sources": [
     "https://www.sec.gov/Archives/edgar/data/943452/000162828026008067/wab-20251231.htm"
    ],
-   "id": 15
-  },
-  {
-   "t": "AROC",
-   "action": "move",
-   "from": "On-site Power & Fuel Cells",
-   "to": "LNG & Midstream",
-   "theme_add": "ENERGY - Natural Gas",
-   "confidence": "medium",
-   "why": "Archrock rents and operates natural-gas compression equipment for producers and midstream pipelines; it trades with midstream gas names.",
-   "sources": [
-    "https://www.archrock.com/downloads/Archrock_Company_Overview_2024.pdf"
-   ],
-   "id": 16
+   "id": 17
   },
   {
    "t": "LEGN",
@@ -224,7 +239,20 @@
    "sources": [
     "https://stocktwits.com/news-articles/markets/equity/legn-stock-clocks-best-day-in-three-years-whats-driving-the-rally/cZBdnyqRIzA"
    ],
-   "id": 17
+   "id": 18
+  },
+  {
+   "t": "ZBRA",
+   "action": "move",
+   "from": "Industrial & Surgical Robots",
+   "to": "Industrial Automation",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Zebra makes barcode scanners, rugged mobile computers and label printers for warehouses and retail (plus a small robotics unit); it is factory/warehouse automation, not surgical/industrial robots.",
+   "sources": [
+    "https://stockanalysis.com/stocks/zbra/company"
+   ],
+   "id": 19
   },
   {
    "t": "XP",
@@ -237,7 +265,7 @@
    "sources": [
     "https://seekingalpha.com/symbol/XP"
    ],
-   "id": 18
+   "id": 20
   },
   {
    "t": "PAYS",
@@ -250,7 +278,7 @@
    "sources": [
     "https://ycharts.com/companies/PAYS"
    ],
-   "id": 19
+   "id": 21
   },
   {
    "t": "GRAL",
@@ -263,7 +291,7 @@
    "sources": [
     "https://intuitionlabs.ai/companies/diagnostics/grail-inc"
    ],
-   "id": 20
+   "id": 22
   },
   {
    "t": "LIND",
@@ -276,7 +304,7 @@
    "sources": [
     "https://en.wikipedia.org/wiki/Lindblad_Expeditions"
    ],
-   "id": 21
+   "id": 23
   },
   {
    "t": "MRVI",
@@ -289,7 +317,7 @@
    "sources": [
     "https://pitchbook.com/profiles/company/61990-12"
    ],
-   "id": 22
+   "id": 24
   },
   {
    "t": "OSPN",
@@ -302,7 +330,7 @@
    "sources": [
     "https://komo.ai/directory/onespan"
    ],
-   "id": 23
+   "id": 25
   },
   {
    "t": "GDYN",
@@ -315,7 +343,7 @@
    "sources": [
     "https://stockanalysis.com/stocks/gdyn/company"
    ],
-   "id": 24
+   "id": 26
   },
   {
    "t": "NSIT",
@@ -328,7 +356,7 @@
    "sources": [
     "https://stockanalysis.com/stocks/nsit/company/"
    ],
-   "id": 25
+   "id": 27
   },
   {
    "t": "SG",
@@ -341,59 +369,150 @@
    "sources": [
     "https://en.wikipedia.org/wiki/Sweetgreen"
    ],
-   "id": 26
-  },
-  {
-   "t": "FET",
-   "action": "add",
-   "from": null,
-   "to": "Oil Services & Drillers",
-   "theme_add": "ENERGY - Oil Services",
-   "confidence": "high",
-   "why": "Forum Energy Technologies makes drilling, completion and subsea equipment for oil and gas.",
-   "sources": [
-    "https://en.wikipedia.org/wiki/Forum_Energy_Technologies"
-   ],
-   "id": 27
-  },
-  {
-   "t": "REPX",
-   "action": "add",
-   "from": null,
-   "to": "Shale E&P",
-   "theme_add": "ENERGY - Oil",
-   "confidence": "high",
-   "why": "Riley Exploration Permian is an oil-weighted Permian Basin producer.",
-   "sources": [
-    "https://stockanalysis.com/stocks/repx/company"
-   ],
    "id": 28
   },
   {
-   "t": "NAT",
+   "t": "TBBB",
    "action": "add",
    "from": null,
-   "to": "Tankers & Shipping",
-   "theme_add": "TRANSPORT - Shipping",
+   "to": "Mass Merchants & Grocers",
+   "theme_add": null,
    "confidence": "high",
-   "why": "Nordic American Tankers owns Suezmax crude oil tankers.",
+   "why": "BBB Foods runs Tiendas 3B, Mexico's fast-growing hard-discount grocery chain (3,600+ stores).",
    "sources": [
-    "https://www.globaldata.com/company-profile/tsakos-energy-navigation-ltd/"
+    "https://finimize.com/content/tbbb-asset-snapshot"
    ],
    "id": 29
   },
   {
-   "t": "TEN",
+   "t": "NIQ",
    "action": "add",
    "from": null,
-   "to": "Tankers & Shipping",
-   "theme_add": "TRANSPORT - Shipping",
+   "to": "Business Services & Data",
+   "theme_add": null,
    "confidence": "high",
-   "why": "TEN Ltd (Tsakos Energy Navigation) owns crude, product and LNG tankers.",
+   "why": "NIQ (NielsenIQ) sells consumer purchase data and retail analytics to brands and retailers.",
    "sources": [
-    "https://www.globaldata.com/company-profile/tsakos-energy-navigation-ltd/"
+    "https://www.renaissancecapital.com/Profile/NIQ/NIQ-Global-Intelligence/IPO"
    ],
    "id": 30
+  },
+  {
+   "t": "STGW",
+   "action": "add",
+   "from": null,
+   "to": "Media, Live Events & Advertising",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Stagwell is an advertising and marketing-services holding company (agencies plus marketing tech).",
+   "sources": [
+    "https://stockanalysis.com/stocks/stgw/company/"
+   ],
+   "id": 31
+  },
+  {
+   "t": "ACHC",
+   "action": "add",
+   "from": null,
+   "to": "Healthcare Providers",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Acadia Healthcare operates behavioral-health hospitals and addiction treatment centers.",
+   "sources": [
+    "https://stockanalysis.com/stocks/achc/company/"
+   ],
+   "id": 32
+  },
+  {
+   "t": "ARHS",
+   "action": "add",
+   "from": null,
+   "to": "Home Improvement & Specialty Retail",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Arhaus is a premium home-furniture retailer.",
+   "sources": [
+    "https://stockanalysis.com/stocks/arhs/company"
+   ],
+   "id": 33
+  },
+  {
+   "t": "HELE",
+   "action": "add",
+   "from": null,
+   "to": "Household & Personal Care",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Helen of Troy sells household and beauty brands (OXO, Hydro Flask, Braun, Revlon tools).",
+   "sources": [
+    "https://stockanalysis.com/stocks/hele/company"
+   ],
+   "id": 34
+  },
+  {
+   "t": "SIBN",
+   "action": "add",
+   "from": null,
+   "to": "Medical Devices",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "SI-BONE makes implants for sacroiliac joint and pelvic surgery.",
+   "sources": [
+    "https://stockanalysis.com/stocks/sibn/company"
+   ],
+   "id": 35
+  },
+  {
+   "t": "CBLL",
+   "action": "add",
+   "from": null,
+   "to": "Medical Devices",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Ceribell sells a point-of-care EEG system for detecting seizures in hospitals.",
+   "sources": [
+    "https://stockanalysis.com/stocks/cbll/company"
+   ],
+   "id": 36
+  },
+  {
+   "t": "MANH",
+   "action": "add",
+   "from": null,
+   "to": "Enterprise SaaS",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Manhattan Associates sells supply-chain and warehouse-management software.",
+   "sources": [
+    "https://stockanalysis.com/stocks/manh/company"
+   ],
+   "id": 37
+  },
+  {
+   "t": "CROX",
+   "action": "add",
+   "from": null,
+   "to": "Apparel & Footwear Brands",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Crocs owns the Crocs and HEYDUDE footwear brands.",
+   "sources": [
+    "https://stockanalysis.com/stocks/crox/company"
+   ],
+   "id": 38
+  },
+  {
+   "t": "DOCU",
+   "action": "add",
+   "from": null,
+   "to": "Enterprise SaaS",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "DocuSign sells e-signature and agreement-management software.",
+   "sources": [
+    "https://stockanalysis.com/stocks/docu/company"
+   ],
+   "id": 39
   },
   {
    "t": "SLS",
@@ -406,20 +525,7 @@
    "sources": [
     "https://ir.sellaslifesciences.com/"
    ],
-   "id": 31
-  },
-  {
-   "t": "LIFE",
-   "action": "add",
-   "from": null,
-   "to": "Life Insurers",
-   "theme_add": "FINANCIALS - Insurance",
-   "confidence": "medium",
-   "why": "Ethos Technologies runs an online life-insurance platform (IPO'd 2026); closest existing group is life insurers.",
-   "sources": [
-    "https://www.dig-in.com/articles/insurance-platform-ethos-backers-raise-200m-in-us-ipo"
-   ],
-   "id": 32
+   "id": 40
   },
   {
    "t": "ETON",
@@ -432,20 +538,7 @@
    "sources": [
     "https://fundamentei.com/en-US/us/eton/about"
    ],
-   "id": 33
-  },
-  {
-   "t": "AMN",
-   "action": "add",
-   "from": null,
-   "to": "Healthcare Providers",
-   "theme_add": "HEALTHCARE - Services",
-   "confidence": "medium",
-   "why": "AMN Healthcare is the largest US healthcare staffing company (travel nurses, locum doctors), selling to hospitals.",
-   "sources": [
-    "https://finance.yahoo.com/quote/AMN/profile/"
-   ],
-   "id": 34
+   "id": 41
   },
   {
    "t": "ANDG",
@@ -458,7 +551,7 @@
    "sources": [
     "https://www.renaissancecapital.com/IPO-Center/News/113632/Tax-advisory-firm-Andersen-Group-files-for-a-$100-million-IPO"
    ],
-   "id": 35
+   "id": 42
   },
   {
    "t": "CLYM",
@@ -471,7 +564,7 @@
    "sources": [
     "https://www.biospace.com/press-releases/climb-bio-announces-fda-fast-track-designation-for-budoprutug-for-the-treatment-of-primary-membranous-nephropathy"
    ],
-   "id": 36
+   "id": 43
   },
   {
    "t": "VSTS",
@@ -484,7 +577,7 @@
    "sources": [
     "https://ir.vestis.com/company-information"
    ],
-   "id": 37
+   "id": 44
   },
   {
    "t": "RSKD",
@@ -497,7 +590,7 @@
    "sources": [
     "https://bitscale.ai/directory/riskified"
    ],
-   "id": 38
+   "id": 45
   },
   {
    "t": "PRCH",
@@ -510,7 +603,7 @@
    "sources": [
     "https://pitchbook.com/profiles/company/57322-81"
    ],
-   "id": 39
+   "id": 46
   },
   {
    "t": "SEPN",
@@ -523,20 +616,164 @@
    "sources": [
     "https://www.thepharmaletter.com/septerna-and-novo-nordisk-to-collaborate-on-oral-obesity-and-other-cardiometabolic-diseases"
    ],
-   "id": 40
+   "id": 47
   },
   {
-   "t": "MBX",
+   "t": "XERS",
    "action": "add",
    "from": null,
-   "to": "Obesity & Metabolic",
-   "theme_add": "BIOTECH - Biotech",
+   "to": "Mid-cap Biotech",
+   "theme_add": null,
    "confidence": "medium",
-   "why": "MBX Biosciences develops long-acting peptide drugs for endocrine and metabolic disease (canvuparatide for hypoparathyroidism, obesity programs).",
+   "why": "Xeris Biopharma sells endocrine drugs (Recorlev for Cushing's, Gvoke glucagon, Keveyis) and is growing commercially.",
    "sources": [
-    "https://investors.mbxbio.com/news-releases/news-release-details/mbx-biosciences-reports-fourth-quarter-and-full-year-2025"
+    "https://ycharts.com/companies/XERS",
+    "https://stockanalysis.com/stocks/xers/company"
    ],
-   "id": 41
+   "id": 48
+  },
+  {
+   "t": "IBTA",
+   "action": "add",
+   "from": null,
+   "to": "Social & Ad Platforms",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Ibotta runs a performance-marketing network that pays consumers cash back on brand promotions through its app and retailer partners (Walmart, Kroger): an ad platform.",
+   "sources": [
+    "https://investors.ibotta.com/company-information"
+   ],
+   "id": 49
+  },
+  {
+   "t": "MANE",
+   "action": "add",
+   "from": null,
+   "to": "Mid-cap Biotech",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Veradermics is a clinical-stage biotech developing an oral non-hormonal treatment for hair loss.",
+   "sources": [
+    "https://stockanalysis.com/stocks/mane/company/"
+   ],
+   "id": 50
+  },
+  {
+   "t": "PVLA",
+   "action": "add",
+   "from": null,
+   "to": "Mid-cap Biotech",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Palvella develops QTORIN topical rapamycin for rare skin diseases (microcystic lymphatic malformations); NDA submission in progress.",
+   "sources": [
+    "https://ir.palvellatx.com/news-releases/news-release-details/palvella-therapeutics-completes-rolling-submission-new-drug"
+   ],
+   "id": 51
+  },
+  {
+   "t": "CYRX",
+   "action": "add",
+   "from": null,
+   "to": "Life Science Tools",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Cryoport provides temperature-controlled supply-chain services and equipment for cell and gene therapies: a supplier to drug makers.",
+   "sources": [
+    "https://umbrex.com/resources/company-profiles/cryoport-inc/"
+   ],
+   "id": 52
+  },
+  {
+   "t": "PUBM",
+   "action": "add",
+   "from": null,
+   "to": "Social & Ad Platforms",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "PubMatic runs a sell-side ad-tech platform that helps publishers sell digital ad inventory programmatically.",
+   "sources": [
+    "https://stockanalysis.com/stocks/pubm/company"
+   ],
+   "id": 53
+  },
+  {
+   "t": "BB",
+   "action": "add",
+   "from": null,
+   "to": "Auto Tech Suppliers",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "BlackBerry is now mainly QNX embedded software for car systems (record QNX revenue, ~$950M backlog) plus a cybersecurity unit.",
+   "sources": [
+    "https://www.cmcmarkets.com/en-gb/news-and-analysis/blackberry-stock-can-qnx-drive-a-turnaround"
+   ],
+   "id": 54
+  },
+  {
+   "t": "PCRX",
+   "action": "add",
+   "from": null,
+   "to": "Mid-cap Biotech",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Pacira sells non-opioid pain drugs (Exparel, Zilretta, iovera) to hospitals and surgeons.",
+   "sources": [
+    "https://www.globaldata.com/company-profile/pacira-biosciences-inc"
+   ],
+   "id": 55
+  },
+  {
+   "t": "CERT",
+   "action": "add",
+   "from": null,
+   "to": "CROs",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Certara sells biosimulation software and regulatory consulting used in drug development; it sits with drug-development services.",
+   "sources": [
+    "https://stockanalysis.com/stocks/cert/company"
+   ],
+   "id": 56
+  },
+  {
+   "t": "VIR",
+   "action": "add",
+   "from": null,
+   "to": "Mid-cap Biotech",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Vir Biotechnology develops antibody drugs for hepatitis delta and masked T-cell engagers for cancer.",
+   "sources": [
+    "https://stockanalysis.com/stocks/vir/company"
+   ],
+   "id": 57
+  },
+  {
+   "t": "XMTR",
+   "action": "add",
+   "from": null,
+   "to": "E-Commerce Marketplaces",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Xometry runs an online marketplace that matches buyers with custom-manufacturing suppliers.",
+   "sources": [
+    "https://stockanalysis.com/stocks/xmtr/company"
+   ],
+   "id": 58
+  },
+  {
+   "t": "RPRX",
+   "action": "add",
+   "from": null,
+   "to": "Large-cap Pharma",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Royalty Pharma buys royalties on blockbuster drugs; it trades with large-cap pharma.",
+   "sources": [
+    "https://stockanalysis.com/stocks/rprx/company"
+   ],
+   "id": 59
   },
   {
    "t": "ATEX",
@@ -549,7 +786,7 @@
    "sources": [
     "https://www.nasdaq.com/articles/anterix-atex-spectrum-powers-oncors-private-wireless-network"
    ],
-   "id": 42
+   "id": 60
   },
   {
    "t": "PURR",
@@ -562,7 +799,46 @@
    "sources": [
     "https://www.theblock.co/news/business/2026-08-27-purr-jumps-15-hyperliquid-strategies-1-9-billion-hype-treasury-fortress-balance-sheet-412926"
    ],
-   "id": 43
+   "id": 61
+  },
+  {
+   "t": "ECPG",
+   "action": "add",
+   "from": null,
+   "to": "Digital Banks & Lenders",
+   "theme_add": null,
+   "confidence": "low",
+   "why": "Encore Capital buys and collects defaulted consumer debt (US and Europe); consumer-credit lenders are the closest group.",
+   "sources": [
+    "https://Www.wikipedia.org/wiki/Encore_Capital_Group"
+   ],
+   "id": 62
+  },
+  {
+   "t": "CHPT",
+   "action": "add",
+   "from": null,
+   "to": "EV Makers",
+   "theme_add": null,
+   "confidence": "low",
+   "why": "ChargePoint sells EV charging hardware and networked charging software; it trades with EV/clean-tech names, no exact charging group exists.",
+   "sources": [
+    "https://pitchbook.com/profiles/company/50962-15"
+   ],
+   "id": 63
+  },
+  {
+   "t": "VIA",
+   "action": "add",
+   "from": null,
+   "to": "Enterprise SaaS",
+   "theme_add": null,
+   "confidence": "low",
+   "why": "Via Transportation sells software and operations for public transit agencies (on-demand transit, routing, Citymapper); software is the closest group.",
+   "sources": [
+    "https://www.renaissancecapital.com/Profile/VIA/Via-Transportation/IPO"
+   ],
+   "id": 64
   },
   {
    "t": "MSI",
@@ -573,18 +849,7 @@
    "confidence": "high",
    "why": "Motorola Solutions makes public-safety radios, land-mobile networks and video security; no better existing group, it just trades like a steady compounder.",
    "sources": [],
-   "id": 44
-  },
-  {
-   "t": "GSAT",
-   "action": "keep",
-   "from": "Satellite Connectivity & Imaging",
-   "to": null,
-   "theme_add": null,
-   "confidence": "high",
-   "why": "Amazon agreed to buy Globalstar at $90/share, so the stock is pinned to the deal price; business is still satellite connectivity. Remove when the deal closes.",
-   "sources": [],
-   "id": 45
+   "id": 65
   },
   {
    "t": "NTNX",
@@ -595,7 +860,7 @@
    "confidence": "high",
    "why": "Nutanix sells hyperconverged / hybrid-cloud infrastructure software, which is what this group is named for.",
    "sources": [],
-   "id": 46
+   "id": 66
   },
   {
    "t": "JCI",
@@ -606,7 +871,7 @@
    "confidence": "high",
    "why": "Johnson Controls is an HVAC and building-systems company; the current home is exact.",
    "sources": [],
-   "id": 47
+   "id": 67
   },
   {
    "t": "ORCL",
@@ -617,7 +882,7 @@
    "confidence": "high",
    "why": "Oracle runs OCI, one of the big AI clouds; recent weakness is about its debt-funded capex, not a wrong group.",
    "sources": [],
-   "id": 48
+   "id": 68
   },
   {
    "t": "INFY",
@@ -628,8 +893,118 @@
    "confidence": "high",
    "why": "Infosys is the anchor of this group; moving it would empty the group.",
    "sources": [],
-   "id": 49
+   "id": 69
+  },
+  {
+   "t": "J",
+   "action": "keep",
+   "from": "Engineering & Construction",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Jacobs is an engineering, consulting and project-management firm for infrastructure and water: this group is its home.",
+   "sources": [],
+   "id": 70
+  },
+  {
+   "t": "ACM",
+   "action": "keep",
+   "from": "Engineering & Construction",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "AECOM designs and manages infrastructure projects; Engineering & Construction is the right group, the weak fit is just a quiet stock.",
+   "sources": [],
+   "id": 71
+  },
+  {
+   "t": "AXON",
+   "action": "keep",
+   "from": "Defense Tech & Electronics",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Axon sells Tasers, body cameras and evidence software to police; Defense Tech & Electronics is the closest group.",
+   "sources": [],
+   "id": 72
+  },
+  {
+   "t": "APP",
+   "action": "keep",
+   "from": "AI Applications & Platforms",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "AppLovin runs an AI-driven mobile ad platform; current group is reasonable, it trades on its own story.",
+   "sources": [],
+   "id": 73
+  },
+  {
+   "t": "LH",
+   "action": "keep",
+   "from": "Genomics & Diagnostics",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Labcorp is a diagnostic lab and drug-development services company; Genomics & Diagnostics fits.",
+   "sources": [],
+   "id": 74
+  },
+  {
+   "t": "DGX",
+   "action": "keep",
+   "from": "Genomics & Diagnostics",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Quest Diagnostics runs clinical lab testing; Genomics & Diagnostics fits.",
+   "sources": [],
+   "id": 75
+  },
+  {
+   "t": "TMDX",
+   "action": "keep",
+   "from": "Diabetes & Cardio Devices",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "TransMedics sells the Organ Care System and organ transport services; it is a medical device company, the low correlation is stock-specific.",
+   "sources": [],
+   "id": 76
+  },
+  {
+   "t": "DUOL",
+   "action": "keep",
+   "from": "Consumer Apps",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Duolingo is a consumer language-learning app; Consumer Apps is right.",
+   "sources": [],
+   "id": 77
+  },
+  {
+   "t": "ITRI",
+   "action": "keep",
+   "from": "Gas Turbines & Grid Equipment",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Itron makes smart meters and grid-edge networks for utilities; grid equipment is the right home.",
+   "sources": [],
+   "id": 78
+  },
+  {
+   "t": "LIN",
+   "action": "keep",
+   "from": "Industrial Gases & Hydrogen",
+   "to": null,
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Linde is the largest industrial gas company; the group is named for it.",
+   "sources": [],
+   "id": 79
   }
  ],
- "checked": 50
+ "checked": 79
 }
