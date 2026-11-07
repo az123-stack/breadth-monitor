@@ -111,3 +111,6 @@ APPROVED_LAYERS = ("launch", "box_favorites", "lifecycle")   # Oct 25: Launch li
 # when its last 10 sessions averaged a daily range under DEAL_ADR10 % (cash buyouts trade in a tiny band) or it is in data/aimon.json
 # "exclude" (announced deals). Deals are left out of every leader ranking (strongest list, Leaders, Oracle cohorts, Strongest stocks).
 DEAL_ADR10 = 0.8
+# Since the bottom tab (Nov 7, 2026; Adam: "since 11/5, so it includes 11/6"): first session counted (base = the Nov 5 close). Adam moves it as the bottom is re-judged;
+# the page can also pick any of the last 25 sessions.
+EMERGE_START = "2026-11-06"

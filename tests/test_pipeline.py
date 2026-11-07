@@ -2077,6 +2077,31 @@ def test_pop_watch():
     return r["state"]
 
 
+def test_since_the_bottom():
+    """Nov 7: emerge payload = liquid theme / sub-theme stocks with closes (PICK + PRE), $ volume, 50-day base, EMA seeds; the default start
+    is kept when it is a session in the pickable window, and the page renderer is wired into v3."""
+    import pandas as pd
+    from breadth import emerge, v3site
+    d = pd.bdate_range("2025-01-01", periods=160); rows = []
+    for t in ["A", "B", "C", "SPY", "QQQ", "IWM"]:
+        px = 20.0
+        for i, x in enumerate(d):
+            px *= 1.001 if t in "ABC" else 1.0005
+            rows.append(dict(date=x, ticker=t, o=px, h=px * 1.01, l=px * 0.99, c=px, v=2e6))
+    T = {"subthemes": [{"theme": "G", "group": "P", "members": ["A", "B", "C"]}], "themes": [{"theme": "TH", "members": ["A", "B", "C"]}],
+         "stocks": [{"t": t, "name": t + " Inc", "rsr": 90, "sub": "G"} for t in "ABC"]}
+    old = config.BENCHMARK; config.BENCHMARK = "SPY"
+    try:
+        X = emerge.build(pd.DataFrame(rows), T, start=d[-3].strftime("%Y-%m-%d"))
+    finally:
+        config.BENCHMARK = old
+    assert X["start"] == d[-3].strftime("%Y-%m-%d") and X["subs"]["G"] == ["A", "B", "C"] and X["parent"]["G"] == "P"
+    r = X["rows"]["A"]
+    assert len(r["c"]) == emerge.PICK + emerge.PRE and len(r["dv"]) == len(r["b50"]) == emerge.PICK and len(r["e"]) == 3
+    assert ("gemerge", "Since the bottom") in v3site.NAV[1][2] and "function renderEmerge" in v3site.TABS_JS.read_text()
+    return X["start"]
+
+
 def test_in_play_rank():
     """Nov 7: In Play ranking marks (both-halves traits only): leading group / near the high add, spike / ADR > 10% / 30%+ off subtract."""
     from breadth import inplay

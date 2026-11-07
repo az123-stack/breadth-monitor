@@ -409,3 +409,171 @@ function renderAIRev(app) {
       </tbody></table></div><p class="meta" style="margin:8px 0 0">A name moves to the table above when it pulls back into its 9 / 21 EMAs. Above its 9 EMA = extended, wait; under its 21 = the pullback went too deep for this setup.</p></section>`));
   }
 }
+// Nov 7, 2026 (Adam: "a tab dedicated to analyzing the themes that emerge starting from the beginning of the day 11/6 … money flow, EMAs etc.
+// This date may change, but I want to anchor to a bottom where themes and/or leaders begin to emerge"): Groups → Since the bottom.
+// breadth/emerge.py ships compact arrays; everything is computed here so the start date is a picker (last 25 sessions) and live prices
+// extend it. Descriptive only — nothing is backtested and nothing moves the picks.
+function emergeCalc(X, si) {
+  const P = X.pre, D = X.days, a = si - 1, live = liveActive();
+  const benchR = (b) => { const c = (X.bench || {})[b]; if (!c) return null; const lr = live ? liveRow(b) : null; return (lr ? lr.price : c[c.length - 1]) / c[a] - 1; };
+  const spyR = benchR(X.bench.SPY ? "SPY" : Object.keys(X.bench)[0]);
+  const S = {};
+  for (const [t, x] of Object.entries(X.rows)) {
+    const c = x.c, lr = live ? liveRow(t) : null;
+    const cs = lr ? [...c, lr.price] : c, L = cs.length - 1;
+    const dvAt = (i) => i < c.length ? x.dv[i - P] : (lr && lr.volume ? lr.price * lr.volume / 1e6 : null);
+    if (!c[a] || !cs[L]) continue;
+    const r = cs[L] / c[a] - 1;
+    let pre = 0; for (let i = Math.max(0, a - 19); i <= a; i++) pre = Math.max(pre, c[i]);
+    const dd = c[a] / pre - 1, rec = pre > c[a] * 1.003 ? (cs[L] - c[a]) / (pre - c[a]) : null;
+    let [e9, e21, e50] = x.e, at = {};
+    const K = [2 / 10, 2 / 22, 2 / 51];
+    for (let i = P; i <= L; i++) {
+      if (e9 != null) e9 += K[0] * (cs[i] - e9); if (e21 != null) e21 += K[1] * (cs[i] - e21); if (e50 != null) e50 += K[2] * (cs[i] - e50);
+      if (i === a) at.a = { e9, e21, e50 }; if (i === L) at.L = { e9, e21, e50 };
+    }
+    if (a === P - 1) at.a = { e9: x.e[0], e21: x.e[1], e50: x.e[2] };
+    let net = 0, tot = 0, upd$ = 0, nd = 0, upn = 0, hi = x.hs || 0, nh = null;
+    for (let i = 0; i <= a; i++) hi = Math.max(hi, c[i]);
+    for (let i = a + 1; i <= L; i++) {
+      const sg = cs[i] > cs[i - 1] ? 1 : cs[i] < cs[i - 1] ? -1 : 0; if (sg > 0) upn++;
+      if (nh == null && cs[i] > hi) nh = i; hi = Math.max(hi, cs[i]);
+      const d = dvAt(i); if (d == null) continue; net += d * sg; tot += d; if (sg > 0) upd$ += d; nd++;
+    }
+    const bi = Math.min(Math.max(a + 1 - P, 0), x.b50.length - 1), base = x.b50[bi];
+    S[t] = { t, x, r, rel: spyR == null ? null : (1 + r) / (1 + spyR) - 1, dd, rec, pre,
+      a21: at.a && at.a.e21 != null ? c[a] > at.a.e21 : null, n21: at.L && at.L.e21 != null ? cs[L] > at.L.e21 : null,
+      n50: at.L && at.L.e50 != null ? cs[L] > at.L.e50 : null, n9: at.L && at.L.e9 != null ? cs[L] > at.L.e9 : null,
+      net, tot, up$: upd$, nd, base, pace: base && nd ? tot / nd / base : null, ups: (L - a) ? upn / (L - a) : null,
+      nh, nhDate: nh == null ? null : (nh < D.length ? D[nh] : "today"), today: lr ? lr.chg : null, cs };
+  }
+  const nsess = Object.values(S)[0] ? Object.values(S)[0].cs.length - 1 - a : 0;
+  const mean = (v) => v.length ? v.reduce((p, q) => p + q, 0) / v.length : null;
+  const med = (v) => { v = v.filter(z => z != null && isFinite(z)).sort((p, q) => p - q); if (!v.length) return null; const m = v.length >> 1; return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2; };
+  const share = (v) => { v = v.filter(z => z != null); return v.length ? v.filter(Boolean).length / v.length : null; };
+  const group = (name, mem, parent) => {
+    const m = mem.map(t => S[t]).filter(Boolean); if (m.length < 3) return null;
+    const r = mean(m.map(s => Math.max(-0.5, Math.min(1, s.r))));
+    const tot = m.reduce((p, s) => p + s.tot, 0), bas = m.reduce((p, s) => p + (s.base || 0) * s.nd, 0);
+    const L0 = m[0].cs.length - 1, spark = [];
+    for (let i = Math.max(0, a - 10); i <= L0; i++) spark.push(mean(m.map(s => s.cs[i] / s.x.c[a])));
+    const td = m.map(s => s.today).filter(z => z != null);
+    return { name, parent, n: m.length, r, rel: spyR == null ? null : (1 + r) / (1 + spyR) - 1, up: share(m.map(s => s.r > 0)),
+      n21: share(m.map(s => s.n21)), a21: share(m.map(s => s.a21)), n50: share(m.map(s => s.n50)),
+      net: m.reduce((p, s) => p + s.net, 0), pace: bas ? tot / bas : null, up$: tot ? m.reduce((p, s) => p + s.up$, 0) / tot : null,
+      nh: m.filter(s => s.nh != null).length, dd: med(m.map(s => s.dd)), rec: med(m.map(s => s.rec)), spark, sk: Math.min(10, a),
+      lead: m.slice().sort((p, q) => q.r - p.r).slice(0, 4), today: td.length ? mean(td) : null, members: m.map(s => s.t) };
+  };
+  const mk = (src, par) => Object.entries(src).map(([g, mem]) => group(g, mem, par ? (X.parent[g] || "") : "")).filter(Boolean);
+  const score = (G) => {
+    const pr = (k) => { const v = G.map(g => g[k] ?? -9).slice().sort((p, q) => p - q); return (x) => v.length > 1 ? v.filter(z => z < (x ?? -9)).length / (v.length - 1) : 0.5; };
+    const W = [["rel", 0.35], ["up", 0.15], ["n21", 0.15], ["up$", 0.2], ["nhs", 0.15]];
+    G.forEach(g => { g.nhs = g.nh / g.n; });
+    const F = W.map(([k, w]) => [k, w, pr(k)]);
+    G.forEach(g => { const raw = 100 * F.reduce((p, [k, w, f]) => p + w * f(g[k]), 0); g.score = Math.round(50 + (raw - 50) * Math.min(1, g.n / 8)); });   // groups under 8 stocks shrunk toward 50
+    return G;
+  };
+  const all = Object.values(S);
+  // day by day: each session's best and worst sub-themes vs SPY (equal-weight member move that day)
+  const spyC = X.bench.SPY || []; const lsp = live ? liveRow("SPY") : null; const spyCs = lsp ? [...spyC, lsp.price] : spyC;
+  const daily = [];
+  for (let i = a + 1; i < spyCs.length; i++) {
+    const sr = spyCs[i] / spyCs[i - 1] - 1;
+    const g = Object.entries(X.subs).map(([n, mem]) => { const v = mem.map(t => S[t]).filter(s => s && s.cs[i] != null && s.cs[i - 1]).map(s => s.cs[i] / s.cs[i - 1] - 1); return v.length >= 3 ? { n, v: mean(v) - sr, up: v.filter(z => z > 0).length / v.length } : null; }).filter(Boolean).sort((p, q) => q.v - p.v);
+    const st = all.filter(s => s.cs[i] != null && s.cs[i - 1]).map(s => ({ t: s.t, v: s.cs[i] / s.cs[i - 1] - 1 }));
+    daily.push({ d: i < D.length ? D[i] : "today", spy: sr, top: g.slice(0, 6), bot: g.slice(-3).reverse(), up: st.length ? st.filter(z => z.v > 0).length / st.length : null });
+  }
+  return { S, all, subs: score(mk(X.subs, true)), themes: score(mk(X.themes, false)), spyR, bench: Object.fromEntries(Object.keys(X.bench).map(b => [b, benchR(b)])),
+    nsess, a, daily, mkt: { up: share(all.map(s => s.r > 0)), n21: share(all.map(s => s.n21)), a21: share(all.map(s => s.a21)), nh: all.filter(s => s.nh != null).length, n: all.length } };
+}
+function emSpark(g) {
+  const v = g.spark.filter(z => z != null); if (v.length < 3) return "";
+  const w = 110, h = 28, lo = Math.min(1, ...v), hi = Math.max(1, ...v), sp = hi - lo || 1, n = v.length - 1;
+  const y = (z) => (h - 2 - (z - lo) / sp * (h - 4)).toFixed(1), kx = (g.sk / n * w).toFixed(1);
+  const pts = v.map((z, i) => `${(i / n * w).toFixed(1)},${y(z)}`).join(" ");
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-label="group index, base = 1"><line x1="0" x2="${w}" y1="${y(1)}" y2="${y(1)}" class="orgridl"/><line x1="${kx}" x2="${kx}" y1="0" y2="${h}" class="orgridl"/><polyline points="${pts}" fill="none" stroke="var(--s1)" stroke-width="1.6"/></svg>`;
+}
+function renderEmerge(app) {
+  const X = (DATA.themes || {}).emerge;
+  if (!X || !X.rows) { app.append($('<div class="card empty">Since the bottom appears after the next data run.</div>')); return; }
+  app.append(liveBar());
+  const D = X.days, picks = D.slice(X.pre);
+  UI.em = UI.em || { st: lsGet("emStart", X.start), view: lsGet("emView", "sub"), by: lsGet("emBy", "score"), sc: lsGet("emScope", "top"), rs: lsGet("emRs", "all"), sb: lsGet("emSort", "r"), sel: "", all: false };
+  const U = UI.em;
+  if (!picks.includes(U.st)) U.st = picks.includes(X.start) ? X.start : picks[picks.length - 1];
+  const si = D.indexOf(U.st), Z = emergeCalc(X, si), live = liveActive();
+  const save = () => { lsSet("emStart", U.st); lsSet("emView", U.view); lsSet("emBy", U.by); lsSet("emScope", U.sc); lsSet("emRs", U.rs); lsSet("emSort", U.sb); try { Object.keys(AUTOSORT).filter(k => k.includes("Since the bottom")).forEach(k => delete AUTOSORT[k]); } catch (e) {} rerenderPanel(); };
+  const pp = (v) => v == null ? "–" : Math.round(v * 100) + "%";
+  const xx = (v) => v == null ? "–" : v.toFixed(2) + "×";
+  const ses = Z.nsess, M = Z.mkt;
+  const head = $(`<section class="card orhead"><h2>Since the bottom <span class="meta">· since the ${shortDate(D[si - 1])} close (${shortDate(U.st)} is the first session counted) · ${ses} session${ses === 1 ? "" : "s"}${live ? " incl. today live" : ""} · data to ${shortDate(X.date)}</span></h2>
+    <div class="filters"><div class="chips" role="group" aria-label="Start"><span class="meta" style="align-self:center">Since the close of</span> <select class="emstart" aria-label="Base close (the bottom)">${picks.slice().reverse().map(d => `<option value="${d}"${d === U.st ? " selected" : ""}>${shortDate(D[D.indexOf(d) - 1])}${d === X.default_start ? " (default)" : ""}</option>`).join("")}</select>
+      ${U.st !== X.start ? `<button class="emreset">Back to ${shortDate(D[D.indexOf(X.start) - 1])}</button>` : ""}</div></div>
+    <div class="meta orsub">Market since the base: ${Object.entries(Z.bench).map(([b, v]) => `<b>${b}</b> <span class="${tint(v, 0.02)}">${pct(v, 1)}</span>`).join(" · ")} ·
+      ${pp(M.up)} of ${M.n} theme stocks up · above their 21 EMA <b>${pp(M.n21)}</b> now vs ${pp(M.a21)} at the base · <b>${M.nh}</b> at a new 3-month closing high.</div>
+    <div class="meta orsub">Pick the close you think was the bottom; everything below re-counts from the next session on. <b>Emergence score</b> (0–100, ranks the groups against each other) =
+      35% vs SPY since the base · 20% share of dollar volume on up days · 15% share of members up · 15% share above their 21 EMA · 15% share at a new 3-month closing high.
+      It's a lens, not a tested signal: past studies here found plain RS leaders lagged after thrusts, while high-beta names paid only after deep washouts (SPY −8%+, T2108 ≤ 25). Watch who keeps scoring as the sessions add up.</div></section>`);
+  const f = head.querySelector(".filters");
+  head.querySelector(".emstart").addEventListener("change", (e) => { U.st = e.target.value; U.sel = ""; save(); });
+  const rb = head.querySelector(".emreset"); if (rb) rb.addEventListener("click", () => { U.st = X.start; save(); });
+  f.append(chips("View", [["sub", "Sub-themes"], ["theme", "Themes"]], U, "view", () => { U.sel = ""; save(); }));
+  f.append(chips("Sort", [["score", "Emergence score"], ["rel", "Vs SPY"], ["flow", "Up-volume share"], ["nh", "New highs"], ["held", "Held up best into the bottom"]], U, "by", save));
+  app.append(head);
+  const SORT = { score: (p, q) => q.score - p.score, rel: (p, q) => (q.rel ?? -9) - (p.rel ?? -9), flow: (p, q) => (q.up$ ?? -9) - (p.up$ ?? -9), nh: (p, q) => q.nhs - p.nhs || q.rel - p.rel, held: (p, q) => (q.dd ?? -9) - (p.dd ?? -9) };
+  const G = (U.view === "sub" ? Z.subs : Z.themes).slice().sort(SORT[U.by] || SORT.score);
+  const rank = Object.fromEntries((U.view === "sub" ? Z.subs : Z.themes).slice().sort(SORT.score).map((g, i) => [g.name, i + 1]));
+  const gtab = $(`<section class="card ortable"><div class="head"><h2>${G.length} ${U.view === "sub" ? "sub-themes" : "themes"} <span class="meta">· click a name to list its stocks below · hover a header for what it means</span></h2><button class="xopen emgtv">⬇ TradingView (top 10 groups)</button></div>
+    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">${U.view === "sub" ? "Sub-theme" : "Theme"}</th><th title="0–100 vs the other groups (see the note above)">Score</th><th title="Equal-weight member move since the base close">Since</th><th>Vs SPY</th>
+      <th title="Share of members up since the base">Up</th><th title="Share above their 21 EMA now (and the change since the base)">Above 21 EMA</th><th title="Share above their 50 EMA now">Above 50</th>
+      <th title="Share of the group's dollar volume traded on up days since the base">Up-$ share</th><th title="Average daily dollar volume since the base vs the 50 days before">$ vol × normal</th>
+      <th title="Members at a new 3-month closing high since the base">New highs</th><th title="Median drop from the 20-day closing high into the base close (closer to 0 = held up)">Into the bottom</th>
+      <th title="Median share of that drop won back since">Won back</th>${live ? "<th>Today</th>" : ""}<th class="l">Base → now</th><th class="l">Leading stocks since the base</th></tr></thead><tbody>
+    ${G.map(g => `<tr${g.name === U.sel ? ' class="sel"' : ""}><td class="num">${rank[g.name]}</td><td class="l"><a href="#" class="emg" data-g="${esc(g.name)}"><b>${esc(g.name)}</b></a><small class="meta" style="display:block">${g.n} stocks${g.parent ? " · " + esc(g.parent) : ""}</small></td>
+      <td class="num"><b>${g.score}</b></td><td class="num ${tint(g.r, 0.03)}">${pct(g.r, 1)}</td><td class="num ${tint(g.rel, 0.02)}">${pct(g.rel, 1)}</td><td class="num">${pp(g.up)}</td>
+      <td class="num" data-v="${g.n21 ?? 0}">${pp(g.n21)}<small class="meta" style="display:block">${g.a21 == null ? "" : (g.n21 - g.a21 >= 0 ? "+" : "") + Math.round((g.n21 - g.a21) * 100) + " pts"}</small></td>
+      <td class="num">${pp(g.n50)}</td><td class="num ${g.up$ == null ? "" : tint(g.up$ - 0.5, 0.15)}">${pp(g.up$)}</td><td class="num">${xx(g.pace)}</td>
+      <td class="num" data-v="${g.nhs}">${g.nh}<small class="meta"> / ${g.n}</small></td><td class="num ${tint(g.dd, 0.08)}">${pct(g.dd, 1)}</td><td class="num">${g.rec == null ? "–" : Math.round(g.rec * 100) + "%"}</td>
+      ${live ? `<td class="num ${tint(g.today, 0.02)}">${pct(g.today, 1)}</td>` : ""}<td class="l">${emSpark(g)}</td>
+      <td class="l">${g.lead.map(s => `<a href="#" class="tkl" data-t="${esc(s.t)}"><b>${esc(s.t)}</b></a> <small class="meta">${pct(s.r, 0)}</small>`).join(" · ")}</td></tr>`).join("")}
+    </tbody></table></div></section>`);
+  gtab.querySelectorAll(".emg").forEach(el => el.addEventListener("click", (e) => { e.preventDefault(); U.sel = U.sel === el.dataset.g ? "" : el.dataset.g; if (U.sel) U.sc = "sel"; else if (U.sc === "sel") U.sc = "top"; save(); }));
+  gtab.querySelector(".emgtv").addEventListener("click", () => tsDownload("since-the-bottom-groups", G.slice(0, 10).map(g => ({ name: shortDate(U.st) + " - " + g.name, ticks: g.lead.map(s => s.t).concat(g.members.filter(t => !g.lead.some(s => s.t === t))).slice(0, 12) }))));
+  app.append(gtab);
+  // stocks
+  const top10 = new Set((U.view === "sub" ? Z.subs : Z.themes).slice().sort(SORT.score).slice(0, 10).flatMap(g => g.members));
+  const selG = U.sel ? G.find(g => g.name === U.sel) : null;
+  if (U.sc === "sel" && !selG) U.sc = "top";
+  let rows = Z.all.filter(s => U.sc === "all" || (U.sc === "top" ? top10.has(s.t) : selG.members.includes(s.t)));
+  if (U.rs === "80") rows = rows.filter(s => (s.x.rs || 0) >= 80);
+  if (U.rs === "nh") rows = rows.filter(s => s.nh != null);
+  if (U.rs === "rc") rows = rows.filter(s => s.n21 && s.a21 === false);
+  const SS = { r: (p, q) => q.r - p.r, first: (p, q) => (p.nh ?? 999) - (q.nh ?? 999) || q.r - p.r, held: (p, q) => q.dd - p.dd, flow: (p, q) => (q.up$ / (q.tot || 1)) - (p.up$ / (p.tot || 1)) || q.r - p.r, pace: (p, q) => (q.pace ?? 0) - (p.pace ?? 0) };
+  rows.sort(SS[U.sb] || SS.r);
+  const shown = U.all ? rows : rows.slice(0, 80);
+  const tag21 = (s) => s.n21 == null ? "–" : s.n21 && s.a21 === false ? '<span class="tg sow-breakout">Reclaimed</span>' : s.n21 ? '<span class="tg">Held above</span>' : s.a21 ? '<span class="tg sow-extended">Lost it</span>' : '<span class="meta">Below</span>';
+  const scard = $(`<section class="card ortable"><div class="head"><h2>Stocks <span class="meta">· ${rows.length} ${U.sc === "sel" ? "in " + esc(U.sel) : U.sc === "top" ? "in the top 10 groups by score" : "theme stocks"}</span></h2><button class="xopen emstv">⬇ TradingView</button></div>
+    <div class="filters"></div>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th class="l">Sub-theme</th><th>RS</th><th>Since</th><th>Vs SPY</th><th title="Drop from the 20-day closing high into the base close">Into the bottom</th><th title="Share of that drop won back">Won back</th>
+      <th class="l" title="Close vs the 21 EMA now, compared with the base">21 EMA</th><th title="Share of its dollar volume since the base traded on up days">Up-$ share</th><th title="Average $ volume since the base vs its 50-day average">$ vol × normal</th>
+      <th title="First session it closed at a new 3-month high after the base">New 3-mo high</th>${live ? "<th>Today</th>" : ""}</tr></thead><tbody>
+    ${shown.map(s => `<tr><td class="l"><a href="#" class="tkl" data-t="${esc(s.t)}"><b>${esc(s.t)}</b></a><small class="meta" style="display:block">${esc(s.x.nm)}</small></td><td class="l"><small>${esc(s.x.sub || "–")}</small></td>
+      <td class="num">${s.x.rs ?? "–"}</td><td class="num ${tint(s.r, 0.04)}">${pct(s.r, 1)}</td><td class="num ${tint(s.rel, 0.03)}">${pct(s.rel, 1)}</td><td class="num ${tint(s.dd, 0.1)}">${pct(s.dd, 1)}</td>
+      <td class="num" data-v="${s.rec ?? -9}">${s.rec == null ? "–" : s.rec > 3 ? "300%+" : Math.round(s.rec * 100) + "%"}</td><td class="l">${tag21(s)}</td><td class="num">${s.tot ? pp(s.up$ / s.tot) : "–"}</td><td class="num">${xx(s.pace)}</td>
+      <td class="num" data-v="${s.nh == null ? 0 : 999 - s.nh}">${s.nhDate ? (s.nhDate === "today" ? "today" : shortDate(s.nhDate)) : "–"}</td>${live ? `<td class="num ${tint(s.today, 0.03)}">${pct(s.today, 1)}</td>` : ""}</tr>`).join("")}
+    </tbody></table></div>${rows.length > shown.length ? `<button class="xopen emall" style="margin:8px 0">Show all ${rows.length}</button>` : ""}</section>`);
+  const f2 = scard.querySelector(".filters");
+  f2.append(chips("Which", [["top", "Top 10 groups"], ...(selG ? [["sel", esc(U.sel)]] : []), ["all", "All theme stocks"]], U, "sc", save));
+  f2.append(chips("Only", [["all", "Any"], ["80", "RS 80+"], ["nh", "Made a new 3-month high"], ["rc", "Reclaimed the 21 EMA"]], U, "rs", save));
+  f2.append(chips("Sort", [["r", "Most up since"], ["first", "First to a new high"], ["flow", "Up-volume share"], ["pace", "$ volume × normal"], ["held", "Held up best"]], U, "sb", save));
+  const ab = scard.querySelector(".emall"); if (ab) ab.addEventListener("click", () => { U.all = true; rerenderPanel(); });
+  scard.querySelector(".emstv").addEventListener("click", () => tsDownload("since-the-bottom-stocks", [{ name: "Since " + shortDate(U.st), ticks: rows.slice(0, 120).map(s => s.t) }]));
+  app.append(scard);
+  // day by day
+  const dcard = $(`<section class="card"><h2>Day by day <span class="meta">· which sub-themes led each session since the base (equal-weight member move minus SPY's) — the order groups show up in is the emergence story</span></h2>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">Session</th><th>SPY</th><th title="Share of theme stocks up that day">Stocks up</th><th class="l">Led</th><th class="l">Lagged</th></tr></thead><tbody>
+    ${Z.daily.slice().reverse().map(d => `<tr><td class="l"><b>${d.d === "today" ? "Today (live)" : shortDate(d.d)}</b></td><td class="num ${tint(d.spy, 0.01)}">${pct(d.spy, 1)}</td><td class="num">${pp(d.up)}</td>
+      <td class="l">${d.top.map(g => `${esc(g.n)} <small class="g2">${num(g.v * 100, 1)}</small>`).join(" · ")}</td><td class="l"><small>${d.bot.map(g => `${esc(g.n)} <span class="r2">${num(g.v * 100, 1)}</span>`).join(" · ")}</small></td></tr>`).join("")}
+    </tbody></table></div></section>`);
+  app.append(dcard);
+}

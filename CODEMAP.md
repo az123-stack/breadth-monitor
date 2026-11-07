@@ -739,6 +739,18 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   `POP_DAYS` 25 sessions; state running (within 0.5 group ADR of the post-pop high) / pulling back / gave_back (under the pop-day open); rel = vs
   SPY since the pop close; names = lifecycle `stock_frames` base members with Lined-up fields → page `lineupState` tags live; `live_today` = groups in
   data/runner_log.csv today. Study: post-pop dips +0.19R ≈ no-pop dips +0.18R (t 1.27) → a memory, not an edge. Test `test_pop_watch`.
+- **Since the bottom** (Nov 7, 2026; Adam: "a tab dedicated to analyzing the themes that emerge starting from the beginning of the day 11/6 …
+  money flow, EMAs etc. This date may change" + "since 11/5 because I want it to include 11/6"; card R-2026-11-07-since-the-bottom, untested)
+  → `breadth/emerge.py` `build(adjusted, theme_data, start=None)` (update.py after popwatch, ~45 s) → `DATA.themes.emerge` {date, days (45),
+  pre 20, start (first session counted; default `config.EMERGE_START` "2026-11-06" = base Nov 5 close), bench {SPY, QQQ, IWM: closes},
+  subs / themes {name: members with data, 3+}, parent {sub: group}, rows {t: c (45 closes), dv / b50 ($M, last 25), e (EMA 9/21/50 seeds at
+  the day before the last 25), hs (max close of the 63 sessions before the closes), rs, sub, nm}} (~0.75 MB, 1,065 stocks). Liquid theme /
+  sub-theme stocks $5+, $5M+/day 50-day, ETFs and deals out. Page `emergeCalc` / `renderEmerge` (v3_tabs.js): picker "Since the close of"
+  (last 25 closes, localStorage emStart; "Back to" default), View Sub-themes / Themes, Sort; group table (score, since, vs SPY, % up, % > 21 EMA
+  + change, % > 50, up-$ share, $ vol × normal, new 3-month closing highs, into the bottom, won back, spark from 10 sessions before the base,
+  leading stocks; click a name = its stocks); stock table (Which / Only / Sort chips, 80 rows until "Show all", ⬇ TradingView); Day by day
+  (best 6 / worst 3 sub-themes each session vs SPY). Live: Google price appended as a session. Emergence score = rank percentiles 35% vs SPY,
+  20% up-$ share, 15% % up, 15% % > 21 EMA, 15% new-high share, groups < 8 stocks shrunk toward 50 — untested. Test `test_since_the_bottom`.
 - **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
   `build(adjusted, theme_data)` (~70 s) → `DATA.themes.inplay` {date, days, rows, n, counts, pool {t: [adr, v50, sub]}}, v3 Stocks → **In Play**
   (`renderInPlay` in v3_tabs.js). Universe stocks $5+, $10M+/day (no deals), last 5 sessions: news = gap ≥ max(3%, 1 ADR) on 2.5x vol
