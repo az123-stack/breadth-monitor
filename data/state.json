@@ -1,5 +1,5 @@
 {
-  "universe_refreshed": "2026-10-31",
+  "universe_refreshed": "2026-11-07",
   "splits_covered_from": "2024-10-10",
   "extras_done": [
     "AAXJ",
@@ -120,6 +120,7 @@
     "KEP",
     "KIE",
     "KRE",
+    "KVUE",
     "KWEB",
     "LAZR",
     "LEGN",
