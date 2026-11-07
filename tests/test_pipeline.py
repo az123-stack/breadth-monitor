@@ -2104,6 +2104,62 @@ def test_in_play():
     assert F2["news"]["NEWS"].iloc[-2] == F["news"]["NEWS"].iloc[-2]
 
 
+def test_librarian_brief():
+    """The Librarian's weekly Project brief: pinned rules can't fade, layer statuses and card ids must be real,
+    new cards can't be silently dropped, no secrets, a word cap, and only `approve` writes the approved brief."""
+    import json as _json, shutil, tempfile
+    from pathlib import Path
+    from breadth import librarian as LB, agentfiles as AF
+    saved = (config.DATA_DIR, config.DOCS_DIR, LB._rdir)
+    config.DATA_DIR = config.ROOT / "data"
+    config.DOCS_DIR = config.ROOT / "docs"
+    try:
+        pack = LB.pack()
+        assert all(f"## {i}." in pack for i in range(1, 9)) and LB.pinned_rules()
+        assert all(r in pack for r in LB.pinned_rules())
+        draft = _json.loads((config.ROOT / "docs" / "agent" / "brief.json").read_text())
+        text = draft["brief"]
+        assert LB.check_brief(text)[0] == [], LB.check_brief(text)[0]
+        clean = AF.validate("brief", {"for_date": "2026-11-07", "summary": "s", "brief": text,
+                                      "changes": [{"change": "added", "what": "w", "source": "PINNED"}, {"change": "x"}]})
+        assert clean["changes"] == [{"change": "added", "what": "w", "source": "PINNED"}]
+        rule = LB.pinned_rules()[0]
+        bad = {"pinned": text.replace(rule, rule[:-5]),
+               "status": text.replace("launch (live)", "launch (info)", 1),
+               "card": text + "\nR-2099-01-01-made-up\n",
+               "secret": text + "\nMASSIVE_API_KEY=abcd1234efgh5678\n",
+               "cap": text + " word" * LB.WORD_CAP,
+               "header": "<!-- approved: 2026-11-07 draft: 2026-11-07 -->\n" + text,
+               "section": text.replace("## Open threads", "## Later")}
+        for k, b in bad.items():
+            assert LB.check_brief(b)[0], f"{k} not caught"
+        try:
+            AF.validate("brief", {"for_date": "2026-11-07", "summary": "s", "brief": bad["pinned"]})
+            raise AssertionError("bad brief validated")
+        except ValueError:
+            pass
+        tmp = Path(tempfile.mkdtemp())
+        try:
+            shutil.copy(config.ROOT / "research" / LB.PINNED, tmp / LB.PINNED)
+            LB._rdir = lambda: tmp
+            config.DOCS_DIR = tmp / "docs"
+            (tmp / "docs" / "agent").mkdir(parents=True)
+            assert LB.approved() == (None, None, "") and "no draft" in LB.diff()
+            (tmp / "docs" / "agent" / "brief.json").write_text(_json.dumps({**clean, "for_date": "2026-11-01"}))
+            assert "+" in LB.diff().splitlines()[0]
+            LB.approve()
+            ap, dr, body = LB.approved()
+            assert dr == "2026-11-01" and body.strip() == clean["brief"].strip()
+            # cards filed on/after the approved draft date must now be named
+            assert LB.check_brief(text)[0] == []
+            assert any("R-2026-11-04-pop-watch" in e for e in LB.check_brief(text.replace("R-2026-11-04-pop-watch", "pop watch"))[0])
+        finally:
+            shutil.rmtree(tmp)
+    finally:
+        config.DATA_DIR, config.DOCS_DIR, LB._rdir = saved
+    return f"{len(text.split())} words"
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

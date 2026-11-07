@@ -1013,5 +1013,20 @@ research card if it gets tested. Strategy 1 = Pop watch pullbacks (v3 Groups →
   `data/layers.json` registry (ladder idea→tested→info→proven→approved→live, retired), "Market Monitor · Integrator" Sat 10:07 AM ET
   → `docs/agent/plan.json` (kind `plan`). **Every research chat ends by filing a card** (`python -m breadth.research new ...`),
   updating `integrated` on cards and `status` in the registry when something is built. "build #N" = build Integrator plan item N.
+- **Librarian · weekly Project brief** (Nov 7, 2026; Adam: a "sleep cycle" agent that consolidates what the project knows each week;
+  card R-2026-11-07-librarian, process). Problem: the claude.ai Project's context doc ("Market Dashboard Context", what every Market
+  Dashboard chat starts from) went stale while this repo stayed current. `breadth/librarian.py` (stdlib): `pack` = source bundle from
+  the REPO ONLY, never chats (research/PINNED.md, data/layers.json, every card's one-line result, ROADMAP open items, the Integrator plan,
+  DECISIONS.md, CLAUDE.md minus findings with a shortened code map, the approved brief); `check --file F` / agentfiles kind `brief`
+  validate a draft: the 5 sections in order (Rules that never fade, How it runs, What's live, Findings, Open threads), every pinned rule
+  word for word (pinned rules never decay; only Adam edits research/PINNED.md), ≤ 3,000 words, layers written `id (status)` must match the
+  registry, every R- id must exist, every card dated on/after the approved brief's draft date must be named, no secret-looking strings,
+  no "approved" header. Scheduled task "Market Monitor · Librarian (weekly Project brief)" Sat 11:07 AM ET (after the Integrator) drafts
+  it and publishes `docs/agent/brief.json` (summary, brief, changes with sources) via `agentfiles publish --kind brief --push`, then
+  notifies Adam with the change list. PROPOSES ONLY. When Adam says **"approve brief"**: pull, `python -m breadth.librarian diff` (show
+  him the gist if he asks), `python -m breadth.librarian approve` (writes research/BRIEF.md with an `<!-- approved: … draft: … -->`
+  header; refuses if the draft no longer passes), commit + push, then replace the Project doc "Market Dashboard Context" with BRIEF.md
+  (Projects tool `project_write`, same path, without the header line). "reject brief" = do nothing; next Saturday drafts again.
+  Test `test_librarian_brief`.
 - Scheduled tasks: "Market Monitor · macro brief agent" 7:02 AM, "· catalyst agent" 7:12 AM (Mon–Fri), "· weekly layer
   review" Sat 9:07 AM (push notification).

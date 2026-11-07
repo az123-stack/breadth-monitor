@@ -106,3 +106,9 @@ If agent input lands while a daily update runs, the daily update's last step reb
   equally, unusable brief/review = missing.
 - Agent layers: forward log started Oct 15, 2026 (Oct 15 rows have no agent data; first full agent day: Oct 16 cards,
   researched Mon Oct 19 before the open). Earliest meaningful test ≈ 60+ settled ideas over 20+ dates (~5–6 weeks).
+
+## Librarian (Nov 7, 2026)
+The Project brief every chat starts from is rewritten weekly by the Librarian agent from the repo (never from chats), under the same
+rule as every other agent: it proposes, Adam approves ("approve brief"). Pinned rules (research/PINNED.md) are copied word for word and
+can't fade; the check rejects wrong layer statuses, unknown or missing new cards, secrets, and drafts over 3,000 words.
+

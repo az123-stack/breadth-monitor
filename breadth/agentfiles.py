@@ -21,8 +21,8 @@ from datetime import datetime, timezone
 from . import config
 
 REPO = "az123-stack/breadth-monitor"
-KINDS = ("catalysts", "macro_brief", "review", "plan", "reclass")
-WEEKLY = ("review", "plan", "reclass")      # weekly agents: not tied to a card date / entry cutoff
+KINDS = ("catalysts", "macro_brief", "review", "plan", "reclass", "brief")
+WEEKLY = ("review", "plan", "reclass", "brief")      # weekly agents: not tied to a card date / entry cutoff
 FULL_RESEARCH = 15        # first N carded tickers get full catalyst research; the rest get an earnings-date check only
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 URL = re.compile(r"^https?://\S+$")
@@ -59,6 +59,16 @@ SCHEMA = {
         "retire": [{"target": "layer id or agent name", "why": "evidence"}],
         "registry_updates": [{"layer": "id", "to": "proposed status on the ladder", "why": "evidence"}],
         "card_updates": [{"card": "R-...", "integrated": "yes | partly | no | rejected", "why": "..."}],
+    },
+    "brief": {
+        "for_date": "YYYY-MM-DD — today's date (America/New_York)",
+        "summary": "2-4 plain sentences for Adam: what changed in the brief this week and why",
+        "brief": "the whole Project brief as markdown: sections '## Rules that never fade', '## How it runs', \"## What's live\", "
+                 "'## Findings', '## Open threads' in that order; pinned rules word for word; layers written as `id (status)`; "
+                 "every NEW card from the pack named by id; <= 3000 words (python -m breadth.librarian check --file F)",
+        "changes": [{"change": "added | updated | merged | retired | moved",
+                     "what": "one line: what changed in the brief",
+                     "source": "where it came from: an R- card id, a repo path (CLAUDE.md, ROADMAP.md, data/layers.json...) or PINNED"}],
     },
     "reclass": {
         "for_date": "YYYY-MM-DD — copy `for_date` from `python -m breadth.reclass worklist`",
@@ -291,6 +301,9 @@ def validate(kind, js, allowed=None):
         out["checked"] = int(ck) if isinstance(ck, (int, float)) or (isinstance(ck, str) and ck.isdigit()) else len(moves)
         if not moves:
             raise ValueError("no valid moves (each needs a worklist ticker, a known sub-theme or 'NEW: Group / Name', and a source)")
+    elif kind == "brief":
+        from . import librarian
+        out.update(librarian.validate(js))
     elif kind == "review":
         out["summary"] = _s(js.get("summary"), 700)
         out["findings"] = [_s(x, 300) for x in _list(js.get("findings")) if isinstance(x, str) and _s(x)][:10]
@@ -317,6 +330,8 @@ def validate(kind, js, allowed=None):
 
 
 def _allowed(kind):
+    if kind in ("brief", "plan", "review"):
+        return None
     if kind == "reclass":
         from . import reclass
         W = reclass.worklist()

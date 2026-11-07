@@ -92,6 +92,10 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
 10. **Retired from the page Oct 27** (old Top 2 swing picks, Decision Cards, pick scoreboard): Python still logs them quietly. Around
    December decide whether to delete that code for good (it costs build time) — the macro brief stays (Read-out card).
 
+## Librarian (Nov 7, 2026)
+- First draft brief published Nov 7 (docs/agent/brief.json). Waiting on Adam: "approve brief" → approve + copy into the Project doc
+  (see CLAUDE.md "Librarian"). After ~4 weekly runs, check whether the briefs drift or stay stable; tighten PINNED.md only on Adam's say.
+
 ## Housekeeping
 11. **Build time** ~5½ minutes per rebuild: profile it (`python -m cProfile -m breadth.update --rebuild-only`) and speed up the slowest
    parts (box study ~85 s, SoW ~40 s, market health ~40 s are known).
