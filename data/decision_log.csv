@@ -362,7 +362,6 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-05,QLYS,watch,kq,thrust,Deteriorating,Focus,0.155,94.0,Identity & Security Tools,78.6,neutral,,-0.84,-1.66,+1% dollar → +2.6%,,,"October jobs report (payrolls, unemployment) 2026-11-06",,,,,,high,2,1,,,,,pending
 2026-11-06,A,cand,pullback,thrust,Deteriorating,Focus,0.279,87.0,Life Science Tools,85.3,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,2,1,,,,,pending
 2026-11-06,ACHC,cand,round,thrust,Deteriorating,Focus,0.293,96.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,ARHS,cand,ath,thrust,Deteriorating,Focus,0.16,95.0,Home Improvement & Specialty Retail,88.0,confirmed,,2.06,11.31,+10bp 10-yr yield → -2.9%,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-06,AVAH,cand,rotation,thrust,Deteriorating,Focus,0.406,95.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-06,BTSG,cand,rotation,thrust,Deteriorating,Focus,0.406,93.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-06,CON,cand,rotation,thrust,Deteriorating,Focus,0.406,96.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
