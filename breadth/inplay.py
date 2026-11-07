@@ -21,6 +21,25 @@ from . import config, store, strength
 
 CFG = dict(win=5, px=5.0, dvol=10e6, gap_min=0.03, gap_adr=1.0, rv_news=2.5, rv_brk=1.5, base_n=40, base_adr=6.0, hi_n=60,
            range_adr=2.0, rv_range=2.0, ipo_n=120, live_move_adr=2.0, live_rv=2.0, max_rows=800)
+# Ranking score (Nov 7, 2026; Adam: "score the in play so it's sorted with the best at the top"; card R-2026-11-07-inplay-score,
+# tools/inplay_study/score.py). Only traits with the same sign in BOTH halves (Nov 2025–Oct 2026, next open → 10 sessions):
+#   +1 sub-theme top third on 63-day equal-weight return (+2.9 pts vs other in-play stocks) · +1 within 15% of the 52-wk high (+2.1)
+#   −1 spike in the window: gap 10%+, day +20%+ or 20x volume (−6.8) · −1 ADR over 10% (−12.2) · −1 30%+ below the 52-wk high (−3.3)
+# Score +2 → +1.2% vs SPY over 10 sessions (56% up); −3 → −18.9% (22%). Up/down direction, RS, freshness: halves disagreed, not used.
+RANK = dict(grp_top=2 / 3, near=-0.15, far=-0.30, spike_gap=0.10, spike_day=0.20, spike_rv=20.0, adr_max=0.10)
+
+
+def rank_marks(sub, top_groups, off_hi, spike, adr):
+    """Ranking marks for one in-play stock: list of "+Leading group" / "-Spike" ...; score = (+1 each "+") − (1 each "-")."""
+    rk = []
+    if sub and sub in top_groups: rk.append("+Leading group")
+    if off_hi is not None and np.isfinite(off_hi) and off_hi >= RANK["near"]: rk.append("+Near 52-wk high")
+    if spike: rk.append("-Spike")
+    if adr is not None and np.isfinite(adr) and adr > RANK["adr_max"]: rk.append("-ADR > 10%")
+    if off_hi is not None and np.isfinite(off_hi) and off_hi <= RANK["far"]: rk.append("-30%+ off high")
+    return rk
+
+
 PTS = {"earnings": 3, "news": 3, "breakout": 2, "base": 2, "breakdown": 2, "range": 1, "ipo": 1}
 
 
@@ -85,6 +104,20 @@ def build(adjusted, theme_data=None):
     cat = _catalysts()
     deals = {s["t"] for s in stocks.values() if s.get("deal")}
     hi52 = W["h"].rolling(252, min_periods=60).max().iloc[d]
+    # sub-theme equal-weight 63-session return rank (top third = leading group)
+    r1 = c.pct_change().clip(-0.5, 1.0)
+    members = {}
+    for t2, g in sub_of.items():
+        if t2 in c.columns:
+            members.setdefault(g, []).append(t2)
+    g63 = {}
+    for g, m in members.items():
+        if len(m) >= 3:
+            ix = (1 + r1[m].iloc[-64:].mean(axis=1)).prod() - 1
+            g63[g] = float(ix)
+    gr = pd.Series(g63).rank(pct=True) if g63 else pd.Series(dtype=float)
+    top_groups = sorted(gr[gr >= RANK["grp_top"]].index)
+    spike_w = ((F["gap"] >= RANK["spike_gap"]) | (F["move"] >= RANK["spike_day"]) | (F["rv"] > RANK["spike_rv"])).iloc[list(win)].any()
     rows, pool = [], {}
     for t in tick:
         if not bool(liq.get(t, False)) or t in deals:
@@ -93,7 +126,8 @@ def build(adjusted, theme_data=None):
         v50 = F["v50"][t].iloc[d]
         s = stocks.get(t) or {}
         if np.isfinite(a) and np.isfinite(v50):
-            pool[t] = [round(float(a), 4), int(v50), sub_of.get(t, "")]
+            h52 = hi52.get(t, np.nan)
+            pool[t] = [round(float(a), 4), int(v50), sub_of.get(t, ""), round(float(h52), 2) if np.isfinite(h52) else None]
         why = []
         for j in win:
             day = str(days[j].date())
@@ -124,6 +158,8 @@ def build(adjusted, theme_data=None):
         c0 = c[t]
         dirn = float(c0.iloc[d] / c0.iloc[d - CFG["win"]] - 1) if nb > CFG["win"] else float(c0.iloc[d] / c0.dropna().iloc[0] - 1)
         e = (cat.get(t) or {}).get("earnings_date")
+        offh = float(c0.iloc[d] / hi52[t] - 1) if np.isfinite(hi52.get(t, np.nan)) else np.nan
+        rk = rank_marks(s.get("sub") or sub_of.get(t, ""), top_groups, offh, bool(spike_w.get(t, False)), a)
         rows.append({
             "t": t, "name": s.get("name") or names.get(t, ""), "sub": s.get("sub") or sub_of.get(t, ""),
             "rs": int(round(s["rsr"])) if s.get("rsr") is not None else int(rs_last.get(t)) if np.isfinite(rs_last.get(t, np.nan)) else None,
@@ -134,10 +170,11 @@ def build(adjusted, theme_data=None):
             "off_hi": round(float(c0.iloc[d] / hi52[t] - 1), 4) if np.isfinite(hi52.get(t, np.nan)) else None,
             "dvol": round(float(dv20[t].iloc[d]) / 1e6, 1), "kinds": kinds, "why": sorted(why, key=lambda w: w["ago"]),
             "ago": min(w["ago"] for w in why), "score": round(score, 2),
+            "rank": sum(1 if x[0] == "+" else -1 for x in rk), "rank_why": rk,
             "earn_next": e if e and e > str(days[d].date()) else None,
             "dir": "up" if dirn > 0 else "down",
         })
-    rows.sort(key=lambda r: (r["ago"], -r["score"]))
+    rows.sort(key=lambda r: (-r["rank"], r["ago"], -r["score"], -(r["rs"] or 0)))
     try:
         from . import unseen
         on = unseen.on_lists(theme_data or {}, {r["t"] for r in rows})
@@ -147,7 +184,7 @@ def build(adjusted, theme_data=None):
         pass
     counts = {k: sum(1 for r in rows if k in r["kinds"]) for k in PTS}
     return {"date": str(days[d].date()), "days": [str(days[j].date()) for j in win], "cfg": CFG, "rows": rows[:CFG["max_rows"]],
-            "n": len(rows), "counts": counts, "pool": pool}
+            "n": len(rows), "counts": counts, "pool": pool, "top_groups": top_groups, "rank_cfg": RANK}
 
 
 if __name__ == "__main__":   # python -m breadth.inplay → today's in-play list

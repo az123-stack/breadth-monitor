@@ -747,6 +747,11 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   "Today" (move ≥ 2 ADRs, or gap ≥ max(3%, 1 ADR) with paced vol ≥ 2x); before the open Yahoo pre-market (≥ 6 active bars). Chips Why
   (multi) / Direction / When / RS / search (localStorage ipWhy/ipDir/ipWhen/ipRs), ⬇ TradingView, "On these lists". Descriptive only;
   test "same setup, in play vs not" queued in ROADMAP. Test `test_in_play`.
+  Ranking (Nov 7, Adam: "score the in play so it's sorted with the best at the top"; card R-2026-11-07-inplay-score,
+  tools/inplay_study/score.py): `inplay.RANK` / `rank_marks` → rows `rank` (−3…+2) + `rank_why`; +1 sub-theme top third on 63-day return
+  (`top_groups` in the payload), +1 within 15% of the 52-wk high, −1 spike in the window (gap 10%+, day +20%+, 20x vol), −1 ADR > 10%,
+  −1 30%+ off the high (only traits with the same sign in both halves). Rows sorted rank → newest → activity → RS; `pool[t]` gains hi52 so
+  the page scores live-only "Today" names too. Page: Score column + Sort chip Best first / Newest first (localStorage ipSort). Test `test_in_play_rank`.
 - **AI Revenue setups** (Nov 5, 2026; Adam: "a separate tab for AI Revenue Setups where we look for all these stocks coming back into EMAs")
   → `breadth/airev.py` `build(adjusted, theme_data)` (~60 s, after lifecycle / aimon / popwatch) → `DATA.themes.airev`, v3 Stocks → **AI Revenue**
   (`renderAIRev`). Names: aimon pool (verified AI revenue line, with the market's in / out verdict) + "Enterprise AI SaaS" / "AI Monetizers" theme

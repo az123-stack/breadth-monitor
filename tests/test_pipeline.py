@@ -2077,6 +2077,14 @@ def test_pop_watch():
     return r["state"]
 
 
+def test_in_play_rank():
+    """Nov 7: In Play ranking marks (both-halves traits only): leading group / near the high add, spike / ADR > 10% / 30%+ off subtract."""
+    from breadth import inplay
+    assert inplay.rank_marks("G", ["G"], -0.05, False, 0.04) == ["+Leading group", "+Near 52-wk high"]
+    assert inplay.rank_marks("H", ["G"], -0.40, True, 0.12) == ["-Spike", "-ADR > 10%", "-30%+ off high"]
+    assert inplay.rank_marks("", [], None, False, None) == []
+
+
 def test_in_play():
     """Nov 5: In Play flags a news gap (≥ max(3%, 1 ADR) on 2.5x vol), a fresh 52-wk high on 1.5x vol and a 2-ADR range day on 2x vol
     in the last 5 sessions, from data known at each close; a quiet stock is left out."""
@@ -2145,13 +2153,14 @@ def test_librarian_brief():
             config.DOCS_DIR = tmp / "docs"
             (tmp / "docs" / "agent").mkdir(parents=True)
             assert LB.approved() == (None, None, "") and "no draft" in LB.diff()
-            (tmp / "docs" / "agent" / "brief.json").write_text(_json.dumps({**clean, "for_date": "2026-11-01"}))
+            (tmp / "docs" / "agent" / "brief.json").write_text(_json.dumps({**clean, "for_date": "2099-01-01"}))
             assert "+" in LB.diff().splitlines()[0]
             LB.approve()
             ap, dr, body = LB.approved()
-            assert dr == "2026-11-01" and body.strip() == clean["brief"].strip()
-            # cards filed on/after the approved draft date must now be named
-            assert LB.check_brief(text)[0] == []
+            assert dr == "2099-01-01" and body.strip() == clean["brief"].strip()
+            assert LB.check_brief(text)[0] == []          # no card filed after the draft date → nothing new required
+            # cards filed on/after the approved draft date must be named (later cards may also be listed as missing)
+            (tmp / LB.APPROVED).write_text("<!-- approved: 2026-11-07 draft: 2026-11-04 -->\n" + body)
             assert any("R-2026-11-04-pop-watch" in e for e in LB.check_brief(text.replace("R-2026-11-04-pop-watch", "pop watch"))[0])
         finally:
             shutil.rmtree(tmp)
