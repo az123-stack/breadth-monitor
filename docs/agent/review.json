@@ -1,20 +1,19 @@
 {
- "for_date": "2026-10-30",
- "written": "2026-10-31T13:16Z",
- "summary": "Still too early to judge the news, catalyst and macro-brief layers: only 132 ideas from 6 days (Oct 15-22) have closed, far short of the ~60 ideas over 20+ days the rule needs. The macro-fit backtest (6,382 past setups) again fails: stocks with a recent macro headwind actually did better than those with a tailwind, in both halves, but not by enough to count (t -1.64). The old 5-day swing Top 2 is roughly flat (19 closed, +0.1% avg, 47% winners vs +0.7% for the average candidate). Nothing passed, so nothing should change.",
+ "for_date": "2026-11-06",
+ "written": "2026-11-07T14:14Z",
+ "summary": "Nothing has earned a promotion this week. The macro-fit backtest failed again (stocks with a macro tailwind did slightly worse, not better), and the forward log now has 249 settled ideas but only 11 dates, well short of the 20 dates a fair test needs, so every agent layer stays information only. This week's settled ideas lost about 3.6% vs SPY on average as the market weakened into the Nov 4 thrust; the old swing Top 2 picks held up better than the average candidate, mostly thanks to two big CDNA wins.",
  "findings": [
-  "Macro fit (backtest Apr 2025-Oct 2026, 6,382 signals): tailwind +0.47% (n 1,062) vs headwind +1.92% (n 801), t -1.64, both halves negative (-1.0, -1.1 pts). Not proven; info only.",
-  "Catalyst positive (forward): +2.7% (n 19) vs -1.1% (n 17), t 0.6, halves disagree (+10.0 / -0.5 pts). Not proven; 6 dates only.",
-  "Red flags (forward): no flags +0.8% (n 26) vs flagged +1.2% (n 19), t 0.07, halves disagree. No signal yet.",
-  "Earnings inside the hold (forward): clear +2.9% (n 25) vs earnings in hold -1.8% (n 13), t 0.86, both halves same sign but tiny sample. Not proven.",
-  "Macro tailwind (forward): 65 vs 1 row, untestable. Macro-brief low risk: 0 low-risk rows, untestable. More support: 5 vs 69 rows, untestable.",
-  "No warnings (forward): +3.4% (n 63) vs -1.9% (n 16), no t yet. Interesting direction, sample too small.",
-  "By role (132 closed, 5-day vs SPY): pick1 -0.1% (n 6), pick2 +4.1% (n 6), watch +4.2% (n 24), candidates +0.4% (n 96).",
-  "Swing Top 2 ledger: 19 closed, avg +0.12% with stops vs +0.69% avg candidate, 47% winners; 9 open, 2 no fill. Setup review flag: off (regime mixed, 20 days since baseline)."
+  "Macro fit (backtest, 6,369 signals Apr 2025-Oct 2026): tailwind +0.61% vs headwind +1.23% over 5 sessions, t -0.46, both halves negative - not proven, stays info only.",
+  "Forward log: 249 settled ideas over 11 dates (Oct 15-29); 117 settled this week over 5 dates, avg -3.6% vs SPY. Under 20 dates: too thin to judge any agent layer.",
+  "By role (5-session vs SPY): pick1 -0.1% (n 11), pick2 +4.5% (n 11), watch +4.1% (n 41), candidates -2.6% (n 186). Small samples; no conclusion.",
+  "Catalyst positive -0.4% vs not -2.1% (t 0.31, halves disagree); red flags absent -2.3% vs present +0.4% (t -0.93); earnings in hold +0.9% vs -0.4% (t -0.35): all not proven.",
+  "Macro tailwind (forward) t -0.08; more supporting layers (3+) -4.1% (n 7) vs +0.9% (t -1.07, both halves negative but tiny n); macro brief was never 'low risk' (158 high-risk rows) so it can't be tested yet.",
+  "Swing Top 2 scoreboard: 28 closed, avg +1.0% a trade vs avg candidate -1.8%, 43% winners, 57% stopped. This week 9 closed: +2.8% avg vs candidates -7.0% (CDNA +28% and +23%; the other 7 small losses).",
+  "Setup review flag is on: breadth thrust Nov 4 (post-thrust playbook favours Rotation Rookie +0.41R, Round Number +0.29R, Leader Pullback +0.24R), Minervini VCP slumping -0.26R over 70 signals, all top-5 themes new since Oct 11."
  ],
  "proposals": [
-  "No changes yet: not enough data. Forward log has 132 settled ideas over 6 dates; the rule needs 20+ dates (about mid-to-late November).",
-  "Keep macro fit as information only: it failed again (t -1.64). If anything it hints at mean reversion; not worth acting on unless t reaches -2 in both halves.",
-  "Watch 'earnings inside the hold' and 'no warnings': both point the expected way; re-check when 20+ dates have settled. Any promotion would still need Adam's approval."
+  "No changes yet: not enough data. No layer PASSED; forward evidence covers 11 dates (need 20+). Keep every agent layer and macro fit as information only.",
+  "Not a ranking change, just a reminder: the existing setup review flag is up (Nov 4 thrust, VCP slump, new leading themes). If you want, say 'review my trade setups' to look at it.",
+  "Next real check: about 3 more weeks of settled rows (roughly Nov 27) gets the forward log past 20 dates."
  ]
 }
