@@ -6,7 +6,7 @@ status: mixed           # works | doesnt | mixed | untested | process
 kind: setup             # market | group | setup | stock | exit | sizing | macro | news | data | process
 horizon: 20 sessions (trades); 5 / 21 / 63 sessions (excess returns)
 sample: 2,420 breaks, 404 dates, Jan 2025 – Nov 2026 ($5+, $20M+/day stocks); 2,088 with 63 sessions observed
-result: base rate no edge (hold-the-line buy +0.17R, halves +0.44 / −0.11). In top-20% groups: hold-the-line buy +0.48R (t 2.3, n 509, 278 dates), 21d +3.2% vs matched breakouts (t 4.3), 63d +13%; thrust + top group +0.80R (t 2.1). Bottom-half groups −0.27R (t −2.2). Timing: clears happen fast (median 4 sessions, 90% within 13)
+result: base rate no edge (hold-the-line buy +0.17R, halves +0.44 / −0.11). In top-20% groups: hold-the-line buy +0.48R (t 2.3, n 509, 278 dates), 21d +3.2% vs matched breakouts (t 4.3), 63d +13%; thrust + top group +0.80R (t 2.1). Bottom-half groups −0.27R (t −2.2). Timing: clears happen fast (median 4 sessions, 90% within 13). SHORT on the cross back under (Adam's follow-up): no edge in any cut, −0.08R (t −1.8) at 20 sessions, 31% win
 halves: top group R +0.72 / +0.26, 21d excess +3.5% / +2.8%; bottom-half group R −0.22 / −0.35
 layers: []              # ids from data/layers.json this is evidence for (empty = new idea)
 integrated: no          # yes | partly | no | rejected
@@ -43,3 +43,14 @@ levels.json only covers ~1,100 tickers; the retest definition is loose (most bre
 **How it could be used.** A "Supply breaks" card: live breaks in the last ~15 sessions, phase (retesting / working off / cleared / real
 fail), sessions since the break vs the 13-session clock, group percentile, and the grade (top group + thrust = best; bottom-half group =
 skip). Stop = the real-fail rule (3 closes under and 1 ADR below), not a 0.5-ADR wiggle. Information only until Adam approves.
+
+**Short version (Adam, same day: "flag where price broke a big overhead supply pivot and short it; entry = crossing back down below the pivot,
+stop above the local high").** `tools/supply_study/short.py`. Trigger within 21 sessions of the break: A = first close back under the level
+(fired on 85% of breaks, median 2 sessions after), B = first close 0.5 ADR under (77%, median 4). Entry next open (also tested at the trigger
+close: worse, −0.16R), stop 0.1 ADR above the highest high since the break (median risk 1.7 ADR), exits: 20 sessions, or 1R / 2R targets.
+- A: n 1,790, win 31%, stopped 57%, R20 −0.08 (t −1.8; halves −0.15 / −0.03); reached 1R first 36%, 2R first 19%; with a 1R target −0.09
+  (t −4.1), 2R target −0.07. B: n 1,501, win 38%, R20 −0.06; 1R target −0.09, 2R target −0.10.
+- No cut was positive in both halves. Worst: top-20% groups −0.15 to −0.18R (leaders' dips get bought), and no-thrust + bottom-half group
+  −0.45R (t −4.9, both halves; beaten-down groups snap back). Least bad: mid groups (50–80%) ≈ 0, broken floors +0.08 (halves +0.36 / −0.01).
+- Same answer as the Box study (failed breakout short −0.07R, retest rejection −0.12R). → DOESN'T WORK as a short. The useful part is the
+  mirror: the "real fail" (3 closes under + 1 ADR below) is an EXIT for longs (those lagged −9.2% vs +8.6% at 21d), not an entry for shorts.
