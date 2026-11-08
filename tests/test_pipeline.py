@@ -2077,6 +2077,28 @@ def test_pop_watch():
     return r["state"]
 
 
+def test_heavy_lifters():
+    """Nov 8: heavy payload = stocks with a Google market cap: WIN+1 closes, EMA 9/21/50, ADR, cap ($B), S&P flag; nav wired."""
+    import pandas as pd
+    from unittest import mock
+    from breadth import heavy, v3site
+    d = pd.bdate_range("2025-01-01", periods=120); rows = []
+    for t in ["A", "B", "SPY"]:
+        px = 50.0
+        for x in d:
+            px *= 1.002
+            rows.append(dict(date=x, ticker=t, o=px, h=px * 1.01, l=px * 0.99, c=px, v=1e6))
+    old = config.BENCHMARK; config.BENCHMARK = "SPY"
+    try:
+        with mock.patch.object(heavy.strength, "mega_caps", return_value={"A": 2e11, "B": "x"}):
+            X = heavy.build(pd.DataFrame(rows), {"stocks": [{"t": "A", "name": "A Inc", "rsr": 90, "sub": "G"}]})
+    finally:
+        config.BENCHMARK = old
+    r = X["rows"]["A"]
+    assert "B" not in X["rows"] and len(r["c"]) == heavy.WIN + 1 and r["cap"] == 200.0 and r["rs"] == 90 and len(r["e"]) == 3 and r["e21p"] < r["e"][1]
+    assert ("sheavy", "Heavy lifters") in v3site.NAV[2][2] and "function renderHeavy" in v3site.TABS_JS.read_text()
+
+
 def test_since_the_bottom():
     """Nov 7: emerge payload = liquid theme / sub-theme stocks with closes (PICK + PRE), $ volume, 50-day base, EMA seeds; the default start
     is kept when it is a session in the pickable window, and the page renderer is wired into v3."""

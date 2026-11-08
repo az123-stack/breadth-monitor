@@ -751,6 +751,17 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   leading stocks; click a name = its stocks); stock table (Which / Only / Sort chips, 80 rows until "Show all", ⬇ TradingView); Day by day
   (best 6 / worst 3 sub-themes each session vs SPY). Live: Google price appended as a session. Emergence score = rank percentiles 35% vs SPY,
   20% up-$ share, 15% % up, 15% % > 21 EMA, 15% new-high share, groups < 8 stocks shrunk toward 50 — untested. Test `test_since_the_bottom`.
+- **Heavy lifters** (Nov 8, 2026; Adam: "of what's going up, what are the largest, having the most contribution to the upside" then "a tab
+  that shows these stocks and the next tier, and which ones are pulling back into their EMAs for good setups") → `breadth/heavy.py`
+  `build(adjusted, theme_data)` (update.py after In Play) → `DATA.themes.heavy` {date, win 30, spx_cap ($B, S&P members), bench (SPY
+  closes), rows {t: c (31 closes), h / l (last bar), e (EMA 9/21/50 last close), e21p (21 EMA 5 sessions back), adr, cap ($B, Google via
+  `strength.mega_caps()` = data/close_snapshot.csv), spx, rs, sub, sec (index_members.csv), nm}} (~236 KB, ~512 stocks). Page `heavyCalc` /
+  `renderHeavy` (v3_tabs.js): Window 3 / 6 weeks, Show top 25 / 50 / all gainers, Only (★ setups / at an EMA), Sort; header = SPY, index
+  points added by gainers vs losers, top drags, sector points (click a sector in the table to filter). $ added = cap × (1 − 1/(1+r));
+  index pts = $ ÷ total S&P cap. EMA spot (ADRs; live steps the EMAs with the Google price): Below 50 (< −0.25) · At 50 (≤ 0.75, under the
+  21) · Between 21 & 50 · Wicked 21 / 9, reclaimed (low under, close over within 1 ADR; end of day only) · At 21 / At 9 (±0.5) · Extended
+  (> 3 over the 21) · Above 9. ★ Setup = a pullback tag + up over the window + 21 EMA rising + above the 50 (or At 50) + 1+ ADR under the
+  10-session closing high. Untested. Test `test_heavy_lifters`.
 - **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
   `build(adjusted, theme_data)` (~70 s) → `DATA.themes.inplay` {date, days, rows, n, counts, pool {t: [adr, v50, sub]}}, v3 Stocks → **In Play**
   (`renderInPlay` in v3_tabs.js). Universe stocks $5+, $10M+/day (no deals), last 5 sessions: news = gap ≥ max(3%, 1 ADR) on 2.5x vol

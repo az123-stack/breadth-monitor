@@ -118,6 +118,7 @@ One line per module. Before changing a module, read its entry in **CODEMAP.md** 
 - **Pop watch** (Nov 4, 2026; Adam: "sub-themes pop and then I forget them … that's exactly when I need to be grabbing them"; card
 - **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
 - `emerge.py` **Since the bottom** (Nov 7, 2026; Adam: "since 11/5, so it includes 11/6") v3 Groups → Since the bottom (`renderEmerge`); page picks the base close; info only. CODEMAP.md
+- `heavy.py` **Heavy lifters** (Nov 8, 2026; Adam: "the biggest stocks moving the market up while the hyperscalers fall, and which are pulling back into their EMAs") v3 Stocks → Heavy lifters (`renderHeavy`); info only. CODEMAP.md
 - **AI Revenue setups** (Nov 5, 2026; Adam: "a separate tab for AI Revenue Setups where we look for all these stocks coming back into EMAs")
 - **Trade warehouse · step 1** (Nov 4, 2026; Adam's VEEV weekly chart: "daily or weekly EMA pullback, and when?"; card
 - **Rotation stage rewritten** (Oct 30, 2026; Adam: "energy/oil was showing Early but it's been climbing all year"): the sheet's rule

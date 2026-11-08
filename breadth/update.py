@@ -394,6 +394,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["inplay"] = inplay.build(adjusted, theme_data)
         except Exception as e:  # optional panel; never block the page
             log.exception("in play failed: %s", e)
+        try:   # Heavy lifters: biggest market-cap gainers and their EMA pullbacks (Adam, Nov 8 2026; v3 Stocks → Heavy lifters; info only)
+            from . import heavy
+            theme_data["heavy"] = heavy.build(adjusted, theme_data)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("heavy lifters failed: %s", e)
         try:   # AI Revenue setups: AI-revenue stocks coming back into their 9/21 EMAs (Adam, Nov 5 2026; v3 Stocks → AI Revenue; info only)
             from . import airev
             theme_data["airev"] = airev.build(adjusted, theme_data)

@@ -577,3 +577,96 @@ function renderEmerge(app) {
     </tbody></table></div></section>`);
   app.append(dcard);
 }
+// Nov 8, 2026 (Adam: "the most powerful stocks moving the market up while the hyperscalers go down … a tab that shows these and the next
+// tier, and which ones are pulling back into their EMAs for good setups"): Stocks → Heavy lifters. breadth/heavy.py ships closes, EMA
+// 9/21/50 at the last close, ADR and Google market caps; the page ranks by market-cap $ added and tags the EMA spot, live. Info only.
+function heavyCalc(X, win) {
+  const live = liveActive(), out = [];
+  const bc = X.bench, blr = live && bc ? liveRow("SPY") : null;
+  const spyR = bc ? (blr ? blr.price : bc[bc.length - 1]) / bc[bc.length - 1 - win] - 1 : null;
+  for (const [t, x] of Object.entries(X.rows)) {
+    const c = x.c, lr = live ? liveRow(t) : null, last = c[c.length - 1];
+    const p = lr && lr.price ? lr.price : last, base = c[c.length - 1 - win];
+    if (!base || !p) continue;
+    const r = p / base - 1, cap = x.cap * (lr ? p / last : 1), add = cap * (1 - 1 / (1 + r));
+    // live: step each EMA one bar with today's price (as the dashboard's other live EMA tags do)
+    const step = (ev, k) => ev == null ? null : (lr ? ev + 2 / (k + 1) * (p - ev) : ev);
+    const e9 = step(x.e[0], 9), e21 = step(x.e[1], 21), e50 = step(x.e[2], 50), a = (x.adr || 0.02) * p;
+    const hi10 = Math.max(...c.slice(-10), p), off = (p / hi10 - 1) / (x.adr || 0.02);   // ADRs under the 10-session closing high
+    const lo = lr ? null : x.l, rising = x.e21p != null && x.e[1] != null ? x.e[1] > x.e21p : null;
+    const d = (ev) => ev == null ? null : (p - ev) / a;
+    const d9 = d(e9), d21 = d(e21), d50 = d(e50);
+    let tag, cls = "";
+    if (d50 != null && d50 < -0.25) tag = "Below 50 EMA", cls = "r2";
+    else if (d50 != null && d50 <= 0.75 && (d21 == null || d21 < 0)) tag = "At 50 EMA";
+    else if (d21 != null && d21 < -0.5) tag = "Between 21 & 50";
+    else if (lo != null && e21 != null && lo < e21 && p >= e21 && d21 <= 1) tag = "Wicked 21, reclaimed";
+    else if (d21 != null && Math.abs(d21) <= 0.5) tag = "At 21 EMA";
+    else if (lo != null && e9 != null && lo < e9 && p >= e9 && d9 <= 1) tag = "Wicked 9, reclaimed";
+    else if (d9 != null && Math.abs(d9) <= 0.5) tag = "At 9 EMA";
+    else if (d21 != null && d21 > 3) tag = "Extended", cls = "meta";
+    else tag = "Above 9 EMA", cls = "meta";
+    const pull = ["At 9 EMA", "At 21 EMA", "At 50 EMA", "Wicked 9, reclaimed", "Wicked 21, reclaimed"].includes(tag);
+    const setup = pull && r > 0 && rising !== false && off <= -1 && (tag === "At 50 EMA" || (d50 != null && d50 > 0));   // a real pullback: 1+ ADR under the 10-day closing high
+    out.push({ t, x, p, r, rel: spyR == null ? null : (1 + r) / (1 + spyR) - 1, cap, add, pts: x.spx && X.spx_cap ? add / X.spx_cap * 100 : null,
+      d9, d21, d50, off, tag, cls, pull, setup, rising, today: lr ? lr.chg : null });
+  }
+  return { rows: out, spyR };
+}
+function renderHeavy(app) {
+  const X = (DATA.themes || {}).heavy;
+  if (!X || !X.rows) { app.append($('<div class="card empty">Heavy lifters appear after the next data run (needs the Google market caps).</div>')); return; }
+  app.append(liveBar());
+  UI.hv = UI.hv || { win: lsGet("hvWin", "30"), top: lsGet("hvTop", "50"), only: lsGet("hvOnly", "all"), sort: lsGet("hvSort", "add"), sec: "" };
+  const U = UI.hv, win = +U.win, live = liveActive();
+  const save = () => { ["win", "top", "only", "sort"].forEach(k => lsSet("hv" + k[0].toUpperCase() + k.slice(1), U[k])); try { Object.keys(AUTOSORT).filter(k => k.includes("Heavy lifters")).forEach(k => delete AUTOSORT[k]); } catch (e) {} rerenderPanel(); };
+  const Z = heavyCalc(X, win), all = Z.rows;
+  const gain = all.filter(s => s.add > 0).sort((p, q) => q.add - p.add), drag = all.filter(s => s.add < 0).sort((p, q) => p.add - q.add);
+  const spx = all.filter(s => s.x.spx), sumPts = (v) => v.reduce((p, s) => p + (s.pts || 0), 0);
+  const gPts = sumPts(spx.filter(s => s.add > 0)), dPts = sumPts(spx.filter(s => s.add < 0));
+  const rank = Object.fromEntries(gain.map((s, i) => [s.t, i + 1]));
+  // sectors (S&P members)
+  const secs = {}; spx.forEach(s => { const k = s.x.sec || "Other"; (secs[k] = secs[k] || { pts: 0, n: 0, up: 0 }); secs[k].pts += s.pts || 0; secs[k].n++; if (s.r > 0) secs[k].up++; });
+  const secList = Object.entries(secs).sort((p, q) => q[1].pts - p[1].pts);
+  const wlab = win === 15 ? "3 weeks" : "6 weeks";
+  const head = $(`<section class="card orhead"><h2>Heavy lifters <span class="meta">· the biggest stocks adding market value over the last ${wlab} (${win} sessions) · data to ${shortDate(X.date)}${live ? " + today live" : ""}</span></h2>
+    <div class="filters"></div>
+    <div class="meta orsub">S&amp;P 500: SPY <b class="${tint(Z.spyR, 0.02)}">${pct(Z.spyR, 1)}</b> · gainers added <b class="g2">${num(gPts, 2)}</b> index pts, losers took <b class="r2">${num(dPts, 2)}</b> ·
+      ${spx.filter(s => s.r > 0).length} of ${spx.length} members up. Biggest drags: ${drag.slice(0, 5).map(s => `<b>${esc(s.t)}</b> <span class="r2">${num(s.add, 0)}B</span>`).join(" · ")}.</div>
+    <div class="meta orsub">Sectors (index pts): ${secList.map(([k, v]) => `${esc(k)} <span class="${v.pts >= 0 ? "g2" : "r2"}">${num(v.pts, 2)}</span> <small>(${Math.round(100 * v.up / v.n)}% up)</small>`).join(" · ")}</div>
+    <div class="meta orsub"><b>$ added</b> = market cap × the move over the window (Google caps, S&amp;P 500 + Nasdaq-100). <b>Index pts</b> ≈ $ added ÷ total S&amp;P cap.
+      <b>EMA spot</b> uses ADRs: "At 9 / 21 EMA" = within ½ ADR, "At 50" = within ¾ ADR from above-ish, "Wicked … reclaimed" = the day's low under it and the close back over, within 1 ADR (end of day only). <b>Pullback</b> = ADRs under the 10-session closing high.
+      <b>★ Setup</b> = at / wicked an EMA, 1+ ADR under its 10-day closing high, up over the window, 21 EMA rising, above its 50 (or at it). Big caps move ~1–2% a day: a pullback here is a slow-money entry, not a Kristjan breakout. Nothing here is backtested.</div></section>`);
+  const f = head.querySelector(".filters");
+  f.append(chips("Window", [["15", "3 weeks"], ["30", "6 weeks"]], U, "win", save));
+  f.append(chips("Show", [["25", "Top 25"], ["50", "Top 50 (next tier)"], ["all", "All gainers"]], U, "top", save));
+  f.append(chips("Only", [["all", "Any"], ["setup", "★ Setups"], ["pull", "At an EMA"]], U, "only", save));
+  f.append(chips("Sort", [["add", "$ added"], ["setup", "Setups first"], ["r", "% move"], ["rs", "RS"], ["d21", "Closest to 21 EMA"]], U, "sort", save));
+  app.append(head);
+  let rows = U.top === "all" ? gain : gain.slice(0, +U.top);
+  if (U.only === "setup") rows = rows.filter(s => s.setup);
+  if (U.only === "pull") rows = rows.filter(s => s.pull);
+  if (U.sec) rows = rows.filter(s => (s.x.sec || "Other") === U.sec);
+  const SS = { add: (p, q) => q.add - p.add, setup: (p, q) => (q.setup - p.setup) || (q.pull - p.pull) || q.add - p.add, r: (p, q) => q.r - p.r, rs: (p, q) => (q.x.rs || 0) - (p.x.rs || 0), d21: (p, q) => Math.abs(p.d21 ?? 99) - Math.abs(q.d21 ?? 99) };
+  rows = rows.slice().sort(SS[U.sort] || SS.add);
+  const nset = rows.filter(s => s.setup).length;
+  const fa = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + v.toFixed(1);
+  const card = $(`<section class="card ortable"><div class="head"><h2>${rows.length} stocks <span class="meta">· ${nset} ★ setup${nset === 1 ? "" : "s"}${U.sec ? " · sector " + esc(U.sec) + ' <a href="#" class="hvclr">(clear)</a>' : ""} · click a sector to filter</span></h2><button class="xopen hvtv">⬇ TradingView</button></div>
+    <div class="scroll"><table class="grid"><thead><tr><th>#</th><th class="l">Stock</th><th class="l">Sector · sub-theme</th><th title="Google market cap">Cap $B</th><th title="Market-cap dollars added over the window">$ added</th>
+      <th title="≈ S&P 500 index points (S&P members only)">Index pts</th><th>Move</th><th>Vs SPY</th><th>RS</th>${live ? "<th>Today</th>" : ""}
+      <th class="l">EMA spot</th><th title="Price vs the 9 EMA in ADRs">vs 9</th><th title="Price vs the 21 EMA in ADRs">vs 21</th><th title="Price vs the 50 EMA in ADRs">vs 50</th><th title="21 EMA higher than 5 sessions ago">21 rising</th><th title="ADRs under the 10-session closing high (how far it has pulled back)">Pullback</th><th class="l">Setup</th></tr></thead><tbody>
+    ${rows.map(s => `<tr${s.setup ? ' class="sel"' : ""}><td class="num">${rank[s.t] || ""}</td><td class="l"><a href="#" class="tkl" data-t="${esc(s.t)}"><b>${esc(s.t)}</b></a><small class="meta" style="display:block">${esc(s.x.nm)}</small></td>
+      <td class="l"><a href="#" class="hvsec" data-s="${esc(s.x.sec || "Other")}"><small>${esc(s.x.sec || "–")}</small></a><small class="meta" style="display:block">${esc(s.x.sub || "")}</small></td>
+      <td class="num">${Math.round(s.cap).toLocaleString()}</td><td class="num g2"><b>${num(s.add, 1)}</b></td><td class="num">${s.pts == null ? "–" : num(s.pts, 3)}</td>
+      <td class="num ${tint(s.r, 0.03)}">${pct(s.r, 1)}</td><td class="num ${tint(s.rel, 0.03)}">${pct(s.rel, 1)}</td><td class="num">${s.x.rs ?? "–"}</td>
+      ${live ? `<td class="num ${tint(s.today, 0.015)}">${pct(s.today, 1)}</td>` : ""}
+      <td class="l"><span class="${s.cls}">${s.pull ? "<b>" + s.tag + "</b>" : s.tag}</span></td><td class="num">${fa(s.d9)}</td><td class="num">${fa(s.d21)}</td><td class="num">${fa(s.d50)}</td>
+      <td class="num">${s.rising == null ? "–" : s.rising ? "yes" : '<span class="r2">no</span>'}</td><td class="num">${s.off < -0.05 ? s.off.toFixed(1) + " ADR" : "at high"}</td><td class="l">${s.setup ? '<span class="tg sow-breakout">★ Setup</span>' : ""}</td></tr>`).join("")}
+    </tbody></table></div></section>`);
+  card.querySelectorAll(".hvsec").forEach(el => el.addEventListener("click", (e) => { e.preventDefault(); U.sec = U.sec === el.dataset.s ? "" : el.dataset.s; rerenderPanel(); }));
+  const cl = card.querySelector(".hvclr"); if (cl) cl.addEventListener("click", (e) => { e.preventDefault(); U.sec = ""; rerenderPanel(); });
+  card.querySelector(".hvtv").addEventListener("click", () => tsDownload("heavy-lifters", [
+    { name: "Heavy lifters setups " + wlab, ticks: rows.filter(s => s.setup).map(s => s.t) },
+    { name: "Heavy lifters " + wlab, ticks: rows.filter(s => !s.setup).map(s => s.t) }].filter(g => g.ticks.length)));
+  app.append(card);
+}
