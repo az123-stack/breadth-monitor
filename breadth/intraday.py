@@ -26,6 +26,7 @@ from . import config, store
 # Market pulse rows: key -> (Google symbol, label)
 PULSE = {
     "^SPX": ("INDEXSP:.INX", "S&P 500"), "^NDX": ("INDEXNASDAQ:NDX", "Nasdaq-100"),
+    "^IXIC": ("INDEXNASDAQ:.IXIC", "Nasdaq Composite"), "^DJI": ("INDEXDJX:.DJI", "Dow Jones"),   # Nov 9, 2026 (Adam: point moves)
     "SPY": ("SPY", "SPY"), "QQQ": ("QQQ", "QQQ"), "IWM": ("IWM", "Russell 2000 (IWM)"), "DIA": ("DIA", "Dow (DIA)"),
     "RSP": ("RSP", "S&P equal weight (RSP)"), "QQEW": ("QQEW", "Nasdaq-100 equal weight (QQEW)"),
     "^VIX": ("INDEXCBOE:VIX", "VIX"), "^TNX": ("INDEXCBOE:TNX", "10-year yield"), "TLT": ("TLT", "20y Treasuries (TLT)"), "UUP": ("UUP", "US dollar (UUP)"),

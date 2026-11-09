@@ -4488,7 +4488,7 @@ function renderPremarketCards(app, I, T, R) {
   const vixTile = () => { if (!vixNow) return ""; const d = vixNow[0] - vixNow[1], c = d > 0 ? "dn" : d < 0 ? "up" : "";
     const lvl = vixNow[0] >= 30 ? "fear" : vixNow[0] >= 20 ? "elevated" : vixNow[0] >= 15 ? "normal" : "calm";
     return `<div class="itile" title="Cboe Volatility Index: the market's expected S&P 500 swing over the next 30 days. Up = more fear (red); it trades from ~3:15 AM ET."><small>VIX (fear gauge)</small><b class="${c}">${vixNow[0].toFixed(2)}</b><span class="meta">${d >= 0 ? "+" : ""}${d.toFixed(2)} pts (${pc(vixNow[0] / vixNow[1] - 1)}) · ${lvl}${vixNow[3] ? " · " + vixNow[3] : ""}</span></div>`; };
-  const fut = [["ES=F", "S&P"], ["NQ=F", "Nasdaq"], ["RTY=F", "Russell"]].map(([k, l]) => fchg(k) == null ? "" : `${l} ${pc(fchg(k))}`).filter(Boolean).concat(vixTxt ? [vixTxt] : []).join(" · ");
+  const fut = [["ES=F", "S&P"], ["NQ=F", "Nasdaq"], ["YM=F", "Dow"], ["RTY=F", "Russell"]].map(([k, l]) => fchg(k) == null ? "" : `${l} ${pc(fchg(k))} (${ptMove(F[k][0], F[k][1], "pts")})`).filter(Boolean).concat(vixTxt ? [vixTxt] : []).join(" · ");
   const bullets = [
     fut ? `<b>Futures:</b> ${fut}.` : "",
     PK ? `<b>Oil:</b> ${crackRead(PK)}` : "",
@@ -4501,8 +4501,10 @@ function renderPremarketCards(app, I, T, R) {
   app.append($(`<section class="icard card regcard"><div class="kicker">Morning read · ${PM.asof ? PM.asof.slice(11, 16) + " ET" : ""}</div><ul style="margin:8px 0 0;padding-left:18px;line-height:1.55">${bullets.map(b => `<li>${b}</li>`).join("")}</ul></section>`));
   // Futures & macro
   const ftile = (k) => { const f = F[k], v = fchg(k); if (!f) return "";
-    return `<div class="itile"><small>${esc(FL[k] || k)}</small><b class="${cls(v)}">${pc(v)}</b><span class="meta">${fmt(f[0], f[0] < 100 ? 2 : 0)}${f[3] ? " · " + f[3] : ""}</span></div>`; };
-  const tile = (k, label) => { const r = liveRow(k); return r ? `<div class="itile"><small>${esc(label)}</small><b class="${cls(r.chg)}">${pc(r.chg)}</b><span class="meta">${fmt(r.price, r.price < 100 ? 2 : 0)}</span></div>` : ""; };
+    const mv = ptMove(f[0], f[1], PT_UNIT(k));
+    return `<div class="itile"><small>${esc(FL[k] || k)}</small><b class="${cls(v)}">${pc(v)}</b><span class="meta">${mv ? `<span class="${cls(v)}" style="font-weight:600">${mv}</span> · ` : ""}${fmt(f[0], f[0] < 100 ? 2 : 0)}${f[3] ? " · " + f[3] : ""}</span></div>`; };
+  const tile = (k, label) => { const r = liveRow(k); const mv = r ? ptMove(r.price, r.closeyest || (r.chg != null ? r.price / (1 + r.chg) : null), PT_UNIT(k)) : "";
+    return r ? `<div class="itile"><small>${esc(label)}</small><b class="${cls(r.chg)}">${pc(r.chg)}</b><span class="meta">${mv ? `<span class="${cls(r.chg)}" style="font-weight:600">${mv}</span> · ` : ""}${fmt(r.price, r.price < 100 ? 2 : 0)}</span></div>` : ""; };
   const spread = (a, b, label, note) => { const x = liveRow(a), y = liveRow(b); const v = x && y ? x.chg - y.chg : null;
     return v == null ? "" : `<div class="itile"><small>${esc(label)}</small><b class="${cls(v)}">${(v > 0 ? "+" : "") + (v * 100).toFixed(2) + " pts"}</b><span class="meta">${esc(note)}</span></div>`; };
   app.append($(`<section class="icard card regcard"><div class="kicker">Futures, macro & ETFs</div>
@@ -4543,6 +4545,14 @@ function renderPremarketCards(app, I, T, R) {
 }
 /* ---------- Shared Intraday / Pre-market cards (read prices through liveRow, so ROWS_OVERRIDE swaps the source) ---------- */
 const pcI = (v, d = 2) => v == null ? "–" : `${v > 0 ? "+" : ""}${(v * 100).toFixed(d)}%`;
+// Nov 9, 2026 (Adam: "you show % and the level, also show the change, i.e. Nasdaq moved +231 pts"): signed move in points (indexes /
+// index futures) or price units (ETFs, commodities)
+function ptMove(now, prev, unit) {
+  if (now == null || !prev) return "";
+  const d = now - prev, a = Math.abs(d), dec = a >= 100 ? 0 : a >= 10 ? 1 : 2;
+  return `${d > 0 ? "+" : d < 0 ? "−" : ""}${unit === "$" ? "$" : ""}${a.toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec })}${unit === "pts" ? " pts" : ""}`;
+}
+const PT_UNIT = (k) => /^\^|=F$/.test(k) && !/^(\^TNX|\^VIX|CL=F|RB=F|HO=F|NG=F|GC=F|SI=F|HG=F|ZN=F)$/.test(k) ? "pts" : (/^\^/.test(k) || /=F$|-USD$|\.NYB$/.test(k) ? "" : "$");
 const clsI = (v) => v == null ? "" : v > 0 ? "up" : v < 0 ? "dn" : "";
 function indexMoversCard(o) {
   const I = DATA.intraday, pc = pcI, cls = clsI;
@@ -4805,7 +4815,8 @@ function renderIntraday(app) {
       const sc = r && r.price > 20 ? 10 : 1, y = r ? r.price / sc : null, bp = r && r.closeyest ? Math.round((r.price - r.closeyest) / sc * 100) : null;
       return `<div class="itile"><small>${esc(label)}</small><b class="${bp == null ? "" : bp > 0 ? "dn" : bp < 0 ? "up" : ""}">${y == null ? "–" : y.toFixed(2) + "%"}</b><span class="meta">${bp == null ? "" : (bp > 0 ? "+" : "") + bp + " bp today" + (bp > 0 ? " (yields up: pressure on stocks)" : bp < 0 ? " (yields down)" : "")}</span></div>`;
     }
-    return `<div class="itile"><small>${esc(label)}</small><b class="${cls(r && r.chg)}">${r ? pc(r.chg) : "–"}</b><span class="meta">${r ? fmt(r.price, r.price < 100 ? 2 : 0) : ""}</span></div>`; };
+    const mv = r ? ptMove(r.price, r.closeyest || (r.chg != null ? r.price / (1 + r.chg) : null), k === "^VIX" ? "pts" : PT_UNIT(k)) : "";
+    return `<div class="itile"><small>${esc(label)}</small><b class="${cls(r && r.chg)}">${r ? pc(r.chg) : "–"}</b><span class="meta">${mv ? `<span class="${cls(r.chg)}" style="font-weight:600">${mv}</span> · ` : ""}${r ? fmt(r.price, r.price < 100 ? 2 : 0) : ""}</span></div>`; };
   const spread = (a, b, label, note) => { const x = liveRow(a), y = liveRow(b); const v = x && y ? x.chg - y.chg : null;
     return `<div class="itile"><small>${esc(label)}</small><b class="${cls(v)}">${v == null ? "–" : (v > 0 ? "+" : "") + (v * 100).toFixed(2) + " pts"}</b><span class="meta">${esc(note)}</span></div>`; };
   app.append($(`<section class="icard card regcard"><div class="kicker">Market pulse</div>

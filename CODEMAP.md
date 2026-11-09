@@ -762,6 +762,11 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   21) · Between 21 & 50 · Wicked 21 / 9, reclaimed (low under, close over within 1 ADR; end of day only) · At 21 / At 9 (±0.5) · Extended
   (> 3 over the 21) · Above 9. ★ Setup = a pullback tag + up over the window + 21 EMA rising + above the 50 (or At 50) + 1+ ADR under the
   10-session closing high. Untested. Test `test_heavy_lifters`.
+- **Point moves on tiles** (Nov 9, 2026; Adam: "show the change, i.e. Nasdaq moved +231 pts"): template.html `ptMove(now, prev, unit)` +
+  `PT_UNIT(k)` (indexes / index futures "pts", ETFs "$", commodities / yields / FX plain units); Pre-market futures tiles (Yahoo last vs
+  prior settle), ETF tiles and the Morning read "Futures:" line (now with the Dow), Intraday Market pulse tiles (price − closeyest).
+  `intraday.PULSE` gained ^IXIC (Nasdaq Composite, INDEXNASDAQ:.IXIC) and ^DJI (Dow, INDEXDJX:.DJI) — they reach the Google sheet via
+  data/live_sheet.csv on the next build.
 - **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
   `build(adjusted, theme_data)` (~70 s) → `DATA.themes.inplay` {date, days, rows, n, counts, pool {t: [adr, v50, sub]}}, v3 Stocks → **In Play**
   (`renderInPlay` in v3_tabs.js). Universe stocks $5+, $10M+/day (no deals), last 5 sessions: news = gap ≥ max(3%, 1 ADR) on 2.5x vol
