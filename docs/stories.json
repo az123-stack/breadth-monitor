@@ -1,19 +1,19 @@
 {
- "updated": "2026-11-06T16:55",
+ "updated": "2026-11-09T16:56",
  "stories": [
   {
    "id": "ai-spending-repriced",
    "title": "AI spending gets repriced",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-11-06",
+   "updated": "2026-11-09",
    "summary": "Investors now want proof that AI spending pays back in cash, so money is leaving AI hardware and, as of Oct 29, software too.",
-   "changed": "Nov 6: the seesaw swung to the losers. AI hardware bounced about a third of the crash while software (Atlassian −16%, Five9 −18%) kept falling on results; the bounce faded late. Forced selling paused; the story is not over.",
+   "changed": "Nov 9: the seesaw swung back. The sold-hardest AI hardware groups bounced hard (Custom Silicon +11.2%, Semicap +9.9%, Memory +8.0%) and the VIX fell 22%, while IT services and the steady names rested. No new driver found for the bounce: oversold buying, not news. The story is not over.",
    "thesis": {
     "what": "Since early October the AI-hardware groups (chip equipment, optical, AI servers, custom chips, memory, neoclouds, data-center power) fell about 18% over 20 sessions while IT services, enterprise software and steady consumer names rose about 10%: a 28-point swing. On Oct 22 the S&P 500 fell 1.2% but the equal-weight S&P rose 0.7%: the money moved, it didn't leave.",
     "why": "Two worries feed each other. **Cost:** Meta announced non-voting shares to help fund its AI spending and fell 5%; Tesla cut capex; Lam Research guided below consensus ([Korea Times](https://www.koreatimes.co.kr/world/20261023/wall-street-sinks-as-nasdaq-falls-over-2-on-ai-cost-worries), [Investrade](https://investrade.com/market-review-october-22-2026/)). **Financing:** hot CPI pushed the 10-year to 5.26% and CoreWeave's credit spread past 1,000 bp, so borrowing to build data centers got expensive ([TradingKey](https://www.tradingkey.com/analysis/stocks/us-stocks/262218623-us-premarket-tsmc-record-profit-chip-stocks-fall-nvidia-micron-ppi-tradingkey)). Funding is the newest strain: Meta plans to raise up to $95B, starting with $35B in stock ([MarketScreener](https://www.marketscreener.com/news/wall-st-rises-as-anthropic-s-ipo-filing-sharpens-focus-on-ai-trade-ce785cdcdd8ff22d)), and Anthropic's filing adds a large new AI listing to the supply.",
     "how": "Funds were crowded in AI hardware after a huge run. When the spending story wobbles they trim those winners first and park the money in businesses that grow without AI capex (software, IT services, staples). The giants' weight drags the S&P down while the average stock holds up.",
-    "real": "Not a clean seesaw today: both sides fell, 93% of dollar volume was in falling stocks, and the winners' cushion shrank. Price still agrees on 5 and 20 days (long groups +23% over 5). Past heavy-selling days inside an outflow streak (n 18) were followed by snapbacks that started in the sold-hardest groups; this is also a year-end positioning unwind, which can retest lows first.",
+    "real": "Nov 9 was the seesaw's other side: the losers won back a chunk, with only ~21% of dollars in falling stocks on Google prices (estimates). Evidence says a calm 'money is back' day (n 9) has usually seen the bounce run, with the groups that held up beating it over the next 10 sessions. Price still agrees on 20 days. Not a washout-thrust: the code sees none in the last 10 sessions.",
     "confirm": "The verdict comes next week: Fed decision and Microsoft + Alphabet earnings on Oct 28, PCE inflation and Amazon on Oct 29, Apple on Nov 2. Capex still rising AND rewarded → AI hardware snaps back and this fades. Capex cut or punished → the rotation runs on. A day with ≤ 40% of dollars in falling stocks is the code's comeback trigger. Next: Amazon's reaction at the Oct 30 open and Apple on Nov 2. Nov 6: jobs report. A second 60%+ falling-dollar-volume day, or 3 closes under the 20-day average, says the unwind is not done; 40% or less says snapback candidates (sold-hardest 60-day leaders) are in play."
    },
    "timeline": [
@@ -170,6 +170,13 @@
      "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-6-2026",
      "source": "StockTitan",
      "reaction": "Sold-hardest groups +6.8% vs held-up −0.6% (Google estimates); Custom Silicon +8.8%, Neoclouds +10.4%; Enterprise SaaS −3.4%"
+    },
+    {
+     "date": "2026-11-09",
+     "event": "Buyers return to AI and chips after four weekly Nasdaq declines; Alphabet unveils two new TPU chips; Nvidia falls on a board probe of its CEO",
+     "url": "https://leprivatebanker.com/2026/11/09/nasdaq-surges-2-5-to-claw-back-part-of-correction-as-chipmakers-rally-even-with-nvidia-down-on-board-probe-of-huang/",
+     "source": "Le Private Banker",
+     "reaction": "Custom Silicon +11.2%, Semicap +9.9%, Memory +8.0%, Hyperscalers +3.0%; ~21% of dollars in falling stocks (Google est.)"
     }
    ],
    "groups": {
@@ -209,6 +216,12 @@
     ]
    },
    "catalysts": [
+    {
+     "date": "2026-11-10",
+     "time": "8:30 AM ET",
+     "name": "October CPI",
+     "why": "A hot print would test whether the VIX-driven bounce can hold; a cool one lets AI hardware keep recovering (source: Vista P Global)."
+    },
     {
      "date": "2026-12-09",
      "time": "2:00 PM ET",
@@ -474,17 +487,38 @@
       "Memory & Storage Media"
      ],
      "note": "Nov 6: the seesaw swung to the losers. AI hardware bounced about a third of the crash while software (Atlassian −16%, Five9 −18%) kept falling on results; the bounce faded late. Forced selling paused; the story is not over."
+    },
+    {
+     "date": "2026-11-09",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "Enterprise SaaS",
+      "Business Services & Data",
+      "Household & Personal Care",
+      "Packaged Foods"
+     ],
+     "short": [
+      "Semicap Equipment",
+      "Optical Components & Transceivers",
+      "AI Servers & Integrators",
+      "Custom Silicon & Networking Chips",
+      "Neoclouds & GPU Hosting",
+      "Data Center Power & Cooling",
+      "Memory & Storage Media"
+     ],
+     "note": "Nov 9: the seesaw swung back. The sold-hardest AI hardware groups bounced hard (Custom Silicon +11.2%, Semicap +9.9%, Memory +8.0%) and the VIX fell 22%, while IT services and the steady names rested. No new driver found for the bounce: oversold buying, not news. The story is not over."
     }
    ]
   },
   {
    "id": "rates-near-5",
    "title": "Hot inflation keeps the 10-year near 5%",
-   "status": "peaking",
+   "status": "fading",
    "started": "2026-10-14",
-   "updated": "2026-11-06",
+   "updated": "2026-11-09",
    "summary": "Hot CPI and PPI pushed the 10-year Treasury yield to 5.26%, hurting companies whose profits are years away; yields eased on Oct 22, but the Fed and PCE next week decide the next leg.",
-   "changed": "Nov 6: a strong jobs report pushed the 10-year back to about 4.86% and kept a December hike above 65% odds; rate-sensitive groups lagged.",
+   "changed": "Nov 9: small caps led (IWM +3.2%) as oil fell and the VIX dropped; the rate story is on hold until Tuesday's CPI. Price has disagreed with the story for several sessions: if CPI is calm this goes to resolved.",
    "thesis": {
     "what": "Since the Oct 14 CPI the groups that need cheap money or are years from profits (small nuclear reactors, quantum, homebuilders, REITs, residential solar) fell about 13% vs SPY over 20 sessions.",
     "why": "September CPI came in at 3.7% vs 3.6% and PPI was hot the next day, reviving rate-hike bets; the 10-year hit 5.26% ([24/7 Wall St.](https://247wallst.com/investing/2026/10/14/nuscale-power-falls-7-as-10-year-treasury-yield-climbs-to-5-26-energy-fuels-drops-9-oklo-slides-5/)). Oil above $100 feeds inflation worries too (see the Gulf oil story).",
@@ -569,6 +603,13 @@
      "url": "https://www.stocktitan.net/articles/stock-market-today-live-november-6-2026",
      "source": "StockTitan",
      "reaction": "Homebuilders −2.5%, Insurance Brokers −2.6%; dollar (UUP) +0.7%, gold −0.8%; SPY +0.3%"
+    },
+    {
+     "date": "2026-11-09",
+     "event": "Oil falls 4%+ and the VIX drops 22%; small caps lead; October CPI due Tuesday (Fed held at 3.75%–4.00% on Oct 28, two officials preferred a hike)",
+     "url": "https://vistapglobal.com/stock-market-today-november-9-2026-dow-jumps-1104-points-nasdaq-rallies-as-oils-slide-fuels-breadth-amwl-ant-eprx-googl-modd-nvda-ser-spcx/",
+     "source": "Vista P Global",
+     "reaction": "IWM +3.2% (Google est.): rate-sensitive small caps rallied on cheaper oil and calmer fear"
     }
    ],
    "groups": {
@@ -591,6 +632,12 @@
     ]
    },
    "catalysts": [
+    {
+     "date": "2026-11-10",
+     "time": "8:30 AM ET",
+     "name": "October CPI",
+     "why": "First inflation read since the Fed held at 3.75%–4.00% on Oct 28 with two officials preferring a hike; PPI follows Friday."
+    },
     {
      "date": "2026-12-09",
      "time": "2:00 PM ET",
@@ -759,6 +806,19 @@
       "Residential Solar & Yieldcos"
      ],
      "note": "Nov 6: a strong jobs report pushed the 10-year back to about 4.86% and kept a December hike above 65% odds; rate-sensitive groups lagged."
+    },
+    {
+     "date": "2026-11-09",
+     "status": "fading",
+     "long": [],
+     "short": [
+      "Nuclear Reactors (SMR)",
+      "Quantum Computing",
+      "Homebuilders",
+      "REITs",
+      "Residential Solar & Yieldcos"
+     ],
+     "note": "Nov 9: small caps led (IWM +3.2%) as oil fell and the VIX dropped; the rate story is on hold until Tuesday's CPI. Price has disagreed with the story for several sessions: if CPI is calm this goes to resolved."
     }
    ]
   },
@@ -767,9 +827,9 @@
    "title": "IT services: from AI loser to AI implementer",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-11-06",
+   "updated": "2026-11-09",
    "summary": "After being sold as AI losers, IT services and consulting are being re-rated as the firms that will implement AI, and they're absorbing money leaving AI hardware.",
-   "changed": "Nov 5: IT Services rose 2.3% on a −4.4% S&P day; relative strength intact.",
+   "changed": "Nov 9: IT Services was flat (−0.0%) in a +2.4% S&P rally as money went back to chips; it is the winners' side of the seesaw, resting. Relative strength over 20 days intact.",
    "thesis": {
     "what": "IT Services & Consulting is up about 20% over 20 sessions (+10% in 5) with every member above its 21-day EMA, the strongest dollar flow of any group (+0.76).",
     "why": "Accenture's outlook on Oct 1–2 eased fears that AI will eat consulting revenue ([The Star](https://www.thestar.com.my/tech/tech-news/2026/10/02/accenture039s-forecast-eases-ai-disruption-fears-lifts-battered-it-services-stocks)); in June the same fear had sent Accenture down 18% ([SentiSense](https://app.sentisense.ai/stories/accenture-shares-plummet-18-percent-it-stocks-crash-amid-weak-guidance-06192026)). Cognizant rose 7% in sympathy ([Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/cognizant-shares-rise-7-2-123306736.html)).",
@@ -976,6 +1036,16 @@
      ],
      "short": [],
      "note": "Nov 5: IT Services rose 2.3% on a −4.4% S&P day; relative strength intact."
+    },
+    {
+     "date": "2026-11-09",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "India IT Services"
+     ],
+     "short": [],
+     "note": "Nov 9: IT Services was flat (−0.0%) in a +2.4% S&P rally as money went back to chips; it is the winners' side of the seesaw, resting. Relative strength over 20 days intact."
     }
    ]
   },
@@ -984,7 +1054,7 @@
    "title": "Managed care repairs on better Medicare ratings",
    "status": "building",
    "started": "2026-10-09",
-   "updated": "2026-11-06",
+   "updated": "2026-11-09",
    "summary": "Better Medicare star ratings and UnitedHealth's beat-and-raise are pulling managed care out of its slump.",
    "changed": "Nov 4: policy tailwind from the midterms (ACA subsidies, Medicaid) drove CNC and OSCR higher; CVS fell on its split plan, a company-specific drag.",
    "thesis": {
@@ -1144,6 +1214,15 @@
      ],
      "short": [],
      "note": "Nov 4: policy tailwind from the midterms (ACA subsidies, Medicaid) drove CNC and OSCR higher; CVS fell on its split plan, a company-specific drag."
+    },
+    {
+     "date": "2026-11-09",
+     "status": "building",
+     "long": [
+      "Managed Care"
+     ],
+     "short": [],
+     "note": "Nov 4: policy tailwind from the midterms (ACA subsidies, Medicaid) drove CNC and OSCR higher; CVS fell on its split plan, a company-specific drag."
     }
    ]
   },
@@ -1152,7 +1231,7 @@
    "title": "SpaceX eyes cell sites; towers up, carriers down",
    "status": "building",
    "started": "2026-10-23",
-   "updated": "2026-11-06",
+   "updated": "2026-11-09",
    "summary": "Reports that SpaceX wants about 80,000 US cell sites for a wireless network lift tower landlords and hit AT&T and T-Mobile.",
    "changed": "",
    "thesis": {
@@ -1337,6 +1416,18 @@
       "Wireless Carriers"
      ],
      "note": ""
+    },
+    {
+     "date": "2026-11-09",
+     "status": "building",
+     "long": [
+      "Tower REITs",
+      "Launch & Space Systems"
+     ],
+     "short": [
+      "Wireless Carriers"
+     ],
+     "note": ""
     }
    ]
   },
@@ -1345,7 +1436,7 @@
    "title": "Gulf attacks keep oil above $100",
    "status": "resolved",
    "started": "2026-10-09",
-   "updated": "2026-11-06",
+   "updated": "2026-11-09",
    "summary": "Houthi attacks on Saudi sites and Hormuz shipping pushed Brent from about $98 to over $110 in two weeks; refiners and drillers lead, airlines lose.",
    "changed": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it.",
    "thesis": {
@@ -1666,6 +1757,21 @@
     },
     {
      "date": "2026-11-06",
+     "status": "resolved",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it."
+    },
+    {
+     "date": "2026-11-09",
      "status": "resolved",
      "long": [
       "Refiners",
