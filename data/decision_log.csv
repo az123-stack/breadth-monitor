@@ -360,26 +360,26 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-05,FIGS,watch,kq,thrust,Deteriorating,Focus,0.155,97.0,Consumer Brands,90.4,confirmed,,3.26,8.44,+10bp 10-yr yield → -2.1%,,,"October jobs report (payrolls, unemployment) 2026-11-06",No clear catalyst found in this run's searches (only older items surfaced).,full,none,none,,high,3,1,,,,,pending
 2026-11-05,NTSK,watch,pullback,thrust,Deteriorating,Focus,0.289,95.0,Cybersecurity Platforms,46.5,outflow,,0.0,0.0,,,,"October jobs report (payrolls, unemployment) 2026-11-06",,,,,,high,2,2,,,,,pending
 2026-11-05,QLYS,watch,kq,thrust,Deteriorating,Focus,0.155,94.0,Identity & Security Tools,78.6,neutral,,-0.84,-1.66,+1% dollar → +2.6%,,,"October jobs report (payrolls, unemployment) 2026-11-06",,,,,,high,2,1,,,,,pending
-2026-11-06,A,cand,pullback,thrust,Deteriorating,Focus,0.279,87.0,Life Science Tools,85.3,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,2,1,,,,,pending
-2026-11-06,ACHC,cand,round,thrust,Deteriorating,Focus,0.293,96.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,AVAH,cand,rotation,thrust,Deteriorating,Focus,0.406,95.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,BTSG,cand,rotation,thrust,Deteriorating,Focus,0.406,93.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,CON,cand,rotation,thrust,Deteriorating,Focus,0.406,96.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,CYRX,cand,round,thrust,Deteriorating,Focus,0.293,97.0,Life Science Tools,85.3,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,EBAY,cand,rotation,thrust,Deteriorating,Focus,0.406,86.0,E-Commerce Marketplaces,85.1,steady,,0.67,3.67,+10bp 10-yr yield → -1.0%,,,CPI (October) 2026-11-10,,,,,,high,2,1,,,,,pending
-2026-11-06,HELE,cand,round,thrust,Deteriorating,Focus,0.293,95.0,Household & Personal Care,83.9,confirmed,,1.84,10.14,+10bp 10-yr yield → -2.6%,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,HUM,cand,rotation,thrust,Deteriorating,Focus,0.406,95.0,Managed Care,71.6,steady,warming,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,KOD,cand,round,thrust,Deteriorating,Focus,0.293,99.0,Mid-cap Biotech,76.5,neutral,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,2,1,,,,,pending
-2026-11-06,NVAX,cand,pullback,thrust,Deteriorating,Focus,0.279,88.0,Mid-cap Biotech,76.5,neutral,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,1,1,,,,,pending
-2026-11-06,PACS,cand,rotation,thrust,Deteriorating,Focus,0.406,97.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,PLSE,cand,rotation,thrust,Deteriorating,Focus,0.406,99.0,Medical Devices,89.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,SN,cand,ath,thrust,Deteriorating,Focus,0.16,97.0,Consumer Brands,91.7,confirmed,,1.39,7.65,+10bp 10-yr yield → -2.0%,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,VTRS,cand,round,thrust,Deteriorating,Focus,0.293,91.0,Large-cap Pharma,85.6,confirmed,,0.51,2.78,+10bp 10-yr yield → -0.7%,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,XMTR,cand,ath,thrust,Deteriorating,Focus,0.16,94.0,E-Commerce Marketplaces,85.1,steady,,1.13,0.26,+1% dollar → +2.7%,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,NIQ,pick1,ath,thrust,Deteriorating,Focus,0.16,97.0,Business Services & Data,84.1,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,KNSA,pick2,round,thrust,Deteriorating,Focus,0.293,97.0,Immunology & Inflammation,84.7,confirmed,ignition,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,APPN,watch,kq,thrust,Deteriorating,Focus,0.167,98.0,Enterprise SaaS,84.7,steady,,1.73,9.54,+10bp 10-yr yield → -2.5%,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,CBRL,watch,pullback,thrust,Deteriorating,Focus,0.279,96.0,Restaurants,74.0,confirmed,,-1.14,-0.26,+1% dollar → -2.7%,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,CRL,watch,kq,thrust,Deteriorating,Focus,0.167,96.0,CROs,97.2,confirmed,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,FIGS,watch,round,thrust,Deteriorating,Focus,0.293,97.0,Consumer Brands,91.7,confirmed,,1.49,8.19,+10bp 10-yr yield → -2.1%,,,CPI (October) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-06,NTSK,watch,kq,thrust,Deteriorating,Focus,0.167,93.0,Cybersecurity Platforms,48.0,outflow,,0.0,0.0,,,,CPI (October) 2026-11-10,,,,,,high,2,2,,,,,pending
+2026-11-06,A,cand,pullback,thrust,Deteriorating,Focus,0.279,87.0,Life Science Tools,85.3,confirmed,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,2,1,,,,,pending
+2026-11-06,ACHC,cand,round,thrust,Deteriorating,Focus,0.293,96.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,AVAH,cand,rotation,thrust,Deteriorating,Focus,0.406,95.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,BTSG,cand,rotation,thrust,Deteriorating,Focus,0.406,93.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,CON,cand,rotation,thrust,Deteriorating,Focus,0.406,96.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,CYRX,cand,round,thrust,Deteriorating,Focus,0.293,97.0,Life Science Tools,85.3,confirmed,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,EBAY,cand,rotation,thrust,Deteriorating,Focus,0.406,86.0,E-Commerce Marketplaces,85.1,steady,,0.67,3.67,+10bp 10-yr yield → -1.0%,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,2,1,,,,,pending
+2026-11-06,HELE,cand,round,thrust,Deteriorating,Focus,0.293,95.0,Household & Personal Care,83.9,confirmed,,1.84,10.14,+10bp 10-yr yield → -2.6%,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,HUM,cand,rotation,thrust,Deteriorating,Focus,0.406,95.0,Managed Care,71.6,steady,warming,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,KOD,cand,round,thrust,Deteriorating,Focus,0.293,99.0,Mid-cap Biotech,76.5,neutral,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,2,1,,,,,pending
+2026-11-06,NVAX,cand,pullback,thrust,Deteriorating,Focus,0.279,88.0,Mid-cap Biotech,76.5,neutral,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,1,1,,,,,pending
+2026-11-06,PACS,cand,rotation,thrust,Deteriorating,Focus,0.406,97.0,Healthcare Providers,93.1,confirmed,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,PLSE,cand,rotation,thrust,Deteriorating,Focus,0.406,99.0,Medical Devices,89.1,confirmed,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,SN,cand,ath,thrust,Deteriorating,Focus,0.16,97.0,Consumer Brands,91.7,confirmed,,1.39,7.65,+10bp 10-yr yield → -2.0%,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,VTRS,cand,round,thrust,Deteriorating,Focus,0.293,91.0,Large-cap Pharma,85.6,confirmed,,0.51,2.78,+10bp 10-yr yield → -0.7%,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,XMTR,cand,ath,thrust,Deteriorating,Focus,0.16,94.0,E-Commerce Marketplaces,85.1,steady,,1.13,0.26,+1% dollar → +2.7%,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,NIQ,pick1,ath,thrust,Deteriorating,Focus,0.16,97.0,Business Services & Data,84.1,confirmed,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,KNSA,pick2,round,thrust,Deteriorating,Focus,0.293,97.0,Immunology & Inflammation,84.7,confirmed,ignition,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,APPN,watch,kq,thrust,Deteriorating,Focus,0.167,98.0,Enterprise SaaS,84.7,steady,,1.73,9.54,+10bp 10-yr yield → -2.5%,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,CBRL,watch,pullback,thrust,Deteriorating,Focus,0.279,96.0,Restaurants,74.0,confirmed,,-1.14,-0.26,+1% dollar → -2.7%,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,CRL,watch,kq,thrust,Deteriorating,Focus,0.167,96.0,CROs,97.2,confirmed,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,FIGS,watch,round,thrust,Deteriorating,Focus,0.293,97.0,Consumer Brands,91.7,confirmed,,1.49,8.19,+10bp 10-yr yield → -2.1%,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,3,1,,,,,pending
+2026-11-06,NTSK,watch,kq,thrust,Deteriorating,Focus,0.167,93.0,Cybersecurity Platforms,48.0,outflow,,0.0,0.0,,,,"October CPI (consensus +0.3% headline, +0.2% core) 2026-11-10",,,,,,high,2,2,,,,,pending
