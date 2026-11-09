@@ -1,53 +1,43 @@
 {
- "for_date": "2026-11-05",
- "written": "2026-11-06T12:06Z",
- "headline": "AI-chip rout sent the S&P 500 down 4.4% Thursday, its worst day since April 2025, and the October jobs report lands at 8:30 AM ET today.",
+ "for_date": "2026-11-06",
+ "written": "2026-11-09T12:06Z",
+ "headline": "Tech correction and a hot jobs report have December Fed-hike odds near 75% going into Tuesday's October CPI.",
  "risk": "high",
- "rates": "The 10-year Treasury yield fell to about 4.84% Thursday from 4.90%, as money moved to safety, after topping 5.30% last month.",
- "fed": "The Fed held at 3.75%-4.00% on Oct 28 with two dissents favoring a hike, futures leaned toward a December 9 hike before the selloff, and no Fed speakers were confirmed.",
- "oil": "Brent rose 3.9% to about $98.29 Thursday, recovering part of Wednesday's near-9% drop, on uncertainty over the Iran war and when energy markets normalize.",
- "geo": "The Iran war keeps driving oil and inflation worries, and Democratic midterm wins raised the risk of government pauses on AI data-center construction.",
+ "rates": "After October payrolls of +165K (vs ~65K expected), the 10-year rose to about 4.88% and the 2-year to about 4.53% on Nov 6.",
+ "fed": "The Fed hiked in September and held in October; futures price roughly a 75% chance of another hike at the Dec 8-9 meeting, and I found no specific Fed speakers for this week.",
+ "oil": "Brent is hovering near $100 (about $99.90 on Nov 6) after a roughly 9% drop earlier in the week, swinging on US-Iran talk progress against Hormuz tanker attacks.",
+ "geo": "US-Iran talks mediated by Qatar are unresolved with Hormuz still effectively blocked, and the Nasdaq is down about 12% from its Oct 6 high on fears of a slower AI data-center buildout after the midterms.",
  "events": [
   {
-   "date": "2026-11-06",
+   "date": "2026-11-10",
    "time": "8:30 AM ET",
-   "name": "October jobs report (payrolls, unemployment)",
+   "name": "October CPI (consensus +0.3% headline, +0.2% core)",
    "impact": "high"
   },
   {
    "date": "2026-11-10",
-   "time": "8:30 AM ET",
-   "name": "CPI (October)",
-   "impact": "high"
-  },
-  {
-   "date": "2026-11-13",
-   "time": "8:30 AM ET",
-   "name": "PPI (October)",
+   "time": "All day",
+   "name": "Russia-Ukraine-US talks in Abu Dhabi (Nov 10-11)",
    "impact": "medium"
   },
   {
-   "date": "2026-11-17",
-   "time": "8:30 AM ET",
-   "name": "Retail sales (October)",
+   "date": "2026-11-11",
+   "time": "All day",
+   "name": "Veterans Day: Treasury market closed",
    "impact": "medium"
   },
   {
-   "date": "2026-11-17",
-   "time": "4:20 PM ET",
-   "name": "Nvidia earnings",
-   "impact": "high"
-  },
-  {
-   "date": "2026-11-18",
-   "time": "2:00 PM ET",
-   "name": "FOMC minutes (October meeting)",
+   "date": "2026-11-12",
+   "time": "After the close",
+   "name": "Cisco and Applied Materials earnings",
    "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.wsaw.com/2026/11/05/brutal-sell-off-ai-stocks-sends-wall-street-reeling-sp-500-sees-worst-day-since-2025-liberation-day-tariffs/",
-  "https://www.regardsofwallstreet.com/news/stock-market-week-ahead-november-2-2026",
-  "https://www.simianx.ai/stories/us-economic-calendar-this-month-in-your-time-zone"
+  "https://www.kitco.com/news/off-the-wire/2026-11-06/wall-st-week-ahead-tech-swoon-roils-market-us-inflation-data-tap",
+  "https://thriveinmarkets.com/calendar/2026-11-09/",
+  "https://finimize.com/content/strong-us-jobs-report-pushed-treasury-yields-higher",
+  "https://leprivatebanker.com/2026/11/06/oil-swings-near-100-as-iran-studies-qatari-nuclear-proposals-and-offers-hormuz-reopening-within-two-days-on-sanctions-relief/",
+  "https://www.khaleejtimes.com/business/oil-prices-ease-to-nearly-four-week-low-amid-peace-talks"
  ]
 }
