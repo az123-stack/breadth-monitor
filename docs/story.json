@@ -373,6 +373,14 @@
      "why": "last inflation read before the Dec 9 Fed meeting; hot = hike odds up, pressure on growth and small caps"
     }
    ]
+  },
+  {
+   "date": "2026-11-10",
+   "slot": "data",
+   "title": "CPI hot but futures shrug; chips, small caps lag",
+   "branch": "B",
+   "md": "**The numbers:** October CPI came in hot. Headline rose 0.4% on the month vs 0.3% expected and 0.6% in September; core rose 0.3% vs 0.2% expected and 0.3% prior ([24/7 Wall St.](https://247wallst.com/investing/2026/11/10/inflation-just-came-in-hotter-than-expected-that-is-a-warning-to-retirees-that-kevin-warshs-fed-is-not-done-raising-rates/), [CoinDesk](https://www.coindesk.com/markets/2026/11/10/u-s-cpi-rose-stronger-than-expected-0-4-in-october-core-rate-rose-0-3)). No official 12-month rate was published because October 2025 prices were not collected during the shutdown.\n\n**How the market took it:** Small. Since before 8:30, S&P futures are +0.04%, Nasdaq-100 futures +0.10%, Russell 2000 futures +0.01%, the dollar index +0.01%, and 10-year note futures -0.06% (yields up a touch). In the ETFs since 8:24, QQQ is -0.75%, SMH -1.35%, IWM -0.89%, KRE -0.75%, TLT -0.18%, and RSP -0.07%. Futures shrugged; the pre-market ETFs lean lower in growth, chips and small caps.\n\n**What it means today:** A hot print keeps the Fed's December 9 hike on the table; CME FedWatch had about 84% priced before the report (24/7 Wall St.), so this confirms rather than shocks. Higher-for-longer rates hurt long-duration growth, chips, small caps and regional banks most, and favor equal-weight and defensives. It sits awkwardly with branch B, money coming back: the bounce in chips and small caps now has to hold against a rates headwind. Oil is down about 2.4% on the day, which helps the inflation outlook.\n\n**Watch at the open:**\n- Do QQQ and SMH hold their pre-market weakness, or does the chips bounce get bought again?\n- Do IWM and KRE stay lower than SPY? A small-cap lag confirms the rate worry.",
+   "written": "2026-11-10T08:46"
   }
  ]
 }
