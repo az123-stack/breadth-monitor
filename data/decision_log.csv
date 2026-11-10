@@ -386,20 +386,20 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-09,ABCL,cand,pullback,thrust,Breadth thrust,Focus,0.267,99.0,AI Drug Discovery & Synbio,93.3,neutral,warming,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-09,AVAH,cand,rotation,thrust,Breadth thrust,Focus,0.428,95.0,Healthcare Providers,86.8,steady,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-09,AVTR,cand,pullback,thrust,Breadth thrust,Focus,0.267,91.0,Life Science Tools,92.6,confirmed,,0.25,1.38,+1% dollar → -2.7%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-09,CON,cand,rotation,thrust,Breadth thrust,Focus,0.428,96.0,Healthcare Providers,86.8,steady,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
+2026-11-09,CON,cand,rotation,thrust,Breadth thrust,Focus,0.428,96.0,Healthcare Providers,86.8,steady,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,earnings date check only,earnings_only,none,unknown,,high,3,1,,,,,pending
 2026-11-09,EBAY,cand,rotation,thrust,Breadth thrust,Focus,0.428,83.0,E-Commerce Marketplaces,80.7,steady,,0.29,3.69,+10bp 10-yr yield → -1.0%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,2,1,,,,,pending
 2026-11-09,EWTX,cand,round,thrust,Breadth thrust,Focus,0.286,95.0,Mid-cap Biotech,78.3,neutral,,0.58,7.22,+10bp 10-yr yield → -1.9%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,2,1,,,,,pending
-2026-11-09,FIGS,cand,kq,thrust,Breadth thrust,Focus,0.169,98.0,Consumer Brands,88.2,confirmed,,0.62,7.83,+10bp 10-yr yield → -2.1%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
+2026-11-09,FIGS,cand,kq,thrust,Breadth thrust,Focus,0.169,98.0,Consumer Brands,88.2,confirmed,,0.62,7.83,+10bp 10-yr yield → -2.1%,,,October CPI (no YoY rate) 2026-11-10,"Q3 beat-and-raise for a fourth straight call, but a Jordan supply squeeze caps near-term upside.",full,positive,strong,Jordan supply constraint,high,3,1,,,,,pending
 2026-11-09,INTA,cand,kq,thrust,Breadth thrust,Focus,0.169,91.0,Enterprise SaaS,79.0,steady,,0.61,7.64,+10bp 10-yr yield → -2.0%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-09,KOD,cand,vcp,thrust,Breadth thrust,Focus,0.265,99.0,Mid-cap Biotech,78.3,neutral,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,2,1,,,,,pending
 2026-11-09,KYMR,cand,round,thrust,Breadth thrust,Focus,0.286,95.0,Immunology & Inflammation,89.3,confirmed,ignition,2.17,1.49,+1% oil → -0.2%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-09,MANE,cand,round,thrust,Breadth thrust,Focus,0.286,98.0,Mid-cap Biotech,78.3,neutral,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,2,1,,,,,pending
 2026-11-09,NEO,cand,pullback,thrust,Breadth thrust,Focus,0.267,92.0,Genomics & Diagnostics,76.4,fading,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,2,1,,,,,pending
 2026-11-09,NTSK,cand,round,thrust,Breadth thrust,Focus,0.286,94.0,Cybersecurity Platforms,53.9,outflow,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,2,2,,,,,pending
-2026-11-09,PACS,cand,rotation,thrust,Breadth thrust,Focus,0.428,97.0,Healthcare Providers,86.8,steady,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-09,PLSE,cand,ath,thrust,Breadth thrust,Focus,0.166,99.0,Medical Devices,83.2,confirmed,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
+2026-11-09,PACS,cand,rotation,thrust,Breadth thrust,Focus,0.428,97.0,Healthcare Providers,86.8,steady,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,earnings date check only,earnings_only,none,unknown,,high,3,1,,,,,pending
+2026-11-09,PLSE,cand,ath,thrust,Breadth thrust,Focus,0.166,99.0,Medical Devices,83.2,confirmed,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,"Q3 reported Nov 5: EPS beat and pivotal enrollment finished early, but CE Mark timeline slipped and spending rose.",full,mixed,real,CE Mark delay; rising spend,high,3,1,,,,,pending
 2026-11-09,SLDE,cand,pullback,thrust,Breadth thrust,Focus,0.267,91.0,P&C Insurers,74.8,steady,,0.34,4.31,+10bp 10-yr yield → -1.1%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-09,SN,cand,ath,thrust,Breadth thrust,Focus,0.166,97.0,Consumer Brands,88.2,confirmed,,0.57,7.19,+10bp 10-yr yield → -1.9%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
+2026-11-09,SN,cand,ath,thrust,Breadth thrust,Focus,0.166,97.0,Consumer Brands,88.2,confirmed,,0.57,7.19,+10bp 10-yr yield → -1.9%,,,October CPI (no YoY rate) 2026-11-10,earnings date check only,earnings_only,none,unknown,,high,3,1,,,,,pending
 2026-11-09,THC,cand,rotation,thrust,Breadth thrust,Focus,0.428,88.0,Healthcare Providers,86.8,steady,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,2,1,,,,,pending
 2026-11-09,WAT,cand,round,thrust,Breadth thrust,Focus,0.286,85.0,Life Science Tools,92.6,confirmed,,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,2,1,,,,,pending
 2026-11-09,KNSA,pick1,ath,thrust,Breadth thrust,Focus,0.166,97.0,Immunology & Inflammation,89.3,confirmed,ignition,0.0,0.0,,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
