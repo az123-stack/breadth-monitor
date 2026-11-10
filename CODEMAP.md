@@ -767,6 +767,12 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   prior settle), ETF tiles and the Morning read "Futures:" line (now with the Dow), Intraday Market pulse tiles (price − closeyest).
   `intraday.PULSE` gained ^IXIC (Nasdaq Composite, INDEXNASDAQ:.IXIC) and ^DJI (Dow, INDEXDJX:.DJI) — they reach the Google sheet via
   data/live_sheet.csv on the next build.
+- **v3 Stocks → Setups** (Nov 10, 2026; Adam: "put the episodic pivots setup in our setups tab and add a feature where you can download those
+  (along with the lined-up buys) and any other setups we end up putting in there"): `V3_SETUPS` entries are [key, label, render, ticks];
+  `ticks()` returns TradingView sections and feeds the counts on the third-row buttons and the "⬇ All setups" button (`setupsDownloadAll`,
+  one file, each setup its own section(s)). New setups only need a ticks function to join. Tabs: Lined-up buys (`lineupTicks`: triggered /
+  in the EMAs / approaching) · Episodic pivots (`epV3Card` from `DATA.themes.lists.eps`; chips Universe / When / Holding (since ≥ 0);
+  own ⬇; `epTicks`: last session / last 5 sessions; follows the chips). EPs stay a watch list (faded in every regime without a catalyst check).
 - **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
   `build(adjusted, theme_data)` (~70 s) → `DATA.themes.inplay` {date, days, rows, n, counts, pool {t: [adr, v50, sub]}}, v3 Stocks → **In Play**
   (`renderInPlay` in v3_tabs.js). Universe stocks $5+, $10M+/day (no deals), last 5 sessions: news = gap ≥ max(3%, 1 ADR) on 2.5x vol

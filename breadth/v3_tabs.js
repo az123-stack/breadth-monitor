@@ -2,20 +2,75 @@
    Stocks → Setups (Adam: "setups as a sub tab, and we might need a sub tab under that; I want the lined-up buys setups"):
    a third row of tabs (V3_SETUPS) under Setups; only Lined-up buys for now — add [key, label, render] entries as setups move over.
    Groups → Rotation (Adam: "the where-is-the-money-going card, nothing else from that old tab for now"). */
+// Nov 10, 2026 (Adam: "put the episodic pivots setup in our setups tab and add a feature where you can download those (along with the
+// lined-up buys) and any other setups we end up putting in there"): each entry = [key, label, render, ticks]; ticks() returns TradingView
+// sections [{name, ticks}] for the "⬇ All setups" button, so any setup added here joins the download automatically.
+function lineupTicks() {
+  const LC = (DATA.themes || {}).lifecycle; if (!LC || !(LC.live || []).length) return [];
+  const rows = (LC.live || []).map(lineupState).filter(r => r.st);
+  return [{ name: "Lined-up buys - triggered", ticks: rows.filter(r => r.st === "over").map(r => r.t) },
+    { name: "Lined-up buys - in the EMAs", ticks: rows.filter(r => r.st === "zone").map(r => r.t) },
+    { name: "Lined-up buys - approaching", ticks: rows.filter(r => r.st === "near").map(r => r.t) }];
+}
+function epRows() {
+  const L = (DATA.themes || {}).lists || {}, M = stockMap(), U = UI.ep || {};
+  return (L.eps || []).map(r => ({ ...r, rsr: (M[r.t] && M[r.t].rsr) ?? r.rsr, sub: r.sub || (M[r.t] || {}).sub }))
+    .filter(r => U.mine !== "mine" || !!(r.theme || r.sub)).filter(r => U.when !== "1" || r.days === 0)
+    .filter(r => U.hold !== "held" || (r.since ?? -1) >= 0);
+}
+function epTicks() {
+  const R = epRows();
+  return [{ name: "Episodic pivots - last session", ticks: R.filter(r => r.days === 0).map(r => r.t) },
+    { name: "Episodic pivots - last 5 sessions", ticks: R.filter(r => r.days > 0).map(r => r.t) }];
+}
+function epV3Card() {
+  const T = DATA.themes || {}, L = T.lists || {};
+  UI.ep = UI.ep || { mine: lsGet("epMine", "all"), when: lsGet("epWhen", "5"), hold: lsGet("epHold", "all") };
+  const U = UI.ep, live = !!LIVE_T, save = () => { lsSet("epMine", U.mine); lsSet("epWhen", U.when); lsSet("epHold", U.hold); rerenderPanel(); };
+  const rows = epRows();
+  const ec = [{ k: "t", h: "Ticker", l: true, asc: true }, { k: "days", h: "When", asc: true }, { k: "gap", h: "Gap" }, { k: "vx", h: "Volume<small>× 50d avg</small>" },
+    { k: "since", h: "Since EP<small>close to close</small>" }, ...(live ? [{ k: null, h: "Now<small>live</small>" }] : []), { k: "rsr", h: "RS Rating" },
+    { k: "dvol", h: "$ vol<small>50d, $M</small>" }, { k: "price", h: "Price" }];
+  const sec = $(`<section class="card tcard"><div class="head"><h2>Episodic pivots <span class="meta">· ${rows.length} of ${(L.counts || {}).eps ?? (L.eps || []).length} big gaps on huge volume, last 5 sessions · ${longDate(T.date)} close</span></h2>
+    <button class="xopen epdl">⬇ TradingView</button></div><div class="filters" style="padding:0 16px 8px"></div></section>`);
+  const f = sec.querySelector(".filters");
+  f.append(chips("Universe", [["all", "Whole market"], ["mine", "Only my themes"]], U, "mine", save));
+  f.append(chips("When", [["5", "Last 5 sessions"], ["1", "Last session"]], U, "when", save));
+  f.append(chips("Holding", [["all", "Any"], ["held", "Still above the EP close"]], U, "hold", save));
+  sec.append(listTable(rows, ec, r => `${nameCell(r)}<td class="num">${r.days === 0 ? "Last session" : r.days + "d ago"}<small class="meta"> ${r.date.slice(5)}</small></td>${retCell(r.gap, "d5")}<td class="num">${r.vx == null ? "–" : r.vx.toFixed(1) + "×"}</td>${retCell(r.since, "d5")}${live ? nowCell(r) : ""}
+    <td class="num ${rsTint(r.rsr)}">${r.rsr ?? "–"}</td><td class="num">${r.dvol == null ? "–" : r.dvol.toFixed(0)}</td><td class="num">${r.price?.toFixed(2) ?? "–"}</td>`, SETUP_SORT.e));
+  sec.append($(`<div class="note">Stockbee / Kristjan-style episodic pivot: gap up 8–60% on 3× average volume that held +5% at the close; $5+ and $20M+ average dollar volume.
+    <b>A watch list, not a buy list:</b> without checking the catalyst, these faded on average in every breadth regime in our backtest (buy the close, 5 sessions).
+    The ones worth trading have a real surprise (earnings beat with raised guidance, a new contract, FDA approval): read the news, then buy the opening-range high or the first tight pullback, stop the low of the EP day.</div>`));
+  sec.querySelector(".epdl").addEventListener("click", () => tsDownload("episodic-pivots", epTicks()));
+  return sec;
+}
 const V3_SETUPS = [
   ["lineup", "Lined-up buys", (app) => {
     const T = DATA.themes || {};
     app.append(liveBar());
     const c = lineupCard(T);
     app.append(c.children.length ? c : $('<div class="card empty">No lined-up buys today: no BUY / ready group has a liquid RS 70+ uptrend stock near its 9/21 EMAs. The list refills after each data run.</div>'));
-  }],
+  }, lineupTicks],
+  ["ep", "Episodic pivots", (app) => {
+    app.append(liveBar());
+    app.append((DATA.themes || {}).lists ? epV3Card() : $('<div class="card empty">Episodic pivots appear after the next data run.</div>'));
+  }, epTicks],
 ];
+function setupsDownloadAll() {
+  const secs = V3_SETUPS.flatMap(([k, l, r, ticks]) => { try { return ticks ? ticks() : []; } catch (e) { return []; } }).filter(x => x.ticks.length);
+  if (!secs.length) return;
+  tsDownload("all-setups", secs);
+}
 function renderStockSetups(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Setups appear after the next data run.</div>')); return; }
   UI.ss = UI.ss || { k: lsGet("v3setup", V3_SETUPS[0][0]) };
   if (!V3_SETUPS.some(x => x[0] === UI.ss.k)) UI.ss.k = V3_SETUPS[0][0];
-  const bar = $(`<nav class="tabs3" role="tablist" aria-label="Setup type">${V3_SETUPS.map(([k, l]) => `<button role="tab" data-k="${k}" aria-selected="${k === UI.ss.k}">${l}</button>`).join("")}</nav>`);
-  bar.querySelectorAll("button").forEach(b => b.addEventListener("click", () => { UI.ss.k = b.dataset.k; lsSet("v3setup", UI.ss.k); rerenderPanel(); }));
+  const cnt = (ticks) => { try { return (ticks ? ticks() : []).reduce((a, x) => a + x.ticks.length, 0); } catch (e) { return 0; } };
+  const bar = $(`<nav class="tabs3" role="tablist" aria-label="Setup type" style="align-items:center">${V3_SETUPS.map(([k, l, r, ticks]) => `<button role="tab" data-k="${k}" aria-selected="${k === UI.ss.k}">${l} <small class="meta">${cnt(ticks)}</small></button>`).join("")}
+    <button class="xopen ssall" style="margin-left:auto" title="One TradingView watchlist with every setup tab, each as its own section">⬇ All setups</button></nav>`);
+  bar.querySelectorAll("button[data-k]").forEach(b => b.addEventListener("click", () => { UI.ss.k = b.dataset.k; lsSet("v3setup", UI.ss.k); rerenderPanel(); }));
+  bar.querySelector(".ssall").addEventListener("click", setupsDownloadAll);
   app.append(bar);
   V3_SETUPS.find(x => x[0] === UI.ss.k)[2](app);
 }

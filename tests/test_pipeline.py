@@ -2097,6 +2097,8 @@ def test_heavy_lifters():
     r = X["rows"]["A"]
     assert "B" not in X["rows"] and len(r["c"]) == heavy.WIN + 1 and r["cap"] == 200.0 and r["rs"] == 90 and len(r["e"]) == 3 and r["e21p"] < r["e"][1]
     assert ("sheavy", "Heavy lifters") in v3site.NAV[2][2] and "function renderHeavy" in v3site.TABS_JS.read_text()
+    js = v3site.TABS_JS.read_text()   # Nov 10: EP setup tab + "All setups" download (every V3_SETUPS entry carries a ticks() function)
+    assert '["ep", "Episodic pivots"' in js and "function setupsDownloadAll" in js and "}, epTicks]" in js and "}, lineupTicks]" in js
 
 
 def test_since_the_bottom():
