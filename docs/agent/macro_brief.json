@@ -1,43 +1,59 @@
 {
- "for_date": "2026-11-06",
- "written": "2026-11-09T12:06Z",
- "headline": "Tech correction and a hot jobs report have December Fed-hike odds near 75% going into Tuesday's October CPI.",
+ "for_date": "2026-11-09",
+ "written": "2026-11-10T12:05Z",
+ "headline": "October CPI at 8:30 AM ET today with markets pricing ~84% odds of a December Fed hike, while Brent slid near $92 on US-Iran de-escalation hopes.",
  "risk": "high",
- "rates": "After October payrolls of +165K (vs ~65K expected), the 10-year rose to about 4.88% and the 2-year to about 4.53% on Nov 6.",
- "fed": "The Fed hiked in September and held in October; futures price roughly a 75% chance of another hike at the Dec 8-9 meeting, and I found no specific Fed speakers for this week.",
- "oil": "Brent is hovering near $100 (about $99.90 on Nov 6) after a roughly 9% drop earlier in the week, swinging on US-Iran talk progress against Hormuz tanker attacks.",
- "geo": "US-Iran talks mediated by Qatar are unresolved with Hormuz still effectively blocked, and the Nasdaq is down about 12% from its Oct 6 high on fears of a slower AI data-center buildout after the midterms.",
+ "rates": "The 10-year yield is near 4.88% and the 2-year near 4.56%, both rising as traders lean toward a hike.",
+ "fed": "The Fed held at 3.75%-4.00% on Oct 28, markets price about an 84% chance of a hike on Dec 9, and Fed speakers (Bowman today, Williams Thursday) are on deck.",
+ "oil": "Brent is near $92, down about 22% from a late-October peak above $117 on hopes for a US-Iran deal, though diesel and LNG supply stay tight.",
+ "geo": "US-Iran talks and Strait of Hormuz incidents remain live, and Nvidia fell 4.3% on an investigation into its CEO tied to suspected China chip smuggling.",
  "events": [
   {
    "date": "2026-11-10",
    "time": "8:30 AM ET",
-   "name": "October CPI (consensus +0.3% headline, +0.2% core)",
+   "name": "October CPI (no YoY rate)",
    "impact": "high"
   },
   {
    "date": "2026-11-10",
-   "time": "All day",
-   "name": "Russia-Ukraine-US talks in Abu Dhabi (Nov 10-11)",
+   "time": "1:00 PM ET",
+   "name": "10-year Treasury note auction",
    "impact": "medium"
   },
   {
-   "date": "2026-11-11",
-   "time": "All day",
-   "name": "Veterans Day: Treasury market closed",
+   "date": "2026-11-10",
+   "time": "3:30 PM ET",
+   "name": "Fed Governor Bowman speaks",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-10",
+   "time": "After close",
+   "name": "CoreWeave earnings",
    "impact": "medium"
   },
   {
    "date": "2026-11-12",
-   "time": "After the close",
+   "time": "6:30 AM ET",
+   "name": "NY Fed President Williams speaks",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-12",
+   "time": "After close",
    "name": "Cisco and Applied Materials earnings",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-13",
+   "time": "8:30 AM ET",
+   "name": "October PPI",
    "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.kitco.com/news/off-the-wire/2026-11-06/wall-st-week-ahead-tech-swoon-roils-market-us-inflation-data-tap",
-  "https://thriveinmarkets.com/calendar/2026-11-09/",
-  "https://finimize.com/content/strong-us-jobs-report-pushed-treasury-yields-higher",
-  "https://leprivatebanker.com/2026/11/06/oil-swings-near-100-as-iran-studies-qatari-nuclear-proposals-and-offers-hormuz-reopening-within-two-days-on-sanctions-relief/",
-  "https://www.khaleejtimes.com/business/oil-prices-ease-to-nearly-four-week-low-amid-peace-talks"
+  "https://www.home.saxo/en-gb/content/articles/macro/market-quick-take---wall-street-rebounds-and-brent-slides-below-usd-92---10-november-2026-10112026",
+  "https://www.regardsofwallstreet.com/news/stock-market-week-ahead-november-9-2026",
+  "https://stocktwits.com/news-articles/markets/equity/what-to-expect-markets-this-week-nov-8-2026/cNGYG4ZR9Iu"
  ]
 }
