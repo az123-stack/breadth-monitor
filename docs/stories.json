@@ -1,14 +1,14 @@
 {
- "updated": "2026-11-09T16:56",
+ "updated": "2026-11-10T16:56",
  "stories": [
   {
    "id": "ai-spending-repriced",
    "title": "AI spending gets repriced",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-11-09",
+   "updated": "2026-11-10",
    "summary": "Investors now want proof that AI spending pays back in cash, so money is leaving AI hardware and, as of Oct 29, software too.",
-   "changed": "Nov 9: the seesaw swung back. The sold-hardest AI hardware groups bounced hard (Custom Silicon +11.2%, Semicap +9.9%, Memory +8.0%) and the VIX fell 22%, while IT services and the steady names rested. No new driver found for the bounce: oversold buying, not news. The story is not over.",
+   "changed": "Nov 10: hot CPI and a second Nvidia drop pushed AI hardware lower again (Optical -4.1%, AI Applications -2.7%); the bounce stalled but the sold-hardest basket still beat what held up by about 2 points.",
    "thesis": {
     "what": "Since early October the AI-hardware groups (chip equipment, optical, AI servers, custom chips, memory, neoclouds, data-center power) fell about 18% over 20 sessions while IT services, enterprise software and steady consumer names rose about 10%: a 28-point swing. On Oct 22 the S&P 500 fell 1.2% but the equal-weight S&P rose 0.7%: the money moved, it didn't leave.",
     "why": "Two worries feed each other. **Cost:** Meta announced non-voting shares to help fund its AI spending and fell 5%; Tesla cut capex; Lam Research guided below consensus ([Korea Times](https://www.koreatimes.co.kr/world/20261023/wall-street-sinks-as-nasdaq-falls-over-2-on-ai-cost-worries), [Investrade](https://investrade.com/market-review-october-22-2026/)). **Financing:** hot CPI pushed the 10-year to 5.26% and CoreWeave's credit spread past 1,000 bp, so borrowing to build data centers got expensive ([TradingKey](https://www.tradingkey.com/analysis/stocks/us-stocks/262218623-us-premarket-tsmc-record-profit-chip-stocks-fall-nvidia-micron-ppi-tradingkey)). Funding is the newest strain: Meta plans to raise up to $95B, starting with $35B in stock ([MarketScreener](https://www.marketscreener.com/news/wall-st-rises-as-anthropic-s-ipo-filing-sharpens-focus-on-ai-trade-ce785cdcdd8ff22d)), and Anthropic's filing adds a large new AI listing to the supply.",
@@ -177,6 +177,13 @@
      "url": "https://leprivatebanker.com/2026/11/09/nasdaq-surges-2-5-to-claw-back-part-of-correction-as-chipmakers-rally-even-with-nvidia-down-on-board-probe-of-huang/",
      "source": "Le Private Banker",
      "reaction": "Custom Silicon +11.2%, Semicap +9.9%, Memory +8.0%, Hyperscalers +3.0%; ~21% of dollars in falling stocks (Google est.)"
+    },
+    {
+     "date": "2026-11-10",
+     "event": "Nvidia falls 5.5% to $168.89 for a second day on the board's investigation into its CEO; hot CPI pushes the 10-year up 7 bp to 4.93%",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-tuesday-november-10-dow-sp-500-nasdaq-inflation-data-cpi-090627830.html",
+     "source": "Yahoo Finance",
+     "reaction": "Optical -4.1%, AI Applications -2.7%, SPY -0.37%, QQQ -0.68%"
     }
    ],
    "groups": {
@@ -216,12 +223,6 @@
     ]
    },
    "catalysts": [
-    {
-     "date": "2026-11-10",
-     "time": "8:30 AM ET",
-     "name": "October CPI",
-     "why": "A hot print would test whether the VIX-driven bounce can hold; a cool one lets AI hardware keep recovering (source: Vista P Global)."
-    },
     {
      "date": "2026-12-09",
      "time": "2:00 PM ET",
@@ -508,6 +509,27 @@
       "Memory & Storage Media"
      ],
      "note": "Nov 9: the seesaw swung back. The sold-hardest AI hardware groups bounced hard (Custom Silicon +11.2%, Semicap +9.9%, Memory +8.0%) and the VIX fell 22%, while IT services and the steady names rested. No new driver found for the bounce: oversold buying, not news. The story is not over."
+    },
+    {
+     "date": "2026-11-10",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "Enterprise SaaS",
+      "Business Services & Data",
+      "Household & Personal Care",
+      "Packaged Foods"
+     ],
+     "short": [
+      "Semicap Equipment",
+      "Optical Components & Transceivers",
+      "AI Servers & Integrators",
+      "Custom Silicon & Networking Chips",
+      "Neoclouds & GPU Hosting",
+      "Data Center Power & Cooling",
+      "Memory & Storage Media"
+     ],
+     "note": "Nov 10: hot CPI and a second Nvidia drop pushed AI hardware lower again (Optical -4.1%, AI Applications -2.7%); the bounce stalled but the sold-hardest basket still beat what held up by about 2 points."
     }
    ]
   },
@@ -516,9 +538,9 @@
    "title": "Hot inflation keeps the 10-year near 5%",
    "status": "fading",
    "started": "2026-10-14",
-   "updated": "2026-11-09",
+   "updated": "2026-11-10",
    "summary": "Hot CPI and PPI pushed the 10-year Treasury yield to 5.26%, hurting companies whose profits are years away; yields eased on Oct 22, but the Fed and PCE next week decide the next leg.",
-   "changed": "Nov 9: small caps led (IWM +3.2%) as oil fell and the VIX dropped; the rate story is on hold until Tuesday's CPI. Price has disagreed with the story for several sessions: if CPI is calm this goes to resolved.",
+   "changed": "Nov 10: the hot CPI revived the story: the 10-year is back near 5% and rate-sensitive groups fell 2.7%. It stays 'fading' until they lag SPY for several sessions; the Dec 9 Fed decision is the next test.",
    "thesis": {
     "what": "Since the Oct 14 CPI the groups that need cheap money or are years from profits (small nuclear reactors, quantum, homebuilders, REITs, residential solar) fell about 13% vs SPY over 20 sessions.",
     "why": "September CPI came in at 3.7% vs 3.6% and PPI was hot the next day, reviving rate-hike bets; the 10-year hit 5.26% ([24/7 Wall St.](https://247wallst.com/investing/2026/10/14/nuscale-power-falls-7-as-10-year-treasury-yield-climbs-to-5-26-energy-fuels-drops-9-oklo-slides-5/)). Oil above $100 feeds inflation worries too (see the Gulf oil story).",
@@ -610,6 +632,13 @@
      "url": "https://vistapglobal.com/stock-market-today-november-9-2026-dow-jumps-1104-points-nasdaq-rallies-as-oils-slide-fuels-breadth-amwl-ant-eprx-googl-modd-nvda-ser-spcx/",
      "source": "Vista P Global",
      "reaction": "IWM +3.2% (Google est.): rate-sensitive small caps rallied on cheaper oil and calmer fear"
+    },
+    {
+     "date": "2026-11-10",
+     "event": "October CPI hot: +0.4% vs +0.3% expected, core +0.3% vs +0.2%; 10-year up 7 bp to 4.93%; about 84% odds of a December hike",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-tuesday-november-10-dow-sp-500-nasdaq-inflation-data-cpi-090627830.html",
+     "source": "Yahoo Finance",
+     "reaction": "TLT -1.3%, UUP +0.6%, IWM -0.7%, rate-sensitive groups -2.7%"
     }
    ],
    "groups": {
@@ -632,12 +661,6 @@
     ]
    },
    "catalysts": [
-    {
-     "date": "2026-11-10",
-     "time": "8:30 AM ET",
-     "name": "October CPI",
-     "why": "First inflation read since the Fed held at 3.75%–4.00% on Oct 28 with two officials preferring a hike; PPI follows Friday."
-    },
     {
      "date": "2026-12-09",
      "time": "2:00 PM ET",
@@ -819,6 +842,19 @@
       "Residential Solar & Yieldcos"
      ],
      "note": "Nov 9: small caps led (IWM +3.2%) as oil fell and the VIX dropped; the rate story is on hold until Tuesday's CPI. Price has disagreed with the story for several sessions: if CPI is calm this goes to resolved."
+    },
+    {
+     "date": "2026-11-10",
+     "status": "fading",
+     "long": [],
+     "short": [
+      "Nuclear Reactors (SMR)",
+      "Quantum Computing",
+      "Homebuilders",
+      "REITs",
+      "Residential Solar & Yieldcos"
+     ],
+     "note": "Nov 10: the hot CPI revived the story: the 10-year is back near 5% and rate-sensitive groups fell 2.7%. It stays 'fading' until they lag SPY for several sessions; the Dec 9 Fed decision is the next test."
     }
    ]
   },
@@ -827,7 +863,7 @@
    "title": "IT services: from AI loser to AI implementer",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-11-09",
+   "updated": "2026-11-10",
    "summary": "After being sold as AI losers, IT services and consulting are being re-rated as the firms that will implement AI, and they're absorbing money leaving AI hardware.",
    "changed": "Nov 9: IT Services was flat (−0.0%) in a +2.4% S&P rally as money went back to chips; it is the winners' side of the seesaw, resting. Relative strength over 20 days intact.",
    "thesis": {
@@ -1046,6 +1082,16 @@
      ],
      "short": [],
      "note": "Nov 9: IT Services was flat (−0.0%) in a +2.4% S&P rally as money went back to chips; it is the winners' side of the seesaw, resting. Relative strength over 20 days intact."
+    },
+    {
+     "date": "2026-11-10",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "India IT Services"
+     ],
+     "short": [],
+     "note": "Nov 9: IT Services was flat (−0.0%) in a +2.4% S&P rally as money went back to chips; it is the winners' side of the seesaw, resting. Relative strength over 20 days intact."
     }
    ]
   },
@@ -1054,9 +1100,9 @@
    "title": "Managed care repairs on better Medicare ratings",
    "status": "building",
    "started": "2026-10-09",
-   "updated": "2026-11-09",
+   "updated": "2026-11-10",
    "summary": "Better Medicare star ratings and UnitedHealth's beat-and-raise are pulling managed care out of its slump.",
-   "changed": "Nov 4: policy tailwind from the midterms (ACA subsidies, Medicaid) drove CNC and OSCR higher; CVS fell on its split plan, a company-specific drag.",
+   "changed": "Nov 10: Managed Care +2.6% on the biggest net inflow of the day in a down tape; no new news found, so it may be defensive money.",
    "thesis": {
     "what": "Managed Care is up about 11% over 20 sessions and 2% over 5, beating SPY on both.",
     "why": "Humana jumped 16% on better Medicare Advantage star ratings ([24/7 Wall St.](https://247wallst.com/investing/2026/10/09/humana-soars-16-on-improved-medicare-advantage-star-ratings-cvs-slides-3-unitedhealth-holds-steady/)), then UnitedHealth beat and raised its full-year outlook ([24/7 Wall St.](https://247wallst.com/investing/2026/10/13/unitedhealth-rises-4-on-earnings-beat-and-raised-full-year-outlook-humana-advances-2/)).",
@@ -1085,6 +1131,13 @@
      "url": "https://ca.finance.yahoo.com/news/health-insurers-hospitals-rally-sweeping-150601800.html",
      "source": "Yahoo Finance",
      "reaction": "Managed Care +3.5%, Healthcare Providers rally ~10% in HCA/THC/UHS"
+    },
+    {
+     "date": "2026-11-10",
+     "event": "CVS up about 3% and UnitedHealth about 1.5% with no single trigger named, only a turnaround narrative",
+     "url": "https://www.tradingkey.com/news/market-movers/262299327-market-movers-cvs-20261110",
+     "source": "TradingKey",
+     "reaction": "Managed Care +2.6%, biggest net inflow of the day"
     }
    ],
    "groups": {
@@ -1223,6 +1276,15 @@
      ],
      "short": [],
      "note": "Nov 4: policy tailwind from the midterms (ACA subsidies, Medicaid) drove CNC and OSCR higher; CVS fell on its split plan, a company-specific drag."
+    },
+    {
+     "date": "2026-11-10",
+     "status": "building",
+     "long": [
+      "Managed Care"
+     ],
+     "short": [],
+     "note": "Nov 10: Managed Care +2.6% on the biggest net inflow of the day in a down tape; no new news found, so it may be defensive money."
     }
    ]
   },
@@ -1231,7 +1293,7 @@
    "title": "SpaceX eyes cell sites; towers up, carriers down",
    "status": "building",
    "started": "2026-10-23",
-   "updated": "2026-11-09",
+   "updated": "2026-11-10",
    "summary": "Reports that SpaceX wants about 80,000 US cell sites for a wireless network lift tower landlords and hit AT&T and T-Mobile.",
    "changed": "",
    "thesis": {
@@ -1428,6 +1490,18 @@
       "Wireless Carriers"
      ],
      "note": ""
+    },
+    {
+     "date": "2026-11-10",
+     "status": "building",
+     "long": [
+      "Tower REITs",
+      "Launch & Space Systems"
+     ],
+     "short": [
+      "Wireless Carriers"
+     ],
+     "note": ""
     }
    ]
   },
@@ -1436,7 +1510,7 @@
    "title": "Gulf attacks keep oil above $100",
    "status": "resolved",
    "started": "2026-10-09",
-   "updated": "2026-11-09",
+   "updated": "2026-11-10",
    "summary": "Houthi attacks on Saudi sites and Hormuz shipping pushed Brent from about $98 to over $110 in two weeks; refiners and drillers lead, airlines lose.",
    "changed": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it.",
    "thesis": {
@@ -1772,6 +1846,21 @@
     },
     {
      "date": "2026-11-09",
+     "status": "resolved",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it."
+    },
+    {
+     "date": "2026-11-10",
      "status": "resolved",
      "long": [
       "Refiners",
