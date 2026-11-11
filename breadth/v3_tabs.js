@@ -725,3 +725,76 @@ function renderHeavy(app) {
     { name: "Heavy lifters " + wlab, ticks: rows.filter(s => !s.setup).map(s => s.t) }].filter(g => g.ticks.length)));
   app.append(card);
 }
+// Nov 11, 2026 (Adam: "in the market tab create another tab that's an intraday checklist figuring out which direction the action is
+// pointing towards"): Market → Checklist. Live Google prices for the dashboard's stock universe (theme / S&P / Nasdaq stocks, $5+,
+// $20M+/day). Each line scores +1 / 0 / −1; the verdict reads the pattern (broad rally · narrow pop · mixed · broad selling). Outside the
+// session it reads the last close (items that need the open / 10 AM marks show "–"). Thresholds are judgment calls, not tested.
+function checklistCalc() {
+  const T = DATA.themes || {}, live = liveActive(), M = {};
+  (T.stocks || []).forEach(s => { if (s.is_stock !== false && (s.price || 0) >= 5 && (s.v50 || 0) * (s.price || 0) >= 20e6) M[s.t] = s; });
+  const rows = Object.values(M).map(s => { const r = live ? liveRow(s.t) : null;
+    return r ? { s, chg: r.chg, gap: r.gap, fo: r.fromOpen, dv: r.volume && r.price ? r.volume * r.price : null, at10: r.at10 && r.at10.p ? r.price / r.at10.p - 1 : null }
+      : (live ? null : { s, chg: s.today, gap: null, fo: null, dv: null, at10: null }); }).filter(r => r && r.chg != null && isFinite(r.chg));
+  const ix = (k) => { const r = live ? liveRow(k) : null; return r ? r : null; };
+  const med = (v) => { v = v.filter(x => x != null && isFinite(x)).sort((a, b) => a - b); return v.length ? v[v.length >> 1] : null; };
+  const share = (v, f) => v.length ? v.filter(f).length / v.length : null;
+  const n = rows.length, up = share(rows, r => r.chg > 0), m = med(rows.map(r => r.chg));
+  const u4 = rows.filter(r => r.chg >= 0.04).length, d4 = rows.filter(r => r.chg <= -0.04).length;
+  const spy = ix("SPY"), qqq = ix("QQQ"), iwm = ix("IWM"), vix = ix("^VIX"), tnx = ix("^TNX");
+  const spyChg = spy ? spy.chg : (live ? null : ((T.bench || {}).today ?? null));
+  const rs90 = rows.filter(r => (r.s.rsr || 0) >= 90), beaten = rows.filter(r => (r.s.off_hi ?? 0) <= -0.30), near = rows.filter(r => (r.s.off_hi ?? -1) >= -0.05);
+  const subs = (T.subthemes || []).filter(g => (g.members || []).length >= 4), byS = {};
+  rows.forEach(r => { const k = r.s.sub; if (k) (byS[k] = byS[k] || []).push(r.chg); });
+  const lead = subs.slice().sort((a, b) => (b.strength || 0) - (a.strength || 0)).slice(0, 10).map(g => ({ g: g.theme, v: med(byS[g.theme] || []) })).filter(x => x.v != null);
+  const leadUp = share(lead, x => x.v > 0), leadMed = med(lead.map(x => x.v));
+  const upDv = rows.reduce((a, r) => a + (r.dv && r.chg > 0 ? r.dv : 0), 0), allDv = rows.reduce((a, r) => a + (r.dv && r.chg !== 0 ? r.dv : 0), 0);
+  const gappers = rows.filter(r => r.gap != null && r.gap >= 0.02), gapHold = share(gappers, r => r.fo > 0);
+  const at10 = rows.filter(r => r.at10 != null), late = share(at10, r => r.at10 > 0);
+  const sg = (v, hi, lo) => v == null ? 0 : v >= hi ? 1 : v <= lo ? -1 : 0;
+  const P = (v, d = 0) => v == null ? "–" : Math.round(v * 100 * 10 ** d) / 10 ** d + "%";
+  const S = (v, d = 1) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(d) + "%";
+  const items = [
+    { k: "Participation", v: `${P(up)} of ${n} stocks up · median ${S(m, 2)}`, s: sg(up, 0.6, 0.4), why: "Above 60% = broad buying; under 40% = broad selling." },
+    { k: "4% movers", v: `${u4} up 4%+ vs ${d4} down 4%+`, s: u4 + d4 < 20 ? 0 : sg(u4 / Math.max(1, d4), 2, 0.5), why: "Momentum days have 2:1 or better; under 1:2 = distribution." },
+    { k: "Typical stock vs SPY", v: `median ${S(m, 2)} vs SPY ${S(spyChg, 2)}`, s: m == null || spyChg == null ? 0 : (m >= spyChg - 0.002 && m > 0 ? 1 : m < 0 && spyChg > 0 ? -1 : 0), why: "Index up but the typical stock down = a narrow, cap-weighted move." },
+    { k: "Leaders (RS 90+)", v: `${P(share(rs90, r => r.chg > 0))} of ${rs90.length} up · median ${S(med(rs90.map(r => r.chg)), 2)}`, s: sg(share(rs90, r => r.chg > 0), 0.6, 0.4), why: "Real rebounds lift the leaders; junk-only rallies leave them flat." },
+    { k: "Leading groups (top 10 Strength)", v: `${lead.filter(x => x.v > 0).length} of ${lead.length} green · median ${S(leadMed, 2)}`, s: sg(leadUp, 0.6, 0.4), why: lead.length ? "Leaders: " + lead.slice(0, 5).map(x => `${esc(x.g)} ${S(x.v)}`).join(" · ") : "" },
+    { k: "Beaten-down vs near highs", v: `30%+ off highs ${S(med(beaten.map(r => r.chg)), 2)} (${beaten.length}) vs within 5% ${S(med(near.map(r => r.chg)), 2)} (${near.length})`,
+      s: (() => { const a = med(beaten.map(r => r.chg)), b = med(near.map(r => r.chg)); if (a == null || b == null) return 0; return b > 0 && a > 0 ? 1 : a > 0.01 && b <= 0 ? -1 : b < 0 && a < 0 ? -1 : 0; })(),
+      why: "Both up = broad. Only the beaten-down up = a short-covering pop; leaders sold to fund it." },
+    { k: "Dollar volume in rising stocks", v: allDv ? `${P(upDv / allDv)} of traded $` : "–", s: allDv ? sg(upDv / allDv, 0.6, 0.4) : 0, why: "Where the money actually traded. Needs live volume." },
+    { k: "Gaps holding", v: gappers.length ? `${P(gapHold)} of ${gappers.length} gap-ups above their open` : "–", s: gappers.length >= 10 ? sg(gapHold, 0.55, 0.4) : 0, why: "Gap-and-go vs gap-and-fade. Needs the open (live only)." },
+    { k: "Since 10:00 AM", v: at10.length ? `${P(late)} higher than at 10:00` : "–", s: at10.length >= 50 ? sg(late, 0.55, 0.4) : 0, why: "Buyers after the open's noise = conviction. Shows once the 10:00 snapshot exists." },
+    { k: "Indexes vs open", v: [["SPY", spy], ["QQQ", qqq], ["IWM", iwm]].map(([k, r]) => r && r.fromOpen != null ? `${k} ${S(r.fromOpen, 2)}` : "").filter(Boolean).join(" · ") || "–",
+      s: [spy, qqq, iwm].filter(r => r && r.fromOpen != null).reduce((a, r) => a + Math.sign(r.fromOpen), 0) >= 2 ? 1 : [spy, qqq, iwm].filter(r => r && r.fromOpen != null).reduce((a, r) => a + Math.sign(r.fromOpen), 0) <= -2 ? -1 : 0,
+      why: "Trading above the open = buyers in control through the day." },
+    { k: "Small caps (IWM vs SPY)", v: iwm && spy ? `${S(iwm.chg - spy.chg, 2)}` : "–", s: iwm && spy ? sg(iwm.chg - spy.chg, 0.003, -0.005) : 0, why: "Small caps leading = risk appetite spreading." },
+    { k: "Fear (VIX)", v: vix ? `${S(vix.chg)} · ${vix.price.toFixed(1)}` : "–", s: vix ? sg(-vix.chg, 0.03, -0.03) : 0, why: "VIX falling = calmer, supportive." },
+    { k: "10-year yield", v: tnx ? `${S(tnx.chg, 2)}` : "–", s: tnx ? sg(-tnx.chg, 0.005, -0.005) : 0, why: "Yields jumping = headwind for growth and housing." },
+  ];
+  const score = items.reduce((a, x) => a + x.s, 0), maxS = items.filter(x => x.v !== "–").length;
+  // rotation = the beaten-down names up while the stocks near highs AND the leading groups are flat / red: money moving INTO the laggards
+  const rotation = items[5].s === -1 && items[4].s === -1 && (up ?? 0) >= 0.45;
+  const broad = (up ?? 0) >= 0.6 && (share(rs90, r => r.chg > 0) ?? 0) >= 0.55 && !rotation, sell = (up ?? 1) <= 0.4 && d4 > u4;
+  const narrow = !sell && ((spyChg ?? 0) > 0.003 && (up ?? 0) < 0.5 || rotation);
+  const verdict = broad && score >= 4 ? ["Broad rally", "g2", "Most stocks, the leaders and the money are on the same side. Pullbacks in leaders are buyable."]
+    : narrow ? [rotation ? "Narrow pop · beaten-down rotation" : "Narrow pop", "", rotation ? "The beaten-down names are running while the leaders and stocks near highs sit flat or get sold to pay for it. Don't chase the pop; keep bounce trades small and buy the leaders' dips." : "The index is up on a slice of the market. Don't chase; favor leaders on dips, keep bounce trades small."]
+    : sell && score <= -4 ? ["Broad selling", "r2", "Most stocks and the money are leaving. Protect open trades; new longs wait."]
+    : score >= 3 ? ["Leaning up", "g2", "More checks point up than down, but not everything confirms."] : score <= -3 ? ["Leaning down", "r2", "More checks point down than up."] : ["Mixed", "", "No clear side. Smaller size, wait for the 10:00–11:00 picture."];
+  return { items, score, maxS, verdict, live, n };
+}
+function renderChecklist(app) {
+  if (!DATA.themes || !DATA.themes.stocks) { app.append($('<div class="card empty">The checklist appears after the next data run.</div>')); return; }
+  app.append(liveBar());
+  const Z = checklistCalc(), [vt, vc, vd] = Z.verdict;
+  const dot = (s) => s > 0 ? '<span class="g2" aria-label="points up">▲</span>' : s < 0 ? '<span class="r2" aria-label="points down">▼</span>' : '<span class="meta" aria-label="neutral">●</span>';
+  const card = $(`<section class="card"><h2>Intraday checklist <span class="meta">· ${Z.live ? "live, refreshes with the Google prices" : "last close (" + shortDate(DATA.themes.date) + "): live lines fill in during the session"} · ${Z.n} stocks</span></h2>
+    <div style="display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;margin:6px 0 10px"><div style="font-size:26px;font-weight:700" class="${vc}">${vt}</div>
+      <div class="meta">score <b>${Z.score >= 0 ? "+" : ""}${Z.score}</b> of ±${Z.maxS} · ${vd}</div></div>
+    <div class="scroll"><table class="grid"><thead><tr><th></th><th class="l">Check</th><th class="l">Now</th><th class="l">What it means</th></tr></thead><tbody>
+    ${Z.items.map(x => `<tr><td class="num">${dot(x.s)}</td><td class="l"><b>${x.k}</b></td><td class="l">${x.v}</td><td class="l" style="white-space:normal;min-width:240px"><small class="meta">${x.why}</small></td></tr>`).join("")}
+    </tbody></table></div>
+    <p class="meta" style="margin:8px 0 0">Universe: the dashboard's stocks ($5+, $20M+/day) with a live Google price. Before ~10:00 ET the read is noisy (gaps, opening orders); it firms up after the 10:00 and 11:00 snapshots.
+      Thresholds are judgment calls, not backtested. Related evidence: high-beta bounces lasted only after deep washouts (T2108 ≤ 25); setups paid in the 5 sessions after a breadth thrust.</p></section>`);
+  app.append(card);
+}

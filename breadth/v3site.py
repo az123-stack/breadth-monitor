@@ -22,7 +22,7 @@ TABS_JS = Path(__file__).with_name("v3_tabs.js")
 # parent key, label, [(sub-tab key = v1 renderer key, label)]
 NAV = [
     # Nov 4 (Adam: "add intraday and premarket tabs … under their own parent tab where breadth will also reside")
-    ("market", "Market", [("breadth", "Breadth"), ("premarket", "Pre-market"), ("intraday", "Intraday")]),
+    ("market", "Market", [("breadth", "Breadth"), ("premarket", "Pre-market"), ("intraday", "Intraday"), ("mcheck", "Checklist")]),   # Nov 11: Checklist
     ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle"), ("grotation", "Rotation"), ("gpop", "Pop watch"), ("gemerge", "Since the bottom"), ("grsrank", "RS ranks")]),   # Nov 7: Since the bottom   # Nov 4: RS ranks   # Nov 4: Pop watch
     ("stocks", "Stocks", [("stocks", "Stocks"), ("sstrong", "Strongest"), ("sinplay", "In Play"), ("sheavy", "Heavy lifters"), ("sairev", "AI Revenue"), ("ssetups", "Setups"), ("sleaders", "Leadership")]),   # Nov 5: In Play   # Nov 4: Strongest (every RS 90+ name, nothing missed)   # Oct 31: Setups (third row: Lined-up buys); Rotation = money card only   # Oct 31 (Adam: "add another parent for stocks and start building that out")
 ]
@@ -228,7 +228,7 @@ SWAPS = [
     ('function pulseCard(T) {', PULSE_V3, "compact long / short cards (v1 version kept as pulseCardV1)"),
     (MODE_BTN_OLD, MODE_BTN_NEW, "Light / Dark switch in the header"),
     (MODE_JS_OLD, MODE_JS_NEW, "Light / Dark switch behaviour"),
-    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, sstrong: renderStrongest, sinplay: renderInPlay, sheavy: renderHeavy, sairev: renderAIRev, breadth: renderBreadthV3, gpop: renderPopWatch, gemerge: renderEmerge, grsrank: renderRsRanks, themes: renderThemesTab,', "Theme Dash renderer"),
+    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, sstrong: renderStrongest, sinplay: renderInPlay, sheavy: renderHeavy, mcheck: renderChecklist, sairev: renderAIRev, breadth: renderBreadthV3, gpop: renderPopWatch, gemerge: renderEmerge, grsrank: renderRsRanks, themes: renderThemesTab,', "Theme Dash renderer"),
     ('function renderTab(panel) {', None, "Theme Dash code (v3_themedash.js) before renderTab"),
     # Nov 4 (Adam): Market health lives on Stocks → Leadership, and the stat tiles aren't needed ("I just look at the charts") →
     # v3 Breadth = regime, macro strip, washout card, signals, charts, table. v1 keeps them.

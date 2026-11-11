@@ -773,6 +773,13 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   one file, each setup its own section(s)). New setups only need a ticks function to join. Tabs: Lined-up buys (`lineupTicks`: triggered /
   in the EMAs / approaching) · Episodic pivots (`epV3Card` from `DATA.themes.lists.eps`; chips Universe / When / Holding (since ≥ 0);
   own ⬇; `epTicks`: last session / last 5 sessions; follows the chips). EPs stay a watch list (faded in every regime without a catalyst check).
+- **Market → Checklist** (Nov 11, 2026; Adam: "an intraday checklist figuring out which direction the action is pointing towards"):
+  `checklistCalc` / `renderChecklist` (v3_tabs.js), browser only. Universe = DATA.themes.stocks ($5+, $20M+/day) with a live Google row;
+  outside the session it reads the last close (`today`, SPY from `themes.bench`). 13 checks, each +1 / 0 / −1: participation (60/40%),
+  4% movers (2:1), median stock vs SPY, RS 90+ share up, top-10-Strength sub-themes green, beaten-down (30%+ off highs) vs near highs
+  (within 5%), up-$ share, gap-ups above their open, share above the 10:00 snapshot (`at10`), SPY/QQQ/IWM vs open, IWM − SPY, VIX, ^TNX.
+  Verdict: Broad rally (60%+ up, RS 90+ 55%+ up, score ≥ 4, not rotation) · Narrow pop (SPY up with < 50% of stocks up, or "beaten-down
+  rotation" = beaten-down check and leading-groups check both −1) · Broad selling · Leaning up / down (±3) · Mixed. Untested thresholds.
 - **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
   `build(adjusted, theme_data)` (~70 s) → `DATA.themes.inplay` {date, days, rows, n, counts, pool {t: [adr, v50, sub]}}, v3 Stocks → **In Play**
   (`renderInPlay` in v3_tabs.js). Universe stocks $5+, $10M+/day (no deals), last 5 sessions: news = gap ≥ max(3%, 1 ADR) on 2.5x vol
