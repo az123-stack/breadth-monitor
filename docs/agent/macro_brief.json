@@ -1,46 +1,22 @@
 {
- "for_date": "2026-11-09",
- "written": "2026-11-10T12:05Z",
- "headline": "October CPI at 8:30 AM ET today with markets pricing ~84% odds of a December Fed hike, while Brent slid near $92 on US-Iran de-escalation hopes.",
+ "for_date": "2026-11-10",
+ "written": "2026-11-11T12:05Z",
+ "headline": "Hot October CPI (+0.4% headline, core +0.3%) has pushed 10-year yields to about 4.9-5% and December rate-hike odds to roughly 70-80%, pressuring tech while oil slides on Iran de-escalation hopes.",
  "risk": "high",
- "rates": "The 10-year yield is near 4.88% and the 2-year near 4.56%, both rising as traders lean toward a hike.",
- "fed": "The Fed held at 3.75%-4.00% on Oct 28, markets price about an 84% chance of a hike on Dec 9, and Fed speakers (Bowman today, Williams Thursday) are on deck.",
- "oil": "Brent is near $92, down about 22% from a late-October peak above $117 on hopes for a US-Iran deal, though diesel and LNG supply stay tight.",
- "geo": "US-Iran talks and Strait of Hormuz incidents remain live, and Nvidia fell 4.3% on an investigation into its CEO tied to suspected China chip smuggling.",
+ "rates": "The 10-year yield touched 5% after the CPI beat (closing near 4.9%), the 2-year is near 4.75%, and the US bond market is closed today for Veterans Day.",
+ "fed": "The funds rate is 3.75-4.00% with markets pricing a December 9 hike and Governor Waller reportedly backing it; Fed speakers continue through the week, including Hammack, Barr, Daly and Williams on Thursday.",
+ "oil": "Brent settled near $91.5 and WTI near $86, the lowest since Aug 31, on hopes for Iran de-escalation and recovering Gulf flows, though shipping and infrastructure risks remain.",
+ "geo": "Iran de-escalation hopes are driving the oil slide, with no confirmed end to the uncertainty.",
  "events": [
   {
-   "date": "2026-11-10",
+   "date": "2026-11-12",
    "time": "8:30 AM ET",
-   "name": "October CPI (no YoY rate)",
-   "impact": "high"
-  },
-  {
-   "date": "2026-11-10",
-   "time": "1:00 PM ET",
-   "name": "10-year Treasury note auction",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-10",
-   "time": "3:30 PM ET",
-   "name": "Fed Governor Bowman speaks",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-10",
-   "time": "After close",
-   "name": "CoreWeave earnings",
+   "name": "Initial jobless claims",
    "impact": "medium"
   },
   {
    "date": "2026-11-12",
-   "time": "6:30 AM ET",
-   "name": "NY Fed President Williams speaks",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-12",
-   "time": "After close",
+   "time": "4:30 PM ET",
    "name": "Cisco and Applied Materials earnings",
    "impact": "medium"
   },
@@ -52,8 +28,10 @@
   }
  ],
  "sources": [
-  "https://www.home.saxo/en-gb/content/articles/macro/market-quick-take---wall-street-rebounds-and-brent-slides-below-usd-92---10-november-2026-10112026",
+  "https://eurasiabusinessnews.com/2026/11/11/stock-market-today-dow-jones-nasdaq-sp-500-fall-on-november-10-2026-oil-and-gold-retreat/",
+  "https://www.fool.com/coverage/stock-market-today/2026/11/10/stock-market-today-nov-10-wall-street-s-rally-hits-a-roadblock-as-hot-inflation-raises-the-stakes-for-the-fed/",
   "https://www.regardsofwallstreet.com/news/stock-market-week-ahead-november-9-2026",
-  "https://stocktwits.com/news-articles/markets/equity/what-to-expect-markets-this-week-nov-8-2026/cNGYG4ZR9Iu"
+  "https://stockhub.kr/en/insights/macro-weekly-20261109",
+  "https://www.zerohedge.com/markets/key-events-week-cpi-ppi-fed-speakers-galore-and-end-earnings-season"
  ]
 }
