@@ -274,28 +274,28 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-10-30,RELY,watch,vcp,thrust,Choppy / mixed,Focus,0.279,84.0,Payments & Networks,66.9,confirmed,,0.0,0.0,,,,Apple earnings (after close) 2026-11-02,,,,,,high,2,1,24.2,23.97,-0.0095,-0.0089,closed
 2026-10-30,VEEV,watch,pullback,thrust,Choppy / mixed,Focus,0.294,92.0,Enterprise SaaS,89.8,steady,,0.0,0.0,,,,Apple earnings (after close) 2026-11-02,earnings date check only,earnings_only,none,unknown,,high,3,1,316.2,306.4,-0.03099,-0.0089,closed
 2026-10-30,WSM,watch,vcp,thrust,Choppy / mixed,Focus,0.279,78.0,Home Improvement & Specialty Retail,76.5,confirmed,,0.93,3.96,+10bp 10-yr yield → -1.8%; +1% oil → -0.2%,,,Apple earnings (after close) 2026-11-02,,,,,,high,2,1,256.64,261.68,0.01964,-0.0089,closed
-2026-11-02,ANF,cand,rotation,thrust,Choppy / mixed,Focus,0.408,97.0,Consumer Brands,88.1,confirmed,,0.0,0.0,,,,US midterm elections 2026-11-03,no clear catalyst found; only generic earnings-calendar pages turned up,full,none,none,,high,3,1,,,,,pending
-2026-11-02,APPN,cand,round,thrust,Choppy / mixed,Focus,0.304,97.0,Enterprise SaaS,88.9,steady,,1.77,8.03,+10bp 10-yr yield → -1.9%,,,US midterm elections 2026-11-03,"Strong Q2 (Aug 6): revenue +19% y/y to $203M beat, Q3 guidance above consensus; stock +14% then. Next report unconfirmed, MarketBeat estimates Nov 5 (not confirmed).",full,positive,real,earnings likely inside 5 sessions (date unconfirmed),high,3,1,,,,,pending
-2026-11-02,ATRC,cand,pullback,thrust,Choppy / mixed,Focus,0.283,97.0,Medical Devices,73.5,steady,warming,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
-2026-11-02,CAKE,cand,rotation,thrust,Choppy / mixed,Focus,0.408,96.0,Restaurants,74.0,confirmed,warming,1.1,0.15,+1% dollar → -2.0%,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
-2026-11-02,FRSH,cand,pullback,thrust,Choppy / mixed,Focus,0.283,88.0,Enterprise SaaS,88.9,steady,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,,,,,pending
-2026-11-02,GKOS,cand,round,thrust,Choppy / mixed,Focus,0.304,98.0,Medical Devices,73.5,steady,warming,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
-2026-11-02,LLY,cand,ath,thrust,Choppy / mixed,Focus,0.207,91.0,Large-cap Pharma,86.9,confirmed,,1.31,5.94,+10bp 10-yr yield → -1.4%,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
-2026-11-02,NUE,cand,rotation,thrust,Choppy / mixed,Focus,0.408,88.0,Steel,66.8,new,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,1,1,,,,,pending
-2026-11-02,PLSE,cand,pullback,thrust,Choppy / mixed,Focus,0.283,99.0,Medical Devices,73.5,steady,warming,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
-2026-11-02,REGN,cand,round,thrust,Choppy / mixed,Focus,0.304,88.0,Large-cap Biotech,62.3,bouncing,,1.37,6.22,+10bp 10-yr yield → -1.5%,,,US midterm elections 2026-11-03,,,,,,high,1,1,,,,,pending
-2026-11-02,REPL,cand,round,thrust,Choppy / mixed,Focus,0.304,99.0,Oncology Biotech,61.9,new,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,,,,,pending
-2026-11-02,RXO,cand,rotation,thrust,Choppy / mixed,Focus,0.408,94.0,Trucking & Logistics,50.1,neutral,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,,,,,pending
-2026-11-02,SN,cand,ath,thrust,Choppy / mixed,Focus,0.207,97.0,Consumer Brands,88.1,confirmed,,1.74,7.91,+10bp 10-yr yield → -1.9%,,,US midterm elections 2026-11-03,no clear catalyst found; only generic earnings-calendar pages turned up,full,none,none,,high,3,1,,,,,pending
-2026-11-02,TENB,cand,round,thrust,Choppy / mixed,Focus,0.304,97.0,Identity & Security Tools,87.7,neutral,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
-2026-11-02,WSM,cand,vcp,thrust,Choppy / mixed,Focus,0.264,80.0,Home Improvement & Specialty Retail,80.8,confirmed,,1.94,8.81,+10bp 10-yr yield → -2.1%,,,US midterm elections 2026-11-03,,,,,,high,2,1,,,,,pending
-2026-11-02,SLDE,pick1,rotation,thrust,Choppy / mixed,Focus,0.408,94.0,P&C Insurers,84.0,confirmed,warming,1.43,6.48,+10bp 10-yr yield → -1.6%,,,US midterm elections 2026-11-03,"Q3 2026 (Oct 27): revenue +35.9% to $361M, EPS $1.09 (+37%), full-year net income outlook raised to $500-520M, $1.50 special dividend payable Nov 30 (ex-date likely soon).",full,positive,strong,combined ratio rose to 59.3% from 48.5%,high,3,1,,,,,pending
-2026-11-02,SAIC,pick2,ath,thrust,Choppy / mixed,Focus,0.207,93.0,Defense IT & Services,90.9,confirmed,warming,0.67,6.07,+10bp 10-yr yield → -1.2%; +1% oil → +0.1%,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
-2026-11-02,EOG,watch,vcp,thrust,Choppy / mixed,Focus,0.264,83.0,Shale E&P,74.7,steady,,-1.4,-3.09,+10bp 10-yr yield → +1.0%; +1% oil → +0.1%,,,US midterm elections 2026-11-03,,,,,,high,2,1,,,,,pending
-2026-11-02,GTLB,watch,kq,thrust,Choppy / mixed,Focus,0.177,94.0,Developer & DevOps Tools,51.8,,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,,,,,pending
-2026-11-02,MTD,watch,vcp,thrust,Choppy / mixed,Focus,0.264,81.0,Life Science Tools,81.6,neutral,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,,,,,pending
-2026-11-02,PR,watch,round,thrust,Choppy / mixed,Focus,0.304,91.0,Shale E&P,74.7,steady,,-1.65,-4.33,+10bp 10-yr yield → +1.3%; +1% oil → +0.1%,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
-2026-11-02,VEEV,watch,pullback,thrust,Choppy / mixed,Focus,0.283,93.0,Enterprise SaaS,88.9,steady,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,,,,,pending
+2026-11-02,ANF,cand,rotation,thrust,Choppy / mixed,Focus,0.408,97.0,Consumer Brands,88.1,confirmed,,0.0,0.0,,,,US midterm elections 2026-11-03,no clear catalyst found; only generic earnings-calendar pages turned up,full,none,none,,high,3,1,162.91,154.0,-0.05469,-0.00373,closed
+2026-11-02,APPN,cand,round,thrust,Choppy / mixed,Focus,0.304,97.0,Enterprise SaaS,88.9,steady,,1.77,8.03,+10bp 10-yr yield → -1.9%,,,US midterm elections 2026-11-03,"Strong Q2 (Aug 6): revenue +19% y/y to $203M beat, Q3 guidance above consensus; stock +14% then. Next report unconfirmed, MarketBeat estimates Nov 5 (not confirmed).",full,positive,real,earnings likely inside 5 sessions (date unconfirmed),high,3,1,47.91,52.35,0.09267,-0.00373,closed
+2026-11-02,ATRC,cand,pullback,thrust,Choppy / mixed,Focus,0.283,97.0,Medical Devices,73.5,steady,warming,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,59.45,56.26,-0.05366,-0.00373,closed
+2026-11-02,CAKE,cand,rotation,thrust,Choppy / mixed,Focus,0.408,96.0,Restaurants,74.0,confirmed,warming,1.1,0.15,+1% dollar → -2.0%,,,US midterm elections 2026-11-03,,,,,,high,3,1,113.77,108.8,-0.04368,-0.00373,closed
+2026-11-02,FRSH,cand,pullback,thrust,Choppy / mixed,Focus,0.283,88.0,Enterprise SaaS,88.9,steady,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,13.85,11.88,-0.14224,-0.00373,closed
+2026-11-02,GKOS,cand,round,thrust,Choppy / mixed,Focus,0.304,98.0,Medical Devices,73.5,steady,warming,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,240.94,236.19,-0.01971,-0.00373,closed
+2026-11-02,LLY,cand,ath,thrust,Choppy / mixed,Focus,0.207,91.0,Large-cap Pharma,86.9,confirmed,,1.31,5.94,+10bp 10-yr yield → -1.4%,,,US midterm elections 2026-11-03,,,,,,high,3,1,1399.63,1432.29,0.02333,-0.00373,closed
+2026-11-02,NUE,cand,rotation,thrust,Choppy / mixed,Focus,0.408,88.0,Steel,66.8,new,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,1,1,277.12,256.47,-0.07452,-0.00373,closed
+2026-11-02,PLSE,cand,pullback,thrust,Choppy / mixed,Focus,0.283,99.0,Medical Devices,73.5,steady,warming,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,53.42,55.12,0.03182,-0.00373,closed
+2026-11-02,REGN,cand,round,thrust,Choppy / mixed,Focus,0.304,88.0,Large-cap Biotech,62.3,bouncing,,1.37,6.22,+10bp 10-yr yield → -1.5%,,,US midterm elections 2026-11-03,,,,,,high,1,1,956.28,916.06,-0.04206,-0.00373,closed
+2026-11-02,REPL,cand,round,thrust,Choppy / mixed,Focus,0.304,99.0,Oncology Biotech,61.9,new,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,19.52,23.28,0.19262,-0.00373,closed
+2026-11-02,RXO,cand,rotation,thrust,Choppy / mixed,Focus,0.408,94.0,Trucking & Logistics,50.1,neutral,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,27.89,27.93,0.00143,-0.00373,closed
+2026-11-02,SN,cand,ath,thrust,Choppy / mixed,Focus,0.207,97.0,Consumer Brands,88.1,confirmed,,1.74,7.91,+10bp 10-yr yield → -1.9%,,,US midterm elections 2026-11-03,no clear catalyst found; only generic earnings-calendar pages turned up,full,none,none,,high,3,1,211.95,226.5,0.06865,-0.00373,closed
+2026-11-02,TENB,cand,round,thrust,Choppy / mixed,Focus,0.304,97.0,Identity & Security Tools,87.7,neutral,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,47.45,41.96,-0.1157,-0.00373,closed
+2026-11-02,WSM,cand,vcp,thrust,Choppy / mixed,Focus,0.264,80.0,Home Improvement & Specialty Retail,80.8,confirmed,,1.94,8.81,+10bp 10-yr yield → -2.1%,,,US midterm elections 2026-11-03,,,,,,high,2,1,257.33,261.55,0.0164,-0.00373,closed
+2026-11-02,SLDE,pick1,rotation,thrust,Choppy / mixed,Focus,0.408,94.0,P&C Insurers,84.0,confirmed,warming,1.43,6.48,+10bp 10-yr yield → -1.6%,,,US midterm elections 2026-11-03,"Q3 2026 (Oct 27): revenue +35.9% to $361M, EPS $1.09 (+37%), full-year net income outlook raised to $500-520M, $1.50 special dividend payable Nov 30 (ex-date likely soon).",full,positive,strong,combined ratio rose to 59.3% from 48.5%,high,3,1,27.53,26.36,-0.0425,-0.00373,closed
+2026-11-02,SAIC,pick2,ath,thrust,Choppy / mixed,Focus,0.207,93.0,Defense IT & Services,90.9,confirmed,warming,0.67,6.07,+10bp 10-yr yield → -1.2%; +1% oil → +0.1%,,,US midterm elections 2026-11-03,,,,,,high,3,1,149.2,152.53,0.02232,-0.00373,closed
+2026-11-02,EOG,watch,vcp,thrust,Choppy / mixed,Focus,0.264,83.0,Shale E&P,74.7,steady,,-1.4,-3.09,+10bp 10-yr yield → +1.0%; +1% oil → +0.1%,,,US midterm elections 2026-11-03,,,,,,high,2,1,156.11,151.51,-0.02947,-0.00373,closed
+2026-11-02,GTLB,watch,kq,thrust,Choppy / mixed,Focus,0.177,94.0,Developer & DevOps Tools,51.8,,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,51.3,46.66,-0.09045,-0.00373,closed
+2026-11-02,MTD,watch,vcp,thrust,Choppy / mixed,Focus,0.264,81.0,Life Science Tools,81.6,neutral,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,2,1,1686.6,1751.38,0.03841,-0.00373,closed
+2026-11-02,PR,watch,round,thrust,Choppy / mixed,Focus,0.304,91.0,Shale E&P,74.7,steady,,-1.65,-4.33,+10bp 10-yr yield → +1.3%; +1% oil → +0.1%,,,US midterm elections 2026-11-03,,,,,,high,3,1,24.27,21.72,-0.10507,-0.00373,closed
+2026-11-02,VEEV,watch,pullback,thrust,Choppy / mixed,Focus,0.283,93.0,Enterprise SaaS,88.9,steady,,0.0,0.0,,,,US midterm elections 2026-11-03,,,,,,high,3,1,303.0,305.55,0.00842,-0.00373,closed
 2026-11-03,ANF,cand,rotation,thrust,Choppy / mixed,Focus,0.371,97.0,Consumer Brands,88.5,confirmed,,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,No clear catalyst found; next earnings date not confirmed.,full,none,none,,high,3,1,,,,,pending
 2026-11-03,ATRC,cand,pullback,thrust,Choppy / mixed,Focus,0.283,96.0,Medical Devices,74.7,confirmed,warming,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
 2026-11-03,CBRL,cand,rotation,thrust,Choppy / mixed,Focus,0.371,97.0,Restaurants,70.8,confirmed,,0.0,0.0,,,,October jobs report (nonfarm payrolls) 2026-11-06,,,,,,high,3,1,,,,,pending
@@ -407,3 +407,26 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-09,APPN,watch,kq,thrust,Breadth thrust,Focus,0.169,96.0,Enterprise SaaS,79.0,steady,,0.78,9.8,+10bp 10-yr yield → -2.6%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-09,CBRL,watch,pullback,thrust,Breadth thrust,Focus,0.267,96.0,Restaurants,74.5,confirmed,,0.27,1.48,+1% dollar → -2.9%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-09,DOCU,watch,pullback,thrust,Breadth thrust,Focus,0.267,91.0,Enterprise SaaS,79.0,steady,,0.47,5.86,+10bp 10-yr yield → -1.6%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
+2026-11-10,AVAH,cand,pullback,thrust,Choppy / mixed,Focus,0.266,95.0,Healthcare Providers,89.6,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,AVTR,cand,pullback,thrust,Choppy / mixed,Focus,0.266,90.0,Life Science Tools,89.2,steady,,-0.99,0.83,+1% dollar → -2.7%,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,BTSG,cand,round,thrust,Choppy / mixed,Focus,0.28,94.0,Healthcare Providers,89.6,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,CGAU,cand,rotation,thrust,Choppy / mixed,Focus,0.418,84.0,Gold Mid-tiers,53.6,bouncing,,0.0,0.0,,,,,,,,,,high,1,1,,,,,pending
+2026-11-10,CRL,cand,rotation,thrust,Choppy / mixed,Focus,0.418,96.0,CROs,92.3,confirmed,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,EWTX,cand,round,thrust,Choppy / mixed,Focus,0.28,94.0,Mid-cap Biotech,74.4,new,,-0.62,4.69,+10bp 10-yr yield → -2.0%,,,,,,,,,high,2,1,,,,,pending
+2026-11-10,FIGS,cand,kq,thrust,Choppy / mixed,Focus,0.175,98.0,Consumer Brands,90.1,confirmed,,-0.52,3.9,+10bp 10-yr yield → -1.7%,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,HTFL,cand,pullback,thrust,Choppy / mixed,Focus,0.266,98.0,Genomics & Diagnostics,69.3,fading,,0.0,0.0,,,,,,,,,,high,2,1,,,,,pending
+2026-11-10,INTA,cand,kq,thrust,Choppy / mixed,Focus,0.175,92.0,Enterprise SaaS,80.0,steady,,-0.58,4.39,+10bp 10-yr yield → -1.9%,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,IQV,cand,rotation,thrust,Choppy / mixed,Focus,0.418,88.0,CROs,92.3,confirmed,,0.0,0.0,,,,,,,,,,high,2,1,,,,,pending
+2026-11-10,LLY,cand,round,thrust,Choppy / mixed,Focus,0.28,89.0,Large-cap Pharma,85.0,confirmed,,-0.36,2.7,+10bp 10-yr yield → -1.2%,,,,,,,,,high,2,1,,,,,pending
+2026-11-10,MEDP,cand,rotation,thrust,Choppy / mixed,Focus,0.418,85.0,CROs,92.3,confirmed,,0.0,0.0,,,,,,,,,,high,2,1,,,,,pending
+2026-11-10,MRK,cand,round,thrust,Choppy / mixed,Focus,0.28,86.0,Large-cap Pharma,85.0,confirmed,,-0.33,2.47,+10bp 10-yr yield → -1.1%,,,,,,,,,high,2,1,,,,,pending
+2026-11-10,PRCH,cand,ath,thrust,Choppy / mixed,Focus,0.166,98.0,P&C Insurers,79.8,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,SAIC,cand,ath,thrust,Choppy / mixed,Focus,0.166,92.0,Defense IT & Services,87.7,confirmed,,-1.72,1.27,+10bp 10-yr yield → -1.0%; +1% oil → +0.1%,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,SLDE,cand,pullback,thrust,Choppy / mixed,Focus,0.266,91.0,P&C Insurers,79.8,steady,,-0.32,2.44,+10bp 10-yr yield → -1.0%,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,SN,cand,ath,thrust,Choppy / mixed,Focus,0.166,97.0,Consumer Brands,90.1,confirmed,,-0.56,4.26,+10bp 10-yr yield → -1.8%,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,TBBB,cand,ath,thrust,Choppy / mixed,Focus,0.166,97.0,Mass Merchants & Grocers,80.7,confirmed,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,KNSA,pick1,round,thrust,Choppy / mixed,Focus,0.28,97.0,Immunology & Inflammation,88.2,confirmed,ignition,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,KOD,pick2,vcp,thrust,Choppy / mixed,Focus,0.261,99.0,Mid-cap Biotech,74.4,new,,0.0,0.0,,,,,,,,,,high,2,1,,,,,pending
+2026-11-10,APPN,watch,kq,thrust,Choppy / mixed,Focus,0.175,97.0,Enterprise SaaS,80.0,steady,,-0.79,5.97,+10bp 10-yr yield → -2.6%,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,DOCU,watch,pullback,thrust,Choppy / mixed,Focus,0.266,92.0,Enterprise SaaS,80.0,steady,,-0.47,3.56,+10bp 10-yr yield → -1.5%,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,NTSK,watch,pullback,thrust,Choppy / mixed,Focus,0.266,93.0,Cybersecurity Platforms,53.0,outflow,,0.0,0.0,,,,,,,,,,high,2,2,,,,,pending
