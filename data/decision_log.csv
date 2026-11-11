@@ -407,26 +407,26 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-09,APPN,watch,kq,thrust,Breadth thrust,Focus,0.169,96.0,Enterprise SaaS,79.0,steady,,0.78,9.8,+10bp 10-yr yield → -2.6%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-09,CBRL,watch,pullback,thrust,Breadth thrust,Focus,0.267,96.0,Restaurants,74.5,confirmed,,0.27,1.48,+1% dollar → -2.9%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
 2026-11-09,DOCU,watch,pullback,thrust,Breadth thrust,Focus,0.267,91.0,Enterprise SaaS,79.0,steady,,0.47,5.86,+10bp 10-yr yield → -1.6%,,,October CPI (no YoY rate) 2026-11-10,,,,,,high,3,1,,,,,pending
-2026-11-10,AVAH,cand,pullback,thrust,Choppy / mixed,Focus,0.268,95.0,Healthcare Providers,89.6,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,AVAH,cand,pullback,thrust,Choppy / mixed,Focus,0.268,95.0,Healthcare Providers,89.6,steady,,0.0,0.0,,,,,earnings date check only,earnings_only,none,unknown,,high,3,1,,,,,pending
 2026-11-10,AVTR,cand,pullback,thrust,Choppy / mixed,Focus,0.268,90.0,Life Science Tools,89.2,steady,,-0.99,0.83,+1% dollar → -2.7%,,,,,,,,,high,3,1,,,,,pending
 2026-11-10,BTSG,cand,round,thrust,Choppy / mixed,Focus,0.283,94.0,Healthcare Providers,89.6,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
 2026-11-10,CGAU,cand,rotation,thrust,Choppy / mixed,Focus,0.42,84.0,Gold Mid-tiers,53.6,bouncing,,0.0,0.0,,,,,,,,,,high,1,1,,,,,pending
-2026-11-10,CRL,cand,rotation,thrust,Choppy / mixed,Focus,0.42,96.0,CROs,92.3,confirmed,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,CRL,cand,rotation,thrust,Choppy / mixed,Focus,0.42,96.0,CROs,92.3,confirmed,,0.0,0.0,,,,,earnings date check only,earnings_only,none,unknown,,high,3,1,,,,,pending
 2026-11-10,EWTX,cand,round,thrust,Choppy / mixed,Focus,0.283,94.0,Mid-cap Biotech,74.4,new,,-0.62,4.69,+10bp 10-yr yield → -2.0%,,,,,,,,,high,2,1,,,,,pending
-2026-11-10,FIGS,cand,kq,thrust,Choppy / mixed,Focus,0.175,98.0,Consumer Brands,90.1,confirmed,,-0.52,3.9,+10bp 10-yr yield → -1.7%,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,FIGS,cand,kq,thrust,Choppy / mixed,Focus,0.175,98.0,Consumer Brands,90.1,confirmed,,-0.52,3.9,+10bp 10-yr yield → -1.7%,,,,Fourth straight beat-and-raise quarter; a Jordan supply squeeze caps near-term upside.,full,positive,strong,Jordan supply squeeze,high,3,1,,,,,pending
 2026-11-10,HTFL,cand,pullback,thrust,Choppy / mixed,Focus,0.268,98.0,Genomics & Diagnostics,69.3,fading,,0.0,0.0,,,,,,,,,,high,2,1,,,,,pending
 2026-11-10,INTA,cand,kq,thrust,Choppy / mixed,Focus,0.175,92.0,Enterprise SaaS,80.0,steady,,-0.58,4.39,+10bp 10-yr yield → -1.9%,,,,,,,,,high,3,1,,,,,pending
 2026-11-10,IQV,cand,rotation,thrust,Choppy / mixed,Focus,0.42,88.0,CROs,92.3,confirmed,,0.0,0.0,,,,,,,,,,high,2,1,,,,,pending
 2026-11-10,LLY,cand,round,thrust,Choppy / mixed,Focus,0.283,89.0,Large-cap Pharma,85.0,confirmed,,-0.36,2.7,+10bp 10-yr yield → -1.2%,,,,,,,,,high,2,1,,,,,pending
 2026-11-10,MEDP,cand,rotation,thrust,Choppy / mixed,Focus,0.42,85.0,CROs,92.3,confirmed,,0.0,0.0,,,,,,,,,,high,2,1,,,,,pending
 2026-11-10,MRK,cand,round,thrust,Choppy / mixed,Focus,0.283,86.0,Large-cap Pharma,85.0,confirmed,,-0.33,2.47,+10bp 10-yr yield → -1.1%,,,,,,,,,high,2,1,,,,,pending
-2026-11-10,PRCH,cand,ath,thrust,Choppy / mixed,Focus,0.164,98.0,P&C Insurers,79.8,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,PRCH,cand,ath,thrust,Choppy / mixed,Focus,0.164,98.0,P&C Insurers,79.8,steady,,0.0,0.0,,,,,Q3 EPS $0.12 vs $0.06 a year ago; no fresh hard catalyst beyond earnings.,full,positive,real,,high,4,1,,,,,pending
 2026-11-10,SAIC,cand,ath,thrust,Choppy / mixed,Focus,0.164,92.0,Defense IT & Services,87.7,confirmed,,-1.72,1.27,+10bp 10-yr yield → -1.0%; +1% oil → +0.1%,,,,,,,,,high,3,1,,,,,pending
 2026-11-10,SLDE,cand,pullback,thrust,Choppy / mixed,Focus,0.268,91.0,P&C Insurers,79.8,steady,,-0.32,2.44,+10bp 10-yr yield → -1.0%,,,,,,,,,high,3,1,,,,,pending
-2026-11-10,SN,cand,ath,thrust,Choppy / mixed,Focus,0.164,97.0,Consumer Brands,90.1,confirmed,,-0.56,4.26,+10bp 10-yr yield → -1.8%,,,,,,,,,high,3,1,,,,,pending
-2026-11-10,TBBB,cand,ath,thrust,Choppy / mixed,Focus,0.164,97.0,Mass Merchants & Grocers,80.7,confirmed,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,SN,cand,ath,thrust,Choppy / mixed,Focus,0.164,97.0,Consumer Brands,90.1,confirmed,,-0.56,4.26,+10bp 10-yr yield → -1.8%,,,,Q3 revenue up ~20-21% but inventory up 43% and operational challenges noted; analysts slightly trimmed targets.,full,mixed,real,43% inventory surge,high,3,1,,,,,pending
+2026-11-10,TBBB,cand,ath,thrust,Choppy / mixed,Focus,0.164,97.0,Mass Merchants & Grocers,80.7,confirmed,,0.0,0.0,,,,,"Q3 turned profitable and acceleration extended a fourth straight quarter, but guidance was only reaffirmed and profit is thin.",full,positive,real,thin profit; guidance only reaffirmed,high,3,1,,,,,pending
 2026-11-10,KNSA,pick1,round,thrust,Choppy / mixed,Focus,0.283,97.0,Immunology & Inflammation,88.2,confirmed,ignition,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
 2026-11-10,KOD,pick2,vcp,thrust,Choppy / mixed,Focus,0.261,99.0,Mid-cap Biotech,74.4,new,,0.0,0.0,,,,,,,,,,high,2,1,,,,,pending
-2026-11-10,APPN,watch,kq,thrust,Choppy / mixed,Focus,0.175,97.0,Enterprise SaaS,80.0,steady,,-0.79,5.97,+10bp 10-yr yield → -2.6%,,,,,,,,,high,3,1,,,,,pending
+2026-11-10,APPN,watch,kq,thrust,Choppy / mixed,Focus,0.175,97.0,Enterprise SaaS,80.0,steady,,-0.79,5.97,+10bp 10-yr yield → -2.6%,,,,earnings date check only,earnings_only,none,unknown,,high,3,1,,,,,pending
 2026-11-10,DOCU,watch,pullback,thrust,Choppy / mixed,Focus,0.268,92.0,Enterprise SaaS,80.0,steady,,-0.47,3.56,+10bp 10-yr yield → -1.5%,,,,,,,,,high,3,1,,,,,pending
 2026-11-10,NTSK,watch,pullback,thrust,Choppy / mixed,Focus,0.268,93.0,Cybersecurity Platforms,53.0,outflow,,0.0,0.0,,,,,,,,,,high,2,2,,,,,pending
