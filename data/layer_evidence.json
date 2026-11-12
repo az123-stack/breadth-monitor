@@ -74,16 +74,16 @@
   }
  },
  "log": {
-  "asof": "2026-11-11",
-  "closed": 296,
-  "dates": 13,
+  "asof": "2026-11-12",
+  "closed": 318,
+  "dates": 14,
   "catalyst_positive": {
    "n_good": 30,
-   "n_bad": 40,
+   "n_bad": 42,
    "avg_good": -0.00193,
-   "avg_bad": -0.02011,
+   "avg_bad": -0.01788,
    "dates": 7,
-   "diff": 0.01818,
+   "diff": 0.01595,
    "t": 0.41,
    "halves": [
     0.02994,
@@ -92,26 +92,26 @@
    "passed": false
   },
   "red_flags": {
-   "n_good": 53,
-   "n_bad": 34,
-   "avg_good": -0.02289,
-   "avg_bad": 0.00501,
-   "dates": 7,
-   "diff": -0.0279,
-   "t": -1.04,
+   "n_good": 55,
+   "n_bad": 35,
+   "avg_good": -0.02109,
+   "avg_bad": 0.00645,
+   "dates": 8,
+   "diff": -0.02754,
+   "t": -1.21,
    "halves": [
-    0.00366,
-    -0.04932
+    0.00179,
+    -0.05561
    ],
    "passed": false
   },
   "earnings_in_hold": {
    "n_good": 34,
-   "n_bad": 24,
+   "n_bad": 25,
    "avg_good": 0.0093,
-   "avg_bad": -0.0043,
+   "avg_bad": -0.0019,
    "dates": 6,
-   "diff": 0.0136,
+   "diff": 0.0112,
    "t": -0.35,
    "halves": [
     0.03185,
@@ -120,26 +120,26 @@
    "passed": false
   },
   "macro_tailwind": {
-   "n_good": 91,
-   "n_bad": 21,
-   "avg_good": -0.02537,
-   "avg_bad": -0.06167,
-   "dates": 5,
-   "diff": 0.0363,
-   "t": 0.63,
+   "n_good": 99,
+   "n_bad": 25,
+   "avg_good": -0.02278,
+   "avg_bad": -0.05891,
+   "dates": 6,
+   "diff": 0.03613,
+   "t": 0.94,
    "halves": [
-    -0.0566,
-    0.07276
+    -0.00408,
+    0.05615
    ],
    "passed": false
   },
   "more_support": {
    "n_good": 7,
-   "n_bad": 161,
+   "n_bad": 169,
    "avg_good": -0.0408,
-   "avg_bad": 0.00255,
+   "avg_bad": 0.00105,
    "dates": 4,
-   "diff": -0.04335,
+   "diff": -0.04185,
    "t": -1.07,
    "halves": [
     -0.05122,
@@ -149,21 +149,21 @@
   },
   "no_warnings": {
    "n_good": 63,
-   "n_bad": 33,
+   "n_bad": 34,
    "avg_good": 0.03395,
-   "avg_bad": 0.0052,
+   "avg_bad": 0.00669,
    "dates": 0,
-   "diff": 0.02875,
+   "diff": 0.02726,
    "t": null,
    "halves": [],
    "passed": false
   },
   "brief_low_risk": {
    "n_good": 0,
-   "n_bad": 205,
-   "dates": 9,
+   "n_bad": 227,
+   "dates": 10,
    "avg_good": null,
-   "avg_bad": -0.02959,
+   "avg_bad": -0.02834,
    "test": "welch over dates",
    "diff": null,
    "t": null,
