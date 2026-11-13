@@ -74,30 +74,30 @@
   }
  },
  "log": {
-  "asof": "2026-11-12",
-  "closed": 318,
-  "dates": 14,
+  "asof": "2026-11-13",
+  "closed": 343,
+  "dates": 15,
   "catalyst_positive": {
-   "n_good": 30,
-   "n_bad": 42,
-   "avg_good": -0.00193,
-   "avg_bad": -0.01788,
-   "dates": 7,
-   "diff": 0.01595,
-   "t": 0.41,
+   "n_good": 31,
+   "n_bad": 46,
+   "avg_good": -0.00118,
+   "avg_bad": -0.01924,
+   "dates": 8,
+   "diff": 0.01806,
+   "t": 0.71,
    "halves": [
-    0.02994,
-    -0.00404
+    0.01828,
+    0.01378
    ],
    "passed": false
   },
   "red_flags": {
-   "n_good": 55,
+   "n_good": 60,
    "n_bad": 35,
-   "avg_good": -0.02109,
+   "avg_good": -0.02121,
    "avg_bad": 0.00645,
    "dates": 8,
-   "diff": -0.02754,
+   "diff": -0.02766,
    "t": -1.21,
    "halves": [
     0.00179,
@@ -120,50 +120,50 @@
    "passed": false
   },
   "macro_tailwind": {
-   "n_good": 99,
-   "n_bad": 25,
-   "avg_good": -0.02278,
-   "avg_bad": -0.05891,
-   "dates": 6,
-   "diff": 0.03613,
-   "t": 0.94,
+   "n_good": 109,
+   "n_bad": 26,
+   "avg_good": -0.02168,
+   "avg_bad": -0.06275,
+   "dates": 7,
+   "diff": 0.04107,
+   "t": 1.49,
    "halves": [
     -0.00408,
-    0.05615
+    0.07909
    ],
    "passed": false
   },
   "more_support": {
-   "n_good": 7,
-   "n_bad": 169,
-   "avg_good": -0.0408,
-   "avg_bad": 0.00105,
-   "dates": 4,
-   "diff": -0.04185,
-   "t": -1.07,
+   "n_good": 8,
+   "n_bad": 182,
+   "avg_good": -0.03306,
+   "avg_bad": -0.00165,
+   "dates": 5,
+   "diff": -0.03141,
+   "t": -0.57,
    "halves": [
     -0.05122,
-    -0.02639
+    0.00172
    ],
    "passed": false
   },
   "no_warnings": {
    "n_good": 63,
-   "n_bad": 34,
+   "n_bad": 35,
    "avg_good": 0.03395,
-   "avg_bad": 0.00669,
+   "avg_bad": 0.00061,
    "dates": 0,
-   "diff": 0.02726,
+   "diff": 0.03334,
    "t": null,
    "halves": [],
    "passed": false
   },
   "brief_low_risk": {
    "n_good": 0,
-   "n_bad": 227,
-   "dates": 10,
+   "n_bad": 252,
+   "dates": 11,
    "avg_good": null,
-   "avg_bad": -0.02834,
+   "avg_bad": -0.02916,
    "test": "welch over dates",
    "diff": null,
    "t": null,
