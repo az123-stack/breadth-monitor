@@ -1,24 +1,47 @@
 {
- "for_date": "2026-11-11",
- "written": "2026-11-12T12:05Z",
- "headline": "Hot October CPI pushed the 10-year to about 5% and a December Fed hike is nearly fully priced, with PPI due tomorrow and AI stocks still fragile after the Nov 5 sell-off.",
+ "for_date": "2026-11-12",
+ "written": "2026-11-13T12:04Z",
+ "headline": "10-year yield jumped to 5.10%, oil rose on US-Iran uncertainty and Nvidia lost CEO Jensen Huang, leaving stocks lower into Nvidia earnings on Nov 17.",
  "risk": "high",
- "rates": "The 10-year Treasury touched about 5.02% after the hot CPI and the 2-year jumped 18bp to about 4.74%.",
- "fed": "CME FedWatch shows a December hike nearly fully priced (about 91% for 25bp, roughly 9-13% for 50bp); Waller floated a half-point hike and Logan argued for at least two quarter-point moves.",
- "oil": "Brent was around $98 after violent swings (nearly -9% one day, +3.9% the next) with the Iran war keeping crude volatile and sub-$100 crude cited after the midterms.",
- "geo": "The Iran war remains a volatile backdrop, and the Democratic midterm wins raised the chance of curbs on AI data-center buildout, which drove the Nov 5 AI sell-off.",
+ "rates": "The 10-year Treasury yield closed near 5.10%, up about 10 bps, on renewed inflation worries.",
+ "fed": "October inflation is still elevated while jobless claims are low, and the October FOMC minutes come out Wednesday Nov 18.",
+ "oil": "December crude rose about 2.6% to $88.75 after Trump said the US no longer needs a deal with Iran, raising Strait of Hormuz risk.",
+ "geo": "US-Iran diplomacy and Strait of Hormuz risk are driving energy prices; Nvidia's CEO resigned with CFO Colette Kress as interim CEO.",
  "events": [
   {
    "date": "2026-11-13",
    "time": "8:30 AM ET",
-   "name": "October PPI (consensus headline +0.4% m/m, core +0.3%)",
+   "name": "PPI (October)",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-17",
+   "time": "8:30 AM ET",
+   "name": "Retail sales (October)",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-17",
+   "time": "After close (call\u2026",
+   "name": "Nvidia Q3 FY27 earnings",
    "impact": "high"
+  },
+  {
+   "date": "2026-11-18",
+   "time": "2:00 PM ET",
+   "name": "FOMC minutes (October meeting)",
+   "impact": "high"
+  },
+  {
+   "date": "2026-11-20",
+   "time": "9:30 AM ET",
+   "name": "Monthly options expiration",
+   "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.tradingkey.com/analysis/economic/indicators/262302060-us-october-ppi-preview-fed-hike-expectations-stocks-dollar-gold-tradingkey",
-  "https://en.sedaily.com/economy/2026/11/12/us-cpi-fuels-talk-of-half-point-fed-hike-as-treasury-yields",
-  "https://www.kold.com/2026/11/05/brutal-sell-off-ai-stocks-sends-wall-street-reeling-sp-500-sees-worst-day-since-2025-liberation-day-tariffs/",
-  "https://thriveinmarkets.com/calendar/2026-11-16/"
+  "https://vistapglobal.com/stock-market-today-november-12-2026-stocks-fall-as-treasury-yields-hit-5-10-oil-rises-and-nvidia-faces-leadership-reset-amd-crwv-eprx-googl-modd-msft-nvda-ser-spcx-ttek-ual/",
+  "https://www.simianx.ai/stories/us-economic-calendar-this-month-in-your-time-zone",
+  "https://roboforex.com/blog/analysis/nvidia-earnings-date-interim-ceo-scenarios/"
  ]
 }
