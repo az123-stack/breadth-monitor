@@ -436,6 +436,14 @@
      "why": "after Tuesday hot CPI; hot = pressure on growth and small caps"
     }
    ]
+  },
+  {
+   "date": "2026-11-13",
+   "slot": "data",
+   "title": "PPI cooler than expected; small caps and chips edge up",
+   "branch": "A",
+   "md": "**The numbers:** October PPI (final demand) rose +0.3% m/m vs +0.4% expected, after a revised +1.4% in September ([Seeking Alpha](https://seekingalpha.com/news/4672315-ppi-inflation-rises-less-than-expected-in-october?feed_item_type=news)). That is slightly cool. The pre-release consensus for core (ex food and energy) was +0.3% m/m, prior +0.7% ([StockTitan preview](https://www.stocktitan.net/articles/october-2026-ppi-preview-yearly-rate)); I could not find the core actual, so no core read here.\n\n**How the market took it:** Small and positive. Since before 8:30, S&P 500 futures are +0.25%, Nasdaq-100 +0.38%, Russell 2000 +0.47%, Dow +0.23%. The 10y note is +0.09% (yields slightly lower since the release), though the 10y yield is still 5.14%, +4 bp vs yesterday's close. The dollar index is flat (-0.06%). Among rate-sensitive ETFs since 8:20: IWM +0.38%, QQQ +0.36%, SMH +0.95%, XLK +0.46%, TLT +0.13%, KRE and XHB flat. All of these moves are small (futures under ~0.3% to 0.5%).\n\n**What it means today:** A softer-than-expected headline takes some pressure off after Tuesday's hot CPI, and small caps and chips are the first to respond. It does not erase the September jump, and no source I found says rate-hike odds changed. For the story's scenario A, it is a mild relief, not a change of trend.\n\n**Watch at the open:**\n- Do small-cap (Russell) and Nasdaq futures hold the post-8:30 gains, or fade into the open?\n- Does the 10y yield stay near 5.1% or slip lower, and do KRE and XHB start to move?",
+   "written": "2026-11-13T08:45"
   }
  ]
 }
