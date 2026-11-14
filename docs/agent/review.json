@@ -1,19 +1,20 @@
 {
- "for_date": "2026-11-06",
- "written": "2026-11-07T14:14Z",
- "summary": "Nothing has earned a promotion this week. The macro-fit backtest failed again (stocks with a macro tailwind did slightly worse, not better), and the forward log now has 249 settled ideas but only 11 dates, well short of the 20 dates a fair test needs, so every agent layer stays information only. This week's settled ideas lost about 3.6% vs SPY on average as the market weakened into the Nov 4 thrust; the old swing Top 2 picks held up better than the average candidate, mostly thanks to two big CDNA wins.",
+ "for_date": "2026-11-13",
+ "written": "2026-11-14T14:14Z",
+ "summary": "Nothing has passed the promotion test, so no layer should change any ranking. The macro-fit backtest (6,757 past signals) shows no edge: tailwind +0.73% vs headwind +1.07% over 5 days. The forward log has 360 settled ideas but only 16 dates, and ideas on the same day move together, so the real sample is thin. The Top 2 scoreboard is flat: 37 closed picks, +0.8% average, 40% winners.",
  "findings": [
-  "Macro fit (backtest, 6,369 signals Apr 2025-Oct 2026): tailwind +0.61% vs headwind +1.23% over 5 sessions, t -0.46, both halves negative - not proven, stays info only.",
-  "Forward log: 249 settled ideas over 11 dates (Oct 15-29); 117 settled this week over 5 dates, avg -3.6% vs SPY. Under 20 dates: too thin to judge any agent layer.",
-  "By role (5-session vs SPY): pick1 -0.1% (n 11), pick2 +4.5% (n 11), watch +4.1% (n 41), candidates -2.6% (n 186). Small samples; no conclusion.",
-  "Catalyst positive -0.4% vs not -2.1% (t 0.31, halves disagree); red flags absent -2.3% vs present +0.4% (t -0.93); earnings in hold +0.9% vs -0.4% (t -0.35): all not proven.",
-  "Macro tailwind (forward) t -0.08; more supporting layers (3+) -4.1% (n 7) vs +0.9% (t -1.07, both halves negative but tiny n); macro brief was never 'low risk' (158 high-risk rows) so it can't be tested yet.",
-  "Swing Top 2 scoreboard: 28 closed, avg +1.0% a trade vs avg candidate -1.8%, 43% winners, 57% stopped. This week 9 closed: +2.8% avg vs candidates -7.0% (CDNA +28% and +23%; the other 7 small losses).",
-  "Setup review flag is on: breadth thrust Nov 4 (post-thrust playbook favours Rotation Rookie +0.41R, Round Number +0.29R, Leader Pullback +0.24R), Minervini VCP slumping -0.26R over 70 signals, all top-5 themes new since Oct 11."
+  "Macro fit (backtest 2025-04-29..2026-11-05, 6,757 signals): tailwind +0.73% (n 980) vs headwind +1.07% (n 816), t -0.03, halves -0.56% / +0.53%. Not proven; information only.",
+  "Forward log: 360 settled ideas over 16 dates (below the 20-date bar). No layer reaches PASSED. Closest: macro_tailwind t 1.99 (good -2.2% n 113 vs bad -6.7% n 27) but only 27 bad ideas and it is not PASSED.",
+  "catalyst_positive t 0.71 (n 31 vs 51), red_flags t -1.21 (flagged ideas did not do worse; halves disagree), earnings_in_hold t -0.35, more_support t -0.57 (n 8 vs 188). All not proven.",
+  "no_warnings and brief_low_risk have no test: too few rows (brief risk was 'high' on 269 of 360 settled ideas, 'low' on none).",
+  "By role (5-day return vs SPY): pick1 +0.4% (n 16), pick2 +2.9% (n 16), watch +1.3% (n 66), cand -2.9% (n 262). Picks beat the broad candidate pool, but 16 dates is too few to call it real.",
+  "Top 2 scoreboard: 37 closed, avg +0.8%, 40% winners; rank 1 +0.2% (n 19), rank 2 +1.4% (n 18); 3 no-fill, 12 still open or pending.",
+  "Setup review flag is ON: leadership rotated (all 5 top themes are new since Oct 11) and the setups were last reviewed 34 days ago. Regime is 'mixed'."
  ],
  "proposals": [
-  "No changes yet: not enough data. No layer PASSED; forward evidence covers 11 dates (need 20+). Keep every agent layer and macro fit as information only.",
-  "Not a ranking change, just a reminder: the existing setup review flag is up (Nov 4 thrust, VCP slump, new leading themes). If you want, say 'review my trade setups' to look at it.",
-  "Next real check: about 3 more weeks of settled rows (roughly Nov 27) gets the forward log past 20 dates."
+  "No changes yet: not enough data. Under 60 independent dates are needed before any forward layer can be promoted; every layer is still information only.",
+  "Do not change any ranking or weight. Macro fit stays info-only (backtest t -0.03).",
+  "For Adam to decide: run the setup review the flag is asking for (34 days stale, top themes fully rotated). This would only re-check the setup list and needs your approval.",
+  "Watch item: macro_tailwind (t 1.99) is the one layer to re-test in 2-3 weeks. Its halves are both positive, but the bad group is small (n 27)."
  ]
 }
