@@ -2123,7 +2123,7 @@ def test_since_the_bottom():
     assert X["start"] == d[-3].strftime("%Y-%m-%d") and X["subs"]["G"] == ["A", "B", "C"] and X["parent"]["G"] == "P"
     r = X["rows"]["A"]
     assert len(r["c"]) == emerge.PICK + emerge.PRE and len(r["dv"]) == len(r["b50"]) == emerge.PICK and len(r["e"]) == 3
-    assert ("gemerge", "Since the bottom") in v3site.NAV[1][2] and "function renderEmerge" in v3site.TABS_JS.read_text()
+    assert ("gemerge", "Since the bottom") in dict((n[0], n[2]) for n in v3site.NAV)["groups"] and "function renderEmerge" in v3site.TABS_JS.read_text()
     return X["start"]
 
 
