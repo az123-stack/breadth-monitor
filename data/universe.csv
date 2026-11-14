@@ -52,7 +52,6 @@ ACGLN,"Arch Capital Group Ltd. Depositary Shares, each Representing a 1/1,000th 
 ACH,"Accendra Health, Inc.",XNYS
 ACHC,"Acadia Healthcare Company, Inc.",XNAS
 ACHR,Archer Aviation Inc.,XNYS
-ACHV,"Achieve Life Sciences, Inc.",XNAS
 ACI,"Albertsons Companies, Inc.",XNYS
 ACIC,American Coastal Insurance Corporation Common Stock,XNAS
 ACIU,AC Immune SA,XNAS
@@ -209,7 +208,6 @@ ALAB,"Astera Labs, Inc. Common Stock",XNAS
 ALB,Albemarle Corporation,XNYS
 ALC,Alcon Inc. Ordinary Shares,XNYS
 ALCO,Alico Inc,XNAS
-ALDF,Aldel Financial II Inc. Class A Ordinary Shares,XNAS
 ALDX,"Aldeyra Therapeutics, Inc.",XNAS
 ALEC,"Alector, Inc. Common Stock",XNAS
 ALF,Centurion Acquisition Corp. Class A Ordinary Shares,XNAS
@@ -375,7 +373,6 @@ ARE,"Alexandria Real Estate Equities, Inc.",XNYS
 AREC,AMERICAN RESOURCES CORP,XNAS
 ARES,Ares Management Corporation Class A Common Stock,XNYS
 ARHS,"Arhaus, Inc. Class A Common Stock",XNAS
-ARI,"APOLLO COMMERCIAL REAL ESTATE FINANCE, INC.",XNYS
 ARIS,Aris Mining Corporation,XNYS
 ARKO,ARKO Corp. Common Stock,XNAS
 ARKR,Ark Restaurants Corp,XNAS
@@ -430,7 +427,6 @@ ASTL,Algoma Steel Group Inc. Common Shares,XNAS
 ASTS,"AST SpaceMobile, Inc. Class A Common Stock",XNAS
 ASUR,"Asure Software, Inc",XNAS
 ASYS,Amtech Systems Inc,XNAS
-ATCH,"AtlasClear Holdings, Inc.",XASE
 ATCX,Atlas Critical Minerals Corporation Common Stock,XNAS
 ATEC,"Alphatec Holdings, Inc.",XNAS
 ATEN,A10 NETWORKS INC,XNYS
@@ -831,7 +827,6 @@ BWFG,Bankwell Financial Group Inc,XNAS
 BWIN,"The Baldwin Insurance Group, Inc. Class A Common Stock",XNAS
 BWIV,Blue Water Acquisition Corp. IV,XNYS
 BWLP,BW LPG Limited,XNYS
-BWMN,Bowman Consulting Group Ltd. Common Stock,XNAS
 BWMX,"Betterware de Mexico, S.A.P.I. de C.V.",XNYS
 BWXT,"BWX Technologies, Inc.",XNYS
 BX,Blackstone Inc.,XNYS
@@ -985,7 +980,7 @@ CFFI,C&F Financial Corp,XNAS
 CFFN,"Capitol Federal Financial, Inc.",XNAS
 CFG,"Citizens Financial Group, Inc.",XNYS
 CFND,C1 Fund Inc.,XNYS
-CFR,Cullen/Frost Bankers Inc.,XNYS
+CFR,Cullen/Frost Bankers Inc.,
 CG,The Carlyle Group Inc. Common Stock,XNAS
 CGABL,The Carlyle Group Inc. 4.625% Subordinated Notes due 2061,XNAS
 CGAU,Centerra Gold Inc.,XNYS
@@ -1222,6 +1217,7 @@ CRL,"Charles River Laboratories International, Inc.",XNYS
 CRM,"Salesforce, Inc.",XNYS
 CRMD,CorMedix Inc.,XNAS
 CRML,Critical Metals Corp. Ordinary Shares,XNAS
+CRMN,Skyline Builders Group Holding Limited Class A Ordinary Shares,XNAS
 CRMT,America's Car Mart Inc,XNAS
 CRNC,Cerence Inc. Common Stock,XNAS
 CRNT,Ceragon Networks Ltd,XNAS
@@ -1718,7 +1714,6 @@ EYE,"National Vision Holdings, Inc. Common Stock",XNAS
 EYPT,"EyePoint, Inc. Common Stock",XNAS
 EZGO,EZGO Technologies Ltd. Ordinary Shares,XNAS
 EZPW,Ezcorp Inc,XNAS
-EZRA,"Reliance Global Group, Inc. Common Stock",XNAS
 F,Ford Motor Company,XNYS
 FA,First Advantage Corporation Common Stock,XNAS
 FABC,"Fabric.AI, Inc. Common Stock",XNAS
@@ -1973,7 +1968,7 @@ GBFH,GBank Financial Holdings Inc. Common Stock,XNAS
 GBLI,"Global Indemnity Group, LLC Class A Common Stock",XNAS
 GBR,New Concept Energy Inc,XASE
 GBX,"The Greenbrier Companies, Inc.",XNYS
-GCBC,Greene County Bancorp Inc,XNAS
+GCBC,"Greene Bancorp, Inc. Common Stock",XNAS
 GCGR,General Catalyst Global Resilience Merger Corp. Class A Ordinary Shares,XNAS
 GCL,GCL Global Holdings Ltd Ordinary Shares,XNAS
 GCMG,GCM Grosvenor Inc. Class A Common Stock,XNAS
@@ -2252,7 +2247,6 @@ HLLY,Holley Inc.,XNYS
 HLMN,Hillman Solutions Corp. Common Stock,XNAS
 HLNE,Hamilton Lane Incorporated Class A Common Stock,XNAS
 HLP,Hongli Group Inc. Class A Ordinary Shares,XNAS
-HLSQ,Tessera Defense and Homeland Security Inc.,XASE
 HLT,Hilton Worldwide Holdings Inc. Common Stock,XNAS
 HLXC,Helix Acquisition Corp. III Class A Ordinary Shares,XNAS
 HMH,HMH Holding Inc. Class A Common Stock,XNAS
@@ -2340,6 +2334,7 @@ HWM,Howmet Aerospace Inc.,XNYS
 HXHX,Haoxin Holdings Limited Class A Ordinary Shares,XNAS
 HXL,Hexcel Corporation,XNYS
 HY,"Hyster-Yale, Inc.",XNYS
+HYAC,Haymaker Acquisition Corp V,XNYS
 HYFM,"Hydrofarm Holdings Group, Inc. Common Stock",XNAS
 HYFT,MindWalk Holdings Corp. Common Stock,XNAS
 HYLN,Hyliion Holdings Corp.,XASE
@@ -2453,7 +2448,6 @@ INIO,INNIO N.V. Ordinary Shares,XNAS
 INKT,"MiNK Therapeutics, Inc. Common Stock",XNAS
 INLF,INLIF LIMITED Class A Ordinary Shares,XNAS
 INLX,"Intellinetics, Inc.",XASE
-INM,InMed Pharmaceuticals Inc. Common Shares,XNAS
 INMB,INmune Bio Inc. Common stock,XNAS
 INMD,InMode Ltd. Ordinary Shares,XNAS
 INN,"Summit Hotel Properties, Inc.",XNYS
@@ -2614,7 +2608,6 @@ KALU,Kaiser Aluminum Corporation,XNAS
 KAPA,"Kairos Pharma, Ltd.",XASE
 KARD,"Kardigan, Inc. Common Stock",XNAS
 KARO,Karooooo Ltd. Ordinary Shares,XNAS
-KAZR,Skyline Builders Group Holding Limited Class A Ordinary Shares,XNAS
 KBDC,"Kayne Anderson BDC, Inc.",XNYS
 KBH,KB Home,XNYS
 KBON,Karbon Capital Partners Corp. Class A Ordinary Shares,XNAS
@@ -2669,7 +2662,6 @@ KN,KNOWLES CORPORATION,XNYS
 KNDI,"Kandi Technologies Group, Inc. Ordinary Shares",XNAS
 KNF,Knife River Corporation,XNYS
 KNOP,KNOT OFFSHORE PARTNERS LP,XNYS
-KNRX,KNOREX LTD.,XASE
 KNSA,"Kiniksa Pharmaceuticals International, plc Class A Ordinary Shares",XNAS
 KNSL,"Kinsale Capital Group, Inc.",XNYS
 KNTK,Kinetik Holdings Inc.,XNYS
@@ -2685,7 +2677,6 @@ KOYN,CSLM Digital Asset Acquisition Corp III Class A Ordinary Shares,XNAS
 KPET,KPET Ultra Paceline Corporation,XNYS
 KPLT,"Katapult Holdings, Inc. Common Stock",XNAS
 KPRX,"Kiora Pharmaceuticals, Inc. Common Stock",XNAS
-KPTI,Karyopharm Therapeutics Inc.,XNAS
 KR,The Kroger Co.,XNYS
 KRAQ,KRAKacquisition Corp Class A Ordinary Shares,XNAS
 KRC,Kilroy Realty Corp.,XNYS
@@ -2765,6 +2756,7 @@ LDOS,"Leidos Holdings, Inc.",XNYS
 LE,"Lands' End, Inc. Common Stock",XNAS
 LEA,Lear Corporation,XNYS
 LECO,Lincoln Electric Holdings Inc,XNAS
+LEDR,Leader's Advantage Acquisition Corp. Class A Ordinary Shares,XNAS
 LEDS,SemiLEDS Corporation,XNAS
 LEE,"Lee Enterprises, Inc.",XNAS
 LEGH,Legacy Housing Corporation Common Stock,XNAS
@@ -2979,7 +2971,6 @@ MCRB,"Seres Therapeutics, Inc.",XNAS
 MCRI,Monarch Casino & Resort Inc,XNAS
 MCRP,Micropolis AI Robotics,XASE
 MCS,The Marcus Corporation,XNYS
-MCTA,Charming Medical Limited Class A Ordinary Shares,XNAS
 MCY,Mercury General Corp.,XNYS
 MD,"Pediatrix Medical Group, Inc.",XNYS
 MDA,MDA Space Ltd.,XNYS
@@ -3181,6 +3172,7 @@ MTN,"Vail Resorts, Inc.",XNYS
 MTNB,"Matinas BioPharma Holdings, Inc.",XASE
 MTNE,CH4 Natural Solutions Corporation,XNYS
 MTR,Mesa Royalty Trust,XNYS
+MTRI,"Mentari Therapeutics, Inc. Common Stock",XNAS
 MTRN,Materion Corporation,XNYS
 MTRX,Matrix Service Co,XNAS
 MTSI,"MACOM Technology Solutions Holdings, Inc",XNAS
@@ -3448,7 +3440,6 @@ NXT,Nextpower Inc. Common Stock,XNAS
 NXTC,"NextCure, Inc. Common Stock",XNAS
 NXTS,Nexentis Technologies Inc. Common Stock,XNAS
 NXTT,Next Technology Holding Inc. Ordinary Shares,XNAS
-NXXT,"NextNRG, Inc. Common Stock",XNAS
 NYAX,Nayax Ltd. Ordinary Shares,XNAS
 NYC,American Strategic Investment Co.,XNYS
 NYT,New York Times Co.,XNYS
@@ -3880,7 +3871,6 @@ PSIX,"Power Solutions International, Inc. Common Stock",XNAS
 PSMT,Pricesmart Inc,XNAS
 PSN,Parsons Corporation,XNYS
 PSNL,"Personalis, Inc. Common Stock",XNAS
-PSQH,"PSQ Holdings, Inc.",XNYS
 PSQL,Pasqal Holding SA Ordinary Share,XNAS
 PSTL,"Postal Realty Trust, Inc",XNYS
 PSX,PHILLIPS 66,XNYS
@@ -3952,6 +3942,7 @@ QUAD,"QUAD/GRAPHICS, INC.",XNYS
 QUBT,Quantum Computing Inc. Common,XNAS
 QUCY,Quantum Cyber N.V. Ordinary Shares,XNAS
 QUIK,QuickLogic Corp,XNAS
+QUIT,"Achieve Life Sciences, Inc.",XNAS
 QUMS,Quantumsphere Acquisition Corp. Ordinary Shares,XNAS
 QURE,uniQure N.V.,XNAS
 QVCG,"QVC Group, Inc. Common Stock",XNAS
@@ -4109,7 +4100,6 @@ ROCK,"Gibraltar Industries, Inc.",XNAS
 ROG,Rogers Corporation,XNYS
 ROIV,Roivant Sciences Ltd. Common Shares,XNAS
 ROK,"Rockwell Automation, Inc.",XNYS
-ROKU,"Roku, Inc. Class A Common Stock",XNAS
 ROL,"Rollins, Inc.",XNYS
 ROLR,"High Roller Technologies, Inc.",XASE
 ROMA,Roma Green Finance Limited Class A Ordinary Shares,XNAS
@@ -4231,6 +4221,7 @@ SCM,STELLUS CAPITAL INVESTMENT CORPORATION,XNYS
 SCNX,"Scienture Holdings, Inc. Common Stock",XNAS
 SCOR,"comScore, Inc. Common Stock",XNAS
 SCPQ,Social Commerce Partners Corporation Class A Ordinary Shares,XNAS
+SCQC,SPACCircle Acquisition Corp. Class A Ordinary Shares,XNAS
 SCSC,Scansource Inc,XNAS
 SCTX,Scribe Therapeutics Inc. Common Stock,XNAS
 SCWO,374Water Inc. Common Stock,XNAS
@@ -4609,7 +4600,6 @@ TBI,"Trueblue, Inc.",XNYS
 TBLA,Taboola.com Ltd. Ordinary Shares,XNAS
 TBLD,Thornburg Income Builder Opportunities Trust Common Stock,XNAS
 TBN,Tamboran Resources Corporation,XNYS
-TCBI,"Texas Capital Bancshares, Inc. Common Stock, par value $0.01 per share",
 TCBK,Trico Bancshares,XNAS
 TCBS,"Texas Community Bancshares, Inc. Common Stock",XNAS
 TCBX,"Third Coast Bancshares, Inc. Common Stock",XNYS
@@ -4831,6 +4821,7 @@ TWIN,"Twin Disc, Incorporated",XNAS
 TWLO,Twilio Inc.,XNYS
 TWLV,Twelve Seas Investment Company III Class A Ordinary Shares,XNAS
 TWST,Twist Bioscience Corporation Common Stock,XNAS
+TXCP,"Texas Capital Bancshares, Inc. Common Stock, par value $0.01 per share",
 TXG,"10x Genomics, Inc. Class A Common Stock",XNAS
 TXMD,"TherapeuticsMD, Inc.",XNAS
 TXN,Texas Instruments Incorporated,XNAS
@@ -5058,6 +5049,7 @@ VTVT,vTv Therapeutics Inc. Class A Common Stock,XNAS
 VUZI,Vuzix Corporation,XNAS
 VVOS,"Vivos Therapeutics, Inc. Common Stock",XNAS
 VVV,Valvoline Inc.,XNYS
+VVVV,vVARDIS Holding AG,XNYS
 VVX,"V2X, Inc.",XNYS
 VWAV,"VisionWave Holdings, Inc. Common Stock",XNAS
 VYGR,"Voyager Therapeutics, Inc. Common Stock",XNAS
@@ -5212,6 +5204,7 @@ XERS,"Xeris Biopharma Holdings, Inc. Common Stock",XNAS
 XFLH,XFLH Capital Corporation,XNYS
 XFOR,"X4 Pharmaceuticals, Inc. Common Stock",XNAS
 XGN,Exagen Inc. Common Stock,XNAS
+XGPU,"Reliance Global Group, Inc. Common Stock",XNAS
 XHLD,"TEN Holdings, Inc. Common Stock",XNAS
 XHR,"Xenia Hotels & Resorts, Inc.",XNYS
 XIFR,"XPLR Infrastructure, LP",XNYS
