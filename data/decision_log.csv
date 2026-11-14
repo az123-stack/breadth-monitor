@@ -474,24 +474,22 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-12,SAIC,pick2,ath,thrust,Choppy / mixed,Focus,0.15,93.0,Defense IT & Services,87.7,steady,,-2.95,-1.72,+10bp 10-yr yield → -1.0%; +1% oil → +0.1%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
 2026-11-12,AMGN,watch,vcp,thrust,Choppy / mixed,Focus,0.255,83.0,Large-cap Pharma,87.5,confirmed,,-2.21,-0.12,+10bp 10-yr yield → -0.8%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
 2026-11-12,CTAS,watch,vcp,thrust,Choppy / mixed,Focus,0.255,79.0,Waste & Facility Services,85.0,confirmed,,-2.46,-0.13,+10bp 10-yr yield → -0.9%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
-2026-11-13,BTSG,cand,round,thrust,Choppy / mixed,Focus,0.295,94.0,Healthcare Providers,84.5,steady,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
+2026-11-13,BTSG,cand,round,thrust,Choppy / mixed,Focus,0.29,94.0,Healthcare Providers,84.5,steady,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
 2026-11-13,CART,cand,vcp,thrust,Choppy / mixed,Focus,0.256,91.0,E-Commerce Marketplaces,75.8,steady,,-4.19,-0.79,+10bp 10-yr yield → -1.4%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,CBRL,cand,rotation,thrust,Choppy / mixed,Focus,0.4,97.0,Restaurants,73.4,steady,,-3.05,-4.33,+1% dollar → -2.8%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,CNC,cand,rotation,thrust,Choppy / mixed,Focus,0.4,92.0,Managed Care,75.8,steady,warming,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,CRL,cand,pullback,thrust,Choppy / mixed,Focus,0.254,97.0,CROs,82.7,fading,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
+2026-11-13,CBRL,cand,rotation,thrust,Choppy / mixed,Focus,0.404,97.0,Restaurants,73.4,steady,,-3.05,-4.33,+1% dollar → -2.8%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
+2026-11-13,CNC,cand,rotation,thrust,Choppy / mixed,Focus,0.404,92.0,Managed Care,75.8,steady,warming,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
+2026-11-13,CRL,cand,pullback,thrust,Choppy / mixed,Focus,0.262,97.0,CROs,82.7,fading,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
 2026-11-13,EG,cand,vcp,thrust,Choppy / mixed,Focus,0.256,81.0,P&C Insurers,82.6,steady,,-2.12,-0.4,+10bp 10-yr yield → -0.7%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
-2026-11-13,ELF,cand,rotation,thrust,Choppy / mixed,Focus,0.4,94.0,Consumer Brands,90.6,steady,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,EWTX,cand,round,thrust,Choppy / mixed,Focus,0.295,92.0,Mid-cap Biotech,59.5,steady,,-6.08,-1.15,+10bp 10-yr yield → -2.1%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,LLY,cand,round,thrust,Choppy / mixed,Focus,0.295,89.0,Large-cap Pharma,89.0,confirmed,,-3.32,-0.63,+10bp 10-yr yield → -1.1%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
-2026-11-13,MEDP,cand,rotation,thrust,Choppy / mixed,Focus,0.4,85.0,CROs,82.7,fading,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,1,1,,,,,pending
-2026-11-13,PACS,cand,round,thrust,Choppy / mixed,Focus,0.295,97.0,Healthcare Providers,84.5,steady,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,RXO,cand,rotation,thrust,Choppy / mixed,Focus,0.4,96.0,Trucking & Logistics,48.2,confirmed,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,SLDE,cand,pullback,thrust,Choppy / mixed,Focus,0.254,90.0,P&C Insurers,82.6,steady,,-3.12,-0.59,+10bp 10-yr yield → -1.1%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,SN,cand,ath,thrust,Choppy / mixed,Focus,0.151,97.0,Consumer Brands,90.6,steady,,-5.38,-1.02,+10bp 10-yr yield → -1.8%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,TBBB,cand,ath,thrust,Choppy / mixed,Focus,0.151,97.0,Mass Merchants & Grocers,88.1,confirmed,warming,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,VEEV,cand,pullback,thrust,Choppy / mixed,Focus,0.254,92.0,Enterprise SaaS,83.7,fading,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
-2026-11-13,KNSA,pick1,ath,thrust,Choppy / mixed,Focus,0.151,97.0,Immunology & Inflammation,82.3,confirmed,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
-2026-11-13,MGNI,pick2,round,thrust,Choppy / mixed,Focus,0.295,98.0,Social & Ad Platforms,48.6,new,,-5.11,-0.97,+10bp 10-yr yield → -1.7%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
+2026-11-13,ELF,cand,rotation,thrust,Choppy / mixed,Focus,0.404,94.0,Consumer Brands,90.6,steady,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
+2026-11-13,EWTX,cand,round,thrust,Choppy / mixed,Focus,0.29,92.0,Mid-cap Biotech,59.5,steady,,-6.08,-1.15,+10bp 10-yr yield → -2.1%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
+2026-11-13,LLY,cand,round,thrust,Choppy / mixed,Focus,0.29,89.0,Large-cap Pharma,89.0,confirmed,,-3.32,-0.63,+10bp 10-yr yield → -1.1%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
+2026-11-13,MEDP,cand,rotation,thrust,Choppy / mixed,Focus,0.404,85.0,CROs,82.7,fading,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,1,1,,,,,pending
+2026-11-13,PACS,cand,round,thrust,Choppy / mixed,Focus,0.29,97.0,Healthcare Providers,84.5,steady,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
+2026-11-13,RXO,cand,rotation,thrust,Choppy / mixed,Focus,0.404,96.0,Trucking & Logistics,48.2,confirmed,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
+2026-11-13,SLDE,cand,pullback,thrust,Choppy / mixed,Focus,0.262,90.0,P&C Insurers,82.6,steady,,-3.12,-0.59,+10bp 10-yr yield → -1.1%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
+2026-11-13,VEEV,cand,pullback,thrust,Choppy / mixed,Focus,0.262,92.0,Enterprise SaaS,83.7,fading,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
+2026-11-13,KNSA,pick1,round,thrust,Choppy / mixed,Focus,0.29,97.0,Immunology & Inflammation,82.3,confirmed,,0.0,0.0,,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,3,1,,,,,pending
+2026-11-13,MGNI,pick2,round,thrust,Choppy / mixed,Focus,0.29,98.0,Social & Ad Platforms,48.6,new,,-5.11,-0.97,+10bp 10-yr yield → -1.7%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
 2026-11-13,CTAS,watch,vcp,thrust,Choppy / mixed,Focus,0.256,79.0,Waste & Facility Services,80.7,confirmed,warming,-2.86,-0.54,+10bp 10-yr yield → -1.0%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
 2026-11-13,MA,watch,vcp,thrust,Choppy / mixed,Focus,0.256,81.0,Payments & Networks,77.0,steady,,-1.09,-1.55,+1% dollar → -1.0%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
 2026-11-13,PYPL,watch,vcp,thrust,Choppy / mixed,Focus,0.256,70.0,Payments & Networks,77.0,steady,,-4.09,-0.78,+10bp 10-yr yield → -1.4%,,,Nvidia Q3 FY27 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
