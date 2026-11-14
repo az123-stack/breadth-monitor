@@ -1,45 +1,45 @@
 {
  "macro_fit": {
-  "asof": "2026-11-07",
-  "signals": 6369,
-  "from": "2025-04-22",
-  "to": "2026-10-29",
+  "asof": "2026-11-14",
+  "signals": 6757,
+  "from": "2025-04-29",
+  "to": "2026-11-05",
   "rule": "tailwind = macro moves of the last 5 sessions imply > +0.25% for the stock (real sensitivities only); headwind < -0.25%; result = actionable 5-session return of each Trade Setups signal",
   "tail5": {
-   "n_good": 879,
-   "n_bad": 794,
-   "avg_good": 0.00612,
-   "avg_bad": 0.01234,
-   "dates": 222,
-   "diff": -0.00622,
-   "t": -0.46,
+   "n_good": 980,
+   "n_bad": 816,
+   "avg_good": 0.00733,
+   "avg_bad": 0.01068,
+   "dates": 226,
+   "diff": -0.00335,
+   "t": -0.03,
    "halves": [
-    -0.0032,
-    -0.00299
+    -0.00561,
+    0.00525
    ],
    "passed": false
   },
   "tail20": {
-   "n_good": 922,
-   "n_bad": 842,
-   "avg_good": 0.0093,
-   "avg_bad": 0.01124,
-   "dates": 219,
-   "diff": -0.00194,
-   "t": -0.86,
+   "n_good": 1004,
+   "n_bad": 883,
+   "avg_good": 0.01019,
+   "avg_bad": 0.01029,
+   "dates": 223,
+   "diff": -0.0001,
+   "t": -0.7,
    "halves": [
-    0.00404,
-    -0.01516
+    -0.00351,
+    -0.00556
    ],
    "passed": false
   },
   "passed": false,
   "by_setup": {
    "ath": {
-    "n_good": 208,
-    "n_bad": 137,
-    "diff": -0.00523,
-    "t": -0.35
+    "n_good": 223,
+    "n_bad": 145,
+    "diff": 0.00516,
+    "t": 0.32
    },
    "kq": {
     "n_good": 12,
@@ -48,28 +48,28 @@
     "t": null
    },
    "pullback": {
-    "n_good": 135,
-    "n_bad": 216,
-    "diff": 5e-05,
-    "t": 0.71
+    "n_good": 145,
+    "n_bad": 226,
+    "diff": 0.00561,
+    "t": 0.16
    },
    "rotation": {
-    "n_good": 169,
-    "n_bad": 200,
-    "diff": -0.02623,
-    "t": -0.7
+    "n_good": 219,
+    "n_bad": 192,
+    "diff": -0.02102,
+    "t": -0.77
    },
    "round": {
-    "n_good": 284,
-    "n_bad": 193,
-    "diff": 0.00168,
-    "t": -0.07
+    "n_good": 304,
+    "n_bad": 204,
+    "diff": -0.00185,
+    "t": 0.15
    },
    "vcp": {
-    "n_good": 71,
-    "n_bad": 38,
-    "diff": 0.00021,
-    "t": -1.28
+    "n_good": 77,
+    "n_bad": 39,
+    "diff": -0.00522,
+    "t": -1.69
    }
   }
  },
