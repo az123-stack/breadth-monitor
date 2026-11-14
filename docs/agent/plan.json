@@ -1,7 +1,7 @@
 {
- "for_date": "2026-11-07",
- "written": "2026-11-07T15:11Z",
- "summary": "Nothing passed the proof rule this week, and the first live results are rough: all 7 settled lined-up buys hit their stop (-1R each) and Launch pick IT was stopped at -17%, with 3 of the last 9 Launch picks in the same group (IT Services). The big new tool is the trade warehouse with ~11 years of Yahoo history, which finally gives more than 2 deep thrusts to test on. Best next step: re-check the dashboard's core edges (post-thrust window, leading group, lifecycle BUY) on that 11-year history before building anything new on top of them.",
+ "for_date": "2026-11-14",
+ "written": "2026-11-14T15:10Z",
+ "summary": "Quiet research week: one new study (shorting rallies into falling EMAs: no edge) plus the Nov 7 supply-breaks study, whose long side is the best new lead (buy the hold after a stock clears big overhead supply, only in top-20% groups: +0.48R, t 2.3, both halves). Nothing passed the promotion rule and none of last week's plan was built, so the 11-year re-test is still the top job. Live warning: the Oct 15 shallow-thrust high-beta list finished -20% vs the market +0.7%, and the Nov 4 one is -6% after 7 days, yet the playbook still says 'Press, size up' after every thrust. Best next step: re-test the core edges on 11 years (#1) and split the playbook's post-thrust state into deep vs shallow (#2).",
  "items": [
   {
    "title": "Re-test the core edges on 11 years of history (warehouse step 2), then the stacked R",
@@ -11,28 +11,44 @@
     "R-2026-11-04-daily-vs-weekly-dips",
     "R-2026-10-27-theme-lifecycle",
     "R-2026-10-24-box-leaders",
-    "R-2026-10-16-imbalance-volume-tilt",
-    "R-2026-10-17-order-flow-proxies"
+    "R-2026-11-07-supply-breaks"
    ],
-   "where": "tools/warehouse (build.py / study.py on the 11-year Yahoo data, branch warehouse-data); later a stack line on launchPicksCard and lineupCard",
-   "how": "Almost every edge we use was found on ~2 bull-heavy years with 6-7 thrusts. Put the lined-up dip trade (leader, first 9/21 ribbon dip, buy the dip-day-high break, stop the dip low, 20 sessions) into the 11-year warehouse with fixed columns: post-thrust window, leading group (top 30% on 60 days), lifecycle BUY, SPY above 50-day, strong breadth, volume tilt tier, extension at the leg high. Only the lifts that survive go into a stacked expected R shown on each live trade.",
-   "test": "Pre-register the columns (same plan, grade 85%+ before outcomes). Each lift = R with minus without, per date, clustered by month, t 2+ and the same sign in both halves AND in pre-2024 vs 2024+. Stacked R then scored on the later half only: top fifth minus bottom fifth 0 and rank IC 0.05+.",
-   "kill": "If the post-thrust or leading-group lift is about 0 before 2024, the lined-up / box edge is a 2-year artefact: drop those lifts from grades and say so on the cards. Stacked R with IC under 0.05: show proven single tags only.",
+   "where": "tools/warehouse (11-year Yahoo data on branch warehouse-data); later a stack line on launchPicksCard and lineupCard",
+   "how": "Carried over from last week, not started. Almost every edge we use was found on ~2 bull-heavy years with 2 deep thrusts. Put the lined-up dip trade and the supply-break hold into the 11-year warehouse with fixed columns: post-thrust window (deep vs shallow), leading group (top 20-30%), lifecycle BUY, SPY above 50-day, breadth state, extension at the leg high. Only lifts that survive go into a stacked expected R on each live trade.",
+   "test": "Pre-register the columns (grade 85%+ before outcomes). Each lift = R with minus without, per date, clustered by month, t 2+, same sign in both halves AND pre-2024 vs 2024+. Stacked R scored on the later half only: top fifth minus bottom fifth 0 and rank IC 0.05+.",
+   "kill": "Post-thrust or leading-group lift about 0 before 2024: those edges are a 2-year artefact, drop them from grades and say so on the cards. Stacked R with IC under 0.05: show proven single tags only.",
    "effort": "M",
    "priority": 1
   },
   {
-   "title": "Lined-up buys: 0 for 7 live, check the gate before trusting it",
-   "verdict": "watch",
+   "title": "Post-thrust playbook: split deep vs shallow thrusts before saying 'Press'",
+   "verdict": "test_first",
    "cards": [
-    "R-2026-10-27-theme-lifecycle"
+    "R-2026-10-16-connector-beta",
+    "R-2026-11-04-turn-leaders",
+    "R-2026-10-17-thrust-unconfirmed",
+    "R-2026-10-11-setups-by-breadth"
    ],
-   "where": "lifecycle layer, data/lineup_ledger.csv, lineupCard gate (buy / half / hold)",
-   "how": "All 7 settled live trades (FIGS, FTRE, EOG, PTC, JNJ, VTRS, BILL) were stopped at -1R; 15 more didn't fill. With a 29% backtest win rate, 7 losses in a row happens about 1 time in 11, so it isn't proof yet. Check two things: what the gate said on those dates (they came during the late-October selloff, when breadth was weak and the backtest says BUY groups had no edge), and whether stops sit too tight versus the backtest (live fill = max(open, trigger)).",
-   "test": "After 30 closed live trades: average R vs the +0.84R backtest and vs the weak-breadth subset of the backtest; same check split by gate state on the signal date.",
-   "kill": "30 closed trades with average R below 0 while the gate said buy: switch the card to 'hold off' until the 11-year re-test (item 1) is done.",
+   "where": "playbook_state (playbook.py state 'thrust' advice and setup verdicts); washout_thrust card",
+   "how": "The playbook treats every thrust the same and today says 'Press, size up'. But the washout scorecard says shallow thrusts are different: Oct 15 (SPY only -2% off high) high-beta list -20.1% vs all stocks +0.7%; Nov 4 (-3.5%) -6.1% vs -1.4% after 7 sessions; deep thrusts (Apr 2025, Mar 2026) +26% / +34%. Turn-leaders says post-thrust breakouts still beat ordinary ones after shallow thrusts (+1.7% vs +4.1% deep), so the fix may be 'select, don't size up' rather than 'avoid'. Split the state into post-thrust deep / shallow and re-score each setup's verdict in each.",
+   "test": "Existing trade backtest (trade_bt by state) re-cut by thrust depth (deep = SPY 8%+ pullback and T2108 25 or under), per thrust clustered, both halves; then confirm on the 11-year warehouse where there are far more thrusts. Build if shallow post-thrust R is below deep by t 2+ in both halves.",
+   "kill": "Shallow post-thrust R about equal to deep (within 0.1R) or halves disagree: keep one post-thrust state.",
    "effort": "S",
    "priority": 2
+  },
+  {
+   "title": "Supply breaks: a 'held the break' card for top-group stocks, plus the real-fail exit",
+   "verdict": "test_first",
+   "cards": [
+    "R-2026-11-07-supply-breaks",
+    "R-2026-10-17-in-vogue"
+   ],
+   "where": "new info-only layer 'supply_breaks' (Setups tab card + forward ledger); 'real fail' as an exit tag on Launch picks, lined-up buys and box longs",
+   "how": "Live list of stocks that closed above big overhead supply in the last ~15 sessions: phase (retesting / working off / cleared / real fail), sessions vs the 13-session clock, group percentile. Grade: top-20% group = buy the hold above the line (next open, stop 0.5 ADR under the level); bottom-half group = skip. Separately flag 'real fail' (3 closes under the level AND 1 ADR below) on open longs, since those lagged -9.2% vs +8.6% at 21 days. Information only, logged forward like the lined-up ledger.",
+   "test": "Already: top-20% groups +0.48R (t 2.3, n 509, 278 dates, both halves), +3.2% vs matched breakouts at 21d (t 4.3). Not proven yet because windows overlap and group ranks use today's lists. Confirm on the 11-year warehouse with point-in-time groups (item 1), plus 20+ live dates in the forward ledger.",
+   "kill": "Top-group lift under t 2 on 11 years, or live ledger average R below 0 after 30 closed trades. The short side is already dead (-0.08R, no cut positive in both halves).",
+   "effort": "M",
+   "priority": 3
   },
   {
    "title": "Launch picks: one open pick per sub-theme across weeks",
@@ -41,53 +57,36 @@
     "R-2026-10-25-what-made-them-go",
     "R-2026-10-16-three-month-picks"
    ],
-   "where": "launch.select (the held-names skip) and launch.replay",
-   "how": "The rule is one pick per sub-theme each week, but open picks from earlier weeks don't count, so IT Services got IT, then CTSH, then CDW (IT stopped -17%), and Enterprise SaaS got ASAN then TEAM. With 13-week holds that stacks one group's risk. Proposal: skip a sub-theme that already has an open Launch pick (or cap at 2), and take the next name.",
-   "test": "Run launch.replay both ways on every past week: average 13-week result vs SPY, worst drawdown of the open book, and t in both halves. Build only if the average is about the same or better (within 1 pt) and the worst open-book drawdown is smaller.",
+   "where": "launch.select (held-names skip) and launch.replay",
+   "how": "Got worse this week: this Friday's #1 is ACN, the 4th IT Services pick in 4 weeks (IT stopped -17%, CTSH -2.5%, CDW +8.8%), plus 2 Enterprise SaaS (ASAN -12%, TEAM -3%). The 9 entered picks average -2.9% vs SPY so far (early in 13-week holds, so not a verdict). Proposal: skip a sub-theme that already has an open Launch pick (or cap at 2) and take the next name.",
+   "test": "launch.replay both ways on every past week: 13-week result vs SPY, worst open-book drawdown, t in both halves. Build only if the average is the same or better (within 1 pt) and the worst open-book drawdown is smaller.",
    "kill": "Average drops more than 1 pt vs SPY or a half turns negative: keep the current rule (concentration in the leading group may be the edge).",
-   "effort": "S",
-   "priority": 3
-  },
-  {
-   "title": "After the Nov 4 thrust: 'broke out together' list + 21-EMA pullbacks in strong groups",
-   "verdict": "test_first",
-   "cards": [
-    "R-2026-11-04-turn-leaders",
-    "R-2026-11-01-special-group-pullbacks",
-    "R-2026-10-16-connector-beta"
-   ],
-   "where": "info-only list next to the washout_thrust card (Breadth tab); playbook_state post-thrust window",
-   "how": "Two new cards agree the edge is the 15-25 sessions after a thrust: fresh breakouts with 2+ sub-theme peers breaking out did +4.3% / +6.9% vs ordinary breakouts (t 4.1 / 2.5), and strong-group leaders that come back to the 21 EMA were a better buy than chasing (+0.37 to +0.60R, both halves). The 'special' 5-day jump added nothing. A Nov 4 thrust just printed, so this window is live until about Nov 25: build the list as information only and log it.",
-   "test": "On the 11-year warehouse (many more thrusts): post-thrust peer-cluster breakouts vs ordinary breakouts, next open to 21 sessions, per thrust, both halves, t 2+; plus the card's open question: offensive vs defensive clusters (Apr 2025 defensives lost -8%).",
-   "kill": "Edge under t 2 on 11 years, or only in deep thrusts (then fold it into the washout card).",
    "effort": "S",
    "priority": 4
   },
   {
-   "title": "Extension at the leg high and room to old peaks as dip penalties",
-   "verdict": "test_first",
+   "title": "Lined-up buys: half the stops hit on entry day; check the fill and stop rule",
+   "verdict": "watch",
    "cards": [
-    "R-2026-11-04-daily-vs-weekly-dips",
-    "R-2026-11-05-liquidity-magnets"
+    "R-2026-10-27-theme-lifecycle"
    ],
-   "where": "lined-up buys and Best Setups nuzzle rows (a warning tag), via the warehouse",
-   "how": "The weekly-dip test failed its main idea but left two leads: dips after a leg that ran 2.5+ weekly ranges over the weekly 21 EMA lost (-0.10R daily, -0.27R weekly), and dips with under 5% room to the next old peak lost on the daily entry (-0.25R). These are found, not proven. The magnets test was stopped by its power gate, so nothing there yet.",
-   "test": "Pre-registered follow-up on the 11-year data (item 1 columns): extension top third vs rest, room under 5% vs rest, per date, clustered, both halves and both eras, t 2+.",
-   "kill": "Either lead under t 2 or halves disagree: no tag.",
+   "where": "lifecycle layer, data/lineup_ledger.csv, lineupCard gate",
+   "how": "Better than last week but not yet good: 39 filled, 15 stopped at -1R, 24 open marked +13R in total, so about -0.05R a trade vs the +0.84R backtest. 7 of the 15 stops hit the same day as entry (VTRS, PTC, BILL, TRV, CDW, AVTR, CNC) and 3 more the next day. Risk is ~1 ADR (stop = dip-day low), so an entry at the dip-day-high break can be stopped by one normal day. Check the backtest's same-day-stop rate against the live one; if live is much higher, the live fill (max of open, trigger) or the intraday stop check differs from the backtest.",
+   "test": "Backtest same-day stop rate vs live (now 7 of 39 = 18%); after 30 closed trades: average R vs +0.84R, split by gate state and by stage (Blossom vs Quiet build).",
+   "kill": "30 closed trades with average R below 0 while the gate said buy: card switches to 'hold off' until item 1 is done.",
    "effort": "S",
    "priority": 5
   },
   {
-   "title": "Agent layers and live ledgers: first honest read about Nov 27",
+   "title": "Agent layers: forward log still too thin; the macro brief's risk field never varies",
    "verdict": "watch",
    "cards": [
-    "R-2026-10-22-trade-stories",
-    "R-2026-10-17-thrust-unconfirmed"
+    "R-2026-10-22-trade-stories"
    ],
-   "where": "decision_log (catalyst, calendar, macro_brief), launch_ledger, trade_stories scorecard, washout_thrust",
-   "how": "Nothing to build. Forward log: 249 settled ideas but only 11 dates; no agent layer is near t 2, and the macro brief has never said 'low risk', so it can't be tested. The Oct 15 shallow, 'unconfirmed' thrust is scored about Nov 13; log it as a case.",
+   "where": "decision_log (catalyst, calendar, macro_brief), weekly Reviewer",
+   "how": "360 settled ideas but only 16 dates (rule needs 20+). Closest: macro_tailwind t 1.99, both halves positive, but only 27 'bad' ideas over 8 dates; the code-only macro-fit backtest says no edge (t -0.03 on 6,757 signals), so treat it as likely noise. The macro brief said 'high' risk on 269 of 269 settled ideas, so brief_low_risk can never be tested; the brief needs a relative scale (vs its own last 20 days) to be measurable. That is an agent prompt change, Adam's call.",
    "test": "t 2+ over 20+ dates, same sign both halves.",
-   "kill": "No agent layer reaches |t| 1 by about 100 more settled ideas: cut the catalyst agent to earnings checks only (saves ~20-40 searches a weekday).",
+   "kill": "No agent layer at |t| 1+ after ~100 more settled ideas: cut the catalyst agent to earnings-date checks only (saves ~20-40 searches a weekday). Macro brief risk still constant after the change: drop the risk field from the log.",
    "effort": "S",
    "priority": 6
   }
@@ -96,7 +95,7 @@
  "retire": [
   {
    "target": "who_won_close",
-   "why": "Fourth week proposed: IC about 0 in both halves on two cards. Hide the tiles; keep the data columns."
+   "why": "Fifth week proposed: IC about 0 in both halves on two cards. Hide the tiles; keep the data columns."
   },
   {
    "target": "market_health",
@@ -104,61 +103,66 @@
   },
   {
    "target": "dips",
-   "why": "Repeat: its own test shows no edge; lined-up buys cover the same 9/21 entry with the tested group filter."
+   "why": "Repeat: its own test shows no edge; lined-up buys and RS pullbacks cover the same 9/21 entry with tested group filters."
   }
  ],
  "registry_updates": [
   {
    "layer": "who_won_close",
    "to": "retired",
-   "why": "IC about 0 in both halves; descriptive only."
+   "why": "IC about 0 in both halves; descriptive only (repeat, not applied last week)."
   },
   {
    "layer": "market_health",
    "to": "retired",
-   "why": "No forward edge, halves disagree."
+   "why": "No forward edge, halves disagree (repeat)."
   },
   {
    "layer": "position_exits",
    "to": "live",
-   "why": "The weekly close under the 50-week EMA exit is part of the approved Launch picks (launch.ledger_settle)."
+   "why": "The weekly close under the 50-week EMA exit is part of the approved Launch picks (repeat)."
   },
   {
    "layer": "rs2w",
    "to": "info",
-   "why": "Built on the Stocks/Themes tabs; untested, so info rather than idea."
+   "why": "Built on the Stocks/Themes tabs; untested, so info rather than idea (repeat)."
   }
  ],
  "card_updates": [
   {
+   "card": "R-2026-11-08-ema-rally-short",
+   "integrated": "rejected",
+   "why": "No standing edge; only one bear episode paid and it is the worst trade measured inside thrust windows (-0.28R)."
+  },
+  {
    "card": "R-2026-11-04-rs-sheet-vs-dashboard",
    "integrated": "rejected",
-   "why": "Decision was to keep the dashboard RS Rating; the sheet's 3-month % did worse on the names only it picks."
+   "why": "Kept the dashboard RS Rating (repeat from last week)."
   },
   {
    "card": "R-2026-11-04-daily-vs-weekly-dips",
    "integrated": "rejected",
-   "why": "Pre-registered H1 failed (-0.03R); leads carried to the warehouse follow-up (item 5)."
+   "why": "Pre-registered H1 failed; leads carried into item 1 (repeat)."
   },
   {
    "card": "R-2026-10-24-orb-subtheme",
    "integrated": "rejected",
-   "why": "No usable edge, halves disagree (proposed last week, still 'no')."
+   "why": "No usable edge, halves disagree (repeat)."
   },
   {
    "card": "R-2026-10-28-old-pivots",
    "integrated": "rejected",
-   "why": "Old pivots fail no more than ordinary breakouts (proposed last week)."
+   "why": "Old pivots fail no more than ordinary breakouts (repeat)."
   },
   {
    "card": "R-2026-10-27-bad-day-holders",
    "integrated": "rejected",
-   "why": "Adds nothing beyond 30-day relative strength (proposed last week)."
+   "why": "Adds nothing beyond 30-day relative strength (repeat)."
   },
   {
    "card": "R-2026-10-16-position-exits",
    "integrated": "yes",
-   "why": "Launch picks exit on a weekly close under the 50-week EMA."
+   "why": "Launch picks exit on a weekly close under the 50-week EMA (repeat)."
   }
  ]
 }
