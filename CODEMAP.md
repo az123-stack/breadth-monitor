@@ -780,6 +780,9 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   (within 5%), up-$ share, gap-ups above their open, share above the 10:00 snapshot (`at10`), SPY/QQQ/IWM vs open, IWM − SPY, VIX, ^TNX.
   Verdict: Broad rally (60%+ up, RS 90+ 55%+ up, score ≥ 4, not rotation) · Narrow pop (SPY up with < 50% of stocks up, or "beaten-down
   rotation" = beaten-down check and leading-groups check both −1) · Broad selling · Leaning up / down (±3) · Mixed. Untested thresholds.
+- **v3 Brief parent** (Nov 14, 2026; Adam: "a new tab before Market for the read-out and trade stories … Brief is great"): `v3site.NAV[0]` =
+  ("brief", "Brief", [readout, stories]) — the v1 renderers `renderReadout` / `renderStories` (story.json / stories.json via REL_FILES). First
+  visit still lands on Themes (last-used tab after that).
 - **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
   `build(adjusted, theme_data)` (~70 s) → `DATA.themes.inplay` {date, days, rows, n, counts, pool {t: [adr, v50, sub]}}, v3 Stocks → **In Play**
   (`renderInPlay` in v3_tabs.js). Universe stocks $5+, $10M+/day (no deals), last 5 sessions: news = gap ≥ max(3%, 1 ADR) on 2.5x vol

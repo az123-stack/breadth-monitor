@@ -21,6 +21,8 @@ TABS_JS = Path(__file__).with_name("v3_tabs.js")
 
 # parent key, label, [(sub-tab key = v1 renderer key, label)]
 NAV = [
+    # Nov 14 (Adam: "get the readout and trade stories into a new tab before Market … Brief is great")
+    ("brief", "Brief", [("readout", "Read-out"), ("stories", "Trade stories")]),
     # Nov 4 (Adam: "add intraday and premarket tabs … under their own parent tab where breadth will also reside")
     ("market", "Market", [("breadth", "Breadth"), ("premarket", "Pre-market"), ("intraday", "Intraday"), ("mcheck", "Checklist")]),   # Nov 11: Checklist
     ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle"), ("grotation", "Rotation"), ("gpop", "Pop watch"), ("gemerge", "Since the bottom"), ("grsrank", "RS ranks")]),   # Nov 7: Since the bottom   # Nov 4: RS ranks   # Nov 4: Pop watch
