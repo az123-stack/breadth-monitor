@@ -783,6 +783,12 @@ Read the entry for the module you're working on (grep for its file name). Add ne
 - **v3 Brief parent** (Nov 14, 2026; Adam: "a new tab before Market for the read-out and trade stories … Brief is great"): `v3site.NAV[0]` =
   ("brief", "Brief", [readout, stories]) — the v1 renderers `renderReadout` / `renderStories` (story.json / stories.json via REL_FILES). First
   visit still lands on Themes (last-used tab after that).
+- **v1 → v3 carry-over** (Nov 15, 2026; Adam: "anything in v1 that's not in v3 we should bring over before I trim v1?" → all four
+  groups): Stocks → Setups gained Best setups (`renderBest`), Launch list (`renderLaunch`), Trade setups (`renderTrades`: dips, RS pullback,
+  EMA odds, playbook, setup lists, box, SOW, tag stats, record volume, backtest), Leaders & bursts (`renderSetups`), Record volume
+  (`hveCard`), each with a ticks() for "⬇ All setups" (`bestTicks`, `launchTicks`, `tradeTicks`, `momentumTicks`, `hveTicks`). Groups →
+  Rotation now also shows ignition, rotation ideas, money flow (RRG), pair chart, timeline; new Groups → Stair steps (`stairsCard`) and
+  Groups → Biotech (`renderBiotech`). v1 renderers reused unchanged, so v1 must keep building until they move into v3 files.
 - **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
   `build(adjusted, theme_data)` (~70 s) → `DATA.themes.inplay` {date, days, rows, n, counts, pool {t: [adr, v50, sub]}}, v3 Stocks → **In Play**
   (`renderInPlay` in v3_tabs.js). Universe stocks $5+, $10M+/day (no deals), last 5 sessions: news = gap ≥ max(3%, 1 ADR) on 2.5x vol

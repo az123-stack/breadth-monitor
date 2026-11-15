@@ -45,7 +45,33 @@ function epV3Card() {
   sec.querySelector(".epdl").addEventListener("click", () => tsDownload("episodic-pivots", epTicks()));
   return sec;
 }
+// Nov 15, 2026 (Adam: "anything in v1 that's not in v3 we should bring over before I trim v1?" → Setups, Rotation cards, Stair steps +
+// record volume, Biotech). The v1 renderers are reused as they are; each tab adds a ticks() so "⬇ All setups" carries it.
+const tk = (rows) => [...new Set((rows || []).map(r => typeof r === "string" ? r : r && r.t).filter(Boolean))];
+function bestTicks() {
+  const T = DATA.themes || {}, X = T.polished || {}, L = T.launch || {};
+  return [{ name: "Launch picks", ticks: tk(L.picks) },
+    { name: "Best setups - leading-group EMA pullbacks", ticks: tk(X.nuzzle) },
+    { name: "Best setups - high tight flags", ticks: tk(X.flags) }];
+}
+function launchTicks() {
+  const R = ((DATA.themes || {}).launch || {}).rows || [], AB = R.filter(r => r.grade !== "C");
+  return [{ name: "Launch list - curl (before the break), A/B", ticks: tk(AB.filter(r => r.stage === "curl")) },
+    { name: "Launch list - early (just broke out), A/B", ticks: tk(AB.filter(r => r.stage === "early")) }];
+}
+function tradeTicks() {
+  const T = DATA.themes || {}, S = ((T.trade_setups || {}).setups) || [];
+  return [{ name: "Dip buys - reclaimed the 9/21", ticks: tk(((T.dips || {}).rows || []).filter(r => r.reclaim9 || r.reclaim21)) },
+    ...S.map(x => ({ name: x.name, ticks: tk(x.top) })),
+    { name: "Strength on Weakness - prime", ticks: tk(((T.sow || {}).rows || []).filter(r => r.prime)) }];
+}
+function momentumTicks() {
+  const L = (DATA.themes || {}).lists || {};
+  return [{ name: "Leaders - strongest", ticks: tk((L.strongest || []).slice(0, 25)) }, { name: "Momentum bursts", ticks: tk(L.bursts) }, { name: "Anticipation coils", ticks: tk(L.anticipation) }];
+}
+function hveTicks() { return [{ name: "Record volume", ticks: tk(((DATA.themes || {}).hve || {}).rows) }]; }
 const V3_SETUPS = [
+  ["best", "Best setups", (app) => { if (typeof renderBest === "function") renderBest(app); }, bestTicks],
   ["lineup", "Lined-up buys", (app) => {
     const T = DATA.themes || {};
     app.append(liveBar());
@@ -56,7 +82,13 @@ const V3_SETUPS = [
     app.append(liveBar());
     app.append((DATA.themes || {}).lists ? epV3Card() : $('<div class="card empty">Episodic pivots appear after the next data run.</div>'));
   }, epTicks],
+  ["launch", "Launch list", (app) => { app.append(liveBar()); renderLaunch(app); }, launchTicks],
+  ["trades", "Trade setups", (app) => renderTrades(app), tradeTicks],
+  ["momentum", "Leaders & bursts", (app) => renderSetups(app), momentumTicks],
+  ["hve", "Record volume", (app) => { app.append(liveBar()); app.append(DATA.themes && DATA.themes.hve ? hveCard(DATA.themes) : $('<div class="card empty">Record volume appears after the next data run.</div>')); }, hveTicks],
 ];
+// Groups → Stair steps and Groups → Biotech (v1 cards, Nov 15)
+function renderStairsV3(app) { if (!DATA.themes) { app.append($('<div class="card empty">Appears after the next data run.</div>')); return; } app.append(stairsCard(DATA.themes)); }
 function setupsDownloadAll() {
   const secs = V3_SETUPS.flatMap(([k, l, r, ticks]) => { try { return ticks ? ticks() : []; } catch (e) { return []; } }).filter(x => x.ticks.length);
   if (!secs.length) return;
@@ -78,6 +110,8 @@ function renderGroupRotation(app) {
   if (!DATA.themes) { app.append($('<div class="card empty">Theme data isn\'t available yet. It appears after the next data run.</div>')); return; }
   app.append(moneyTodayCard());
   app.append(moneyStocksCard());
+  // Nov 15 (Adam): bring v1's Rotation cards over before trimming v1
+  [ignitionCard, rotationIdeasCard, moneyFlowCard, pairCard, timelineCard].forEach(f => { try { app.append(f()); } catch (e) { console.error(e); } });
 }
 // Oct 31 (Adam: "show inflow and outflow of dollars for the top 20 stocks in each of the periods"; then: "a single table like the
 // sub-themes rotation table, with the ability to select the time frame"): DATA.themes.rotation.mstocks (rotation.money_stocks) = every
