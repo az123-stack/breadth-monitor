@@ -126,6 +126,7 @@ One line per module. Before changing a module, read its entry in **CODEMAP.md** 
 - `data/themes.csv` (theme,ticker,role) 81 themes · `data/subthemes.csv` (group,subtheme,ticker) 156 peer groups (Oct 15: every S&P 500 / …
 - AI themes (Oct 29, 2026; Adam: "Box is what Wall Street wants: companies successfully monetizing AI"): themes.csv "AI & ROBOTICS - Enterprise
 - `aimon.py` **AI Monetizers kept honest by the market** (Oct 29–30, 2026; Adam: "they're trying but it's not coming in yet" + "flag a new AI
+- `podcast.py` **Morning podcast** (Nov 15, 2026; Adam: "turn the brief into a podcast … make it interesting, try different formats each day until I pick") → release `podcast` MP3s + docs/podcast/feed.xml; scheduled task "Market Monitor · podcast". CODEMAP.md
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
 ## Definitions

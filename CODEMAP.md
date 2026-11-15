@@ -878,3 +878,15 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   `python -m breadth.aimon` prints it. Test `test_ai_monetizers_verdict`.
 - `tools/` build_themes, build_subthemes, evaluate (v1 vs v2) · `tests/test_pipeline.py` (run directly)
 
+
+- **Morning podcast** (Nov 15, 2026; Adam: "turn the brief and its sub tabs into a podcast so it's easy to intake on the go" +
+  "make it interesting and not lame" + "try different formats each day until I tell you which I like best"). `breadth/podcast.py`
+  + `.github/workflows/podcast.yml`. Source = the Brief: latest AM chapter (story.json), agent/macro_brief.json, open stories.json.
+  Claude scheduled task "Market Monitor · podcast" (Sonnet, ~8:07 AM ET Mon–Fri, after the morning story): `facts` (format guide +
+  COMMON_RULES + source bundle) → writes a speaker-tagged script ("MAYA: …") → `check` → `publish --push` (gzip+b64 → podcast.yml).
+  Workflow: edge-tts (free Microsoft neural voices, `VOICES` per speaker tag, chunks concatenated) → asset on release `podcast`
+  (`--prerelease`, keeps git small; unique file name per build) → `feed --add` rewrites docs/podcast/episodes.json + feed.xml (KEEP 30,
+  same-day rebuild replaces, dropped assets deleted). Feed: https://az123-stack.github.io/breadth-monitor/podcast/feed.xml
+  (`itunes:block`, public URL like the rest of Pages). Cron 13:40 UTC = backup "basic" read-aloud of today's chapter if no episode.
+  FORMATS rotate by trading day from Nov 16 (two_host → huddle → narrative → radio); set `FIXED_FORMAT` when Adam picks. Episode
+  titles carry the format name. Info only. Test `test_podcast`.

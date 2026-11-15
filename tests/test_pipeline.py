@@ -2220,6 +2220,39 @@ def test_librarian_brief():
     return f"{len(text.split())} words"
 
 
+def test_podcast():
+    """Podcast: format rotation, script parse/check, ear text, feed add/replace/trim."""
+    import json as _json, tempfile, shutil
+    from pathlib import Path as _P
+    from breadth import podcast as PC
+    assert [PC.format_for(d) for d in ("2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20")] == \
+        ["two_host", "huddle", "narrative", "radio", "two_host"]
+    assert PC.ear("SPY -2.5% vs $1.2B", True) == "S P Y minus 2.5 percent versus 1.2 billion dollars"
+    good = "MAYA: Hook line here.\n\nJAKE: " + "word " * 1000 + "\n\nMAYA: This is information, not advice."
+    assert PC.check(good, "two_host") and any("90 words" in e for e in PC.check(good, "two_host"))
+    ok = "\n\n".join(("MAYA: " if i % 2 else "JAKE: ") + "word " * 40 for i in range(26)) + "\n\nMAYA: information, not advice."
+    assert PC.check(ok, "two_host") == [], PC.check(ok, "two_host")
+    assert any("markdown" in e for e in PC.check(ok + " https://x.com", "two_host"))
+    assert any("unknown speaker" in e for e in PC.check(ok.replace("MAYA:", "BOB:", 1), "two_host"))
+    saved, tmp = (PC.POD, PC.KEEP), _P(tempfile.mkdtemp())
+    try:
+        PC.POD, PC.KEEP = tmp, 2
+        ep = lambda d, n: {"id": f"{d}-am", "date": d, "title": "T & <x>", "name": n, "url": "u", "bytes": 100, "seconds": 65,
+                           "format_name": "Desk huddle", "published": f"{d}T13:00:00Z"}
+        assert PC.add_episode(ep("2026-11-16", "a.mp3")) == []
+        assert PC.add_episode(ep("2026-11-16", "b.mp3")) == ["a.mp3"]          # same day replaced → old asset deleted
+        PC.add_episode(ep("2026-11-17", "c.mp3"))
+        assert PC.add_episode(ep("2026-11-18", "d.mp3")) == ["b.mp3"]          # trimmed to KEEP
+        eps = _json.loads((tmp / "episodes.json").read_text())["episodes"]
+        assert [e["name"] for e in eps] == ["d.mp3", "c.mp3"]
+        import xml.dom.minidom as _m
+        _m.parseString((tmp / "feed.xml").read_text())
+        assert "Desk huddle" in (tmp / "feed.xml").read_text() and "1:05" in (tmp / "feed.xml").read_text()
+    finally:
+        PC.POD, PC.KEEP = saved
+        shutil.rmtree(tmp)
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

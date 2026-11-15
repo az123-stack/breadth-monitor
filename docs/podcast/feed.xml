@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
+ <channel>
+  <title>Market Monitor · Morning Brief</title>
+  <link>https://az123-stack.github.io/breadth-monitor/v3/</link>
+  <atom:link href="https://az123-stack.github.io/breadth-monitor/podcast/feed.xml" rel="self" type="application/rss+xml"/>
+  <description>The Market Monitor's Brief as a morning show each weekday: the front-page story, macro and the week ahead, and the open trade stories. Written by Claude from the dashboard. Information, not advice.</description>
+  <language>en-us</language>
+  <itunes:author>Market Monitor</itunes:author>
+  <itunes:image href="https://az123-stack.github.io/breadth-monitor/podcast/cover.png"/>
+  <image><url>https://az123-stack.github.io/breadth-monitor/podcast/cover.png</url><title>Market Monitor · Morning Brief</title><link>https://az123-stack.github.io/breadth-monitor/v3/</link></image>
+  <itunes:category text="Business"><itunes:category text="Investing"/></itunes:category>
+  <itunes:explicit>false</itunes:explicit>
+  <itunes:block>Yes</itunes:block>
+
+ </channel>
+</rss>

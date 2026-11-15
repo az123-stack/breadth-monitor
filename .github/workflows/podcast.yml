@@ -1,0 +1,75 @@
+name: Podcast episode
+
+# Morning podcast (breadth/podcast.py). The Claude scheduled task "Market Monitor · podcast" writes the script and dispatches
+# this with it (gzip + base64). The cron is the backup: if no episode exists for today's morning chapter by ~8:40 AM ET it
+# builds a plain read-aloud ("basic") so there is always an episode. Audio = release `podcast` assets; feed = docs/podcast/feed.xml.
+on:
+  workflow_dispatch:
+    inputs:
+      date: { description: "YYYY-MM-DD (morning chapter date; empty = latest)", required: false, default: "" }
+      format: { description: "two_host, huddle, narrative, radio or basic (empty = today's rotation / basic without a script)", required: false, default: "" }
+      script_gz_b64: { description: "Script, gzip + base64 (empty = basic read-aloud)", required: false, default: "" }
+      force: { description: "Replace today's episode if it exists (true/false)", required: false, default: "true" }
+  schedule:
+    - cron: "40 13 * * 1-5"   # 8:40 AM ET winter / 9:40 summer: backup read-aloud if the agent didn't publish
+
+permissions:
+  contents: write
+
+concurrency:
+  group: podcast
+  cancel-in-progress: false
+
+jobs:
+  episode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q edge-tts
+      - name: Build the audio
+        id: build
+        env:
+          PDATE: ${{ inputs.date }}
+          PFMT: ${{ inputs.format }}
+          SCRIPT: ${{ inputs.script_gz_b64 }}
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force || 'false' }}
+        run: |
+          set -eo pipefail
+          args=()
+          if [ -z "$PDATE" ] && [ "${{ github.event_name }}" = "schedule" ]; then
+            PDATE=$(TZ=America/New_York date +%F)   # backup only builds TODAY's morning chapter
+          fi
+          [ -n "$PDATE" ] && args+=(--date "$PDATE")
+          if [ -n "$SCRIPT" ]; then
+            echo "$SCRIPT" | base64 -d | gunzip > /tmp/pod.txt
+            args+=(--file /tmp/pod.txt)
+            [ -n "$PFMT" ] && args+=(--format "$PFMT")
+          fi
+          [ "$FORCE" = "true" ] && args+=(--force)
+          python -m breadth.podcast build "${args[@]}" | tee /tmp/build.out || { echo "no chapter / nothing to build"; echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0; }
+          grep -q '"skip"' /tmp/build.out && echo "skip=1" >> "$GITHUB_OUTPUT" || true
+      - name: Upload + update the feed
+        if: steps.build.outputs.skip != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eo pipefail
+          gh release view podcast >/dev/null 2>&1 || gh release create podcast --title "Podcast audio" --prerelease --latest=false \
+            --notes "Audio files for the Market Monitor morning podcast (feed: https://az123-stack.github.io/breadth-monitor/podcast/feed.xml)."
+          FILE=$(python -c "import json;print(json.load(open('/tmp/podcast/ep.json'))['file'])")
+          gh release upload podcast "$FILE" --clobber
+          git config user.name "breadth-bot"
+          git config user.email "breadth-bot@users.noreply.github.com"
+          for i in 1 2 3; do
+            python -m breadth.podcast feed --add /tmp/podcast/ep.json > /tmp/drop.txt
+            git add docs/podcast/episodes.json docs/podcast/feed.xml
+            git diff --cached --quiet && break
+            git commit -qm "Podcast: $(python -c "import json;e=json.load(open('/tmp/podcast/ep.json'));print(e['id'],e['format'])")"
+            git push -q && break
+            git reset -q --hard HEAD~1 && git pull -q --rebase
+          done
+          while read -r old; do [ -n "$old" ] && gh release delete-asset podcast "$old" -y || true; done < /tmp/drop.txt
