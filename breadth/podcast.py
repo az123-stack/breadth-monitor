@@ -370,8 +370,9 @@ def publish(file: str, date: str | None, fmt: str | None, push: bool):
 
 
 # ---------- audio (workflow side) ----------
-FALLBACK = {"MAYA": "en-US-AriaNeural", "JAKE": "en-US-GuyNeural", "ANCHOR": "en-US-ChristopherNeural",
-            "NARRATOR": "en-US-GuyNeural", "DATA": "en-US-JennyNeural"}
+# Same person's standard (non-multilingual) voice, so a fallback line still sounds like the same speaker.
+FALLBACK = {"MAYA": "en-US-AvaNeural", "JAKE": "en-US-AndrewNeural", "ANCHOR": "en-US-BrianNeural",
+            "NARRATOR": "en-US-AndrewNeural", "DATA": "en-US-EmmaNeural"}
 
 
 async def _one(tag: str, text: str, spell: bool) -> bytes:
@@ -379,7 +380,7 @@ async def _one(tag: str, text: str, spell: bool) -> bytes:
     import asyncio
     import edge_tts
     say = ear(text, spell)
-    for attempt, voice in enumerate([VOICES.get(tag, VOICES["ANCHOR"])] * 3 + [FALLBACK.get(tag, "en-US-GuyNeural")] * 2):
+    for attempt, voice in enumerate([VOICES.get(tag, VOICES["ANCHOR"])] * 4 + [FALLBACK.get(tag, "en-US-BrianNeural")] * 2):
         try:
             buf = bytearray()
             async for chunk in edge_tts.Communicate(say, voice, rate=RATE).stream():
@@ -395,7 +396,7 @@ async def _one(tag: str, text: str, spell: bool) -> bytes:
 
 async def _synth(lines, path: Path, spell: bool):
     import asyncio
-    sem = asyncio.Semaphore(4)
+    sem = asyncio.Semaphore(3)
 
     async def run(tag, s):
         async with sem:
