@@ -22,7 +22,7 @@ TABS_JS = Path(__file__).with_name("v3_tabs.js")
 # parent key, label, [(sub-tab key = v1 renderer key, label)]
 NAV = [
     # Nov 14 (Adam: "get the readout and trade stories into a new tab before Market … Brief is great")
-    ("brief", "Brief", [("readout", "Read-out"), ("stories", "Trade stories")]),
+    ("brief", "Brief", [("bfront", "Front page"), ("bstories", "Trade stories"), ("readout", "Read-out")]),   # Nov 15: news-site Brief
     # Nov 4 (Adam: "add intraday and premarket tabs … under their own parent tab where breadth will also reside")
     ("market", "Market", [("breadth", "Breadth"), ("premarket", "Pre-market"), ("intraday", "Intraday"), ("mcheck", "Checklist")]),   # Nov 11: Checklist
     ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle"), ("grotation", "Rotation"), ("gpop", "Pop watch"), ("gemerge", "Since the bottom"), ("gstairs", "Stair steps"), ("gbio", "Biotech"), ("grsrank", "RS ranks")]),   # Nov 7: Since the bottom   # Nov 4: RS ranks   # Nov 4: Pop watch
@@ -50,6 +50,57 @@ NAV_SHOW = """    tabs.querySelectorAll("button").forEach(b => b.setAttribute("a
     tabs.querySelectorAll("button").forEach(b => { b.hidden = parentOf(b.dataset.tab) !== P; });"""
 
 CSS = """
+/* Nov 15 2026 (Adam: "the brief and trade stories in a cleaner format, almost like a news website"): Brief → Front page / Trade stories */
+.news { max-width: 1180px; margin: 0 auto; }
+.masthead { text-align: center; border-bottom: 3px double var(--text-primary); padding: 6px 0 10px; margin: 4px 0 18px; }
+.masthead .mh-name { font-family: Newsreader, Georgia, "Times New Roman", serif; font-weight: 700; font-size: clamp(30px, 5vw, 46px); letter-spacing: -0.5px; line-height: 1.05; }
+.masthead .mh-sub { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--border); margin-top: 8px; padding-top: 6px;
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); }
+.news-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; }
+@media (max-width: 900px) { .news-grid { grid-template-columns: minmax(0, 1fr); } }
+.nkick { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--s2); }
+.nkick .nk2 { color: var(--text-muted); font-weight: 600; }
+.lead h1, .art h1 { font-family: Newsreader, Georgia, serif; font-weight: 700; font-size: clamp(28px, 4.2vw, 42px); line-height: 1.08; letter-spacing: -0.4px; margin: 6px 0 10px; }
+.ndeck { font-family: Newsreader, Georgia, serif; font-size: 20px; line-height: 1.45; color: var(--text-secondary); margin: 0 0 14px; }
+.nbyline { font-size: 12.5px; color: var(--text-muted); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 7px 0; margin-bottom: 18px; }
+.nbody { font-family: Newsreader, Georgia, serif; font-size: 18.5px; line-height: 1.62; max-width: 720px; }
+.nbody p { margin: 0 0 14px; }
+.nbody ul { margin: 0 0 16px; padding-left: 22px; } .nbody li { margin: 0 0 8px; }
+.nbody a { color: var(--s1); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.nbody h3.nsec, .art h3.nsec { font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px;
+  margin: 26px 0 8px; padding-top: 10px; border-top: 1px solid var(--border); color: var(--text-primary); }
+.rail h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--text-primary); }
+.rail section { margin-bottom: 26px; }
+.rail .ri { padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+.rail .ri:last-child { border-bottom: none; }
+.rail .ri b.rt { display: block; font-family: Newsreader, Georgia, serif; font-size: 17.5px; line-height: 1.25; margin: 3px 0; }
+.rail .ri:hover b.rt, .ncard:hover h2 { text-decoration: underline; text-decoration-thickness: 1px; }
+.rail .ri small { color: var(--text-secondary); line-height: 1.4; display: block; }
+.rail .ri.on b.rt { color: var(--s1); }
+.ncal { display: grid; grid-template-columns: 54px 1fr; gap: 2px 10px; font-size: 13.5px; }
+.ncal .d { font-weight: 700; } .ncal .w { color: var(--text-secondary); font-size: 12.5px; }
+.npill { display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; padding: 2px 7px; border-radius: 3px; }
+.npill.building { background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good); }
+.npill.peaking { background: color-mix(in srgb, var(--warning) 22%, transparent); color: color-mix(in srgb, var(--warning) 70%, var(--text-primary)); }
+.npill.fading { background: color-mix(in srgb, var(--critical) 16%, transparent); color: var(--critical); }
+.npill.resolved { background: var(--neutral-mid); color: var(--text-muted); }
+.ngrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0 28px; }
+.ncard { padding: 18px 0; border-top: 1px solid var(--border); cursor: pointer; }
+.ncard.top { grid-column: 1 / -1; border-top: none; padding-top: 4px; }
+.ncard h2 { font-family: Newsreader, Georgia, serif; font-weight: 700; font-size: 25px; line-height: 1.15; margin: 6px 0 8px; }
+.ncard.top h2 { font-size: clamp(30px, 4vw, 40px); }
+.ncard p { font-family: Newsreader, Georgia, serif; font-size: 17px; line-height: 1.5; color: var(--text-secondary); margin: 0 0 8px; }
+.ncard .nchg { font-size: 13.5px; color: var(--text-primary); } .ncard .meta { font-size: 12px; }
+.nback { background: none; border: none; color: var(--s1); font: inherit; font-weight: 600; cursor: pointer; padding: 0; margin: 0 0 12px; }
+.art { max-width: 760px; }
+.art .storycard { border: none; background: none; box-shadow: none; padding: 0; margin: 0; }
+.art .storycard > summary { display: none; }
+.art .stbody { font-family: Newsreader, Georgia, serif; font-size: 18px; line-height: 1.6; }
+.art .stbody .sth { font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px; margin: 26px 0 8px; padding-top: 10px; border-top: 1px solid var(--border); }
+.art .stbody .stpart > b { display: block; font-family: Inter, system-ui, sans-serif; font-size: 14px; margin: 14px 0 4px; }
+.art .stbody table, .art .stbody .htiles { font-family: Inter, system-ui, sans-serif; font-size: 14px; }
+.art .stbody .sttl li { margin: 0 0 10px; }
+.nearlier .ri { display: grid; grid-template-columns: 66px 1fr; gap: 8px; align-items: baseline; }
 /* v3 (Oct 30 2026): parent tabs → sub-tabs */
 .ptabs { display: flex; gap: 6px; margin: 0 0 6px; overflow-x: auto; scrollbar-width: none; }
 .ptabs::-webkit-scrollbar { display: none; }
@@ -230,7 +281,7 @@ SWAPS = [
     ('function pulseCard(T) {', PULSE_V3, "compact long / short cards (v1 version kept as pulseCardV1)"),
     (MODE_BTN_OLD, MODE_BTN_NEW, "Light / Dark switch in the header"),
     (MODE_JS_OLD, MODE_JS_NEW, "Light / Dark switch behaviour"),
-    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, sstrong: renderStrongest, sinplay: renderInPlay, sheavy: renderHeavy, mcheck: renderChecklist, gstairs: renderStairsV3, gbio: renderBiotech, sairev: renderAIRev, breadth: renderBreadthV3, gpop: renderPopWatch, gemerge: renderEmerge, grsrank: renderRsRanks, themes: renderThemesTab,', "Theme Dash renderer"),
+    ('  const R = { themes: renderThemesTab,', '  const R = { themedash: renderThemeDash, oracle: renderOracle, grotation: renderGroupRotation, ssetups: renderStockSetups, sleaders: renderLeadership, sstrong: renderStrongest, sinplay: renderInPlay, sheavy: renderHeavy, mcheck: renderChecklist, bfront: renderFrontPage, bstories: renderNewsStories, gstairs: renderStairsV3, gbio: renderBiotech, sairev: renderAIRev, breadth: renderBreadthV3, gpop: renderPopWatch, gemerge: renderEmerge, grsrank: renderRsRanks, themes: renderThemesTab,', "Theme Dash renderer"),
     ('function renderTab(panel) {', None, "Theme Dash code (v3_themedash.js) before renderTab"),
     # Nov 4 (Adam): Market health lives on Stocks → Leadership, and the stat tiles aren't needed ("I just look at the charts") →
     # v3 Breadth = regime, macro strip, washout card, signals, charts, table. v1 keeps them.
@@ -242,6 +293,7 @@ SWAPS = [
     ('  if (last.clv_all != null) app.append(closeTiles(rows, last));\n', '', "Breadth: who-won-the-close tiles off"),
     ('  if (DX && DX.dev != null) app.append(dixTiles(DX));\n', '', "Breadth: hidden buying tiles off"),
     ('</style>', CSS, "v3 styles (first </style> only)"),
+    ('family=Inter:wght@400;500;600;700&', 'family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&', "Newsreader serif for the Brief"),
 ]
 
 

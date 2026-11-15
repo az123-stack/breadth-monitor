@@ -789,6 +789,12 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   (`hveCard`), each with a ticks() for "⬇ All setups" (`bestTicks`, `launchTicks`, `tradeTicks`, `momentumTicks`, `hveTicks`). Groups →
   Rotation now also shows ignition, rotation ideas, money flow (RRG), pair chart, timeline; new Groups → Stair steps (`stairsCard`) and
   Groups → Biotech (`renderBiotech`). v1 renderers reused unchanged, so v1 must keep building until they move into v3 files.
+- **Brief as a news site** (Nov 15, 2026; Adam: "the brief and trade stories in a cleaner format, almost like a news website"): Brief =
+  Front page (`renderFrontPage`: masthead, latest story.json chapter as the lead article (deck = first 2 sentences, "**Label:**" paragraphs
+  → section heads via `newsBody`), rail = open trade stories (click → `NEWS_OPEN` → Trade stories article; `v3Go` redraws the cached pane),
+  Coming up (stories' future catalysts), Earlier editions (last 12 chapters, click to read)) · Trade stories (`renderNewsStories`: magazine
+  grid, lead story full width, resolved below; click → article = header + `storyCardFull` body restyled) · Read-out (unchanged, live tools).
+  Styles in v3site CSS (`.news`, `.masthead`, `.nbody`, `.ncard`, `.art`); Newsreader serif added to the Google Fonts link (v3 only).
 - **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
   `build(adjusted, theme_data)` (~70 s) → `DATA.themes.inplay` {date, days, rows, n, counts, pool {t: [adr, v50, sub]}}, v3 Stocks → **In Play**
   (`renderInPlay` in v3_tabs.js). Universe stocks $5+, $10M+/day (no deals), last 5 sessions: news = gap ≥ max(3%, 1 ADR) on 2.5x vol

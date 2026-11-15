@@ -832,3 +832,90 @@ function renderChecklist(app) {
       Thresholds are judgment calls, not backtested. Related evidence: high-beta bounces lasted only after deep washouts (T2108 ≤ 25); setups paid in the 5 sessions after a breadth thrust.</p></section>`);
   app.append(card);
 }
+// Nov 15, 2026 (Adam: "put the brief and trade stories in a cleaner format, almost like a news website"): Brief → Front page (latest story
+// chapter as the lead article, trade-story headlines, coming-up calendar, earlier editions) and Brief → Trade stories (magazine grid →
+// full article). Reads docs/story.json and docs/stories.json (written by the story agents); the Read-out keeps the live tools.
+let NEWS_OPEN = null;   // a front-page headline click → open that story on the Trade stories tab
+const NEWS_SLOT = { am: "Morning edition", pm: "After the close", data: "8:30 data card" };
+const NEWS_BR = { A: "Scenario A · money leaving", B: "Scenario B · money coming back", W: "Scenario W · whipsaw" };
+function newsBody(md) {
+  // "**Label:** text" paragraphs become section heads; the first plain paragraph is the deck
+  const html = mdLite(md);
+  return html.replace(/<p><b>([^<]{2,60}?):?<\/b>:?\s*/g, (m, lab) => `<h3 class="nsec">${lab.replace(/:$/, "")}</h3><p>`).replace(/<p>\s*<\/p>/g, "");
+}
+function newsLoad() {
+  if (!STORYJ && !STORY_ERR && !STORY_BUSY) fetchStory().then(() => rerenderPanel());
+  if (!STORIESJ && !STORIES_ERR && !STORIES_BUSY) fetchStories().then(() => rerenderPanel());
+}
+function newsWhen(c) { return `${longDate(c.date)} · ${NEWS_SLOT[c.slot] || c.slot}`; }
+function renderFrontPage(app) {
+  newsLoad();
+  const CH = ((STORYJ || {}).chapters || []).slice().sort((a, b) => (a.date + (a.slot === "am" ? "1" : a.slot === "data" ? "2" : "3")).localeCompare(b.date + (b.slot === "am" ? "1" : b.slot === "data" ? "2" : "3")));
+  if (!CH.length) { app.append($(`<div class="card empty">${STORY_ERR ? "Couldn't load the story: " + esc(STORY_ERR) : "Loading the front page…"}</div>`)); return; }
+  UI.news = UI.news || { i: null };
+  const U = UI.news, i = U.i == null || U.i >= CH.length ? CH.length - 1 : U.i, c = CH[i];
+  const md = String(c.md || ""), paras = md.split(/\n{2,}/);
+  // deck = the "Where we are" paragraph without its label (first ~2 sentences)
+  const first = (paras[0] || "").replace(/^\*\*[^*]+\*\*:?\s*/, "");
+  const sents = first.split(/(?<=[.!?])\s+/), deck = sents.slice(0, 2).join(" ");
+  // the deck already carries the first two sentences: start the body's "Where we are" after them
+  const lab = ((paras[0] || "").match(/^\*\*[^*]+\*\*:?\s*/) || [""])[0], rest = sents.slice(2).join(" ");
+  const bodyMd = [rest ? lab + rest : "", ...paras.slice(1)].filter(Boolean).join("\n\n");
+  const SS = ((STORIESJ || {}).stories || []).filter(s => s.status !== "resolved");
+  const today = etToday(), cal = [];
+  SS.forEach(s => (s.catalysts || []).forEach(k => { if (k.date >= today) cal.push({ ...k, st: s.title }); }));
+  const seen = new Set(), calU = cal.sort((a, b) => a.date.localeCompare(b.date)).filter(k => { const key = k.date + k.name; if (seen.has(key)) return false; seen.add(key); return true; }).slice(0, 8);
+  const latest = CH[CH.length - 1], dataDate = (DATA.themes || {}).date;
+  const page = $(`<div class="news">
+    <header class="masthead"><div class="mh-name">The Market Monitor</div>
+      <div class="mh-sub"><span>${longDate(etToday())}</span><span>${esc(NEWS_SLOT[latest.slot] || "")} · ${shortDate(latest.date)}</span><span>Official data through ${dataDate ? shortDate(dataDate) : "–"}</span></div></header>
+    <div class="news-grid">
+      <article class="lead">
+        <div class="nkick">${esc(NEWS_SLOT[c.slot] || c.slot)} ${c.branch && NEWS_BR[c.branch] ? `<span class="nk2">· ${NEWS_BR[c.branch]}</span>` : ""}${i < CH.length - 1 ? ' <span class="nk2">· earlier edition</span>' : ""}</div>
+        <h1>${esc(c.title || "Market update")}</h1>
+        ${deck ? `<p class="ndeck">${mdLite(deck).replace(/^<p>|<\/p>$/g, "")}</p>` : ""}
+        <div class="nbyline">${newsWhen(c)} · written by the Market Monitor story agent from the dashboard's numbers${c.written ? " · " + esc(String(c.written).slice(11, 16)) + " UTC" : ""}</div>
+        <div class="nbody">${newsBody(deck ? bodyMd : md)}</div>
+        ${i < CH.length - 1 ? `<button class="nback nlatest">← Back to the latest edition</button>` : ""}
+      </article>
+      <aside class="rail">
+        <section><h4>Trade stories</h4>${SS.length ? SS.map(s => `<div class="ri nstory" data-id="${esc(s.id)}"><span class="npill ${esc(s.status)}">${esc(s.status)}</span>
+          <b class="rt">${esc(s.title)}</b><small>${esc(s.changed || s.summary || "")}</small></div>`).join("") : `<small class="meta">${STORIES_ERR ? esc(STORIES_ERR) : "Loading…"}</small>`}</section>
+        ${calU.length ? `<section><h4>Coming up</h4><div class="ncal">${calU.map(k => `<span class="d">${shortDate(k.date)}</span><span>${esc(k.name)}${k.time ? ` <span class="w">· ${esc(k.time)}</span>` : ""}</span>`).join("")}</div></section>` : ""}
+        <section class="nearlier"><h4>Earlier editions</h4>${CH.slice(-12).reverse().map(x => { const j = CH.indexOf(x); return `<div class="ri nch${j === i ? " on" : ""}" data-i="${j}"><small>${shortDate(x.date)}<br>${esc((NEWS_SLOT[x.slot] || x.slot).replace(" edition", ""))}</small><b class="rt" style="font-size:15.5px">${esc(x.title || "")}</b></div>`; }).join("")}</section>
+      </aside>
+    </div></div>`);
+  page.querySelectorAll(".nch").forEach(el => el.addEventListener("click", () => { U.i = +el.dataset.i; rerenderPanel(); window.scrollTo({ top: 0, behavior: "smooth" }); }));
+  const lb = page.querySelector(".nlatest"); if (lb) lb.addEventListener("click", () => { U.i = null; rerenderPanel(); });
+  page.querySelectorAll(".nstory").forEach(el => el.addEventListener("click", () => { NEWS_OPEN = el.dataset.id; v3Go("bstories"); }));
+  app.append(page);
+}
+function v3Go(k) { try { const b = document.querySelector(`nav.tabs button[data-tab="${k}"]`); if (b) { b.click(); rerenderPanel(); window.scrollTo({ top: 0 }); return; } /* panes are cached: redraw so the chosen story opens */ } catch (e) {} rerenderPanel(); }
+function renderNewsStories(app) {
+  newsLoad();
+  const all = ((STORIESJ || {}).stories || []);
+  if (!all.length) { app.append($(`<div class="card empty">${STORIES_ERR ? "Couldn't load the trade stories: " + esc(STORIES_ERR) : "Loading the trade stories…"}</div>`)); return; }
+  UI.nst = UI.nst || { open: null };
+  if (NEWS_OPEN) { UI.nst.open = NEWS_OPEN; NEWS_OPEN = null; }
+  const U = UI.nst, open = all.find(s => s.id === U.open), upd = (STORIESJ || {}).updated;
+  const age = (s) => Math.max(0, Math.round((new Date(etToday() + "T12:00:00") - new Date(s.started + "T12:00:00")) / 864e5));
+  if (open) {
+    const art = $(`<div class="news"><article class="art"><button class="nback">← All trade stories</button>
+      <div class="nkick"><span class="npill ${esc(open.status)}">${esc(open.status)}</span> <span class="nk2">· day ${age(open)} · since ${shortDate(open.started)} · updated ${shortDate(open.updated)}</span></div>
+      <h1>${esc(open.title)}</h1><p class="ndeck">${esc(open.summary || "")}</p>
+      ${open.changed ? `<div class="nbyline"><b>Latest:</b> ${esc(open.changed)}</div>` : ""}
+      ${storyCardFull(open, true)}</article></div>`);
+    art.querySelector(".nback").addEventListener("click", () => { U.open = null; rerenderPanel(); window.scrollTo({ top: 0 }); });
+    art.querySelectorAll("[data-story]").forEach(el => el.addEventListener("click", (e) => { e.preventDefault(); U.open = el.dataset.story; rerenderPanel(); window.scrollTo({ top: 0 }); }));
+    app.append(art); return;
+  }
+  const live = all.filter(s => s.status !== "resolved"), done = all.filter(s => s.status === "resolved");
+  const card = (s, top) => `<div class="ncard${top ? " top" : ""}" data-id="${esc(s.id)}"><div class="nkick"><span class="npill ${esc(s.status)}">${esc(s.status)}</span> <span class="nk2">· day ${age(s)} · updated ${shortDate(s.updated)}</span></div>
+    <h2>${esc(s.title)}</h2><p>${esc(s.summary || "")}</p>${s.changed ? `<div class="nchg"><b>Latest:</b> ${esc(s.changed)}</div>` : ""}</div>`;
+  const page = $(`<div class="news"><header class="masthead"><div class="mh-name">Trade Stories</div>
+      <div class="mh-sub"><span>The multi-day narratives moving groups</span><span>${live.length} open · ${done.length} resolved</span><span>Updated ${upd ? shortDate(String(upd).slice(0, 10)) : "–"}</span></div></header>
+    <div class="ngrid">${live.map((s, k) => card(s, k === 0)).join("")}</div>
+    ${done.length ? `<h4 style="font-size:12px;text-transform:uppercase;letter-spacing:1px;margin:26px 0 0;border-bottom:2px solid var(--text-primary);padding-bottom:6px">Resolved</h4><div class="ngrid">${done.map(s => card(s, false)).join("")}</div>` : ""}</div>`);
+  page.querySelectorAll(".ncard").forEach(el => el.addEventListener("click", () => { U.open = el.dataset.id; rerenderPanel(); window.scrollTo({ top: 0 }); }));
+  app.append(page);
+}
