@@ -50,7 +50,11 @@ jobs:
             [ -n "$PFMT" ] && args+=(--format "$PFMT")
           fi
           [ "$FORCE" = "true" ] && args+=(--force)
-          python -m breadth.podcast build "${args[@]}" | tee /tmp/build.out || { echo "no chapter / nothing to build"; echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0; }
+          if ! python -m breadth.podcast build "${args[@]}" | tee /tmp/build.out; then
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+            # the backup cron quietly skips days with no morning chapter; a dispatched script that fails shows red
+            [ "${{ github.event_name }}" = "schedule" ] && exit 0 || exit 1
+          fi
           grep -q '"skip"' /tmp/build.out && echo "skip=1" >> "$GITHUB_OUTPUT" || true
       - name: Upload + update the feed
         if: steps.build.outputs.skip != '1'

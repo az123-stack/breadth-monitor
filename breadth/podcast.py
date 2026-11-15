@@ -370,14 +370,43 @@ def publish(file: str, date: str | None, fmt: str | None, push: bool):
 
 
 # ---------- audio (workflow side) ----------
-async def _synth(lines, path: Path, spell: bool):
+FALLBACK = {"MAYA": "en-US-AriaNeural", "JAKE": "en-US-GuyNeural", "ANCHOR": "en-US-ChristopherNeural",
+            "NARRATOR": "en-US-GuyNeural", "DATA": "en-US-JennyNeural"}
+
+
+async def _one(tag: str, text: str, spell: bool) -> bytes:
+    """One spoken line → mp3 bytes. Retries, then the older (non-multilingual) voice; b'' if it still fails."""
+    import asyncio
     import edge_tts
-    with open(path, "wb") as out:
-        for tag, s in lines:
-            comm = edge_tts.Communicate(ear(s, spell), VOICES.get(tag, VOICES["ANCHOR"]), rate=RATE)
-            async for chunk in comm.stream():
+    say = ear(text, spell)
+    for attempt, voice in enumerate([VOICES.get(tag, VOICES["ANCHOR"])] * 3 + [FALLBACK.get(tag, "en-US-GuyNeural")] * 2):
+        try:
+            buf = bytearray()
+            async for chunk in edge_tts.Communicate(say, voice, rate=RATE).stream():
                 if chunk["type"] == "audio":
-                    out.write(chunk["data"])
+                    buf += chunk["data"]
+            if buf:
+                return bytes(buf)
+        except Exception as e:   # NoAudioReceived / throttling / network blips
+            print(f"  retry {attempt + 1} {tag} ({type(e).__name__}): {say[:60]!r}", file=sys.stderr)
+        await asyncio.sleep(2 + 3 * attempt)
+    return b""
+
+
+async def _synth(lines, path: Path, spell: bool):
+    import asyncio
+    sem = asyncio.Semaphore(4)
+
+    async def run(tag, s):
+        async with sem:
+            return await _one(tag, s, spell)
+    parts = await asyncio.gather(*(run(t, s) for t, s in lines))
+    missing = [lines[i][1][:60] for i, b in enumerate(parts) if not b]
+    if len(missing) > max(1, len(lines) // 10):
+        raise SystemExit(f"TTS failed on {len(missing)} of {len(lines)} lines, e.g. {missing[:3]}")
+    if missing:
+        print(f"warning: skipped {len(missing)} line(s) the voice service refused: {missing}", file=sys.stderr)
+    path.write_bytes(b"".join(parts))
 
 
 def build(file: str | None, date: str | None, fmt: str | None, force: bool = False) -> dict:
