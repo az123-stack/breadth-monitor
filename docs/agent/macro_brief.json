@@ -1,47 +1,62 @@
 {
- "for_date": "2026-11-12",
- "written": "2026-11-13T12:04Z",
- "headline": "10-year yield jumped to 5.10%, oil rose on US-Iran uncertainty and Nvidia lost CEO Jensen Huang, leaving stocks lower into Nvidia earnings on Nov 17.",
+ "for_date": "2026-11-13",
+ "written": "2026-11-16T12:03Z",
+ "headline": "Fed Chair Warsh speaks at noon ET today, then retail sales and Nvidia earnings Tuesday and FOMC minutes Wednesday, with a hawkish Fed and ~5% 10-year yields the key risk.",
  "risk": "high",
- "rates": "The 10-year Treasury yield closed near 5.10%, up about 10 bps, on renewed inflation worries.",
- "fed": "October inflation is still elevated while jobless claims are low, and the October FOMC minutes come out Wednesday Nov 18.",
- "oil": "December crude rose about 2.6% to $88.75 after Trump said the US no longer needs a deal with Iran, raising Strait of Hormuz risk.",
- "geo": "US-Iran diplomacy and Strait of Hormuz risk are driving energy prices; Nvidia's CEO resigned with CFO Colette Kress as interim CEO.",
+ "rates": "The 10-year Treasury yield is reported near 5.15% after hotter inflation data, and some traders price a possible half-point December hike.",
+ "fed": "The Fed held at 3.75%-4.00% on Oct 28 (10-2 vote); Williams speaks today at 9:05 AM ET, Warsh at noon ET, and FOMC minutes come Wednesday at 2 PM ET.",
+ "oil": "Brent settled about $95.84 and WTI about $88.56 on Friday, after a second weekly loss on supply-surplus worries, with US-Iran tensions still keeping a bid under prices.",
+ "geo": "US-Iran tensions persist (Trump said the US doesn't need a deal with Iran); Anthropic is expected to begin Nasdaq trading Thursday.",
  "events": [
   {
-   "date": "2026-11-13",
-   "time": "8:30 AM ET",
-   "name": "PPI (October)",
+   "date": "2026-11-16",
+   "time": "9:05 AM ET",
+   "name": "Fed's Williams speaks",
    "impact": "medium"
+  },
+  {
+   "date": "2026-11-16",
+   "time": "12:00 PM ET",
+   "name": "Fed Chair Warsh speaks",
+   "impact": "high"
   },
   {
    "date": "2026-11-17",
    "time": "8:30 AM ET",
-   "name": "Retail sales (October)",
+   "name": "US retail sales (Oct)",
    "impact": "medium"
   },
   {
    "date": "2026-11-17",
-   "time": "After close (call\u2026",
-   "name": "Nvidia Q3 FY27 earnings",
+   "time": "After close",
+   "name": "Nvidia earnings",
    "impact": "high"
   },
   {
    "date": "2026-11-18",
    "time": "2:00 PM ET",
-   "name": "FOMC minutes (October meeting)",
+   "name": "FOMC minutes",
    "impact": "high"
   },
   {
+   "date": "2026-11-19",
+   "time": "Before the open",
+   "name": "Walmart earnings",
+   "impact": "medium"
+  },
+  {
    "date": "2026-11-20",
-   "time": "9:30 AM ET",
-   "name": "Monthly options expiration",
+   "time": "10:00 AM ET",
+   "name": "Final UMich sentiment / monthly options expiry",
    "impact": "medium"
   }
  ],
  "sources": [
-  "https://vistapglobal.com/stock-market-today-november-12-2026-stocks-fall-as-treasury-yields-hit-5-10-oil-rises-and-nvidia-faces-leadership-reset-amd-crwv-eprx-googl-modd-msft-nvda-ser-spcx-ttek-ual/",
-  "https://www.simianx.ai/stories/us-economic-calendar-this-month-in-your-time-zone",
-  "https://roboforex.com/blog/analysis/nvidia-earnings-date-interim-ceo-scenarios/"
+  "https://thriveinmarkets.com/market-insights/week-ahead-2026-11-16/",
+  "https://thriveinmarkets.com/calendar/2026-11-16/",
+  "https://www.gate.com/news/detail/brent-crude-settles-9584-after-second-weekly-loss-on-supply-surplus-25618627",
+  "https://marketscreener.com/news/december-wti-crude-oil-contract-closes-down-0-18-or-0-2-settles-at-88-56-per-barrel-january-br-ce785eded98bf326",
+  "https://www.thevibes.com/articles/business/129483/oil-steadies-as-us-iran-tensions-persist",
+  "https://www.bloomberg.com/news/articles/2026-11-12/latest-oil-market-news-and-analysis-for-nov-13"
  ]
 }
