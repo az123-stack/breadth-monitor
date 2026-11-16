@@ -1,21 +1,21 @@
 {
- "for_date": "2026-11-12",
- "written": "2026-11-13T12:14Z",
+ "for_date": "2026-11-13",
+ "written": "2026-11-16T12:14Z",
  "stocks": {
   "ACN": {
-   "why": "No fresh hard news found; coverage is the fiscal Q4 beat (revenue $18.68B) and record large client bookings, with AI-disruption worries in the background.",
-   "direction": "mixed",
+   "why": "Early-November coverage asks what just happened to the stock after its fiscal Q4 report (revenue $18.68B beat); no fresh hard news found since.",
+   "direction": "none",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
     "https://www.trefis.com/stock/acn/articles/623247/what-just-happened-to-accenture-stock/2026-11-06",
-    "https://www.webull.com/news/15672916112983040"
+    "https://www.quiverquant.com/news/Accenture+Q4+Revenue+Reaches+%2418.68+Billion+as+GAAP+EPS+Climbs+46%25"
    ]
   },
   "FDS": {
-   "why": "Record subscription value growth last quarter but the guidance held back the stock; dividend declared. No fresh catalyst found.",
+   "why": "Last result showed record subscription value gains but the guidance held the stock back; recent news is only a dividend declaration.",
    "direction": "mixed",
    "quality": "real",
    "depth": "full",
@@ -23,39 +23,64 @@
    "red_flags": [],
    "sources": [
     "https://stock3.com/news/factset-rekordzuwachs-beim-abo-wert-doch-die-prognose-bremst-17310527",
-    "https://finviz.com/news/418338/factset-declares-dividend"
+    "https://www.streetinsider.com/Globe+Newswire/FactSet+Declares+Dividend/27304292.html"
    ]
   },
   "GEN": {
-   "why": "Fiscal Q2 (reported Oct 28) beat estimates and raised the outlook; about two weeks old.",
+   "why": "No clear catalyst found; only generic quote and outlook pages came back.",
+   "direction": "none",
+   "quality": "none",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.benzinga.com/quote/GEN/charts"
+   ]
+  },
+  "AGL": {
+   "why": "Q3 2026 results (Nov 5): swung to a profit and raised EBITDA guidance again, though one-time catch-ups and a softer 2027 tailwind temper the beat.",
+   "direction": "positive",
+   "quality": "strong",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [
+    "one-time catch-ups; softer 2027 tailwind"
+   ],
+   "sources": [
+    "https://finviz.com/news/416326/agilon-health-swings-to-a-197-profit-and-lifts-ebitda-guide-again-but-one-time-catch-ups-and-a-softer-2027-tailwind-temper-the-beat",
+    "https://finviz.com/news/415938/agilon-health-reports-third-quarter-2026-results"
+   ]
+  },
+  "FIGS": {
+   "why": "Q3 beat and raise, the fourth straight; stock popped Nov 9. A Jordan supply squeeze caps near-term upside.",
+   "direction": "positive",
+   "quality": "strong",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [
+    "Jordan supply squeeze"
+   ],
+   "sources": [
+    "https://finviz.com/news/418105/figs-beats-and-raises-for-a-fourth-straight-call-but-a-jordan-supply-squeeze-caps-near-term-upside",
+    "https://www.fool.com/investing/2026/11/09/why-figs-stock-popped-today/"
+   ]
+  },
+  "PRCH": {
+   "why": "Q3 EPS 12c vs 6c a year ago; also retired most of its 2026 convertible notes.",
    "direction": "positive",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.chartmill.com/news/GEN/Chartmill-37237-GEN-DIGITAL-INC-NASDAQGEN-Surpasses-Q2-FY2026-Estimates-and-Raises-Outlook",
-    "https://www.marketbeat.com/instant-alerts/transcript-gen-digital-q2-earnings-call-highlights-2026-10-28/"
-   ]
-  },
-  "FIGS": {
-   "why": "Q3 beat and raise, fourth in a row, stock popped Nov 9; a Jordan supply squeeze caps near-term upside.",
-   "direction": "positive",
-   "quality": "strong",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [
-    "Jordan supply constraint"
-   ],
-   "sources": [
-    "https://www.fool.com/investing/2026/11/09/why-figs-stock-popped-today/",
-    "https://finviz.com/news/418105/figs-beats-and-raises-for-a-fourth-straight-call-but-a-jordan-supply-squeeze-caps-near-term-upside"
+    "https://www.nasdaq.com/articles/porch-group-reports-q3-eps-12c-vs-6c-last-year",
+    "https://quantisnow.com/insight/porch-group-announces-closing-of-transaction-retiring-majority-of-2026-unsecured-notes-and-plans-6060823"
    ]
   },
   "GKOS": {
-   "why": "Q3 (Oct 28) revenue up 58% to $211M, first operating profit, stock up ~17% after hours; Epioxa launch adds growth.",
+   "why": "Record Q3 (Oct 28): revenue up 58% to $211M, first operating profit; stock jumped about 17% after hours.",
    "direction": "positive",
-   "quality": "real",
+   "quality": "strong",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [],
@@ -65,45 +90,22 @@
    ]
   },
   "PLSE": {
-   "why": "Q3 (Nov 5) EPS beat and pivotal study enrolment finished early, but CE mark timelines slipped and spending rose.",
+   "why": "Q3 (Nov 5): EPS beat and pivotal enrollment finished early, but CE Mark timelines slipped and spending is rising.",
    "direction": "mixed",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "CE mark timeline slip",
-    "rising spending"
+    "CE Mark delay; rising spend"
    ],
    "sources": [
     "https://finviz.com/news/418055/pulse-biosciences-beats-on-eps-and-finishes-pivotal-enrollment-early-but-ce-mark-timelines-slip-and-spending-rises"
    ]
   },
-  "ANDG": {
-   "why": "No clear catalyst found; company closed three acquisitions earlier.",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/413379/andersen-group-closes-three-strategic-acquisitions-further-accelerating-global-expansion"
-   ]
-  },
-  "CYRX": {
-   "why": "Q3 (Nov 5) revenue beat and guidance raised again; EPS missed.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/418113/cryoport-misses-on-eps-but-beats-on-revenue-and-raises-guidance-again-while-its-regulatory-catalyst-calendar-keeps-shrinking"
-   ]
-  },
   "ANF": {
-   "why": "No clear fresh catalyst found; Q3 report is scheduled for Nov 24.",
+   "why": "Q3 report due Nov 24 (confirmed by company release); no fresh catalyst before then.",
    "direction": "none",
-   "quality": "none",
+   "quality": "real",
    "depth": "full",
    "earnings_date": "2026-11-24",
    "red_flags": [],
@@ -111,45 +113,38 @@
     "https://finviz.com/news/412527/abercrombie-fitch-co-to-report-third-quarter-2026-results-on-november-24-2026"
    ]
   },
-  "TBBB": {
-   "why": "Q3 turned profitable, fourth straight quarter of acceleration, stock jumped; guidance only reaffirmed.",
+  "SN": {
+   "why": "Q3 2026 results (Nov 4): about 20% revenue growth, raised guidance; operational challenges noted.",
    "direction": "positive",
-   "quality": "real",
+   "quality": "strong",
    "depth": "full",
    "earnings_date": null,
-   "red_flags": [],
+   "red_flags": [
+    "operational challenges"
+   ],
+   "sources": [
+    "https://finviz.com/news/415273/sharkninja-reports-third-quarter-2026-results",
+    "https://www.panabee.com/news/sharkninja-earnings-q3-2026-report"
+   ]
+  },
+  "TBBB": {
+   "why": "Q3 results turned profitable, fourth straight quarter of acceleration; guidance only reaffirmed and profit is thin.",
+   "direction": "positive",
+   "quality": "strong",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [
+    "thin profit"
+   ],
    "sources": [
     "https://www.webull.com/news/15862517027595264",
     "https://finviz.com/news/414984/tiendas-3bs-acceleration-extends-to-a-fourth-straight-quarter-but-reaffirmed-guidance-and-a-thin-profit-keep-the-beat-in-perspective"
    ]
   },
-  "PRCH": {
-   "why": "Q3 EPS 12c vs 6c a year ago and most of the 2026 convertible notes retired.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nasdaq.com/articles/porch-group-reports-q3-eps-12c-vs-6c-last-year"
-   ]
-  },
-  "GDYN": {
-   "why": "Q3 revenue up 10% to $114M, gross margin 40%, AI revenue surge; Needham stays bullish.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.panabee.com/news/grid-dynamics-earnings-q3-2026-report",
-    "https://www.webull.com/news/15856068283622400"
-   ]
-  },
   "HAE": {
-   "why": "Fiscal Q2 (Nov 5) beat and raise on CSL-fuelled plasma growth, but margin guidance was cut.",
-   "direction": "mixed",
-   "quality": "real",
+   "why": "FQ2 2027 (Nov 5): beat and raise on CSL-driven plasma surge, but margin guide was cut.",
+   "direction": "positive",
+   "quality": "strong",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
@@ -160,32 +155,72 @@
    ]
   },
   "AZTA": {
-   "why": "Shares fell ~9% on Oct 16; recent headlines include a late annual-report filing notice and modest FY27 organic growth outlook of 3-5%.",
-   "direction": "negative",
-   "quality": "weak",
+   "why": "FQ4 2026 reported with an EPS beat and FY2027 outlook; no newer catalyst found.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://247wallst.com/cards/azenta-q4-2026-earnings-azta-01m73p8ee0mkv78s0qpgfwqb6p"
+   ]
+  },
+  "CYRX": {
+   "why": "Q3 beat on gross margin surge, but slowing growth and a fading EBITDA outlook leave a rallied stock little room for error. (Ticker CTKB in sources.)",
+   "direction": "mixed",
+   "quality": "real",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "NT 10-K late filing notice",
-    "soft FY27 growth outlook"
+    "slowing growth; fading EBITDA outlook"
    ],
    "sources": [
-    "https://www.marketbeat.com/instant-alerts/price-azenta-nasdaq-azta-shares-down-93-whats-next-2026-10-16/",
-    "https://www.panabee.com/news/azenta-earnings-q4-2026"
+    "https://finviz.com/news/416344/cytek-beats-on-a-gross-margin-surge-but-slowing-growth-and-a-fading-ebitda-outlook-leave-a-rallied-stock-little-room-for-error"
    ]
   },
-  "SN": {
-   "why": "Q3 beat and raised again, but tariff refunds flatter margin and Q4 profit growth slows.",
+  "GDYN": {
+   "why": "Q3 revenue up 10% to $114M, gross margin 40%, AI revenue push; stock reported up about 22% on the report.",
    "direction": "positive",
    "quality": "strong",
    "depth": "full",
    "earnings_date": null,
-   "red_flags": [
-    "tariff refunds flatter margin"
-   ],
+   "red_flags": [],
    "sources": [
-    "https://finviz.com/news/415692/sharkninja-crushes-estimates-and-raises-again-but-tariff-refunds-flatter-the-margin-story-and-q4-profit-growth-slows-sharply",
-    "https://finviz.com/news/415273/sharkninja-reports-third-quarter-2026-results"
+    "https://www.panabee.com/news/grid-dynamics-earnings-q3-2026-report",
+    "https://www.aaii.com/investingideas/article/559719-why-grid-dynamics-holdings-inc8217s-gdyn-stock-is-up-2192"
+   ]
+  },
+  "PACS": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.nextearningsdate.com/pacs-group.html"
+   ]
+  },
+  "HELE": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.nextearningsdate.com/hele.html"
+   ]
+  },
+  "U": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.nextearningsdate.com/unity-software.html"
    ]
   },
   "OSPN": {
@@ -221,7 +256,7 @@
     "https://www.nextearningsdate.com/lifestance-health-gr.html"
    ]
   },
-  "PACS": {
+  "HUM": {
    "why": "earnings date check only",
    "direction": "none",
    "quality": "unknown",
@@ -229,10 +264,10 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.nextearningsdate.com/pacs-group.html"
+    "https://nextearningsdate.com/humana.html"
    ]
   },
-  "HELE": {
+  "XMTR": {
    "why": "earnings date check only",
    "direction": "none",
    "quality": "unknown",
@@ -240,7 +275,7 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.nextearningsdate.com/hele.html"
+    "https://www.nextearningsdate.com/xometry.html"
    ]
   },
   "NSIT": {
@@ -265,50 +300,6 @@
     "https://www.nextearningsdate.com/con.html"
    ]
   },
-  "XMTR": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/xometry.html"
-   ]
-  },
-  "ATRC": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/atricure.html"
-   ]
-  },
-  "RVTY": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/stocks/NYSE/RVTY/earnings/"
-   ]
-  },
-  "RPD": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/stocks/NASDAQ/RPD/earnings"
-   ]
-  },
   "NIQ": {
    "why": "earnings date check only",
    "direction": "none",
@@ -329,193 +320,6 @@
    "red_flags": [],
    "sources": [
     "https://nextearningsdate.com/elf.html"
-   ]
-  },
-  "AMRX": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/amrx.html"
-   ]
-  },
-  "TENB": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/tenable-holdings.html"
-   ]
-  },
-  "BTSG": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://nextearningsdate.com/brightspring-health.html"
-   ]
-  },
-  "AVTR": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/avantor.html"
-   ]
-  },
-  "VRNS": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/varonis-systems.html"
-   ]
-  },
-  "CART": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.tipranks.com/stocks/CART/earnings"
-   ]
-  },
-  "SIBN": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/sibn.html"
-   ]
-  },
-  "ETSY": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/stocks/NYSE/ETSY/earnings/"
-   ]
-  },
-  "RPRX": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/stocks/NASDAQ/RPRX/earnings"
-   ]
-  },
-  "VTRS": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/vtrs.html"
-   ]
-  },
-  "SLDE": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/slide-insurance-holdings.html"
-   ]
-  },
-  "EPAM": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/stocks/NYSE/EPAM/earnings/"
-   ]
-  },
-  "WST": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/west-pharmaceutical-servs.html"
-   ]
-  },
-  "CDW": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/stocks/NASDAQ/CDW/earnings"
-   ]
-  },
-  "LLY": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://nextearningsdate.com/eli-lilly.html"
-   ]
-  },
-  "TEVA": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.marketbeat.com/stocks/NYSE/TEVA/earnings/"
-   ]
-  },
-  "MTD": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://nextearningsdate.com/mettler-toledo-intl.html"
    ]
   }
  }
