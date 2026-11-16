@@ -1,6 +1,21 @@
 {
- "updated": "2026-11-15T22:36:41Z",
+ "updated": "2026-11-16T13:15:03Z",
  "episodes": [
+  {
+   "id": "2026-11-16-am",
+   "date": "2026-11-16",
+   "slot": "am",
+   "format": "two_host",
+   "format_name": "Two-host show",
+   "title": "AI chips slide into Nvidia; money hides in health",
+   "name": "2026-11-16-am-two_host-130945.mp3",
+   "url": "https://github.com/az123-stack/breadth-monitor/releases/download/podcast/2026-11-16-am-two_host-130945.mp3",
+   "bytes": 3015936,
+   "seconds": 503,
+   "words": 1302,
+   "summary": "Data today. 12:00 PM Fed Chair Warsh speaks. Markets already price a December hike as certain, so the question is size and pace. Nvidia reports Tuesday after the close and FOMC minutes land Wednesday at 2:00 PM. Where we are. Scenario A (money is still leaving) holds on official numbers for Nov 13: 61.9 percent of dollar volume in falling stocks, net minus 145 billion dollars, 75 stocks up 4 percent+ versus 145 down, T2108 52.5. Friday's pharma-and-consumer shelter was real, but it did not stop",
+   "published": "2026-11-16T13:15:03Z"
+  },
   {
    "id": "2026-11-13-am",
    "date": "2026-11-13",
