@@ -890,3 +890,7 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   (`itunes:block`, public URL like the rest of Pages). Cron 13:40 UTC = backup "basic" read-aloud of today's chapter if no episode.
   FORMATS rotate by trading day from Nov 16 (two_host → huddle → narrative → radio); set `FIXED_FORMAT` when Adam picks. Episode
   titles carry the format name. Info only. Test `test_podcast`.
+  **Listen box** (Nov 16; Adam: "a button in the brief for the podcast … I don't otherwise know where to access that" + "the date/time it
+  updated"): Front page `podBox(c.date)` under the byline (v3_tabs.js, `.npod` CSS in v3site): `<audio>` of the episode for that edition's
+  date (else the latest), format + length, "Updated" = episode `published` in the viewer's time zone, MP3 / Apple Podcasts / Overcast /
+  Pocket Casts / copy-feed links. Reads ../podcast/episodes.json (refetched every 10 min on the tab).

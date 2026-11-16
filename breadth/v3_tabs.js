@@ -848,6 +848,34 @@ function newsLoad() {
   if (!STORIESJ && !STORIES_ERR && !STORIES_BUSY) fetchStories().then(() => rerenderPanel());
 }
 function newsWhen(c) { return `${longDate(c.date)} · ${NEWS_SLOT[c.slot] || c.slot}`; }
+// Nov 16, 2026 (Adam: "put a button in the brief for the podcast version, I don't otherwise know where to access that" + "also have the
+// date/time it updated"): Front page → "Listen" box under the byline: player for the episode (docs/podcast/episodes.json, written by
+// podcast.yml), its format, length and publish time in the viewer's time zone, MP3 download and one-tap subscribe links.
+let PODJ = null, POD_ERR = null, POD_BUSY = false;
+const POD_FEED = "https://az123-stack.github.io/breadth-monitor/podcast/feed.xml";
+async function fetchPod() {
+  if (POD_BUSY) return; POD_BUSY = true;
+  try { const r = await fetch("../podcast/episodes.json?cb=" + Date.now(), { cache: "no-store" }); if (!r.ok) throw new Error("HTTP " + r.status); PODJ = await r.json(); POD_ERR = null; }
+  catch (e) { POD_ERR = String(e.message || e); }
+  POD_BUSY = false; bumpView(); if (TAB === "bfront") rerenderPanel();
+}
+setInterval(() => { if (document.visibilityState === "visible" && TAB === "bfront") fetchPod(); }, 10 * 60 * 1000);
+function podWhen(iso) {
+  try { return new Date(iso).toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }); } catch (e) { return iso; }
+}
+function podBox(chDate) {
+  if (!PODJ && !POD_ERR && !POD_BUSY) fetchPod();
+  const eps = ((PODJ || {}).episodes || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+  if (!eps.length) return `<div class="npod"><div class="npod-h">🎧 Podcast</div><small class="meta">${POD_ERR ? "Couldn't load the episode list (" + esc(POD_ERR) + ")" : PODJ ? "No episodes yet: the first arrives around 8:10 AM ET on a weekday." : "Loading…"}</small></div>`;
+  const ep = eps.find(e => e.date === chDate) || eps[eps.length - 1], latest = eps[eps.length - 1];
+  const mins = Math.max(1, Math.round((ep.seconds || 0) / 60)), feedNoScheme = POD_FEED.replace(/^https:\/\//, "");
+  const notToday = latest.date !== etToday();
+  return `<div class="npod"><div class="npod-h">🎧 Listen to this brief <span class="meta">· ${esc(ep.format_name || "")} · ${mins} min</span></div>
+    <div class="npod-t"><b>Updated ${esc(podWhen(ep.published))}</b> · episode for ${shortDate(ep.date)} morning</div>
+    ${notToday && ep === latest ? `<small class="meta">Today's episode usually lands around 8:10 AM ET (after the morning story). This is the latest one.</small>` : ""}
+    <audio controls preload="none" src="${esc(ep.url)}"></audio>
+    <div class="npod-l"><a href="${esc(ep.url)}" download>⬇ MP3</a><a href="podcast://${esc(feedNoScheme)}">Apple Podcasts</a><a href="overcast://x-callback-url/add?url=${encodeURIComponent(POD_FEED)}">Overcast</a><a href="https://pca.st/subscribe/${esc(feedNoScheme)}" target="_blank" rel="noopener">Pocket Casts</a><a href="#" class="npod-copy">Copy feed URL</a></div></div>`;
+}
 function renderFrontPage(app) {
   newsLoad();
   const CH = ((STORYJ || {}).chapters || []).slice().sort((a, b) => (a.date + (a.slot === "am" ? "1" : a.slot === "data" ? "2" : "3")).localeCompare(b.date + (b.slot === "am" ? "1" : b.slot === "data" ? "2" : "3")));
@@ -875,6 +903,7 @@ function renderFrontPage(app) {
         <h1>${esc(c.title || "Market update")}</h1>
         ${deck ? `<p class="ndeck">${mdLite(deck).replace(/^<p>|<\/p>$/g, "")}</p>` : ""}
         <div class="nbyline">${newsWhen(c)} · written by the Market Monitor story agent from the dashboard's numbers${c.written ? " · " + esc(String(c.written).slice(11, 16)) + " UTC" : ""}</div>
+        ${podBox(c.date)}
         <div class="nbody">${newsBody(deck ? bodyMd : md)}</div>
         ${i < CH.length - 1 ? `<button class="nback nlatest">← Back to the latest edition</button>` : ""}
       </article>
@@ -888,6 +917,7 @@ function renderFrontPage(app) {
   page.querySelectorAll(".nch").forEach(el => el.addEventListener("click", () => { U.i = +el.dataset.i; rerenderPanel(); window.scrollTo({ top: 0, behavior: "smooth" }); }));
   const lb = page.querySelector(".nlatest"); if (lb) lb.addEventListener("click", () => { U.i = null; rerenderPanel(); });
   page.querySelectorAll(".nstory").forEach(el => el.addEventListener("click", () => { NEWS_OPEN = el.dataset.id; v3Go("bstories"); }));
+  const pc = page.querySelector(".npod-copy"); if (pc) pc.addEventListener("click", (e) => { e.preventDefault(); try { navigator.clipboard.writeText(POD_FEED); pc.textContent = "Copied ✓"; } catch (err) { prompt("Feed URL", POD_FEED); } });
   app.append(page);
 }
 function v3Go(k) { try { const b = document.querySelector(`nav.tabs button[data-tab="${k}"]`); if (b) { b.click(); rerenderPanel(); window.scrollTo({ top: 0 }); return; } /* panes are cached: redraw so the chosen story opens */ } catch (e) {} rerenderPanel(); }

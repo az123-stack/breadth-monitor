@@ -91,6 +91,10 @@ CSS = """
 .ncard.top h2 { font-size: clamp(30px, 4vw, 40px); }
 .ncard p { font-family: Newsreader, Georgia, serif; font-size: 17px; line-height: 1.5; color: var(--text-secondary); margin: 0 0 8px; }
 .ncard .nchg { font-size: 13.5px; color: var(--text-primary); } .ncard .meta { font-size: 12px; }
+.npod { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin: 0 0 18px; background: color-mix(in srgb, var(--s1) 6%, transparent); }
+.npod-h { font-weight: 700; font-size: 15px; margin-bottom: 2px; } .npod-t { font-size: 13px; margin-bottom: 6px; }
+.npod audio { width: 100%; margin: 6px 0; }
+.npod-l { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; } .npod-l a { color: var(--s1); font-weight: 600; text-decoration: none; }
 .nback { background: none; border: none; color: var(--s1); font: inherit; font-weight: 600; cursor: pointer; padding: 0; margin: 0 0 12px; }
 .art { max-width: 760px; }
 .art .storycard { border: none; background: none; box-shadow: none; padding: 0; margin: 0; }

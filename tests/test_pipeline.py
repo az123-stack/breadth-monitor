@@ -1974,6 +1974,8 @@ def test_v3_page_builds():
     assert 'let TAB = "readout"' not in h and "Market Monitor v3" in h and h.count("/*__DATA__*/null") == 1
     # Nov 4: Market parent (Breadth / Pre-market / Intraday); side files one folder up; Strongest sub-tab; Oracle reads pre-market
     assert '"market", "Market"' in h and '["premarket", "Pre-market"]' in h and 'fetch("../premarket.json?cb=' in h and 'fetch("premarket.json' not in h
+    # Nov 16: Front page carries the podcast player (episodes.json one folder up) with its publish time
+    assert "function podBox" in h and "${podBox(c.date)}" in h and 'fetch("../podcast/episodes.json?cb=' in h and ".npod {" in h
     assert "sairev: renderAIRev" in h and "function renderAIRev" in h and "sinplay: renderInPlay" in h and "function renderInPlay" in h and "sstrong: renderStrongest" in h and "function renderStrongest" in h and "function orSession" in h and '["d1", "Today", 5]' in h and "breadth: renderBreadthV3" in h and "gpop: renderPopWatch" in h and "grsrank: renderRsRanks" in h and "Browse groups and their stocks" not in h and "app.append(healthCard(DATA.themes.leadership));" not in h
     tmp = Path(__import__("tempfile").mkdtemp()); old = config.DOCS_DIR
     try:
