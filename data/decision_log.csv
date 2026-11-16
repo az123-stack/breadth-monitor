@@ -480,11 +480,11 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-13,CNC,cand,rotation,thrust,Choppy / mixed,Focus,0.404,92.0,Managed Care,75.8,steady,warming,0.0,0.0,,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,3,1,,,,,pending
 2026-11-13,CRL,cand,pullback,thrust,Choppy / mixed,Focus,0.262,97.0,CROs,82.7,fading,,0.0,0.0,,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,2,1,,,,,pending
 2026-11-13,EG,cand,vcp,thrust,Choppy / mixed,Focus,0.256,81.0,P&C Insurers,82.6,steady,,-2.12,-0.4,+10bp 10-yr yield → -0.7%,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,2,1,,,,,pending
-2026-11-13,ELF,cand,rotation,thrust,Choppy / mixed,Focus,0.404,94.0,Consumer Brands,90.6,steady,,0.0,0.0,,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,3,1,,,,,pending
+2026-11-13,ELF,cand,rotation,thrust,Choppy / mixed,Focus,0.404,94.0,Consumer Brands,90.6,steady,,0.0,0.0,,,,Fed Chair Warsh speaks 2026-11-16,earnings date check only,earnings_only,none,unknown,,high,3,1,,,,,pending
 2026-11-13,EWTX,cand,round,thrust,Choppy / mixed,Focus,0.29,92.0,Mid-cap Biotech,59.5,steady,,-6.08,-1.15,+10bp 10-yr yield → -2.1%,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,3,1,,,,,pending
 2026-11-13,LLY,cand,round,thrust,Choppy / mixed,Focus,0.29,89.0,Large-cap Pharma,89.0,confirmed,,-3.32,-0.63,+10bp 10-yr yield → -1.1%,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,2,1,,,,,pending
 2026-11-13,MEDP,cand,rotation,thrust,Choppy / mixed,Focus,0.404,85.0,CROs,82.7,fading,,0.0,0.0,,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,1,1,,,,,pending
-2026-11-13,PACS,cand,round,thrust,Choppy / mixed,Focus,0.29,97.0,Healthcare Providers,84.5,steady,,0.0,0.0,,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,3,1,,,,,pending
+2026-11-13,PACS,cand,round,thrust,Choppy / mixed,Focus,0.29,97.0,Healthcare Providers,84.5,steady,,0.0,0.0,,,,Fed Chair Warsh speaks 2026-11-16,earnings date check only,earnings_only,none,unknown,,high,3,1,,,,,pending
 2026-11-13,RXO,cand,rotation,thrust,Choppy / mixed,Focus,0.404,96.0,Trucking & Logistics,48.2,confirmed,,0.0,0.0,,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,3,1,,,,,pending
 2026-11-13,SLDE,cand,pullback,thrust,Choppy / mixed,Focus,0.262,90.0,P&C Insurers,82.6,steady,,-3.12,-0.59,+10bp 10-yr yield → -1.1%,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,3,1,,,,,pending
 2026-11-13,VEEV,cand,pullback,thrust,Choppy / mixed,Focus,0.262,92.0,Enterprise SaaS,83.7,fading,,0.0,0.0,,,,Fed Chair Warsh speaks 2026-11-16,,,,,,high,2,1,,,,,pending
