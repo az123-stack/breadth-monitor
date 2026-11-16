@@ -2,7 +2,7 @@ name: Podcast episode
 
 # Morning podcast (breadth/podcast.py). The Claude scheduled task "Market Monitor · podcast" writes the script and dispatches
 # this with it (gzip + base64). The cron is the backup: if no episode exists for today's morning chapter by ~8:40 AM ET it
-# builds a plain read-aloud ("basic") so there is always an episode. Audio = release `podcast` assets; feed = docs/podcast/feed.xml.
+# builds a plain read-aloud ("basic") so there is always an episode. Audio = docs/podcast/audio (Pages); feed = docs/podcast/feed.xml.
 on:
   workflow_dispatch:
     inputs:
@@ -56,24 +56,22 @@ jobs:
             [ "${{ github.event_name }}" = "schedule" ] && exit 0 || exit 1
           fi
           grep -q '"skip"' /tmp/build.out && echo "skip=1" >> "$GITHUB_OUTPUT" || true
-      - name: Upload + update the feed
+      - name: Publish the audio on Pages + update the feed
         if: steps.build.outputs.skip != '1'
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -eo pipefail
-          gh release view podcast >/dev/null 2>&1 || gh release create podcast --title "Podcast audio" --prerelease --latest=false \
-            --notes "Audio files for the Market Monitor morning podcast (feed: https://az123-stack.github.io/breadth-monitor/podcast/feed.xml)."
+          # Nov 16, 2026: MP3s live in docs/podcast/audio (Pages serves audio/mpeg; release assets were octet-stream and
+          # Apple Podcasts refused to play them). KEEP newest episodes; dropped files are removed from the tree.
           FILE=$(python -c "import json;print(json.load(open('/tmp/podcast/ep.json'))['file'])")
-          gh release upload podcast "$FILE" --clobber
           git config user.name "breadth-bot"
           git config user.email "breadth-bot@users.noreply.github.com"
           for i in 1 2 3; do
             python -m breadth.podcast feed --add /tmp/podcast/ep.json > /tmp/drop.txt
-            git add docs/podcast/episodes.json docs/podcast/feed.xml
+            mkdir -p docs/podcast/audio && cp "$FILE" docs/podcast/audio/
+            while read -r old; do [ -n "$old" ] && git rm -q --ignore-unmatch "docs/podcast/audio/$old" || true; done < /tmp/drop.txt
+            git add docs/podcast
             git diff --cached --quiet && break
             git commit -qm "Podcast: $(python -c "import json;e=json.load(open('/tmp/podcast/ep.json'));print(e['id'],e['format'])")"
             git push -q && break
             git reset -q --hard HEAD~1 && git pull -q --rebase
           done
-          while read -r old; do [ -n "$old" ] && gh release delete-asset podcast "$old" -y || true; done < /tmp/drop.txt

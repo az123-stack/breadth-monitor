@@ -874,7 +874,7 @@ function podBox(chDate) {
     <div class="npod-t"><b>Updated ${esc(podWhen(ep.published))}</b> · episode for ${shortDate(ep.date)} morning</div>
     ${notToday && ep === latest ? `<small class="meta">Today's episode usually lands around 8:10 AM ET (after the morning story). This is the latest one.</small>` : ""}
     <audio controls preload="none" src="${esc(ep.url)}"></audio>
-    <div class="npod-l"><a href="${esc(ep.url)}" download>⬇ MP3</a><a href="podcast://${esc(feedNoScheme)}">Apple Podcasts</a><a href="overcast://x-callback-url/add?url=${encodeURIComponent(POD_FEED)}">Overcast</a><a href="https://pca.st/subscribe/${esc(feedNoScheme)}" target="_blank" rel="noopener">Pocket Casts</a><a href="#" class="npod-copy">Copy feed URL</a></div></div>`;
+    <div class="npod-l"><a href="${esc(ep.url)}" download>⬇ MP3</a><a href="podcast://${esc(feedNoScheme)}">Apple Podcasts</a><a href="https://pca.st/subscribe/${esc(feedNoScheme)}" target="_blank" rel="noopener">Pocket Casts</a><a href="#" class="npod-copy">Copy feed URL</a></div></div>`;
 }
 function renderFrontPage(app) {
   newsLoad();

@@ -893,4 +893,7 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   **Listen box** (Nov 16; Adam: "a button in the brief for the podcast … I don't otherwise know where to access that" + "the date/time it
   updated"): Front page `podBox(c.date)` under the byline (v3_tabs.js, `.npod` CSS in v3site): `<audio>` of the episode for that edition's
   date (else the latest), format + length, "Updated" = episode `published` in the viewer's time zone, MP3 / Apple Podcasts / Overcast /
-  Pocket Casts / copy-feed links. Reads ../podcast/episodes.json (refetched every 10 min on the tab).
+  Pocket Casts / copy-feed links (Overcast link dropped: it errors in Safari when the app isn't installed).
+  **Audio on Pages** (Nov 16): release assets download as application/octet-stream + nosniff, so Apple Podcasts refused them ("can't be
+  played on this device"). MP3s now live in docs/podcast/audio/ (Pages serves audio/mpeg), `ASSET_URL` = Pages URL, KEEP 14 (older
+  files `git rm`'d by podcast.yml). Repo grows ~2–3 MB per episode in history; the old `podcast` release is no longer written. Reads ../podcast/episodes.json (refetched every 10 min on the tab).

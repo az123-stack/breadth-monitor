@@ -43,8 +43,10 @@ ET = ZoneInfo("America/New_York")
 REPO = "az123-stack/breadth-monitor"
 SITE = "https://az123-stack.github.io/breadth-monitor"
 RELEASE = "podcast"
-ASSET_URL = f"https://github.com/{REPO}/releases/download/{RELEASE}/{{name}}"
-KEEP = 30                 # episodes kept in the feed (older release assets are deleted)
+# Nov 16, 2026: audio moved from release assets to GitHub Pages (docs/podcast/audio/). Release downloads are served as
+# application/octet-stream + nosniff, so Apple Podcasts said "This episode can't be played on this device"; Pages serves audio/mpeg.
+ASSET_URL = f"{SITE}/podcast/audio/{{name}}"
+KEEP = 14                 # episodes kept in the feed; older MP3s are removed from docs/podcast/audio (repo size)
 BITRATE = 48_000          # edge-tts mp3: 24 kHz, 48 kbit/s mono → duration estimate
 RATE = "+6%"
 
