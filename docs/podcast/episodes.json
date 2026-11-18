@@ -1,6 +1,21 @@
 {
- "updated": "2026-11-17T13:11:00Z",
+ "updated": "2026-11-18T13:13:10Z",
  "episodes": [
+  {
+   "id": "2026-11-18-am",
+   "date": "2026-11-18",
+   "slot": "am",
+   "format": "narrative",
+   "format_name": "Story-first",
+   "title": "Nvidia beat lifts AI; retail earnings test consumer",
+   "name": "2026-11-18-am-narrative-130917.mp3",
+   "url": "https://az123-stack.github.io/breadth-monitor/podcast/audio/2026-11-18-am-narrative-130917.mp3",
+   "bytes": 2406672,
+   "seconds": 401,
+   "words": 1123,
+   "summary": "Data today. 2:00 PM FOMC minutes from the October meeting; Target, Lowe's and T J X report before the open; Anthropic prices its IPO late in the day (trading expected Thursday) and Palo Alto reports after the close. The minutes matter because a December hike is already the base case; a hawkish tone would hit growth and metals. Where we are. Scenario A (money is still leaving) holds on official numbers for Nov 17: 78.4 percent of dollar volume in falling stocks, net minus 379 billion dollars, 63",
+   "published": "2026-11-18T13:13:10Z"
+  },
   {
    "id": "2026-11-17-am",
    "date": "2026-11-17",
