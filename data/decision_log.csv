@@ -511,22 +511,22 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-16,PACS,pick2,pullback,thrust,Deteriorating,Focus,0.257,98.0,Healthcare Providers,89.6,confirmed,,0.0,0.0,,,,Nvidia Q3 earnings 2026-11-17,"Q3 beat-and-raise with EBITDA up ~34%; wider GAAP gap, earlier restatement of 1Q/2Q revenue and regulatory scrutiny noted.",full,positive,strong,prior revenue restatement; regulatory scrutiny; wider GAAP gap,high,3,1,,,,,pending
 2026-11-16,CTAS,watch,vcp,thrust,Deteriorating,Focus,0.247,77.0,Waste & Facility Services,83.3,confirmed,,-2.43,0.14,+10bp 10-yr yield → -0.9%,,,Nvidia Q3 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
 2026-11-16,VRTX,watch,vcp,thrust,Deteriorating,Focus,0.247,70.0,Large-cap Biotech,74.8,steady,,-2.56,0.15,+10bp 10-yr yield → -1.0%,,,Nvidia Q3 earnings 2026-11-17,,,,,,high,2,1,,,,,pending
-2026-11-17,ACHC,cand,round,thrust,Deteriorating,Focus,0.265,97.0,Healthcare Providers,93.8,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
-2026-11-17,AMRX,cand,pullback,thrust,Deteriorating,Focus,0.248,94.0,Large-cap Pharma,90.6,confirmed,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
-2026-11-17,CAKE,cand,rotation,thrust,Deteriorating,Focus,0.403,97.0,Restaurants,81.6,confirmed,,-2.83,-3.87,+1% dollar → -2.3%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
+2026-11-17,ACHC,cand,round,thrust,Deteriorating,Focus,0.263,97.0,Healthcare Providers,93.8,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
+2026-11-17,AMRX,cand,pullback,thrust,Deteriorating,Focus,0.269,94.0,Large-cap Pharma,90.6,confirmed,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
+2026-11-17,CAKE,cand,rotation,thrust,Deteriorating,Focus,0.415,97.0,Restaurants,81.6,confirmed,,-2.83,-3.87,+1% dollar → -2.3%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
 2026-11-17,CART,cand,vcp,thrust,Deteriorating,Focus,0.238,91.0,E-Commerce Marketplaces,64.3,steady,,-1.71,0.2,+10bp 10-yr yield → -1.4%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
-2026-11-17,CON,cand,pullback,thrust,Deteriorating,Focus,0.248,96.0,Healthcare Providers,93.8,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
+2026-11-17,CON,cand,pullback,thrust,Deteriorating,Focus,0.269,96.0,Healthcare Providers,93.8,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
 2026-11-17,DRI,cand,vcp,thrust,Deteriorating,Focus,0.238,75.0,Restaurants,81.6,confirmed,,-1.21,0.14,+10bp 10-yr yield → -1.0%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
-2026-11-17,MEDP,cand,rotation,thrust,Deteriorating,Focus,0.403,86.0,CROs,82.1,fading,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,1,1,,,,,pending
-2026-11-17,MGNI,cand,round,thrust,Deteriorating,Focus,0.265,97.0,Social & Ad Platforms,54.0,new,,-1.92,0.22,+10bp 10-yr yield → -1.6%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
-2026-11-17,PACS,cand,round,thrust,Deteriorating,Focus,0.265,98.0,Healthcare Providers,93.8,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
-2026-11-17,PRCH,cand,pullback,thrust,Deteriorating,Focus,0.248,98.0,P&C Insurers,88.4,confirmed,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
-2026-11-17,REGN,cand,round,thrust,Deteriorating,Focus,0.265,87.0,Large-cap Biotech,78.6,confirmed,,-1.2,0.14,+10bp 10-yr yield → -1.0%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
-2026-11-17,RXO,cand,rotation,thrust,Deteriorating,Focus,0.403,97.0,Trucking & Logistics,54.2,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
-2026-11-17,SN,cand,rotation,thrust,Deteriorating,Focus,0.403,97.0,Consumer Brands,89.8,steady,,-2.14,0.25,+10bp 10-yr yield → -1.8%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
-2026-11-17,THC,cand,pullback,thrust,Deteriorating,Focus,0.248,86.0,Healthcare Providers,93.8,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
-2026-11-17,KNSA,pick1,round,thrust,Deteriorating,Focus,0.265,97.0,Immunology & Inflammation,76.4,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
-2026-11-17,CBRL,pick2,rotation,thrust,Deteriorating,Focus,0.403,98.0,Restaurants,81.6,confirmed,,-3.42,-4.68,+1% dollar → -2.8%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
+2026-11-17,MEDP,cand,rotation,thrust,Deteriorating,Focus,0.415,86.0,CROs,82.1,fading,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,1,1,,,,,pending
+2026-11-17,MGNI,cand,round,thrust,Deteriorating,Focus,0.263,97.0,Social & Ad Platforms,54.0,new,,-1.92,0.22,+10bp 10-yr yield → -1.6%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
+2026-11-17,PACS,cand,pullback,thrust,Deteriorating,Focus,0.269,98.0,Healthcare Providers,93.8,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
+2026-11-17,PRCH,cand,pullback,thrust,Deteriorating,Focus,0.269,98.0,P&C Insurers,88.4,confirmed,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
+2026-11-17,REGN,cand,round,thrust,Deteriorating,Focus,0.263,87.0,Large-cap Biotech,78.6,confirmed,,-1.2,0.14,+10bp 10-yr yield → -1.0%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
+2026-11-17,RXO,cand,rotation,thrust,Deteriorating,Focus,0.415,97.0,Trucking & Logistics,54.2,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
+2026-11-17,SN,cand,rotation,thrust,Deteriorating,Focus,0.415,97.0,Consumer Brands,89.8,steady,,-2.14,0.25,+10bp 10-yr yield → -1.8%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
+2026-11-17,THC,cand,pullback,thrust,Deteriorating,Focus,0.269,86.0,Healthcare Providers,93.8,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
+2026-11-17,KNSA,pick1,round,thrust,Deteriorating,Focus,0.263,97.0,Immunology & Inflammation,76.4,steady,,0.0,0.0,,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
+2026-11-17,CBRL,pick2,rotation,thrust,Deteriorating,Focus,0.415,98.0,Restaurants,81.6,confirmed,,-3.42,-4.68,+1% dollar → -2.8%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,3,1,,,,,pending
 2026-11-17,CTAS,watch,vcp,thrust,Deteriorating,Focus,0.238,77.0,Waste & Facility Services,87.3,confirmed,,-1.1,0.13,+10bp 10-yr yield → -0.9%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
 2026-11-17,HLT,watch,vcp,thrust,Deteriorating,Focus,0.238,80.0,Hotels & Cruise Lines,83.7,steady,,-0.0,0.86,+1% oil → -0.1%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
 2026-11-17,PYPL,watch,vcp,thrust,Deteriorating,Focus,0.238,70.0,Payments & Networks,74.4,steady,,-1.65,0.19,+10bp 10-yr yield → -1.4%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
