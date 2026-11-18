@@ -1,31 +1,13 @@
 {
- "for_date": "2026-11-16",
- "written": "2026-11-17T12:04Z",
- "headline": "Nvidia earnings tonight and FOMC minutes tomorrow headline a week where markets are pricing a possible December Fed hike amid Iran-driven oil volatility.",
+ "for_date": "2026-11-17",
+ "written": "2026-11-18T12:05Z",
+ "headline": "Stocks are focused on the 2 PM FOMC minutes after hot October CPI revived Fed hike talk, with Nvidia's post-close results and Thursday's Anthropic IPO testing the AI trade.",
  "risk": "high",
- "rates": "CME FedWatch shows roughly a 96% chance of a quarter-point hike in December after hot October inflation data, keeping yields elevated.",
- "fed": "FOMC minutes from the Oct 27-28 meeting land Wednesday at 2:00 PM ET, with Fed Governor Cook speaking Friday after Chair Warsh spoke Monday.",
- "oil": "Oil fell about 5% on Nov 9 (Brent below $92) when Trump signaled restraint on Iran despite fresh shipping attacks near Hormuz, and it remains headline-driven.",
- "geo": "The Iran conflict and attacks on Gulf shipping remain the live geopolitical risk, with Trump's restraint signals driving oil swings.",
+ "rates": "Hot October inflation has pushed bond yields higher and put a possible December Fed hike on the table.",
+ "fed": "Minutes of the Oct 27-28 meeting (two dissents favoring a hike) come out Wednesday at 2 PM ET, and Governor Cook speaks Friday.",
+ "oil": "Oil has slid to the low $90s Brent on hopes for a US-Iran deal, though Iran says the Strait of Hormuz stays closed until its conditions are met.",
+ "geo": "US-Iran talks over the war and Hormuz, plus Ukraine-Russia talks, remain the main geopolitical swing factors.",
  "events": [
-  {
-   "date": "2026-11-17",
-   "time": "8:30 AM ET",
-   "name": "October retail sales",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-17",
-   "time": "After close",
-   "name": "Nvidia Q3 earnings",
-   "impact": "high"
-  },
-  {
-   "date": "2026-11-17",
-   "time": "Before open",
-   "name": "Home Depot earnings",
-   "impact": "medium"
-  },
   {
    "date": "2026-11-18",
    "time": "2:00 PM ET",
@@ -34,27 +16,45 @@
   },
   {
    "date": "2026-11-18",
-   "time": "Before open",
-   "name": "Target earnings",
+   "time": "Before the open",
+   "name": "Target, TJX, Lowe's earnings",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-18",
+   "time": "4:30 PM ET",
+   "name": "Palo Alto Networks earnings",
    "impact": "medium"
   },
   {
    "date": "2026-11-19",
-   "time": "Before open",
+   "time": "7:00 AM ET",
    "name": "Walmart earnings",
    "impact": "medium"
   },
   {
    "date": "2026-11-19",
-   "time": "Morning",
-   "name": "Philadelphia Fed manufacturing survey",
+   "time": "Trading debut\u2026",
+   "name": "Anthropic IPO (ANT) expected to begin trading",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-19",
+   "time": "After the close",
+   "name": "Intuit and Ross Stores earnings",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-20",
+   "time": "Time TBD",
+   "name": "Fed Governor Cook speech",
    "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.fool.com/investing/2026/11/17/stock-market-primed-for-explosive-week-nvidia-federal-reserve/",
   "https://www.heygotrade.com/en/news/weekly-economic-outlook-2026-11-16/",
-  "https://www.rte.ie/news/business/2026/1109/1598486-world-oil-prices/",
-  "https://www.insurancejournal.com/news/international/2026/11/09/892091.htm"
+  "https://www.fool.com/investing/2026/11/16/this-is-a-huge-week-for-the-stock-market-nvidia-earnings-fed-minutes-and-anthropic-s-ipo/",
+  "https://www.stocktitan.net/articles/earnings-calendar-week-of-november-16-2026",
+  "https://www.newsquawk.com/headlines/crude-wrap-wti-z6-settles-usd-081-lower-at-8604bbl-brent-f7-settles-usd-108-lower-at-9149bbl"
  ]
 }
