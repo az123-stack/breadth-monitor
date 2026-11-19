@@ -164,7 +164,7 @@ def theme_tickers():
         vc = valuechain.tickers()
     except Exception:
         vc = set()
-    return set(t["ticker"]) | set(load_subthemes()["ticker"]) | vc | {config.BENCHMARK}
+    return set(t["ticker"]) | set(load_subthemes()["ticker"]) | vc | {config.BENCHMARK} | set(config.RATIO_ETFS)
 
 
 def load_names():

@@ -2222,6 +2222,32 @@ def test_librarian_brief():
     return f"{len(text.split())} words"
 
 
+def test_ratio_watch():
+    """Ratio watch (pairs.py): ETF used when present, member basket otherwise; bad prints masked; payload aligned to dates."""
+    import numpy as _np, pandas as _pd
+    from breadth import pairs as PR
+    d = _pd.bdate_range("2025-01-02", periods=160)
+    rows = []
+    for i, day in enumerate(d):
+        for t, base, g in (("SPY", 500, 0.0005), ("SOXX", 200, 0.001), ("RSP", 180, 0.0002)) + tuple((m, 100, 0.002) for m in PR.MAG7):
+            c = base * (1 + g) ** i * (0.5 if (t == "NVDA" and i >= 80) else 1)     # NVDA "split" mid-way must be masked
+            rows.append({"date": day, "ticker": t, "o": c, "h": c, "l": c, "c": c, "v": 1e6})
+    from breadth import config as _C
+    old, _C.BENCHMARK = _C.BENCHMARK, "SPY"          # earlier tests leave BENCHMARK patched
+    try:
+        out = PR.build(_pd.DataFrame(rows), d[-120:])
+    finally:
+        _C.BENCHMARK = old
+    P = {p["key"]: p for p in out["pairs"]}
+    assert P["rsp_spy"]["src"] == {"RSP": "etf", "SPY": "etf"}
+    assert P["mags_soxx"]["src"] == {"MAGS": "basket", "SOXX": "etf"}
+    m = P["mags_soxx"]
+    assert len(m["series"]) == len(m["dates"]) == 120 and m["state"] == "up" and m["d20"] > 0
+    assert P["rsp_spy"]["state"] == "down" and P["rsp_spy"]["d20"] < 0           # RSP grows slower than SPY
+    assert abs(m["d20"] - 100 * ((1.002 / 1.001) ** 20 - 1)) < 0.2                # the split day didn't dent the basket
+    assert set(m["bt"]) == {"chg5", "chg21", "trend5", "trend21"}
+
+
 def test_podcast():
     """Podcast: format rotation, script parse/check, ear text, feed add/replace/trim."""
     import json as _json, tempfile, shutil

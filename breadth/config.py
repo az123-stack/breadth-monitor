@@ -29,6 +29,8 @@ MIN_CALL_INTERVAL = float(os.environ.get("MASSIVE_MIN_INTERVAL", "12.5"))
 UNIVERSE_REFRESH_DAYS = 7
 
 BENCHMARK = "SPY"
+# Ratio watch ETFs (Breadth tab, Nov 18 2026; breadth/pairs.py). Stored like theme ETFs, never in breadth.
+RATIO_ETFS = ("RSP", "MAGS", "SOXX")
 # Published Google Sheet (CSV) with GOOGLEFINANCE prices for the live layer.
 LIVE_CSV_URL = os.environ.get("LIVE_CSV_URL", "https://docs.google.com/spreadsheets/d/e/2PACX-1vTtdx4lANR9e4jocUDpnxs36dGZCVpxMC7NA9rU53hXunXlzPZ4j2sHmKWKGvXjaR2dqbtgoZCJVxpn/pub?output=csv")
 # "Positions" tab of the same sheet (Adam's own trades, Oct 28 2026); sheet gid 810220388, read by the v2 page only

@@ -281,6 +281,11 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["vtilt"] = vtilt.build(history, adjusted[adjusted["ticker"] == config.BENCHMARK])
         except Exception as e:  # optional panel; never block the page
             log.exception("volume tilt failed: %s", e)
+        try:   # ratio watch: RSP / SPY and MAGS / SOXX (Adam, Nov 18 2026; information only)
+            from . import pairs
+            theme_data["pairs"] = pairs.build(adjusted, history.index)
+        except Exception as e:  # optional panel; never block the page
+            log.exception("ratio watch failed: %s", e)
         try:   # FINRA off-exchange short share (free daily; experimental "hidden buying" read, Oct 17 study)
             from . import finra
             if config.LEVELS_ENABLED:

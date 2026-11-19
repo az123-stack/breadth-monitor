@@ -1939,6 +1939,7 @@ function renderBreadth(app) {
   if (last.clv_all != null) app.append(closeTiles(rows, last));
   const DX = DATA.themes && DATA.themes.dix;
   if (DX && DX.dev != null) app.append(dixTiles(DX));
+  if (DATA.themes && DATA.themes.pairs && DATA.themes.pairs.pairs) app.append(pairTiles(DATA.themes.pairs));
   IDX = Object.fromEntries(rows.map((r, i) => [r.date, i]));
   EVBY = {}; (DATA.events || []).forEach(e => { (EVBY[e.date] = EVBY[e.date] || []).push(e); });
   app.append(signalsCard());
@@ -1962,6 +1963,7 @@ function renderBreadth(app) {
   charts.append(chartNearHigh(rows));
   if (rows.some(r => r.dv_net != null)) charts.append(chartMoney(rows));
   if (VT && rows.some(r => r.vtilt10 != null)) charts.append(chartTilt(rows, VT));
+  ((DATA.themes && DATA.themes.pairs && DATA.themes.pairs.pairs) || []).forEach(P => charts.append(chartPair(rows, P)));
   syncScroll([...charts.querySelectorAll(".scroller")], bar, rows);
   app.append(table(rows));
 
@@ -2447,6 +2449,48 @@ function chartTilt(rows, VT) {
   const sg = (v) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + fmt(Math.abs(v), 1);
   hover(c, rows, x, [["Tilt (10-day)", r => sg(r.vtilt10)], ["Up-movers / down-movers volume vs normal", r => r.vt_up == null ? "–" : fmt(r.vt_up, 2) + "× / " + fmt(r.vt_dn, 2) + "×"],
     ["Reading", r => r.vtilt10 == null ? "–" : r.vtilt10 <= VT.lo ? (post.has(r.date) ? "low · after a thrust" : "low · no recent thrust") : r.vtilt10 >= VT.hi ? "high" : "middle"]]);
+  return c.el;
+}
+/* ---------- Ratio watch: RSP ÷ SPY and MAGS ÷ SOXX (pairs.py, Nov 18 2026; information only) ---------- */
+const sgnR = (v) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + fmt(Math.abs(v), 2);
+function pairNext(P) {   // [headline, detail] for "what happened next" after a 20-day move like today's
+  const b = P.bt && P.bt.chg21;
+  if (!b || !b.high || !b.low) return ["–", "history still building"];
+  const t = P.d20_pct >= 80 ? ["top 20%", b.high] : P.d20_pct <= 20 ? ["bottom 20%", b.low] : ["normal range", b.mid];
+  return [`SPY ${pct(t[1].spy / 100, 1)}`, `next 21 sessions after a 20-day move in its ${t[0]}: up ${t[1].up}% of the time (n ${t[1].n}) · all days ${pct(b.all.spy / 100, 1)}, ${b.all.up}% up`];
+}
+function pairTiles(PD) {
+  const tl = $('<section class="tiles tiles4"></section>');
+  PD.pairs.forEach(P => {
+    const st = P.state === "up" ? ["up", "Rising"] : P.state === "down" ? ["dn", "Falling"] : ["", "Mixed"];
+    const means = P.state === "up" ? P.up_txt : P.state === "down" ? P.dn_txt : "no clear trend";
+    const src = Object.entries(P.src).filter(([, v]) => v === "basket").map(([k]) => k);
+    const nx = pairNext(P), b = P.bt && P.bt.chg21;
+    tl.append($(`<div class="card tile"><div class="k">${P.label}</div><div class="v num"><span class="${st[0]}">${st[1]}</span></div>
+      <div class="s">${means} · 20-day ${pct(P.d20 / 100, 1)} (${ord(P.d20_pct)} pct of days) · 5-day ${pct(P.d5 / 100, 1)} · ${P.above ? "above" : "below"} its ${PD.ma}-day avg · ${ord(P.yr_pct)} pct of its 1-yr range</div></div>`));
+    tl.append($(`<div class="card tile"><div class="k">${P.a} ÷ ${P.b} · what happened next · info only</div><div class="v num">${nx[0]}</div>
+      <div class="s">${nx[1]}${b ? ` · rank corr ${sgnR(b.ic)} (halves ${b.ic_halves.map(sgnR).join(" / ")})` : ""}${src.length ? ` · ${src.join(", ")} rebuilt from member stocks until its own history loads` : ""}</div></div>`));
+  });
+  return tl;
+}
+function chartPair(rows, P) {
+  const vm = {}, mm = {};
+  P.dates.forEach((d, i) => { vm[d] = P.series[i]; mm[d] = P.ma50[i]; });
+  const rr = rows.map(r => ({ date: r.date, _p: vm[r.date] == null ? null : vm[r.date], _m: mm[r.date] == null ? null : mm[r.date] }));
+  const c = frame(P.label + " · rising = " + P.up_txt,
+    `<span><i class="line" style="background:var(--s1)"></i>Ratio (start = 100)</span><span><i class="line" style="background:var(--text-muted)"></i>${DATA.themes.pairs.ma}-day average</span>`);
+  const vals = rr.flatMap(r => [r._p, r._m]).filter(v => v != null);
+  if (!vals.length) return c.el;
+  let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.08 || 1; lo -= pad; hi += pad;
+  const y = (v) => M.t + (1 - (v - lo) / (hi - lo)) * (c.h - M.t - M.b);
+  const x = axes(c, rr, y, [lo + pad, (lo + hi) / 2, hi - pad], v => fmt(v, 0));
+  S("path", { d: path(rr, x, y, "_m"), fill: "none", stroke: "var(--text-muted)", "stroke-width": 1.5, "stroke-dasharray": "4 3" }, c.svg);
+  S("path", { d: path(rr, x, y, "_p"), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
+  endLabel(c.svg, x, y, rr, "_p", "", "var(--s1)");
+  eventLines(c, x, false);
+  const idx = Object.fromEntries(rr.map((r, i) => [r.date, i]));
+  hover(c, rr, x, [["Ratio", r => r._p == null ? "–" : fmt(r._p, 1)], [DATA.themes.pairs.ma + "-day avg", r => r._m == null ? "–" : fmt(r._m, 1)],
+    ["20-day change", r => { const i = idx[r.date], j = i - DATA.themes.pairs.chg; return (j >= 0 && r._p != null && rr[j]._p != null) ? pct(r._p / rr[j]._p - 1, 1) : "–"; }]]);
   return c.el;
 }
 function chartNearHigh(rows) {

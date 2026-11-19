@@ -897,3 +897,13 @@ Read the entry for the module you're working on (grep for its file name). Add ne
   **Audio on Pages** (Nov 16): release assets download as application/octet-stream + nosniff, so Apple Podcasts refused them ("can't be
   played on this device"). MP3s now live in docs/podcast/audio/ (Pages serves audio/mpeg), `ASSET_URL` = Pages URL, KEEP 14 (older
   files `git rm`'d by podcast.yml). Repo grows ~2–3 MB per episode in history; the old `podcast` release is no longer written. Reads ../podcast/episodes.json (refetched every 10 min on the tab).
+
+## pairs.py · Ratio watch (Nov 18, 2026)
+Adam: "two things to watch, Mags / SOXX and RSP / SPY" → Breadth tab, after the FINRA tiles (`pairTiles`) and after the Volume tilt chart
+(`chartPair`, one per ratio, synced with the other charts; values keyed by date onto `DATA.rows`). `config.RATIO_ETFS` (RSP, MAGS, SOXX)
+join `store.theme_tickers()`, so the extras backfill fetches their history once and the daily grouped pull keeps them; they never enter
+breadth. Until an ETF covers 98% of the window, `_leg` falls back to a member basket (equal-weight S&P 500 members from
+data/index_members.csv for RSP; equal-weight Mag 7 for MAGS); one-day moves > 35% in a basket member are masked (bad print / missed split).
+Payload per pair: ratio rebased to 100, 50-day avg, d5 / d20 (+ percentile of d20 across history), 1-yr range position, state up / down /
+mixed, `bt` = SPY next open → 5 / 21 sessions by d20 tier (bottom / top 20%) with rank corr + halves, and by above / below the 50-day.
+Card R-2026-11-18-ratio-watch (mixed: RSP/SPY surge → weaker SPY 21d, MAGS/SOXX surge → stronger, both halves, t < 2). Test `test_ratio_watch`.

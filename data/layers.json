@@ -590,6 +590,20 @@
     "R-2026-10-31-accelerating-groups"
    ],
    "notes": "edge = plain 60D strength; acceleration adds nothing on top (Oct 31)"
+  },
+  {
+   "id": "ratio_watch",
+   "name": "Ratio watch: RSP/SPY and MAGS/SOXX",
+   "kind": "code",
+   "owner": "daily update + page",
+   "status": "info",
+   "where": "pairs.py \u2192 DATA.themes.pairs; Breadth tab pairTiles + chartPair",
+   "what": "Equal-weight vs cap-weight S&P and Mag 7 vs semis: ratio, 50-day avg, 20-day change tiers, SPY 21d what-happened-next",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-11-18-ratio-watch"
+   ],
+   "notes": "contrarian both ways (RSP/SPY surge \u2192 weaker SPY; MAGS/SOXX surge \u2192 stronger), t < 2 \u2014 watch"
   }
  ]
 }
