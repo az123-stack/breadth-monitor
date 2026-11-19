@@ -1,6 +1,21 @@
 {
- "updated": "2026-11-18T13:13:10Z",
+ "updated": "2026-11-19T13:11:27Z",
  "episodes": [
+  {
+   "id": "2026-11-19-am",
+   "date": "2026-11-19",
+   "slot": "am",
+   "format": "radio",
+   "format_name": "Radio news",
+   "title": "Security and chips bounce as Anthropic IPO lists",
+   "name": "2026-11-19-am-radio-130951.mp3",
+   "url": "https://az123-stack.github.io/breadth-monitor/podcast/audio/2026-11-19-am-radio-130951.mp3",
+   "bytes": 1834848,
+   "seconds": 306,
+   "words": 877,
+   "summary": "Where we are. Scenario W (selling paused) holds on official numbers for Nov 18: 53.6 percent of dollar volume in falling stocks, net minus 46 billion dollars, 168 stocks up 4 percent+ against 181 down, 186 new lows, T2108 42.2. Pre-market (7:50 AM ET): S and P futures plus 1.17 percent, Nasdaq-100 plus 2.03 percent, Russell 2000 plus 0.67 percent, Dow plus 0.57 percent. That is a big gap up after five straight S and P losses. The trade: Consumer over AI Infrastructure, 31 sessions on, still a se",
+   "published": "2026-11-19T13:11:27Z"
+  },
   {
    "id": "2026-11-18-am",
    "date": "2026-11-18",
