@@ -530,23 +530,27 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-17,CTAS,watch,vcp,thrust,Deteriorating,Focus,0.238,77.0,Waste & Facility Services,87.3,confirmed,,-1.1,0.13,+10bp 10-yr yield → -0.9%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
 2026-11-17,HLT,watch,vcp,thrust,Deteriorating,Focus,0.238,80.0,Hotels & Cruise Lines,83.7,steady,,-0.0,0.86,+1% oil → -0.1%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
 2026-11-17,PYPL,watch,vcp,thrust,Deteriorating,Focus,0.238,70.0,Payments & Networks,74.4,steady,,-1.65,0.19,+10bp 10-yr yield → -1.4%,,,FOMC minutes (Oct 27-28 meeting) 2026-11-18,,,,,,high,2,1,,,,,pending
-2026-11-18,ACHC,cand,round,thrust,Washed out,Focus,0.256,98.0,Healthcare Providers,81.7,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,AZTA,cand,round,thrust,Washed out,Focus,0.256,97.0,Life Science Tools,88.1,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,BTSG,cand,pullback,thrust,Washed out,Focus,0.265,94.0,Healthcare Providers,81.7,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,CART,cand,vcp,thrust,Washed out,Focus,0.241,91.0,E-Commerce Marketplaces,67.3,steady,,-0.96,1.13,+10bp 10-yr yield → -1.4%,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,CBRL,cand,round,thrust,Washed out,Focus,0.256,99.0,Restaurants,85.0,confirmed,,-2.37,-5.68,+1% dollar → -2.6%,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,CON,cand,pullback,thrust,Washed out,Focus,0.265,95.0,Healthcare Providers,81.7,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,CRL,cand,pullback,thrust,Washed out,Focus,0.265,97.0,CROs,82.1,fading,,0.0,0.0,,,,,,,,,,high,2,1,,,,,pending
-2026-11-18,ELF,cand,rotation,thrust,Washed out,Focus,0.407,94.0,Consumer Brands,92.7,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,FIGS,cand,rotation,thrust,Washed out,Focus,0.407,98.0,Consumer Brands,92.7,steady,,-1.23,1.45,+10bp 10-yr yield → -1.8%,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,GEN,cand,vcp,thrust,Washed out,Focus,0.241,79.0,Identity & Security Tools,98.6,confirmed,,-1.54,1.81,+10bp 10-yr yield → -2.3%,,,,,,,,,high,2,1,,,,,pending
-2026-11-18,HAE,cand,pullback,thrust,Washed out,Focus,0.265,95.0,Medical Devices,87.3,confirmed,,-1.61,-3.85,+1% dollar → -1.7%,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,MAS,cand,rotation,thrust,Washed out,Focus,0.407,83.0,Building Products,85.5,confirmed,,-1.63,1.92,+10bp 10-yr yield → -2.4%,,,,,,,,,high,2,1,,,,,pending
-2026-11-18,REGN,cand,rotation,thrust,Washed out,Focus,0.407,86.0,Large-cap Biotech,77.2,steady,,-0.66,0.78,+10bp 10-yr yield → -1.0%,,,,,,,,,high,2,1,,,,,pending
-2026-11-18,RXO,cand,rotation,thrust,Washed out,Focus,0.407,96.0,Trucking & Logistics,58.4,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,SLDE,cand,pullback,thrust,Washed out,Focus,0.265,92.0,P&C Insurers,85.4,confirmed,,-0.74,0.87,+10bp 10-yr yield → -1.1%,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,KNSA,pick1,round,thrust,Washed out,Focus,0.256,97.0,Immunology & Inflammation,79.0,steady,,0.0,0.0,,,,,,,,,,high,3,1,,,,,pending
-2026-11-18,VIA,pick2,round,thrust,Washed out,Focus,0.256,99.0,Enterprise SaaS,78.7,fading,,0.0,0.0,,,,,,,,,,high,2,1,,,,,pending
-2026-11-18,CTAS,watch,vcp,thrust,Washed out,Focus,0.241,76.0,Waste & Facility Services,85.7,steady,,-0.62,0.73,+10bp 10-yr yield → -0.9%,,,,,,,,,high,2,1,,,,,pending
-2026-11-18,HLT,watch,vcp,thrust,Washed out,Focus,0.241,81.0,Hotels & Cruise Lines,91.5,confirmed,,0.29,1.29,+1% oil → -0.1%,,,,,,,,,high,2,1,,,,,pending
-2026-11-18,VRTX,watch,vcp,thrust,Washed out,Focus,0.241,72.0,Large-cap Biotech,77.2,steady,,-0.66,0.78,+10bp 10-yr yield → -1.0%,,,,,,,,,high,2,1,,,,,pending
+2026-11-18,ACHC,cand,round,thrust,Washed out,Focus,0.26,98.0,Healthcare Providers,81.7,steady,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,Q3 EPS beat (+29%) and guidance raised again (Nov); quality tempered by a Florida windfall and weak commercial mix.,full,positive,real,earnings quality tempered by one-time Florida windfall,medium,3,0,,,,,pending
+2026-11-18,APPN,cand,kq,thrust,Washed out,Focus,0.151,98.0,Enterprise SaaS,78.7,fading,,-1.61,1.9,+10bp 10-yr yield → -2.4%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,0,,,,,pending
+2026-11-18,AZTA,cand,round,thrust,Washed out,Focus,0.26,97.0,Life Science Tools,88.1,steady,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,earnings date check only,earnings_only,none,unknown,,medium,3,0,,,,,pending
+2026-11-18,BTSG,cand,pullback,thrust,Washed out,Focus,0.25,94.0,Healthcare Providers,81.7,steady,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,earnings date check only,earnings_only,none,unknown,,medium,3,0,,,,,pending
+2026-11-18,CART,cand,vcp,thrust,Washed out,Focus,0.243,91.0,E-Commerce Marketplaces,67.3,steady,,-0.96,1.13,+10bp 10-yr yield → -1.4%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,earnings date check only,earnings_only,none,unknown,,medium,3,0,,,,,pending
+2026-11-18,CBRL,cand,round,thrust,Washed out,Focus,0.26,99.0,Restaurants,85.0,confirmed,,-2.37,-5.68,+1% dollar → -2.6%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,"No fresh hard catalyst found; stock fell ~5% around Nov 5 after a gain since its last earnings report; holiday menu launch and cost cuts (real estate deal, Maple Street exit) are background.",full,none,weak,,medium,3,0,,,,,pending
+2026-11-18,CON,cand,pullback,thrust,Washed out,Focus,0.25,95.0,Healthcare Providers,81.7,steady,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,earnings date check only,earnings_only,none,unknown,,medium,3,0,,,,,pending
+2026-11-18,CRL,cand,pullback,thrust,Washed out,Focus,0.25,97.0,CROs,82.1,fading,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,0,,,,,pending
+2026-11-18,ELF,cand,rotation,thrust,Washed out,Focus,0.399,94.0,Consumer Brands,92.7,steady,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,earnings date check only,earnings_only,none,unknown,,medium,3,0,,,,,pending
+2026-11-18,FIGS,cand,rotation,thrust,Washed out,Focus,0.399,98.0,Consumer Brands,92.7,steady,,-1.23,1.45,+10bp 10-yr yield → -1.8%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,"Q3 beat-and-raise, fourth straight; stock popped Nov 9, though a Jordan supply squeeze caps near-term upside.",full,positive,strong,supply squeeze (Jordan) limiting near-term upside,medium,3,0,,,,,pending
+2026-11-18,GEN,cand,vcp,thrust,Washed out,Focus,0.243,79.0,Identity & Security Tools,98.6,confirmed,,-1.54,1.81,+10bp 10-yr yield → -2.3%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,0,,,,,pending
+2026-11-18,HAE,cand,pullback,thrust,Washed out,Focus,0.25,95.0,Medical Devices,87.3,confirmed,,-1.61,-3.85,+1% dollar → -1.7%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,earnings date check only,earnings_only,none,unknown,,medium,3,0,,,,,pending
+2026-11-18,MAS,cand,rotation,thrust,Washed out,Focus,0.399,83.0,Building Products,85.5,confirmed,,-1.63,1.92,+10bp 10-yr yield → -2.4%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,0,,,,,pending
+2026-11-18,REGN,cand,rotation,thrust,Washed out,Focus,0.399,86.0,Large-cap Biotech,77.2,steady,,-0.66,0.78,+10bp 10-yr yield → -1.0%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,0,,,,,pending
+2026-11-18,RXO,cand,rotation,thrust,Washed out,Focus,0.399,96.0,Trucking & Logistics,58.4,steady,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,3,0,,,,,pending
+2026-11-18,SLDE,cand,pullback,thrust,Washed out,Focus,0.25,92.0,P&C Insurers,85.4,confirmed,,-0.74,0.87,+10bp 10-yr yield → -1.1%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,earnings date check only,earnings_only,none,unknown,,medium,3,0,,,,,pending
+2026-11-18,XMTR,cand,kq,thrust,Washed out,Focus,0.151,96.0,E-Commerce Marketplaces,67.3,steady,,2.47,5.92,+1% dollar → +2.7%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,earnings date check only,earnings_only,none,unknown,,medium,3,0,,,,,pending
+2026-11-18,KNSA,pick1,round,thrust,Washed out,Focus,0.26,97.0,Immunology & Inflammation,79.0,steady,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,3,0,,,,,pending
+2026-11-18,VIA,pick2,round,thrust,Washed out,Focus,0.26,99.0,Enterprise SaaS,78.7,fading,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,0,,,,,pending
+2026-11-18,CDNA,watch,kq,thrust,Washed out,Focus,0.151,99.0,Genomics & Diagnostics,56.7,outflow,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,1,,,,,pending
+2026-11-18,CERT,watch,kq,thrust,Washed out,Focus,0.151,95.0,CROs,82.1,fading,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,0,,,,,pending
+2026-11-18,HLT,watch,vcp,thrust,Washed out,Focus,0.243,81.0,Hotels & Cruise Lines,91.5,confirmed,,0.29,1.29,+1% oil → -0.1%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,0,,,,,pending
+2026-11-18,REPL,watch,round,thrust,Washed out,Focus,0.26,99.0,Oncology Biotech,54.3,steady,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,3,0,,,,,pending
+2026-11-18,VRTX,watch,vcp,thrust,Washed out,Focus,0.243,72.0,Large-cap Biotech,77.2,steady,,-0.66,0.78,+10bp 10-yr yield → -1.0%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,0,,,,,pending
