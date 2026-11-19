@@ -1,60 +1,61 @@
 {
- "for_date": "2026-11-17",
- "written": "2026-11-18T12:05Z",
- "headline": "Stocks are focused on the 2 PM FOMC minutes after hot October CPI revived Fed hike talk, with Nvidia's post-close results and Thursday's Anthropic IPO testing the AI trade.",
- "risk": "high",
- "rates": "Hot October inflation has pushed bond yields higher and put a possible December Fed hike on the table.",
- "fed": "Minutes of the Oct 27-28 meeting (two dissents favoring a hike) come out Wednesday at 2 PM ET, and Governor Cook speaks Friday.",
- "oil": "Oil has slid to the low $90s Brent on hopes for a US-Iran deal, though Iran says the Strait of Hormuz stays closed until its conditions are met.",
- "geo": "US-Iran talks over the war and Hormuz, plus Ukraine-Russia talks, remain the main geopolitical swing factors.",
+ "for_date": "2026-11-18",
+ "written": "2026-11-19T12:03Z",
+ "headline": "Stocks are bouncing in futures after four straight S&P 500 declines as Nvidia's big beat meets a Fed priced for hikes, with PCE and GDP due Wednesday before Thanksgiving.",
+ "risk": "medium",
+ "rates": "Treasury yields are elevated with money markets pricing almost no cuts and rising odds of a Fed hike, though the 10-year slipped a couple of basis points Wednesday.",
+ "fed": "October FOMC minutes (10-2 hold) came out Wednesday and Governor Barr spoke; no Fed speakers are listed for Nov 19-20.",
+ "oil": "WTI was near $84 on Wednesday, down about 2% on a rising US crude stockpile and surplus worries, well below the recent Hormuz-driven highs.",
+ "geo": "Iran tensions and tanker attacks near the Strait of Hormuz remain the oil wildcard, with only preliminary talk of US-Iran talks.",
  "events": [
   {
-   "date": "2026-11-18",
-   "time": "2:00 PM ET",
-   "name": "FOMC minutes (Oct 27-28 meeting)",
-   "impact": "high"
-  },
-  {
-   "date": "2026-11-18",
-   "time": "Before the open",
-   "name": "Target, TJX, Lowe's earnings",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-18",
-   "time": "4:30 PM ET",
-   "name": "Palo Alto Networks earnings",
-   "impact": "medium"
-  },
-  {
    "date": "2026-11-19",
-   "time": "7:00 AM ET",
-   "name": "Walmart earnings",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-19",
-   "time": "Trading debut\u2026",
-   "name": "Anthropic IPO (ANT) expected to begin trading",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-19",
-   "time": "After the close",
-   "name": "Intuit and Ross Stores earnings",
+   "time": "8:30 AM ET",
+   "name": "Initial jobless claims",
    "impact": "medium"
   },
   {
    "date": "2026-11-20",
-   "time": "Time TBD",
-   "name": "Fed Governor Cook speech",
+   "time": "10:00 AM ET",
+   "name": "UMich consumer sentiment (final Nov)",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-23",
+   "time": "9:45 AM ET",
+   "name": "S&P Global flash PMIs",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-24",
+   "time": "10:00 AM ET",
+   "name": "Conference Board consumer confidence",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-25",
+   "time": "8:30 AM ET",
+   "name": "Q3 GDP (2nd est.) and Core PCE",
+   "impact": "high"
+  },
+  {
+   "date": "2026-11-26",
+   "time": "All day",
+   "name": "Thanksgiving: US markets closed",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-27",
+   "time": "1:00 PM ET",
+   "name": "Early close for US stocks",
    "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.heygotrade.com/en/news/weekly-economic-outlook-2026-11-16/",
-  "https://www.fool.com/investing/2026/11/16/this-is-a-huge-week-for-the-stock-market-nvidia-earnings-fed-minutes-and-anthropic-s-ipo/",
-  "https://www.stocktitan.net/articles/earnings-calendar-week-of-november-16-2026",
-  "https://www.newsquawk.com/headlines/crude-wrap-wti-z6-settles-usd-081-lower-at-8604bbl-brent-f7-settles-usd-108-lower-at-9149bbl"
+  "https://alertsify.com/blog/daily-briefing-2026-11-18",
+  "https://www.litefinance.org/blog/analysts-opinions/weekly-economic-calendar-for-23112026-29112026/",
+  "https://letterstoayounginvestor.substack.com/p/weekly-economic-calendar-november-cf0",
+  "https://www.newsquawk.com/headlines/crude-wrap-wti-z6-settles-usd-049-higher-at-8653bbl-brent-f7-settles-usd-127-higher-at-9276bbl",
+  "https://www.heygotrade.com/en/news/fed-rate-cuts-priced-out-2026-treasury-yields-hammack-jolts/"
  ]
 }
