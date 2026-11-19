@@ -907,3 +907,12 @@ data/index_members.csv for RSP; equal-weight Mag 7 for MAGS); one-day moves > 35
 Payload per pair: ratio rebased to 100, 50-day avg, d5 / d20 (+ percentile of d20 across history), 1-yr range position, state up / down /
 mixed, `bt` = SPY next open → 5 / 21 sessions by d20 tier (bottom / top 20%) with rank corr + halves, and by above / below the 50-day.
 Card R-2026-11-18-ratio-watch (mixed: RSP/SPY surge → weaker SPY 21d, MAGS/SOXX surge → stronger, both halves, t < 2). Test `test_ratio_watch`.
+
+## Stale page guard (Nov 19, 2026; template.html `checkFresh`, site.py `docs/version.json`)
+Adam saw OKTA "+17.7% today" on a +6% day: his tab was opened Wed before the midnight update and never reloaded, so live Google
+prices were compared with Tue's close (`refs.c1`) and every Today was a 2-day move. Every build now writes docs/version.json
+{generated, date}. The page (v1 + v3, shared template) polls it every 10 min while visible, on returning to the tab and on
+back/forward restore. Newer data date → red sticky bar on every tab + one automatic reload per version (sessionStorage key
+`stale-reload:<date>:<generated>`, so CDN lag can't loop), onto the same tab (hash kept) with `?v=` to bust GitHub Pages' 10-min cache;
+waits 60 s if you're typing. Newer build, same date → grey "Reload" link only. Check can't run → red bar once the page's data is older
+than the previous weekday after 6 AM ET. Test: asserted in the e2e build test.

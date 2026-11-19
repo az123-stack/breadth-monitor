@@ -85,6 +85,10 @@ def build(history, theme_data=None, kq_data=None, macro_data=None):
     html = TEMPLATE.read_text().replace("/*__DATA__*/null", blob)
     (config.DOCS_DIR / "index.html").write_text(html)
     (config.DOCS_DIR / "data.json").write_text(json.dumps(data, separators=(",", ":")))
+    # Tiny build stamp the open page polls (Nov 19 2026): a tab left open across the midnight update compared live prices
+    # with the old close, so every "Today" was a 2-day move. The page reloads itself when this says its data is older.
+    (config.DOCS_DIR / "version.json").write_text(json.dumps(
+        {"generated": data.get("generated"), "date": (theme_data or {}).get("date") or (data.get("rows") or [{}])[-1].get("date")}))
     history.to_csv(config.DOCS_DIR / "breadth.csv", float_format="%.4f")
     (config.DOCS_DIR / ".nojekyll").touch()
     try:   # v2 page at /v2/ from the same payload (Oct 28 2026); never blocks the v1 page

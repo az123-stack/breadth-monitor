@@ -209,6 +209,10 @@ def test_end_to_end(tmp_path=None):
 
     html = (config.DOCS_DIR / "index.html").read_text()
     assert "/*__DATA__*/null" not in html and '"regime"' in html
+    # Stale page guard (Nov 19 2026): every build writes version.json and the page polls it
+    ver = json.loads((config.DOCS_DIR / "version.json").read_text())
+    assert ver["generated"] and ver["date"], ver
+    assert "async function checkFresh()" in html and "stale-reload:" in html and 'versionURL() + "?cb="' in html
     update.today_et = real_today
     return tmp
 

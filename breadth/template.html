@@ -2995,6 +2995,61 @@ function rerenderPanel() {
 }
 setInterval(() => { if (document.visibilityState === "visible" && (TAB !== "breadth")) fetchLive(); }, 3 * 60 * 1000);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && LIVE && Date.now() - LIVE.fetched > 60000) fetchLive(); });
+/* ---------- Stale page guard (Nov 19 2026) ----------
+   A tab opened Wed and left open showed Thu's live prices against Tue's close (OKTA "+17.7%" for a +6% day).
+   The page now polls version.json (written by every build) and, when the site holds newer daily data, shows a red bar on
+   every tab and reloads onto the same tab (location.hash keeps it). If the check can't run, it still warns once the page's
+   data is older than the previous weekday after 6 AM ET. Newer build with the same data date = quiet "reload" link only. */
+const pageDataDate = () => (DATA.themes && DATA.themes.date) || (DATA.rows && DATA.rows.length ? DATA.rows[DATA.rows.length - 1].date : null);
+const versionURL = () => { const p = location.pathname.replace(/\/(v2|v3)\/[^\/]*$/, "/").replace(/[^\/]*$/, ""); return location.origin + p + "version.json"; };
+function prevWeekdayET(today) {   // "YYYY-MM-DD" of the weekday before today (ET); holidays ignored
+  const d = new Date(today + "T12:00:00Z"); do { d.setUTCDate(d.getUTCDate() - 1); } while (d.getUTCDay() === 0 || d.getUTCDay() === 6);
+  return d.toISOString().slice(0, 10);
+}
+function staleBar(html, level) {
+  let el = document.getElementById("stale-bar");
+  if (!html) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement("div"); el.id = "stale-bar"; document.body.prepend(el); }
+  el.style.cssText = "position:sticky;top:0;z-index:9999;padding:8px 14px;font-size:14px;font-weight:600;color:#fff;background:" +
+    (level === "hard" ? "#c0392b" : "#7f8c8d");
+  el.innerHTML = html;
+}
+let STALE_T = null;
+function freshURL(v) {   // bust the browser / GitHub Pages cache (max-age 600) so the reload gets the new page
+  const u = new URL(location.href); u.searchParams.set("v", (v && v.generated) || Date.now()); return u.toString();
+}
+function staleReload(v) {
+  // at most one automatic reload per new version: if the reloaded page is still old (CDN lag), wait for the next check
+  const key = "stale-reload:" + v.date + ":" + v.generated;
+  try { if (sessionStorage.getItem(key)) return false; sessionStorage.setItem(key, String(Date.now())); } catch (e) { return false; }
+  const go = () => location.replace(freshURL(v));
+  const busy = document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+  if (document.visibilityState !== "visible" || !busy) { go(); return true; }
+  if (!STALE_T) STALE_T = setTimeout(go, 60000);   // typing: give a minute
+  return true;
+}
+async function checkFresh() {
+  const mine = pageDataDate(), today = etToday(), clk = nyClock();
+  let v = null;
+  if (location.protocol !== "file:") {
+    try { const r = await fetch(versionURL() + "?cb=" + Date.now(), { cache: "no-store" }); if (r.ok) v = await r.json(); } catch (e) {}
+  }
+  if (v && v.date && mine && v.date > mine) {
+    staleBar(`⚠ This page holds data through ${longDate(mine)}; the site now has ${longDate(v.date)}. <a href="${freshURL(v)}" style="color:#fff;text-decoration:underline">Reload now</a>`, "hard");
+    staleReload(v); return;
+  }
+  if (v && v.generated && DATA.generated && v.generated > DATA.generated) {
+    staleBar(`A newer build of this page is ready (same data date). <a href="${freshURL(v)}" style="color:#fff;text-decoration:underline">Reload</a>`, "soft"); return;
+  }
+  if (!v && mine && clk && clk.mins > -210 /* after 6 AM ET: the midnight run can wait until 2:30, backup 5:48 */ && mine < prevWeekdayET(today)) {
+    staleBar(`⚠ This page's data is through ${longDate(mine)}, older than the last trading day. Reload the page before trusting "Today" numbers. <a href="${freshURL(null)}" style="color:#fff;text-decoration:underline">Reload</a>`, "hard"); return;
+  }
+  staleBar(null);
+}
+setInterval(() => { if (document.visibilityState === "visible") checkFresh(); }, 10 * 60 * 1000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkFresh(); });
+window.addEventListener("pageshow", (e) => { if (e.persisted) checkFresh(); });   // restored from the back/forward cache
+setTimeout(checkFresh, 1500);
 
 /* =================== THEMES, SUB-THEMES, BROWSE & STOCKS =================== */
 const pct = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : "") + (v * 100).toFixed(d) + "%";
