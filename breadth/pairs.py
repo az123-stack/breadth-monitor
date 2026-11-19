@@ -65,6 +65,13 @@ def _leg(close, etf, basket):
     return _basket(close, basket), "basket"
 
 
+def _rank_corr(a, b):
+    """Spearman rank correlation without scipy (the GitHub runner has only pandas and numpy)."""
+    if len(a) < 3:
+        return None
+    return a.rank().corr(b.rank())
+
+
 def _bt(sig, fwd):
     df = pd.DataFrame({"s": sig, "f": fwd}).dropna()
     if len(df) < 60:
@@ -75,9 +82,9 @@ def _bt(sig, fwd):
         x = df.f[m]
         out[name] = {"n": int(len(x)), "spy": _f(100 * x.mean(), 2), "up": _f(100 * (x > 0).mean(), 0)}
     half = len(df) // 2
-    out["ic"] = _f(df.s.corr(df.f, method="spearman"), 2)
-    out["ic_halves"] = [_f(df.s.iloc[:half].corr(df.f.iloc[:half], method="spearman"), 2),
-                        _f(df.s.iloc[half:].corr(df.f.iloc[half:], method="spearman"), 2)]
+    out["ic"] = _f(_rank_corr(df.s, df.f), 2)
+    out["ic_halves"] = [_f(_rank_corr(df.s.iloc[:half], df.f.iloc[:half]), 2),
+                        _f(_rank_corr(df.s.iloc[half:], df.f.iloc[half:]), 2)]
     return out
 
 

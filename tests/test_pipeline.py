@@ -2246,6 +2246,10 @@ def test_ratio_watch():
     assert P["rsp_spy"]["state"] == "down" and P["rsp_spy"]["d20"] < 0           # RSP grows slower than SPY
     assert abs(m["d20"] - 100 * ((1.002 / 1.001) ** 20 - 1)) < 0.2                # the split day didn't dent the basket
     assert set(m["bt"]) == {"chg5", "chg21", "trend5", "trend21"}
+    import inspect as _ins
+    assert "spearman" not in _ins.getsource(PR), "the GitHub runner has no scipy: no method='spearman'"
+    a, b = _pd.Series([1.0, 2, 3, 4, 5]), _pd.Series([5.0, 6, 7, 8, 100])
+    assert abs(PR._rank_corr(a, b) - 1) < 1e-9
 
 
 def test_podcast():
