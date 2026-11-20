@@ -555,20 +555,20 @@ date,t,role,setup,state,regime,setup_verdict,setup_avg_r,rsr,sub,grp_str,flow_ti
 2026-11-18,REPL,watch,round,thrust,Washed out,Focus,0.26,99.0,Oncology Biotech,54.3,steady,,0.0,0.0,,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,3,0,,,,,pending
 2026-11-18,VRTX,watch,vcp,thrust,Washed out,Focus,0.243,72.0,Large-cap Biotech,77.2,steady,,-0.66,0.78,+10bp 10-yr yield → -1.0%,,,Q3 GDP (2nd est.) and Core PCE 2026-11-25,,,,,,medium,2,0,,,,,pending
 2026-11-19,ACEL,cand,rotation,thrust,Deteriorating,Focus,0.388,81.0,Casinos & Gaming Equipment,68.8,confirmed,,1.45,2.04,+10bp 10-yr yield → -1.0%; +1% oil → -0.1%,,,PCE inflation 2026-11-25,,,,,,high,2,1,,,,,pending
-2026-11-19,AZTA,cand,round,thrust,Deteriorating,Focus,0.257,97.0,Life Science Tools,91.2,confirmed,,0.0,0.0,,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
+2026-11-19,AZTA,cand,round,thrust,Deteriorating,Focus,0.257,97.0,Life Science Tools,91.2,confirmed,,0.0,0.0,,,,PCE inflation 2026-11-25,"Fiscal Q4 results (~Nov 11) were upbeat and the stock jumped ~10%, with headlines of shares skyrocketing on Nov 11-12.",full,positive,real,,high,4,1,,,,,pending
 2026-11-19,BOX,cand,pullback,thrust,Deteriorating,Focus,0.228,95.0,Enterprise SaaS,82.8,fading,,0.5,-0.98,+10bp 10-yr yield → -1.0%,,,PCE inflation 2026-11-25,,,,,,high,2,1,,,,,pending
 2026-11-19,CART,cand,pullback,thrust,Deteriorating,Focus,0.228,92.0,E-Commerce Marketplaces,61.0,steady,,0.72,-1.4,+10bp 10-yr yield → -1.4%,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
 2026-11-19,CBRL,cand,round,thrust,Deteriorating,Focus,0.257,98.0,Restaurants,83.5,confirmed,,-1.88,-5.45,+1% dollar → -2.7%,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
 2026-11-19,DGX,cand,vcp,thrust,Deteriorating,Focus,0.211,86.0,Genomics & Diagnostics,59.6,outflow,,0.0,0.0,,,,PCE inflation 2026-11-25,,,,,,high,1,2,,,,,pending
-2026-11-19,HAE,cand,pullback,thrust,Deteriorating,Focus,0.228,96.0,Medical Devices,90.4,confirmed,,0.0,0.0,,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
+2026-11-19,HAE,cand,pullback,thrust,Deteriorating,Focus,0.228,96.0,Medical Devices,90.4,confirmed,,0.0,0.0,,,,PCE inflation 2026-11-25,Q2 FY27 (Nov 5) beat and raise on CSL-fueled plasma surge; stock soared ~34%. A margin guidance cut shows the cost of growth.,full,positive,strong,margin guidance cut,high,3,1,,,,,pending
 2026-11-19,KNSA,cand,round,thrust,Deteriorating,Focus,0.257,97.0,Immunology & Inflammation,83.1,steady,,0.0,0.0,,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
 2026-11-19,LH,cand,vcp,thrust,Deteriorating,Focus,0.211,88.0,Genomics & Diagnostics,59.6,outflow,,0.34,-0.66,+10bp 10-yr yield → -0.7%,,,PCE inflation 2026-11-25,,,,,,high,1,2,,,,,pending
-2026-11-19,PRCH,cand,pullback,thrust,Deteriorating,Focus,0.228,98.0,P&C Insurers,90.7,confirmed,,0.0,0.0,,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
+2026-11-19,PRCH,cand,pullback,thrust,Deteriorating,Focus,0.228,98.0,P&C Insurers,90.7,confirmed,,0.0,0.0,,,,PCE inflation 2026-11-25,"Q3 2026 EPS $0.12 vs $0.06 a year ago, a return to profit (reported early Nov); no fresher news found.",full,positive,real,,high,4,1,,,,,pending
 2026-11-19,REGN,cand,rotation,thrust,Deteriorating,Focus,0.388,85.0,Large-cap Biotech,79.7,confirmed,,0.48,-0.94,+10bp 10-yr yield → -0.9%,,,PCE inflation 2026-11-25,,,,,,high,2,1,,,,,pending
 2026-11-19,RXO,cand,rotation,thrust,Deteriorating,Focus,0.388,97.0,Trucking & Logistics,61.9,steady,,0.0,0.0,,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
 2026-11-19,S,cand,rotation,thrust,Deteriorating,Focus,0.388,93.0,Identity & Security Tools,99.2,confirmed,,0.0,0.0,,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
-2026-11-19,SIBN,cand,round,thrust,Deteriorating,Focus,0.257,92.0,Medical Devices,90.4,confirmed,,0.0,0.0,,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
-2026-11-19,TENB,cand,pullback,thrust,Deteriorating,Focus,0.228,97.0,Identity & Security Tools,99.2,confirmed,,0.9,-1.76,+10bp 10-yr yield → -1.8%,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
+2026-11-19,SIBN,cand,round,thrust,Deteriorating,Focus,0.257,92.0,Medical Devices,90.4,confirmed,,0.0,0.0,,,,PCE inflation 2026-11-25,earnings date check only,earnings_only,none,unknown,,high,3,1,,,,,pending
+2026-11-19,TENB,cand,pullback,thrust,Deteriorating,Focus,0.228,97.0,Identity & Security Tools,99.2,confirmed,,0.9,-1.76,+10bp 10-yr yield → -1.8%,,,PCE inflation 2026-11-25,"No fresh catalyst found; latest headlines are older (July dip, an AI-led security platform outlook piece).",full,none,none,,high,3,1,,,,,pending
 2026-11-19,VLTO,cand,rotation,thrust,Deteriorating,Focus,0.388,86.0,Water Technology,56.9,confirmed,,0.62,-1.2,+10bp 10-yr yield → -1.2%,,,PCE inflation 2026-11-25,,,,,,high,2,1,,,,,pending
 2026-11-19,ORKA,pick1,round,thrust,Deteriorating,Focus,0.257,99.0,Immunology & Inflammation,83.1,steady,,0.0,0.0,,,,PCE inflation 2026-11-25,,,,,,high,3,1,,,,,pending
 2026-11-19,VIA,pick2,round,thrust,Deteriorating,Focus,0.257,99.0,Enterprise SaaS,82.8,fading,,0.0,0.0,,,,PCE inflation 2026-11-25,,,,,,high,2,1,,,,,pending
