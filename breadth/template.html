@@ -1892,6 +1892,7 @@ function renderBreadth(app) {
   // morning the last row should be the previous weekday.
   const prevWk = (() => { const d = new Date(etToday() + "T12:00:00"); do d.setDate(d.getDate() - 1); while ([0, 6].includes(d.getDay())); return d.toISOString().slice(0, 10); })();
   if (last && last.date < prevWk) app.append($(`<div class="r2kwarn" style="margin:0 0 12px">⚠ <b>Breadth data runs through ${longDate(last.date)}.</b> ${longDate(prevWk)}'s numbers haven't loaded yet (unless the market was closed that day). Massive's free plan releases each day just after midnight ET, so the update runs at 12:17–12:25 AM with morning backups; if this is still here after 7 AM, ask Claude to check the update.</div>`));
+  if (DATA.health && DATA.health.length) app.append($(`<div class="r2kwarn" style="margin:0 0 12px">⚠ <b>Breadth data has gaps.</b> ${DATA.health.map(esc).join(" · ")}. Ask Claude to backfill (the nightly check flags this too).</div>`));
   if (DATA.macro && DATA.macro.length) app.append(macroStrip(true));
   if (DATA.themes && DATA.themes.washout) app.append(washoutCard(DATA.themes.washout));
   if (DATA.themes && DATA.themes.leadership) app.append(healthCard(DATA.themes.leadership));
@@ -2300,6 +2301,18 @@ function chartT2108(rows) {
   return c.el;
 }
 
+// Warm-up stretch: a metric that needs a year (or a few months) of price history has no value at the start of the chart.
+// Shade it and say so, so an empty stretch never looks like lost data.
+function warmup(c, rows, x, key, why) {
+  const i0 = rows.findIndex(r => r[key] != null);
+  if (i0 <= 0) return;
+  const bw = (W - M.l - M.r) / rows.length, x1 = x(i0) - bw / 2;
+  S("rect", { x: M.l, y: M.t, width: Math.max(0, x1 - M.l), height: c.h - M.t - M.b, fill: "var(--text-muted)", opacity: 0.07 }, c.svg);
+  const msg = `No data yet: ${why}; starts ${shortDate(rows[i0].date)}, ${rows[i0].date.slice(0, 4)}`;
+  for (let xx = x1 - 12; xx > M.l + 60; xx -= 420) {
+    const t = S("text", { x: xx, y: M.t + 16, "text-anchor": "end", fill: "var(--text-muted)", "font-size": 12 }, c.svg); t.textContent = msg;
+  }
+}
 function chartHighsLows(rows) {
   const c = frame("New 52-week highs vs new 52-week lows",
     '<span><i style="background:var(--up)"></i>New highs</span><span><i style="background:var(--down)"></i>New lows</span><span><i class="line" style="background:var(--s2);height:3px"></i>Highs − lows (10-day avg)</span><span><i class="line" style="background:var(--text-muted)"></i>10-day avg of each</span>');
@@ -2317,6 +2330,7 @@ function chartHighsLows(rows) {
     if (r.nl) S("rect", { x: x0, y: mid, width: w, height: yd(r.nl) - mid, rx: Math.min(2, w / 3), fill: "var(--down)" }, c.svg);
   });
   S("line", { x1: M.l, x2: W - M.r, y1: mid, y2: mid, stroke: "var(--text-muted)", "stroke-width": 1 }, c.svg);
+  warmup(c, rows, x, "nh", "52-week highs/lows need a year of price history");
   eventLines(c, x, false);
   S("path", { d: path(rows, x, y, "nh10"), fill: "none", stroke: "var(--text-muted)", "stroke-width": 1.5, "stroke-linejoin": "round", opacity: 0.8 }, c.svg);
   S("path", { d: path(rows, x, yd, "nl10"), fill: "none", stroke: "var(--text-muted)", "stroke-width": 1.5, "stroke-linejoin": "round", opacity: 0.8 }, c.svg);
@@ -2503,6 +2517,7 @@ function chartNearHigh(rows) {
   S("path", { d: path(rows, x, y, "pct_near10"), fill: "none", stroke: "var(--text-muted)", "stroke-width": 1.5, "stroke-dasharray": "4 3" }, c.svg);
   S("path", { d: path(rows, x, y, "pct_near"), fill: "none", stroke: "var(--s1)", "stroke-width": 2, "stroke-linejoin": "round" }, c.svg);
   endLabel(c.svg, x, y, rows, "pct_near", "", "var(--s1)");
+  warmup(c, rows, x, "pct_near", "52-week highs need a year of price history");
   eventLines(c, x, false);
   eventMarkers(c, x, y, rows, "pct_near10", ["narrowing"]);
   hover(c, rows, x, [["Near a 52-week high", r => r.pct_near == null ? "–" : fmt(r.pct_near, 1) + "% (" + fmt(r.near_hi) + " stocks)"], ["10-day average", r => r.pct_near10 == null ? "–" : fmt(r.pct_near10, 1) + "%"], ["SPY vs its 52-week high", r => r.spy_off_hi == null ? "–" : pct(r.spy_off_hi)]]);

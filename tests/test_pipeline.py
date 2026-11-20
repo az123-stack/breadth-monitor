@@ -2289,6 +2289,23 @@ def test_podcast():
         shutil.rmtree(tmp)
 
 
+def test_breadth_health():
+    """health.problems: clean file ok; a skipped session, an interior blank and a blank latest metric are all reported."""
+    import tempfile, pandas as _pd
+    from pathlib import Path as _P
+    from breadth import health as HL
+    d = _P(tempfile.mkdtemp())
+    dates = list(_pd.bdate_range("2026-11-02", "2026-11-13"))
+    df = _pd.DataFrame({"date": dates, "up4": range(10), "nh": [None, None] + list(range(8))})
+    df.to_csv(d / "b.csv", index=False)
+    assert HL.problems(d / "b.csv", d / "nobars") == [], HL.problems(d / "b.csv", d / "nobars")
+    bad = df.drop(index=4).copy(); bad.loc[6, "nh"] = None; bad.loc[9, "up4"] = None
+    bad.to_csv(d / "b.csv", index=False)
+    p = " | ".join(HL.problems(d / "b.csv", d / "nobars"))
+    assert "skips 1 session" in p and "2026-11-06" in p, p
+    assert "nh is blank on 1 day" in p and "latest row" in p and "up4" in p, p
+    return "ok"
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

@@ -81,6 +81,11 @@ jobs:
             done
           fi
 
+      - name: Check breadth data for gaps
+        # Fails red (GitHub emails the owner) if a session is skipped, a bar file is missing, a metric goes blank after
+        # it started, or the latest row lacks a core metric. Runs after the commit so the data is still saved.
+        run: python -m breadth.health
+
       - name: Rebuild again if an agent saved new input while this ran
         # Agent answers (docs/agent/*.json) saved during this run would otherwise be missing from the page and the
         # decision log until the next rebuild (this run's generated files won the rebase above).

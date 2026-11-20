@@ -6,8 +6,17 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import config, metrics
+from . import health as _health
 
 TEMPLATE = Path(__file__).with_name("template.html")
+
+
+def _safe_health():
+    """Data-gap check for the Breadth tab banner (breadth/health.py). Never breaks the build."""
+    try:
+        return _health.problems()
+    except Exception as e:  # pragma: no cover
+        return [f"health check failed to run: {e}"]
 
 
 def _clean(v):
@@ -48,6 +57,7 @@ def payload(history, theme_data=None, kq_data=None, macro_data=None):
         "history_days": int(history["complete"].sum()),
         "regime": metrics.classify(history),
         "events": metrics.events(history),
+        "health": _safe_health(),
         "percentiles": metrics.percentiles(history),
         "scale": scale,
         "thresholds": {"oversold": config.T2108_OVERSOLD,
