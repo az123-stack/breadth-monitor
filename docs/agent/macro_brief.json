@@ -1,17 +1,17 @@
 {
- "for_date": "2026-11-18",
- "written": "2026-11-19T12:03Z",
- "headline": "Stocks are bouncing in futures after four straight S&P 500 declines as Nvidia's big beat meets a Fed priced for hikes, with PCE and GDP due Wednesday before Thanksgiving.",
- "risk": "medium",
- "rates": "Treasury yields are elevated with money markets pricing almost no cuts and rising odds of a Fed hike, though the 10-year slipped a couple of basis points Wednesday.",
- "fed": "October FOMC minutes (10-2 hold) came out Wednesday and Governor Barr spoke; no Fed speakers are listed for Nov 19-20.",
- "oil": "WTI was near $84 on Wednesday, down about 2% on a rising US crude stockpile and surplus worries, well below the recent Hormuz-driven highs.",
- "geo": "Iran tensions and tanker attacks near the Strait of Hormuz remain the oil wildcard, with only preliminary talk of US-Iran talks.",
+ "for_date": "2026-11-19",
+ "written": "2026-11-20T12:06Z",
+ "headline": "Stocks sank for a sixth straight day (S&P 500 -2%, Dow -1,100 points) with the 10-year near 5.04% and the Fed minutes pointing to a likely December hike.",
+ "risk": "high",
+ "rates": "The 10-year Treasury yield eased to about 5.04% from 5.07% on weaker jobless-claims and mid-Atlantic manufacturing data, but it remains near multi-year highs.",
+ "fed": "The Fed minutes flagged a high likelihood of a 25 basis point hike in December, and Governors Waller (8:25 AM ET) and Cook (12:15 PM ET) speak today after Barr said policy needs further adjustment.",
+ "oil": "WTI is near $85 and Brent near $92.6 as a Q4 supply surplus (IEA) and a 5.3M-barrel US crude build are offset by Middle East risk premium.",
+ "geo": "US-Iran fighting and disrupted Strait of Hormuz shipping continue, US-China trade talks ended with no progress on chips or tariffs, and midterm results raised AI-regulation worries.",
  "events": [
   {
-   "date": "2026-11-19",
-   "time": "8:30 AM ET",
-   "name": "Initial jobless claims",
+   "date": "2026-11-20",
+   "time": "8:25 AM ET",
+   "name": "Fed Governor Waller speaks",
    "impact": "medium"
   },
   {
@@ -21,9 +21,15 @@
    "impact": "medium"
   },
   {
+   "date": "2026-11-20",
+   "time": "12:15 PM ET",
+   "name": "Fed Governor Cook speaks",
+   "impact": "medium"
+  },
+  {
    "date": "2026-11-23",
    "time": "9:45 AM ET",
-   "name": "S&P Global flash PMIs",
+   "name": "S&P Global US flash PMI",
    "impact": "medium"
   },
   {
@@ -35,27 +41,28 @@
   {
    "date": "2026-11-25",
    "time": "8:30 AM ET",
-   "name": "Q3 GDP (2nd est.) and Core PCE",
+   "name": "PCE inflation",
    "impact": "high"
   },
   {
-   "date": "2026-11-26",
-   "time": "All day",
-   "name": "Thanksgiving: US markets closed",
+   "date": "2026-11-25",
+   "time": "8:30 AM ET",
+   "name": "GDP Q3 second estimate",
    "impact": "medium"
   },
   {
    "date": "2026-11-27",
    "time": "1:00 PM ET",
-   "name": "Early close for US stocks",
+   "name": "Early close after Thanksgiving (markets closed Nov 26)",
    "impact": "medium"
   }
  ],
  "sources": [
-  "https://alertsify.com/blog/daily-briefing-2026-11-18",
+  "https://www.dtnpf.com/agriculture/web/ag/news/world-policy/article/2026/11/19/wall-street-tumbles-longest-losing-1",
+  "https://gokhshtein.com/news/2026-11-19-yields-fall-equities-risebut-fed-rate-hike-still-approaches",
+  "https://gulfnews.com/business/energy/oil-slips-in-asia-led-by-murban-brent-wti-what-to-know-on-nov-18-2026-1.500751476",
   "https://www.litefinance.org/blog/analysts-opinions/weekly-economic-calendar-for-23112026-29112026/",
-  "https://letterstoayounginvestor.substack.com/p/weekly-economic-calendar-november-cf0",
-  "https://www.newsquawk.com/headlines/crude-wrap-wti-z6-settles-usd-049-higher-at-8653bbl-brent-f7-settles-usd-127-higher-at-9276bbl",
-  "https://www.heygotrade.com/en/news/fed-rate-cuts-priced-out-2026-treasury-yields-hammack-jolts/"
+  "https://helious.io/calendar/2026-11",
+  "https://thriveinmarkets.com/calendar/"
  ]
 }
