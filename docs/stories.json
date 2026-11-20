@@ -1,14 +1,14 @@
 {
- "updated": "2026-11-19T16:56",
+ "updated": "2026-11-20T16:55",
  "stories": [
   {
    "id": "ai-spending-repriced",
    "title": "AI spending gets repriced",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-11-19",
+   "updated": "2026-11-20",
    "summary": "Investors now want proof that AI spending pays back in cash, so money is leaving AI hardware and, as of Oct 29, software too.",
-   "changed": "The Nov 19 rebound failed on heavy selling (91% of dollar volume in falling stocks): the market sold the news instead of buying it.",
+   "changed": "Nov 20 was a washout: 88% of dollar volume in falling stocks, QQQ -5.67%. Even the \"software\" long side bent (Intuit cut its forecast), but IT Services and Enterprise SaaS lost far less than AI hardware.",
    "thesis": {
     "what": "Since early October the AI-hardware groups (chip equipment, optical, AI servers, custom chips, memory, neoclouds, data-center power) fell about 18% over 20 sessions while IT services, enterprise software and steady consumer names rose about 10%: a 28-point swing. On Oct 22 the S&P 500 fell 1.2% but the equal-weight S&P rose 0.7%: the money moved, it didn't leave.",
     "why": "Two worries feed each other. **Cost:** Meta announced non-voting shares to help fund its AI spending and fell 5%; Tesla cut capex; Lam Research guided below consensus ([Korea Times](https://www.koreatimes.co.kr/world/20261023/wall-street-sinks-as-nasdaq-falls-over-2-on-ai-cost-worries), [Investrade](https://investrade.com/market-review-october-22-2026/)). **Financing:** hot CPI pushed the 10-year to 5.26% and CoreWeave's credit spread past 1,000 bp, so borrowing to build data centers got expensive ([TradingKey](https://www.tradingkey.com/analysis/stocks/us-stocks/262218623-us-premarket-tsmc-record-profit-chip-stocks-fall-nvidia-micron-ppi-tradingkey)). Funding is the newest strain: Meta plans to raise up to $95B, starting with $35B in stock ([MarketScreener](https://www.marketscreener.com/news/wall-st-rises-as-anthropic-s-ipo-filing-sharpens-focus-on-ai-trade-ce785cdcdd8ff22d)), and Anthropic's filing adds a large new AI listing to the supply.",
@@ -233,6 +233,13 @@
      "url": "https://www.tradingkey.com/analysis/stocks/us-stocks/262313953-us-stock-nasdaq-falls-anthropic-ipo-debut-amd-short-report-tradingkey",
      "source": "TradingKey",
      "reaction": "Hyperscalers -3.1%, QQQ -2.19%, VIX +15.8% (Google close estimates)"
+    },
+    {
+     "date": "2026-11-20",
+     "event": "Nasdaq Composite fell about 5% (worst week since 2020) as Nvidia dropped roughly 12–14% after a Reuters-reported SEC probe of its accounting (single source; the SEC report itself not found) and the AI-favorites chip index fell 11%. Intuit plunged after cutting its annual revenue growth forecast.",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/nasdaq-plunges-5-day-anthropic-211724232.html",
+     "source": "Reuters via Yahoo Finance",
+     "reaction": "Memory & Storage -13.6%, Custom Silicon & Networking -13.2%, Hyperscalers -4.8%, QQQ -5.67%, VIX +26.2% (Google close estimates)"
     }
    ],
    "groups": {
@@ -279,7 +286,7 @@
      "why": "A December hike would hit long-duration growth; strong jobs on Nov 6 keep it in play."
     }
    ],
-   "trade": "- **Today's tape is forced selling:** no new longs into it; the long-group names (VEEV, APPN, TEAM, PAYC) are pullback candidates, not chases.\n- **Entries:** wait for the first calm day (share in falling stocks under 60%), then buy leaders on pullbacks to the 9/21 EMAs with the stop under the touch-day low.\n- **Counter-trade:** the comeback trigger is 40% or less in falling stocks; sold-hardest 60-day leaders (Enterprise AI Infrastructure, Cybersecurity Platforms, Data & Observability) have tended to snap back first.\n- **Into Friday's jobs report:** small size, no adds before 8:30 AM.\n- **Avoid:** catching chips and memory while the VIX is 28 and the Nasdaq is under its 200-day average.\n- **Nov 6 update:** the bounce is a snapback in what was sold, not proof of a bottom. Wait for a pullback that holds above the Nov 5 lows before touching AI hardware; software longs (TEAM −16% on results) need their own stop discipline.\n- **Nov 11 update:** the snapback is a catalyst-driven bounce (funding relief), not yet a thrust (135 up 4%+ vs 17 down, 1.6x average; thrust pace is 2.5x). Don't chase the neocloud and memory gaps: wait for a pullback that holds above the gap, stop under the touch-day low, and size down into Nvidia on Nov 17.\n- **Nov 16 update:** 85% of dollars fell and 239 stocks dropped 4%+, forced-selling territory. No new AI-hardware longs before Nvidia; the first calm day (under 60% falling) is the entry signal for software and IT-services pullbacks.",
+   "trade": "- **Today's tape is forced selling:** no new longs into it; the long-group names (VEEV, APPN, TEAM, PAYC) are pullback candidates, not chases.\n- **Entries:** wait for the first calm day (share in falling stocks under 60%), then buy leaders on pullbacks to the 9/21 EMAs with the stop under the touch-day low.\n- **Counter-trade:** the comeback trigger is 40% or less in falling stocks; sold-hardest 60-day leaders (Enterprise AI Infrastructure, Cybersecurity Platforms, Data & Observability) have tended to snap back first.\n- **Into Friday's jobs report:** small size, no adds before 8:30 AM.\n- **Avoid:** catching chips and memory while the VIX is 28 and the Nasdaq is under its 200-day average.\n- **Nov 6 update:** the bounce is a snapback in what was sold, not proof of a bottom. Wait for a pullback that holds above the Nov 5 lows before touching AI hardware; software longs (TEAM −16% on results) need their own stop discipline.\n- **Nov 11 update:** the snapback is a catalyst-driven bounce (funding relief), not yet a thrust (135 up 4%+ vs 17 down, 1.6x average; thrust pace is 2.5x). Don't chase the neocloud and memory gaps: wait for a pullback that holds above the gap, stop under the touch-day low, and size down into Nvidia on Nov 17.\n- **Nov 16 update:** 85% of dollars fell and 239 stocks dropped 4%+, forced-selling territory. No new AI-hardware longs before Nvidia; the first calm day (under 60% falling) is the entry signal for software and IT-services pullbacks.\n- Nov 20 update: the market is in a washout, not an orderly rotation. No new entries until 4%+ up stocks jump well above 100 and the share in falling stocks drops under 40%; keep stops on existing longs.",
    "related": [
     "rates-near-5",
     "it-services-rerating",
@@ -748,6 +755,27 @@
       "Memory & Storage Media"
      ],
      "note": "The Nov 19 rebound failed on heavy selling (91% of dollar volume in falling stocks): the market sold the news instead of buying it."
+    },
+    {
+     "date": "2026-11-20",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "Enterprise SaaS",
+      "Business Services & Data",
+      "Household & Personal Care",
+      "Packaged Foods"
+     ],
+     "short": [
+      "Semicap Equipment",
+      "Optical Components & Transceivers",
+      "AI Servers & Integrators",
+      "Custom Silicon & Networking Chips",
+      "Neoclouds & GPU Hosting",
+      "Data Center Power & Cooling",
+      "Memory & Storage Media"
+     ],
+     "note": "Nov 20 was a washout: 88% of dollar volume in falling stocks, QQQ -5.67%. Even the \"software\" long side bent (Intuit cut its forecast), but IT Services and Enterprise SaaS lost far less than AI hardware."
     }
    ]
   },
@@ -756,9 +784,9 @@
    "title": "Making room for Anthropic: the IPO supply test",
    "status": "building",
    "started": "2026-10-26",
-   "updated": "2026-11-19",
+   "updated": "2026-11-20",
    "summary": "A record ~$90B Anthropic offering prices Nov 18. The theory says funds sell AI winners to pay for it; the one pattern the data shows (SpaceX, n=1) is that stand-in stocks get dumped once the real one trades.",
-   "changed": "ANT listed: opened high, faded to $97.17, and the AI complex sold off with it (Hyperscalers -3.1%); the proxy-swap window (5–20 sessions) now starts.",
+   "changed": "Day two: ANT -9% and the AI complex fell harder (Nvidia -12–14% on an SEC-probe report); the stand-in selling the story predicted is playing out, not yet a bottom.",
    "thesis": {
     "what": "Anthropic is selling 825M shares at $70–78 (up to $64.4B) plus a $26B private placement at the IPO price, about $90B in all, more than SpaceX's record $75B. Since its public filing on Oct 26 the dashboard's AI-hardware basket is **−7.6% vs SPY** (16th percentile of all 14-session windows), the 50 crowded momentum winners **−8.2%** (14th pct) and NVDA **−23%**, while AVGO is +7% and AMZN (a big Anthropic owner) +8.5%.",
     "why": "New stock has to be paid for. Research on 254 IPOs found that stocks most like a big new issue fall relative to others in the IPO month, more so when the IPO is bigger ([Braun & Larrain, Review of Financial Studies 2009](https://www.bostonfed.org/-/media/Documents/Workingpapers/PDF/wp0604.pdf)), though the authors note one IPO rarely moves a large developed market. This one is unusual: it is [about six times oversubscribed](https://www.investing.com/news/stock-market-news/anthropics-ipo-is-about-six-times-oversubscribed-bloomberg-news-reports-5023345), so funds want more than they'll get.",
@@ -836,6 +864,13 @@
      "url": "https://www.tradingkey.com/analysis/stocks/us-stocks/262313953-us-stock-nasdaq-falls-anthropic-ipo-debut-amd-short-report-tradingkey",
      "source": "TradingKey",
      "reaction": "SPY -1.96%, QQQ -2.19%, Hyperscalers -3.1%, Launch & Space -4.2% (Google close estimates)"
+    },
+    {
+     "date": "2026-11-20",
+     "event": "ANT closed -9% on day two after trading down as much as 14%; AI favorites sold off broadly. Reuters called the debut a failure to quell AI nerves (day-one pop of +17% over the $83 price fully faded in the AI complex).",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/nasdaq-plunges-5-day-anthropic-211724232.html",
+     "source": "Reuters via Yahoo Finance",
+     "reaction": "Hyperscalers -4.8%, QQQ -5.67% (Google close estimates)"
     }
    ],
    "groups": {
@@ -930,6 +965,18 @@
       "AI Servers & Integrators"
      ],
      "note": "ANT listed: opened high, faded to $97.17, and the AI complex sold off with it (Hyperscalers -3.1%); the proxy-swap window (5–20 sessions) now starts."
+    },
+    {
+     "date": "2026-11-20",
+     "status": "building",
+     "long": [],
+     "short": [
+      "AI Accelerators & GPUs",
+      "Neoclouds & GPU Hosting",
+      "Custom Silicon & Networking Chips",
+      "AI Servers & Integrators"
+     ],
+     "note": "Day two: ANT -9% and the AI complex fell harder (Nvidia -12–14% on an SEC-probe report); the stand-in selling the story predicted is playing out, not yet a bottom."
     }
    ]
   },
@@ -938,9 +985,9 @@
    "title": "Hot inflation keeps the 10-year near 5%",
    "status": "building",
    "started": "2026-10-14",
-   "updated": "2026-11-19",
+   "updated": "2026-11-20",
    "summary": "Hot CPI and PPI pushed the 10-year Treasury yield from 4.86% (Nov 6) to about 5.15%, and a December hike is close to fully priced; growth and long-duration stocks are bearing the cost.",
-   "changed": "FOMC minutes read hawkish (some open to a 50-point hike) but Treasuries still rose on the day.",
+   "changed": "Yields eased to 4.93% in a flight to safety, but December hike odds are above 95%; the rates story now stacks on an AI washout.",
    "thesis": {
     "what": "Since the Oct 14 CPI the groups that need cheap money or are years from profits (small nuclear reactors, quantum, homebuilders, REITs, residential solar) fell about 13% vs SPY over 20 sessions.",
     "why": "September CPI came in at 3.7% vs 3.6% and PPI was hot the next day, reviving rate-hike bets; the 10-year hit 5.26% ([24/7 Wall St.](https://247wallst.com/investing/2026/10/14/nuscale-power-falls-7-as-10-year-treasury-yield-climbs-to-5-26-energy-fuels-drops-9-oklo-slides-5/)). Oil above $100 feeds inflation worries too (see the Gulf oil story).",
@@ -1074,6 +1121,13 @@
      "url": "https://lufkindailynews.com/news_reuters/business/wall-street-ends-mixed-after-nvidia-earnings-fed-minutes/article_757d7e1e-451b-5fc3-914c-44086229e225.html",
      "source": "Reuters via Lufkin Daily News",
      "reaction": "TLT +0.84%, UUP +0.27%, GLD -3.20%"
+    },
+    {
+     "date": "2026-11-20",
+     "event": "The 10-year yield fell about 12 bp to 4.93% as Treasuries acted as a haven, yet futures priced better than 95% odds of a December hike after Governor Cook said policy is not restrictive enough for current inflation.",
+     "url": "https://www.ibtimes.com/us-stocks-ai-selloff-nasdaq-market-decline-3810038",
+     "source": "IBTimes",
+     "reaction": "TLT +1.37%, GLD -3.67%, UUP -0.03% (Google close estimates)"
     }
    ],
    "groups": {
@@ -1394,6 +1448,19 @@
       "Residential Solar & Yieldcos"
      ],
      "note": "FOMC minutes read hawkish (some open to a 50-point hike) but Treasuries still rose on the day."
+    },
+    {
+     "date": "2026-11-20",
+     "status": "building",
+     "long": [],
+     "short": [
+      "Nuclear Reactors (SMR)",
+      "Quantum Computing",
+      "Homebuilders",
+      "REITs",
+      "Residential Solar & Yieldcos"
+     ],
+     "note": "Yields eased to 4.93% in a flight to safety, but December hike odds are above 95%; the rates story now stacks on an AI washout."
     }
    ]
   },
@@ -1402,9 +1469,9 @@
    "title": "IT services: from AI loser to AI implementer",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-11-19",
+   "updated": "2026-11-20",
    "summary": "After being sold as AI losers, IT services and consulting are being re-rated as the firms that will implement AI, and they're absorbing money leaving AI hardware.",
-   "changed": "IT Services -1.4% today and still wobbling (5 days -3.0% vs SPY).",
+   "changed": "Nov 20: IT Services & Consulting closed -0.1% in a -3.6% S&P day (Google estimates), holding up far better than AI hardware; still a landing spot but price wobbles on 5 days.",
    "thesis": {
     "what": "IT Services & Consulting is up about 20% over 20 sessions (+10% in 5) with every member above its 21-day EMA, the strongest dollar flow of any group (+0.76).",
     "why": "Accenture's outlook on Oct 1–2 eased fears that AI will eat consulting revenue ([The Star](https://www.thestar.com.my/tech/tech-news/2026/10/02/accenture039s-forecast-eases-ai-disruption-fears-lifts-battered-it-services-stocks)); in June the same fear had sent Accenture down 18% ([SentiSense](https://app.sentisense.ai/stories/accenture-shares-plummet-18-percent-it-stocks-crash-amid-weak-guidance-06192026)). Cognizant rose 7% in sympathy ([Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/cognizant-shares-rise-7-2-123306736.html)).",
@@ -1711,6 +1778,16 @@
      ],
      "short": [],
      "note": "IT Services -1.4% today and still wobbling (5 days -3.0% vs SPY)."
+    },
+    {
+     "date": "2026-11-20",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "India IT Services"
+     ],
+     "short": [],
+     "note": "Nov 20: IT Services & Consulting closed -0.1% in a -3.6% S&P day (Google estimates), holding up far better than AI hardware; still a landing spot but price wobbles on 5 days."
     }
    ]
   },
@@ -1719,9 +1796,9 @@
    "title": "Managed care repairs on better Medicare ratings",
    "status": "fading",
    "started": "2026-10-09",
-   "updated": "2026-11-19",
+   "updated": "2026-11-20",
    "summary": "Better Medicare star ratings and UnitedHealth's beat-and-raise are pulling managed care out of its slump.",
-   "changed": "Price still disagrees with the story (5-day move well below SPY); watch for resolution if it persists.",
+   "changed": "Nov 20: Managed Care -0.1% while the market fell 3.6%: a net inflow group, but 5-day price still lags (-7.6% vs SPY), so the repair story stays unproven.",
    "thesis": {
     "what": "Managed Care is up about 11% over 20 sessions and 2% over 5, beating SPY on both.",
     "why": "Humana jumped 16% on better Medicare Advantage star ratings ([24/7 Wall St.](https://247wallst.com/investing/2026/10/09/humana-soars-16-on-improved-medicare-advantage-star-ratings-cvs-slides-3-unitedhealth-holds-steady/)), then UnitedHealth beat and raised its full-year outlook ([24/7 Wall St.](https://247wallst.com/investing/2026/10/13/unitedhealth-rises-4-on-earnings-beat-and-raised-full-year-outlook-humana-advances-2/)).",
@@ -1976,6 +2053,15 @@
      ],
      "short": [],
      "note": "Price still disagrees with the story (5-day move well below SPY); watch for resolution if it persists."
+    },
+    {
+     "date": "2026-11-20",
+     "status": "fading",
+     "long": [
+      "Managed Care"
+     ],
+     "short": [],
+     "note": "Nov 20: Managed Care -0.1% while the market fell 3.6%: a net inflow group, but 5-day price still lags (-7.6% vs SPY), so the repair story stays unproven."
     }
    ]
   },
@@ -1984,7 +2070,7 @@
    "title": "SpaceX eyes cell sites; towers up, carriers down",
    "status": "fading",
    "started": "2026-10-23",
-   "updated": "2026-11-19",
+   "updated": "2026-11-20",
    "summary": "Reports that SpaceX wants about 80,000 US cell sites for a wireless network lift tower landlords and hit AT&T and T-Mobile.",
    "changed": "Price still disagrees with the story (5-day move well below SPY); watch for resolution if it persists.",
    "thesis": {
@@ -2289,6 +2375,18 @@
       "Wireless Carriers"
      ],
      "note": "Price still disagrees with the story (5-day move well below SPY); watch for resolution if it persists."
+    },
+    {
+     "date": "2026-11-20",
+     "status": "fading",
+     "long": [
+      "Tower REITs",
+      "Launch & Space Systems"
+     ],
+     "short": [
+      "Wireless Carriers"
+     ],
+     "note": "Price still disagrees with the story (5-day move well below SPY); watch for resolution if it persists."
     }
    ]
   },
@@ -2297,7 +2395,7 @@
    "title": "Gulf attacks keep oil above $100",
    "status": "resolved",
    "started": "2026-10-09",
-   "updated": "2026-11-19",
+   "updated": "2026-11-20",
    "summary": "Houthi attacks on Saudi sites and Hormuz shipping pushed Brent from about $98 to over $110 in two weeks; refiners and drillers lead, airlines lose.",
    "changed": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it.",
    "thesis": {
@@ -2768,6 +2866,21 @@
     },
     {
      "date": "2026-11-19",
+     "status": "resolved",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it."
+    },
+    {
+     "date": "2026-11-20",
      "status": "resolved",
      "long": [
       "Refiners",
