@@ -1,6 +1,21 @@
 {
- "updated": "2026-11-19T13:11:27Z",
+ "updated": "2026-11-20T13:16:18Z",
  "episodes": [
+  {
+   "id": "2026-11-20-am",
+   "date": "2026-11-20",
+   "slot": "am",
+   "format": "two_host",
+   "format_name": "Two-host show",
+   "title": "Selling spreads: even security leaders gap down",
+   "name": "2026-11-20-am-two_host-131032.mp3",
+   "url": "https://az123-stack.github.io/breadth-monitor/podcast/audio/2026-11-20-am-two_host-131032.mp3",
+   "bytes": 2843136,
+   "seconds": 474,
+   "words": 1244,
+   "summary": "Where we are. Scenario A (money is still leaving) holds, and Wednesday's heavy selling got worse on official numbers for Nov 19: 90.5 percent of dollar volume in falling stocks, net minus 572 billion dollars, only 50 stocks up 4 percent+ against 351 down, 213 new lows, T2108 34.7. Yesterday's afternoon chapter flagged the Anthropic rally failing, and the failure carries over. Pre-market (7:46 AM ET): S and P futures minus 0.88 percent, Nasdaq-100 minus 1.71 percent, Russell 2000 minus 0.27 perce",
+   "published": "2026-11-20T13:16:18Z"
+  },
   {
    "id": "2026-11-19-am",
    "date": "2026-11-19",
