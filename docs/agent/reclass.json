@@ -1,7 +1,7 @@
 {
- "for_date": "2026-11-13",
- "written": "2026-11-14T13:39Z",
- "summary": "Checked 34 tickers (1 stale, 16 poor-fit, 17 of the top unclassified names). Most important: ROKU was acquired by Fox and delisted, so it should be removed; 15 strong unclassified stocks have clear homes (e.g. SGRY, ICLR, PEB, FLYW). All 16 poor-fit names were kept.",
+ "for_date": "2026-11-20",
+ "written": "2026-11-21T13:39Z",
+ "summary": "Checked 1 stale, 20 poor-fit and the top 30 of 100 unclassified tickers (several skipped as unidentifiable from thin search results: TRAX, ONT, LIFE, GEO, CXW and others). The key fix: ROKU was acquired by Fox on Nov 6 and should be removed. Two poor-fit moves (APP, TMDX) and about 25 unclassified adds, mostly healthcare services, staffing/business services, hotels REITs and retail.",
  "moves": [
   {
    "t": "ROKU",
@@ -10,12 +10,38 @@
    "to": null,
    "theme_add": null,
    "confidence": "high",
-   "why": "Roku was acquired by Fox Corporation and delisted from Nasdaq (no trading data since Nov 6).",
+   "why": "Fox completed its roughly $22B acquisition of Roku on Nov 6, 2026; ROKU stopped trading (last data Nov 6) and options were delisted. Also remove from theme TECH - Internet.",
    "sources": [
-    "https://www.panabee.com/news/fox-completes-acquisition-of-roku-ending-standalone-operations",
-    "https://capital.com/en-ke/news/roku-seeks-nasdaq-delisting-after-fox-merger"
+    "https://techcrunch.com/2026/11/06/fox-completes-its-22b-acquisition-of-roku/",
+    "https://www.miaxglobal.com/alert/2026/11/06/miax-exchange-group-options-markets-delisting-roku-inc-roku"
    ],
    "id": 1
+  },
+  {
+   "t": "APP",
+   "action": "move",
+   "from": "AI Applications & Platforms",
+   "to": "Social & Ad Platforms",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "AppLovin's revenue is its mobile ad-tech platform (AXON engine); it trades with ad platforms (0.53 with gaming/ads names), not general AI apps.",
+   "sources": [
+    "https://stockanalysis.com/stocks/app/company/"
+   ],
+   "id": 2
+  },
+  {
+   "t": "TMDX",
+   "action": "move",
+   "from": "Diabetes & Cardio Devices",
+   "to": "Medical Devices",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "TransMedics makes organ-transplant perfusion systems and flight logistics; not a diabetes or cardio-monitoring device maker.",
+   "sources": [
+    "https://stockanalysis.com/stocks/tmdx/company/"
+   ],
+   "id": 3
   },
   {
    "t": "SGRY",
@@ -24,24 +50,24 @@
    "to": "Healthcare Providers",
    "theme_add": null,
    "confidence": "high",
-   "why": "Operates ambulatory surgery centers and surgical hospitals.",
+   "why": "Surgery Partners operates surgical facilities and ambulatory surgery centers.",
    "sources": [
-    "https://stockanalysis.com/stocks/sgry/company"
+    "https://stockanalysis.com/stocks/sgry/company/"
    ],
-   "id": 2
+   "id": 4
   },
   {
-   "t": "LBRX",
+   "t": "ARDT",
    "action": "add",
    "from": null,
-   "to": "Mid-cap Biotech",
+   "to": "Healthcare Providers",
    "theme_add": null,
    "confidence": "high",
-   "why": "Clinical-stage neuropsychiatry biotech (LB-102, schizophrenia, Phase 3 planned).",
+   "why": "Ardent Health operates acute-care hospitals and outpatient facilities.",
    "sources": [
-    "https://stockanalysis.com/stocks/lbrx/company/"
+    "https://stockanalysis.com/stocks/ardt/company/"
    ],
-   "id": 3
+   "id": 5
   },
   {
    "t": "AXGN",
@@ -50,63 +76,11 @@
    "to": "Medical Devices",
    "theme_add": null,
    "confidence": "high",
-   "why": "Nerve-repair products (Avance nerve graft) sold to surgeons.",
+   "why": "Axogen sells nerve repair and reconstruction products.",
    "sources": [
-    "https://umbrex.com/?p=286837"
-   ],
-   "id": 4
-  },
-  {
-   "t": "BFLY",
-   "action": "add",
-   "from": null,
-   "to": "Medical Devices",
-   "theme_add": null,
-   "confidence": "high",
-   "why": "Handheld ultrasound devices and software.",
-   "sources": [
-    "https://discountingcashflows.com/company/BFLY/profile/"
-   ],
-   "id": 5
-  },
-  {
-   "t": "PEB",
-   "action": "add",
-   "from": null,
-   "to": "REITs",
-   "theme_add": null,
-   "confidence": "high",
-   "why": "Hotel REIT owning upscale urban and resort hotels.",
-   "sources": [
-    "https://www.globaldata.com/company-profile/pebblebrook-hotel-trust/"
+    "https://stockanalysis.com/stocks/axgn/company/"
    ],
    "id": 6
-  },
-  {
-   "t": "AAMI",
-   "action": "add",
-   "from": null,
-   "to": "Asset Managers & Alternatives",
-   "theme_add": null,
-   "confidence": "high",
-   "why": "Quantitative investment manager (formerly BrightSphere).",
-   "sources": [
-    "https://stockanalysis.com/stocks/aami/company"
-   ],
-   "id": 7
-  },
-  {
-   "t": "FLYW",
-   "action": "add",
-   "from": null,
-   "to": "Payments & Networks",
-   "theme_add": null,
-   "confidence": "high",
-   "why": "Cross-border payments platform for education, healthcare and travel.",
-   "sources": [
-    "https://stockanalysis.com/stocks/flyw/company/"
-   ],
-   "id": 8
   },
   {
    "t": "MYGN",
@@ -115,48 +89,74 @@
    "to": "Genomics & Diagnostics",
    "theme_add": null,
    "confidence": "high",
-   "why": "Genetic testing (hereditary cancer, prenatal, oncology).",
+   "why": "Myriad Genetics sells genetic and molecular diagnostic tests.",
    "sources": [
-    "https://www.plunkettresearch.com/company-profile/myriad-genetics-inc/"
+    "https://stockanalysis.com/stocks/mygn/company/"
+   ],
+   "id": 7
+  },
+  {
+   "t": "PEB",
+   "action": "add",
+   "from": null,
+   "to": "REITs",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Pebblebrook is a lodging REIT owning upscale hotels.",
+   "sources": [
+    "https://stockanalysis.com/stocks/peb/company/"
+   ],
+   "id": 8
+  },
+  {
+   "t": "APLE",
+   "action": "add",
+   "from": null,
+   "to": "REITs",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Apple Hospitality is a lodging REIT owning select-service hotels.",
+   "sources": [
+    "https://stockanalysis.com/stocks/aple/company/"
    ],
    "id": 9
   },
   {
-   "t": "ICLR",
+   "t": "FA",
    "action": "add",
    "from": null,
-   "to": "CROs",
+   "to": "Business Services & Data",
    "theme_add": null,
    "confidence": "high",
-   "why": "Global contract research organization for pharma trials.",
+   "why": "First Advantage provides employment background screening and verification.",
    "sources": [
-    "https://stockanalysis.com/stocks/iclr/company/"
+    "https://stockanalysis.com/stocks/fa/company/"
    ],
    "id": 10
   },
   {
-   "t": "VAC",
+   "t": "NSP",
    "action": "add",
    "from": null,
-   "to": "Hotels & Cruise Lines",
+   "to": "Business Services & Data",
    "theme_add": null,
-   "confidence": "medium",
-   "why": "Timeshare/vacation ownership operator (Marriott-branded resorts).",
+   "confidence": "high",
+   "why": "Insperity is a professional employer organization (HR outsourcing).",
    "sources": [
-    "https://marriottvacationsworldwide.com/our-company"
+    "https://stockanalysis.com/stocks/nsp/company/"
    ],
    "id": 11
   },
   {
-   "t": "AMN",
+   "t": "KFRC",
    "action": "add",
    "from": null,
-   "to": "Healthcare Providers",
+   "to": "Business Services & Data",
    "theme_add": null,
-   "confidence": "medium",
-   "why": "Healthcare staffing (travel nurses, locum physicians) sold to hospitals.",
+   "confidence": "high",
+   "why": "Kforce is a professional staffing firm (technology and finance).",
    "sources": [
-    "https://globaldata.com/company-profile/amn-healthcare-services-inc/"
+    "https://stockanalysis.com/stocks/kfrc/company/"
    ],
    "id": 12
   },
@@ -166,241 +166,247 @@
    "from": null,
    "to": "Business Services & Data",
    "theme_add": null,
-   "confidence": "medium",
-   "why": "Regulatory filing and compliance software/services for financial firms.",
+   "confidence": "high",
+   "why": "Donnelley Financial supplies regulatory and compliance software and filing services.",
    "sources": [
-    "https://www.plunkettresearch.com/company-profile/donnelley-financial-solutions-inc/"
+    "https://stockanalysis.com/stocks/dfin/company/"
    ],
    "id": 13
   },
   {
-   "t": "LIFE",
+   "t": "FLYW",
    "action": "add",
    "from": null,
-   "to": "Life Insurers",
+   "to": "Payments & Networks",
    "theme_add": null,
-   "confidence": "medium",
-   "why": "Ethos is a digital life-insurance marketplace/underwriting platform.",
+   "confidence": "high",
+   "why": "Flywire is a cross-border payments platform for education, healthcare and travel.",
    "sources": [
-    "https://stockanalysis.com/stocks/life/company/"
+    "https://stockanalysis.com/stocks/flyw/company/"
    ],
    "id": 14
   },
   {
-   "t": "TRAX",
+   "t": "CRSR",
    "action": "add",
    "from": null,
-   "to": "Immunology & Inflammation",
+   "to": "Consumer Hardware",
    "theme_add": null,
-   "confidence": "medium",
-   "why": "Clinical-stage biotech developing autoimmune disease therapies.",
+   "confidence": "high",
+   "why": "Corsair makes gaming PC peripherals and components.",
    "sources": [
-    "https://www.santelog.com/actualites-sante-nasdaq/first-tracks-biotherapeutics-debuts-nasdaq-advance-therapies-autoimmune"
+    "https://stockanalysis.com/stocks/crsr/company/"
    ],
    "id": 15
   },
   {
-   "t": "PGNY",
+   "t": "IPAR",
+   "action": "add",
+   "from": null,
+   "to": "Household & Personal Care",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Inter Parfums makes and licenses fragrances and personal care brands.",
+   "sources": [
+    "https://stockanalysis.com/stocks/ipar/company/"
+   ],
+   "id": 16
+  },
+  {
+   "t": "WWW",
+   "action": "add",
+   "from": null,
+   "to": "Apparel & Footwear Brands",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Wolverine World Wide owns footwear brands (Merrell, Saucony, Sweaty Betty).",
+   "sources": [
+    "https://stockanalysis.com/stocks/www/company/"
+   ],
+   "id": 17
+  },
+  {
+   "t": "BWIN",
+   "action": "add",
+   "from": null,
+   "to": "Insurance Brokers",
+   "theme_add": null,
+   "confidence": "high",
+   "why": "Baldwin Insurance Group is an insurance distribution / brokerage platform.",
+   "sources": [
+    "https://stockanalysis.com/stocks/bwin/company/"
+   ],
+   "id": 18
+  },
+  {
+   "t": "VCEL",
+   "action": "add",
+   "from": null,
+   "to": "Medical Devices",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Vericel makes autologous cell therapies for cartilage repair (MACI) and burn care.",
+   "sources": [
+    "https://stockanalysis.com/stocks/vcel/company/"
+   ],
+   "id": 19
+  },
+  {
+   "t": "LBRX",
+   "action": "add",
+   "from": null,
+   "to": "Mid-cap Biotech",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "LB Pharmaceuticals is a clinical-stage neuropsychiatric drug developer.",
+   "sources": [
+    "https://stockanalysis.com/stocks/lbrx/company/"
+   ],
+   "id": 20
+  },
+  {
+   "t": "VAC",
+   "action": "add",
+   "from": null,
+   "to": "Hotels & Cruise Lines",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Marriott Vacations is a timeshare / vacation ownership operator.",
+   "sources": [
+    "https://stockanalysis.com/stocks/vac/company/"
+   ],
+   "id": 21
+  },
+  {
+   "t": "AVPT",
+   "action": "add",
+   "from": null,
+   "to": "Data & Observability",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "AvePoint sells SaaS for data management, governance and backup.",
+   "sources": [
+    "https://stockanalysis.com/stocks/avpt/company/"
+   ],
+   "id": 22
+  },
+  {
+   "t": "ATEN",
+   "action": "add",
+   "from": null,
+   "to": "Cybersecurity Platforms",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "A10 Networks sells application delivery and DDoS/security appliances.",
+   "sources": [
+    "https://stockanalysis.com/stocks/aten/company/"
+   ],
+   "id": 23
+  },
+  {
+   "t": "ASO",
+   "action": "add",
+   "from": null,
+   "to": "Home Improvement & Specialty Retail",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Academy Sports + Outdoors is a sporting goods retailer.",
+   "sources": [
+    "https://stockanalysis.com/stocks/aso/company/"
+   ],
+   "id": 24
+  },
+  {
+   "t": "HZO",
+   "action": "add",
+   "from": null,
+   "to": "Home Improvement & Specialty Retail",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "MarineMax is a recreational boat and yacht retailer.",
+   "sources": [
+    "https://stockanalysis.com/stocks/hzo/company/"
+   ],
+   "id": 25
+  },
+  {
+   "t": "KSS",
+   "action": "add",
+   "from": null,
+   "to": "Home Improvement & Specialty Retail",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Kohl's is a department-store retailer; this is the closest retail group.",
+   "sources": [
+    "https://stockanalysis.com/stocks/kss/company/"
+   ],
+   "id": 26
+  },
+  {
+   "t": "ENR",
+   "action": "add",
+   "from": null,
+   "to": "Household & Personal Care",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Energizer makes batteries and auto-care products sold through consumer retail.",
+   "sources": [
+    "https://stockanalysis.com/stocks/enr/company/"
+   ],
+   "id": 27
+  },
+  {
+   "t": "GCT",
+   "action": "add",
+   "from": null,
+   "to": "E-Commerce Marketplaces",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "GigaCloud runs a B2B online marketplace for large-parcel goods like furniture.",
+   "sources": [
+    "https://stockanalysis.com/stocks/gct/company/"
+   ],
+   "id": 28
+  },
+  {
+   "t": "EVC",
+   "action": "add",
+   "from": null,
+   "to": "Media, Live Events & Advertising",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Entravision is a Spanish-language media and digital advertising company.",
+   "sources": [
+    "https://stockanalysis.com/stocks/evc/company/"
+   ],
+   "id": 29
+  },
+  {
+   "t": "NAVN",
+   "action": "add",
+   "from": null,
+   "to": "Travel & Gig Platforms",
+   "theme_add": null,
+   "confidence": "medium",
+   "why": "Navan sells corporate travel booking and expense management software.",
+   "sources": [
+    "https://stockanalysis.com/stocks/navn/company/"
+   ],
+   "id": 30
+  },
+  {
+   "t": "AMN",
    "action": "add",
    "from": null,
    "to": "Healthcare Providers",
    "theme_add": null,
    "confidence": "low",
-   "why": "Fertility and family-building benefits manager for employers; no exact peer group (benefits manager closer to managed care).",
+   "why": "AMN Healthcare supplies healthcare staffing to hospitals; closest peer group is providers.",
    "sources": [
-    "https://stockanalysis.com/stocks/pgny/company/"
+    "https://stockanalysis.com/stocks/amn/company/"
    ],
-   "id": 16
-  },
-  {
-   "t": "SRZN",
-   "action": "add",
-   "from": null,
-   "to": "Mid-cap Biotech",
-   "theme_add": null,
-   "confidence": "low",
-   "why": "Clinical-stage biotech developing Wnt-pathway tissue-repair antibodies.",
-   "sources": [
-    "https://investors.surrozen.com"
-   ],
-   "id": 17
-  },
-  {
-   "t": "MSI",
-   "action": "keep",
-   "from": "Telecom Equipment & Test",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 18
-  },
-  {
-   "t": "JCI",
-   "action": "keep",
-   "from": "HVAC & Building Systems",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 19
-  },
-  {
-   "t": "ITRI",
-   "action": "keep",
-   "from": "Gas Turbines & Grid Equipment",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 20
-  },
-  {
-   "t": "NTNX",
-   "action": "keep",
-   "from": "Enterprise AI Infrastructure (Servers, Storage, HCI)",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 21
-  },
-  {
-   "t": "DGX",
-   "action": "keep",
-   "from": "Genomics & Diagnostics",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 22
-  },
-  {
-   "t": "LIN",
-   "action": "keep",
-   "from": "Industrial Gases & Hydrogen",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 23
-  },
-  {
-   "t": "AXON",
-   "action": "keep",
-   "from": "Defense Tech & Electronics",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 24
-  },
-  {
-   "t": "ORCL",
-   "action": "keep",
-   "from": "Hyperscalers",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 25
-  },
-  {
-   "t": "LH",
-   "action": "keep",
-   "from": "Genomics & Diagnostics",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 26
-  },
-  {
-   "t": "APP",
-   "action": "keep",
-   "from": "AI Applications & Platforms",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 27
-  },
-  {
-   "t": "DUOL",
-   "action": "keep",
-   "from": "Consumer Apps",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 28
-  },
-  {
-   "t": "GSAT",
-   "action": "keep",
-   "from": "Satellite Connectivity & Imaging",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 29
-  },
-  {
-   "t": "HALO",
-   "action": "keep",
-   "from": "Mid-cap Biotech",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 30
-  },
-  {
-   "t": "MRNA",
-   "action": "keep",
-   "from": "Mid-cap Biotech",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
    "id": 31
-  },
-  {
-   "t": "ERIC",
-   "action": "keep",
-   "from": "Telecom Equipment & Test",
-   "to": null,
-   "theme_add": null,
-   "confidence": "medium",
-   "why": "Business fits current home; low correlation is not enough to move it.",
-   "sources": [],
-   "id": 32
-  },
-  {
-   "t": "TMDX",
-   "action": "keep",
-   "from": "Diabetes & Cardio Devices",
-   "to": null,
-   "theme_add": null,
-   "confidence": "low",
-   "why": "Not researched enough to justify a move.",
-   "sources": [],
-   "id": 33
   }
  ],
- "checked": 34
+ "checked": 51
 }
