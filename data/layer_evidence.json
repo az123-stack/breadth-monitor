@@ -1,45 +1,45 @@
 {
  "macro_fit": {
-  "asof": "2026-11-14",
-  "signals": 6757,
-  "from": "2025-04-29",
-  "to": "2026-11-05",
+  "asof": "2026-11-21",
+  "signals": 6783,
+  "from": "2025-05-06",
+  "to": "2026-11-12",
   "rule": "tailwind = macro moves of the last 5 sessions imply > +0.25% for the stock (real sensitivities only); headwind < -0.25%; result = actionable 5-session return of each Trade Setups signal",
   "tail5": {
-   "n_good": 980,
-   "n_bad": 816,
-   "avg_good": 0.00733,
-   "avg_bad": 0.01068,
-   "dates": 226,
-   "diff": -0.00335,
-   "t": -0.03,
+   "n_good": 989,
+   "n_bad": 824,
+   "avg_good": 0.0058,
+   "avg_bad": 0.00979,
+   "dates": 227,
+   "diff": -0.00399,
+   "t": 0.35,
    "halves": [
-    -0.00561,
-    0.00525
+    0.0008,
+    0.00377
    ],
    "passed": false
   },
   "tail20": {
-   "n_good": 1004,
-   "n_bad": 883,
-   "avg_good": 0.01019,
-   "avg_bad": 0.01029,
-   "dates": 223,
-   "diff": -0.0001,
-   "t": -0.7,
+   "n_good": 1024,
+   "n_bad": 889,
+   "avg_good": 0.00883,
+   "avg_bad": 0.00942,
+   "dates": 222,
+   "diff": -0.00059,
+   "t": -0.39,
    "halves": [
-    -0.00351,
-    -0.00556
+    0.00082,
+    -0.00587
    ],
    "passed": false
   },
   "passed": false,
   "by_setup": {
    "ath": {
-    "n_good": 223,
-    "n_bad": 145,
-    "diff": 0.00516,
-    "t": 0.32
+    "n_good": 225,
+    "n_bad": 146,
+    "diff": 0.00234,
+    "t": 0.23
    },
    "kq": {
     "n_good": 12,
@@ -48,28 +48,28 @@
     "t": null
    },
    "pullback": {
-    "n_good": 145,
+    "n_good": 142,
     "n_bad": 226,
-    "diff": 0.00561,
-    "t": 0.16
+    "diff": 0.00684,
+    "t": -0.03
    },
    "rotation": {
-    "n_good": 219,
+    "n_good": 225,
     "n_bad": 192,
-    "diff": -0.02102,
-    "t": -0.77
+    "diff": -0.02197,
+    "t": -1.12
    },
    "round": {
-    "n_good": 304,
-    "n_bad": 204,
-    "diff": -0.00185,
-    "t": 0.15
+    "n_good": 309,
+    "n_bad": 210,
+    "diff": -0.00235,
+    "t": 0.68
    },
    "vcp": {
-    "n_good": 77,
-    "n_bad": 39,
-    "diff": -0.00522,
-    "t": -1.69
+    "n_good": 76,
+    "n_bad": 40,
+    "diff": -0.00718,
+    "t": -1.29
    }
   }
  },
