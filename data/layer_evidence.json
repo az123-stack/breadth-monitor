@@ -74,16 +74,16 @@
   }
  },
  "log": {
-  "asof": "2026-11-20",
-  "closed": 452,
-  "dates": 20,
+  "asof": "2026-11-21",
+  "closed": 474,
+  "dates": 21,
   "catalyst_positive": {
-   "n_good": 39,
+   "n_good": 40,
    "n_bad": 51,
-   "avg_good": -0.00138,
+   "avg_good": -0.00025,
    "avg_bad": -0.02339,
    "dates": 8,
-   "diff": 0.02201,
+   "diff": 0.02314,
    "t": 0.71,
    "halves": [
     0.01828,
@@ -92,16 +92,16 @@
    "passed": false
   },
   "red_flags": {
-   "n_good": 68,
-   "n_bad": 42,
-   "avg_good": -0.02261,
-   "avg_bad": 0.00017,
-   "dates": 10,
-   "diff": -0.02278,
-   "t": -0.94,
+   "n_good": 69,
+   "n_bad": 43,
+   "avg_good": -0.02165,
+   "avg_bad": -0.00077,
+   "dates": 11,
+   "diff": -0.02088,
+   "t": -0.48,
    "halves": [
     -0.02005,
-    -0.01864
+    -0.00152
    ],
    "passed": false
   },
@@ -121,11 +121,11 @@
   },
   "macro_tailwind": {
    "n_good": 130,
-   "n_bad": 52,
+   "n_bad": 60,
    "avg_good": -0.0173,
-   "avg_bad": -0.02959,
+   "avg_bad": -0.02108,
    "dates": 9,
-   "diff": 0.01229,
+   "diff": 0.00378,
    "t": 1.85,
    "halves": [
     0.00648,
@@ -134,36 +134,36 @@
    "passed": false
   },
   "more_support": {
-   "n_good": 11,
-   "n_bad": 221,
-   "avg_good": -0.02014,
-   "avg_bad": -0.00865,
-   "dates": 7,
-   "diff": -0.01149,
-   "t": 0.01,
+   "n_good": 12,
+   "n_bad": 232,
+   "avg_good": -0.01483,
+   "avg_bad": -0.00838,
+   "dates": 8,
+   "diff": -0.00645,
+   "t": 0.25,
    "halves": [
-    -0.03196,
-    0.02458
+    -0.03881,
+    0.05107
    ],
    "passed": false
   },
   "no_warnings": {
    "n_good": 63,
-   "n_bad": 41,
+   "n_bad": 42,
    "avg_good": 0.03395,
-   "avg_bad": 0.00063,
+   "avg_bad": 0.00113,
    "dates": 0,
-   "diff": 0.03332,
+   "diff": 0.03282,
    "t": null,
    "halves": [],
    "passed": false
   },
   "brief_low_risk": {
    "n_good": 0,
-   "n_bad": 361,
-   "dates": 16,
+   "n_bad": 383,
+   "dates": 17,
    "avg_good": null,
-   "avg_bad": -0.0268,
+   "avg_bad": -0.02423,
    "test": "welch over dates",
    "diff": null,
    "t": null,
