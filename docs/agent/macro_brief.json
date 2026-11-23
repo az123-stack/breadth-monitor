@@ -1,68 +1,53 @@
 {
- "for_date": "2026-11-19",
- "written": "2026-11-20T12:06Z",
- "headline": "Stocks sank for a sixth straight day (S&P 500 -2%, Dow -1,100 points) with the 10-year near 5.04% and the Fed minutes pointing to a likely December hike.",
+ "for_date": "2026-11-20",
+ "written": "2026-11-23T12:04Z",
+ "headline": "Stocks open the holiday week in correction after Friday's tech rout (S&P 500 -3.5%, Nasdaq-100 -5.6%, NVIDIA hit by a reported SEC accounting probe) with Wednesday's PCE the main data risk before Thanksgiving.",
  "risk": "high",
- "rates": "The 10-year Treasury yield eased to about 5.04% from 5.07% on weaker jobless-claims and mid-Atlantic manufacturing data, but it remains near multi-year highs.",
- "fed": "The Fed minutes flagged a high likelihood of a 25 basis point hike in December, and Governors Waller (8:25 AM ET) and Cook (12:15 PM ET) speak today after Barr said policy needs further adjustment.",
- "oil": "WTI is near $85 and Brent near $92.6 as a Q4 supply surplus (IEA) and a 5.3M-barrel US crude build are offset by Middle East risk premium.",
- "geo": "US-Iran fighting and disrupted Strait of Hormuz shipping continue, US-China trade talks ended with no progress on chips or tariffs, and midterm results raised AI-regulation worries.",
+ "rates": "Fed funds futures price a December 25bp hike at about 99%, per a Newsquawk week-ahead note, so inflation data matters more than usual.",
+ "fed": "No Fed speakers are scheduled on the week-ahead calendar; the Beige Book lands Wednesday and recent Waller and Williams comments debated the size of the next hike.",
+ "oil": "Oil has been drifting lower on supply-surplus worries (Brent in the low-to-mid $90s mid-November) but swings on Iran headlines, including a reported US-Iran ceasefire and talk of renewed strikes.",
+ "geo": "The Trump-Xi-Putin meeting produced a largely symbolic peace declaration, Iran ceasefire/strike headlines continue, and Trump says trade deals with Mexico and Thailand are progressing.",
  "events": [
-  {
-   "date": "2026-11-20",
-   "time": "8:25 AM ET",
-   "name": "Fed Governor Waller speaks",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-20",
-   "time": "10:00 AM ET",
-   "name": "UMich consumer sentiment (final Nov)",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-20",
-   "time": "12:15 PM ET",
-   "name": "Fed Governor Cook speaks",
-   "impact": "medium"
-  },
   {
    "date": "2026-11-23",
    "time": "9:45 AM ET",
-   "name": "S&P Global US flash PMI",
+   "name": "S&P Global flash PMIs (Nov)",
    "impact": "medium"
   },
   {
    "date": "2026-11-24",
    "time": "10:00 AM ET",
-   "name": "Conference Board consumer confidence",
+   "name": "Conference Board consumer confidence (Nov)",
    "impact": "medium"
   },
   {
    "date": "2026-11-25",
    "time": "8:30 AM ET",
-   "name": "PCE inflation",
+   "name": "PCE (Oct) and GDP 2nd estimate (Q3)",
    "impact": "high"
   },
   {
    "date": "2026-11-25",
-   "time": "8:30 AM ET",
-   "name": "GDP Q3 second estimate",
+   "time": "2:00 PM ET",
+   "name": "Fed Beige Book",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-11-26",
+   "time": "All day",
+   "name": "US markets closed (Thanksgiving)",
    "impact": "medium"
   },
   {
    "date": "2026-11-27",
    "time": "1:00 PM ET",
-   "name": "Early close after Thanksgiving (markets closed Nov 26)",
+   "name": "US markets early close",
    "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.dtnpf.com/agriculture/web/ag/news/world-policy/article/2026/11/19/wall-street-tumbles-longest-losing-1",
-  "https://gokhshtein.com/news/2026-11-19-yields-fall-equities-risebut-fed-rate-hike-still-approaches",
-  "https://gulfnews.com/business/energy/oil-slips-in-asia-led-by-murban-brent-wti-what-to-know-on-nov-18-2026-1.500751476",
-  "https://www.litefinance.org/blog/analysts-opinions/weekly-economic-calendar-for-23112026-29112026/",
-  "https://helious.io/calendar/2026-11",
-  "https://thriveinmarkets.com/calendar/"
+  "https://www.newsquawk.com/headlines/week-in-focus--november-23rd-27th-highlights-include-us-pce-flash-pmis-aussie-cpi-and-ecb-minutes",
+  "https://www.newsquawk.com/headlines/newsquawk-daily-european-equity-opening-news---23rd-november-2026",
+  "https://hdfcsky.com/news/brent-crude-oil-price-today-november-16-2026-brent-falls-1percent-to-94-86-wti-slips-below-88-as-supply-surplus-looms"
  ]
 }
