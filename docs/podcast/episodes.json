@@ -1,6 +1,21 @@
 {
- "updated": "2026-11-20T13:16:18Z",
+ "updated": "2026-11-23T13:10:47Z",
  "episodes": [
+  {
+   "id": "2026-11-23-am",
+   "date": "2026-11-23",
+   "slot": "am",
+   "format": "huddle",
+   "format_name": "Desk huddle",
+   "title": "Futures snap back after worst week; AI bounce, ZS deal",
+   "name": "2026-11-23-am-huddle-130941.mp3",
+   "url": "https://az123-stack.github.io/breadth-monitor/podcast/audio/2026-11-23-am-huddle-130941.mp3",
+   "bytes": 2297952,
+   "seconds": 383,
+   "words": 1030,
+   "summary": "Where we are. Scenario A (money is still leaving) holds on official numbers for Nov 20: 87.2 percent of dollar volume in falling stocks, net minus 670 billion dollars, only 30 stocks up 4 percent+ against 725 down, 339 new lows against 10 new highs, T2108 27.8. That is the worst day of the washout, and the S and P 500 and Dow both closed more than 10 percent under their highs, which is a correction. This morning the tape snaps the other way. Pre-market (7:47 AM ET): S and P futures plus 2.37 per",
+   "published": "2026-11-23T13:10:47Z"
+  },
   {
    "id": "2026-11-20-am",
    "date": "2026-11-20",
