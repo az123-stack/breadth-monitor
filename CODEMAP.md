@@ -916,3 +916,14 @@ back/forward restore. Newer data date → red sticky bar on every tab + one auto
 `stale-reload:<date>:<generated>`, so CDN lag can't loop), onto the same tab (hash kept) with `?v=` to bust GitHub Pages' 10-min cache;
 waits 60 s if you're typing. Newer build, same date → grey "Reload" link only. Check can't run → red bar once the page's data is older
 than the previous weekday after 6 AM ET. Test: asserted in the e2e build test.
+
+- **Post-thrust board** (Nov 23, 2026; Adam, the day of the Nov 23 rally: "what can we build to track the cross between best sub-theme,
+  where money is going and stocks that are lined up best over the next few sessions" → "not in Brief, in Setups") → `breadth/thrustboard.py`
+  `build(adjusted, theme_data, history)` (~1 s, after emerge in update.py) → `DATA.themes.thrustboard` {date, thrust, thrust_date, anchor (close
+  before the thrust day), day, label, detail, window 25, spy_since, rsp_since, ft {spy_ok, rsp_ok, net4, verdict holding/wobbling/fading},
+  groups[8] {rank, g, sector, n, lead, tday, up, tier, strength, stage, buy, score, stocks[≤5], more}, n_groups}. Thrust = latest major
+  thrust / follow-through from `metrics.events` within 25 sessions, else anchor 10 sessions back + "no thrust" banner. Group score = 40% pct
+  rank of median member return vs SPY since the anchor + 20% thrust-day median + 20% flow tier (`FLOW_PTS` from rotation.flow) + 20% Strength.
+  Stocks: RS Rating 80+, $10+, $20M+/day 50-day, above the 21 EMA; `stock_state` zone / tight / extended / watch with trigger + stop (cap 1
+  ADR). Page v3_tabs.js `renderThrustBoard` (first `V3_SETUPS` tab), `tbLive` flips to Triggered / Stopped on Google prices, `thrustTicks`
+  for TradingView. Card R-2026-11-23-thrust-board; test `test_thrust_board_states`. Untested ranking.

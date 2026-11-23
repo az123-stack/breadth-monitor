@@ -2306,6 +2306,20 @@ def test_breadth_health():
     assert "nh is blank on 1 day" in p and "latest row" in p and "up4" in p, p
     return "ok"
 
+def test_thrust_board_states():
+    """thrustboard.stock_state: EMA dip -> zone with stop capped at 1 ADR; tight range -> tight; stretched -> extended; under 21 -> None."""
+    import numpy as _np
+    from breadth import thrustboard as TB
+    a = 4.0  # ADR %
+    z = TB.stock_state(_np.array([101, 100.5, 100.8]), _np.array([102, 101.5, 101.6]), _np.array([99.8, 99.6, 97.0]), 99.9, 98.0, a)
+    assert z["st"] == "zone" and z["trigger"] == 101.61 and abs(z["stop"] - (101.61 - 101.61 * 0 - 100.8 * a / 100)) < 0.02, z
+    t = TB.stock_state(_np.array([110, 110.5, 110.2]), _np.array([111, 111.2, 111.0]), _np.array([109.5, 109.8, 109.6]), 108.6, 104.0, a)
+    assert t["st"] == "tight" and t["trigger"] == 111.21 and t["stop"] == 109.49, t
+    e = TB.stock_state(_np.array([120, 125, 130]), _np.array([121, 126, 131]), _np.array([119, 124, 129]), 120.0, 112.0, a)
+    assert e["st"] == "extended" and e["trigger"] is None, e
+    assert TB.stock_state(_np.array([90, 89, 88]), _np.array([91, 90, 89]), _np.array([89, 88, 87]), 92.0, 95.0, a) is None
+    return "ok"
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

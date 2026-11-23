@@ -70,7 +70,65 @@ function momentumTicks() {
   return [{ name: "Leaders - strongest", ticks: tk((L.strongest || []).slice(0, 25)) }, { name: "Momentum bursts", ticks: tk(L.bursts) }, { name: "Anticipation coils", ticks: tk(L.anticipation) }];
 }
 function hveTicks() { return [{ name: "Record volume", ticks: tk(((DATA.themes || {}).hve || {}).rows) }]; }
+/* ---------- Post-thrust board (Nov 23, 2026; Adam: "track the cross between best sub-theme, where money is going and stocks lined up
+   best over the next few sessions") — breadth/thrustboard.py → DATA.themes.thrustboard. Info only; ranking untested (card
+   R-2026-11-23-thrust-board). Live: a stock flips to "Triggered" over its buy-stop and "Stopped" under its stop on Google prices. ---------- */
+function tbLive(x) {
+  const L = liveActive() ? liveRow(x.t) : null;
+  const p = L && L.price > 0 ? L.price : x.price;
+  const st = L && x.trigger && p > x.trigger ? (x.stop && p < x.stop ? "stopped" : "over") : L && x.stop && p < x.stop ? "stopped" : x.st;
+  return { ...x, p, chg: L ? L.chg : null, live: !!L, st };
+}
+function tbRows() {
+  const X = (DATA.themes || {}).thrustboard; if (!X) return [];
+  return X.groups.flatMap(g => g.stocks.map(s => ({ ...tbLive(s), g: g.g, rank: g.rank })));
+}
+function thrustTicks() {
+  const R = tbRows();
+  return [{ name: "Post-thrust - triggered", ticks: R.filter(r => r.st === "over").map(r => r.t) },
+    { name: "Post-thrust - set up (EMA dip or tight)", ticks: R.filter(r => r.st === "zone" || r.st === "tight").map(r => r.t) },
+    { name: "Post-thrust - extended, wait", ticks: R.filter(r => r.st === "extended").map(r => r.t) }];
+}
+function renderThrustBoard(app) {
+  const X = (DATA.themes || {}).thrustboard;
+  if (!X) { app.append($('<div class="card empty">The post-thrust board appears after the next data run.</div>')); return; }
+  app.append(liveBar());
+  const pc = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const FT = { holding: ["Holding", "act"], wobbling: ["Wobbling", "watch"], fading: ["Fading", "watch"] };
+  const ft = X.ft ? FT[X.ft.verdict] : null;
+  const head = X.thrust
+    ? `<div class="rbanner ${ft ? ft[1] : "act"}"><b>Day ${X.day} of ${X.window} after the ${esc(X.label || "breadth thrust")} on ${shortDate(X.thrust_date)}</b>${ft ? ` · follow-through: <b>${ft[0]}</b> (SPY ${X.ft.spy_ok ? "above" : "below"} the thrust-day close, RSP ${X.ft.rsp_ok ? "above" : "below"}, net 4% movers ${X.ft.net4 >= 0 ? "+" : ""}${X.ft.net4}/day)` : ""}. Since the ${shortDate(X.anchor)} close: SPY ${pc(X.spy_since)}, RSP ${pc(X.rsp_since)}.</div>`
+    : `<div class="rbanner watch"><b>No major breadth thrust in the last ${X.window} sessions.</b> Groups are ranked from the ${shortDate(X.anchor)} close instead; this board is built for the sessions after a thrust, so treat it as a watch list until one fires.</div>`;
+  const TL = { over: ["🟢 Triggered", "sow-breakout"], stopped: ["Stopped", "sow-extended"], zone: ["In the 9/21 EMAs", "sow-nuzzle"], tight: ["Tight range", "sow-nuzzle"], extended: ["Extended · wait", "sow-pop"], watch: ["Not set up", "sow-riding"] };
+  const nTrig = tbRows().filter(r => r.st === "over").length, nSet = tbRows().filter(r => r.st === "zone" || r.st === "tight").length;
+  const card = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv unproven">Unproven</span> Post-thrust board <span class="meta">· best groups × money flow × buyable leaders · ${tbRows().some(r => r.live) ? "live" : "as of the " + shortDate(X.date) + " close"}</span></h2>
+      <div class="tsbtns"><button class="tbdl">⬇ TradingView</button></div></div>${head}
+    <p class="meta" style="margin:6px 0 10px">${nTrig} triggered · ${nSet} set up · top ${X.groups.length} of ${X.n_groups} sub-themes. Group score = 40% lead vs SPY since the thrust + 20% thrust-day move + 20% money flow + 20% Theme Strength. Stocks: RS 80+, $10+, $20M+/day, above the 21 EMA; 9/21 EMA dips and tight ranges first. Rules of thumb, not a backtested ranking yet.</p></section>`);
+  card.querySelector(".tbdl").addEventListener("click", () => tsDownload("post-thrust", thrustTicks()));
+  for (const g of X.groups) {
+    const rows = g.stocks.map(tbLive);
+    const live = rows.filter(r => r.chg != null).map(r => r.chg).sort((a, b) => a - b);
+    const today = live.length ? live[Math.floor(live.length / 2)] : null;
+    const tr = (r) => { const L = TL[r.st] || TL.watch;
+      return `<tr${r.st === "over" ? ' style="background:color-mix(in srgb, var(--good) 10%, transparent)"' : ""}>
+        <td class="l"><b>${r.t}</b></td><td class="l"><span class="tg ${L[1]}">${L[0]}</span></td>
+        <td class="num">$${(+r.p).toFixed(2)}${r.chg != null ? `<small class="meta" style="display:block">${pc(r.chg)}</small>` : ""}</td>
+        <td class="num">${r.trigger ? `<b>$${r.trigger.toFixed(2)}</b>` : r.level ? `<small class="meta">watch $${r.level.toFixed(2)}</small>` : "–"}</td>
+        <td class="num">${r.stop ? `$${r.stop.toFixed(2)}<small class="meta" style="display:block">${pc(r.stop / r.trigger - 1)}</small>` : "–"}</td>
+        <td class="num ${rsTint(r.rs)}">${r.rs ?? "–"}</td><td class="num">${pc(r.since)}</td><td class="num">${r.adr != null ? r.adr.toFixed(1) + "%" : "–"}</td>
+        <td class="l"><small class="meta">${esc(r.plan || "")}</small></td></tr>`; };
+    const sec = $(`<section class="card" style="margin-top:10px"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline">
+        <h3 style="margin:0">#${g.rank} ${esc(g.g)} <span class="meta">· score ${g.score}${g.sector ? " · " + esc(g.sector) : ""}</span></h3>
+        <div class="meta">lead ${pc(g.lead)} vs SPY · thrust day ${pc(g.tday)} · ${Math.round((g.up || 0) * 100)}% up · money ${esc(g.tier || "–")} · Strength ${g.strength ?? "–"}${g.stage ? " · " + esc(g.stage) : ""}${g.buy ? " · <b>BUY</b>" : ""}${today != null ? ` · today ${pc(today)}` : ""}</div></div>
+      ${rows.length ? `<div class="scroll"><table class="grid" style="margin-top:6px"><thead><tr><th class="l">Stock</th><th class="l">State</th><th>Price</th><th>Buy over</th><th>Stop<small>max 1 ADR</small></th><th>RS</th><th>Since thrust</th><th>ADR</th><th class="l">Plan</th></tr></thead><tbody>${rows.map(tr).join("")}</tbody></table></div>${g.more ? `<p class="meta">+${g.more} more qualifying names</p>` : ""}`
+        : `<p class="meta" style="margin-top:6px">No RS 80+ liquid stock above its 21 EMA in this group yet: the group is leading on breadth, not on a single name.</p>`}</section>`);
+    card.append(sec);
+  }
+  app.append(card);
+}
 const V3_SETUPS = [
+  ["thrust", "Post-thrust board", (app) => renderThrustBoard(app), thrustTicks],
   ["best", "Best setups", (app) => { if (typeof renderBest === "function") renderBest(app); }, bestTicks],
   ["lineup", "Lined-up buys", (app) => {
     const T = DATA.themes || {};
