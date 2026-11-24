@@ -2317,6 +2317,14 @@ def test_thrust_board_states():
     assert t["st"] == "tight" and t["trigger"] == 111.21 and t["stop"] == 109.49, t
     e = TB.stock_state(_np.array([120, 125, 130]), _np.array([121, 126, 131]), _np.array([119, 124, 129]), 120.0, 112.0, a)
     assert e["st"] == "extended" and e["trigger"] is None, e
+    import pandas as _pd
+    dates = _pd.bdate_range("2026-11-02", periods=12)
+    hist = _pd.DataFrame({"date": dates, "dn_share": [50, 95, 50, 50, 8, 50, 7, 50, 50, 50, 50, 50]})
+    spy_c = _pd.Series([100, 98, 96, 95, 96, 96.5, 97, 98.5, 98, 99.5, 99, 99], index=dates)
+    spy_v = _pd.Series([10, 12, 13, 14, 9, 8, 8, 9, 7, 8, 9, 9], index=dates)
+    C = TB.confirmations(hist, spy_c, spy_v)
+    assert C["ten_dn"] == ["2026-11-03"] and C["ten_up"] == ["2026-11-06", "2026-11-10"] and C["two_up"], C
+    assert C["low"] == "2026-11-05" and C["ftd"] == "2026-11-11", C   # day 4+ : Nov 11 +1.5% on higher volume (Nov 9 +1.5% is day 2)
     assert TB.stock_state(_np.array([90, 89, 88]), _np.array([91, 90, 89]), _np.array([89, 88, 87]), 92.0, 95.0, a) is None
     return "ok"
 

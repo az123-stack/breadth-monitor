@@ -83,6 +83,32 @@ def stock_state(c, h, l, e9, e21, adr_pct):
     return {"st": "watch", "trigger": None, "stop": None, "level": _f(e9, 2), "plan": "Above the 21 EMA but not set up yet"}
 
 
+def confirmations(history, spy_c, spy_v, lookback=25):
+    """Upside confirmation checks (Nov 23, 2026; Adam shared Mark Minervini's post: "it pays to wait for upside confirmation"):
+    10:1 days = dollar volume in rising vs falling stocks (dn_share <= 9.09% up, >= 90.91% down); the strong signal is two 10:1 up days
+    with no 10:1 down day between. Follow-through day (O'Neil/Minervini) = SPY +1%+ on higher volume than the day before, on day 4+ of
+    a rally attempt from the lowest close of the last `lookback` sessions, with that low not undercut since."""
+    try:
+        h = history.set_index(pd.to_datetime(history["date"])) if "date" in history.columns else history
+        ds = h["dn_share"].dropna().iloc[-lookback:]
+        days = [(d, "up" if x <= 100 / 11 else "down") for d, x in ds.items() if x <= 100 / 11 or x >= 1000 / 11]
+        ups = [d for d, k in days if k == "up"]
+        kinds = [k for _, k in days]
+        two = any(a == b == "up" for a, b in zip(kinds, kinds[1:]))   # two 10:1 up days, no 10:1 down day between
+        sc, sv = spy_c.dropna().iloc[-lookback:], spy_v.reindex(spy_c.index).iloc[-lookback:]
+        lo = int(np.argmin(sc.to_numpy()))
+        ftd = None
+        for k in range(lo + 4, len(sc)):
+            if sc.iloc[k] / sc.iloc[k - 1] - 1 >= 0.01 and sv.iloc[k] > sv.iloc[k - 1]:
+                ftd = str(sc.index[k].date()); break
+        return {"ten_up": [str(d.date()) for d in ups], "ten_dn": [str(d.date()) for d, k in days if k == "down"], "two_up": bool(two),
+                "low": str(sc.index[lo].date()), "low_px": _f(sc.iloc[lo], 2), "rally_day": int(len(sc) - 1 - lo),
+                "ftd": ftd, "ftd_from": str(sc.index[lo + 4].date()) if lo + 4 < len(sc) else None}
+    except Exception as e:  # never break the board
+        log.warning("confirmations failed: %s", e)
+        return None
+
+
 def build(adjusted, theme_data, history):
     T = theme_data or {}
     stocks = {s["t"]: s for s in T.get("stocks") or []}
@@ -165,7 +191,8 @@ def build(adjusted, theme_data, history):
         ok = sum([bool(spy_ok), bool(rsp_ok), net >= 0])
         ft = {"spy_ok": bool(spy_ok), "rsp_ok": bool(rsp_ok), "net4": round(net, 1),
               "verdict": "holding" if ok == 3 else ("wobbling" if ok == 2 else "fading")}
-    return {"date": str(dates[-1].date()), "thrust": thrust,
+    conf = confirmations(history, c[config.BENCHMARK], v[config.BENCHMARK])
+    return {"date": str(dates[-1].date()), "thrust": thrust, "conf": conf,
             "thrust_date": str(dates[tday].date()), "anchor": str(dates[a].date()), "day": n - tday,
             "label": (ev or {}).get("label"), "detail": (ev or {}).get("detail"), "window": WINDOW,
             "spy_since": _f(spy_since), "rsp_since": _f(since.get("RSP")), "ft": ft,

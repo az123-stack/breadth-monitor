@@ -99,11 +99,15 @@ function renderThrustBoard(app) {
   const head = X.thrust
     ? `<div class="rbanner ${ft ? ft[1] : "act"}"><b>Day ${X.day} of ${X.window} after the ${esc(X.label || "breadth thrust")} on ${shortDate(X.thrust_date)}</b>${ft ? ` · follow-through: <b>${ft[0]}</b> (SPY ${X.ft.spy_ok ? "above" : "below"} the thrust-day close, RSP ${X.ft.rsp_ok ? "above" : "below"}, net 4% movers ${X.ft.net4 >= 0 ? "+" : ""}${X.ft.net4}/day)` : ""}. Since the ${shortDate(X.anchor)} close: SPY ${pc(X.spy_since)}, RSP ${pc(X.rsp_since)}.</div>`
     : `<div class="rbanner watch"><b>No major breadth thrust in the last ${X.window} sessions.</b> Groups are ranked from the ${shortDate(X.anchor)} close instead; this board is built for the sessions after a thrust, so treat it as a watch list until one fires.</div>`;
+  const C = X.conf, d10 = (a) => a.length ? a.map(shortDate).join(", ") : "none";
+  const conf = C ? `<div class="rbanner ${C.ftd && C.two_up ? "act" : "watch"}" style="margin-top:6px"><b>Upside confirmation</b> (Minervini: "it pays to wait for upside confirmation") ·
+    Follow-through day: ${C.ftd ? `<b>yes, ${shortDate(C.ftd)}</b>` : `not yet: rally day ${C.rally_day} from the ${shortDate(C.low)} low ($${C.low_px}); a +1% SPY day on higher volume counts from day 4${C.rally_day < 4 ? " (earliest " + (C.ftd_from ? shortDate(C.ftd_from) : "in " + (4 - C.rally_day) + " sessions") + ")" : ""}, and only while that low holds`} ·
+    10:1 up-volume days: ${d10(C.ten_up)} · 10:1 down: ${d10(C.ten_dn)} · ${C.two_up ? "<b>two 10:1 up days in a row of signals ✓</b>" : "two 10:1 up days with no 10:1 down day between: not yet"}</div>` : "";
   const TL = { over: ["🟢 Triggered", "sow-breakout"], stopped: ["Stopped", "sow-extended"], zone: ["In the 9/21 EMAs", "sow-nuzzle"], tight: ["Tight range", "sow-nuzzle"], extended: ["Extended · wait", "sow-pop"], watch: ["Not set up", "sow-riding"] };
   const nTrig = tbRows().filter(r => r.st === "over").length, nSet = tbRows().filter(r => r.st === "zone" || r.st === "tight").length;
   const card = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
       <h2><span class="pbv unproven">Unproven</span> Post-thrust board <span class="meta">· best groups × money flow × buyable leaders · ${tbRows().some(r => r.live) ? "live" : "as of the " + shortDate(X.date) + " close"}</span></h2>
-      <div class="tsbtns"><button class="tbdl">⬇ TradingView</button></div></div>${head}
+      <div class="tsbtns"><button class="tbdl">⬇ TradingView</button></div></div>${head}${conf}
     <p class="meta" style="margin:6px 0 10px">${nTrig} triggered · ${nSet} set up · top ${X.groups.length} of ${X.n_groups} sub-themes. Group score = 40% lead vs SPY since the thrust + 20% thrust-day move + 20% money flow + 20% Theme Strength. Stocks: RS 80+, $10+, $20M+/day, above the 21 EMA; 9/21 EMA dips and tight ranges first. Rules of thumb, not a backtested ranking yet.</p></section>`);
   card.querySelector(".tbdl").addEventListener("click", () => tsDownload("post-thrust", thrustTicks()));
   for (const g of X.groups) {
