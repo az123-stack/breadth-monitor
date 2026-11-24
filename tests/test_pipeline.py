@@ -2325,6 +2325,11 @@ def test_thrust_board_states():
     C = TB.confirmations(hist, spy_c, spy_v)
     assert C["ten_dn"] == ["2026-11-03"] and C["ten_up"] == ["2026-11-06", "2026-11-10"] and C["two_up"], C
     assert C["low"] == "2026-11-05" and C["ftd"] == "2026-11-11", C   # day 4+ : Nov 11 +1.5% on higher volume (Nov 9 +1.5% is day 2)
+    cc = _pd.DataFrame({"A": range(100, 112), "B": range(50, 62), "D": range(20, 32), "RSP": range(10, 22)}, index=dates, dtype=float)
+    hist2 = hist.assign(nh10=[5] * 12, nl10=[1] * 12)
+    cache = {"vix": {"rows": [[str(d.date()), v] for d, v in zip(dates, [20, 22, 25, 30, 35, 34, 30, 28, 26, 22, 20, 18])]}}
+    LT = {l["k"]: l["ok"] for l in TB.checklist(hist2, cc, C, 5, ["A", "B", "D"], cache)}
+    assert LT == {"ftd": True, "ten": True, "neo": True, "vix": True, "broad": True}, LT
     assert TB.stock_state(_np.array([90, 89, 88]), _np.array([91, 90, 89]), _np.array([89, 88, 87]), 92.0, 95.0, a) is None
     return "ok"
 

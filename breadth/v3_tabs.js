@@ -103,11 +103,15 @@ function renderThrustBoard(app) {
   const conf = C ? `<div class="rbanner ${C.ftd && C.two_up ? "act" : "watch"}" style="margin-top:6px"><b>Upside confirmation</b> (Minervini: "it pays to wait for upside confirmation") ·
     Follow-through day: ${C.ftd ? `<b>yes, ${shortDate(C.ftd)}</b>` : `not yet: rally day ${C.rally_day} from the ${shortDate(C.low)} low ($${C.low_px}); a +1% SPY day on higher volume counts from day 4${C.rally_day < 4 ? " (earliest " + (C.ftd_from ? shortDate(C.ftd_from) : "in " + (4 - C.rally_day) + " sessions") + ")" : ""}, and only while that low holds`} ·
     10:1 up-volume days: ${d10(C.ten_up)} · 10:1 down: ${d10(C.ten_dn)} · ${C.two_up ? "<b>two 10:1 up days in a row of signals ✓</b>" : "two 10:1 up days with no 10:1 down day between: not yet"}</div>` : "";
+  const LT = X.lights || [], nG = LT.filter(l => l.ok).length;
+  const lights = LT.length ? `<div class="rbanner ${nG >= LT.length - 1 ? "act" : "watch"}" style="margin-top:6px"><b>Confluence: ${nG} of ${LT.length} green</b> <span class="meta">· the thesis stays the plan; these help size it (more green = bigger)</span>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${LT.map(l => `<span class="tg ${l.ok ? "sow-breakout" : l.ok === false ? "sow-extended" : "sow-riding"}" title="${esc(l.detail)} (${esc(l.src)})">${l.ok ? "🟢" : "🔴"} ${esc(l.label)}</span>`).join("")}</div>
+    <div class="meta" style="margin-top:4px;font-size:12px">${LT.map(l => `<b>${esc(l.label)}:</b> ${esc(l.detail)}`).join(" · ")}</div></div>` : "";
   const TL = { over: ["🟢 Triggered", "sow-breakout"], stopped: ["Stopped", "sow-extended"], zone: ["In the 9/21 EMAs", "sow-nuzzle"], tight: ["Tight range", "sow-nuzzle"], extended: ["Extended · wait", "sow-pop"], watch: ["Not set up", "sow-riding"] };
   const nTrig = tbRows().filter(r => r.st === "over").length, nSet = tbRows().filter(r => r.st === "zone" || r.st === "tight").length;
   const card = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
       <h2><span class="pbv unproven">Unproven</span> Post-thrust board <span class="meta">· best groups × money flow × buyable leaders · ${tbRows().some(r => r.live) ? "live" : "as of the " + shortDate(X.date) + " close"}</span></h2>
-      <div class="tsbtns"><button class="tbdl">⬇ TradingView</button></div></div>${head}${conf}
+      <div class="tsbtns"><button class="tbdl">⬇ TradingView</button></div></div>${head}${lights}${conf}
     <p class="meta" style="margin:6px 0 10px">${nTrig} triggered · ${nSet} set up · top ${X.groups.length} of ${X.n_groups} sub-themes. Group score = 40% lead vs SPY since the thrust + 20% thrust-day move + 20% money flow + 20% Theme Strength. Stocks: RS 80+, $10+, $20M+/day, above the 21 EMA; 9/21 EMA dips and tight ranges first. Rules of thumb, not a backtested ranking yet.</p></section>`);
   card.querySelector(".tbdl").addEventListener("click", () => tsDownload("post-thrust", thrustTicks()));
   for (const g of X.groups) {

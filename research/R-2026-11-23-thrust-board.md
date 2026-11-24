@@ -24,3 +24,10 @@ days without a 10:1 down day between. Built as the "Upside confirmation" line on
 <= 9.09% / >= 90.91%; FTD from the lowest SPY close of the last 25 sessions). Our own data agrees on the caution: the Oct 15 and Nov 4
 thrusts both failed; 10:1 up days are rare here (4 in 2 years, none at the Mar 31 2026 thrust which still worked), so absence of one
 is not a veto. To test with the board: does FTD / 10:1 confirmation improve the post-thrust stock results (same pre-registered test).
+
+**Confluence checklist (Nov 23 evening; Adam: "stick to our original thesis, but these are complementary confluences to guide us through the
+next few weeks").** `thrustboard.checklist` → `lights` on the board: follow-through day, 10:1 up day (Minervini), neoclouds holding the bid,
+VIX rolling over (< 5-day avg and <= 80% of the 10-day peak), credit recovering (HYG/IEI up over 5 sessions and 0.5%+ off its 25-day low)
+(a trader's risk-curve read: "fading VIX + neoclouds bid = position bigger; credit tied to AI financing is the real tell"), broadening (RSP
+up on its own + 10-day new highs > new lows; our thesis). Sizing guide only; none of it is tested. First reading (Nov 20 bars, Nov 23 VIX):
+1 of 6 green (VIX).

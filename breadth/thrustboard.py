@@ -109,6 +109,58 @@ def confirmations(history, spy_c, spy_v, lookback=25):
         return None
 
 
+NEOCLOUD = "Neoclouds & GPU Hosting"
+
+
+def _macro_series(cache, key):
+    rec = (cache or {}).get(key) or {}
+    rows = rec.get("rows") or []
+    return pd.Series([float(v) for _, v in rows], index=pd.to_datetime([d for d, _ in rows]), dtype=float).dropna() if rows else None
+
+
+def checklist(history, c, conf, tday, neo, cache):
+    """Confluence lights (Nov 23, 2026; Adam: "stick to our original thesis, but these are complementary confluences to guide us through the
+    next few weeks"). Sources: our thesis (follow-through, broadening), Mark Minervini (follow-through day, 10:1 up days) and a trader's
+    3-point risk-curve read (neoclouds catch a bid, VIX rolls over, credit recovers). Each light: ok True / False / None (no data)."""
+    out = []
+    add = lambda k, label, ok, detail, src: out.append({"k": k, "label": label, "ok": ok, "detail": detail, "src": src})
+    pc = lambda x: f"{x * 100:+.1f}%"
+    if conf:
+        add("ftd", "Follow-through day", bool(conf.get("ftd")),
+            f"SPY +1% on higher volume, day 4+ from the {conf['low']} low" + (f": yes, {conf['ftd']}" if conf.get("ftd") else f" (rally day {conf['rally_day']})"),
+            "Minervini / O'Neil")
+        add("ten", "10:1 up-volume day", bool(conf.get("ten_up")), "two in a row is the strong version" + (": yes, two ✓" if conf.get("two_up") else ""), "Minervini")
+    m = [t for t in neo if t in c.columns]
+    if len(m) >= 3 and tday is not None and tday >= 1:
+        base = c.iloc[tday - 1][m]
+        since = (c.iloc[-1][m] / base - 1).median()
+        last5 = (c.iloc[-1][m] / c.iloc[-6][m] - 1).median() if len(c) > 6 else np.nan
+        add("neo", "Neoclouds holding the bid", bool(since > 0 and (np.isnan(last5) or last5 > -0.05)),
+            f"{NEOCLOUD} median {pc(since)} since the thrust eve, {pc(last5)} over 5 sessions", "risk-curve read")
+    vix = _macro_series(cache, "vix")
+    if vix is not None and len(vix) > 10:
+        pk = vix.iloc[-10:].max()
+        ok = bool(vix.iloc[-1] < vix.iloc[-5:].mean() and vix.iloc[-1] <= 0.8 * pk)
+        add("vix", "VIX rolling over", ok, f"{vix.iloc[-1]:.1f} vs 10-day peak {pk:.1f} and 5-day avg {vix.iloc[-5:].mean():.1f}", "risk-curve read")
+    h, i = _macro_series(cache, "hyg"), _macro_series(cache, "iei")
+    if h is not None and i is not None:
+        cr = (h / i).dropna()
+        if len(cr) > 25:
+            lo = cr.iloc[-25:].min()
+            ok = bool(cr.iloc[-1] > cr.iloc[-6] and cr.iloc[-1] >= lo * 1.005)
+            add("credit", "Credit recovering (HYG/IEI)", ok, f"{cr.iloc[-1]:.4f}: {pc(cr.iloc[-1] / cr.iloc[-6] - 1)} over 5 sessions, {pc(cr.iloc[-1] / lo - 1)} off its 25-day low", "risk-curve read")
+    try:
+        hh = history.set_index(pd.to_datetime(history["date"])) if "date" in history.columns else history
+        last = hh.iloc[-1]
+        rsp_up = "RSP" in c.columns and c["RSP"].iloc[-1] > c["RSP"].iloc[-6]
+        nhnl = (last.get("nh10") or 0) > (last.get("nl10") or 0)
+        add("broad", "Broadening", bool(rsp_up and nhnl),
+            f"RSP {'up' if rsp_up else 'down'} over 5 sessions on its own; new highs {'above' if nhnl else 'below'} new lows (10-day avg)", "our thesis")
+    except Exception:
+        pass
+    return out
+
+
 def build(adjusted, theme_data, history):
     T = theme_data or {}
     stocks = {s["t"]: s for s in T.get("stocks") or []}
@@ -192,7 +244,16 @@ def build(adjusted, theme_data, history):
         ft = {"spy_ok": bool(spy_ok), "rsp_ok": bool(rsp_ok), "net4": round(net, 1),
               "verdict": "holding" if ok == 3 else ("wobbling" if ok == 2 else "fading")}
     conf = confirmations(history, c[config.BENCHMARK], v[config.BENCHMARK])
-    return {"date": str(dates[-1].date()), "thrust": thrust, "conf": conf,
+    try:
+        from . import macro as _macro
+        cache = _macro.load()
+    except Exception:
+        cache = {}
+    neo = [t for t in subs.get(NEOCLOUD, [])]
+    if len(neo) < 3:
+        neo = ["CRWV", "NBIS", "IREN", "APLD", "CORZ", "WULF", "CIFR"]
+    lights = checklist(history, c, conf, tday, neo, cache)
+    return {"date": str(dates[-1].date()), "thrust": thrust, "conf": conf, "lights": lights,
             "thrust_date": str(dates[tday].date()), "anchor": str(dates[a].date()), "day": n - tday,
             "label": (ev or {}).get("label"), "detail": (ev or {}).get("detail"), "window": WINDOW,
             "spy_since": _f(spy_since), "rsp_since": _f(since.get("RSP")), "ft": ft,
