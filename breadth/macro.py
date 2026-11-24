@@ -39,6 +39,7 @@ SERIES = [
     ("tnx", "^TNX", "10-yr yield", "pct", None, ["Homebuilders", "Regional & Community Banks", "Regulated Utilities"]),
     ("dxy", "DX-Y.NYB", "US dollar", "pts", None, []),
     ("vix", "^VIX", "VIX", "pts", None, []),
+    ("credit", None, "Credit appetite (HYG/IEI)", "pts", None, []),
     ("btc", "BTC-USD", "Bitcoin", "$", "IBIT", ["Bitcoin Miners", "Bitcoin Treasury Companies", "Crypto Exchanges & Brokers"]),
 ]
 
@@ -75,12 +76,16 @@ def parse_chart(js):
     return [[d, out[d]] for d in sorted(out)]
 
 
+# fetched but not shown as their own tiles: inputs for derived series (Nov 23, 2026; Adam: "HYG/IEI: price bounced, credit didn't")
+EXTRA = [("hyg", "HYG"), ("iei", "IEI")]
+
+
 def refresh(session=None):
     """Fetch a year of daily closes for every Yahoo series. Never raises."""
     cache = load()
     session = session or requests.Session()
     got = 0
-    for key, sym, *_ in SERIES:
+    for key, sym, *_ in list(SERIES) + [(k, t) for k, t in EXTRA]:
         if not sym:
             continue
         try:
@@ -97,7 +102,7 @@ def refresh(session=None):
         time.sleep(PAUSE)
     if got:
         _path().write_text(json.dumps(cache, separators=(",", ":"), sort_keys=True))
-    log.info("macro: %d of %d series fetched", got, sum(1 for s in SERIES if s[1]))
+    log.info("macro: %d of %d series fetched", got, sum(1 for s in SERIES if s[1]) + len(EXTRA))
     return cache
 
 
@@ -108,6 +113,17 @@ def _crack(cache):
         return None
     ds = sorted(set(cl) & set(rb) & set(ho))
     rows = [[d, round((2 * rb[d] * 42 + ho[d] * 42 - 3 * cl[d]) / 3, 2)] for d in ds]
+    return {"rows": rows} if rows else None
+
+
+def _credit(cache):
+    """HYG / IEI: high-yield bonds vs 3-7 year Treasuries. Rising = credit markets taking risk; falling = credit stress."""
+    try:
+        h = dict(cache["hyg"]["rows"]); i = dict(cache["iei"]["rows"])
+    except (KeyError, TypeError):
+        return None
+    ds = sorted(set(h) & set(i))
+    rows = [[d, round(h[d] / i[d], 5)] for d in ds if i[d]]
     return {"rows": rows} if rows else None
 
 
@@ -139,6 +155,9 @@ def build(adjusted, cache=None):
     crack = _crack(cache)
     if crack:
         cache["crack"] = crack
+    credit = _credit(cache)
+    if credit:
+        cache["credit"] = credit
     last_bar = pd.Timestamp(adjusted["date"].max()) if adjusted is not None and len(adjusted) else None
     closes = None
     out = []
