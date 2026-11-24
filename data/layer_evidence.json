@@ -75,8 +75,8 @@
  },
  "log": {
   "asof": "2026-11-24",
-  "closed": 474,
-  "dates": 21,
+  "closed": 493,
+  "dates": 22,
   "catalyst_positive": {
    "n_good": 40,
    "n_bad": 51,
@@ -121,11 +121,11 @@
   },
   "macro_tailwind": {
    "n_good": 130,
-   "n_bad": 60,
+   "n_bad": 70,
    "avg_good": -0.0173,
-   "avg_bad": -0.02108,
+   "avg_bad": -0.01769,
    "dates": 9,
-   "diff": 0.00378,
+   "diff": 0.00039,
    "t": 1.85,
    "halves": [
     0.00648,
@@ -135,11 +135,11 @@
   },
   "more_support": {
    "n_good": 12,
-   "n_bad": 232,
+   "n_bad": 241,
    "avg_good": -0.01483,
-   "avg_bad": -0.00838,
+   "avg_bad": -0.00857,
    "dates": 8,
-   "diff": -0.00645,
+   "diff": -0.00626,
    "t": 0.25,
    "halves": [
     -0.03881,
@@ -160,10 +160,10 @@
   },
   "brief_low_risk": {
    "n_good": 0,
-   "n_bad": 383,
-   "dates": 17,
+   "n_bad": 402,
+   "dates": 18,
    "avg_good": null,
-   "avg_bad": -0.02423,
+   "avg_bad": -0.02325,
    "test": "welch over dates",
    "diff": null,
    "t": null,
