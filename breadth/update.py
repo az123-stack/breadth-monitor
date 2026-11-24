@@ -384,11 +384,7 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["popwatch"] = popwatch.build(adjusted, theme_data)
         except Exception as e:  # optional panel; never block the page
             log.exception("pop watch failed: %s", e)
-        try:   # Since the bottom: themes / leaders emerging from an anchor date (Adam, Nov 7 2026; v3 Groups → Since the bottom; info only)
-            from . import emerge
-            theme_data["emerge"] = emerge.build(adjusted, theme_data)
-        except Exception as e:  # optional panel; never block the page
-            log.exception("since the bottom failed: %s", e)
+        # Since the bottom (emerge.py) retired Nov 24, 2026 (Adam: "not the bottom anymore"); module kept for reuse.
         try:   # Post-thrust board: leading groups x money flow x buyable stocks (Adam, Nov 23 2026; v3 Stocks -> Setups; info only)
             from . import thrustboard
             theme_data["thrustboard"] = thrustboard.build(adjusted, theme_data, history)

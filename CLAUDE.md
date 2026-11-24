@@ -117,7 +117,7 @@ One line per module. Before changing a module, read its entry in **CODEMAP.md** 
 - **v3 Nov 4, 2026** (Adam): **Market parent** = Breadth / Pre-market / Intraday (v1 renderers). v3 lives in docs/v3/, so v3site rewrites the
 - **Pop watch** (Nov 4, 2026; Adam: "sub-themes pop and then I forget them … that's exactly when I need to be grabbing them"; card
 - **In Play** (Nov 5, 2026; Adam, after a Lance Breitstein transcript: "Let's have In Play under the stocks tab") → `breadth/inplay.py`
-- `emerge.py` **Since the bottom** (Nov 7, 2026; Adam: "since 11/5, so it includes 11/6") v3 Groups → Since the bottom (`renderEmerge`); page picks the base close; info only. CODEMAP.md
+- `emerge.py` **Since the bottom** (Nov 7, 2026; Adam: "since 11/5, so it includes 11/6") RETIRED Nov 24, 2026 (Adam: "not the bottom anymore"): tab and daily build removed, module + `renderEmerge` kept for reuse. CODEMAP.md
 - `heavy.py` **Heavy lifters** (Nov 8, 2026; Adam: "the biggest stocks moving the market up while the hyperscalers fall, and which are pulling back into their EMAs") v3 Stocks → Heavy lifters (`renderHeavy`); info only. CODEMAP.md
 - `pairs.py` **Ratio watch** (Nov 18, 2026; Adam: "Mags / SOXX and RSP / SPY") Breadth tab tiles (`pairTiles`) + charts (`chartPair`) → `DATA.themes.pairs`; info only, layer `ratio_watch`. CODEMAP.md
 - **AI Revenue setups** (Nov 5, 2026; Adam: "a separate tab for AI Revenue Setups where we look for all these stocks coming back into EMAs")

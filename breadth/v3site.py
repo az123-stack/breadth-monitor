@@ -25,7 +25,7 @@ NAV = [
     ("brief", "Brief", [("bfront", "Front page"), ("bstories", "Trade stories"), ("readout", "Read-out")]),   # Nov 15: news-site Brief
     # Nov 4 (Adam: "add intraday and premarket tabs … under their own parent tab where breadth will also reside")
     ("market", "Market", [("breadth", "Breadth"), ("premarket", "Pre-market"), ("intraday", "Intraday"), ("mcheck", "Checklist")]),   # Nov 11: Checklist
-    ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle"), ("grotation", "Rotation"), ("gpop", "Pop watch"), ("gemerge", "Since the bottom"), ("gstairs", "Stair steps"), ("gbio", "Biotech"), ("grsrank", "RS ranks")]),   # Nov 7: Since the bottom   # Nov 4: RS ranks   # Nov 4: Pop watch
+    ("groups", "Groups", [("themes", "Themes"), ("themedash", "Theme Dash"), ("oracle", "Oracle"), ("grotation", "Rotation"), ("gpop", "Pop watch"), ("gstairs", "Stair steps"), ("gbio", "Biotech"), ("grsrank", "RS ranks")]),   # Nov 24: Since the bottom removed (Adam: "not the bottom anymore")   # Nov 4: RS ranks   # Nov 4: Pop watch
     ("stocks", "Stocks", [("stocks", "Stocks"), ("sstrong", "Strongest"), ("sinplay", "In Play"), ("sheavy", "Heavy lifters"), ("sairev", "AI Revenue"), ("ssetups", "Setups"), ("sleaders", "Leadership")]),   # Nov 5: In Play   # Nov 4: Strongest (every RS 90+ name, nothing missed)   # Oct 31: Setups (third row: Lined-up buys); Rotation = money card only   # Oct 31 (Adam: "add another parent for stocks and start building that out")
 ]
 
