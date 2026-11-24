@@ -1,6 +1,21 @@
 {
- "updated": "2026-11-23T13:10:47Z",
+ "updated": "2026-11-24T13:13:32Z",
  "episodes": [
+  {
+   "id": "2026-11-24-am",
+   "date": "2026-11-24",
+   "slot": "am",
+   "format": "narrative",
+   "format_name": "Story-first",
+   "title": "Retail gaps up, AI gives back Monday's thrust",
+   "name": "2026-11-24-am-narrative-130942.mp3",
+   "url": "https://az123-stack.github.io/breadth-monitor/podcast/audio/2026-11-24-am-narrative-130942.mp3",
+   "bytes": 2652048,
+   "seconds": 442,
+   "words": 1226,
+   "summary": "Where we are. Scenario B (money is coming back) holds on official numbers for Nov 23: only 11.8 percent of dollar volume in falling stocks, net plus 668 billion dollars, 339 stocks up 4 percent+ against 26 down, new lows fell to 72 (from 339) and new highs are still just 22, T2108 36.5. That is a real thrust day after a washout. This morning the market hands part of it back. Pre-market (7:47 AM ET): S and P futures minus 1.03 percent, Nasdaq-100 minus 1.82 percent, Russell 2000 minus 0.64 percen",
+   "published": "2026-11-24T13:13:32Z"
+  },
   {
    "id": "2026-11-23-am",
    "date": "2026-11-23",
