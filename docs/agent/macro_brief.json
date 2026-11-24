@@ -1,29 +1,35 @@
 {
- "for_date": "2026-11-20",
- "written": "2026-11-23T12:04Z",
- "headline": "Stocks open the holiday week in correction after Friday's tech rout (S&P 500 -3.5%, Nasdaq-100 -5.6%, NVIDIA hit by a reported SEC accounting probe) with Wednesday's PCE the main data risk before Thanksgiving.",
+ "for_date": "2026-11-23",
+ "written": "2026-11-24T12:04Z",
+ "headline": "Stocks try to rebound from an AI-led rout (S&P 500 -8.6% last week) with core PCE and GDP due Wednesday and oil sliding on Iran-talks hopes.",
  "risk": "high",
- "rates": "Fed funds futures price a December 25bp hike at about 99%, per a Newsquawk week-ahead note, so inflation data matters more than usual.",
- "fed": "No Fed speakers are scheduled on the week-ahead calendar; the Beige Book lands Wednesday and recent Waller and Williams comments debated the size of the next hike.",
- "oil": "Oil has been drifting lower on supply-surplus worries (Brent in the low-to-mid $90s mid-November) but swings on Iran headlines, including a reported US-Iran ceasefire and talk of renewed strikes.",
- "geo": "The Trump-Xi-Putin meeting produced a largely symbolic peace declaration, Iran ceasefire/strike headlines continue, and Trump says trade deals with Mexico and Thailand are progressing.",
+ "rates": "The 2-year yield is about 4.69% and the 10-year about 4.92-4.93%, with yields ticking up Monday.",
+ "fed": "NY Fed's Williams spoke Monday 4:00 PM ET; a headline says markets price a 25bp December hike, and the December decision is Dec 9.",
+ "oil": "WTI settled at $80.17 (-4.5%) and Brent at $89.37 (-3.5%) Monday as hedges against a weekend US escalation unwound and the IEA sees a ~2 mb/d surplus.",
+ "geo": "The US-Iran war and naval blockade continue, with Hormuz tanker attacks and an Iranian strike on Bahrain over the weekend, though Trump is giving talks time.",
  "events": [
   {
-   "date": "2026-11-23",
-   "time": "9:45 AM ET",
-   "name": "S&P Global flash PMIs (Nov)",
+   "date": "2026-11-24",
+   "time": "10:00 AM ET",
+   "name": "Conference Board Consumer Confidence",
    "impact": "medium"
   },
   {
    "date": "2026-11-24",
-   "time": "10:00 AM ET",
-   "name": "Conference Board consumer confidence (Nov)",
+   "time": "After close",
+   "name": "Dell earnings (also Workday, Autodesk, HP)",
    "impact": "medium"
   },
   {
    "date": "2026-11-25",
    "time": "8:30 AM ET",
-   "name": "PCE (Oct) and GDP 2nd estimate (Q3)",
+   "name": "October core PCE inflation",
+   "impact": "high"
+  },
+  {
+   "date": "2026-11-25",
+   "time": "8:30 AM ET",
+   "name": "Q3 GDP second estimate",
    "impact": "high"
   },
   {
@@ -35,19 +41,19 @@
   {
    "date": "2026-11-26",
    "time": "All day",
-   "name": "US markets closed (Thanksgiving)",
+   "name": "US markets closed for Thanksgiving",
    "impact": "medium"
   },
   {
    "date": "2026-11-27",
    "time": "1:00 PM ET",
-   "name": "US markets early close",
+   "name": "Early close after Thanksgiving",
    "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.newsquawk.com/headlines/week-in-focus--november-23rd-27th-highlights-include-us-pce-flash-pmis-aussie-cpi-and-ecb-minutes",
-  "https://www.newsquawk.com/headlines/newsquawk-daily-european-equity-opening-news---23rd-november-2026",
-  "https://hdfcsky.com/news/brent-crude-oil-price-today-november-16-2026-brent-falls-1percent-to-94-86-wti-slips-below-88-as-supply-surplus-looms"
+  "https://www.heygotrade.com/en/news/weekly-economic-outlook-2026-11-23/",
+  "https://www.rigzone.com/news/wire/oil_falls_as_trump_signals_iran_talks-23-nov-2026-185152-article/",
+  "https://msa-trader.com/news/u-s-treasury-yields-rise-intraday-on-nov-23-2026-cdba8f76e726"
  ]
 }
