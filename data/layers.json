@@ -570,12 +570,14 @@
    "name": "RS period toggle: 2 / 4 / 6 weeks (Stocks + Themes tabs, drawer)",
    "kind": "code",
    "owner": "daily update + page (live)",
-   "status": "idea",
+   "status": "tested",
    "where": "breadth/strength.py RS_SHORT, template.html RS_PER / liveRatingShort",
    "what": "10 / 20 / 30-session return percentile 1-99 vs liquid stocks, one RS column switchable with the 1-year RS Rating, live from Google prices",
    "affects_picks": false,
-   "evidence": [],
-   "notes": "Oct 29 Adam asked for a short-term RS next to the ~1-year RS Rating. Untested."
+   "evidence": [
+    "R-2026-11-24-rs-periods"
+   ],
+   "notes": "Nov 24 2026: alone no edge at any period; inside leading groups 4-6wk most consistent (both halves); long periods regime-dependent"
   },
   {
    "id": "oracle_accel",
