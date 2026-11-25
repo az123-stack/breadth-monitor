@@ -1,7 +1,7 @@
 """Trade Stories (Oct 22, 2026; Adam: "a tab where you put together news and earnings narratives into a cohesive story and
 recommend how to trade the developing story").
 
-Running storylines (max 6 open), each a case file that is UPDATED, not rewritten: status, thesis (what / why / how it works /
+Running storylines (max 8 open; 6 until Nov 24, 2026, raised at Adam's request: "great for my learning"), each a case file that is UPDATED, not rewritten: status, thesis (what / why / how it works /
 real or seesaw / what confirms or breaks it), dated timeline with sources, the groups and stocks it trades through, upcoming
 catalysts, how to trade it, related stories and a status history. Stored in docs/stories.json, written once a day by the
 "after the close" Claude task (see stories_guide.md), saved by .github/workflows/stories.yml.
@@ -27,7 +27,7 @@ STORIES = config.DOCS_DIR / "stories.json"
 GUIDE = config.ROOT / "breadth" / "stories_guide.md"
 STATUSES = ("building", "peaking", "fading", "resolved")
 THESIS = ("what", "why", "how", "real", "confirm")
-MAX_OPEN = 6
+MAX_OPEN = 8
 KEEP_RESOLVED = 20
 HOLD = 5
 CHASE = " (don't chase: > 2 ADRs over the 21 EMA)"
@@ -240,7 +240,7 @@ def facts():
     out = []
     P = out.append
     P(f"# Trade Stories fact sheet · generated {now:%Y-%m-%d %H:%M} ET · official data through {T['date']}")
-    P("Rules: max 6 open stories; update, don't rewrite; every timeline item needs a source URL; groups must be exact sub-theme "
+    P("Rules: max 8 open stories; update, don't rewrite; every timeline item needs a source URL; groups must be exact sub-theme "
       "names from the list at the bottom. Edit a copy of docs/stories.json (start from it).")
     X = T.get("thetrade") or {}
     if X.get("name"):

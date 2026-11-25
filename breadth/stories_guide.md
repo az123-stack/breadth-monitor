@@ -20,7 +20,7 @@ without a one-clause explanation.
      (move any that happened into the timeline with the result) and `trade`.
    - Start a new story only when a real, sourced narrative is driving several groups (or a big group) for more than a day.
    - Resolve a story when it has played out or price has disagreed for 5+ sessions (status "resolved", say how it ended in
-     `changed`). Merge stories that turned out to be the same thing. Max 6 open.
+     `changed`). Merge stories that turned out to be the same thing. Max 8 open.
 4. `python3 -m breadth.stories check --file /tmp/stories.json` (fix every warning), then
    `python3 -m breadth.stories publish --file /tmp/stories.json --push` ONCE.
 

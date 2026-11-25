@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-25T00:49",
+ "updated": "2026-11-25T00:57",
  "stories": [
   {
    "id": "ai-spending-repriced",
@@ -1133,6 +1133,182 @@
       "AI Servers & Integrators"
      ],
      "note": "Nov 24: opened. Monday's neocloud bounce (+20%) was mostly gone today (−11%) while HYG/IEI barely moved; credit is the light to watch."
+    }
+   ]
+  },
+  {
+   "id": "crypto-deleveraging",
+   "title": "Bitcoin cracks $60K: crypto's liquidity drain",
+   "status": "building",
+   "started": "2026-11-05",
+   "updated": "2026-11-25",
+   "summary": "Bitcoin has lost about a quarter in three weeks and is back near $59–60K as ETF money leaves, leveraged longs get liquidated and stablecoin supply shrinks. Crypto is the market's purest read on spare cash, and it's saying cash is tight.",
+   "changed": "Nov 24: opened. BTC ~$59.1K (−24% in a month, −32% off its 1-year high on the macro strip), testing the $58.6K July low.",
+   "thesis": {
+    "what": "Bitcoin closed at $80,443 on Nov 5 and fell to about $62,000 by Nov 15, roughly 23% in ten days, with more than $2 billion of liquidations that weekend. US bitcoin ETFs have seen sustained outflows and stablecoin supply shrank about $14 billion in 30 days, the fastest since June 2022. It is now just above its 12-month low of $58,566.",
+    "why": "Crypto has no earnings or yield, so its price is mostly about how much spare money and leverage is in the system. With 5% rates, hike odds rising and AI absorbing the speculative crowd, money is leaving; falling prices then force leveraged longs to sell, which pushes prices lower.",
+    "how": "Bitcoin trades like a high-beta Nasdaq stock on risk-off days. Crypto stocks (Coinbase, Strategy, treasury companies) move 1.5–3× bitcoin. Bitcoin miners now split in two: pure miners follow BTC, while miners that rent their power to AI (IREN, Cipher, TeraWulf) trade with the neoclouds.",
+    "real": "Well documented (liquidations, ETF flows, stablecoin data). Many analysts call this area historical value, but 'cheap' can get cheaper; the July low is the line the market is watching.",
+    "confirm": "**Washout:** a sharp break under $58.6K that reverses quickly on heavy volume, ETF flows turning positive, stablecoin supply growing again. **Deeper bear:** a weekly close under $58K with no bounce, opening $50–55K."
+   },
+   "timeline": [
+    {
+     "date": "2026-11-13",
+     "event": "Bitcoin falls below $70,000 for the first time since August on mass long liquidations; stablecoin supply contracts $14.2B in 30 days",
+     "url": "https://www.forklog.com/en/news/bitcoin-falls-below-70000-for-first-time-since-august",
+     "source": "ForkLog (Glassnode)",
+     "reaction": "Crypto Exchanges & Brokers and Bitcoin Treasury Companies slide"
+    },
+    {
+     "date": "2026-11-15",
+     "event": "Bitcoin hits ~$62,000, down about 23% in ten days; ETF outflows over $1B",
+     "url": "https://coinstats.app/news/b4895c478ff6370c6dae05c5d559123f353f1368227090954fc4a4675109e87b_Bitcoin-Price-Crashes-to-62000-Will-the-60000-Level-Hold/",
+     "source": "CoinStats / cryptoticker",
+     "reaction": ""
+    },
+    {
+     "date": "2026-11-16",
+     "event": "Weekend liquidations top $2 billion",
+     "url": "https://investinglive.com/cryptocurrency/weekend-bitcoin-fell-to-four-month-low-near-62-000-as-crypto-liquidations-top-2-billion/",
+     "source": "investingLive",
+     "reaction": "Bitcoin miners +12% on the Nov 23 bounce, then gave it back with the neoclouds"
+    }
+   ],
+   "groups": {
+    "long": [],
+    "short": [
+     "Crypto Exchanges & Brokers",
+     "Bitcoin Treasury Companies"
+    ]
+   },
+   "tickers": {
+    "long": [],
+    "short": [],
+    "watch": [
+     "IBIT",
+     "COIN",
+     "MSTR",
+     "IREN",
+     "HOOD"
+    ]
+   },
+   "catalysts": [
+    {
+     "date": "2026-11-25",
+     "time": "8:30 ET",
+     "name": "PCE inflation",
+     "why": "Rate-hike odds drive the liquidity story"
+    }
+   ],
+   "trade": "- **Use bitcoin as a risk gauge, not a trade:** a bitcoin bottom that holds usually comes with high-beta stocks firming up too.\n- **Watch $58.6K:** a fast undercut and reclaim is the washout pattern; a slow grind below it is not.\n- **Don't mix up miners:** AI-hosting miners trade with the neoclouds (see the AI credit squeeze story), pure miners with bitcoin.",
+   "related": [
+    "ai-credit-squeeze",
+    "rates-near-5"
+   ],
+   "history": [
+    {
+     "date": "2026-11-25",
+     "status": "building",
+     "long": [],
+     "short": [
+      "Crypto Exchanges & Brokers",
+      "Bitcoin Treasury Companies"
+     ],
+     "note": "Nov 24: opened. BTC ~$59.1K (−24% in a month, −32% off its 1-year high on the macro strip), testing the $58.6K July low."
+    }
+   ]
+  },
+  {
+   "id": "metals-unwind",
+   "title": "Gold and silver lose the safe-haven bid",
+   "status": "building",
+   "started": "2026-11-05",
+   "updated": "2026-11-25",
+   "summary": "With the 10-year near 5%, a December Fed hike priced and the dollar at a 1-year high, gold and silver are being sold even on fear days: holding a metal that pays nothing has got expensive, and leveraged funds are unwinding.",
+   "changed": "Nov 24: opened. Gold futures ~$3,544 (−13% in a month, −33% off the 1-year high), silver ~$40.50 (−25% in a month); both fell on the Nov 20 panic day when 'safe havens' should have held.",
+   "thesis": {
+    "what": "Gold broke below $3,800 on Nov 18 to its lowest since September 2025, erasing the whole post-midterm rally from the $4,147 Nov 5 high. Silver slid harder. On the dashboard's macro strip: gold −13% and silver −25% over a month; the dollar index sits at its 1-year high and the 10-year near 4.9–5.1%.",
+    "why": "Gold and silver pay no interest. When Treasuries yield ~5% and real (after-inflation) yields are near 2.9%, holding metal costs you that yield, and a rising dollar makes it pricier for everyone else. Hike odds for December pushed both higher at once, and leveraged funds that had ridden the metals rally were forced to sell.",
+    "how": "Metals move opposite to real yields and the dollar most of the time. Miners move like leveraged metal (a 1% gold move is often 2–3% in miners). Silver also depends on industrial demand, so it falls harder in a growth scare.",
+    "real": "The rate and dollar link is well established; the forced-selling part is visible (ETF outflows, the Nov 20 drop alongside stocks). Long-term supply/demand (a sixth straight silver deficit) hasn't changed - this is a positioning and rates story, not a broken thesis.",
+    "confirm": "**Turn:** the 10-year falling back toward 4.5%, the dollar rolling over, gold reclaiming ~$3,800, miners outperforming the metal. **Deeper:** a December hike delivered with hawkish guidance, dollar new highs, gold under ~$3,500."
+   },
+   "timeline": [
+    {
+     "date": "2026-11-16",
+     "event": "Gold and silver sell off together on rising yields, a stronger dollar and Fed hike expectations",
+     "url": "https://coinpaper.com/38905/why-are-gold-and-silver-prices-falling-together-fed-rate-bets-trigger-precious-metals-selloff-make",
+     "source": "Coinpaper",
+     "reaction": "Gold Majors & Royalties and Silver Miners slide"
+    },
+    {
+     "date": "2026-11-18",
+     "event": "Gold breaks below $3,800, lowest since Sept 2025; slide erases the post-midterm rally",
+     "url": "https://www.usagold.com/daily-precious-metals-market-report-november-18-2026/",
+     "source": "USAGOLD (CNBC)",
+     "reaction": ""
+    },
+    {
+     "date": "2026-11-18",
+     "event": "Saxo: leveraged funds extend selling; GLD and SLV near 14-month lows",
+     "url": "https://stocktwits.com/news-articles/markets/equity/gld-slv-sink-to-near-14-month-lows-gold-silver-prices/cNbXzasR9LJ",
+     "source": "Stocktwits",
+     "reaction": ""
+    },
+    {
+     "date": "2026-11-19",
+     "event": "Goldman cuts its end-2026 gold target to $4,150 from $4,650",
+     "url": "https://goldsilver.com/?p=198029",
+     "source": "GoldSilver",
+     "reaction": "Gold −4.6%, silver −7.4% on the Nov 20 panic day (dashboard macro strip)"
+    }
+   ],
+   "groups": {
+    "long": [],
+    "short": [
+     "Gold Majors & Royalties",
+     "Silver Miners"
+    ]
+   },
+   "tickers": {
+    "long": [],
+    "short": [],
+    "watch": [
+     "GLD",
+     "SLV",
+     "NEM",
+     "AEM",
+     "PAAS"
+    ]
+   },
+   "catalysts": [
+    {
+     "date": "2026-11-25",
+     "time": "8:30 ET",
+     "name": "PCE inflation",
+     "why": "Hot = more hike odds = more pressure on metals"
+    },
+    {
+     "date": "2026-12-16",
+     "time": "2:00 ET",
+     "name": "FOMC decision",
+     "why": "A hike with hawkish guidance vs a 'one and done' message"
+    }
+   ],
+   "trade": "- **Not a long until rates and the dollar turn.** Watch the 10-year and dollar tiles on the Breadth tab macro strip.\n- **Learning point:** in a rate-driven selloff, 'safe havens' that pay no yield aren't safe. Bonds and cash took the haven role on Nov 20.\n- **If it turns,** miners lead the metal: Gold Mid-tiers jumped +6.9% on the Nov 23 bounce. Wait for a group BUY on the Themes tab, not a one-day pop.",
+   "related": [
+    "rates-near-5"
+   ],
+   "history": [
+    {
+     "date": "2026-11-25",
+     "status": "building",
+     "long": [],
+     "short": [
+      "Gold Majors & Royalties",
+      "Silver Miners"
+     ],
+     "note": "Nov 24: opened. Gold futures ~$3,544 (−13% in a month, −33% off the 1-year high), silver ~$40.50 (−25% in a month); both fell on the Nov 20 panic day when 'safe havens' should have held."
     }
    ]
   },
