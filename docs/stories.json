@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-25T00:57",
+ "updated": "2026-11-25T16:57",
  "stories": [
   {
    "id": "ai-spending-repriced",
@@ -8,13 +8,13 @@
    "started": "2026-10-02",
    "updated": "2026-11-25",
    "summary": "Investors now want proof that AI spending pays back in cash, so money is leaving AI hardware and, as of Oct 29, software too.",
-   "changed": "Nov 24: Monday's AI bounce did not get a second day (HPE margin warning, chips sold), but Dell's record AI orders after the close argue demand is still there.",
+   "changed": "Nov 25: AI hardware was dumped at the open and bought back; Dell held, memory did not (TrendForce cut). Neither confirmed nor broken.",
    "thesis": {
     "what": "Since early October the AI-hardware groups (chip equipment, optical, AI servers, custom chips, memory, neoclouds, data-center power) fell about 18% over 20 sessions while IT services, enterprise software and steady consumer names rose about 10%: a 28-point swing. On Oct 22 the S&P 500 fell 1.2% but the equal-weight S&P rose 0.7%: the money moved, it didn't leave.",
     "why": "Two worries feed each other. **Cost:** Meta announced non-voting shares to help fund its AI spending and fell 5%; Tesla cut capex; Lam Research guided below consensus ([Korea Times](https://www.koreatimes.co.kr/world/20261023/wall-street-sinks-as-nasdaq-falls-over-2-on-ai-cost-worries), [Investrade](https://investrade.com/market-review-october-22-2026/)). **Financing:** hot CPI pushed the 10-year to 5.26% and CoreWeave's credit spread past 1,000 bp, so borrowing to build data centers got expensive ([TradingKey](https://www.tradingkey.com/analysis/stocks/us-stocks/262218623-us-premarket-tsmc-record-profit-chip-stocks-fall-nvidia-micron-ppi-tradingkey)). Funding is the newest strain: Meta plans to raise up to $95B, starting with $35B in stock ([MarketScreener](https://www.marketscreener.com/news/wall-st-rises-as-anthropic-s-ipo-filing-sharpens-focus-on-ai-trade-ce785cdcdd8ff22d)), and Anthropic's filing adds a large new AI listing to the supply.",
     "how": "Funds were crowded in AI hardware after a huge run. When the spending story wobbles they trim those winners first and park the money in businesses that grow without AI capex (software, IT services, staples). The giants' weight drags the S&P down while the average stock holds up.",
-    "real": "Still a seesaw. Monday the sold-hardest AI groups ripped; today they gave much of it back while the average stock rose. The price check reads wobbling: the 20-day call holds, the last 5 days are mixed.",
-    "confirm": "Confirm: AI hardware fails to hold gains on Dell's strong report (Nov 25), which says investors doubt the profit, not the demand. Break: Dell holds up and chips follow for two or more days. Then PCE inflation (Nov 25) and the Fed on Dec 9."
+    "real": "Still a seesaw. Today's early chip rout was mostly bought back while the average stock rose. Price still agrees over 5 and 20 days.",
+    "confirm": "Confirm: chips give back today's recovery and Dell breaks down despite its strong report. Break: Dell and chips build on it for two or more days. Then the Fed on Dec 9."
    },
    "timeline": [
     {
@@ -261,6 +261,20 @@
      "url": "https://1027wbow.com/2026/11/24/dell-lifts-annual-forecasts-after-record-quarter-on-surging-ai-server-demand/",
      "source": "Reuters via WBOW",
      "reaction": "Released after the close; reaction due Nov 25"
+    },
+    {
+     "date": "2026-11-25",
+     "event": "Dell test day: chips fall as much as 8% early on tariffs, hot PCE and AI doubts, then recover almost all of it; Dell ends slightly up",
+     "url": "https://www.techi.com/chip-stocks-recover-early-slide-nasdaq-close-november-25/",
+     "source": "TECHi",
+     "reaction": "QQQ -0.65%, SPY -0.29%, RSP +0.83% (Google close estimates)"
+    },
+    {
+     "date": "2026-11-25",
+     "event": "TrendForce cuts its memory outlook, saying Chinese cloud firms reduced 2027 orders",
+     "url": "https://247wallst.com/investing/2026/11/25/micron-falls-7-as-a-weaker-dram-outlook-and-new-tariffs-hit-memory-stocks-sandisk-drops-7-are-micron-and-memory-stocks-now-a-value-play/",
+     "source": "24/7 Wall St.",
+     "reaction": "Memory & Storage Media -3.2% net flow"
     }
    ],
    "groups": {
@@ -301,25 +315,13 @@
    },
    "catalysts": [
     {
-     "date": "2026-11-25",
-     "time": "9:30 AM ET",
-     "name": "Market reaction to Dell's report",
-     "why": "Tests whether record AI orders still lift AI hardware."
-    },
-    {
-     "date": "2026-11-25",
-     "time": "8:30 AM ET",
-     "name": "PCE inflation (October)",
-     "why": "Sets the rate backdrop for long-duration tech."
-    },
-    {
      "date": "2026-12-09",
      "time": "2:00 PM ET",
      "name": "FOMC decision",
      "why": "A December hike would hit long-duration growth."
     }
    ],
-   "trade": "- **Don't chase either side:** AI hardware has swung hard both ways in two days. No new longs there until a Dell-driven move holds two sessions.\n- **Long side:** software and IT-services names (CRM, WDAY, APPN, TEAM) on pullbacks to the 9/21 EMAs, stop under the touch-day low.\n- **Thin holiday week:** Thursday is closed and Friday is short, so keep new size small.\n- **Counter-trade:** MU, MRVL, LITE reclaiming their 21 EMA after Dell would say the selling was overdone.",
+   "trade": "- **Don't chase either side:** AI hardware swung hard again today. Wait for two sessions holding above today's lows.\n- **Long side:** software and IT-services names (CRM, WDAY, APPN, TEAM) on pullbacks to the 9/21 EMAs, stop under the touch-day low.\n- **Thin holiday:** closed Thursday, 1 PM close Friday; keep new size small.\n- **Counter-trade:** MU, MRVL, LITE reclaiming their 21 EMA would say the selling was overdone.",
    "related": [
     "rates-near-5",
     "it-services-rerating",
@@ -871,178 +873,7 @@
       "Data Center Power & Cooling",
       "Memory & Storage Media"
      ],
-     "note": "Nov 24: Monday's AI bounce did not get a second day (HPE margin warning, chips sold), but Dell's record AI orders after the close argue demand is still there."
-    }
-   ]
-  },
-  {
-   "id": "biotech-deals-data",
-   "title": "Deals and trial data pull money into biotech",
-   "status": "building",
-   "started": "2026-11-23",
-   "updated": "2026-11-25",
-   "summary": "Strong trial data and a $41B takeover are drawing money into biotech and pharma while AI hardware swings.",
-   "changed": "New: Sanofi's $41B cash deal for Insmed came a day after Kymera's eczema data; biotech groups led today.",
-   "thesis": {
-    "what": "Immunology & Inflammation rose 8.0% today and is #3 on Strength (from #22 five sessions earlier), 19.4% ahead of SPY over a month. Large-cap Biotech rose 5.9% and Oncology Biotech 6.1%.",
-    "why": "Company news with hard numbers: Kymera's mid-stage eczema trial ([Investing.com](https://www.investing.com/news/stock-market-news/kymera-shares-jump-29-after-positive-midstage-eczema-trial-5045346)) and Sanofi agreeing to buy Insmed for about $41B in cash ([CNBC](https://www.cnbc.com/2026/11/24/insmed-sanofi-deal-stock-pharma.html)).",
-    "how": "A big cash takeover tells investors drugmakers will pay up for growth, which lifts peers. These earnings and trial results do not depend on AI spending, so money leaving tech has a place to go.",
-    "real": "Price agrees so far: the groups held up through the washout and led again today. Two news days is early, and part of this is shelter money that could leave if tech turns.",
-    "confirm": "Confirm: biotech holds its gains on a day AI hardware rallies, and more deals or strong data follow. Break: the groups give back today's move within a few sessions."
-   },
-   "timeline": [
-    {
-     "date": "2026-11-23",
-     "event": "Kymera's mid-stage eczema trial for a once-daily pill beats placebo; shares jump about 29%",
-     "url": "https://www.investing.com/news/stock-market-news/kymera-shares-jump-29-after-positive-midstage-eczema-trial-5045346",
-     "source": "Investing.com",
-     "reaction": "Immunology & Inflammation led the morning"
-    },
-    {
-     "date": "2026-11-24",
-     "event": "Sanofi agrees to buy Insmed for about $41B in cash",
-     "url": "https://www.cnbc.com/2026/11/24/insmed-sanofi-deal-stock-pharma.html",
-     "source": "CNBC",
-     "reaction": "Large-cap Biotech +5.9%, Immunology & Inflammation +8.0% (Google close estimates)"
-    }
-   ],
-   "groups": {
-    "long": [
-     "Immunology & Inflammation",
-     "Large-cap Biotech",
-     "Oncology Biotech",
-     "Large-cap Pharma",
-     "Gene Editing"
-    ],
-    "short": []
-   },
-   "tickers": {
-    "long": [
-     "KNSA",
-     "SYRE"
-    ],
-    "short": [],
-    "watch": [
-     "KYMR",
-     "INSM",
-     "XNCR"
-    ]
-   },
-   "catalysts": [],
-   "trade": "- **Expression:** RS leaders in Immunology & Inflammation (KNSA, SYRE); KNSA is already an open trade (stop ~$91.17).\n- **Entry:** pullbacks or tight flags; today was an extended day, so don't chase.\n- **Don't buy INSM** for a breakout: a cash deal caps it.\n- **Risk:** single-trial headlines gap both ways; size by ADR.",
-   "related": [
-    "ai-spending-repriced"
-   ],
-   "history": [
-    {
-     "date": "2026-11-24",
-     "status": "building",
-     "long": [
-      "Immunology & Inflammation",
-      "Large-cap Biotech",
-      "Oncology Biotech",
-      "Large-cap Pharma",
-      "Gene Editing"
-     ],
-     "short": [],
-     "note": "New: Sanofi's $41B cash deal for Insmed came a day after Kymera's eczema data; biotech groups led today."
-    },
-    {
-     "date": "2026-11-25",
-     "status": "building",
-     "long": [
-      "Immunology & Inflammation",
-      "Large-cap Biotech",
-      "Oncology Biotech",
-      "Large-cap Pharma",
-      "Gene Editing"
-     ],
-     "short": [],
-     "note": "New: Sanofi's $41B cash deal for Insmed came a day after Kymera's eczema data; biotech groups led today."
-    }
-   ]
-  },
-  {
-   "id": "holiday-offprice",
-   "title": "Holiday shopper picks value: off-price and teen retail beat",
-   "status": "building",
-   "started": "2026-11-18",
-   "updated": "2026-11-25",
-   "summary": "Retail earnings week is pointing to a solid, value-led holiday: TJX beat and expects sales to accelerate, Abercrombie jumped ~20% on results, and off-price retail was a top group on Nov 24.",
-   "changed": "Nov 24: opened after Abercrombie's ~+20% earnings jump and off-price retail leading the tape.",
-   "thesis": {
-    "what": "TJX rose 11% on Nov 18 after 4% comparable sales and a beat on its own plan, and expects holiday sales momentum to accelerate. The NRF forecasts November–December sales up 4.2% to $1.013 trillion, faster than 2025's 3.1%. Abercrombie reported before the open Nov 24 and rose ~20% (Google close estimate); off-price retail was among the top groups (+3.8%).",
-    "why": "Shoppers pressured by inflation and 5% rates trade down to value; branded inventory is plentiful, which feeds off-price buyers. Retail sits far from AI credit stress, so it is a place money can go during the AI unwind.",
-    "how": "Off-price (TJX, Ross, Burlington) and brands with momentum (Abercrombie/Hollister) gain; full-price department stores and weaker mall brands lag.",
-    "real": "Early: one earnings week. Burlington guided Q4 comps only 0–2%, and homebuilder and consumer-confidence data show stretched lower-income shoppers. Treat it as a rotation home for money, not a boom.",
-    "confirm": "**Confirms:** strong Black Friday / Cyber Monday reads, off-price holding gains into December, more retailers raising guidance. **Breaks:** weak holiday sales data or off-price giving back the earnings gaps."
-   },
-   "timeline": [
-    {
-     "date": "2026-11-17",
-     "event": "NRF forecasts holiday sales +4.2% to $1.013 trillion",
-     "url": "https://finviz.com/news/424026/retails-1013-trillion-holiday-forecast-meets-its-first-earnings-test",
-     "source": "Finviz / PR Newswire",
-     "reaction": ""
-    },
-    {
-     "date": "2026-11-18",
-     "event": "TJX +11% on above-plan Q3; CEO expects holiday sales momentum to accelerate",
-     "url": "https://www.tikr.com/blog/tjx-soars-11-on-above-plan-q3-as-ceo-expects-holiday-sales-momentum-to-accelerate",
-     "source": "TIKR",
-     "reaction": "Off-price retail starts leading"
-    },
-    {
-     "date": "2026-11-24",
-     "event": "Abercrombie & Fitch reports Q3 before the open",
-     "url": "https://www.earningswhispers.com/stocks/anf",
-     "source": "Earnings Whispers",
-     "reaction": "ANF ~+20%, off-price retail +3.8% (Google close estimates)"
-    }
-   ],
-   "groups": {
-    "long": [
-     "Off-price Retail"
-    ],
-    "short": []
-   },
-   "tickers": {
-    "long": [],
-    "short": [],
-    "watch": [
-     "TJX",
-     "ROST",
-     "BURL",
-     "ANF"
-    ]
-   },
-   "catalysts": [
-    {
-     "date": "2026-11-27",
-     "time": "all day",
-     "name": "Black Friday",
-     "why": "First real read on holiday traffic"
-    },
-    {
-     "date": "2026-11-30",
-     "time": "all day",
-     "name": "Cyber Monday",
-     "why": "Online spending read"
-    }
-   ],
-   "trade": "- **Watch off-price leaders for the first pullback** after the earnings gaps (Fresh RS → 21 EMA and Episodic pivots lists in Setups).\n- **Don't chase gap-ups in weak breadth**; the What to trade tab currently says small size only.\n- **ANF** is an earnings gap: if it holds the gap-day low for a few sessions it becomes an episodic-pivot candidate.",
-   "related": [
-    "rates-near-5"
-   ],
-   "history": [
-    {
-     "date": "2026-11-25",
-     "status": "building",
-     "long": [
-      "Off-price Retail"
-     ],
-     "short": [],
-     "note": "Nov 24: opened after Abercrombie's ~+20% earnings jump and off-price retail leading the tape."
+     "note": "Nov 25: AI hardware was dumped at the open and bought back; Dell held, memory did not (TrendForce cut). Neither confirmed nor broken."
     }
    ]
   },
@@ -1053,9 +884,9 @@
    "started": "2026-10-15",
    "updated": "2026-11-25",
    "summary": "Lenders are pulling back from AI data-center debt; the stocks most dependent on borrowing (neoclouds, Oracle) bounce hardest and fail fastest, and credit hasn't confirmed any bounce yet.",
-   "changed": "Nov 24: opened. Monday's neocloud bounce (+20%) was mostly gone today (−11%) while HYG/IEI barely moved; credit is the light to watch.",
+   "changed": "Nov 25: AI default insurance hit new records, now including Alphabet. Credit is getting worse, not easing.",
    "thesis": {
-    "what": "The cost of insuring AI borrowers against default has hit records (Oracle five-year CDS 288 bp, CoreWeave past 1,000 bp in mid-October), single-B junk spreads widened to 367 bp in the Nov 5 selloff, and banks are now stress-testing data-center cash flows and contract cancellation clauses. On the dashboard: neoclouds −22% since the Nov 4 thrust eve; HYG/IEI −1.1% over 5 sessions and just 0.1% off its 25-day low.",
+    "what": "The cost of insuring AI borrowers against default has hit records (Oracle five-year CDS 288 bp, CoreWeave past 1,000 bp in mid-October), single-B junk spreads widened to 367 bp in the Nov 5 selloff, and banks are now stress-testing data-center cash flows and contract cancellation clauses. On the dashboard: neoclouds −22% since the Nov 4 thrust eve; HYG/IEI −1.1% over 5 sessions and just 0.1% off its 25-day low. On Nov 25 the records widened again: Oracle 356 bp and CoreWeave 1,314 bp ([Disruption Banking](https://www.disruptionbanking.com/2026/11/25/why-are-ai-credit-default-swaps-hitting-record-spreads/)).",
     "why": "The build-out needs far more money than hyperscaler cash flow covers; the gap is filled by bonds, private credit and data-center ABS. When lenders get picky, the borrowers that need the next loan to finish a project (neoclouds, Oracle's leased campuses) get repriced first; cash-rich hyperscalers much less.",
     "how": "Two speeds. Cash-funded giants (Amazon, Microsoft, Alphabet) hold up better; debt-funded builders and tenants (CoreWeave, Nebius, Oracle, data-center developers) swing hardest both ways. Credit spreads move before equity confirms.",
     "real": "Real and documented in bond and CDS markets, but concentrated: broad junk (HYG/IEI) is only ~3.6% off its 1-year high while SPY was 11.5% off at the low. It explains why AI bounces fail fast; it does not yet look like a general credit crunch.",
@@ -1089,6 +920,13 @@
      "url": "https://finimize.com/content/ai-debt-deals-face-a-tougher-crowd-on-wall-street",
      "source": "Finimize",
      "reaction": "Neoclouds −11%, custom silicon −13% (Google close estimates)"
+    },
+    {
+     "date": "2026-11-25",
+     "event": "Five-year default insurance on Oracle (356 bp), CoreWeave (1,314 bp), Alphabet and SpaceX hits records",
+     "url": "https://www.disruptionbanking.com/2026/11/25/why-are-ai-credit-default-swaps-hitting-record-spreads/",
+     "source": "Disruption Banking",
+     "reaction": "Hyperscalers -1.6% net flow, Neoclouds -0.8% (Google close estimates)"
     }
    ],
    "groups": {
@@ -1132,183 +970,7 @@
       "Neoclouds & GPU Hosting",
       "AI Servers & Integrators"
      ],
-     "note": "Nov 24: opened. Monday's neocloud bounce (+20%) was mostly gone today (−11%) while HYG/IEI barely moved; credit is the light to watch."
-    }
-   ]
-  },
-  {
-   "id": "crypto-deleveraging",
-   "title": "Bitcoin cracks $60K: crypto's liquidity drain",
-   "status": "building",
-   "started": "2026-11-05",
-   "updated": "2026-11-25",
-   "summary": "Bitcoin has lost about a quarter in three weeks and is back near $59–60K as ETF money leaves, leveraged longs get liquidated and stablecoin supply shrinks. Crypto is the market's purest read on spare cash, and it's saying cash is tight.",
-   "changed": "Nov 24: opened. BTC ~$59.1K (−24% in a month, −32% off its 1-year high on the macro strip), testing the $58.6K July low.",
-   "thesis": {
-    "what": "Bitcoin closed at $80,443 on Nov 5 and fell to about $62,000 by Nov 15, roughly 23% in ten days, with more than $2 billion of liquidations that weekend. US bitcoin ETFs have seen sustained outflows and stablecoin supply shrank about $14 billion in 30 days, the fastest since June 2022. It is now just above its 12-month low of $58,566.",
-    "why": "Crypto has no earnings or yield, so its price is mostly about how much spare money and leverage is in the system. With 5% rates, hike odds rising and AI absorbing the speculative crowd, money is leaving; falling prices then force leveraged longs to sell, which pushes prices lower.",
-    "how": "Bitcoin trades like a high-beta Nasdaq stock on risk-off days. Crypto stocks (Coinbase, Strategy, treasury companies) move 1.5–3× bitcoin. Bitcoin miners now split in two: pure miners follow BTC, while miners that rent their power to AI (IREN, Cipher, TeraWulf) trade with the neoclouds.",
-    "real": "Well documented (liquidations, ETF flows, stablecoin data). Many analysts call this area historical value, but 'cheap' can get cheaper; the July low is the line the market is watching.",
-    "confirm": "**Washout:** a sharp break under $58.6K that reverses quickly on heavy volume, ETF flows turning positive, stablecoin supply growing again. **Deeper bear:** a weekly close under $58K with no bounce, opening $50–55K."
-   },
-   "timeline": [
-    {
-     "date": "2026-11-13",
-     "event": "Bitcoin falls below $70,000 for the first time since August on mass long liquidations; stablecoin supply contracts $14.2B in 30 days",
-     "url": "https://www.forklog.com/en/news/bitcoin-falls-below-70000-for-first-time-since-august",
-     "source": "ForkLog (Glassnode)",
-     "reaction": "Crypto Exchanges & Brokers and Bitcoin Treasury Companies slide"
-    },
-    {
-     "date": "2026-11-15",
-     "event": "Bitcoin hits ~$62,000, down about 23% in ten days; ETF outflows over $1B",
-     "url": "https://coinstats.app/news/b4895c478ff6370c6dae05c5d559123f353f1368227090954fc4a4675109e87b_Bitcoin-Price-Crashes-to-62000-Will-the-60000-Level-Hold/",
-     "source": "CoinStats / cryptoticker",
-     "reaction": ""
-    },
-    {
-     "date": "2026-11-16",
-     "event": "Weekend liquidations top $2 billion",
-     "url": "https://investinglive.com/cryptocurrency/weekend-bitcoin-fell-to-four-month-low-near-62-000-as-crypto-liquidations-top-2-billion/",
-     "source": "investingLive",
-     "reaction": "Bitcoin miners +12% on the Nov 23 bounce, then gave it back with the neoclouds"
-    }
-   ],
-   "groups": {
-    "long": [],
-    "short": [
-     "Crypto Exchanges & Brokers",
-     "Bitcoin Treasury Companies"
-    ]
-   },
-   "tickers": {
-    "long": [],
-    "short": [],
-    "watch": [
-     "IBIT",
-     "COIN",
-     "MSTR",
-     "IREN",
-     "HOOD"
-    ]
-   },
-   "catalysts": [
-    {
-     "date": "2026-11-25",
-     "time": "8:30 ET",
-     "name": "PCE inflation",
-     "why": "Rate-hike odds drive the liquidity story"
-    }
-   ],
-   "trade": "- **Use bitcoin as a risk gauge, not a trade:** a bitcoin bottom that holds usually comes with high-beta stocks firming up too.\n- **Watch $58.6K:** a fast undercut and reclaim is the washout pattern; a slow grind below it is not.\n- **Don't mix up miners:** AI-hosting miners trade with the neoclouds (see the AI credit squeeze story), pure miners with bitcoin.",
-   "related": [
-    "ai-credit-squeeze",
-    "rates-near-5"
-   ],
-   "history": [
-    {
-     "date": "2026-11-25",
-     "status": "building",
-     "long": [],
-     "short": [
-      "Crypto Exchanges & Brokers",
-      "Bitcoin Treasury Companies"
-     ],
-     "note": "Nov 24: opened. BTC ~$59.1K (−24% in a month, −32% off its 1-year high on the macro strip), testing the $58.6K July low."
-    }
-   ]
-  },
-  {
-   "id": "metals-unwind",
-   "title": "Gold and silver lose the safe-haven bid",
-   "status": "building",
-   "started": "2026-11-05",
-   "updated": "2026-11-25",
-   "summary": "With the 10-year near 5%, a December Fed hike priced and the dollar at a 1-year high, gold and silver are being sold even on fear days: holding a metal that pays nothing has got expensive, and leveraged funds are unwinding.",
-   "changed": "Nov 24: opened. Gold futures ~$3,544 (−13% in a month, −33% off the 1-year high), silver ~$40.50 (−25% in a month); both fell on the Nov 20 panic day when 'safe havens' should have held.",
-   "thesis": {
-    "what": "Gold broke below $3,800 on Nov 18 to its lowest since September 2025, erasing the whole post-midterm rally from the $4,147 Nov 5 high. Silver slid harder. On the dashboard's macro strip: gold −13% and silver −25% over a month; the dollar index sits at its 1-year high and the 10-year near 4.9–5.1%.",
-    "why": "Gold and silver pay no interest. When Treasuries yield ~5% and real (after-inflation) yields are near 2.9%, holding metal costs you that yield, and a rising dollar makes it pricier for everyone else. Hike odds for December pushed both higher at once, and leveraged funds that had ridden the metals rally were forced to sell.",
-    "how": "Metals move opposite to real yields and the dollar most of the time. Miners move like leveraged metal (a 1% gold move is often 2–3% in miners). Silver also depends on industrial demand, so it falls harder in a growth scare.",
-    "real": "The rate and dollar link is well established; the forced-selling part is visible (ETF outflows, the Nov 20 drop alongside stocks). Long-term supply/demand (a sixth straight silver deficit) hasn't changed - this is a positioning and rates story, not a broken thesis.",
-    "confirm": "**Turn:** the 10-year falling back toward 4.5%, the dollar rolling over, gold reclaiming ~$3,800, miners outperforming the metal. **Deeper:** a December hike delivered with hawkish guidance, dollar new highs, gold under ~$3,500."
-   },
-   "timeline": [
-    {
-     "date": "2026-11-16",
-     "event": "Gold and silver sell off together on rising yields, a stronger dollar and Fed hike expectations",
-     "url": "https://coinpaper.com/38905/why-are-gold-and-silver-prices-falling-together-fed-rate-bets-trigger-precious-metals-selloff-make",
-     "source": "Coinpaper",
-     "reaction": "Gold Majors & Royalties and Silver Miners slide"
-    },
-    {
-     "date": "2026-11-18",
-     "event": "Gold breaks below $3,800, lowest since Sept 2025; slide erases the post-midterm rally",
-     "url": "https://www.usagold.com/daily-precious-metals-market-report-november-18-2026/",
-     "source": "USAGOLD (CNBC)",
-     "reaction": ""
-    },
-    {
-     "date": "2026-11-18",
-     "event": "Saxo: leveraged funds extend selling; GLD and SLV near 14-month lows",
-     "url": "https://stocktwits.com/news-articles/markets/equity/gld-slv-sink-to-near-14-month-lows-gold-silver-prices/cNbXzasR9LJ",
-     "source": "Stocktwits",
-     "reaction": ""
-    },
-    {
-     "date": "2026-11-19",
-     "event": "Goldman cuts its end-2026 gold target to $4,150 from $4,650",
-     "url": "https://goldsilver.com/?p=198029",
-     "source": "GoldSilver",
-     "reaction": "Gold −4.6%, silver −7.4% on the Nov 20 panic day (dashboard macro strip)"
-    }
-   ],
-   "groups": {
-    "long": [],
-    "short": [
-     "Gold Majors & Royalties",
-     "Silver Miners"
-    ]
-   },
-   "tickers": {
-    "long": [],
-    "short": [],
-    "watch": [
-     "GLD",
-     "SLV",
-     "NEM",
-     "AEM",
-     "PAAS"
-    ]
-   },
-   "catalysts": [
-    {
-     "date": "2026-11-25",
-     "time": "8:30 ET",
-     "name": "PCE inflation",
-     "why": "Hot = more hike odds = more pressure on metals"
-    },
-    {
-     "date": "2026-12-16",
-     "time": "2:00 ET",
-     "name": "FOMC decision",
-     "why": "A hike with hawkish guidance vs a 'one and done' message"
-    }
-   ],
-   "trade": "- **Not a long until rates and the dollar turn.** Watch the 10-year and dollar tiles on the Breadth tab macro strip.\n- **Learning point:** in a rate-driven selloff, 'safe havens' that pay no yield aren't safe. Bonds and cash took the haven role on Nov 20.\n- **If it turns,** miners lead the metal: Gold Mid-tiers jumped +6.9% on the Nov 23 bounce. Wait for a group BUY on the Themes tab, not a one-day pop.",
-   "related": [
-    "rates-near-5"
-   ],
-   "history": [
-    {
-     "date": "2026-11-25",
-     "status": "building",
-     "long": [],
-     "short": [
-      "Gold Majors & Royalties",
-      "Silver Miners"
-     ],
-     "note": "Nov 24: opened. Gold futures ~$3,544 (−13% in a month, −33% off the 1-year high), silver ~$40.50 (−25% in a month); both fell on the Nov 20 panic day when 'safe havens' should have held."
+     "note": "Nov 25: AI default insurance hit new records, now including Alphabet. Credit is getting worse, not easing."
     }
    ]
   },
@@ -1319,13 +981,13 @@
    "started": "2026-10-14",
    "updated": "2026-11-25",
    "summary": "Hot inflation pushed the 10-year past 5%; it has eased to about 4.9% but a December hike is still heavily priced, so long-dated growth stays under pressure.",
-   "changed": "Nov 24: the 10-year is near 4.90%, well off its 5.15% area; strong confidence data kept a December hike priced, with PCE tomorrow.",
+   "changed": "Nov 25: PCE ran a touch hot but yields did not go back above 5%; bonds rallied and homebuilders rose. The confirm test failed.",
    "thesis": {
     "what": "Since the Oct 14 CPI the groups that need cheap money or are years from profits (small nuclear reactors, quantum, homebuilders, REITs, residential solar) fell about 13% vs SPY over 20 sessions.",
     "why": "September CPI came in at 3.7% vs 3.6% and PPI was hot the next day, reviving rate-hike bets; the 10-year hit 5.26% ([24/7 Wall St.](https://247wallst.com/investing/2026/10/14/nuscale-power-falls-7-as-10-year-treasury-yield-climbs-to-5-26-energy-fuels-drops-9-oklo-slides-5/)). Oil above $100 feeds inflation worries too (see the Gulf oil story).",
     "how": "A higher 10-year lowers what future profits are worth today, so the longest-dated stories (SMR, quantum) get hit hardest, and it raises mortgage and financing costs for housing and REITs. When yields ease, the same groups snap back fastest.",
     "real": "Over 20 days price agrees, but on 5 days the rate-sensitive groups are level with SPY: the pressure has paused with yields off their high.",
-    "confirm": "Confirm: a hot PCE on Nov 25 sends the 10-year back above 5%. Break: a soft PCE lets yields slide and SMR, quantum and housing recover. The Fed decides Dec 9."
+    "confirm": "The Nov 25 test did not confirm: a hot PCE left the 10-year near 4.85%. Confirm: the 10-year back above 5% into the Fed on Dec 9. Break: yields keep sliding and SMR, quantum and housing keep recovering."
    },
    "timeline": [
     {
@@ -1467,6 +1129,13 @@
      "url": "https://financefeeds.com/nasdaq-falls-about-2-4-as-amd-nvidia-and-arm-give-back-huangs-rally-a-day-before-pce/",
      "source": "FinanceFeeds",
      "reaction": "10-year about 4.90% (^TNX), TLT -0.24% (Google close estimates)"
+    },
+    {
+     "date": "2026-11-25",
+     "event": "October core PCE 3.3% vs 3.2% expected; a December hike stays heavily priced, yet the 10-year eases to about 4.85%",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-november-25-dow-sp-500-nasdaq-pce-inflation-data-091428237.html",
+     "source": "Yahoo Finance",
+     "reaction": "TLT +0.92%, Homebuilders +2.5% (Google close estimates)"
     }
    ],
    "groups": {
@@ -1490,19 +1159,13 @@
    },
    "catalysts": [
     {
-     "date": "2026-11-25",
-     "time": "8:30 AM ET",
-     "name": "PCE inflation (October)",
-     "why": "The Fed's preferred gauge, two weeks before the meeting."
-    },
-    {
      "date": "2026-12-09",
      "time": "2:00 PM ET",
      "name": "FOMC decision",
      "why": "A hike is heavily priced."
     }
    ],
-   "trade": "- **No new longs in SMR or quantum** while they keep making lower lows (SMR group -6.9% today).\n- **Into PCE (8:30 AM Nov 25):** don't add rate-sensitive risk before the number.\n- **Rate-relief trigger:** a soft PCE with yields breaking lower is the cue to watch homebuilders and building products.",
+   "trade": "- **Don't add pressure-side bets** while yields are falling on hot data.\n- **Homebuilders** bounced 2.5% today; treat it as a watch until a group buy signal, not a one-day chase.\n- **No new longs in SMR or quantum** until they stop making lower lows.\n- **Next test:** the Fed on Dec 9.",
    "related": [
     "ai-spending-repriced",
     "gulf-oil-shock"
@@ -1844,7 +1507,199 @@
       "REITs",
       "Residential Solar & Yieldcos"
      ],
-     "note": "Nov 24: the 10-year is near 4.90%, well off its 5.15% area; strong confidence data kept a December hike priced, with PCE tomorrow."
+     "note": "Nov 25: PCE ran a touch hot but yields did not go back above 5%; bonds rallied and homebuilders rose. The confirm test failed."
+    }
+   ]
+  },
+  {
+   "id": "biotech-deals-data",
+   "title": "Deals and trial data pull money into biotech",
+   "status": "building",
+   "started": "2026-11-23",
+   "updated": "2026-11-25",
+   "summary": "Strong trial data and a $41B takeover are drawing money into biotech and pharma while AI hardware swings.",
+   "changed": "Nov 25: biotech mostly paused while sold-off groups bounced; three recent FDA approvals add to the news flow.",
+   "thesis": {
+    "what": "Immunology & Inflammation rose 8.0% today and is #3 on Strength (from #22 five sessions earlier), 19.4% ahead of SPY over a month. Large-cap Biotech rose 5.9% and Oncology Biotech 6.1%.",
+    "why": "Company news with hard numbers: Kymera's mid-stage eczema trial ([Investing.com](https://www.investing.com/news/stock-market-news/kymera-shares-jump-29-after-positive-midstage-eczema-trial-5045346)) and Sanofi agreeing to buy Insmed for about $41B in cash ([CNBC](https://www.cnbc.com/2026/11/24/insmed-sanofi-deal-stock-pharma.html)).",
+    "how": "A big cash takeover tells investors drugmakers will pay up for growth, which lifts peers. These earnings and trial results do not depend on AI spending, so money leaving tech has a place to go.",
+    "real": "Price agrees so far: the groups held up through the washout and led again today. Two news days is early, and part of this is shelter money that could leave if tech turns.",
+    "confirm": "Confirm: the groups hold their gains while AI hardware rallies, with more deals or approvals. Break: they give back the Nov 23-24 move within a few sessions."
+   },
+   "timeline": [
+    {
+     "date": "2026-11-23",
+     "event": "Kymera's mid-stage eczema trial for a once-daily pill beats placebo; shares jump about 29%",
+     "url": "https://www.investing.com/news/stock-market-news/kymera-shares-jump-29-after-positive-midstage-eczema-trial-5045346",
+     "source": "Investing.com",
+     "reaction": "Immunology & Inflammation led the morning"
+    },
+    {
+     "date": "2026-11-24",
+     "event": "Sanofi agrees to buy Insmed for about $41B in cash",
+     "url": "https://www.cnbc.com/2026/11/24/insmed-sanofi-deal-stock-pharma.html",
+     "source": "CNBC",
+     "reaction": "Large-cap Biotech +5.9%, Immunology & Inflammation +8.0% (Google close estimates)"
+    },
+    {
+     "date": "2026-11-25",
+     "event": "Holiday week brings FDA approvals for Cogent, BridgeBio and AbbVie (announced Nov 23-24) on top of Sanofi's $41B Insmed deal",
+     "url": "https://www.prnewswire.com/news-releases/a-41-billion-deal-and-three-new-approvals-fill-biotechs-holiday-week-302950406.html",
+     "source": "PR Newswire",
+     "reaction": "Nov 25: Obesity & Metabolic +2.5%, Large-cap Biotech +0.2%, Immunology -1.1%, Oncology -1.3% (Google close estimates)"
+    }
+   ],
+   "groups": {
+    "long": [
+     "Immunology & Inflammation",
+     "Large-cap Biotech",
+     "Oncology Biotech",
+     "Large-cap Pharma",
+     "Gene Editing"
+    ],
+    "short": []
+   },
+   "tickers": {
+    "long": [
+     "KNSA",
+     "SYRE"
+    ],
+    "short": [],
+    "watch": [
+     "KYMR",
+     "INSM",
+     "XNCR"
+    ]
+   },
+   "catalysts": [
+    {
+     "date": "2026-11-30",
+     "time": "",
+     "name": "FDA decision date for Vertex povetacicept",
+     "why": "Another test of whether good biotech news is still being bought."
+    }
+   ],
+   "trade": "- **Expression:** RS leaders in Immunology & Inflammation (KNSA, SYRE); KNSA is already an open trade (stop ~$91.17).\n- **Entry:** pullbacks or tight flags; today was an extended day, so don't chase.\n- **Don't buy INSM** for a breakout: a cash deal caps it.\n- **Risk:** single-trial headlines gap both ways; size by ADR.",
+   "related": [
+    "ai-spending-repriced"
+   ],
+   "history": [
+    {
+     "date": "2026-11-24",
+     "status": "building",
+     "long": [
+      "Immunology & Inflammation",
+      "Large-cap Biotech",
+      "Oncology Biotech",
+      "Large-cap Pharma",
+      "Gene Editing"
+     ],
+     "short": [],
+     "note": "New: Sanofi's $41B cash deal for Insmed came a day after Kymera's eczema data; biotech groups led today."
+    },
+    {
+     "date": "2026-11-25",
+     "status": "building",
+     "long": [
+      "Immunology & Inflammation",
+      "Large-cap Biotech",
+      "Oncology Biotech",
+      "Large-cap Pharma",
+      "Gene Editing"
+     ],
+     "short": [],
+     "note": "Nov 25: biotech mostly paused while sold-off groups bounced; three recent FDA approvals add to the news flow."
+    }
+   ]
+  },
+  {
+   "id": "holiday-offprice",
+   "title": "Holiday shopper picks value: off-price and teen retail beat",
+   "status": "building",
+   "started": "2026-11-18",
+   "updated": "2026-11-25",
+   "summary": "Retail earnings week is pointing to a solid, value-led holiday: TJX beat and expects sales to accelerate, Abercrombie jumped ~20% on results, and off-price retail was a top group on Nov 24.",
+   "changed": "Nov 25: a caution flag: fewer weekend shoppers projected and spending stalled in October.",
+   "thesis": {
+    "what": "TJX rose 11% on Nov 18 after 4% comparable sales and a beat on its own plan, and expects holiday sales momentum to accelerate. The NRF forecasts November–December sales up 4.2% to $1.013 trillion, faster than 2025's 3.1%. Abercrombie reported before the open Nov 24 and rose ~20% (Google close estimate); off-price retail was among the top groups (+3.8%).",
+    "why": "Shoppers pressured by inflation and 5% rates trade down to value; branded inventory is plentiful, which feeds off-price buyers. Retail sits far from AI credit stress, so it is a place money can go during the AI unwind.",
+    "how": "Off-price (TJX, Ross, Burlington) and brands with momentum (Abercrombie/Hollister) gain; full-price department stores and weaker mall brands lag.",
+    "real": "Early: one earnings week. Burlington guided Q4 comps only 0–2%, and homebuilder and consumer-confidence data show stretched lower-income shoppers. Treat it as a rotation home for money, not a boom.",
+    "confirm": "**Confirms:** strong Black Friday / Cyber Monday reads, off-price holding gains into December, more retailers raising guidance. **Breaks:** weak holiday sales data or off-price giving back the earnings gaps."
+   },
+   "timeline": [
+    {
+     "date": "2026-11-17",
+     "event": "NRF forecasts holiday sales +4.2% to $1.013 trillion",
+     "url": "https://finviz.com/news/424026/retails-1013-trillion-holiday-forecast-meets-its-first-earnings-test",
+     "source": "Finviz / PR Newswire",
+     "reaction": ""
+    },
+    {
+     "date": "2026-11-18",
+     "event": "TJX +11% on above-plan Q3; CEO expects holiday sales momentum to accelerate",
+     "url": "https://www.tikr.com/blog/tjx-soars-11-on-above-plan-q3-as-ceo-expects-holiday-sales-momentum-to-accelerate",
+     "source": "TIKR",
+     "reaction": "Off-price retail starts leading"
+    },
+    {
+     "date": "2026-11-24",
+     "event": "Abercrombie & Fitch reports Q3 before the open",
+     "url": "https://www.earningswhispers.com/stocks/anf",
+     "source": "Earnings Whispers",
+     "reaction": "ANF ~+20%, off-price retail +3.8% (Google close estimates)"
+    },
+    {
+     "date": "2026-11-25",
+     "event": "NRF projects about 183 million Thanksgiving-weekend shoppers, about 4 million fewer than last year; shoppers lean to essentials",
+     "url": "https://wisevoter.com/world/us/2026/11/25/stock-volatility-pressures-holiday-shopping-plans",
+     "source": "Wisevoter",
+     "reaction": "Equal-weight RSP +0.83%, SPY -0.29% (Google close estimates)"
+    }
+   ],
+   "groups": {
+    "long": [
+     "Off-price Retail"
+    ],
+    "short": []
+   },
+   "tickers": {
+    "long": [],
+    "short": [],
+    "watch": [
+     "TJX",
+     "ROST",
+     "BURL",
+     "ANF"
+    ]
+   },
+   "catalysts": [
+    {
+     "date": "2026-11-27",
+     "time": "all day",
+     "name": "Black Friday",
+     "why": "First real read on holiday traffic"
+    },
+    {
+     "date": "2026-11-30",
+     "time": "all day",
+     "name": "Cyber Monday",
+     "why": "Online spending read"
+    }
+   ],
+   "trade": "- **Watch off-price leaders for the first pullback** after the earnings gaps (Fresh RS → 21 EMA and Episodic pivots lists in Setups).\n- **Don't chase gap-ups in weak breadth**; the What to trade tab currently says small size only.\n- **ANF** is an earnings gap: if it holds the gap-day low for a few sessions it becomes an episodic-pivot candidate.",
+   "related": [
+    "rates-near-5"
+   ],
+   "history": [
+    {
+     "date": "2026-11-25",
+     "status": "building",
+     "long": [
+      "Off-price Retail"
+     ],
+     "short": [],
+     "note": "Nov 25: a caution flag: fewer weekend shoppers projected and spending stalled in October."
     }
    ]
   },
@@ -1855,7 +1710,7 @@
    "started": "2026-10-02",
    "updated": "2026-11-25",
    "summary": "After being sold as AI losers, IT services and consulting are being re-rated as the firms that will implement AI, and they're absorbing money leaving AI hardware.",
-   "changed": "Nov 24: no IT-services news found, but ACN and CTSH each rose about 4% (Google close estimates) while AI hardware fell, again trading as the other side of the AI seesaw.",
+   "changed": "",
    "thesis": {
     "what": "IT Services & Consulting is up about 20% over 20 sessions (+10% in 5) with every member above its 21-day EMA, the strongest dollar flow of any group (+0.76).",
     "why": "Accenture's outlook on Oct 1–2 eased fears that AI will eat consulting revenue ([The Star](https://www.thestar.com.my/tech/tech-news/2026/10/02/accenture039s-forecast-eases-ai-disruption-fears-lifts-battered-it-services-stocks)); in June the same fear had sent Accenture down 18% ([SentiSense](https://app.sentisense.ai/stories/accenture-shares-plummet-18-percent-it-stocks-crash-amid-weak-guidance-06192026)). Cognizant rose 7% in sympathy ([Yahoo Finance](https://finance.yahoo.com/markets/stocks/articles/cognizant-shares-rise-7-2-123306736.html)).",
@@ -2201,7 +2056,184 @@
       "India IT Services"
      ],
      "short": [],
-     "note": "Nov 24: no IT-services news found, but ACN and CTSH each rose about 4% (Google close estimates) while AI hardware fell, again trading as the other side of the AI seesaw."
+     "note": ""
+    }
+   ]
+  },
+  {
+   "id": "crypto-deleveraging",
+   "title": "Bitcoin cracks $60K: crypto's liquidity drain",
+   "status": "building",
+   "started": "2026-11-05",
+   "updated": "2026-11-25",
+   "summary": "Bitcoin has lost about a quarter in three weeks and is back near $59–60K as ETF money leaves, leveraged longs get liquidated and stablecoin supply shrinks. Crypto is the market's purest read on spare cash, and it's saying cash is tight.",
+   "changed": "Nov 25: bitcoin touched the $58.6K line early; crypto stocks still bounced a little. No reversal confirmed.",
+   "thesis": {
+    "what": "Bitcoin closed at $80,443 on Nov 5 and fell to about $62,000 by Nov 15, roughly 23% in ten days, with more than $2 billion of liquidations that weekend. US bitcoin ETFs have seen sustained outflows and stablecoin supply shrank about $14 billion in 30 days, the fastest since June 2022. It is now just above its 12-month low of $58,566.",
+    "why": "Crypto has no earnings or yield, so its price is mostly about how much spare money and leverage is in the system. With 5% rates, hike odds rising and AI absorbing the speculative crowd, money is leaving; falling prices then force leveraged longs to sell, which pushes prices lower.",
+    "how": "Bitcoin trades like a high-beta Nasdaq stock on risk-off days. Crypto stocks (Coinbase, Strategy, treasury companies) move 1.5–3× bitcoin. Bitcoin miners now split in two: pure miners follow BTC, while miners that rent their power to AI (IREN, Cipher, TeraWulf) trade with the neoclouds.",
+    "real": "Well documented (liquidations, ETF flows, stablecoin data). Many analysts call this area historical value, but 'cheap' can get cheaper; the July low is the line the market is watching.",
+    "confirm": "**Washout:** a sharp break under $58.6K that reverses quickly on heavy volume, ETF flows turning positive, stablecoin supply growing again. **Deeper bear:** a weekly close under $58K with no bounce, opening $50–55K."
+   },
+   "timeline": [
+    {
+     "date": "2026-11-13",
+     "event": "Bitcoin falls below $70,000 for the first time since August on mass long liquidations; stablecoin supply contracts $14.2B in 30 days",
+     "url": "https://www.forklog.com/en/news/bitcoin-falls-below-70000-for-first-time-since-august",
+     "source": "ForkLog (Glassnode)",
+     "reaction": "Crypto Exchanges & Brokers and Bitcoin Treasury Companies slide"
+    },
+    {
+     "date": "2026-11-15",
+     "event": "Bitcoin hits ~$62,000, down about 23% in ten days; ETF outflows over $1B",
+     "url": "https://coinstats.app/news/b4895c478ff6370c6dae05c5d559123f353f1368227090954fc4a4675109e87b_Bitcoin-Price-Crashes-to-62000-Will-the-60000-Level-Hold/",
+     "source": "CoinStats / cryptoticker",
+     "reaction": ""
+    },
+    {
+     "date": "2026-11-16",
+     "event": "Weekend liquidations top $2 billion",
+     "url": "https://investinglive.com/cryptocurrency/weekend-bitcoin-fell-to-four-month-low-near-62-000-as-crypto-liquidations-top-2-billion/",
+     "source": "investingLive",
+     "reaction": "Bitcoin miners +12% on the Nov 23 bounce, then gave it back with the neoclouds"
+    },
+    {
+     "date": "2026-11-25",
+     "event": "Bitcoin about $58,564 early Wednesday, down 27% in a month, at its July low area",
+     "url": "https://fortune.com/article/price-of-bitcoin-11-25-2026/",
+     "source": "Fortune",
+     "reaction": "Bitcoin Miners +1.8%, Ethereum Treasury +0.4% (Google close estimates)"
+    }
+   ],
+   "groups": {
+    "long": [],
+    "short": [
+     "Crypto Exchanges & Brokers",
+     "Bitcoin Treasury Companies"
+    ]
+   },
+   "tickers": {
+    "long": [],
+    "short": [],
+    "watch": [
+     "IBIT",
+     "COIN",
+     "MSTR",
+     "IREN",
+     "HOOD"
+    ]
+   },
+   "catalysts": [],
+   "trade": "- **Use bitcoin as a risk gauge, not a trade:** a bitcoin bottom that holds usually comes with high-beta stocks firming up too.\n- **Watch $58.6K:** a fast undercut and reclaim is the washout pattern; a slow grind below it is not.\n- **Don't mix up miners:** AI-hosting miners trade with the neoclouds (see the AI credit squeeze story), pure miners with bitcoin.",
+   "related": [
+    "ai-credit-squeeze",
+    "rates-near-5"
+   ],
+   "history": [
+    {
+     "date": "2026-11-25",
+     "status": "building",
+     "long": [],
+     "short": [
+      "Crypto Exchanges & Brokers",
+      "Bitcoin Treasury Companies"
+     ],
+     "note": "Nov 25: bitcoin touched the $58.6K line early; crypto stocks still bounced a little. No reversal confirmed."
+    }
+   ]
+  },
+  {
+   "id": "metals-unwind",
+   "title": "Gold and silver lose the safe-haven bid",
+   "status": "building",
+   "started": "2026-11-05",
+   "updated": "2026-11-25",
+   "summary": "With the 10-year near 5%, a December Fed hike priced and the dollar at a 1-year high, gold and silver are being sold even on fear days: holding a metal that pays nothing has got expensive, and leveraged funds are unwinding.",
+   "changed": "Nov 25: metals and miners bounced as yields fell; one day against the story.",
+   "thesis": {
+    "what": "Gold broke below $3,800 on Nov 18 to its lowest since September 2025, erasing the whole post-midterm rally from the $4,147 Nov 5 high. Silver slid harder. On the dashboard's macro strip: gold −13% and silver −25% over a month; the dollar index sits at its 1-year high and the 10-year near 4.9–5.1%.",
+    "why": "Gold and silver pay no interest. When Treasuries yield ~5% and real (after-inflation) yields are near 2.9%, holding metal costs you that yield, and a rising dollar makes it pricier for everyone else. Hike odds for December pushed both higher at once, and leveraged funds that had ridden the metals rally were forced to sell.",
+    "how": "Metals move opposite to real yields and the dollar most of the time. Miners move like leveraged metal (a 1% gold move is often 2–3% in miners). Silver also depends on industrial demand, so it falls harder in a growth scare.",
+    "real": "The rate and dollar link is well established; the forced-selling part is visible (ETF outflows, the Nov 20 drop alongside stocks). Long-term supply/demand (a sixth straight silver deficit) hasn't changed - this is a positioning and rates story, not a broken thesis.",
+    "confirm": "**Turn:** the 10-year falling back toward 4.5%, the dollar rolling over, gold reclaiming ~$3,800, miners outperforming the metal. **Deeper:** a December hike delivered with hawkish guidance, dollar new highs, gold under ~$3,500."
+   },
+   "timeline": [
+    {
+     "date": "2026-11-16",
+     "event": "Gold and silver sell off together on rising yields, a stronger dollar and Fed hike expectations",
+     "url": "https://coinpaper.com/38905/why-are-gold-and-silver-prices-falling-together-fed-rate-bets-trigger-precious-metals-selloff-make",
+     "source": "Coinpaper",
+     "reaction": "Gold Majors & Royalties and Silver Miners slide"
+    },
+    {
+     "date": "2026-11-18",
+     "event": "Gold breaks below $3,800, lowest since Sept 2025; slide erases the post-midterm rally",
+     "url": "https://www.usagold.com/daily-precious-metals-market-report-november-18-2026/",
+     "source": "USAGOLD (CNBC)",
+     "reaction": ""
+    },
+    {
+     "date": "2026-11-18",
+     "event": "Saxo: leveraged funds extend selling; GLD and SLV near 14-month lows",
+     "url": "https://stocktwits.com/news-articles/markets/equity/gld-slv-sink-to-near-14-month-lows-gold-silver-prices/cNbXzasR9LJ",
+     "source": "Stocktwits",
+     "reaction": ""
+    },
+    {
+     "date": "2026-11-19",
+     "event": "Goldman cuts its end-2026 gold target to $4,150 from $4,650",
+     "url": "https://goldsilver.com/?p=198029",
+     "source": "GoldSilver",
+     "reaction": "Gold −4.6%, silver −7.4% on the Nov 20 panic day (dashboard macro strip)"
+    },
+    {
+     "date": "2026-11-25",
+     "event": "Core PCE a touch hot (3.3% vs 3.2%), but long yields fall and metals shares bounce",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-wednesday-november-25-dow-sp-500-nasdaq-pce-inflation-data-091428237.html",
+     "source": "Yahoo Finance",
+     "reaction": "GLD +0.61%, Silver Miners +4.3%, Copper Miners +2.9% (Google close estimates)"
+    }
+   ],
+   "groups": {
+    "long": [],
+    "short": [
+     "Gold Majors & Royalties",
+     "Silver Miners"
+    ]
+   },
+   "tickers": {
+    "long": [],
+    "short": [],
+    "watch": [
+     "GLD",
+     "SLV",
+     "NEM",
+     "AEM",
+     "PAAS"
+    ]
+   },
+   "catalysts": [
+    {
+     "date": "2026-12-16",
+     "time": "2:00 ET",
+     "name": "FOMC decision",
+     "why": "A hike with hawkish guidance vs a 'one and done' message"
+    }
+   ],
+   "trade": "- **Not a long until rates and the dollar turn.** Watch the 10-year and dollar tiles on the Breadth tab macro strip.\n- **Learning point:** in a rate-driven selloff, 'safe havens' that pay no yield aren't safe. Bonds and cash took the haven role on Nov 20.\n- **If it turns,** miners lead the metal: Gold Mid-tiers jumped +6.9% on the Nov 23 bounce. Wait for a group BUY on the Themes tab, not a one-day pop.",
+   "related": [
+    "rates-near-5"
+   ],
+   "history": [
+    {
+     "date": "2026-11-25",
+     "status": "building",
+     "long": [],
+     "short": [
+      "Gold Majors & Royalties",
+      "Silver Miners"
+     ],
+     "note": "Nov 25: metals and miners bounced as yields fell; one day against the story."
     }
    ]
   },
