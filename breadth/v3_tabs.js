@@ -135,8 +135,74 @@ function renderThrustBoard(app) {
   }
   app.append(card);
 }
+/* ---------- Fresh RS → 21 EMA (Nov 24, 2026; Adam: "when the RS fires one or a couple times and pulls back to the EMAs, buy the touch or
+   the undercut and rally") — breadth/rsfire.py → DATA.themes.rsfire. Leading groups only. Card R-2026-11-24-rs-fire-pullback. ---------- */
+function rfLive(x) {
+  const L = liveActive() ? liveRow(x.t) : null, p = L && L.price > 0 ? L.price : x.price;
+  let st = x.st;
+  if (L && x.st === "zone" && x.ema21 && p <= x.ema21) st = "touching";
+  if (L && x.st === "undercut" && x.trigger && p > x.trigger) st = "triggered";
+  if (L && x.stop && p < x.stop && x.st !== "zone") st = "stopped";
+  return { ...x, p, chg: L ? L.chg : null, st };
+}
+function rsfireTicks() {
+  const R = (((DATA.themes || {}).rsfire || {}).rows || []).map(rfLive);
+  return [{ name: "Fresh RS - undercut/reclaim", ticks: R.filter(r => ["reclaimed", "undercut", "triggered"].includes(r.st)).map(r => r.t) },
+    { name: "Fresh RS - 21 EMA zone", ticks: R.filter(r => r.st === "zone" || r.st === "touching").map(r => r.t) }];
+}
+function renderRsFire(app) {
+  const X = (DATA.themes || {}).rsfire;
+  if (!X) { app.append($('<div class="card empty">Fresh RS → 21 EMA appears after the next data run.</div>')); return; }
+  app.append(liveBar());
+  const S = X.stats, ST = { thrust: "post-thrust", strong: "strong breadth", mixed: "mixed breadth", weak: "weak breadth" };
+  const sel = (DATA.themes || {}).selector, eff = sel ? sel.state : X.state;
+  const fit = { strong: "Focus", mixed: "Focus", thrust: "Selective", weak: "Avoid" }[eff] || "Selective";
+  const row = (k) => ["thrust", "strong", "mixed", "weak"].map(s => { const v = S[k][s]; return `<td class="num"${s === eff ? ' style="outline:2px solid var(--warning);outline-offset:-2px"' : ""}>${v[0] >= 0 ? "+" : ""}${v[0].toFixed(2)}R<small class="meta" style="display:block">${Math.round(v[1] * 100)}% · n ${v[2]}</small></td>`; }).join("");
+  const TL = { reclaimed: ["🟢 Reclaimed: buy the open", "sow-breakout"], triggered: ["🟢 Reclaim triggered", "sow-breakout"], undercut: ["Undercut: wait for reclaim", "sow-pop"],
+    touching: ["🔵 At the 21 EMA now", "sow-nuzzle"], zone: ["Pulling toward the 21 EMA", "sow-nuzzle"], touched: ["Touched today", "sow-riding"], stopped: ["Stopped", "sow-extended"] };
+  const R = (X.rows || []).map(rfLive);
+  const pc = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const card = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2><span class="pbv ${fit === "Focus" ? "act" : fit === "Avoid" ? "avoid" : "watch"}">${fit} in ${ST[eff] || "this market"}</span> Fresh RS → 21 EMA <span class="meta">· leading groups · ${R.length} names · data ${shortDate(X.date)}</span></h2>
+      <div class="tsbtns"><button class="rfdl">⬇ TradingView</button></div></div>
+    <p class="meta" style="margin:6px 0">A stock in a top-30% group whose RS line (vs SPY) made a new 1- or 3-month high <b>1–3 times</b> in the last 20 sessions, then makes its <b>first pullback to the 21 EMA</b>. Two entries: buy the <b>touch</b> of the 21 EMA (stop 1 ADR under), or wait for an <b>undercut</b> of 0.3+ ADR and buy the <b>reclaim</b> (close back over the 21 EMA and the prior high; stop under the undercut low). Exit after 5 sessions or trail the 10 EMA. Outside leading groups it doesn't work; after 4+ RS highs the undercut fails.</p>
+    <div class="scroll"><table class="grid"><thead><tr><th class="l">5-session result by market</th><th>Post-thrust</th><th>Strong</th><th>Mixed</th><th>Weak</th></tr></thead>
+      <tbody><tr><td class="l">Touch 21 EMA <small class="meta">(proven, t 3.3)</small></td>${row("touch")}</tr><tr><td class="l">Undercut + reclaim <small class="meta">(promising, small samples)</small></td>${row("undercut")}</tr></tbody></table></div>
+    ${eff === "weak" ? '<div class="rbanner watch" style="margin-top:8px"><b>Weak breadth today:</b> the touch version lost money in weak markets (−0.15R). Watch the list; trade it when breadth improves to mixed or strong.</div>' : ""}</section>`);
+  card.querySelector(".rfdl").addEventListener("click", () => tsDownload("fresh-rs-21ema", rsfireTicks()));
+  card.append($(R.length ? `<section class="card" style="margin-top:10px"><div class="scroll"><table class="grid"><thead><tr><th class="l">Stock</th><th class="l">Group</th><th class="l">State</th><th>Price</th><th>21 EMA</th><th>Buy</th><th>Stop</th><th>RS</th><th>RS highs</th><th class="l">Plan</th></tr></thead><tbody>${R.map(r => { const L = TL[r.st] || TL.zone;
+      return `<tr><td class="l"><b>${r.t}</b></td><td class="l"><small>${esc(r.g)}</small></td><td class="l"><span class="tg ${L[1]}">${L[0]}</span></td>
+        <td class="num">$${(+r.p).toFixed(2)}${r.chg != null ? `<small class="meta" style="display:block">${pc(r.chg)}</small>` : ""}</td><td class="num">$${(+r.ema21).toFixed(2)}</td>
+        <td class="num">${r.st === "reclaimed" ? "open" : r.trigger ? "$" + r.trigger.toFixed(2) : "–"}</td><td class="num">${r.stop ? "$" + r.stop.toFixed(2) : "–"}</td>
+        <td class="num ${rsTint(r.rs)}">${r.rs ?? "–"}</td><td class="num">${r.fires}<small class="meta" style="display:block">last ${shortDate(r.fire_date)}</small></td><td class="l"><small class="meta">${esc(r.plan)}</small></td></tr>`; }).join("")}</tbody></table></div></section>`
+    : '<div class="card empty" style="margin-top:10px">No fresh RS leaders in leading groups are pulling back to the 21 EMA right now.</div>'));
+  app.append(card);
+}
+
+/* ---------- What to trade (Nov 24, 2026; Adam: "tell me what type of setup I should be trading in any given market condition") —
+   breadth/selector.py → DATA.themes.selector; v3 Brief → What to trade. ---------- */
+function renderWhatToTrade(app) {
+  const X = (DATA.themes || {}).selector;
+  if (!X) { app.append($('<div class="card empty">What to trade appears after the next data run.</div>')); return; }
+  const V = { Focus: "act", Selective: "watch", Unproven: "unproven", Avoid: "avoid" };
+  const cls = { thrust: "act", strong: "act", mixed: "watch", weak: "watch" }[X.state];
+  const head = $(`<section class="card regcard"><h2>What to trade · ${shortDate(X.date)} close <span class="meta">· for the next session</span></h2>
+    <div class="rbanner ${cls}"><b>${esc(X.label)}</b>${X.since != null ? ` (day ${X.since + 1} after the thrust)` : ""}: ${esc(X.headline)}</div>
+    ${X.note ? `<p class="meta" style="margin:6px 0">${esc(X.note)}</p>` : ""}
+    <div class="rbanner ${X.green >= 3 ? "act" : "watch"}" style="margin-top:6px"><b>Size: ${esc(X.size)}</b> · ${X.green} of ${X.lights} confluence lights green. ${esc(X.size_why)}${X.state === "weak" ? " Weak breadth caps size at small whatever the lights say." : ""}</div>
+    <p style="margin:10px 0 4px"><b>Trade these:</b> ${X.focus.length ? X.focus.map(esc).join(" · ") : "nothing has a proven edge in this market — stand aside or trade tiny"}</p>
+    <p class="meta" style="margin:0">Each setup's average result in <b>${esc(X.label.toLowerCase())}</b> markets, from the dashboard's backtests (5-session trades, R = risk units). Focus ≥ +0.15R · Selective ≥ 0 · Avoid < 0 · Unproven = under 15 trades.</p></section>`);
+  const rows = X.rows.map(r => `<tr><td class="l"><span class="pbv ${V[r.verdict]}">${r.verdict}</span></td><td class="l"><b>${esc(r.name)}</b><small class="meta" style="display:block">${esc(r.v3)}</small></td>
+    <td class="num">${r.avg_r != null ? (r.avg_r >= 0 ? "+" : "") + r.avg_r.toFixed(2) + "R" : "–"}</td><td class="num">${r.win != null ? Math.round(r.win * 100) + "%" : "–"}</td><td class="num">${r.n || "–"}</td><td class="num">${r.today ?? "–"}</td><td class="l"><small class="meta">${esc(r.why || "")}</small></td></tr>`).join("");
+  head.append($(`<div class="scroll" style="margin-top:10px"><table class="grid"><thead><tr><th class="l">Verdict</th><th class="l">Setup · where</th><th>Avg R</th><th>Win</th><th>Trades</th><th>Today</th><th class="l">Why</th></tr></thead><tbody>${rows}</tbody></table></div>`));
+  if (X.if_thrust && X.if_thrust.length)
+    head.append($(`<p class="meta" style="margin-top:10px"><b>If a thrust comes</b> (and holds), switch to: ${X.if_thrust.map(r => `${esc(r.name)} (${r.verdict}${r.avg_r != null ? ", " + (r.avg_r >= 0 ? "+" : "") + r.avg_r.toFixed(2) + "R" : ""})`).join(" · ")}.</p>`));
+  head.append($(`<p class="meta" style="margin-top:6px">Market state uses the playbook rule: post-thrust for 25 sessions after a major breadth thrust (unless the Post-thrust board says it's failing), otherwise strong (5- and 10-day breadth ratio ≥ 1.5), weak (10-day ratio under 1) or mixed. Info only — nothing here places or ranks trades automatically.</p>`));
+  app.append(head);
+}
 const V3_SETUPS = [
   ["thrust", "Post-thrust board", (app) => renderThrustBoard(app), thrustTicks],
+  ["rsfire", "Fresh RS → 21 EMA", (app) => renderRsFire(app), rsfireTicks],
   ["best", "Best setups", (app) => { if (typeof renderBest === "function") renderBest(app); }, bestTicks],
   ["lineup", "Lined-up buys", (app) => {
     const T = DATA.themes || {};

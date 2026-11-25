@@ -927,3 +927,13 @@ than the previous weekday after 6 AM ET. Test: asserted in the e2e build test.
   Stocks: RS Rating 80+, $10+, $20M+/day 50-day, above the 21 EMA; `stock_state` zone / tight / extended / watch with trigger + stop (cap 1
   ADR). Page v3_tabs.js `renderThrustBoard` (first `V3_SETUPS` tab), `tbLive` flips to Triggered / Stopped on Google prices, `thrustTicks`
   for TradingView. Card R-2026-11-23-thrust-board; test `test_thrust_board_states`. Untested ranking.
+
+- **Fresh RS → 21 EMA** (Nov 24, 2026) `breadth/rsfire.py` `build(adjusted, theme_data, state)` (~0.2 s, after thrustboard in update.py) →
+  `DATA.themes.rsfire` {date, state, fit, stats (STATS: 5-session R by state for touch / undercut from the study), n_lead, rows[≤40] {t, g, st
+  zone/undercut/reclaimed/touched, fires, fire_date, rs, price, ema21, adr, trigger, stop, dist (ADRs over the 21 EMA), plan}}. Leading group =
+  sub-theme top 30% by 60-day median return (liquid $5M+ members). Page `renderRsFire` / `rfLive` (live: zone → "at the 21 EMA now",
+  undercut → "reclaim triggered" over the trigger, stopped) / `rsfireTicks`, second `V3_SETUPS` tab. Study tools/rs_fire_pullback/study.py.
+- **What to trade** (Nov 24, 2026) `breadth/selector.py` `build(theme_data, history)` → `DATA.themes.selector` {state, label, headline, note,
+  since, rows (playbook.rank rows + rsfire + thrustboard, each with `v3` location), focus, green, lights, size, size_why, if_thrust}. Effective
+  state = playbook.state_of, except post-thrust with thrustboard ft "fading" → ratio regime. Size: lights 0-2 small, 3-4 normal, 5-6 full,
+  weak caps small. v3 Brief → "What to trade" (`bwhat`, `renderWhatToTrade`). Test `test_rsfire_selector`.

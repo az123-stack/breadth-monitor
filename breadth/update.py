@@ -390,6 +390,12 @@ def recompute_and_publish(bars, splits, universe, state):
             theme_data["thrustboard"] = thrustboard.build(adjusted, theme_data, history)
         except Exception as e:  # optional panel; never block the page
             log.exception("post-thrust board failed: %s", e)
+        try:   # Fresh RS -> 21 EMA (Adam, Nov 24 2026; v3 Stocks -> Setups) + What to trade (v3 Brief); info only
+            from . import rsfire, selector, playbook as _pb
+            theme_data["rsfire"] = rsfire.build(adjusted, theme_data, _pb.state_of(history)[0])
+            theme_data["selector"] = selector.build(theme_data, history)
+        except Exception as e:  # optional panels; never block the page
+            log.exception("rs fire / selector failed: %s", e)
         try:   # Strongest stocks + "new leaders you haven't seen" (Adam, Nov 1 2026: NTRA never surfaced; info only)
             from . import unseen
             theme_data["unseen"] = unseen.build(theme_data)

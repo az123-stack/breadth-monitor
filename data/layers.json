@@ -620,6 +620,34 @@
     "R-2026-11-23-thrust-board"
    ],
    "notes": "rules of thumb; test group score x stock state across the 8 past thrusts before trusting the ranking"
+  },
+  {
+   "id": "rs_fire",
+   "name": "Fresh RS -> 21 EMA (leading groups)",
+   "kind": "code",
+   "owner": "daily update + page",
+   "status": "info",
+   "where": "rsfire.py -> DATA.themes.rsfire; v3 Stocks -> Setups -> Fresh RS -> 21 EMA",
+   "what": "RS line new 20/63-day high 1-3x in 20 sessions, first 21 EMA touch or undercut-reclaim, leading groups only",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-11-24-rs-fire-pullback"
+   ],
+   "notes": "touch: strong +0.61R, mixed +0.50R, thrust +0.22R, weak -0.15R"
+  },
+  {
+   "id": "setup_selector",
+   "name": "What to trade: setup menu by market state + size from confluence",
+   "kind": "code",
+   "owner": "daily update + page",
+   "status": "info",
+   "where": "selector.py -> DATA.themes.selector; v3 Brief -> What to trade",
+   "what": "playbook.rank for the effective state (failing thrust -> breadth regime) + rs_fire + thrust board; size from confluence lights",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-11-24-rs-fire-pullback"
+   ],
+   "notes": "uses existing playbook evidence; selector itself not backtested"
   }
  ]
 }

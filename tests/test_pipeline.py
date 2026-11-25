@@ -2184,6 +2184,9 @@ def test_librarian_brief():
         assert all(r in pack for r in LB.pinned_rules())
         draft = _json.loads((config.ROOT / "docs" / "agent" / "brief.json").read_text())
         text = draft["brief"]
+        import re as _re   # a layer's status may move after the draft was written (next Saturday's draft catches up): sync it first
+        for _l in _json.loads((config.ROOT / "data" / "layers.json").read_text())["layers"]:
+            text = _re.sub(rf"\b{_re.escape(_l['id'])} \(\w+\)", f"{_l['id']} ({_l['status']})", text)
         assert LB.check_brief(text)[0] == [], LB.check_brief(text)[0]
         clean = AF.validate("brief", {"for_date": "2026-11-07", "summary": "s", "brief": text,
                                       "changes": [{"change": "added", "what": "w", "source": "PINNED"}, {"change": "x"}]})
@@ -2331,6 +2334,31 @@ def test_thrust_board_states():
     LT = {l["k"]: l["ok"] for l in TB.checklist(hist2, cc, C, 5, ["A", "B", "D"], cache)}
     assert LT == {"ftd": True, "ten": True, "neo": True, "vix": True, "broad": True}, LT
     assert TB.stock_state(_np.array([90, 89, 88]), _np.array([91, 90, 89]), _np.array([89, 88, 87]), 92.0, 95.0, a) is None
+    return "ok"
+
+def test_rsfire_selector():
+    """rsfire.build finds a fresh-RS leader pulling to its 21 EMA in a leading group; selector demotes a failing thrust to the breadth regime."""
+    import numpy as _np, pandas as _pd
+    from breadth import rsfire as RF, selector as SEL, config as _cfg
+    dates = _pd.bdate_range("2026-03-02", periods=150)
+    rows = []
+    for k, d in enumerate(dates):
+        spy = 100.0
+        lead = 50 + 0.4 * k if k < 141 else 50 + 0.4 * 140 - 1.2 * (k - 140)   # leader: up-trend, fresh RS highs, then 9-day pullback
+        lag = 50 - 0.05 * k
+        for t, c in ((_cfg.BENCHMARK, spy), ("LDR", lead), ("P1", 40 + 0.3 * k), ("P2", 30 + 0.2 * k), ("LAG", lag), ("L1", 40 - 0.03 * k), ("L2", 30 - 0.02 * k)):
+            rows.append({"date": d, "ticker": t, "o": c, "h": c * 1.01, "l": c * 0.99, "c": c, "v": 2e6})
+    adj = _pd.DataFrame(rows)
+    T = {"stocks": [{"t": t, "rsr": 95, "is_stock": True} for t in ("LDR", "P1", "P2", "LAG", "L1", "L2")],
+         "subthemes": [{"theme": "Hot", "members": ["LDR", "P1", "P2"]}, {"theme": "Cold", "members": ["LAG", "L1", "L2"]},
+                       {"theme": "Cold2", "members": ["L1"]}, {"theme": "Cold3", "members": ["L2"]}]}
+    X = RF.build(adj, T, "mixed")
+    assert X is not None and X["fit"] == "Focus" and all(r["g"] == "Hot" for r in X["rows"]), X
+    hist = _pd.DataFrame({"ratio5": [0.5], "ratio10": [0.6]}, index=["2026-11-23"])
+    S = SEL.build({"thrustboard": {"ft": {"verdict": "fading"}, "lights": [{"ok": True}] * 4}, "rsfire": X}, hist.assign(
+        up4=0, dn4=0))
+    assert S["state"] == "weak" and S["size"].startswith("Small"), S
+    assert any(r["key"] == "rsfire" and r["verdict"] == "Avoid" for r in S["rows"]), S["rows"]
     return "ok"
 
 if __name__ == "__main__":
