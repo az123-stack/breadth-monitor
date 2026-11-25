@@ -1,12 +1,12 @@
 {
- "updated": "2026-11-24T16:58",
+ "updated": "2026-11-25T00:49",
  "stories": [
   {
    "id": "ai-spending-repriced",
    "title": "AI spending gets repriced",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-11-24",
+   "updated": "2026-11-25",
    "summary": "Investors now want proof that AI spending pays back in cash, so money is leaving AI hardware and, as of Oct 29, software too.",
    "changed": "Nov 24: Monday's AI bounce did not get a second day (HPE margin warning, chips sold), but Dell's record AI orders after the close argue demand is still there.",
    "thesis": {
@@ -851,6 +851,27 @@
       "Memory & Storage Media"
      ],
      "note": "Nov 24: Monday's AI bounce did not get a second day (HPE margin warning, chips sold), but Dell's record AI orders after the close argue demand is still there."
+    },
+    {
+     "date": "2026-11-25",
+     "status": "peaking",
+     "long": [
+      "IT Services & Consulting",
+      "Enterprise SaaS",
+      "Business Services & Data",
+      "Household & Personal Care",
+      "Packaged Foods"
+     ],
+     "short": [
+      "Semicap Equipment",
+      "Optical Components & Transceivers",
+      "AI Servers & Integrators",
+      "Custom Silicon & Networking Chips",
+      "Neoclouds & GPU Hosting",
+      "Data Center Power & Cooling",
+      "Memory & Storage Media"
+     ],
+     "note": "Nov 24: Monday's AI bounce did not get a second day (HPE margin warning, chips sold), but Dell's record AI orders after the close argue demand is still there."
     }
    ]
   },
@@ -859,7 +880,7 @@
    "title": "Deals and trial data pull money into biotech",
    "status": "building",
    "started": "2026-11-23",
-   "updated": "2026-11-24",
+   "updated": "2026-11-25",
    "summary": "Strong trial data and a $41B takeover are drawing money into biotech and pharma while AI hardware swings.",
    "changed": "New: Sanofi's $41B cash deal for Insmed came a day after Kymera's eczema data; biotech groups led today.",
    "thesis": {
@@ -925,6 +946,193 @@
      ],
      "short": [],
      "note": "New: Sanofi's $41B cash deal for Insmed came a day after Kymera's eczema data; biotech groups led today."
+    },
+    {
+     "date": "2026-11-25",
+     "status": "building",
+     "long": [
+      "Immunology & Inflammation",
+      "Large-cap Biotech",
+      "Oncology Biotech",
+      "Large-cap Pharma",
+      "Gene Editing"
+     ],
+     "short": [],
+     "note": "New: Sanofi's $41B cash deal for Insmed came a day after Kymera's eczema data; biotech groups led today."
+    }
+   ]
+  },
+  {
+   "id": "holiday-offprice",
+   "title": "Holiday shopper picks value: off-price and teen retail beat",
+   "status": "building",
+   "started": "2026-11-18",
+   "updated": "2026-11-25",
+   "summary": "Retail earnings week is pointing to a solid, value-led holiday: TJX beat and expects sales to accelerate, Abercrombie jumped ~20% on results, and off-price retail was a top group on Nov 24.",
+   "changed": "Nov 24: opened after Abercrombie's ~+20% earnings jump and off-price retail leading the tape.",
+   "thesis": {
+    "what": "TJX rose 11% on Nov 18 after 4% comparable sales and a beat on its own plan, and expects holiday sales momentum to accelerate. The NRF forecasts November–December sales up 4.2% to $1.013 trillion, faster than 2025's 3.1%. Abercrombie reported before the open Nov 24 and rose ~20% (Google close estimate); off-price retail was among the top groups (+3.8%).",
+    "why": "Shoppers pressured by inflation and 5% rates trade down to value; branded inventory is plentiful, which feeds off-price buyers. Retail sits far from AI credit stress, so it is a place money can go during the AI unwind.",
+    "how": "Off-price (TJX, Ross, Burlington) and brands with momentum (Abercrombie/Hollister) gain; full-price department stores and weaker mall brands lag.",
+    "real": "Early: one earnings week. Burlington guided Q4 comps only 0–2%, and homebuilder and consumer-confidence data show stretched lower-income shoppers. Treat it as a rotation home for money, not a boom.",
+    "confirm": "**Confirms:** strong Black Friday / Cyber Monday reads, off-price holding gains into December, more retailers raising guidance. **Breaks:** weak holiday sales data or off-price giving back the earnings gaps."
+   },
+   "timeline": [
+    {
+     "date": "2026-11-17",
+     "event": "NRF forecasts holiday sales +4.2% to $1.013 trillion",
+     "url": "https://finviz.com/news/424026/retails-1013-trillion-holiday-forecast-meets-its-first-earnings-test",
+     "source": "Finviz / PR Newswire",
+     "reaction": ""
+    },
+    {
+     "date": "2026-11-18",
+     "event": "TJX +11% on above-plan Q3; CEO expects holiday sales momentum to accelerate",
+     "url": "https://www.tikr.com/blog/tjx-soars-11-on-above-plan-q3-as-ceo-expects-holiday-sales-momentum-to-accelerate",
+     "source": "TIKR",
+     "reaction": "Off-price retail starts leading"
+    },
+    {
+     "date": "2026-11-24",
+     "event": "Abercrombie & Fitch reports Q3 before the open",
+     "url": "https://www.earningswhispers.com/stocks/anf",
+     "source": "Earnings Whispers",
+     "reaction": "ANF ~+20%, off-price retail +3.8% (Google close estimates)"
+    }
+   ],
+   "groups": {
+    "long": [
+     "Off-price Retail"
+    ],
+    "short": []
+   },
+   "tickers": {
+    "long": [],
+    "short": [],
+    "watch": [
+     "TJX",
+     "ROST",
+     "BURL",
+     "ANF"
+    ]
+   },
+   "catalysts": [
+    {
+     "date": "2026-11-27",
+     "time": "all day",
+     "name": "Black Friday",
+     "why": "First real read on holiday traffic"
+    },
+    {
+     "date": "2026-11-30",
+     "time": "all day",
+     "name": "Cyber Monday",
+     "why": "Online spending read"
+    }
+   ],
+   "trade": "- **Watch off-price leaders for the first pullback** after the earnings gaps (Fresh RS → 21 EMA and Episodic pivots lists in Setups).\n- **Don't chase gap-ups in weak breadth**; the What to trade tab currently says small size only.\n- **ANF** is an earnings gap: if it holds the gap-day low for a few sessions it becomes an episodic-pivot candidate.",
+   "related": [
+    "rates-near-5"
+   ],
+   "history": [
+    {
+     "date": "2026-11-25",
+     "status": "building",
+     "long": [
+      "Off-price Retail"
+     ],
+     "short": [],
+     "note": "Nov 24: opened after Abercrombie's ~+20% earnings jump and off-price retail leading the tape."
+    }
+   ]
+  },
+  {
+   "id": "ai-credit-squeeze",
+   "title": "AI credit squeeze: data-center debt is the tell",
+   "status": "building",
+   "started": "2026-10-15",
+   "updated": "2026-11-25",
+   "summary": "Lenders are pulling back from AI data-center debt; the stocks most dependent on borrowing (neoclouds, Oracle) bounce hardest and fail fastest, and credit hasn't confirmed any bounce yet.",
+   "changed": "Nov 24: opened. Monday's neocloud bounce (+20%) was mostly gone today (−11%) while HYG/IEI barely moved; credit is the light to watch.",
+   "thesis": {
+    "what": "The cost of insuring AI borrowers against default has hit records (Oracle five-year CDS 288 bp, CoreWeave past 1,000 bp in mid-October), single-B junk spreads widened to 367 bp in the Nov 5 selloff, and banks are now stress-testing data-center cash flows and contract cancellation clauses. On the dashboard: neoclouds −22% since the Nov 4 thrust eve; HYG/IEI −1.1% over 5 sessions and just 0.1% off its 25-day low.",
+    "why": "The build-out needs far more money than hyperscaler cash flow covers; the gap is filled by bonds, private credit and data-center ABS. When lenders get picky, the borrowers that need the next loan to finish a project (neoclouds, Oracle's leased campuses) get repriced first; cash-rich hyperscalers much less.",
+    "how": "Two speeds. Cash-funded giants (Amazon, Microsoft, Alphabet) hold up better; debt-funded builders and tenants (CoreWeave, Nebius, Oracle, data-center developers) swing hardest both ways. Credit spreads move before equity confirms.",
+    "real": "Real and documented in bond and CDS markets, but concentrated: broad junk (HYG/IEI) is only ~3.6% off its 1-year high while SPY was 11.5% off at the low. It explains why AI bounces fail fast; it does not yet look like a general credit crunch.",
+    "confirm": "**Easing:** HYG/IEI rising for a week, neoclouds holding a bounce for 3+ sessions, Oracle CDS headlines turning. **Worsening:** HYG/IEI under its Nov 20 low (0.6626), a pulled data-center bond deal or a neocloud financing miss, Oracle downgrade talk."
+   },
+   "timeline": [
+    {
+     "date": "2026-10-15",
+     "event": "Default insurance on US tech hits records: Oracle CDS 288 bp, CoreWeave past 1,000 bp",
+     "url": "https://www.businessday.co.za/world/international-companies/2026-10-15-ai-credit-fears-push-tech-default-insurance-to-record-highs/",
+     "source": "Reuters via BusinessDay",
+     "reaction": "Neoclouds start the slide into November"
+    },
+    {
+     "date": "2026-10-28",
+     "event": "Citi: CoreWeave and related neoclouds/data centers bore the brunt of the October credit selloff",
+     "url": "https://axios.com/2026/10/28/ai-bonds-coreweave-oracle",
+     "source": "Axios",
+     "reaction": ""
+    },
+    {
+     "date": "2026-11-05",
+     "event": "High-yield spreads widen to 348 bp (single-B 367); a data-center B+ bond falls to ~89 cents",
+     "url": "https://finimize.com/content/bond-investors-are-rethinking-ai-data-center-debt",
+     "source": "Finimize (Reuters / ICE BofA)",
+     "reaction": "Chip selloff day: Nasdaq −5.5%"
+    },
+    {
+     "date": "2026-11-24",
+     "event": "Banks stress-test data-center cash flows and cancellation clauses after the $2.5T Nasdaq-100 selloff",
+     "url": "https://finimize.com/content/ai-debt-deals-face-a-tougher-crowd-on-wall-street",
+     "source": "Finimize",
+     "reaction": "Neoclouds −11%, custom silicon −13% (Google close estimates)"
+    }
+   ],
+   "groups": {
+    "long": [],
+    "short": [
+     "Neoclouds & GPU Hosting",
+     "AI Servers & Integrators"
+    ]
+   },
+   "tickers": {
+    "long": [],
+    "short": [],
+    "watch": [
+     "CRWV",
+     "NBIS",
+     "ORCL",
+     "IREN",
+     "APLD"
+    ]
+   },
+   "catalysts": [
+    {
+     "date": "2026-11-27",
+     "time": "open",
+     "name": "First possible follow-through day (half session)",
+     "why": "A bounce that credit confirms would show HYG/IEI rising with it"
+    }
+   ],
+   "trade": "- **Don't trust neocloud bounces until credit confirms.** Monday's +20% was gone in a day.\n- **Watch HYG/IEI** (Breadth tab macro strip, and the credit light on the Post-thrust board): rising for a week = the squeeze is easing; under 0.6626 = it's getting worse.\n- **Prefer cash-funded AI names** over debt-funded builders when the AI trade comes back.\n- This is context, not a short signal: the dashboard's short setups have not proven out.",
+   "related": [
+    "ai-spending-repriced",
+    "ipo-supply-anthropic",
+    "rates-near-5"
+   ],
+   "history": [
+    {
+     "date": "2026-11-25",
+     "status": "building",
+     "long": [],
+     "short": [
+      "Neoclouds & GPU Hosting",
+      "AI Servers & Integrators"
+     ],
+     "note": "Nov 24: opened. Monday's neocloud bounce (+20%) was mostly gone today (−11%) while HYG/IEI barely moved; credit is the light to watch."
     }
    ]
   },
@@ -933,7 +1141,7 @@
    "title": "Hot inflation keeps the 10-year near 5%",
    "status": "peaking",
    "started": "2026-10-14",
-   "updated": "2026-11-24",
+   "updated": "2026-11-25",
    "summary": "Hot inflation pushed the 10-year past 5%; it has eased to about 4.9% but a December hike is still heavily priced, so long-dated growth stays under pressure.",
    "changed": "Nov 24: the 10-year is near 4.90%, well off its 5.15% area; strong confidence data kept a December hike priced, with PCE tomorrow.",
    "thesis": {
@@ -1448,6 +1656,19 @@
       "Residential Solar & Yieldcos"
      ],
      "note": "Nov 24: the 10-year is near 4.90%, well off its 5.15% area; strong confidence data kept a December hike priced, with PCE tomorrow."
+    },
+    {
+     "date": "2026-11-25",
+     "status": "peaking",
+     "long": [],
+     "short": [
+      "Nuclear Reactors (SMR)",
+      "Quantum Computing",
+      "Homebuilders",
+      "REITs",
+      "Residential Solar & Yieldcos"
+     ],
+     "note": "Nov 24: the 10-year is near 4.90%, well off its 5.15% area; strong confidence data kept a December hike priced, with PCE tomorrow."
     }
    ]
   },
@@ -1456,7 +1677,7 @@
    "title": "IT services: from AI loser to AI implementer",
    "status": "peaking",
    "started": "2026-10-02",
-   "updated": "2026-11-24",
+   "updated": "2026-11-25",
    "summary": "After being sold as AI losers, IT services and consulting are being re-rated as the firms that will implement AI, and they're absorbing money leaving AI hardware.",
    "changed": "Nov 24: no IT-services news found, but ACN and CTSH each rose about 4% (Google close estimates) while AI hardware fell, again trading as the other side of the AI seesaw.",
    "thesis": {
@@ -1795,250 +2016,16 @@
      ],
      "short": [],
      "note": "Nov 24: no IT-services news found, but ACN and CTSH each rose about 4% (Google close estimates) while AI hardware fell, again trading as the other side of the AI seesaw."
-    }
-   ]
-  },
-  {
-   "id": "ipo-supply-anthropic",
-   "title": "Making room for Anthropic: the IPO supply test",
-   "status": "peaking",
-   "started": "2026-10-26",
-   "updated": "2026-11-24",
-   "summary": "A record ~$90B Anthropic offering prices Nov 18. The theory says funds sell AI winners to pay for it; the one pattern the data shows (SpaceX, n=1) is that stand-in stocks get dumped once the real one trades.",
-   "changed": "Nov 24: Anthropic closed below its $83 issue price and AI hardware fell again; the post-pricing bounce the funding theory expects has not lasted.",
-   "thesis": {
-    "what": "Anthropic is selling 825M shares at $70–78 (up to $64.4B) plus a $26B private placement at the IPO price, about $90B in all, more than SpaceX's record $75B. Since its public filing on Oct 26 the dashboard's AI-hardware basket is **−7.6% vs SPY** (16th percentile of all 14-session windows), the 50 crowded momentum winners **−8.2%** (14th pct) and NVDA **−23%**, while AVGO is +7% and AMZN (a big Anthropic owner) +8.5%.",
-    "why": "New stock has to be paid for. Research on 254 IPOs found that stocks most like a big new issue fall relative to others in the IPO month, more so when the IPO is bigger ([Braun & Larrain, Review of Financial Studies 2009](https://www.bostonfed.org/-/media/Documents/Workingpapers/PDF/wp0604.pdf)), though the authors note one IPO rarely moves a large developed market. This one is unusual: it is [about six times oversubscribed](https://www.investing.com/news/stock-market-news/anthropics-ipo-is-about-six-times-oversubscribed-bloomberg-news-reports-5023345), so funds want more than they'll get.",
-    "how": "Two separate mechanisms. **Funding:** managers trim crowded winners to raise cash for an allocation. **Proxy swap:** before the real stock exists, money crowds into stand-ins (for SpaceX, the space stocks); once the real one trades, the stand-ins get sold to buy it. The SpaceX test supports the second, not the first.\n\n**The Anthropic stand-ins** (the names bought as \"Anthropic exposure\" before ANT exists; ranked by how much of each is Anthropic):\n- **SKM (SK Telecom):** its ~$2.7B stake is about 20% of its market value, the purest listed proxy ([Nasdaq](https://www.nasdaq.com/articles/anthropic-ipo-what-it-means-wall-street)).\n- **VCX** (closed-end venture fund): Anthropic was ~21% of its value at listing ([Financial Samurai](https://www.financialsamurai.com/?p=295793)). **−9.2% vs SPY** since Oct 26.\n- **DXYZ (Destiny Tech100):** ~14% in Anthropic via special-purpose vehicles as of Nov 2 ([NerdWallet](https://www.nerdwallet.com/investing/news/can-you-buy-anthropic-stock)).\n- **ZM (Zoom):** a ~$3.1B stake, about 11% of its market value ([AJ Bell](https://www.ajbell.co.uk/group/news/how-investors-can-gain-exposure-anthropic-it-joins-stock-market)). **+3.2% vs SPY** since Oct 26.\n- **Funds with a slice:** Corgi MANGOS ETF (MN, ~9%), BlackRock BST (~7%) and BSTZ (~6%) ([Longbridge / MarketWatch](https://longbridge.com/en/news/303425610)).\n- **Big owners, small slice:** AMZN (stake ~2% of its value, **+8.5% vs SPY**), GOOGL (**−5.2%**), CRM (**−10.6%**) ([Nasdaq](https://www.nasdaq.com/articles/anthropic-ipo-what-it-means-wall-street)). Too diluted to swing on the IPO alone.\nThe SpaceX pattern says the high-percentage ones (SKM, VCX, DXYZ, ZM) are the ones most at risk of being sold once ANT trades.",
-    "real": "Mostly not shown to be the cause. AI hardware bounced on Monday on Nvidia's CEO news, not on the deal being done, and fell again today. If it is still weak after Nov 25 (five sessions after pricing), the selling was about AI itself and this story should close. *Written by Claude, which Anthropic makes: weigh accordingly.*",
-    "confirm": "**Proves the funding story:** AI hardware and the crowded winners bounce within ~5 sessions after the Nov 18 pricing (after SpaceX, AI hardware ran +9% vs SPY in 5 sessions before fading to −13% by 20). **Breaks it:** they keep falling after the deal is done, which means the selling was about AI itself. **Proxy test:** stocks bought as 'Anthropic exposure' lag after ANT starts trading Nov 19. NVDA reports Nov 17, the day before pricing, so that night can swamp everything."
-   },
-   "timeline": [
-    {
-     "date": "2026-05-20",
-     "event": "SpaceX publicly files its S-1 for what becomes a record $75B IPO",
-     "url": "https://satnews.com/2026/05/21/public-capital-for-multi-planetary-infrastructure-spacex-unveils-record-75-billion-ipo/",
-     "source": "SatNews",
-     "reaction": "Space stand-ins had already run +30% vs SPY since the Apr 1 confidential filing (dashboard data)"
     },
-    {
-     "date": "2026-06-11",
-     "event": "SpaceX prices at $135, raising about $75B, the largest IPO ever",
-     "url": "https://www.npr.org/2026/06/12/nx-s1-5855004/stock-ai-spacex-ipo-elon-musk",
-     "source": "NPR",
-     "reaction": "Into pricing: AI hardware +12% vs SPY, crowded winners +7%, megacaps −5% (May 20 → Jun 11)"
-    },
-    {
-     "date": "2026-06-12",
-     "event": "SpaceX opens trading; other space and satellite stocks drop sharply (Planet Labs −8%, EchoStar −14%)",
-     "url": "https://en.prothomalo.com/amp/story/business/global/znjdcqkgfc",
-     "source": "Prothom Alo / Reuters",
-     "reaction": "Space group −16.5% vs SPY over 5 sessions, −28.9% over 20; AI hardware +9.1% over 5, then −13.2% over 20"
-    },
-    {
-     "date": "2026-10-26",
-     "event": "Anthropic files its public S-1 for a Nasdaq listing under ANT",
-     "url": "https://www.wunc.org/2026-10-26/ai-giant-anthropic-files-for-an-ipo-that-could-break-records",
-     "source": "WUNC / NPR",
-     "reaction": "Start of the measurement window"
-    },
-    {
-     "date": "2026-11-05",
-     "event": "Chip selloff after the midterms: Nvidia −9.26%, AMD −17.26%, Nasdaq −5.52%",
-     "url": "https://oplexa.com/blogs/nvidia-stock-crash-ai-chip-selloff-november-2026/",
-     "source": "Oplexa (citing Reuters/AP)",
-     "reaction": "AI hardware −18.2% vs SPY since the filing at the low"
-    },
-    {
-     "date": "2026-11-10",
-     "event": "Roadshow launches: 825M shares at $70–78",
-     "url": "https://www.technobezz.com/news/anthropic-ipo-roadshow-shares-price-range",
-     "source": "Technobezz",
-     "reaction": "AI hardware −8.6% vs SPY since the filing"
-    },
-    {
-     "date": "2026-11-12",
-     "event": "Book reported about six times oversubscribed; pricing Nov 18, trading Nov 19; $26B placement includes Alphabet, Nvidia, Microsoft and TSMC",
-     "url": "https://stockanalysis.com/news/anthropic-ipo-multiple-times-oversubscribed/",
-     "source": "StockAnalysis (Bloomberg)",
-     "reaction": "AI hardware −4.6% vs SPY since the filing (bounced from −18%)"
-    },
-    {
-     "date": "2026-11-16",
-     "event": "Two days before pricing, AI stocks sold off hard into Nvidia's Tuesday report with the Anthropic IPO later in the week; analysts described investors probing other areas rather than fully exiting.",
-     "url": "https://www.koreatimes.co.kr/world/20261117/nasdaq-sp-500-fall-over-1-in-run-up-to-nvidia-results-anthropic-debut",
-     "source": "Reuters via Korea Times",
-     "reaction": "Nvidia -4.2%, CoreWeave -6.2%, Nebius -7.5% (Reuters); Neoclouds and Memory down about 6-7%, QQQ -2.67% (Google close estimates)"
-    },
-    {
-     "date": "2026-11-18",
-     "event": "Anthropic priced its IPO at $83, above the $70–$78 range: 980 million shares, the largest listing on record.",
-     "url": "https://www.stocktitan.net/articles/anthropic-ipo-live-ant-first-trading-day-2026",
-     "source": "StockTitan",
-     "reaction": "Pricing came after the close; the supply fear was already in AI stocks"
-    },
-    {
-     "date": "2026-11-19",
-     "event": "ANT opened at $111.50 (+34%), hit about $115, then faded to close at $97.17 (+17% over the IPO price). The Nasdaq reversed from +2% early to -2.2%; AMD fell 7.7% after a short report, and some analysts say funds sold other AI shares to pay for ANT (an interpretation, not confirmed).",
-     "url": "https://www.tradingkey.com/analysis/stocks/us-stocks/262313953-us-stock-nasdaq-falls-anthropic-ipo-debut-amd-short-report-tradingkey",
-     "source": "TradingKey",
-     "reaction": "SPY -1.96%, QQQ -2.19%, Hyperscalers -3.1%, Launch & Space -4.2% (Google close estimates)"
-    },
-    {
-     "date": "2026-11-20",
-     "event": "ANT closed -9% on day two after trading down as much as 14%; AI favorites sold off broadly. Reuters called the debut a failure to quell AI nerves (day-one pop of +17% over the $83 price fully faded in the AI complex).",
-     "url": "https://finance.yahoo.com/markets/stocks/articles/nasdaq-plunges-5-day-anthropic-211724232.html",
-     "source": "Reuters via Yahoo Finance",
-     "reaction": "Hyperscalers -4.8%, QQQ -5.67% (Google close estimates)"
-    },
-    {
-     "date": "2026-11-23",
-     "event": "Nvidia reinstates Huang and the AI complex rebounds sharply, the opposite of the stand-in dumping the story feared",
-     "url": "https://finance.yahoo.com/markets/live/stock-market-today-monday-november-23-dow-sp-500-nasdaq-nvidia-reinstates-jensen-huang-141511975.html",
-     "source": "Yahoo Finance",
-     "reaction": "Nasdaq best day since April 2025; Neoclouds +16.7%, Custom Silicon +18.4% net inflow; Memory +14.3%"
-    },
-    {
-     "date": "2026-11-24",
-     "event": "Anthropic closes below its $83 IPO price",
-     "url": "https://mlq.ai/news/nasdaq-falls-15-as-nvidia-drops-59-and-chip-stocks-slide-dow-rises-09-and-anthropic-closes-below-its-ipo-price/",
-     "source": "MLQ",
-     "reaction": "AI hardware sold again; QQQ -1.99% (Google close estimates)"
-    }
-   ],
-   "groups": {
-    "long": [],
-    "short": [
-     "Neoclouds & GPU Hosting",
-     "Custom Silicon & Networking Chips",
-     "AI Servers & Integrators"
-    ]
-   },
-   "tickers": {
-    "long": [],
-    "short": [],
-    "watch": [
-     "NVDA",
-     "AVGO",
-     "AMZN",
-     "GOOGL",
-     "CRWV",
-     "NBIS",
-     "SKM",
-     "VCX",
-     "DXYZ",
-     "ZM",
-     "CRM"
-    ]
-   },
-   "catalysts": [
     {
      "date": "2026-11-25",
-     "time": "",
-     "name": "Five sessions after the Nov 18 pricing",
-     "why": "The bounce window ends; no lasting bounce would break the funding story."
-    }
-   ],
-   "trade": "- **Context only:** n=1 evidence; keep using the dashboard's setups and regime.\n- **Don't bottom-fish ANT** below its issue price on this story.\n- **If AI hardware stays weak after Nov 25,** treat it as the AI spending story, not IPO supply.",
-   "related": [
-    "ai-spending-repriced",
-    "spacex-wireless"
-   ],
-   "history": [
-    {
-     "date": "2026-11-15",
-     "status": "building",
-     "long": [],
-     "short": [
-      "AI Accelerators & GPUs",
-      "Neoclouds & GPU Hosting",
-      "Custom Silicon & Networking Chips",
-      "AI Servers & Integrators"
-     ],
-     "note": "Nov 15: story opened with a study of the SpaceX precedent and 4 smaller IPOs (card R-2026-11-15-ipo-supply)."
-    },
-    {
-     "date": "2026-11-16",
-     "status": "building",
-     "long": [],
-     "short": [
-      "AI Accelerators & GPUs",
-      "Neoclouds & GPU Hosting",
-      "Custom Silicon & Networking Chips",
-      "AI Servers & Integrators"
-     ],
-     "note": "Nov 16: AI hardware fell another 4-7% into the Nov 17 Nvidia report and the Nov 18 pricing. The supply theory is still unproven; Nvidia's reaction is the bigger swing factor."
-    },
-    {
-     "date": "2026-11-17",
-     "status": "building",
-     "long": [],
-     "short": [
-      "AI Accelerators & GPUs",
-      "Neoclouds & GPU Hosting",
-      "Custom Silicon & Networking Chips",
-      "AI Servers & Integrators"
-     ],
-     "note": "Nov 17: AI names stayed under pressure the day before Anthropic prices; the supply theory is still unproven."
-    },
-    {
-     "date": "2026-11-18",
-     "status": "building",
-     "long": [],
-     "short": [
-      "AI Accelerators & GPUs",
-      "Neoclouds & GPU Hosting",
-      "Custom Silicon & Networking Chips",
-      "AI Servers & Integrators"
-     ],
-     "note": "Pricing was expected tonight with trading Thursday; I could not confirm the final price in today's research."
-    },
-    {
-     "date": "2026-11-19",
-     "status": "building",
-     "long": [],
-     "short": [
-      "AI Accelerators & GPUs",
-      "Neoclouds & GPU Hosting",
-      "Custom Silicon & Networking Chips",
-      "AI Servers & Integrators"
-     ],
-     "note": "ANT listed: opened high, faded to $97.17, and the AI complex sold off with it (Hyperscalers -3.1%); the proxy-swap window (5–20 sessions) now starts."
-    },
-    {
-     "date": "2026-11-20",
-     "status": "building",
-     "long": [],
-     "short": [
-      "AI Accelerators & GPUs",
-      "Neoclouds & GPU Hosting",
-      "Custom Silicon & Networking Chips",
-      "AI Servers & Integrators"
-     ],
-     "note": "Day two: ANT -9% and the AI complex fell harder (Nvidia -12–14% on an SEC-probe report); the stand-in selling the story predicted is playing out, not yet a bottom."
-    },
-    {
-     "date": "2026-11-23",
-     "status": "building",
-     "long": [],
-     "short": [
-      "AI Accelerators & GPUs",
-      "Neoclouds & GPU Hosting",
-      "Custom Silicon & Networking Chips",
-      "AI Servers & Integrators"
-     ],
-     "note": "Nov 23: AI hardware bounced hard on Nvidia's CEO news; no sign of IPO-related supply today, so the stand-in selling theory is on hold (still n=1)."
-    },
-    {
-     "date": "2026-11-24",
      "status": "peaking",
-     "long": [],
-     "short": [
-      "Neoclouds & GPU Hosting",
-      "Custom Silicon & Networking Chips",
-      "AI Servers & Integrators"
+     "long": [
+      "IT Services & Consulting",
+      "India IT Services"
      ],
-     "note": "Nov 24: Anthropic closed below its $83 issue price and AI hardware fell again; the post-pricing bounce the funding theory expects has not lasted."
+     "short": [],
+     "note": "Nov 24: no IT-services news found, but ACN and CTSH each rose about 4% (Google close estimates) while AI hardware fell, again trading as the other side of the AI seesaw."
     }
    ]
   },
@@ -2047,7 +2034,7 @@
    "title": "Gulf attacks keep oil above $100",
    "status": "resolved",
    "started": "2026-10-09",
-   "updated": "2026-11-24",
+   "updated": "2026-11-25",
    "summary": "Houthi attacks on Saudi sites and Hormuz shipping pushed Brent from about $98 to over $110 in two weeks; refiners and drillers lead, airlines lose.",
    "changed": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it.",
    "thesis": {
@@ -2575,6 +2562,21 @@
       "Airlines"
      ],
      "note": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it."
+    },
+    {
+     "date": "2026-11-25",
+     "status": "resolved",
+     "long": [
+      "Refiners",
+      "Shale E&P",
+      "Integrated & Large-cap Oil",
+      "Tankers & Shipping",
+      "Oil Services & Drillers"
+     ],
+     "short": [
+      "Airlines"
+     ],
+     "note": "Resolved Nov 6: Brent is back under $100 and price has disagreed with the story for 5+ sessions (long groups −19% over 5 days). The shock premium is gone; a new attack would reopen it."
     }
    ],
    "resolved": "2026-11-06"
@@ -2584,7 +2586,7 @@
    "title": "Managed care repairs on better Medicare ratings",
    "status": "resolved",
    "started": "2026-10-09",
-   "updated": "2026-11-24",
+   "updated": "2026-11-25",
    "summary": "Better Medicare star ratings and UnitedHealth's beat-and-raise are pulling managed care out of its slump.",
    "changed": "Resolved Nov 24: price has disagreed for 5+ sessions (the group is about -14% vs SPY over 5 days). Today's +2.5% bounce with no driver found does not restore the repair story.",
    "thesis": {
@@ -2868,6 +2870,15 @@
      ],
      "short": [],
      "note": "Resolved Nov 24: price has disagreed for 5+ sessions (the group is about -14% vs SPY over 5 days). Today's +2.5% bounce with no driver found does not restore the repair story."
+    },
+    {
+     "date": "2026-11-25",
+     "status": "resolved",
+     "long": [
+      "Managed Care"
+     ],
+     "short": [],
+     "note": "Resolved Nov 24: price has disagreed for 5+ sessions (the group is about -14% vs SPY over 5 days). Today's +2.5% bounce with no driver found does not restore the repair story."
     }
    ],
    "resolved": "2026-11-24"
@@ -2877,7 +2888,7 @@
    "title": "SpaceX eyes cell sites; towers up, carriers down",
    "status": "resolved",
    "started": "2026-10-23",
-   "updated": "2026-11-24",
+   "updated": "2026-11-25",
    "summary": "Reports that SpaceX wants about 80,000 US cell sites for a wireless network lift tower landlords and hit AT&T and T-Mobile.",
    "changed": "Resolved Nov 24: price has disagreed for weeks (long groups lagging the carriers) and no deal or follow-up confirmation was added.",
    "thesis": {
@@ -3218,9 +3229,278 @@
       "Wireless Carriers"
      ],
      "note": "Resolved Nov 24: price has disagreed for weeks (long groups lagging the carriers) and no deal or follow-up confirmation was added."
+    },
+    {
+     "date": "2026-11-25",
+     "status": "resolved",
+     "long": [
+      "Tower REITs",
+      "Launch & Space Systems"
+     ],
+     "short": [
+      "Wireless Carriers"
+     ],
+     "note": "Resolved Nov 24: price has disagreed for weeks (long groups lagging the carriers) and no deal or follow-up confirmation was added."
     }
    ],
    "resolved": "2026-11-24"
+  },
+  {
+   "id": "ipo-supply-anthropic",
+   "title": "Making room for Anthropic: the IPO supply test",
+   "status": "resolved",
+   "started": "2026-10-26",
+   "updated": "2026-11-25",
+   "summary": "A record ~$90B Anthropic offering prices Nov 18. The theory says funds sell AI winners to pay for it; the one pattern the data shows (SpaceX, n=1) is that stand-in stocks get dumped once the real one trades.",
+   "changed": "Resolved Nov 24: the story's own break test fired - after pricing, AI hardware kept falling and Anthropic closed under its $83 issue price, so the selling was about AI itself, not making room for the IPO. Followed by the AI credit squeeze story.",
+   "thesis": {
+    "what": "Anthropic is selling 825M shares at $70–78 (up to $64.4B) plus a $26B private placement at the IPO price, about $90B in all, more than SpaceX's record $75B. Since its public filing on Oct 26 the dashboard's AI-hardware basket is **−7.6% vs SPY** (16th percentile of all 14-session windows), the 50 crowded momentum winners **−8.2%** (14th pct) and NVDA **−23%**, while AVGO is +7% and AMZN (a big Anthropic owner) +8.5%.",
+    "why": "New stock has to be paid for. Research on 254 IPOs found that stocks most like a big new issue fall relative to others in the IPO month, more so when the IPO is bigger ([Braun & Larrain, Review of Financial Studies 2009](https://www.bostonfed.org/-/media/Documents/Workingpapers/PDF/wp0604.pdf)), though the authors note one IPO rarely moves a large developed market. This one is unusual: it is [about six times oversubscribed](https://www.investing.com/news/stock-market-news/anthropics-ipo-is-about-six-times-oversubscribed-bloomberg-news-reports-5023345), so funds want more than they'll get.",
+    "how": "Two separate mechanisms. **Funding:** managers trim crowded winners to raise cash for an allocation. **Proxy swap:** before the real stock exists, money crowds into stand-ins (for SpaceX, the space stocks); once the real one trades, the stand-ins get sold to buy it. The SpaceX test supports the second, not the first.\n\n**The Anthropic stand-ins** (the names bought as \"Anthropic exposure\" before ANT exists; ranked by how much of each is Anthropic):\n- **SKM (SK Telecom):** its ~$2.7B stake is about 20% of its market value, the purest listed proxy ([Nasdaq](https://www.nasdaq.com/articles/anthropic-ipo-what-it-means-wall-street)).\n- **VCX** (closed-end venture fund): Anthropic was ~21% of its value at listing ([Financial Samurai](https://www.financialsamurai.com/?p=295793)). **−9.2% vs SPY** since Oct 26.\n- **DXYZ (Destiny Tech100):** ~14% in Anthropic via special-purpose vehicles as of Nov 2 ([NerdWallet](https://www.nerdwallet.com/investing/news/can-you-buy-anthropic-stock)).\n- **ZM (Zoom):** a ~$3.1B stake, about 11% of its market value ([AJ Bell](https://www.ajbell.co.uk/group/news/how-investors-can-gain-exposure-anthropic-it-joins-stock-market)). **+3.2% vs SPY** since Oct 26.\n- **Funds with a slice:** Corgi MANGOS ETF (MN, ~9%), BlackRock BST (~7%) and BSTZ (~6%) ([Longbridge / MarketWatch](https://longbridge.com/en/news/303425610)).\n- **Big owners, small slice:** AMZN (stake ~2% of its value, **+8.5% vs SPY**), GOOGL (**−5.2%**), CRM (**−10.6%**) ([Nasdaq](https://www.nasdaq.com/articles/anthropic-ipo-what-it-means-wall-street)). Too diluted to swing on the IPO alone.\nThe SpaceX pattern says the high-percentage ones (SKM, VCX, DXYZ, ZM) are the ones most at risk of being sold once ANT trades.",
+    "real": "Mostly not shown to be the cause. AI hardware bounced on Monday on Nvidia's CEO news, not on the deal being done, and fell again today. If it is still weak after Nov 25 (five sessions after pricing), the selling was about AI itself and this story should close. *Written by Claude, which Anthropic makes: weigh accordingly.*",
+    "confirm": "**Proves the funding story:** AI hardware and the crowded winners bounce within ~5 sessions after the Nov 18 pricing (after SpaceX, AI hardware ran +9% vs SPY in 5 sessions before fading to −13% by 20). **Breaks it:** they keep falling after the deal is done, which means the selling was about AI itself. **Proxy test:** stocks bought as 'Anthropic exposure' lag after ANT starts trading Nov 19. NVDA reports Nov 17, the day before pricing, so that night can swamp everything."
+   },
+   "timeline": [
+    {
+     "date": "2026-05-20",
+     "event": "SpaceX publicly files its S-1 for what becomes a record $75B IPO",
+     "url": "https://satnews.com/2026/05/21/public-capital-for-multi-planetary-infrastructure-spacex-unveils-record-75-billion-ipo/",
+     "source": "SatNews",
+     "reaction": "Space stand-ins had already run +30% vs SPY since the Apr 1 confidential filing (dashboard data)"
+    },
+    {
+     "date": "2026-06-11",
+     "event": "SpaceX prices at $135, raising about $75B, the largest IPO ever",
+     "url": "https://www.npr.org/2026/06/12/nx-s1-5855004/stock-ai-spacex-ipo-elon-musk",
+     "source": "NPR",
+     "reaction": "Into pricing: AI hardware +12% vs SPY, crowded winners +7%, megacaps −5% (May 20 → Jun 11)"
+    },
+    {
+     "date": "2026-06-12",
+     "event": "SpaceX opens trading; other space and satellite stocks drop sharply (Planet Labs −8%, EchoStar −14%)",
+     "url": "https://en.prothomalo.com/amp/story/business/global/znjdcqkgfc",
+     "source": "Prothom Alo / Reuters",
+     "reaction": "Space group −16.5% vs SPY over 5 sessions, −28.9% over 20; AI hardware +9.1% over 5, then −13.2% over 20"
+    },
+    {
+     "date": "2026-10-26",
+     "event": "Anthropic files its public S-1 for a Nasdaq listing under ANT",
+     "url": "https://www.wunc.org/2026-10-26/ai-giant-anthropic-files-for-an-ipo-that-could-break-records",
+     "source": "WUNC / NPR",
+     "reaction": "Start of the measurement window"
+    },
+    {
+     "date": "2026-11-05",
+     "event": "Chip selloff after the midterms: Nvidia −9.26%, AMD −17.26%, Nasdaq −5.52%",
+     "url": "https://oplexa.com/blogs/nvidia-stock-crash-ai-chip-selloff-november-2026/",
+     "source": "Oplexa (citing Reuters/AP)",
+     "reaction": "AI hardware −18.2% vs SPY since the filing at the low"
+    },
+    {
+     "date": "2026-11-10",
+     "event": "Roadshow launches: 825M shares at $70–78",
+     "url": "https://www.technobezz.com/news/anthropic-ipo-roadshow-shares-price-range",
+     "source": "Technobezz",
+     "reaction": "AI hardware −8.6% vs SPY since the filing"
+    },
+    {
+     "date": "2026-11-12",
+     "event": "Book reported about six times oversubscribed; pricing Nov 18, trading Nov 19; $26B placement includes Alphabet, Nvidia, Microsoft and TSMC",
+     "url": "https://stockanalysis.com/news/anthropic-ipo-multiple-times-oversubscribed/",
+     "source": "StockAnalysis (Bloomberg)",
+     "reaction": "AI hardware −4.6% vs SPY since the filing (bounced from −18%)"
+    },
+    {
+     "date": "2026-11-16",
+     "event": "Two days before pricing, AI stocks sold off hard into Nvidia's Tuesday report with the Anthropic IPO later in the week; analysts described investors probing other areas rather than fully exiting.",
+     "url": "https://www.koreatimes.co.kr/world/20261117/nasdaq-sp-500-fall-over-1-in-run-up-to-nvidia-results-anthropic-debut",
+     "source": "Reuters via Korea Times",
+     "reaction": "Nvidia -4.2%, CoreWeave -6.2%, Nebius -7.5% (Reuters); Neoclouds and Memory down about 6-7%, QQQ -2.67% (Google close estimates)"
+    },
+    {
+     "date": "2026-11-18",
+     "event": "Anthropic priced its IPO at $83, above the $70–$78 range: 980 million shares, the largest listing on record.",
+     "url": "https://www.stocktitan.net/articles/anthropic-ipo-live-ant-first-trading-day-2026",
+     "source": "StockTitan",
+     "reaction": "Pricing came after the close; the supply fear was already in AI stocks"
+    },
+    {
+     "date": "2026-11-19",
+     "event": "ANT opened at $111.50 (+34%), hit about $115, then faded to close at $97.17 (+17% over the IPO price). The Nasdaq reversed from +2% early to -2.2%; AMD fell 7.7% after a short report, and some analysts say funds sold other AI shares to pay for ANT (an interpretation, not confirmed).",
+     "url": "https://www.tradingkey.com/analysis/stocks/us-stocks/262313953-us-stock-nasdaq-falls-anthropic-ipo-debut-amd-short-report-tradingkey",
+     "source": "TradingKey",
+     "reaction": "SPY -1.96%, QQQ -2.19%, Hyperscalers -3.1%, Launch & Space -4.2% (Google close estimates)"
+    },
+    {
+     "date": "2026-11-20",
+     "event": "ANT closed -9% on day two after trading down as much as 14%; AI favorites sold off broadly. Reuters called the debut a failure to quell AI nerves (day-one pop of +17% over the $83 price fully faded in the AI complex).",
+     "url": "https://finance.yahoo.com/markets/stocks/articles/nasdaq-plunges-5-day-anthropic-211724232.html",
+     "source": "Reuters via Yahoo Finance",
+     "reaction": "Hyperscalers -4.8%, QQQ -5.67% (Google close estimates)"
+    },
+    {
+     "date": "2026-11-23",
+     "event": "Nvidia reinstates Huang and the AI complex rebounds sharply, the opposite of the stand-in dumping the story feared",
+     "url": "https://finance.yahoo.com/markets/live/stock-market-today-monday-november-23-dow-sp-500-nasdaq-nvidia-reinstates-jensen-huang-141511975.html",
+     "source": "Yahoo Finance",
+     "reaction": "Nasdaq best day since April 2025; Neoclouds +16.7%, Custom Silicon +18.4% net inflow; Memory +14.3%"
+    },
+    {
+     "date": "2026-11-24",
+     "event": "Anthropic closes below its $83 IPO price",
+     "url": "https://mlq.ai/news/nasdaq-falls-15-as-nvidia-drops-59-and-chip-stocks-slide-dow-rises-09-and-anthropic-closes-below-its-ipo-price/",
+     "source": "MLQ",
+     "reaction": "AI hardware sold again; QQQ -1.99% (Google close estimates)"
+    }
+   ],
+   "groups": {
+    "long": [],
+    "short": [
+     "Neoclouds & GPU Hosting",
+     "Custom Silicon & Networking Chips",
+     "AI Servers & Integrators"
+    ]
+   },
+   "tickers": {
+    "long": [],
+    "short": [],
+    "watch": [
+     "NVDA",
+     "AVGO",
+     "AMZN",
+     "GOOGL",
+     "CRWV",
+     "NBIS",
+     "SKM",
+     "VCX",
+     "DXYZ",
+     "ZM",
+     "CRM"
+    ]
+   },
+   "catalysts": [
+    {
+     "date": "2026-11-25",
+     "time": "",
+     "name": "Five sessions after the Nov 18 pricing",
+     "why": "The bounce window ends; no lasting bounce would break the funding story."
+    }
+   ],
+   "trade": "- **Context only:** n=1 evidence; keep using the dashboard's setups and regime.\n- **Don't bottom-fish ANT** below its issue price on this story.\n- **If AI hardware stays weak after Nov 25,** treat it as the AI spending story, not IPO supply.",
+   "related": [
+    "ai-spending-repriced",
+    "spacex-wireless",
+    "ai-credit-squeeze"
+   ],
+   "history": [
+    {
+     "date": "2026-11-15",
+     "status": "building",
+     "long": [],
+     "short": [
+      "AI Accelerators & GPUs",
+      "Neoclouds & GPU Hosting",
+      "Custom Silicon & Networking Chips",
+      "AI Servers & Integrators"
+     ],
+     "note": "Nov 15: story opened with a study of the SpaceX precedent and 4 smaller IPOs (card R-2026-11-15-ipo-supply)."
+    },
+    {
+     "date": "2026-11-16",
+     "status": "building",
+     "long": [],
+     "short": [
+      "AI Accelerators & GPUs",
+      "Neoclouds & GPU Hosting",
+      "Custom Silicon & Networking Chips",
+      "AI Servers & Integrators"
+     ],
+     "note": "Nov 16: AI hardware fell another 4-7% into the Nov 17 Nvidia report and the Nov 18 pricing. The supply theory is still unproven; Nvidia's reaction is the bigger swing factor."
+    },
+    {
+     "date": "2026-11-17",
+     "status": "building",
+     "long": [],
+     "short": [
+      "AI Accelerators & GPUs",
+      "Neoclouds & GPU Hosting",
+      "Custom Silicon & Networking Chips",
+      "AI Servers & Integrators"
+     ],
+     "note": "Nov 17: AI names stayed under pressure the day before Anthropic prices; the supply theory is still unproven."
+    },
+    {
+     "date": "2026-11-18",
+     "status": "building",
+     "long": [],
+     "short": [
+      "AI Accelerators & GPUs",
+      "Neoclouds & GPU Hosting",
+      "Custom Silicon & Networking Chips",
+      "AI Servers & Integrators"
+     ],
+     "note": "Pricing was expected tonight with trading Thursday; I could not confirm the final price in today's research."
+    },
+    {
+     "date": "2026-11-19",
+     "status": "building",
+     "long": [],
+     "short": [
+      "AI Accelerators & GPUs",
+      "Neoclouds & GPU Hosting",
+      "Custom Silicon & Networking Chips",
+      "AI Servers & Integrators"
+     ],
+     "note": "ANT listed: opened high, faded to $97.17, and the AI complex sold off with it (Hyperscalers -3.1%); the proxy-swap window (5–20 sessions) now starts."
+    },
+    {
+     "date": "2026-11-20",
+     "status": "building",
+     "long": [],
+     "short": [
+      "AI Accelerators & GPUs",
+      "Neoclouds & GPU Hosting",
+      "Custom Silicon & Networking Chips",
+      "AI Servers & Integrators"
+     ],
+     "note": "Day two: ANT -9% and the AI complex fell harder (Nvidia -12–14% on an SEC-probe report); the stand-in selling the story predicted is playing out, not yet a bottom."
+    },
+    {
+     "date": "2026-11-23",
+     "status": "building",
+     "long": [],
+     "short": [
+      "AI Accelerators & GPUs",
+      "Neoclouds & GPU Hosting",
+      "Custom Silicon & Networking Chips",
+      "AI Servers & Integrators"
+     ],
+     "note": "Nov 23: AI hardware bounced hard on Nvidia's CEO news; no sign of IPO-related supply today, so the stand-in selling theory is on hold (still n=1)."
+    },
+    {
+     "date": "2026-11-24",
+     "status": "peaking",
+     "long": [],
+     "short": [
+      "Neoclouds & GPU Hosting",
+      "Custom Silicon & Networking Chips",
+      "AI Servers & Integrators"
+     ],
+     "note": "Nov 24: Anthropic closed below its $83 issue price and AI hardware fell again; the post-pricing bounce the funding theory expects has not lasted."
+    },
+    {
+     "date": "2026-11-25",
+     "status": "resolved",
+     "long": [],
+     "short": [
+      "Neoclouds & GPU Hosting",
+      "Custom Silicon & Networking Chips",
+      "AI Servers & Integrators"
+     ],
+     "note": "Resolved Nov 24: the story's own break test fired - after pricing, AI hardware kept falling and Anthropic closed under its $83 issue price, so the selling was about AI itself, not making room for the IPO. Followed by the AI credit squeeze story."
+    }
+   ],
+   "resolved": "2026-11-25"
   }
  ]
 }
