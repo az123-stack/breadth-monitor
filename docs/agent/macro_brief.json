@@ -1,59 +1,50 @@
 {
- "for_date": "2026-11-23",
- "written": "2026-11-24T12:04Z",
- "headline": "Stocks try to rebound from an AI-led rout (S&P 500 -8.6% last week) with core PCE and GDP due Wednesday and oil sliding on Iran-talks hopes.",
+ "for_date": "2026-11-24",
+ "written": "2026-11-25T12:05Z",
+ "headline": "October PCE and Q3 GDP land this morning with a December Fed hike nearly fully priced, an AI-led tech selloff resuming and Hormuz attacks still disrupting oil flows.",
  "risk": "high",
- "rates": "The 2-year yield is about 4.69% and the 10-year about 4.92-4.93%, with yields ticking up Monday.",
- "fed": "NY Fed's Williams spoke Monday 4:00 PM ET; a headline says markets price a 25bp December hike, and the December decision is Dec 9.",
- "oil": "WTI settled at $80.17 (-4.5%) and Brent at $89.37 (-3.5%) Monday as hedges against a weekend US escalation unwound and the IEA sees a ~2 mb/d surplus.",
- "geo": "The US-Iran war and naval blockade continue, with Hormuz tanker attacks and an Iranian strike on Bahrain over the weekend, though Trump is giving talks time.",
+ "rates": "The 10-year yield was about 4.86% this morning (4.92% at Tuesday's close) and CME pricing puts a quarter-point December hike above 97%.",
+ "fed": "Minutes released Nov 18 showed nearly all officials expecting a December hike, with the Dec 8-9 FOMC meeting next and Governor Waller arguing for a half point.",
+ "oil": "Oil slipped this morning (Brent roughly $88-91 across sources) as expected global surplus outweighed supply risk from Hormuz tanker strikes and Houthi attacks on Saudi facilities, with OPEC+ meeting Nov 29.",
+ "geo": "The Iran conflict keeps Hormuz traffic far below pre-war levels, and the WSJ reports the US is preparing higher tariffs on China, the EU and others.",
  "events": [
   {
-   "date": "2026-11-24",
-   "time": "10:00 AM ET",
-   "name": "Conference Board Consumer Confidence",
-   "impact": "medium"
-  },
-  {
-   "date": "2026-11-24",
-   "time": "After close",
-   "name": "Dell earnings (also Workday, Autodesk, HP)",
-   "impact": "medium"
-  },
-  {
    "date": "2026-11-25",
    "time": "8:30 AM ET",
-   "name": "October core PCE inflation",
+   "name": "PCE inflation and personal spending (Oct)",
    "impact": "high"
   },
   {
    "date": "2026-11-25",
    "time": "8:30 AM ET",
-   "name": "Q3 GDP second estimate",
-   "impact": "high"
-  },
-  {
-   "date": "2026-11-25",
-   "time": "2:00 PM ET",
-   "name": "Fed Beige Book",
+   "name": "Q3 GDP (second estimate)",
    "impact": "medium"
   },
   {
-   "date": "2026-11-26",
-   "time": "All day",
-   "name": "US markets closed for Thanksgiving",
+   "date": "2026-11-29",
+   "time": "",
+   "name": "OPEC+ meeting on 2027 output policy",
    "impact": "medium"
   },
   {
-   "date": "2026-11-27",
-   "time": "1:00 PM ET",
-   "name": "Early close after Thanksgiving",
+   "date": "2026-12-01",
+   "time": "",
+   "name": "ISM Manufacturing (Nov) and JOLTS (Oct)",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-12-02",
+   "time": "",
+   "name": "ADP employment (Nov)",
    "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.heygotrade.com/en/news/weekly-economic-outlook-2026-11-23/",
-  "https://www.rigzone.com/news/wire/oil_falls_as_trump_signals_iran_talks-23-nov-2026-185152-article/",
-  "https://msa-trader.com/news/u-s-treasury-yields-rise-intraday-on-nov-23-2026-cdba8f76e726"
+  "https://www.newsquawk.com/headlines/newsquawk-daily-us-opening-news---25th-november-2026",
+  "https://wearemainstreet.org/world/2026/11/25/oil-prices-fall-global-supply-surplus",
+  "https://www.marketcalls.in/commodities/strait-of-hormuz-november-2026.html",
+  "https://www.usbank.com/content/dam/usbank/en/documents/pdfs/corporate-and-commercial-banking/econ-weekly-pdf-11-20-26.pdf",
+  "https://abcnews.com/US/wireStory/fed-minutes-higher-interest-rates-needed-december-inflation-138258781",
+  "https://www.bea.gov/news/schedule"
  ]
 }
