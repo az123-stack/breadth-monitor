@@ -2336,6 +2336,22 @@ def test_thrust_board_states():
     assert TB.stock_state(_np.array([90, 89, 88]), _np.array([91, 90, 89]), _np.array([89, 88, 87]), 92.0, 95.0, a) is None
     return "ok"
 
+def test_red_light():
+    """selector.redlight: weak breadth + credit under its 20-day avg = red; one = amber; VIX > 22 is a note, not a warning."""
+    import pandas as _pd
+    from breadth import selector as SEL
+    idx = _pd.bdate_range("2026-01-01", periods=30)
+    mk = lambda vals: {"rows": [[str(d.date()), v] for d, v in zip(idx, vals)]}
+    falling = mk([80 - 0.1 * k for k in range(30)]); flat = mk([100.0] * 30)
+    hist = _pd.DataFrame({"ratio10": [0.6] * 30, "ratio5": [0.5] * 30}, index=idx)
+    r = SEL.redlight(hist, {"hyg": falling, "iei": flat, "vix": mk([30.0] * 30)})
+    assert r["level"] == "red" and r["on"] == 2 and r["vix"]["high"], r
+    r = SEL.redlight(hist.assign(ratio10=1.4), {"hyg": falling, "iei": flat, "vix": mk([15.0] * 30)})
+    assert r["level"] == "amber" and not r["vix"]["high"], r
+    r = SEL.redlight(hist.assign(ratio10=1.4), {"hyg": mk([80 + 0.1 * k for k in range(30)]), "iei": flat})
+    assert r["level"] == "clear", r
+
+
 def test_rsfire_selector():
     """rsfire.build finds a fresh-RS leader pulling to its 21 EMA in a leading group; selector demotes a failing thrust to the breadth regime."""
     import numpy as _np, pandas as _pd

@@ -7,6 +7,9 @@ starting tomorrow, and add that to the trade brief"). v3 Brief → "What to trad
 2. Setup menu = playbook.rank() for that state (each setup's backtested R in that state: Focus >= +0.15R, Selective >= 0, Avoid < 0,
    Unproven < 15 trades) plus the newer setups with their own state evidence: Fresh RS → 21 EMA (R-2026-11-24-rs-fire-pullback) and the
    Post-thrust board (only while a thrust holds).
+4. Red light (Nov 25, 2026; R-2026-11-25-red-light): weak breadth (ratio10 < 1) and HYG/IEI credit below its 20-day average each roughly
+   halved SPY's worst drawdown without costing return. Both on = red (half size, no new index longs), one = amber, none = clear. VIX > 22 is
+   shown as "fear high, watch for a bottom" (it came near the lows, not before them).
 3. Size = confluence lights on the Post-thrust board: 0-2 green small / starters, 3-4 normal, 5-6 full. Weak breadth caps it at small.
 """
 from __future__ import annotations
@@ -29,6 +32,32 @@ def _verdict(r, n):
     if r is None or n < playbook.MIN_N:
         return "Unproven"
     return "Focus" if r >= playbook.FOCUS_R else ("Selective" if r >= 0 else "Avoid")
+
+
+def redlight(history, cache=None):
+    """Red-light line. Each check: ok True = warning ON. Never raises."""
+    out = {"checks": [], "on": 0, "level": "clear", "vix": None}
+    try:
+        from . import macro, thrustboard
+        cache = cache if cache is not None else macro.load()
+        r10 = float(history.iloc[-1]["ratio10"])
+        out["checks"].append({"k": "breadth", "label": "Weak breadth (10-day ratio under 1)", "on": r10 < 1, "detail": f"10-day ratio {r10:.2f}"})
+        h, i = thrustboard._macro_series(cache, "hyg"), thrustboard._macro_series(cache, "iei")
+        if h is not None and i is not None:
+            cr = (h / i).dropna()
+            if len(cr) > 20:
+                avg = cr.iloc[-20:].mean()
+                out["checks"].append({"k": "credit", "label": "Credit (HYG/IEI) below its 20-day average", "on": bool(cr.iloc[-1] < avg),
+                                      "detail": f"{cr.iloc[-1]:.4f} vs 20-day avg {avg:.4f} ({cr.index[-1].date()})"})
+        v = thrustboard._macro_series(cache, "vix")
+        if v is not None and len(v):
+            out["vix"] = {"level": round(float(v.iloc[-1]), 1), "high": bool(v.iloc[-1] > 22), "date": str(v.index[-1].date())}
+        n = sum(1 for c in out["checks"] if c["on"])
+        out["on"] = n
+        out["level"] = "red" if n >= 2 else ("amber" if n == 1 else "clear")
+    except Exception:
+        out["level"] = "unknown"
+    return out
 
 
 def build(theme_data, history):
@@ -62,6 +91,7 @@ def build(theme_data, history):
     size = next(s for s in SIZE if green >= s[0])
     if state == "weak" and size[0] > 0:
         size = SIZE[-1]
+    rl = redlight(history)
     focus = [x["name"] for x in rows if x["verdict"] == "Focus"]
     headline = {
         "thrust": "Post-thrust: press the Focus setups in the leading groups.",
@@ -71,6 +101,6 @@ def build(theme_data, history):
     }[state]
     return {"date": str(history.index[-1])[:10], "state": state, "label": playbook.STATE[state][0], "advice": playbook.STATE[state][1],
             "headline": headline, "note": note, "since": since if state == "thrust" else None, "rows": rows, "focus": focus,
-            "green": green, "lights": len(lights), "size": size[1], "size_why": size[2],
+            "redlight": rl, "green": green, "lights": len(lights), "size": size[1], "size_why": size[2],
             "if_thrust": [{"name": x["name"], "verdict": x["verdict"], "avg_r": x["avg_r"], "n": x["n"]} for x in playbook.rank(T, "thrust")[:5]]
             if state != "thrust" else None}

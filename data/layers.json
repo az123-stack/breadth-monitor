@@ -648,6 +648,20 @@
     "R-2026-11-24-rs-fire-pullback"
    ],
    "notes": "uses existing playbook evidence; selector itself not backtested"
+  },
+  {
+   "id": "red_light",
+   "name": "Red light for longs: weak breadth + credit below 20-day avg",
+   "kind": "code",
+   "owner": "daily update + page",
+   "status": "info",
+   "where": "selector.redlight -> DATA.themes.selector.redlight; v3 Brief -> What to trade",
+   "what": "both on = red (half size, no new index longs), one = amber; VIX > 22 shown as a bottom-watch note",
+   "affects_picks": false,
+   "evidence": [
+    "R-2026-11-25-red-light"
+   ],
+   "notes": "rules chosen in-sample on 4 pullbacks, Mar 2025 - Nov 2026"
   }
  ]
 }

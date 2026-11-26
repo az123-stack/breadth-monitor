@@ -8,8 +8,8 @@ horizon: 10 sessions
 sample: Mar 3 2025 – Nov 17 2026, 432 sessions; 12 warnings; 4 SPY 5%+ pullbacks
 result: ratio10 < 1 ("weak") as a step-aside rule = SPY 26.9% vs 25.1% buy & hold, max DD −8.6% vs −14.8%, out 33% of days, fired 0–6 sessions after all 4 peaks; credit (HYG/IEI) below its 20-day avg = 25.0%, max DD −6.0%, out 42%; VIX > 22 / VIX spikes / 10:1 down days / half the leaders below the 21 EMA come LATE (SPY next 10 +2.4% after VIX > 22): bottom signals, not red lights; thrust failing = SPY next 10 −1.38% (5 fires, in-sample)
 halves: not split (only 4 pullbacks); each pullback reported on its own in the script output
-layers: []
-integrated: no
+layers: [red_light]
+integrated: partly
 source: chat (Adam: "run the studies"); tools/redlight_study/run.py
 ---
 **Idea.** Find the warning that gets longs out early in a pullback without throwing away the good periods.

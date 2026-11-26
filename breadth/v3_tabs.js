@@ -181,6 +181,16 @@ function renderRsFire(app) {
 
 /* ---------- What to trade (Nov 24, 2026; Adam: "tell me what type of setup I should be trading in any given market condition") —
    breadth/selector.py → DATA.themes.selector; v3 Brief → What to trade. ---------- */
+function redLightLine(R) {
+  if (!R || !R.checks || !R.checks.length) return "";
+  const L = { red: ["avoid", "Red light", "both warnings on: half size, no new index longs (SPY/QQQ). Strong leaders above their 21 EMA still work, just smaller."],
+    amber: ["watch", "Amber", "one warning on: don't press, keep new positions on the small side."],
+    clear: ["act", "Clear", "no early warning on: size by the confluence lights."] }[R.level] || ["watch", "Unknown", "warning data missing."];
+  const chk = R.checks.map(c => `${c.on ? "🔴" : "🟢"} ${esc(c.label)} <span class="meta">(${esc(c.detail)})</span>`).join(" · ");
+  const vix = R.vix ? ` · ${R.vix.high ? "⚠ " : ""}VIX ${R.vix.level}${R.vix.high ? ": fear is high — in our data that came near the lows, so watch for the bottom rather than reading it as a warning" : ""}` : "";
+  return `<div class="rbanner ${L[0]}" style="margin-top:6px"><b>${L[1]}</b>: ${L[2]}<br><small>${chk}${vix}</small>
+    <small class="meta" style="display:block">Weak breadth and credit below its 20-day average each roughly halved SPY's worst drawdown (−8.6% and −6.0% vs −14.8%) without costing return, Mar 2025 – Nov 2026. Card R-2026-11-25-red-light.</small></div>`;
+}
 function renderWhatToTrade(app) {
   const X = (DATA.themes || {}).selector;
   if (!X) { app.append($('<div class="card empty">What to trade appears after the next data run.</div>')); return; }
@@ -190,6 +200,7 @@ function renderWhatToTrade(app) {
     <div class="rbanner ${cls}"><b>${esc(X.label)}</b>${X.since != null ? ` (day ${X.since + 1} after the thrust)` : ""}: ${esc(X.headline)}</div>
     ${X.note ? `<p class="meta" style="margin:6px 0">${esc(X.note)}</p>` : ""}
     <div class="rbanner ${X.green >= 3 ? "act" : "watch"}" style="margin-top:6px"><b>Size: ${esc(X.size)}</b> · ${X.green} of ${X.lights} confluence lights green. ${esc(X.size_why)}${X.state === "weak" ? " Weak breadth caps size at small whatever the lights say." : ""}</div>
+    ${redLightLine(X.redlight)}
     <p style="margin:10px 0 4px"><b>Trade these:</b> ${X.focus.length ? X.focus.map(esc).join(" · ") : "nothing has a proven edge in this market — stand aside or trade tiny"}</p>
     <p class="meta" style="margin:0">Each setup's average result in <b>${esc(X.label.toLowerCase())}</b> markets, from the dashboard's backtests (5-session trades, R = risk units). Focus ≥ +0.15R · Selective ≥ 0 · Avoid < 0 · Unproven = under 15 trades.</p></section>`);
   const rows = X.rows.map(r => `<tr><td class="l"><span class="pbv ${V[r.verdict]}">${r.verdict}</span></td><td class="l"><b>${esc(r.name)}</b><small class="meta" style="display:block">${esc(r.v3)}</small></td>

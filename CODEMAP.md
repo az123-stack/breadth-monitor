@@ -937,3 +937,5 @@ than the previous weekday after 6 AM ET. Test: asserted in the e2e build test.
   since, rows (playbook.rank rows + rsfire + thrustboard, each with `v3` location), focus, green, lights, size, size_why, if_thrust}. Effective
   state = playbook.state_of, except post-thrust with thrustboard ft "fading" → ratio regime. Size: lights 0-2 small, 3-4 normal, 5-6 full,
   weak caps small. v3 Brief → "What to trade" (`bwhat`, `renderWhatToTrade`). Test `test_rsfire_selector`.
+
+- **Red light** (Nov 25, 2026; card R-2026-11-25-red-light, layer `red_light`, info): `selector.redlight(history, cache)` → `DATA.themes.selector.redlight` {checks, on, level red/amber/clear, vix}; weak breadth (ratio10 < 1) + HYG/IEI below its 20-day avg; VIX > 22 shown as a bottom-watch note. Rendered by `redLightLine` in v3_tabs.js on Brief → What to trade. Test `test_red_light`. Study: tools/redlight_study/run.py; shorts companion tools/short_study (no edge, R-2026-11-25-failed-pop-shorts).
