@@ -54,10 +54,10 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
 - [ ] Skills: turn Adam's chart reads into a written checklist skill, logged per recommendation, tested after 20–30 outcomes.
 
 ## Red light / short green light (Adam, Nov 25, 2026: "not build now"; card R-2026-11-25-green-light-history)
-- [ ] **#1 Red light for longs** (first): which warning fires earliest and saves the most vs false alarms — day-10 ratio10 < 1, 10:1 down days,
+- [x] **#1 Red light for longs** — RAN Nov 25 (R-2026-11-25-red-light): weak breadth or credit below 20-day avg halve the drawdown; next = a Red light line in What to trade (ask Adam). (was: first): which warning fires earliest and saves the most vs false alarms — day-10 ratio10 < 1, 10:1 down days,
   Market health breakdowns > breakouts, VIX, credit (HYG/IEI), leaders below the 21 EMA. Note: Jan 27 – Mar 30, 2026 SPY −9.1% happened INSIDE
   the Nov 21 – Mar 13 green window — the green light didn't turn off; that's the case to beat.
-- [ ] **#2 Green light for shorts**: test failed-pop shorts in broken groups first, then WHEN they work. Study windows = the 4 SPY pullbacks of
+- [x] **#2 Green light for shorts** — RAN Nov 25 (R-2026-11-25-failed-pop-shorts): failed-pop shorts worked only in the current pullback, no edge elsewhere; next candidates = ex-leader breakdowns, shorts after a downside breadth thrust. (was:: test failed-pop shorts in broken groups first, then WHEN they work. Study windows = the 4 SPY pullbacks of
   5%+ in our bars: Feb 19 – Apr 8, 2025 (−19.0%, 34 sessions) · Oct 29 – Nov 20, 2025 (−5.1%, 16) · Jan 27 – Mar 30, 2026 (−9.1%, 43) ·
   Oct 6 – Nov 20, 2026 (−11.5%, 33, not recovered). Remember weak-state SPY next-20 = +0.93% (62% up): weak alone isn't a short signal.
 
