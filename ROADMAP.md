@@ -53,6 +53,14 @@ Open work, in rough priority order. Updated Oct 27, 2026 (end of session). Read 
 - [ ] Step 3: scorecard on live candidates (expected R from proven layers only, per-variable reasons, "daily now / wait / skip"), logged forward.
 - [ ] Skills: turn Adam's chart reads into a written checklist skill, logged per recommendation, tested after 20–30 outcomes.
 
+## Red light / short green light (Adam, Nov 25, 2026: "not build now"; card R-2026-11-25-green-light-history)
+- [ ] **#1 Red light for longs** (first): which warning fires earliest and saves the most vs false alarms — day-10 ratio10 < 1, 10:1 down days,
+  Market health breakdowns > breakouts, VIX, credit (HYG/IEI), leaders below the 21 EMA. Note: Jan 27 – Mar 30, 2026 SPY −9.1% happened INSIDE
+  the Nov 21 – Mar 13 green window — the green light didn't turn off; that's the case to beat.
+- [ ] **#2 Green light for shorts**: test failed-pop shorts in broken groups first, then WHEN they work. Study windows = the 4 SPY pullbacks of
+  5%+ in our bars: Feb 19 – Apr 8, 2025 (−19.0%, 34 sessions) · Oct 29 – Nov 20, 2025 (−5.1%, 16) · Jan 27 – Mar 30, 2026 (−9.1%, 43) ·
+  Oct 6 – Nov 20, 2026 (−11.5%, 33, not recovered). Remember weak-state SPY next-20 = +0.93% (62% up): weak alone isn't a short signal.
+
 ## Next up (Adam: "next week")
 1. **Trade warehouse + stacked R** (Adam, Oct 27: "this trade is 0.8R, that one 0.5R, but layered together 1.3R — keep making this
    smarter"). Card R-2026-10-27-r-stacking says how: (a) one table of every setup's past trades on the same yardstick (box, spring,
