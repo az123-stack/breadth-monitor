@@ -1,6 +1,21 @@
 {
- "updated": "2026-11-25T13:10:45Z",
+ "updated": "2026-11-27T13:11:29Z",
  "episodes": [
+  {
+   "id": "2026-11-27-am",
+   "date": "2026-11-27",
+   "slot": "am",
+   "format": "huddle",
+   "format_name": "Desk huddle",
+   "title": "Futures jump; the sold-out AI names lead the gap",
+   "name": "2026-11-27-am-huddle-130946.mp3",
+   "url": "https://az123-stack.github.io/breadth-monitor/podcast/audio/2026-11-27-am-huddle-130946.mp3",
+   "bytes": 2469168,
+   "seconds": 412,
+   "words": 1079,
+   "summary": "Where we are. Still W: selling paused, no side picked, but the open leans toward B. Wednesday's official count: 48.7 percent of dollar volume in falling stocks (net plus 20 billion dollars), 183 stocks up 4 percent+ against 46 down, 50 new highs, 192 new lows, T2108 42.7. This morning (7:47 AM ET) S and P futures are plus 1.56 percent, Nasdaq-100 plus 2.14 percent, Russell plus 1.39 percent. Today closes at 1 PM; volume should be light. The trade: Consumer over AI Infrastructure, 35 sessions abo",
+   "published": "2026-11-27T13:11:29Z"
+  },
   {
    "id": "2026-11-25-am",
    "date": "2026-11-25",
