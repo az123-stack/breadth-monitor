@@ -1,194 +1,214 @@
 {
- "for_date": "2026-11-24",
- "written": "2026-11-25T12:16Z",
+ "for_date": "2026-11-25",
+ "written": "2026-11-27T12:16Z",
  "stocks": {
   "RBLX": {
-   "why": "Bounce with no company news (tech-day rotation, a bullish broker note) after a Q3 report that guided bookings down 10-15% year over year and a softer margin outlook.",
+   "why": "Rebound with no fresh company news (up 7.6% on Nov 18 without an announcement), helped by an Oppenheimer call around Nov 23; the stock is still far below its 52-week high and the company guided Q4 bookings down 10-15% year on year.",
    "direction": "mixed",
    "quality": "weak",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "bookings guided down 10-15%",
-    "insider selling (CFO)"
+    "bookings guided to decline",
+    "insider selling"
    ],
    "sources": [
     "https://www.trefis.com/stock/rblx/articles/626904/what-is-driving-roblox-stock/2026-11-19",
-    "https://www.marketbeat.com/instant-alerts/insider-insider-selling-roblox-nyse-rblx-cfo-sells-79620611-in-stock-2026-11-23/"
+    "https://www.marketbeat.com/instant-alerts/analyst-oppenheimer-forecasts-strong-price-appreciation-for-roblox-nyse-rblx-stock-2026-11-23/",
+    "https://www.thelincolnianonline.com/2026/11/26/roblox-nyserblx-insider-sells-677769-00-in-stock.html"
+   ]
+  },
+  "CCL": {
+   "why": "No fresh company news found; the last hard news is the Sept 29 raised FY2026 outlook, and cruise shares have been trading off oil prices. Q4 report is expected (not confirmed) around Dec 18.",
+   "direction": "mixed",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.trefis.com/stock/ccl/articles/626786/what-will-move-carnival-stock-through-spring-2027/2026-11-19",
+    "https://247wallst.com/investing/2026/11/02/carnival-and-royal-caribbean-climb-5-norwegian-cruise-line-rises-4-as-oil-prices-drop/"
    ]
   },
   "WING": {
-   "why": "Rebound driven by rotation out of tech/AI and a low bar after a weak Q3: same-store sales fell 5.4% and the full-year guide is -6.5% to -7%.",
+   "why": "Bounce after the Oct 28 report (EPS beat, shares jumped) plus unverified talk of strategic buyer interest; domestic same-store sales fell 5.4% and are guided down about 6.5-7% for 2026.",
    "direction": "mixed",
    "quality": "weak",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "same-store sales guidance cut"
+    "negative same-store sales guidance",
+    "buyer talk is unconfirmed"
    ],
    "sources": [
-    "https://www.fool.com/investing/2026/11/05/why-wingstop-rallied-in-october/"
+    "https://www.sec.gov/Archives/edgar/data/0001636222/000162828026067723/a991wingearningsreleasedra.htm",
+    "https://www.tokenpost.com/news/business/60772"
    ]
   },
-  "KR": {
-   "why": "No fresh company catalyst found; the main event ahead is Q3 earnings on Dec 3 (call 8:00 a.m. ET).",
-   "direction": "none",
-   "quality": "none",
-   "depth": "full",
-   "earnings_date": "2026-12-03",
-   "red_flags": [],
-   "sources": [
-    "https://finance.yahoo.com/markets/stocks/articles/kroger-announces-third-quarter-conference-210500045.html"
-   ]
-  },
-  "PRCH": {
-   "why": "Q3 (Oct 28) beat estimates with 42% policy growth, adjusted EBITDA more than doubled and 2026 guidance raised.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nasdaq.com/press-release/porch-group-reports-third-quarter-2026-results-2026-10-28",
-    "https://www.chartmill.com/news/PRCH/Chartmill-57115-Porch-Group-Inc-NASDAQPRCH-Q3-2026-Earnings-Beat-and-Raised-Outlook-Drive-21-After-Hours-Surge"
-   ]
-  },
-  "ORKA": {
-   "why": "Positive Phase 2b psoriasis data for ORKA-001 (Oct 26); 52-week data expected in December and Phase 3 starts planned for 2027.",
+  "GKOS": {
+   "why": "Q3 sales of $211M (+58%) beat estimates with a preliminary 2027 revenue view near $1B; Stifel raised its target to $280 on Nov 24.",
    "direction": "positive",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "binary data readout expected in December"
+    "insider selling (CEO, COO, director)"
    ],
    "sources": [
-    "https://www.sec.gov/Archives/edgar/data/0000907654/000121390026112281/ea030959401ex99-1.htm",
-    "https://www.rttnews.com/3712642/oruka-expects-orka-001-52-week-data-in-december-phase-3-start-planned-for-2027.aspx"
+    "https://www.investing.com/news/analyst-ratings/stifel-raises-glaukos-stock-price-target-to-280-on-revenue-outlook-93CH-5048226",
+    "https://www.marketbeat.com/instant-alerts/insider-glaukos-nyse-gkos-coo-joseph-gilliam-sells-7550-shares-of-stock-2026-11-25/"
    ]
   },
-  "SYRE": {
-   "why": "Large run after positive mid-stage ulcerative colitis data for SPY001; no newer hard news found.",
-   "direction": "positive",
+  "ORKA": {
+   "why": "Running into 52-week psoriasis data for ORKA-001, expected in December 2026; Phase 3 planned for first half 2027 and $1.2B cash.",
+   "direction": "mixed",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
-   "red_flags": [],
+   "red_flags": [
+    "binary data readout due in December",
+    "insider selling"
+   ],
    "sources": [
-    "https://www.tradingview.com/news/zacks:f4caaac75094b:0-syre-stock-jumps-more-than-70-in-a-month-what-is-driving-this-rally/"
+    "https://www.rttnews.com/3712642/oruka-expects-orka-001-52-week-data-in-december-phase-3-start-planned-for-2027.aspx",
+    "https://www.investing.com/news/insider-trading-news/oruka-therapeutics-general-counsel-sells-853985-of-stock-93CH-5043198"
+   ]
+  },
+  "SYRE": {
+   "why": "No fresh hard news; strength follows earlier pipeline progress in a strong immunology group. It raised over $400M in October and its next major data are due Q3 2027.",
+   "direction": "none",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [
+    "share offering in October"
+   ],
+   "sources": [
+    "https://www.manilatimes.net/2026/11/04/tmt-newswire/globenewswire/spyre-therapeutics-reports-third-quarter-2026-financial-results-and-provides-corporate-update/2461087"
    ]
   },
   "CBRL": {
-   "why": "Near a 52-week high after the last quarter's earnings beat; fiscal Q1 results on Dec 2 are the next event.",
+   "why": "Turnaround rally to a 1-year high on analyst target changes/upgrade; fiscal Q1 results are due before the open Wednesday Dec 2.",
    "direction": "mixed",
    "quality": "real",
    "depth": "full",
    "earnings_date": "2026-12-02",
-   "red_flags": [],
+   "red_flags": [
+    "earnings Dec 2 inside 5 sessions"
+   ],
    "sources": [
-    "https://www.marketbeat.com/earnings/reports/2026-12-2-cracker-barrel-old-country-store-inc-stock/",
-    "https://finviz.com/news/394723/cracker-barrel-shares-rise-10-after-q4-earnings-beat-estimates"
+    "https://www.stocktitan.net/news/CBRL/cracker-barrel-fiscal-2027-first-quarter-conference-c2x968vsakyu.html",
+    "https://www.defenseworld.net/2026/11/25/cracker-barrel-old-country-store-nasdaqcbrl-sets-new-1-year-high-after-analyst-upgrade.html"
    ]
   },
-  "GKOS": {
-   "why": "Record Q3 (revenue up about 58%) with a higher outlook, followed by analyst support including a Stifel target raise to $280 and a new 52-week high.",
+  "PRCH": {
+   "why": "Oct 28 Q3: insurance revenue up 39% and 2026 EBITDA and revenue guidance raised; shares have been making 52-week highs.",
    "direction": "positive",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "insider selling (COO, about $11M)"
+    "insider share sale filed (Form 144)"
    ],
    "sources": [
-    "https://www.investing.com/news/analyst-ratings/stifel-raises-glaukos-stock-price-target-to-280-on-revenue-outlook-93CH-5048226",
-    "https://www.marketbeat.com/instant-alerts/insider-insider-selling-glaukos-nyse-gkos-coo-sells-1106395544-in-stock-2026-11-16/"
+    "https://www.stocktitan.net/news/PRCH/porch-group-reports-third-quarter-2026-koqygxeplw0v.html",
+    "https://www.stocktitan.net/sec-filings/PRCH/144-porch-group-inc-sec-filing-b5becaf0b5ca.html"
    ]
   },
-  "KNSA": {
-   "why": "Q3 (Oct 27) showed ARCALYST revenue up about 58% and raised full-year sales guidance.",
+  "GDYN": {
+   "why": "Record Q3 (reported Oct 29) with margin and AI momentum, then new Outperform coverage from Wedbush around Nov 25.",
    "direction": "positive",
    "quality": "real",
    "depth": "full",
    "earnings_date": null,
-   "red_flags": [],
+   "red_flags": [
+    "director selling"
+   ],
    "sources": [
-    "https://www.globenewswire.com/news-release/2026/10/27/3388879/0/en/kiniksa-pharmaceuticals-reports-third-quarter-2026-financial-results-and-recent-portfolio-execution.html",
-    "https://www.rttnews.com/3703654/kiniksa-q3-revenue-jumps-58-raises-arcalyst-2026-sales-outlook-stock-up.aspx"
+    "https://www.nasdaq.com/press-release/grid-dynamics-reports-record-third-quarter-2026-financial-results-2026-10-29",
+    "https://www.marketbeat.com/instant-alerts/analyst-grid-dynamics-nasdaq-gdyn-stock-rated-outperform-in-new-coverage-at-wedbush-2026-11-25/",
+    "https://www.marketbeat.com/instant-alerts/insider-grid-dynamics-nasdaq-gdyn-director-sells-20293884-in-stock-2026-11-09/"
+   ]
+  },
+  "KNSA": {
+   "why": "Oct 27 Q3: revenue up 58% and ARCALYST 2026 sales guidance raised to about $1.05B.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [
+    "insider selling (CEO and others)"
+   ],
+   "sources": [
+    "https://www.rttnews.com/3703654/kiniksa-q3-revenue-jumps-58-raises-arcalyst-2026-sales-outlook-stock-up.aspx",
+    "https://www.marketbeat.com/instant-alerts/insider-insider-selling-kiniksa-pharmaceuticals-international-nasdaq-knsa-ceo-sells-151300-shares-of-stock-2026-11-06/"
    ]
   },
   "KYMR": {
-   "why": "Positive KT-579 data, then an upsized $1.75B stock offering priced Nov 23 at $150.37 (closing Nov 25).",
+   "why": "Positive mid-stage KT-621 eczema data sent shares up 30% on Nov 23 and 16% on Nov 24, followed by an upsized $1.75B share sale priced at $150.37.",
    "direction": "mixed",
    "quality": "strong",
    "depth": "full",
    "earnings_date": null,
    "red_flags": [
-    "share offering / dilution ($1.75B)"
+    "$1.75B share offering (dilution)",
+    "very extended after data"
    ],
    "sources": [
-    "https://investors.kymeratx.com/news-releases/news-release-details/kymera-therapeutics-announces-pricing-upsized-175-billion-public",
-    "https://www.investing.com/news/analyst-ratings/jefferies-reiterates-kymera-therapeutics-stock-rating-on-trial-data-93CH-5046157"
-   ]
-  },
-  "TGTX": {
-   "why": "Q3 (early November) beat on BRIUMVI sales and raised full-year revenue guidance.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/418926/tg-therapeutics-reports-third-quarter-2026-financial-results-and-raises-full-year-revenue-guidance"
-   ]
-  },
-  "GDYN": {
-   "why": "Record Q3 (Oct 29) with revenue above guidance, wider margins and AI revenue momentum.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nasdaq.com/press-release/grid-dynamics-reports-record-third-quarter-2026-financial-results-2026-10-29"
-   ]
-  },
-  "SG": {
-   "why": "Q3 (Nov 5) beat, October same-store sales turned positive (about +5%) and the full-year comp guide was raised; losses widened and the stock has more than doubled off its low.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/418074/sweetgreen-beats-as-october-comps-turn-positive-but-the-margin-repair-is-still-ahead-of-a-stock-that-already-doubled"
-   ]
-  },
-  "TBBB": {
-   "why": "Q3 turned a small profit versus an expected loss, with same-store sales accelerating to +20.5%; full-year guidance was only reaffirmed.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://finviz.com/news/414984/tiendas-3bs-acceleration-extends-to-a-fourth-straight-quarter-but-reaffirmed-guidance-and-a-thin-profit-keep-the-beat-in-perspective"
-   ]
-  },
-  "CYRX": {
-   "why": "Q3 (Nov 5) revenue beat and a raised 2026 guide sent shares up about 19%, though EPS missed and client regulatory filings have slipped.",
-   "direction": "positive",
-   "quality": "real",
-   "depth": "full",
-   "earnings_date": null,
-   "red_flags": [
-    "convertible notes now current",
-    "regulatory timeline slipping"
-   ],
-   "sources": [
-    "https://finviz.com/news/418113/cryoport-misses-on-eps-but-beats-on-revenue-and-raises-guidance-again-while-its-regulatory-catalyst-calendar-keeps-shrinking"
+    "https://www.trefis.com/stock/kymr/articles/628993/what-did-kymera-stock-investors-miss-before-the-run/2026-11-25",
+    "https://www.globenewswire.com/news-release/2026/11/24/3408981/0/en/kymera-therapeutics-announces-pricing-of-upsized-1-75-billion-public-offering.html"
    ]
   },
   "ANF": {
+   "why": "Nov 24 Q3 beat with record sales and a raised outlook; shares jumped more than 20% to a new high.",
+   "direction": "positive",
+   "quality": "strong",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://finance.yahoo.com/markets/stocks/articles/why-abercrombie-fitch-anf-stock-150033497.html",
+    "https://www.benzinga.com/markets/earnings/26/11/63593055/abercrombie-fitch-stock-third-20-percent-earnings-jump"
+   ]
+  },
+  "SN": {
+   "why": "Joins the S&P 500 before the open Dec 2 (announced Nov 23), on top of Q3 sales up 21% and a raised outlook.",
+   "direction": "positive",
+   "quality": "strong",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [
+    "index-add buying ends Dec 2"
+   ],
+   "sources": [
+    "https://www.trefis.com/stock/sn/articles/628642/why-is-sharkninja-stock-going-up/2026-11-25",
+    "https://www.investing.com/news/company-news/sharkninja-q3-2026-presentation-sales-surge-21-outlook-raised-93CH-5000505"
+   ]
+  },
+  "TBBB": {
+   "why": "Nov 3 Q3: same-store sales up 20.5%, revenue up 40% and 141 net new stores.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.fool.com/earnings/takeaways/2026/11/03/bbb-foods-3-key-takeaways-for-long-term-investors/"
+   ]
+  },
+  "TGTX": {
+   "why": "FDA accepted the filing for a single-infusion BRIUMVI starting dose on Nov 24 (decision date July 10, 2027); stock jumped to a 1-year high.",
+   "direction": "positive",
+   "quality": "real",
+   "depth": "full",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.biopharminternational.com/view/fda-accepts-tg-therapeutics-sbla-for-single-infusion-briumvi-initiation-in-relapsing-multiple-sclerosis",
+    "https://finance.yahoo.com/markets/stocks/articles/tg-therapeutics-tgtx-stock-9-203057470.html"
+   ]
+  },
+  "SG": {
    "why": "earnings date check only",
    "direction": "none",
    "quality": "unknown",
@@ -196,7 +216,7 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.globenewswire.com/news-release/2026/11/24/3409152/0/en/abercrombie-fitch-co-reports-third-quarter-fiscal-2026-results.html"
+    "https://www.tipranks.com/stocks/sg/earnings"
    ]
   },
   "FIGS": {
@@ -207,84 +227,7 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.earningswhispers.com/stocks/FIGS"
-   ]
-  },
-  "SN": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/sn.html"
-   ]
-  },
-  "STGW": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://seekingalpha.com/symbol/STGW/earnings"
-   ]
-  },
-  "LFST": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://therighttrader.com/earnings-calendar/lfst"
-   ]
-  },
-  "ATRC": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://therighttrader.com/earnings-calendar/atrc"
-   ]
-  },
-  "AZTA": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://nextearningsdate.com/azenta.html"
-   ]
-  },
-  "U": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.earningswhispers.com/stocks/u"
-   ]
-  },
-  "ACHC": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://therighttrader.com/earnings-calendar/achc"
+    "https://www.benzinga.com/quote/FIGS/earnings"
    ]
   },
   "CON": {
@@ -295,10 +238,10 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.nextearningsdate.com/concentra-group-holdings.html"
+    "https://finviz.com/news/418455/concentra-beats-and-raises-for-a-third-straight-quarter-as-volume-replaces-pricing-as-the-growth-engine"
    ]
   },
-  "HAE": {
+  "LFST": {
    "why": "earnings date check only",
    "direction": "none",
    "quality": "unknown",
@@ -306,7 +249,18 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://therighttrader.com/earnings-calendar/hae"
+    "https://finviz.com/news/417269/lifestance-beats-and-raises-again-but-a-2027-ehr-headwind-and-price-led-growth-test-a-stock-priced-at-its-highs"
+   ]
+  },
+  "HELE": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/HELE"
    ]
   },
   "ARHS": {
@@ -320,7 +274,7 @@
     "https://www.tipranks.com/stocks/arhs/earnings"
    ]
   },
-  "AMRX": {
+  "ACHC": {
    "why": "earnings date check only",
    "direction": "none",
    "quality": "unknown",
@@ -328,7 +282,51 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.nextearningsdate.com/amrx.html"
+    "https://finviz.com/news/417355/acadia-healthcare-beats-big-and-raises-guidance-again-but-a-florida-windfall-and-weak-commercial-mix-temper-the-quality-of-the-quarter"
+   ]
+  },
+  "AZTA": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/420628/azenta-reports-fourth-quarter-and-full-year-results-for-fiscal-2026-ended-september-30-2026"
+   ]
+  },
+  "CYRX": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/418113/cryoport-misses-on-eps-but-beats-on-revenue-and-raises-guidance-again-while-its-regulatory-catalyst-calendar-keeps-shrinking"
+   ]
+  },
+  "U": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/u"
+   ]
+  },
+  "HAE": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.tipranks.com/stocks/hae/earnings"
    ]
   },
   "SIBN": {
@@ -339,10 +337,10 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://therighttrader.com/earnings-calendar/sibn"
+    "https://www.tipranks.com/stocks/SIBN/earnings"
    ]
   },
-  "RPRX": {
+  "AMRX": {
    "why": "earnings date check only",
    "direction": "none",
    "quality": "unknown",
@@ -350,7 +348,7 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.earningswhispers.com/stocks/RPRX"
+    "https://finviz.com/news/413967/amneal-reports-third-quarter-2026-financial-results"
    ]
   },
   "TGT": {
@@ -361,7 +359,29 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://uk.investing.com/equities/target-earnings"
+    "https://247wallst.com/companies/tgt/earnings/"
+   ]
+  },
+  "RPRX": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.morningstar.com/news/globe-newswire/9869914/royalty-pharma-reports-third-quarter-2026-results"
+   ]
+  },
+  "BBY": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/article/BBY/23219"
    ]
   },
   "RVTY": {
@@ -383,7 +403,7 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.tipranks.com/stocks/TFX/earnings"
+    "https://finviz.com/news/416618/teleflex-reports-third-quarter-financial-results-and-full-year-2026-outlook"
    ]
   },
   "VTRS": {
@@ -394,106 +414,7 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.earningswhispers.com/stocks/VTRS"
-   ]
-  },
-  "BIIB": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.tipranks.com/stocks/biib/earnings"
-   ]
-  },
-  "BBY": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.sec.gov/Archives/edgar/data/0000764478/000076447826000045/bby-20261124.htm"
-   ]
-  },
-  "DLTR": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.nextearningsdate.com/dltr.html"
-   ]
-  },
-  "BTSG": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.tipranks.com/stocks/btsg/earnings"
-   ]
-  },
-  "LIVN": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.earningswhispers.com/stocks/livn"
-   ]
-  },
-  "A": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.thestockobserver.com/2026/11/23/agilent-technologies-nysea-releases-fy-2027-earnings-guidance.html"
-   ]
-  },
-  "EPAM": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://public.com/stocks/epam/earnings"
-   ]
-  },
-  "WST": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.tipranks.com/stocks/wst/earnings"
-   ]
-  },
-  "REGN": {
-   "why": "earnings date check only",
-   "direction": "none",
-   "quality": "unknown",
-   "depth": "earnings_only",
-   "earnings_date": null,
-   "red_flags": [],
-   "sources": [
-    "https://www.earningswhispers.com/stocks/regn"
+    "https://www.tipranks.com/stocks/mx:vtrs/earnings"
    ]
   },
   "TREX": {
@@ -504,7 +425,51 @@
    "earnings_date": null,
    "red_flags": [],
    "sources": [
-    "https://www.nextearningsdate.com/trex-co.html"
+    "https://www.tipranks.com/stocks/TREX/earnings"
+   ]
+  },
+  "BIIB": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.tipranks.com/stocks/BIIB/earnings"
+   ]
+  },
+  "REGN": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.tipranks.com/stocks/REGN/earnings"
+   ]
+  },
+  "EPAM": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.tipranks.com/stocks/EPAM/earnings"
+   ]
+  },
+  "BTSG": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.tipranks.com/stocks/BTSG/earnings"
    ]
   },
   "AIZ": {
@@ -516,6 +481,61 @@
    "red_flags": [],
    "sources": [
     "https://www.marketbeat.com/stocks/NYSE/AIZ/earnings"
+   ]
+  },
+  "CDW": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.earningswhispers.com/stocks/CDW"
+   ]
+  },
+  "DLTR": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.nasdaq.com/press-release/dollar-tree-inc-host-third-quarter-earnings-conference-call-2026-11-03"
+   ]
+  },
+  "LIVN": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://www.tipranks.com/stocks/LIVN/earnings"
+   ]
+  },
+  "CAH": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/416625/cardinal-health-reports-first-quarter-fiscal-year-2027-results-and-raises-outlook"
+   ]
+  },
+  "INSM": {
+   "why": "earnings date check only",
+   "direction": "none",
+   "quality": "unknown",
+   "depth": "earnings_only",
+   "earnings_date": null,
+   "red_flags": [],
+   "sources": [
+    "https://finviz.com/news/411257/insmed-reports-third-quarter-2026-financial-results-and-provides-business-update"
    ]
   }
  }
