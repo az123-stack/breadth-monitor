@@ -1,35 +1,35 @@
 {
- "for_date": "2026-11-24",
- "written": "2026-11-25T12:05Z",
- "headline": "October PCE and Q3 GDP land this morning with a December Fed hike nearly fully priced, an AI-led tech selloff resuming and Hormuz attacks still disrupting oil flows.",
+ "for_date": "2026-11-25",
+ "written": "2026-11-27T12:05Z",
+ "headline": "Stocks are bouncing from an AI-led selloff in a holiday-shortened session while Middle East supply attacks keep oil elevated and a December Fed hike is all but priced in.",
  "risk": "high",
- "rates": "The 10-year yield was about 4.86% this morning (4.92% at Tuesday's close) and CME pricing puts a quarter-point December hike above 97%.",
- "fed": "Minutes released Nov 18 showed nearly all officials expecting a December hike, with the Dec 8-9 FOMC meeting next and Governor Waller arguing for a half point.",
- "oil": "Oil slipped this morning (Brent roughly $88-91 across sources) as expected global surplus outweighed supply risk from Hormuz tanker strikes and Houthi attacks on Saudi facilities, with OPEC+ meeting Nov 29.",
- "geo": "The Iran conflict keeps Hormuz traffic far below pre-war levels, and the WSJ reports the US is preparing higher tariffs on China, the EU and others.",
+ "rates": "The 10-year Treasury yield is roughly 4.85-4.9% (sources differ on today's direction) and markets see a quarter-point hike at the Dec. 8-9 meeting as nearly certain.",
+ "fed": "No Fed decision this week; the one scheduled appearance found is Vice Chair for Supervision Bowman's House testimony on Tuesday, Dec. 1 at 10 AM ET.",
+ "oil": "Brent is around $97 and on track for its first weekly gain in weeks after attacks on Hormuz tankers and Saudi energy sites, with OPEC+ meeting Sunday and expected to keep targets unchanged.",
+ "geo": "The Iran conflict is the live shock (Hormuz still disrupted, Saudi Jazan refinery hit, Kuwait reporting an Iranian drone strike that Iran denies), alongside new US Section 301 tariff proposals on 14 economies.",
  "events": [
   {
-   "date": "2026-11-25",
-   "time": "8:30 AM ET",
-   "name": "PCE inflation and personal spending (Oct)",
-   "impact": "high"
-  },
-  {
-   "date": "2026-11-25",
-   "time": "8:30 AM ET",
-   "name": "Q3 GDP (second estimate)",
+   "date": "2026-11-27",
+   "time": "1:00 PM ET",
+   "name": "Early stock market close",
    "impact": "medium"
   },
   {
    "date": "2026-11-29",
    "time": "",
-   "name": "OPEC+ meeting on 2027 output policy",
+   "name": "OPEC+ meeting",
    "impact": "medium"
   },
   {
    "date": "2026-12-01",
    "time": "",
-   "name": "ISM Manufacturing (Nov) and JOLTS (Oct)",
+   "name": "ISM Manufacturing PMI",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-12-01",
+   "time": "10:00 AM ET",
+   "name": "JOLTS job openings (Oct)",
    "impact": "medium"
   },
   {
@@ -37,14 +37,32 @@
    "time": "",
    "name": "ADP employment (Nov)",
    "impact": "medium"
+  },
+  {
+   "date": "2026-12-03",
+   "time": "",
+   "name": "ISM Services PMI",
+   "impact": "medium"
+  },
+  {
+   "date": "2026-12-04",
+   "time": "8:30 AM ET",
+   "name": "Jobs report (Nov payrolls)",
+   "impact": "high"
+  },
+  {
+   "date": "2026-12-04",
+   "time": "",
+   "name": "UMich consumer sentiment (Dec prelim)",
+   "impact": "medium"
   }
  ],
  "sources": [
-  "https://www.newsquawk.com/headlines/newsquawk-daily-us-opening-news---25th-november-2026",
-  "https://wearemainstreet.org/world/2026/11/25/oil-prices-fall-global-supply-surplus",
-  "https://www.marketcalls.in/commodities/strait-of-hormuz-november-2026.html",
-  "https://www.usbank.com/content/dam/usbank/en/documents/pdfs/corporate-and-commercial-banking/econ-weekly-pdf-11-20-26.pdf",
-  "https://abcnews.com/US/wireStory/fed-minutes-higher-interest-rates-needed-december-inflation-138258781",
-  "https://www.bea.gov/news/schedule"
+  "https://www.home.saxo/en-mena/content/articles/macro/market-quick-take---brent-tops-usd-97-and-asian-stocks-extend-rebound---27-november-2026-27112026",
+  "https://finance.yahoo.com/markets/live/stock-market-today-firday-november-27-dow-sp-500-nasdaq-black-friday-holiday-091152065.html",
+  "https://stocknow.ai/en/breaking-news/kdlol9oud2739kqvmpdaysty/newsquawk-daily-us-opening-news-27th-november-2026",
+  "https://stocknow.ai/en/breaking-news/l1rrnoswtqbvfemrq0470kjc/newsquawk-weekly-economic-calendar-29th-november-4th-december-2026",
+  "https://www.bls.gov/schedule/2026/12_sched_list.htm",
+  "https://www.forth.news/lists/fed/ChQCfWoNSjZX9qb2Rr9ns"
  ]
 }
