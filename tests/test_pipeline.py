@@ -2336,6 +2336,29 @@ def test_thrust_board_states():
     assert TB.stock_state(_np.array([90, 89, 88]), _np.array([91, 90, 89]), _np.array([89, 88, 87]), 92.0, 95.0, a) is None
     return "ok"
 
+def test_base_watch():
+    """basewatch.state_of: inside / at top / breakout / retest / extended / failed from closes vs a fixed box top; build reads the csv."""
+    import tempfile, os, pandas as _pd
+    from breadth import basewatch as BW
+    top = 50.0
+    assert BW.state_of([40, 42, 44], top)[0] == "below"
+    assert BW.state_of([45, 47, 49], top)[0] == "at_top"
+    s, ago = BW.state_of([45, 47, 49, 51], top); assert s == "breakout" and ago == 0, (s, ago)
+    assert BW.state_of([45, 49, 51, 53, 49.5], top)[0] == "retest"
+    assert BW.state_of([45, 49, 56], top)[0] == "extended"
+    assert BW.state_of([45, 49, 51, 52, 45], top)[0] == "failed"
+    assert BW.state_of([45] + [51] * 15, top)[0] == "riding"
+    d = tempfile.mkdtemp(); p = os.path.join(d, "w.csv")
+    open(p, "w").write("ticker,tier,added,ref_px,box_top,note\nAAA,A,2026-11-27,49,50,x\nBBB,B,2026-11-27,10,12,y\n")
+    dates = _pd.bdate_range("2026-10-01", periods=40)
+    adj = _pd.DataFrame([{"date": dt, "ticker": t, "c": c} for i, dt in enumerate(dates) for t, c in (("AAA", 45 + i * 0.2), ("BBB", 10.0))])
+    X = BW.build(adj, {"stocks": [{"t": "AAA", "rsr": 95, "sub": "G"}], "subthemes": [{"theme": "G", "rank": 3}]}, path=p)
+    a = X["rows"][0]
+    assert a["t"] == "AAA" and a["tier"] == "A" and a["state"] == "riding" and a["sub_rank"] == 3 and isinstance(a["brk_ago"], int), a
+    assert X["rows"][1]["state"] == "below" and X["rules"]["fail"] == 0.08
+    return "ok"
+
+
 def test_red_light():
     """selector.redlight: weak breadth + credit under its 20-day avg = red; one = amber; VIX > 22 is a note, not a warning."""
     import pandas as _pd

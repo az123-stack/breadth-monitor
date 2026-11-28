@@ -179,6 +179,59 @@ function renderRsFire(app) {
   app.append(card);
 }
 
+/* ---------- Base watch (Nov 27, 2026; Adam: "a tab to watch these, move it to the top, Tier A and Tier B") —
+   breadth/basewatch.py → DATA.themes.basewatch; list in data/base_watch.csv. Live price re-checks the state with the same rules. ---------- */
+function bwState(x, p) {
+  const R = ((DATA.themes || {}).basewatch || {}).rules || { near: 0.03, ext: 0.1, fail: 0.08 };
+  const pos = p / x.top - 1;
+  if (x.state === "nodata") return "nodata";
+  if (pos <= -R.fail && ["breakout", "riding", "retest", "extended", "failed"].includes(x.state)) return "failed";
+  if (pos > R.ext) return "extended";
+  if (pos > 0) return x.brk_ago != null && x.brk_ago > 10 ? "riding" : "breakout";
+  if (pos >= -R.near) return ["breakout", "riding", "retest", "extended"].includes(x.state) ? "retest" : "at_top";
+  return x.state === "failed" ? "failed" : "below";
+}
+function bwLive(x) {
+  const L = liveActive() ? liveRow(x.t) : null, p = L && L.price > 0 ? L.price : x.price;
+  return { ...x, p, chg: L ? L.chg : null, st: bwState(x, p) };
+}
+function renderBaseWatch(app) {
+  const X = (DATA.themes || {}).basewatch;
+  if (!X) { app.append($('<div class="card empty">Base watch appears after the next data run.</div>')); return; }
+  app.append(liveBar());
+  const S = { breakout: ["🟢 Breaking out", "sow-breakout", "Starter (half size under the Red light); add if the first pullback holds the top"],
+    retest: ["🔵 Retesting the top", "sow-nuzzle", "Add zone: buy the hold of the old top, stop under the stop line"],
+    riding: ["Above the box", "sow-riding", "Hold; trail the 21 EMA"],
+    at_top: ["At the top", "sow-pop", "Alert at the top; buy the close above it"],
+    extended: ["⚠ Extended", "sow-extended", "Don't chase; wait for a pullback toward the top"],
+    below: ["Inside the box", "sow-riding", "Wait"], failed: ["🔴 Failed: back in the box", "sow-extended", "Out / don't buy; re-arm only on a new close above the top"],
+    nodata: ["No data yet", "sow-riding", "–"] };
+  const pc = (v) => v == null ? "–" : (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%";
+  const sel = (DATA.themes || {}).selector, rl = sel && sel.redlight ? sel.redlight.level : null;
+  const R = (X.rows || []).map(bwLive);
+  const table = (tier, label, blurb) => { const rows = R.filter(r => r.tier === tier); if (!rows.length) return "";
+    return `<section class="card" style="margin-top:10px"><h3 style="margin:0 0 4px">${label}</h3><p class="meta" style="margin:0 0 6px">${blurb}</p><div class="scroll"><table class="grid"><thead><tr>
+      <th class="l">Stock</th><th class="l">State</th><th>Price</th><th>Box top</th><th>vs top</th><th>Stop line</th><th>RS</th><th>4-wk RS</th><th>6-wk RS</th><th class="l">Group (rank)</th><th>21 EMA</th><th>Since added</th><th class="l">Plan · why</th></tr></thead><tbody>
+      ${rows.map(r => { const L = S[r.st] || S.below;
+        return `<tr><td class="l"><b>${r.t}</b><small class="meta" style="display:block">${esc(r.name || "")}</small></td><td class="l"><span class="tg ${L[1]}">${L[0]}</span></td>
+          <td class="num">$${(+r.p).toFixed(2)}${r.chg != null ? `<small class="meta" style="display:block">${pc(r.chg)}</small>` : ""}</td>
+          <td class="num">$${(+r.top).toFixed(2)}</td><td class="num">${pc(r.p / r.top - 1)}</td><td class="num">$${(+r.stop).toFixed(2)}</td>
+          <td class="num ${rsTint(r.rs)}">${r.rs ?? "–"}</td><td class="num ${rsTint(r.rs4w)}">${r.rs4w ?? "–"}</td><td class="num ${rsTint(r.rs6w)}">${r.rs6w ?? "–"}</td>
+          <td class="l"><small>${esc(r.sub || "–")}${r.sub_rank ? ` <span class="meta">#${r.sub_rank}/${r.sub_n}</span>` : ""}</small></td>
+          <td class="num">${r.above21 ? "above" : "<b>below</b>"}<small class="meta" style="display:block">$${r.ema21 ?? "–"}</small></td>
+          <td class="num">${r.ref_px ? pc(r.p / r.ref_px - 1) : "–"}<small class="meta" style="display:block">${shortDate(r.added)}</small></td>
+          <td class="l"><small><b>${L[2]}</b><span class="meta" style="display:block">${esc(r.note)}</span></small></td></tr>`; }).join("")}</tbody></table></div></section>`; };
+  const card = $(`<section class="card regcard"><div class="head" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <h2>Base watch <span class="meta">· multi-year box breakouts · ${R.length} names · data ${shortDate(X.date)}</span></h2>
+      <div class="tsbtns"><button class="bwdl">⬇ TradingView</button></div></div>
+    <p class="meta" style="margin:6px 0">Former leaders that based for years in a box (Stage 1) and are pushing through the top (Stage 2), like Unity. Ranked on what our studies say matters: <b>4–6 week RS inside a leading sub-theme</b>, a quiet base, not a defensive group. Plan: starter on the close above the top, add when the first pullback holds the top, out on a close below the stop line (8% under the top). Box tops are fixed when a name is added (data/base_watch.csv).</p>
+    ${rl === "red" ? '<div class="rbanner avoid"><b>Red light on:</b> half-size starters only; let breakouts prove themselves on the retest before adding.</div>' : rl === "amber" ? '<div class="rbanner watch"><b>Amber:</b> one market warning on — keep starters small.</div>' : ""}
+    </section>`);
+  card.querySelector(".bwdl").addEventListener("click", () => tsDownload("base-watch", [{ name: "Base watch - Tier A", ticks: R.filter(r => r.tier === "A").map(r => r.t) }, { name: "Base watch - Tier B", ticks: R.filter(r => r.tier === "B").map(r => r.t) }]));
+  app.append(card);
+  app.append($(`<div>${table("A", "Tier A", "Best fit on every test: strong 4–6 week RS, leading group, quiet base.")}${table("B", "Tier B", "Good, but slower or defensive — second in line.")}</div>`));
+}
+
 /* ---------- What to trade (Nov 24, 2026; Adam: "tell me what type of setup I should be trading in any given market condition") —
    breadth/selector.py → DATA.themes.selector; v3 Brief → What to trade. ---------- */
 function redLightLine(R) {
