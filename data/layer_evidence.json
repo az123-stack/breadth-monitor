@@ -75,33 +75,33 @@
  },
  "log": {
   "asof": "2026-11-28",
-  "closed": 530,
-  "dates": 24,
+  "closed": 554,
+  "dates": 25,
   "catalyst_positive": {
-   "n_good": 45,
-   "n_bad": 53,
-   "avg_good": -0.00179,
-   "avg_bad": -0.01926,
-   "dates": 9,
-   "diff": 0.01747,
-   "t": 0.17,
+   "n_good": 47,
+   "n_bad": 54,
+   "avg_good": -0.00062,
+   "avg_bad": -0.0178,
+   "dates": 10,
+   "diff": 0.01718,
+   "t": 0.01,
    "halves": [
-    0.01828,
-    -0.00743
+    -0.00089,
+    0.0012
    ],
    "passed": false
   },
   "red_flags": {
-   "n_good": 71,
-   "n_bad": 48,
-   "avg_good": -0.02012,
-   "avg_bad": 6e-05,
-   "dates": 12,
-   "diff": -0.02018,
-   "t": -0.42,
+   "n_good": 72,
+   "n_bad": 50,
+   "avg_good": -0.01901,
+   "avg_bad": 0.00108,
+   "dates": 13,
+   "diff": -0.02009,
+   "t": -0.27,
    "halves": [
     -0.02803,
-    0.01189
+    0.0151
    ],
    "passed": false
   },
@@ -120,26 +120,26 @@
    "passed": false
   },
   "macro_tailwind": {
-   "n_good": 131,
-   "n_bad": 88,
-   "avg_good": -0.0174,
-   "avg_bad": -0.00792,
-   "dates": 10,
-   "diff": -0.00948,
-   "t": 1.5,
+   "n_good": 133,
+   "n_bad": 98,
+   "avg_good": -0.01769,
+   "avg_bad": -0.0049,
+   "dates": 11,
+   "diff": -0.01279,
+   "t": 1.2,
    "halves": [
     0.02101,
-    0.05625
+    0.03709
    ],
    "passed": false
   },
   "more_support": {
    "n_good": 13,
-   "n_bad": 261,
+   "n_bad": 271,
    "avg_good": -0.01371,
-   "avg_bad": -0.00691,
+   "avg_bad": -0.00564,
    "dates": 9,
-   "diff": -0.0068,
+   "diff": -0.00807,
    "t": 0.16,
    "halves": [
     -0.03881,
@@ -148,12 +148,12 @@
    "passed": false
   },
   "no_warnings": {
-   "n_good": 63,
+   "n_good": 86,
    "n_bad": 44,
-   "avg_good": 0.03395,
+   "avg_good": 0.03039,
    "avg_bad": 0.0003,
    "dates": 0,
-   "diff": 0.03365,
+   "diff": 0.03009,
    "t": null,
    "halves": [],
    "passed": false

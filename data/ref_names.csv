@@ -24,6 +24,7 @@ AAPX,T-Rex 2X Long Apple Daily Target ETF,ETF,BATS
 AAPY,Kurv Yield Premium Strategy Apple (AAPL) ETF,ETF,BATS
 AAUA,Alpha Architect US Equity 3 ETF,ETF,BATS
 AAUB,Alpha Architect US Equity 4 ETF,ETF,XNAS
+AAUD,Alpha Architect US Equity 5 ETF,ETF,XNAS
 AAUS,Alpha Architect US Equity ETF,ETF,XNAS
 AAVM,EA Series Trust Alpha Architect Global Factor Equity ETF,ETF,XNAS
 AAXJ,iShares MSCI All Country Asia ex Japan ETF,ETF,XNAS
@@ -147,6 +148,7 @@ AIEQ,Amplify AI Powered Equity ETF,ETF,ARCX
 AIFD,TCW Artificial Intelligence ETF,ETF,XNAS
 AIFR,Defiance Global Foundries ETF,ETF,XNAS
 AIHY,Defiance AI Hyperscale Leaders ETF,ETF,ARCX
+AIL,GraniteShares 2x Long Anthropic Daily ETF,ETF,XNAS
 AIMG,Defiance AI Magnificent 10 ETF,ETF,XNAS
 AIMS,Acuitas Small Cap Active ETF,ETF,XNAS
 AINF,Defiance Inference AI Chip ETF,ETF,XNAS
@@ -178,6 +180,7 @@ ALAR,Alarum Technologies Ltd. American Depositary Share,ADRC,XNAS
 ALDB,Aptus Laddered Deep Buffer ETF,ETF,BATS
 ALIL,Argent Focused Small Cap ETF,ETF,XNAS
 ALLW,SSGA Active Trust State Street Bridgewater All Weather ETF,ETF,XNAS
+ALLZ,Zacks All-Cap Core ETF,ETF,BATS
 ALRG,Allspring LT Large Core ETF,ETF,ARCX
 ALTL,Pacer Lunt Large Cap Alternator ETF,ETF,ARCX
 ALTY,Global X Funds Global X Alternative Income ETF,ETF,XNAS
@@ -216,12 +219,24 @@ AMZP,Kurv Yield Premium Strategy Amazon (AMZN) ETF,ETF,BATS
 AMZU,Direxion Shares ETF Trust Direxion Daily AMZN Bull 2X ETF,ETF,XNAS
 AMZW,Roundhill AMZN WeeklyPay ETF,ETF,BATS
 AMZZ,GraniteShares 2x Long AMZN Daily ETF,ETF,XNAS
+ANDD,Leverage Shares 2X Short Anthropic Daily ETF,ETF,BATS
 ANEL,Defiance Daily Target 2x Long ANET ETF,ETF,XNAS
 ANG,Corgi FTSE Fallen Angels Bond ETF,ETF,BATS
 ANGL,VanEck Fallen Angel High Yield Bond ETF,ETF,XNAS
 ANGU,SEI Ang Research Enhanced U.S. Large Cap ETF,ETF,XNAS
 ANL,Adlai Nortye Group Ltd. American Depositary Shares,ADRC,XNAS
+ANS,GraniteShares 2x Short Anthropic Daily ETF,ETF,XNAS
+ANSS,Leverage Shares 1X Short Anthropic Daily ETF,ETF,BATS
+ANTC,Defiance 2X ANT Long Daily ETF,ETF,XNAS
+ANTD,Direxion Daily Anthropic Bear 2X ETF,ETF,XNAS
+ANTO,Direxion Daily Anthropic Bull 2X ETF,ETF,XNAS
+ANTQ,Defiance 2X ANT Short Daily ETF,ETF,XNAS
+ANTT,Tradr 2X Long Anthropic Daily ETF,ETF,BATS
+ANTU,ProShares Ultra Anthropic,ETF,XNAS
 ANTW,Anthropic AI Lab Ecosystem ETF,ETF,ARCX
+ANTY,ProShares UltraShort Anthropic,ETF,XNAS
+ANTZ,Tradr 2X Short Anthropic Daily ETF,ETF,BATS
+ANUU,Leverage Shares 2X Long Anthropic Daily ETF,ETF,BATS
 ANV,GraniteShares Autocallable NVDA ETF,ETF,XNAS
 AOA,iShares Core 80/20 Aggressive Allocation ETF,ETF,ARCX
 AOCT,Innovator Equity Defined Protection ETF - 2 Yr to October 2028,ETF,BATS
@@ -322,6 +337,7 @@ ATCL,REX Autocallable Income ETF,ETF,ARCX
 ATFV,Alger 35 ETF,ETF,ARCX
 ATHE,Alterity Therapeutics Limited American Depositary Shares,ADRC,XNAS
 ATHM,"Autohome Inc. American Depositary Shares, each representing four Class A Ordinary Shares",ADRC,XNYS
+ATHX,2x Anthropic ETF,ETF,BATS
 ATMP,iPath Select MLP ETN,ETF,BATS
 ATTR,Arin Tactical Tail Risk ETF,ETF,BATS
 AUAU,Global X Gold Miners ETF,ETF,ARCX
@@ -913,6 +929,7 @@ CIR,Corgi CRCL 2x Daily ETF,ETF,BATS
 CIVG,Corgi 1-5 Year Investment Grade Corporate Bond ETF,ETF,BATS
 CJUL,Corgi U.S. Equities 15% Structured Buffer ETF - July Series,ETF,BATS
 CJUN,Corgi U.S. Equities 15% Structured Buffer ETF - June Series,ETF,BATS
+CLAU,T-REX 2X Long Anthropic Daily Target ETF,ETF,BATS
 CLCG,Crossmark Large Cap Growth ETF,ETF,ARCX
 CLCV,Crossmark Large Cap Value ETF,ETF,ARCX
 CLIM,Climate Global - Climate Resilient REIT Index ETF,ETF,ARCX
@@ -973,7 +990,6 @@ COPJ,Sprott Junior Copper Miners ETF,ETF,XNAS
 COPP,Sprott Copper Miners ETF,ETF,XNAS
 COPX,Global X Copper Miners ETF (NEW),ETF,ARCX
 COPY,"Tweedy, Browne Insider + Value ETF",ETF,ARCX
-COPZ,Defiance Daily Target 2X Long Copper Miners ETF,ETF,ARCX
 CORB,AB Core Bond ETF,ETF,ARCX
 CORD,T-REX 2X Inverse CRWV Daily Target ETF,ETF,BATS
 CORO,iShares International Country Rotation Active ETF,ETF,XNAS
@@ -988,7 +1004,6 @@ COZX,Tradr 2X Long CORZ Daily ETF,ETF,BATS
 CPAC,CEMENTOS PACASMAYO S.A.A.,ADRC,XNYS
 CPAG,F/m Compoundr U.S. Aggregate Bond ETF,ETF,XNAS
 CPAI,Counterpoint Quantitative Equity ETF,ETF,XNYS
-CPHY,F/m Compoundr High Yield Bond ETF,ETF,XNAS
 CPII,American Beacon Ionic Inflation Protection ETF,ETF,ARCX
 CPLB,NYLIM MacKay Core Plus Bond ETF,ETF,ARCX
 CPLS,AB Core Plus Bond ETF,ETF,XNAS
@@ -1257,6 +1272,7 @@ DIPR,Corgi Space & Satellite Communications ETF,ETF,BATS
 DISK,Tema Memory ETF,ETF,ARCX
 DISV,Dimensional International Small Cap Value ETF,ETF,BATS
 DIV,Global X SuperDividend U.S. ETF,ETF,ARCX
+DIVA,AB Equity Income ETF,ETF,ARCX
 DIVB,iShares Core Dividend ETF,ETF,BATS
 DIVD,Altrius Global Dividend ETF,ETF,XNAS
 DIVE,Dana Concentrated Dividend ETF,ETF,ARCX
@@ -1523,6 +1539,7 @@ ENFR,Alerian Energy Infrastructure ETF,ETF,ARCX
 ENHE,iShares Enhanced Emerging Markets Equity Active ETF,ETF,XNAS
 ENHI,iShares Enhanced International Active ETF,ETF,XNAS
 ENHU,iShares Enhanced Large Cap Core Active ETF,ETF,XNAS
+ENHV,iShares Enhanced Large Cap Value Active ETF,ETF,XNAS
 ENIC,Enel Chile S.A. American Depositary Shares Representing Common Stock (Each representing 50 shares of Common Stock),ADRC,XNYS
 ENOR,iShares MSCI Norway ETF,ETF,BATS
 ENRD,Einride AB American Depositary Shares,ADRC,XNAS
@@ -2702,6 +2719,7 @@ ISHG,iShares 1-3 Year International Treasury Bond ETF,ETF,XNAS
 ISHP,First Trust Exchange-Traded Fund VI First Trust S-Network E-Commerce ETF,ETF,XNAS
 ISMD,Inspire Small/Mid Cap ETF,ETF,ARCX
 ISMF,iShares Managed Futures Active ETF,ETF,BATS
+ISMH,xETFs International Semiconductor ETF,ETF,XNAS
 ISPY,ProShares S&P 500 High Income ETF,ETF,BATS
 ISRA,VanEck Israel ETF,ETF,ARCX
 ISRL,Defiance KSM Israel 120 ETF,ETF,XNAS
@@ -2735,6 +2753,7 @@ IUSV,iShares Core S&P U.S. Value ETF,ETF,XNAS
 IVA,Inventiva S.A. American Depository Shares,ADRC,XNAS
 IVAL,Alpha Architect International Quantitative Value ETF,ETF,XNAS
 IVE,iShares S&P 500 Value ETF,ETF,ARCX
+IVEA,Dan IVES Wedbush AI Autocallable Income ETF,ETF,ARCX
 IVEP,Dan IVES Wedbush AI Power & Infrastructure ETF,ETF,ARCX
 IVES,Dan IVES Wedbush AI Revolution ETF,ETF,ARCX
 IVLU,iShares MSCI Intl Value Factor ETF,ETF,ARCX
@@ -2885,7 +2904,7 @@ JNK,State Street SPDR Bloomberg High Yield Bond ETF,ETF,ARCX
 JNUG,Direxion Daily Junior Gold Miners Index Bull 2X ETF,ETF,ARCX
 JOBC,Corgi JOBY 2x Daily ETF,ETF,BATS
 JOBX,Tradr 2X Long JOBY Daily ETF,ETF,BATS
-JOET,Virtus Terranova U.S. Quality Momentum ETF,ETF,ARCX
+JOET,Virtus NYSE Terranova U.S. Quality Momentum ETF,ETF,ARCX
 JOJO,ATAC Credit Rotation ETF,ETF,ARCX
 JOUL,Corgi High Voltage Grid Equipment ETF,ETF,BATS
 JOYT,JPMorgan Equity and Options Total Return ETF,ETF,XNAS
@@ -2975,7 +2994,6 @@ KDEF,PLUS Korea Defense Industry Index ETF,ETF,ARCX
 KDRN,Kingsbarn Tactical Bond ETF,ETF,ARCX
 KDVD,Keeley Dividend ETF,ETF,ARCX
 KEAT,Keating Active ETF,ETF,XNAS
-KEEX,Defiance Daily Target 2x Long KEEL ETF,ETF,BATS
 KEMQ,KraneShares Public-Private Emerging Markets Internet and Technology ETF,ETF,ARCX
 KEMX,KraneShares MSCI Emerging Markets Ex China Index ETF,ETF,ARCX
 KEO,Kurv Equity Option Income ETF,ETF,BATS
@@ -3564,7 +3582,7 @@ NHYB,Nuveen High Yield Corporate Bond ETF,ETF,ARCX
 NHYM,Nuveen High Yield Municipal Income ETF,ETF,ARCX
 NICE,NICE Ltd,ADRC,XNAS
 NICM,Nicola Mining Inc. American Depositary Shares,ADRC,XNAS
-NICO,Hexis Active Nicotine Engagement ETF,ETF,ARCX
+NICO,Hexis Active Nicotine Engagement ETF,ETF,
 NIHI,NEOS MSCI EAFE High Income ETF,ETF,BATS
 NIKL,Sprott Nickel Miners ETF,ETF,XNAS
 NIO,"NIO Inc. American depositary shares, each representing one Class A ordinary share",ADRC,XNYS
@@ -3657,7 +3675,7 @@ NVDU,Direxion Shares ETF Trust Direxion Daily NVDA Bull 2X ETF,ETF,XNAS
 NVDW,Roundhill NVDA WeeklyPay ETF,ETF,BATS
 NVDX,T-Rex 2X Long NVIDIA Daily Target ETF,ETF,BATS
 NVIB,Direxion NVDA Defined Income Boost ETF,ETF,BATS
-NVII,REX NVDA Growth & Income ETF,ETF,BATS
+NVII,REX NVDA Enhanced Growth & Income ETF,ETF,BATS
 NVIR,Horizon Kinetics Energy and Remediation ETF,ETF,ARCX
 NVIT,YieldMax NVDA Performance & Distribution Target 25 ETF,ETF,BATS
 NVO,Novo-Nordisk A/S,ADRC,XNYS
@@ -4266,7 +4284,6 @@ RBLD,First Trust Alerian US NextGen Infrastructure ETF,ETF,ARCX
 RBLU,T-REX 2X Long RBLX Daily Target ETF,ETF,BATS
 RBTX,iShares Future Robotics and Related Technologies Active ETF,ETF,ARCX
 RBUF,Innovator U.S. Small Cap 10 Buffer ETF - Quarterly,ETF,BATS
-RCAX,Defiance Daily Target 2x Long RCAT ETF,ETF,XNAS
 RCGE,RockCreek Global Equality ETF,ETF,XNAS
 RCLO,Reckoner BBB-B CLO ETF,ETF,ARCX
 RCLR,Reckoner BBB-B CLO Reinvesting ETF,ETF,ARCX
@@ -4342,7 +4359,6 @@ RJDI,RJ Eagle GCM Dividend Select Income ETF,ETF,ARCX
 RJMI,RJ Eagle Municipal Income ETF,ETF,ARCX
 RJVI,RJ Eagle Vertical Income ETF,ETF,ARCX
 RKLX,Defiance Daily Target 2X Long RKLB ETF,ETF,XNAS
-RKNG,Defiance Retail Kings ETF,ETF,XNAS
 RKSG,Ruk Strategic Growth ETF,ETF,ARCX
 RKX,Corgi RKLB 2x Daily ETF,ETF,BATS
 RLX,"RLX Technology Inc. American Depositary Shares, each representing the right to receive one (1) Class A ordinary share",ADRC,XNYS
@@ -4840,7 +4856,6 @@ SRET,Global X SuperDividend REIT ETF,ETF,XNAS
 SRHQ,SRH U.S. Quality GARP ETF,ETF,ARCX
 SRHR,SRH REIT Covered Call ETF,ETF,ARCX
 SRLN,State Street Blackstone Senior Loan ETF,ETF,ARCX
-SROI,Calamos Antetokounmpo Global Sustainable Equities ETF,ETF,ARCX
 SRS,ProShares UltraShort Real Estate,ETF,ARCX
 SRTY,ProShares UltraPro Short Russell2000,ETF,ARCX
 SRVR,Pacer Data & Infrastructure Real Estate ETF,ETF,ARCX
@@ -5186,7 +5201,7 @@ TSES,Truth Social American Energy Security ETF,ETF,ARCX
 TSIB,Direxion TSLA Defined Income Boost ETF,ETF,BATS
 TSIC,Truth Social American Icons ETF,ETF,ARCX
 TSIE,Thrivent Securitized Income ETF,ETF,XNAS
-TSII,REX TSLA Covered Call ETF,ETF,BATS
+TSII,REX TSLA Enhanced Growth & Income ETF,ETF,BATS
 TSL,GraniteShares 1.25x Long TSLA  Daily ETF,ETF,XNAS
 TSLG,Leverage Shares 2X Long TSLA Daily ETF,ETF,XNAS
 TSLL,Direxion Shares ETF Trust Direxion Daily TSLA Bull 2X ETF,ETF,XNAS
@@ -5636,7 +5651,7 @@ WLDR,Simplify Affinity World Leaders Equity ETF,ETF,BATS
 WLDU,Leverage Shares 2x Long World Stock Daily ETF,ETF,BATS
 WLTG,WealthTrust DBS Long Term Growth ETF,ETF,XNYS
 WMSB,Weitz Multisector Bond ETF,ETF,ARCX
-WMTI,REX WMT Growth & Income ETF,ETF,BATS
+WMTI,REX WMT Enhanced Growth & Income ETF,ETF,BATS
 WNDR,Corgi Travel & Leisure ETF,ETF,BATS
 WOMN,Impact Shares Womens Empowerment ETF Trading,ETF,ARCX
 WOOD,iShares Global Timber & Forestry ETF,ETF,XNAS
@@ -5875,6 +5890,7 @@ XYZG,Leverage Shares 2X Long XYZ Daily ETF,ETF,XNAS
 YALA,"Yalla Group Limited American Depositary Shares, each representing one Class A Ordinary Share",ADRC,XNYS
 YALL,Truth Social God Bless America ETF,ETF,ARCX
 YANG,Direxion Daily FTSE China Bear 3X ETF,ETF,ARCX
+YANT,YieldMax ANT Option Income Strategy ETF,ETF,ARCX
 YASX,Yorkville America Space Index ETF,ETF,ARCX
 YB,Yuanbao Inc. American Depositary Shares,ADRC,XNAS
 YBIT,YieldMax Bitcoin Option Income Strategy ETF,ETF,ARCX
@@ -5894,6 +5910,7 @@ YJ,Yunji Inc. American Depository Shares,ADRC,XNAS
 YJUN,FT Vest International Equity Moderate Buffer ETF - June,ETF,BATS
 YLD,Principal Active High Yield ETF,ETF,ARCX
 YLDE,Legg Mason ETF Investment Trust Franklin ClearBridge Enhanced Income ETF,ETF,XNAS
+YLDS,Harbor Arena Structured Income ETF,ETF,ARCX
 YLDW,Westwood Enhanced Income Opportunity ETF,ETF,ARCX
 YLDY,Horizon High Income ETF,ETF,BATS
 YMAG,YieldMax Magnificent 7 Fund of Option Income ETFs,ETF,ARCX
@@ -5926,6 +5943,7 @@ ZALT,Innovator U.S. Equity 10 Buffer ETF - Quarterly,ETF,BATS
 ZAP,Global X U.S. Electrification ETF,ETF,XNAS
 ZAPR,Innovator Equity Defined Protection ETF - 1 Yr April,ETF,BATS
 ZAUG,Innovator Equity Defined Protection ETF - 1 Yr August,ETF,BATS
+ZCAP,Zacks Small-Cap Core ETF,ETF,BATS
 ZCBA,Global X Zero Coupon Bond 2030 ETF,ETF,ARCX
 ZCBB,Global X Zero Coupon Bond 2031 ETF,ETF,ARCX
 ZCBC,Global X Zero Coupon Bond 2032 ETF,ETF,ARCX
